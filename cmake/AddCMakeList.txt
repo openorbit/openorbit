@@ -1,0 +1,9 @@
+# Add a source group for the CMakeLists file
+
+MACRO(ADD_CMAKE_LIST)
+    IF (CMAKE_GENERATOR MATCHES "Xcode")
+        SOURCE_GROUP("CMake Files" FILES "CMakeLists.txt")
+        SET_SOURCE_FILES_PROPERTIES( CMakeLists.txt
+                                     PROPERTIES HEADER_FILE_ONLY yes )
+    ENDIF (CMAKE_GENERATOR MATCHES "Xcode")
+ENDMACRO(ADD_CMAKE_LIST)

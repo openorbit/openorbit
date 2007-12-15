@@ -1,0 +1,21 @@
+# Add a source group for the CMakeLists file
+
+find_program(PYREXC pyrexc)
+if (NOT PYREXC)
+    message(FATAL_ERROR "Could not locate the pyrexc program")
+endif (NOT PYREXC)
+
+
+MACRO(USE_PYREX file)
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${file}.c ${CMAKE_CURRENT_BINARY_DIR}/${file}.h
+        COMMAND ${PYREXC}
+                ${CMAKE_CURRENT_SOURCE_DIR}/${file}.pyx
+                -o ${CMAKE_CURRENT_BINARY_DIR}/${file}.c
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${file}.pyx
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	)
+    source_group("Pyrex Files" FILES ${file}.pyx)
+    set_source_files_properties( ${file}.pyx
+                                 PROPERTIES HEADER_FILE_ONLY yes )
+ENDMACRO(USE_PYREX file)

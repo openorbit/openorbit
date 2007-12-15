@@ -1,0 +1,22 @@
+# Find flex and add flex operation macro.
+# Flex will be invoked with the prefix-option
+
+find_program(FLEX flex)
+if (NOT FLEX)
+    message(FATAL_ERROR "Could not locate the flex program")
+endif (NOT FLEX)
+
+
+MACRO(USE_FLEX file)
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${file}.c ${CMAKE_CURRENT_BINARY_DIR}/${file}.h
+        COMMAND ${FLEX}
+                ${CMAKE_CURRENT_SOURCE_DIR}/${file}.l
+                -o ${CMAKE_CURRENT_BINARY_DIR}/lex.${file}.c
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${file}.l
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	)
+    source_group("Lex Files" FILES ${file}.l)
+    set_source_files_properties( ${file}.l
+                                 PROPERTIES HEADER_FILE_ONLY yes )
+ENDMACRO(USE_FLEX file)

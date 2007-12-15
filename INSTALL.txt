@@ -1,0 +1,28 @@
+Build instructions
+
+
+1. Dependencies
+
+	* Pyrex
+	* Python
+	* CMake
+	* check
+	* SDL
+
+
+2. Configuration
+
+2.1. UNIX like systems
+Create a separate build directory, enter the directory and run cmake on the top
+level CMakeLists.txt file.
+
+Type make, and then make install
+
+2.2. Mac OS X
+See 2.1 (UNIX like systems)
+
+2.3. Windows
+
+
+3. Advanced Configuration
+3.1. Configuration Switches

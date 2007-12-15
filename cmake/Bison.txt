@@ -1,0 +1,21 @@
+# Locate bison and add bison execution macro, the macro will execute bison
+# setting the prefix to the file name.
+find_program(BISON bison)
+if (NOT BISON)
+    message(FATAL_ERROR "Could not locate the bison program")
+endif (NOT BISON)
+
+
+MACRO(USE_BISON file)
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${file}.c ${CMAKE_CURRENT_BINARY_DIR}/${file}.h
+        COMMAND ${BISON}
+                ${CMAKE_CURRENT_SOURCE_DIR}/${file}.y
+               -o ${CMAKE_CURRENT_BINARY_DIR}/yy.${file}.c
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${file}.y
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	)
+    source_group("Yacc Files" FILES ${file}.y)
+    set_source_files_properties( ${file}.y
+                                 PROPERTIES HEADER_FILE_ONLY yes )
+ENDMACRO(USE_PYREX file)

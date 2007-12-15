@@ -1,0 +1,8 @@
+MACRO(INSTALL_MAC_RES target files)
+	IF (APPLE)
+    	
+		FOREACH (file ${files})
+        	
+    	ENDFOREACH (file)
+	ENDIF (APPLE)
+ENDMACRO(INSTALL_MAC_RES target files)
