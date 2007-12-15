@@ -159,6 +159,7 @@ hashtable_t
     ht->cmp = cmp;
     ht->cpy_key = cpy;
     ht->del_key = del;
+//    ht->hash_keys = {.first = NULL, .last = NULL, .entry_count = 0};
     
     return ht;
 }
@@ -229,16 +230,22 @@ hashtable_insert(hashtable_t * restrict ht, const char * restrict key,
     
     unsigned int hash = HASH(ht, key);
     
+    hashentry_t *new_entry = calloc(1, sizeof(hashentry_t));
+    if (new_entry == NULL) {
+        return -1;
+    }
+    ht->cpy_key(&(new_entry->key), key);
+    if (new_entry->key == NULL) {
+        free(new_entry);
+        return -1;
+    }
+    new_entry->object = obj;
+    
+
+    // is the top of the bucket free?
     if ( ! ht->t[hash] ) {
         // remember, calloc clears the memory and thus next will be grounded to NULL
-        ht->t[hash] = calloc(1, sizeof(hashentry_t));
-        if (! ht->t[hash]) return -1;
-        ht->cpy_key(&(ht->t[hash]->key), key);
-        if (! ht->t[hash]->key) {
-            free(ht->t[hash]);
-            return -1;
-        }
-        ht->t[hash]->object = obj;
+        ht->t[hash] = new_entry;
     } else {
         // not first element, go lower in bucket
         hashentry_t *entry = ht->t[hash];
@@ -250,18 +257,8 @@ hashtable_insert(hashtable_t * restrict ht, const char * restrict key,
             if ( ht->cmp(key, entry->key) ) return 1; // key exsists?
         }
         
-        entry->next = calloc(1, sizeof(hashentry_t));
-        if (! entry->next) return -1;
-        
-        ht->cpy_key(&(entry->next->key), key);
-        
-        if (! entry->next->key) {
-            free(entry->next);
-            return -1;
-        }
-        entry->next->object = obj;
+        entry->next = new_entry;
     }
-    
     return 0;
 }
 
