@@ -31,22 +31,23 @@
     the GPL or the LGPL."
  */
 
-
 /*!
-    @header tga
-    @abstract   Functions, enums and structs used when dealing with TGA image files.
-    @discussion The TGA functions allows for the loading of uncompressed and RLE compressed TGA files. The
-        implementation allow for a subset of the TGA standard to be handeled. The requrements for handeling a TGA file
-        are the following:
+    \file tga.h
+    \brief Functions, enums and structs used when dealing with TGA image files.
+    
+    The TGA functions allows for the loading of uncompressed and RLE compressed
+    TGA files. The implementation allow for a subset of the TGA standard to be
+    handeled. The requrements for handeling a TGA file
+    are the following:
+    <ul>
+        <li />It must be a truecolour TGA file.
+        <li />The depth of the image data must be either of:
         <ul>
-            <li />It must be a truecolour TGA file.
-            <li />The depth of the image data must be either of:
-            <ul>
-                <li />24 bits when NO alpha channel is present
-                <li />32 bits when an 8 bit alpha channel is present
-            </ul>
+            <li />24 bits when NO alpha channel is present
+            <li />32 bits when an 8 bit alpha channel is present
         </ul>
-        All other combinations are illegal.
+    </ul>
+    All other combinations are illegal.
 */
 
 #ifndef TGA_H__
@@ -59,30 +60,30 @@ extern "C" {
 #include <stdio.h>
 
 /*!
-    @typedef 
-    @abstract   The constants representing the type of the TGA file's image data.
-    @discussion The tga_img_type_t enum supplies constants that can be used to check what kind of TGA image data that
-        has been loaded. Please note that the @link tga_read_file tga_read_file @/link will decompress any RLE
-        compressed data. At the moment only kTgaUncompTrueColImg and kTgaRleTrueColImg has any meaning since these
-        represent the only TGA files that the tga_read_file function can load.
-    @constant   kTgaUncompTrueColImg The file is an uncompressed truecolour TGA.
-    @constant   kTgaRleTrueColImg The file is an RLE compressed truecolour TGA.
+    \brief   The constants representing the type of the TGA file's image data.
+    
+    The tga_img_type_t enum supplies constants that can be used to check what
+    kind of TGA image data that has been loaded. Please note that the
+    @link tga_read_file tga_read_file @/link will decompress any RLE compressed
+    data. At the moment only TGA_UNCOMP_TRUE_COL_IMG and TGA_RLE_TRUE_COL_IMG
+    has any meaning since these represent the only TGA files that the
+    tga_read_file function can load.
 */
 typedef enum {
     TGA_NO_IMG_DATA = 0,
     TGA_UNCOMP_COM_MAPPED_IMG = 1,
-    TGA_UNCOMP_TRUE_COL_IMG = 2,
+    TGA_UNCOMP_TRUE_COL_IMG = 2, //!< The tga is an uncompressed truecolour TGA.
     TGA_UNCOMP_BW_IMG = 3,
     TGA_RLE_COL_MAPPED_IMG = 9,
-    TGA_RLE_TRUE_COL_IMG = 10,
+    TGA_RLE_TRUE_COL_IMG = 10, //!< The tga is an RLE compressed truecolour TGA.
     TGA_RLE_BW_IMG = 11
 } tga_img_type_t;
 
 /*!
-    @typedef 
-    @abstract   Describes the CLUT tables.
-    @discussion The structure describes the TGA colour maps. Since the current TGA loader only supports truecolour all
-        fields shall be zero.
+    \brief   Describes the CLUT tables.
+    
+    The structure describes the TGA colour maps. Since the current TGA loader
+    only supports truecolour all fields shall be zero.
 */
 typedef struct {
     uint16_t first_entry_index;
@@ -91,45 +92,38 @@ typedef struct {
 } tga_col_map_spec_t;
 
 /*!
-    @typedef 
-    @abstract   Describes the origin of the file.
-    @discussion The tga_origin_t enum is used to describe the origin of the TGA image data. This should be used in
-        order map in the image to the correct u-v coordinates.
-    @constant   kTgaBottomLeft  The TGA starts at the bottom left corner.
-    @constant   kTgaBottomRight The TGA starts at the bottom right corner.
-    @constant   kTgaTopLeft     The TGA starts at the top left corner.
-    @constant   kTgaTopRight    The TGA starts at the top right corner.
+    \brief  Describes the origin of the file.
+    
+    The tga_origin_t enum is used to describe the origin of the TGA image data.
+    This should be used in order map in the image to the correct u-v coordinates.
 */
 typedef enum {
-    TGA_BOTTOM_LEFT = 0,
-    TGA_BOTTOM_RIGHT = 1,
-    TGA_TOP_LEFT = 2,
-    TGA_TOP_RIGHT = 3
+    TGA_BOTTOM_LEFT = 0, //!< The TGA starts at the bottom left corner.
+    TGA_BOTTOM_RIGHT = 1, //!< The TGA starts at the bottom right corner.
+    TGA_TOP_LEFT = 2, //!< The TGA starts at the top left corner.
+    TGA_TOP_RIGHT = 3 //!< The TGA starts at the top right corner.
 } tga_origin_t;
 
 /*!
-    @typedef 
-    @abstract   Metadata describing the image data. 
-    @discussion The tga_img_spec_t structure stores most of the interesting image information such as width, height and
-        depth.
-    @field      x_orig The screen x-coord where the image is to be drawn, this is typically unused and set to zero. 
-    @field      y_orig The screen y-coord where the image is to be drawn, this is typically unused and set to zero.
-    @field      width The width of the image in pixels.
-    @field      height The height of the image in pixels.
-    @field      depth The colour depth i.e. bits per pixel, currently only 24 and 32 are allowed values.
-    @field      origin The origin describes what corner that the image data starts from. This should be queried in
-        order to find out wether one needs to flip the image's u-v coords when used as a texture.
-    @field      alpha_bits The number of bits used for the alpha channel. The only allowed values at the moment are
-        0 and 8.
+    \brief   Metadata describing the image data. 
+    
+    The tga_img_spec_t structure stores most of the interesting image
+    information such as width, height and depth.            
 */
 typedef struct {
-    uint16_t x_orig;
-    uint16_t y_orig;
-    uint16_t width;
-    uint16_t height;
-    uint8_t depth;
-    tga_origin_t origin;
-    uint8_t alpha_bits;
+    uint16_t x_orig; //!< The screen x-coord where the image is to be drawn,
+                     //!< this is typically unused and set to zero
+    uint16_t y_orig; //!< The screen y-coord where the image is to be drawn,
+                     //!< this is typically unused and set to zero.
+    uint16_t width;  //!< The width of the image in pixels.
+    uint16_t height; //!< The height of the image in pixels.
+    uint8_t depth;   //!< Bits per pixel, only 24 and 32 are allowed values.
+    tga_origin_t origin; //!< The corner that the image data starts from.
+                         //!< This should be queried in order to find out
+                         //!< wether one needs to flip the image's u-v coords
+                         //!< when used as a texture.
+    uint8_t alpha_bits; //!< Bits used by the alpha channel. The only allowed
+                        //!< values at the moment are 0 and 8.
 } tga_img_spec_t;
 
 /*!
@@ -151,44 +145,53 @@ typedef struct {
 } tga_header_t;
 
 /*!
-    @typedef 
-    @abstract   A loaded TGA image.
-    @discussion The @link tga_image_t tga_image_t @/link struct stores all interesting information on a loaded TGA file. See
-        @link tga_header_t tga_header_t @/link for more information.
-    @field      header The header field describes the TGA file. From this a number of properties on both the file and
-        the loaded data can be deduced.
-    @field      data The decompressed bitmap image data. The data is loaded into ABGR or BGR format depending on the
-        availability of an alpha channel.
+    \brief   A loaded TGA image.
+    
+    The @link tga_image_t tga_image_t @/link struct stores all interesting
+    information on a loaded TGA file. See @link tga_header_t tga_header_t @/link
+    for more information.
 */
 typedef struct {
-    tga_header_t header;
-    void *data;
+    tga_header_t header; //!< The header field describes the TGA file. From this
+                         //!< a number of properties on both the file and
+                         //!< the loaded data can be deduced.
+    void *data; //!< The decompressed bitmap image data. The data is loaded
+                //!< into ABGR or BGR format depending on the availability of
+                //!< an alpha channel.
 } tga_image_t;
 
 /*!
-    @function tga_read_header
-    @abstract   Reads the header of a TGA file.
-    @discussion The tga_read_header reads the header of a TGA file. The function is usually not necisary to use by one
-        self, since it is called by tga_read_file implicitly, but can be useful if you want to take decisions depending
-        on the file size and other properties but do not wish to load the file before these decisions has been made.
-    @param      head A pointer to a tga_header_t struct where the header data is to be stored. 
-    @param      file A FILE pointer to the TGA file. 
-    @result     The function returns 0 on success, all other values should be treated as if the function failed.
+    \brief   Reads the header of a TGA file.
+    
+    The tga_read_header reads the header of a TGA file. The function is usually
+    not necisary to use by one self, since it is called by tga_read_file
+    implicitly, but can be useful if you want to take decisions depending on the
+    file size and other properties but do not wish to load the file before these
+    decisions has been made.
+    \param  head A pointer to a tga_header_t struct where the header data is to
+                 be stored. 
+    \param  file A FILE pointer to the TGA file. 
+    \return The function returns 0 on success, all other values should be
+            treated as if the function failed.
 */
 int tga_read_header(tga_header_t *head, FILE *file);
 
 /*!
-    @function tga_read_file
-    @abstract   Reads a TGA formatted graphics file.
-    @discussion The tga_read_file function reads a TGA formatted image from a specified file. The function allows you
-        to open a TGA file (with or without RLE compression) in 24 bit true colour format (with an optional alpha
-        channel), thus the loaded data will have either 24 or 32 bit pixels. This pixels are stored in either ABGR or
-        BGR format depending on the inclusion of an alpha channel or not. Please be advised that the function will
-        malloc space where the bitmap data is to be stored that YOU are responsible for cleaning up. This is done by
-        calling free(tga_image_t.data).
-    @param      img A pointer to a tga_image_t struct where the decoded data is to be stored. 
-    @param      file A FILE pointer to the tga file.
-    @result     The function returns 0 on success, all other values should be treated as if the function failed.
+    \brief   Reads a TGA formatted graphics file.
+    
+    The tga_read_file function reads a TGA formatted image from a specified
+    file. The function allows you to open a TGA file (with or without RLE
+    compression) in 24 bit true colour format (with an optional alpha channel),
+    thus the loaded data will have either 24 or 32 bit pixels. This pixels are
+    stored in either ABGR or BGR format depending on the inclusion of an alpha
+    channel or not. Please be advised that the function will malloc space where
+    the bitmap data is to be stored that YOU are responsible for cleaning up.
+    This is done by calling free(tga_image_t.data).
+    \param img A pointer to a tga_image_t struct where the decoded data is to
+               be stored. 
+    \param file A FILE pointer to the tga file.
+    \return The function returns 0 on success, all other values should be
+            treated as if the function failed.
 */
 int tga_read_file(tga_image_t *img, FILE *file);
 
