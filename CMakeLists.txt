@@ -31,6 +31,10 @@ if (WITH_PYTHON)
     include(cmake/Pyrex.txt)
 endif (WITH_PYTHON)
 
+if (APPLE)
+    include(cmake/InstallMacRes.txt)
+endif (APPLE)
+
 option(WITH_GUILE "Enable Scheme Scripting with Guile (DEPRECATED)" off)
 
 find_program(FLEX flex)

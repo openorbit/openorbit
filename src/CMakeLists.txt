@@ -71,5 +71,18 @@ target_link_libraries(openorbit
   ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${GLUT_LIBRARIES}
 )
 
+if (APPLE)    
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+        install_mac_res(openorbit RELEASE ${CMAKE_SOURCE_DIR}/rsrc/data/stars.csv)
+        install_mac_res(openorbit RELEASE ${CMAKE_SOURCE_DIR}/scripts/init.py)
+    endif (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        install_mac_res(openorbit DEBUG ${CMAKE_SOURCE_DIR}/rsrc/data/stars.csv)
+        install_mac_res(openorbit DEBUG ${CMAKE_SOURCE_DIR}/scripts/init.py)
+    endif (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+endif (APPLE)
+
+
 install(TARGETS openorbit
 	RUNTIME DESTINATION bin )
