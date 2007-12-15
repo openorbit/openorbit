@@ -48,6 +48,7 @@ do
         ;;
     *)
         echo $1: unknown option >&2
+        echo "Usage: -f file-name -a app -r ressubdir"
         exit 1
         ;;
     esac

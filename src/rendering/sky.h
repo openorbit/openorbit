@@ -42,15 +42,20 @@ extern "C" {
 
 #include "SDL_opengl.h"
 
+#define STAR_CNT 5000
+    
+typedef struct {
+    unsigned char r, g, b, a;
+    float x, y, z;
+} star_t;
+
 typedef struct {
     size_t n_stars; //!< Number of stars loaded
-    size_t n_stars_allocated; //!< The size of the coords block
-    
-    GLfloat *coords;
-    GLubyte *colours; // includes the magnetude in the alpha component
-    
-    GLushort *octant[8];
+    size_t a_len; //!< Length of data
+    star_t data[];
 } star_list_t;
+
+void init_sky(void);
 
 /*!
     @function   equ_cart_convert
@@ -62,8 +67,13 @@ typedef struct {
     @param      dec Declination in radians
 */
 void equ_cart_convert(vector_t *cart, angle_t ra, angle_t dec);
-star_list_t *initialise_star_list(const char *path);
-void add_star(double ra, double dec, double mag);
+star_list_t* initialise_star_list(int star_count);
+star_list_t *random_stars(void);
+
+void sky_init(void);
+    
+int add_star(double ra, double dec, double mag, double bv);
+    
 void paint_sky(star_list_t *stars);
 
 #ifdef __cplusplus

@@ -47,6 +47,7 @@
 
 #include "settings.h"
 #include "camera.h"
+#include "sky.h"
 
 static void draw_gl(void);
 static void init_gl(void);
@@ -57,8 +58,6 @@ static void create_surface(void);
 static SDL_Surface *REND_screen;
 extern settings_t SETTINGS;
 
-float *stars; // star coordinates
-float *starColours;
 
 
 bool
@@ -73,7 +72,7 @@ init_renderer(void) {
     print_attributes();
     
     init_gl();
-    tex_init();
+ //   tex_init();
     return true;
 }
 
@@ -92,11 +91,11 @@ init_gl(void)
     glMatrixMode(GL_PROJECTION);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glLoadIdentity();
-	gluPerspective(/*fovy*/45.0, /*aspect*/1.33 , /*near*/0.00001, /*far*/100.0);
+	gluPerspective(/*fovy*/45.0, /*aspect*/1.33 , /*near*/0.001, /*far*/100.0);
     
     glViewport(0, 0, SETTINGS.video.width, SETTINGS.video.height);
     
-   // ugly_load_and_init_of_test_texture();
+    ugly_load_and_init_of_test_texture();
 }
 
 
@@ -177,7 +176,6 @@ void cam_hack(void);
 #define MY_TGA_FILE "/Users/holm/Desktop/earth.tga"
 GLUquadricObj *quadric;
 
-
 void
 ugly_load_and_init_of_test_texture(void)
 {
@@ -211,36 +209,37 @@ ugly_load_and_init_of_test_texture(void)
     quadric=gluNewQuadric();
     gluQuadricNormals(quadric, GLU_SMOOTH);
     gluQuadricTexture(quadric, GL_TRUE);
-    
 }
 
 
 void exit_fullscreen()
 {
-    SDL_surface *window =  SDL_SetVideoMode(SETTINGS.video.width,
-                                            SETTINGS.video.height,
-                                            0, SDL_OPENGL);
+    ;
+    //SDL_surface *window =  SDL_SetVideoMode(SETTINGS.video.width,
+    //                                        SETTINGS.video.height,
+    //                                        0, SDL_OPENGL);
 }
 
 void enter_fullscreen()
 {
-    SDL_surface *window =  SDL_SetVideoMode(SETTINGS.video.width,
-                                            SETTINGS.video.height,
-                                            0, SDL_OPENGL|SDL_FULLSCREEN);
+    ;
+    //SDL_surface *window =  SDL_SetVideoMode(SETTINGS.video.width,
+    //                                        SETTINGS.video.height,
+    //                                        0, SDL_OPENGL|SDL_FULLSCREEN);
 }
 
 
 static void
 draw_gl(void)
 {
+    extern star_list_t *gSKY_stars;
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     // first, lets draw the nightsky, z-buffer disabled
-    //glDisable(GL_DEPTH_TEST);
-    
-    //glEnable(GL_DEPTH_TEST);
+    paint_sky(gSKY_stars);
+    glLoadIdentity();
     
     // the drawing is not very well structured at the moment
     // we should do the following: 1. traverse the scene graph and move the

@@ -49,6 +49,7 @@ extern "C" {
     @result		The address of the best matching RGB-value.
 */
 uint8_t *get_temp_colour(int temp);
+double bv_to_temp(double bv);
 
 #ifdef __cplusplus
 }

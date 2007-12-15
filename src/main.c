@@ -61,6 +61,7 @@
 #include "sim.h"
 #include "rendering/render.h"
 #include "rendering/camera.h"
+#include "rendering/sky.h"
 
 
 #include "SDL.h"
@@ -176,7 +177,7 @@ inner_main(void *data, int argc, char *argv[])
     // Setup IO-tables
     io_manager_init();
     init_cam();
-    
+    init_sky();
     if (! init_plugin_manager() ) exit(1);
     
     // Load and run initialisation script

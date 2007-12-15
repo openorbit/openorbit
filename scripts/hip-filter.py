@@ -72,25 +72,27 @@ hipGetKeys = [
 
 
 def filterLine(line, entries, vmagLimit):
-	lst = line.split('|')
-	for i in range(0, len(lst)):
-		lst[i] = lst[i].strip()
-	result = []
+    lst = line.split('|')
+    for i in range(0, len(lst)):
+        lst[i] = lst[i].strip()
+    result = []
 	
-	if len(lst) != len(hipKeys):
-		return None
+    if len(lst) != len(hipKeys):
+        return None
 	
-	if lst[hipDict["Vmag"]] == "":
-		return None
+    if lst[hipDict["Vmag"]] == "":
+        return None
 	
-	if float(lst[hipDict["Vmag"]]) > vmagLimit:
-		return None
-	
-	for entry in entries:
-		keyId = hipDict[entry]
-		result.append(lst[keyId])	
-	
-	return result
+    if float(lst[hipDict["Vmag"]]) > vmagLimit:
+        return None
+
+    for entry in entries:
+        keyId = hipDict[entry]
+        if lst[keyId] == "":
+            return None
+        result.append(lst[keyId])
+    
+    return result
 
 f = open(inFileName)
 o = open(outFileName, "w")
@@ -98,8 +100,8 @@ try:
     for line in f:
         lst = filterLine(line, hipGetKeys, vmagLimit)
         if lst != None:
-        	o.write(",".join(lst))
-        	o.write("\n")
+            o.write(",".join(lst))
+            o.write("\n")
 finally:
     f.close()
     o.close()

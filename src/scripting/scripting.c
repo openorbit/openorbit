@@ -42,6 +42,8 @@
 
 #include "io.h"
 #include "config.h"
+#include "res.h"
+#include "environment.h"
 
 #endif /* WITH_PYTHON */
  
@@ -54,10 +56,13 @@ init_scripting(void)
     Py_Initialize();
     initio();
     initconfig();
+    initres();
+    initenvironment();
+    
     oo_error_t err = load_setup_script();
     
     if (err) {
-        print_error_message(err);
+        oo_print_err_msg(err);
         return true;
     }
     
@@ -92,15 +97,15 @@ load_setup_script(void)
     if (! fp) {
         printf("%s\n", path);
         free(path);
-        return ERROR_FILE_NOT_FOUND;
+        return ERR_file_not_found;
     }
     if (PyRun_SimpleFile(fp, SCR_INIT_SCRIPT_NAME)) {
         free(path);
-        return ERROR_SCRIPT;
+        return ERR_script;
     }
     
     free(path);
-    return ERROR_NONE;
+    return ERR_none;
 }
 
 #elif defined(WITH_GUILE)

@@ -439,14 +439,22 @@ temp2ci(int temp)
 }
 
 
+double
+bv_to_temp(double bv)
+{    
+    double temp = 1000.0+(5000.0/(bv+0.5));
+    
+    return temp;
+}
+
 uint8_t
 *get_temp_colour(int temp)
 {
-	if (temp < 0 || temp >= 41000) {
+	if (temp < 1000 || temp > 40000) {
 		return NULL;
 	}
 	
-	int index = temp / 100 - 10;
+	int index = (temp-1000) / 100;
 	
 	return gCOLOUR_temperature_tbl[index];
 }
