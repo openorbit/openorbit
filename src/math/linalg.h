@@ -128,11 +128,33 @@ void v_sub(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
 void v_s_mul(vec_arr_t res, vec_arr_t a, scalar_t s)
     __attribute__ ((__nonnull__));
 
+#if USE_ALTIVEC
+    #undef V_S_MUL
+    #define V_S_MUL(vr, va, sc) \
+        do {\
+            vector_t vs = {.s.x = (sc), .s.y = (sc), .s.z = (sc), .s.w = (sc) };\
+            vr.v = va.v * vs.v;\
+        } while (0)
+#endif
+
+
+
 #define V_S_DIV(vr, va, s) \
     v_s_div((vr).a, (va).a, (s))
 
 void v_s_div(vec_arr_t res, vec_arr_t a, scalar_t s)
     __attribute__ ((__nonnull__));
+
+
+#if USE_ALTIVEC
+    #undef V_S_DIV
+    #define V_S_DIV(vr, va, sc) \
+        do {\
+            scalar_t repr = 1.0f/(sc);\
+            vector_t vs = {.s.x = repr, .s.y = repr, .s.z = repr, .s.w = repr };\
+            vr.v = va.v * vs.v;\
+        } while (0)
+#endif
 
 
 /* This is really a 3d x product */
