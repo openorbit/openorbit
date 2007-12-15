@@ -53,16 +53,23 @@ typedef struct {
 } ph_obj_t;
 
 typedef struct {
-    vector_t cm;
-    scalar_t m;
-    vector_t g;
+    vector_t r; //!< position of the system in parent world coords
+    scalar_t m; //!< mass of system in kg
+    vector_t g; //!< gravity
     
-    list_t *free_obj_list;
-    size_t alloc_size;
+    list_t *free_obj_list; //!< for quickly inserting objects
+    size_t alloc_size; //!< size of obj array
     ph_obj_t obj[];
 } ph_sys_t;
 
-/*! Creates a new isolated physics system
+
+typedef struct {
+    size_t sys_asize;
+    size_t sys_count;
+    ph_sys_t sys[];
+} ph_world_t;
+
+/*! Creates a new (almost) isolated physics system
     
     The new_sys function, allocates a new physics system with a maximum object
     count of obj_count objects.
@@ -78,6 +85,7 @@ ph_sys_t* ph_new_sys(size_t obj_count);
     \param step The time in seconds, should be sufficiently small.
  */
 void ph_dynamics_step(ph_sys_t *sys, scalar_t step);
+void ph_step(ph_world_t *world, scalar_t step);
 
 /*! Applies an external global force on the entire system
     

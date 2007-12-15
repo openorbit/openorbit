@@ -125,8 +125,14 @@ ph_dynamics_step(ph_sys_t *sys, scalar_t step)
         }
     }
     
-    V_CPY(sys->cm, cm);
+    V_CPY(sys->r, cm);
     sys->m = m;
+}
+
+void
+ph_step(ph_world_t *world, scalar_t dt)
+{
+    ph_dynamics_step(&(world->sys[0]), dt);
 }
 
 void
