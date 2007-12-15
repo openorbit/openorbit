@@ -48,6 +48,8 @@ extern "C" {
 #define Q_Z 2
 #define Q_W 3
 
+#define Q_CPY(dst, src) ((dst).s = (src).s)
+    
 #define QUAT_X(q) (q)[Q_X]
 #define QUAT_Y(q) (q)[Q_Y]
 #define QUAT_Z(q) (q)[Q_Z]
