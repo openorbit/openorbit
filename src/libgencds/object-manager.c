@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include <err.h>
 #include <assert.h>
+#include <sysexits.h>
 
 #include <gencds/object-manager.h>
 #include "object-manager-private.h"
@@ -696,26 +697,43 @@ om_set_ ## N ## _prop(om_object_t *obj, const char *prop_name, T val)       \
     }                                                                       \
 }
 
-// TODO: Ensure that runtime errors are propagated on invalid prop names
-#define _OM_GET_PROP_IDX_FN_(T, N, TC)                                  \
-T                                                                       \
-om_get_ ## N ## _idx_prop(const om_object_t *obj, const char *prop_name,\
-                          unsigned int idx)                             \
-{                                                                       \
-    assert(obj != NULL);                                                \
-    assert(prop_name != NULL);                                          \
-                                                                        \
-	om_prop_t *prop = om_get_prop(obj->cls, prop_name);                 \
-    if (prop && prop->type_code == (OM_ARRAY|(TC))) {                   \
-        T *concrete_prop = (T*)(obj->data + prop->offset);              \
-        return concrete_prop[idx];                                      \
-    }                                                                   \
-    return (T)0;                                                        \
+// TODO: Ensure that runtime errors are propagated on invalid prop names,
+//       for now, just let the application die.
+#define _OM_GET_PROP_IDX_FN_(T, N, TC)                                      \
+T                                                                           \
+om_get_ ## N ## _idx_prop(const om_object_t *obj, const char *prop_name,    \
+                          unsigned int idx)                                 \
+{                                                                           \
+    assert(obj != NULL);                                                    \
+    assert(prop_name != NULL);                                              \
+                                                                            \
+    om_prop_t *prop = om_get_prop(obj->cls, prop_name);                     \
+    if (prop && prop->type_code == (OM_ARRAY|(TC))) {                       \
+        if (idx < prop->info.static_array.length) {                         \
+            T *concrete_prop = (T*)(obj->data + prop->offset);              \
+            return concrete_prop[idx];                                      \
+        } else {                                                            \
+            errx(EX_SOFTWARE,                                               \
+                 "om: index out of static bounds (idx = %d, maxidx = %d)",  \
+                 idx, prop->info.static_array.length-1);                    \
+        }                                                                   \
+    } else if (prop && prop->type_code == (OM_ARRAY|OM_REF|(TC))) {         \
+        om_prop_t *length_prop = prop->info.dynamic_array.length;           \
+        size_t *sz = obj->data + length_prop->offset;                       \
+        if (idx < *sz ) {                                                   \
+            T **concrete_prop = om_get_concrete_prop(obj, prop_name);       \
+            return (*concrete_prop)[idx];                                   \
+        } else {                                                            \
+            errx(EX_SOFTWARE,                                               \
+                 "om: index out of dynamic bounds (idx = %d, maxidx = %d)", \
+                 idx, (*sz)-1);                                             \
+        }                                                                   \
+    }                                                                       \
 }
 
 
 // TODO: Ensure that runtime errors are propagated on invalid prop names
-// TODO: Remove reliance on abort, should probably have some exception
+//       for now, just let the application die.
 #define _OM_SET_PROP_IDX_FN_(T, N, TC)                                      \
 void                                                                        \
 om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name,          \
@@ -730,7 +748,9 @@ om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name,          \
             T *concrete_prop = (T*)(obj->data + prop->offset);              \
             concrete_prop[idx] = val;                                       \
         } else {                                                            \
-            abort();                                                        \
+            errx(EX_SOFTWARE,                                               \
+                 "om: index out of static bounds (idx = %d, maxidx = %d)",  \
+                 idx, prop->info.static_array.length-1);                    \
         }                                                                   \
     } else if (prop && prop->type_code == (OM_ARRAY|OM_REF|(TC))) {         \
         om_prop_t *length_prop = prop->info.dynamic_array.length;           \
@@ -739,7 +759,9 @@ om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name,          \
             T **concrete_prop = om_get_concrete_prop(obj, prop_name);       \
             (*concrete_prop)[idx] = val;                                    \
         } else {                                                            \
-            abort();                                                        \
+            errx(EX_SOFTWARE,                                               \
+                 "om: index out of dynamic bounds (idx = %d, maxidx = %d)", \
+                 idx, (*sz)-1);                                             \
         }                                                                   \
     }                                                                       \
 }
