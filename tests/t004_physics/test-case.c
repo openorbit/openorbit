@@ -32,11 +32,44 @@
  */
 
 
-#import <SenTestingKit/SenTestingKit.h>
+#include <stdlib.h>
+#include <check.h>
+#include "physics/dynamics.h"
 
+START_TEST(test_apply_force_at_pos)
+{
+    ph_apply_force_at_pos(ph_obj_t *obj, vector_t pos, vector_t f);
+}
+END_TEST
 
-@interface PhysicsTest : SenTestCase {
+START_TEST(test_apply_force_relative)
+{   
+    ph_apply_force_relative(ph_obj_t *obj, vector_t pos, vector_t f);
+}
+END_TEST
 
+START_TEST(test_apply_force)
+{
+    ph_apply_force(ph_obj_t *obj, vector_t f);
+    
+    fail_unless( 0 == 0, "mega error");
+}
+END_TEST
+
+Suite
+*test_suite (void)
+{
+    Suite *s = suite_create ("Physics Name");
+    
+    /* Core test case */
+    TCase *tc_core = tcase_create ("Core");
+
+    tcase_add_test(tc_core, test_apply_force);
+    tcase_add_test(tc_core, test_apply_force_relative);
+    tcase_add_test(tc_core, test_apply_force_at_pos);
+    
+    suite_add_tcase(s, tc_core);
+    
+    return s;
 }
 
-@end
