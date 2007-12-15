@@ -42,6 +42,7 @@ extern "C" {
 #include <stdbool.h>
 #include "scripting/scripting.h"
 #include "error.h"
+#include "sim.h"
 
 #define IO_MAX_KEYS             (512)
 #define IO_MAX_MOD_COMBOS         (4)
@@ -73,12 +74,12 @@ typedef void (*io_drag_action_f)(float, float);
 /* Used in the hash table of actions */
 
 typedef enum {
-    IO_EV_Any,
-    IO_EV_Key,
-    IO_EV_Click,
-    IO_EV_Drag,
-    IO_EV_Button,
-    IO_EV_Axis
+    IO_ev_any,
+    IO_ev_key,
+    IO_ev_click,
+    IO_ev_drag,
+    IO_ev_button,
+    IO_ev_axis
 } io_event_kind_t;
 
 typedef struct {
@@ -118,13 +119,11 @@ typedef struct {
 } io_event_t;
 
 
-typedef void (*io_event_handler_c_f)(io_event_t event);
-
 typedef struct {
     bool is_script;
     union {
         scr_func_t s;
-        io_event_handler_c_f c;
+        sim_event_handler_t c;
     } u;
 } io_event_handler_t;
 
@@ -161,7 +160,7 @@ typedef struct {
    	} joystick[IO_MAX_JOYSTICKS];
 } io_bindings_t;
 
-bool io_register_event_handler(const char *key, io_event_handler_c_f f,
+bool io_register_event_handler(const char *key, sim_event_handler_t f,
                                io_event_kind_t kind);
 int io_register_event_handler_script(const char *key, scr_func_t f,
                                      io_event_kind_t kind);

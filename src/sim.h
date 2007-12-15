@@ -42,8 +42,8 @@ extern "C" {
 #include "SDL.h"
 
 typedef enum {
-	SIM_IO_Event,
-	SIM_Time_Event
+	SIM_io_event,
+	SIM_time_event
 } sim_event_t;
 
 typedef void (*sim_event_handler_t)(sim_event_t e, void *data);

@@ -51,9 +51,10 @@ static hashtable_t *IO_key_table;
 static io_bindings_t IO_bindings;
 
 static void
-io_event_def(io_event_t e)
+io_event_def(sim_event_t eid, void *data)
 {
-	return;
+    assert(eid == SIM_io_event);
+    io_event_t *e = (io_event_t*)data;
 }
 
 void
@@ -94,7 +95,7 @@ io_bindings_init(void)
 }
 
 bool
-io_register_event_handler(const char *key, io_event_handler_c_f f,
+io_register_event_handler(const char *key, sim_event_handler_t f,
                           io_event_kind_t kind)
 {
     io_event_handler_container_t *cont;
@@ -133,23 +134,23 @@ void
 io_dispatch_event(const io_event_t *e)
 {
     switch (e->kind) {
-    case IO_EV_Axis:
+    case IO_ev_axis:
         if (IO_bindings.joystick[e->u.axis.joystick_id]
                        .axis[e->u.axis.axis_id].is_script) {
             
         } else {
             IO_bindings.joystick[e->u.axis.joystick_id]
-                       .axis[e->u.axis.axis_id].u.c(*e);
+                       .axis[e->u.axis.axis_id].u.c(SIM_io_event, (void*)e);
         }
         break;
-    case IO_EV_Button:
+    case IO_ev_button:
         if (e->u.button.down) {
             if (IO_bindings.joystick[e->u.button.joystick_id]
                 .button[e->u.button.button_id].down.is_script) {
                 
             } else {
                 IO_bindings.joystick[e->u.button.joystick_id]
-                .button[e->u.button.button_id].down.u.c(*e);
+                .button[e->u.button.button_id].down.u.c(SIM_io_event, (void*)e);
             }                    
         } else {
             if (IO_bindings.joystick[e->u.button.joystick_id]
@@ -157,11 +158,11 @@ io_dispatch_event(const io_event_t *e)
                 
             } else {
                 IO_bindings.joystick[e->u.button.joystick_id]
-                .button[e->u.button.button_id].up.u.c(*e);
+                .button[e->u.button.button_id].up.u.c(SIM_io_event, (void*)e);
             }                                
         }
         break;
-    case IO_EV_Key:
+    case IO_ev_key:
         for (int i = 0 ; i < IO_MAX_MOD_COMBOS ; i ++) {
             if (! (IO_bindings.keyboard.key[e->u.key.key_id][i].modifier_mask
                    ^ e->u.key.modifiers)) {
@@ -170,43 +171,43 @@ io_dispatch_event(const io_event_t *e)
                                             .down.is_script) {
                     
                     } else {
-                        IO_bindings.keyboard.key[e->u.key.key_id][i].down.u.c(*e);
+                        IO_bindings.keyboard.key[e->u.key.key_id][i].down.u.c(SIM_io_event, (void*)e);
                     }
                 } else {
                     if (IO_bindings.keyboard.key[e->u.key.key_id][i]
                                             .up.is_script) {
                         
                     } else {
-                        IO_bindings.keyboard.key[e->u.key.key_id][i].up.u.c(*e);
+                        IO_bindings.keyboard.key[e->u.key.key_id][i].up.u.c(SIM_io_event, (void*)e);
                     }
                 }
                 break;
             }
         }
         break;
-    case IO_EV_Click:
+    case IO_ev_click:
         if (e->u.click.down) {
             if (IO_bindings.mouse.button[e->u.click.button].down.is_script) {
                 
             } else {
-                IO_bindings.mouse.button[e->u.click.button].down.u.c(*e);
+                IO_bindings.mouse.button[e->u.click.button].down.u.c(SIM_io_event, (void*)e);
             }
         } else {
             if (IO_bindings.mouse.button[e->u.click.button].up.is_script) {
                 
             } else {
-                IO_bindings.mouse.button[e->u.click.button].up.u.c(*e);
+                IO_bindings.mouse.button[e->u.click.button].up.u.c(SIM_io_event, (void*)e);
             }
         }
         break;
-    case IO_EV_Drag:
+    case IO_ev_drag:
         if (IO_bindings.mouse.drag[e->u.drag.button].is_script) {
             
         } else {
-            IO_bindings.mouse.drag[e->u.drag.button].u.c(*e);
+            IO_bindings.mouse.drag[e->u.drag.button].u.c(SIM_io_event, (void*)e);
         }
         break;
-    case IO_EV_Any:
+    case IO_ev_any:
         /* fall through, ambiguous events may not be dispatched */
     default:
         assert(0);
