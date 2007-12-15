@@ -106,6 +106,16 @@ v_s_mul(vec_arr_t res, vec_arr_t a, scalar_t s)
     res[3] = a[3] * s;
 }
 
+void
+v_s_div(vec_arr_t res, vec_arr_t a, scalar_t s)
+{
+    scalar_t d = S_CONST(1.0) / s;
+    res[0] = a[0] * d;
+    res[1] = a[1] * d;
+    res[2] = a[2] * d;
+    res[3] = a[3] * d;
+}
+    
 
 void
 v_normalise(vec_arr_t v)
@@ -275,4 +285,16 @@ m_eq(mat_arr_t a, mat_arr_t b, scalar_t tol)
     }
     
     return true;    
+}
+
+
+void
+m_translate(matrix_t *m, scalar_t x, scalar_t y, scalar_t z, scalar_t w)
+{
+    memset(m, 0, sizeof(mat_arr_t));    
+    
+    m->a[0][0] = x;
+    m->a[1][1] = y;
+    m->a[2][2] = z;
+    m->a[3][3] = w;
 }

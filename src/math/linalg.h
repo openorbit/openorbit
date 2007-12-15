@@ -56,23 +56,59 @@ extern "C" {
 void m_v_mul(vec_arr_t res, mat_arr_t a, const vec_arr_t v)
     __attribute__ ((__nonnull__));
 
+#if USE_ALTIVEC
+    #undef M_V_MUL
+    #define M_V_MUL(vr, M, vx) \
+        do { \
+            matrix_t p;\
+            p.v[0] = M.v[0] * vx.v;\
+            p.v[1] = M.v[1] * vx.v;\
+            p.v[2] = M.v[2] * vx.v;\
+            p.v[3] = M.v[3] * vx.v;\
+            \
+            vr.s.x = p.a[0][0] + p.a[0][1] + p.a[0][2] + p.a[0][3];\
+            vr.s.y = p.a[1][0] + p.a[1][1] + p.a[1][2] + p.a[1][3];\
+            vr.s.z = p.a[2][0] + p.a[2][1] + p.a[2][2] + p.a[2][3];\
+            vr.s.w = p.a[3][0] + p.a[3][1] + p.a[3][2] + p.a[3][3];\
+        } while (0)
+#endif
+
+
 #define M_MUL(A, B, C) \
     m_mul((A).a, (B).a, (C).a)
 
 void m_mul(mat_arr_t res, mat_arr_t a, mat_arr_t b)
-    __attribute__ ((__nonnull__));
+    __attribute__ ((__nonnull__));    
+    
     
 #define M_ADD(A, B, C) \
     m_add((A).a, (B).a, (C).a)
     
 void m_add(mat_arr_t res, mat_arr_t a, mat_arr_t b)
     __attribute__ ((__nonnull__));
-    
+
+#if USE_ALTIVEC
+    #undef M_ADD
+    #define M_ADD(vr, va, vb)           \
+       do {                             \
+           vr.v[0] = va.v[0] + vb.v[0]; \
+           vr.v[1] = va.v[1] + vb.v[1]; \
+           vr.v[2] = va.v[2] + vb.v[2]; \
+           vr.v[3] = va.v[3] + vb.v[3]; \
+       } while (0)
+#endif
+
+
 #define V_ADD(vr, va, vb) \
     v_add((vr).a, (va).a, (vb).a)
 
 void v_add(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
     __attribute__ ((__nonnull__));
+
+#if USE_ALTIVEC
+    #undef V_ADD
+    #define V_ADD(vr, va, vb) vr.v = va.v + vb.v
+#endif
 
 #define V_SUB(vr, va, vb) \
     v_sub((vr).a, (va).a, (vb).a)
@@ -80,11 +116,24 @@ void v_add(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
 void v_sub(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
     __attribute__ ((__nonnull__));
 
+#if USE_ALTIVEC
+    #undef V_SUB
+    #define V_SUB(vr, va, vb) vr.v = va.v - vb.v
+#endif
+
+
 #define V_S_MUL(vr, va, s) \
     v_s_mul((vr).a, (va).a, (s))
 
 void v_s_mul(vec_arr_t res, vec_arr_t a, scalar_t s)
     __attribute__ ((__nonnull__));
+
+#define V_S_DIV(vr, va, s) \
+    v_s_div((vr).a, (va).a, (s))
+
+void v_s_div(vec_arr_t res, vec_arr_t a, scalar_t s)
+    __attribute__ ((__nonnull__));
+
 
 /* This is really a 3d x product */
 
@@ -178,6 +227,11 @@ bool m_eq(mat_arr_t a, mat_arr_t b, scalar_t tol)
     __attribute__ ((__pure__, __nonnull__));
 
 
+#define M_TRANSLATE(M, x, y, z, w) \
+    m_translate(&(M), (x), (y), (z), (w))
+
+void m_translate(matrix_t *m, scalar_t x, scalar_t y, scalar_t z, scalar_t w);
+        
 #ifdef __cplusplus
 }
 #endif 
