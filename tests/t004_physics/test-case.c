@@ -33,12 +33,15 @@
 
 
 #include <stdlib.h>
+#include <string.h>
 #include <check.h>
 #include "physics/dynamics.h"
 
 START_TEST(test_apply_force_at_pos)
 {
     ph_obj_t obj;
+    memset(&obj, 0, sizeof(ph_obj_t));
+    
     vector_t pos, f;
     ph_apply_force_at_pos(&obj, pos, f);
 }
@@ -47,6 +50,8 @@ END_TEST
 START_TEST(test_apply_force_relative)
 {
     ph_obj_t obj;
+    memset(&obj, 0, sizeof(ph_obj_t));
+
     vector_t pos, f;
 
     ph_apply_force_relative(&obj, pos, f);
@@ -56,11 +61,25 @@ END_TEST
 START_TEST(test_apply_force)
 {
     ph_obj_t obj;
-    vector_t f;
+    memset(&obj, 0, sizeof(ph_obj_t));
+    
+    vector_t f = {4.0, 4.0, 4.0, 0.0};
 
     ph_apply_force(&obj, f);
     
-    fail_unless( 0 == 0, "mega error");
+    fail_unless( obj.f_acc.s.x == 4.0, "apply force failed");
+    fail_unless( obj.f_acc.s.y == 4.0, "apply force failed");
+    fail_unless( obj.f_acc.s.z == 4.0, "apply force failed");
+    fail_unless( obj.f_acc.s.w == 0.0, "apply force failed");
+
+    vector_t f2 = {1.0, 2.0, 3.0, 0.0};
+    ph_apply_force(&obj, f2);
+
+    fail_unless( obj.f_acc.s.x == 5.0, "apply force failed");
+    fail_unless( obj.f_acc.s.y == 6.0, "apply force failed");
+    fail_unless( obj.f_acc.s.z == 7.0, "apply force failed");
+    fail_unless( obj.f_acc.s.w == 0.0, "apply force failed");
+    
 }
 END_TEST
 
