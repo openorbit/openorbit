@@ -94,9 +94,34 @@ cam_set_free(vector_t p, quaternion_t q)
 }
 
 void
-cam_set_polar(scalar_t len, scalar_t ra, scalar_t dec)
+cam_set_polar(vector_t tgt, scalar_t len, scalar_t ra, scalar_t dec)
 {
+    matrix_t m;
+    vector_t cam_pos, rot_cam_pos, up, rot_up, right, rot_right;
+    quaternion_t q0, q1, qr;
     
+    V_SET(cam_pos, 0.0f, 0.0f, 1.0f, 0.0f);
+    V_SET(up, 0.0f, 1.0f, 0.0f, 0.0f);
+    V_SET(right, 1.0f, 0.0f, 0.0f, 0.0f);
+
+    Q_ROT(q0, up, ra);
+    Q_M_CONVERT(m, q0);
+    M_V_MUL(rot_right, m, right);
+    Q_ROT(q1, rot_right, dec);
+    
+    Q_MUL(qr, q0, q1);
+    Q_M_CONVERT(m, qr);
+    
+    M_V_MUL(rot_cam_pos, m, cam_pos);
+    M_V_MUL(rot_up, m, up);
+    
+    V_S_MUL(rot_cam_pos, rot_cam_pos, len);
+    
+    gluLookAt(tgt.s.x, tgt.s.y, tgt.s.z,
+              tgt.s.x + rot_cam_pos.s.x,
+              tgt.s.y + rot_cam_pos.s.y,
+              tgt.s.z + rot_cam_pos.s.z,
+              rot_up.s.x, rot_up.s.y, rot_up.s.z);
 }
 
 
