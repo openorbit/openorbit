@@ -33,6 +33,8 @@
 
 
 #include <stdlib.h>
+#include <stdio.h>
+
 #include <check.h>
 
 #include <gencds/object-manager.h>
@@ -117,7 +119,9 @@ START_TEST(test_interfaces)
                                    sizeof(test_object_t));
     
     /* Interface "gaaah" is not registered as meta interface */
+    printf("The call to om reg iface, will fail...\n");
     int res = om_reg_iface(cls, "gaaah", &iface);
+    printf("... do not worry about the above error message\n");
     fail_if(res == 0, "The interface gaaah, should not be registerable");
     
     res = om_reg_iface(cls, "test-iface", &iface);
@@ -201,14 +205,14 @@ START_TEST(test_properties)
     
     
     /* Init object slots */
-    obj0_data->a = 0;
-    obj0_data->b = 0;
-    obj0_data->c = 0;
+    obj0_data->a = 5;
+    obj0_data->b = 4;
+    obj0_data->c = 3;
     
     obj1_data->tobj = NULL;
     
     for (int i = 0 ; i < TEST_ARR_LEN ; i ++) {
-        obj1_data->arr[i] == 0;
+        obj1_data->arr[i] = i;
     }
     
     
@@ -220,8 +224,11 @@ START_TEST(test_properties)
                 "Prop tobj in not NULL");
 
     for (int i = 0 ; i < TEST_ARR_LEN ; i ++) {
-        fail_unless(om_get_int_idx_prop(obj1, "arr", i) == 0,
-                    "Arr prop with index %d in not 0", i);
+        int prop_val = om_get_int_idx_prop(obj1, "arr", i);
+        fail_unless(prop_val == i,
+                    "Arr prop with index %d is not equal to %d "
+                    "(real value = %d, arr[%d] = %d)", i, i, prop_val, i,
+                    obj1_data->arr[i]);
     }
 
     
