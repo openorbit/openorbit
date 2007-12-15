@@ -1,0 +1,1598 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		EC4476890CCBFF1C001C88AD /* tests */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = EC44768A0CCBFF3A001C88AD /* Build configuration list for PBXAggregateTarget "tests" */;
+			buildPhases = (
+			);
+			dependencies = (
+				EC44769A0CCBFF7B001C88AD /* PBXTargetDependency */,
+				EC4476D30CCC001A001C88AD /* PBXTargetDependency */,
+				EC4476D10CCC001A001C88AD /* PBXTargetDependency */,
+				EC4476CF0CCC001A001C88AD /* PBXTargetDependency */,
+				EC4476CD0CCC001A001C88AD /* PBXTargetDependency */,
+				EC4476CB0CCC001A001C88AD /* PBXTargetDependency */,
+				EC4476C90CCC001A001C88AD /* PBXTargetDependency */,
+			);
+			name = tests;
+			productName = tests;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		EC4476F40CCC056D001C88AD /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F00CCC056D001C88AD /* SDL_image.framework */; };
+		EC4476F50CCC056D001C88AD /* SDL_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F10CCC056D001C88AD /* SDL_ttf.framework */; };
+		EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
+		EC4484CD0CCD22CD001C88AD /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484C20CCD22CD001C88AD /* error.c */; };
+		EC4484CE0CCD22CD001C88AD /* io-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484C40CCD22CD001C88AD /* io-manager.c */; };
+		EC4484CF0CCD22CD001C88AD /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484C60CCD22CD001C88AD /* main.c */; };
+		EC4484D00CCD22CD001C88AD /* plugin-handler.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484C70CCD22CD001C88AD /* plugin-handler.c */; };
+		EC4484D10CCD22CD001C88AD /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484C90CCD22CD001C88AD /* settings.c */; };
+		EC4484D20CCD22CD001C88AD /* sim.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484CB0CCD22CD001C88AD /* sim.c */; };
+		EC4484EC0CCD23C3001C88AD /* linalg.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484E60CCD23C3001C88AD /* linalg.c */; };
+		EC4484ED0CCD23C3001C88AD /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484E80CCD23C3001C88AD /* quaternions.c */; };
+		EC4484EE0CCD23C3001C88AD /* linalg.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484E60CCD23C3001C88AD /* linalg.c */; };
+		EC4484EF0CCD23C3001C88AD /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484E80CCD23C3001C88AD /* quaternions.c */; };
+		EC4484F50CCD23E6001C88AD /* tga.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484F20CCD23E6001C88AD /* tga.c */; };
+		EC4484FD0CCD23F4001C88AD /* dynamics.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484F80CCD23F4001C88AD /* dynamics.c */; };
+		EC4484FE0CCD23F4001C88AD /* kepler.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484FA0CCD23F4001C88AD /* kepler.c */; };
+		EC44850E0CCD242B001C88AD /* res-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485080CCD242B001C88AD /* res-manager.c */; };
+		EC44850F0CCD242B001C88AD /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = EC44850B0CCD242B001C88AD /* SDLMain.m */; };
+		EC44851E0CCD2456001C88AD /* camera.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485140CCD2456001C88AD /* camera.c */; };
+		EC44851F0CCD2456001C88AD /* colour.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485160CCD2456001C88AD /* colour.c */; };
+		EC4485200CCD2456001C88AD /* render.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485180CCD2456001C88AD /* render.c */; };
+		EC4485210CCD2456001C88AD /* sky.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44851A0CCD2456001C88AD /* sky.c */; };
+		EC4485220CCD2456001C88AD /* texture.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44851C0CCD2456001C88AD /* texture.c */; };
+		EC44852E0CCD2464001C88AD /* scripting.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485280CCD2464001C88AD /* scripting.c */; };
+		EC4485680CCD250C001C88AD /* hash-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485390CCD247E001C88AD /* hash-test.c */; };
+		EC4485690CCD251E001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
+		EC44856A0CCD252D001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
+		EC44856B0CCD253A001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
+		EC44856C0CCD2541001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
+		EC44856D0CCD2547001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
+		EC44856E0CCD254D001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
+		EC44856F0CCD2553001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
+		EC4485700CCD2568001C88AD /* heap-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44853C0CCD247E001C88AD /* heap-test.c */; };
+		EC4485710CCD2575001C88AD /* tga-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485400CCD247E001C88AD /* tga-test.c */; };
+		EC4485720CCD2581001C88AD /* math-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485440CCD247E001C88AD /* math-test.c */; };
+		EC4485730CCD258E001C88AD /* test-case.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485470CCD247E001C88AD /* test-case.c */; };
+		EC4485740CCD259D001C88AD /* om-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854A0CCD247E001C88AD /* om-test.c */; };
+		EC4485750CCD25AB001C88AD /* list-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854D0CCD247E001C88AD /* list-test.c */; };
+		EC4485D60CCD4B11001C88AD /* config.pyx in Sources */ = {isa = PBXBuildFile; fileRef = EC4485250CCD2464001C88AD /* config.pyx */; };
+		EC4485D70CCD4B11001C88AD /* io.pyx in Sources */ = {isa = PBXBuildFile; fileRef = EC4485260CCD2464001C88AD /* io.pyx */; };
+		EC44863F0CCE7BC4001C88AD /* hashtable.h in Headers */ = {isa = PBXBuildFile; fileRef = EC4485910CCD26A8001C88AD /* hashtable.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EC4486400CCE7BC4001C88AD /* heap.h in Headers */ = {isa = PBXBuildFile; fileRef = EC4485920CCD26A8001C88AD /* heap.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EC4486410CCE7BC4001C88AD /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = EC4485930CCD26A8001C88AD /* list.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EC4486420CCE7BC4001C88AD /* object-manager.h in Headers */ = {isa = PBXBuildFile; fileRef = EC4485940CCD26A8001C88AD /* object-manager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EC4486440CCE7BDD001C88AD /* hashtable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484D60CCD238B001C88AD /* hashtable.c */; };
+		EC4486450CCE7BDD001C88AD /* heap.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484D70CCD238B001C88AD /* heap.c */; };
+		EC4486470CCE7BDD001C88AD /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484D90CCD238B001C88AD /* list.c */; };
+		EC4486490CCE7BDD001C88AD /* object-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484DB0CCD238B001C88AD /* object-manager.c */; };
+		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		EC4485D50CCD4A19001C88AD /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.pyx";
+			fileType = pattern.proxy;
+			isEditable = 1;
+			outputFiles = (
+				"$(DERIVED_FILES_DIR)/$(INPUT_FILE_BASE).c",
+				"$(DERIVED_FILES_DIR)/$(INPUT_FILE_BASE).h",
+			);
+			script = "/Library/Frameworks/Python.framework/Versions/Current/bin/pyrexc -o \"$(DERIVED_FILES_DIR)/$(INPUT_FILE_BASE).c\" $(INPUT_FILE_PATH)";
+		};
+/* End PBXBuildRule section */
+
+/* Begin PBXContainerItemProxy section */
+		EC4476990CCBFF7B001C88AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC4476960CCBFF73001C88AD;
+			remoteInfo = t000_hashtable;
+		};
+		EC4476C80CCC001A001C88AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC4476C50CCC0010001C88AD;
+			remoteInfo = t006_list;
+		};
+		EC4476CA0CCC001A001C88AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC4476C00CCBFFF9001C88AD;
+			remoteInfo = t005_object_manager;
+		};
+		EC4476CC0CCC001A001C88AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC4476AC0CCBFFD8001C88AD;
+			remoteInfo = t004_physics;
+		};
+		EC4476CE0CCC001A001C88AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC4476A70CCBFFC3001C88AD;
+			remoteInfo = t003_math;
+		};
+		EC4476D00CCC001A001C88AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC4476A20CCBFFB1001C88AD;
+			remoteInfo = t002_tga;
+		};
+		EC4476D20CCC001A001C88AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC44769D0CCBFF95001C88AD;
+			remoteInfo = t001_heap;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		EC4476970CCBFF73001C88AD /* t000_hashtable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t000_hashtable; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC44769E0CCBFF95001C88AD /* t001_heap */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t001_heap; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC4476A30CCBFFB1001C88AD /* t002_tga */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t002_tga; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC4476A80CCBFFC3001C88AD /* t003_math */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t003_math; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC4476AD0CCBFFD8001C88AD /* t004_physics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t004_physics; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC4476C10CCBFFF9001C88AD /* t005_object_manager */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t005_object_manager; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC4476C60CCC0010001C88AD /* t006_list */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t006_list; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC4476DE0CCC0076001C88AD /* Open Orbit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Open Orbit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Open Orbit-Info.plist"; sourceTree = "<group>"; };
+		EC4476F00CCC056D001C88AD /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = /Library/Frameworks/SDL_image.framework; sourceTree = "<absolute>"; };
+		EC4476F10CCC056D001C88AD /* SDL_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_ttf.framework; path = /Library/Frameworks/SDL_ttf.framework; sourceTree = "<absolute>"; };
+		EC4476F20CCC056D001C88AD /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
+		EC4484C20CCD22CD001C88AD /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = error.c; sourceTree = "<group>"; };
+		EC4484C30CCD22CD001C88AD /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
+		EC4484C40CCD22CD001C88AD /* io-manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "io-manager.c"; sourceTree = "<group>"; };
+		EC4484C50CCD22CD001C88AD /* io-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "io-manager.h"; sourceTree = "<group>"; };
+		EC4484C60CCD22CD001C88AD /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		EC4484C70CCD22CD001C88AD /* plugin-handler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "plugin-handler.c"; sourceTree = "<group>"; };
+		EC4484C80CCD22CD001C88AD /* plugin-handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "plugin-handler.h"; sourceTree = "<group>"; };
+		EC4484C90CCD22CD001C88AD /* settings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = settings.c; sourceTree = "<group>"; };
+		EC4484CA0CCD22CD001C88AD /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
+		EC4484CB0CCD22CD001C88AD /* sim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sim.c; sourceTree = "<group>"; };
+		EC4484CC0CCD22CD001C88AD /* sim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sim.h; sourceTree = "<group>"; };
+		EC4484D40CCD238B001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4484D50CCD238B001C88AD /* hashtable-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "hashtable-private.h"; sourceTree = "<group>"; };
+		EC4484D60CCD238B001C88AD /* hashtable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hashtable.c; sourceTree = "<group>"; };
+		EC4484D70CCD238B001C88AD /* heap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = heap.c; sourceTree = "<group>"; };
+		EC4484D80CCD238B001C88AD /* list-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "list-private.h"; sourceTree = "<group>"; };
+		EC4484D90CCD238B001C88AD /* list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = list.c; sourceTree = "<group>"; };
+		EC4484DA0CCD238B001C88AD /* object-manager-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "object-manager-private.h"; sourceTree = "<group>"; };
+		EC4484DB0CCD238B001C88AD /* object-manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "object-manager.c"; sourceTree = "<group>"; };
+		EC4484E40CCD23C3001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4484E50CCD23C3001C88AD /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constants.h; sourceTree = "<group>"; };
+		EC4484E60CCD23C3001C88AD /* linalg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = linalg.c; sourceTree = "<group>"; };
+		EC4484E70CCD23C3001C88AD /* linalg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linalg.h; sourceTree = "<group>"; };
+		EC4484E80CCD23C3001C88AD /* quaternions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternions.c; sourceTree = "<group>"; };
+		EC4484E90CCD23C3001C88AD /* quaternions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quaternions.h; sourceTree = "<group>"; };
+		EC4484EA0CCD23C3001C88AD /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
+		EC4484F10CCD23E6001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4484F20CCD23E6001C88AD /* tga.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tga.c; sourceTree = "<group>"; };
+		EC4484F30CCD23E6001C88AD /* tga.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tga.h; sourceTree = "<group>"; };
+		EC4484F70CCD23F4001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4484F80CCD23F4001C88AD /* dynamics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dynamics.c; sourceTree = "<group>"; };
+		EC4484F90CCD23F4001C88AD /* dynamics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dynamics.h; sourceTree = "<group>"; };
+		EC4484FA0CCD23F4001C88AD /* kepler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kepler.c; sourceTree = "<group>"; };
+		EC4484FB0CCD23F4001C88AD /* kepler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kepler.h; sourceTree = "<group>"; };
+		EC4485080CCD242B001C88AD /* res-manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "res-manager.c"; sourceTree = "<group>"; };
+		EC44850A0CCD242B001C88AD /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLMain.h; sourceTree = "<group>"; };
+		EC44850B0CCD242B001C88AD /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDLMain.m; sourceTree = "<group>"; };
+		EC4485120CCD243D001C88AD /* example-plugin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "example-plugin.c"; sourceTree = "<group>"; };
+		EC4485140CCD2456001C88AD /* camera.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = camera.c; sourceTree = "<group>"; };
+		EC4485150CCD2456001C88AD /* camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
+		EC4485160CCD2456001C88AD /* colour.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = colour.c; sourceTree = "<group>"; };
+		EC4485170CCD2456001C88AD /* colour.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = colour.h; sourceTree = "<group>"; };
+		EC4485180CCD2456001C88AD /* render.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render.c; sourceTree = "<group>"; };
+		EC4485190CCD2456001C88AD /* render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
+		EC44851A0CCD2456001C88AD /* sky.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sky.c; sourceTree = "<group>"; };
+		EC44851B0CCD2456001C88AD /* sky.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sky.h; sourceTree = "<group>"; };
+		EC44851C0CCD2456001C88AD /* texture.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = texture.c; sourceTree = "<group>"; };
+		EC44851D0CCD2456001C88AD /* texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
+		EC4485240CCD2464001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4485250CCD2464001C88AD /* config.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = config.pyx; sourceTree = "<group>"; };
+		EC4485260CCD2464001C88AD /* io.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = io.pyx; sourceTree = "<group>"; };
+		EC4485270CCD2464001C88AD /* object-manager.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "object-manager.pyx"; sourceTree = "<group>"; };
+		EC4485280CCD2464001C88AD /* scripting.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scripting.c; sourceTree = "<group>"; };
+		EC4485290CCD2464001C88AD /* scripting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scripting.h; sourceTree = "<group>"; };
+		EC4485300CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4485320CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4485330CCD247E001C88AD /* testdriver-main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "testdriver-main.c"; sourceTree = "<group>"; };
+		EC4485350CCD247E001C88AD /* mock.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mock.c; sourceTree = "<group>"; };
+		EC4485360CCD247E001C88AD /* mock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mock.h; sourceTree = "<group>"; };
+		EC4485380CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4485390CCD247E001C88AD /* hash-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "hash-test.c"; sourceTree = "<group>"; };
+		EC44853B0CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC44853C0CCD247E001C88AD /* heap-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "heap-test.c"; sourceTree = "<group>"; };
+		EC44853E0CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC44853F0CCD247E001C88AD /* rle.tga */ = {isa = PBXFileReference; lastKnownFileType = file; path = rle.tga; sourceTree = "<group>"; };
+		EC4485400CCD247E001C88AD /* tga-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "tga-test.c"; sourceTree = "<group>"; };
+		EC4485410CCD247E001C88AD /* uncomp.tga */ = {isa = PBXFileReference; lastKnownFileType = file; path = uncomp.tga; sourceTree = "<group>"; };
+		EC4485430CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4485440CCD247E001C88AD /* math-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "math-test.c"; sourceTree = "<group>"; };
+		EC4485460CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4485470CCD247E001C88AD /* test-case.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-case.c"; sourceTree = "<group>"; };
+		EC4485490CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC44854A0CCD247E001C88AD /* om-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "om-test.c"; sourceTree = "<group>"; };
+		EC44854C0CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC44854D0CCD247E001C88AD /* list-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "list-test.c"; sourceTree = "<group>"; };
+		EC44854F0CCD247E001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4485500CCD247E001C88AD /* test-case.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-case.c"; sourceTree = "<group>"; };
+		EC4485530CCD2496001C88AD /* solarsystem.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = solarsystem.csv; sourceTree = "<group>"; };
+		EC4485550CCD2496001C88AD /* w3d-test.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "w3d-test.obj"; sourceTree = "<group>"; };
+		EC4485590CCD24C6001C88AD /* AddCMakeList.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AddCMakeList.txt; sourceTree = "<group>"; };
+		EC44855A0CCD24C6001C88AD /* Bison.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Bison.txt; sourceTree = "<group>"; };
+		EC44855B0CCD24C6001C88AD /* Flex.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Flex.txt; sourceTree = "<group>"; };
+		EC44855C0CCD24C6001C88AD /* InstallMacRes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = InstallMacRes.txt; sourceTree = "<group>"; };
+		EC44855D0CCD24C6001C88AD /* Pyrex.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Pyrex.txt; sourceTree = "<group>"; };
+		EC44855E0CCD24C6001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC44855F0CCD24C6001C88AD /* COPYING.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING.txt; sourceTree = "<group>"; };
+		EC4485600CCD24C6001C88AD /* Doxyfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
+		EC4485610CCD24C6001C88AD /* HACKING.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HACKING.txt; sourceTree = "<group>"; };
+		EC4485620CCD24C6001C88AD /* INSTALL.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = INSTALL.txt; sourceTree = "<group>"; };
+		EC4485630CCD24C6001C88AD /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		EC4485650CCD24C6001C88AD /* hip-filter.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = "hip-filter.py"; sourceTree = "<group>"; };
+		EC4485660CCD24C6001C88AD /* init.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = init.py; sourceTree = "<group>"; };
+		EC4485670CCD24C6001C88AD /* install-mac-res.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "install-mac-res.sh"; sourceTree = "<group>"; };
+		EC4485910CCD26A8001C88AD /* hashtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hashtable.h; sourceTree = "<group>"; };
+		EC4485920CCD26A8001C88AD /* heap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = heap.h; sourceTree = "<group>"; };
+		EC4485930CCD26A8001C88AD /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		EC4485940CCD26A8001C88AD /* object-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "object-manager.h"; sourceTree = "<group>"; };
+		EC4485970CCD26A8001C88AD /* control-if.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "control-if.h"; sourceTree = "<group>"; };
+		EC4485980CCD26A8001C88AD /* openorbit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = openorbit.h; sourceTree = "<group>"; };
+		EC4485990CCD26B5001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC4486390CCE7B20001C88AD /* gencds.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = gencds.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC44863A0CCE7B20001C88AD /* gencds-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "gencds-Info.plist"; sourceTree = "<group>"; };
+		EC5B8BA00CD7DDBC00BDB22A /* res-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "res-manager.h"; sourceTree = "<group>"; };
+		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EC4476950CCBFF73001C88AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC44769C0CCBFF95001C88AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476A10CCBFFB1001C88AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476A60CCBFFC3001C88AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476AB0CCBFFD8001C88AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476BF0CCBFFF9001C88AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476C40CCC0010001C88AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476DC0CCC0076001C88AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC4476F40CCC056D001C88AD /* SDL_image.framework in Frameworks */,
+				EC4476F50CCC056D001C88AD /* SDL_ttf.framework in Frameworks */,
+				EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */,
+				EC89155C0CD503EC000E662E /* Python.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4486370CCE7B20001C88AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		EC4476740CCBFEDB001C88AD = {
+			isa = PBXGroup;
+			children = (
+				EC4476EB0CCC0117001C88AD /* src */,
+				EC4476EA0CCC010C001C88AD /* include */,
+				EC4485640CCD24C6001C88AD /* scripts */,
+				EC4485510CCD2496001C88AD /* rsrc */,
+				EC4485760CCD25C6001C88AD /* docs */,
+				EC44852F0CCD247E001C88AD /* tests */,
+				EC4485580CCD24C6001C88AD /* cmake */,
+				EC44855E0CCD24C6001C88AD /* CMakeLists.txt */,
+				EC4485600CCD24C6001C88AD /* Doxyfile */,
+				EC4476850CCBFEFA001C88AD /* Products */,
+				EC447DDF0CCC0681001C88AD /* Frameworks */,
+				EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		EC4476850CCBFEFA001C88AD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EC4476970CCBFF73001C88AD /* t000_hashtable */,
+				EC44769E0CCBFF95001C88AD /* t001_heap */,
+				EC4476A30CCBFFB1001C88AD /* t002_tga */,
+				EC4476A80CCBFFC3001C88AD /* t003_math */,
+				EC4476AD0CCBFFD8001C88AD /* t004_physics */,
+				EC4476C10CCBFFF9001C88AD /* t005_object_manager */,
+				EC4476C60CCC0010001C88AD /* t006_list */,
+				EC4476DE0CCC0076001C88AD /* Open Orbit.app */,
+				EC4486390CCE7B20001C88AD /* gencds.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EC4476EA0CCC010C001C88AD /* include */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485990CCD26B5001C88AD /* CMakeLists.txt */,
+				EC4485900CCD26A8001C88AD /* gencds */,
+				EC4485950CCD26A8001C88AD /* openorbit */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		EC4476EB0CCC0117001C88AD /* src */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485230CCD2464001C88AD /* scripting */,
+				EC4485130CCD2456001C88AD /* rendering */,
+				EC4485100CCD243D001C88AD /* plugins */,
+				EC4485060CCD242B001C88AD /* platform */,
+				EC4484F60CCD23F4001C88AD /* physics */,
+				EC4484F00CCD23E6001C88AD /* parsers */,
+				EC4484E30CCD23C3001C88AD /* math */,
+				EC4484D30CCD238B001C88AD /* libgencds */,
+				EC4484C20CCD22CD001C88AD /* error.c */,
+				EC4484C30CCD22CD001C88AD /* error.h */,
+				EC4484C40CCD22CD001C88AD /* io-manager.c */,
+				EC4484C50CCD22CD001C88AD /* io-manager.h */,
+				EC4484C60CCD22CD001C88AD /* main.c */,
+				EC4484C70CCD22CD001C88AD /* plugin-handler.c */,
+				EC4484C80CCD22CD001C88AD /* plugin-handler.h */,
+				EC4484C90CCD22CD001C88AD /* settings.c */,
+				EC4484CA0CCD22CD001C88AD /* settings.h */,
+				EC4484CB0CCD22CD001C88AD /* sim.c */,
+				EC4484CC0CCD22CD001C88AD /* sim.h */,
+				EC5B8BA00CD7DDBC00BDB22A /* res-manager.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EC89155B0CD503EC000E662E /* Python.framework */,
+				EC4476F00CCC056D001C88AD /* SDL_image.framework */,
+				EC4476F10CCC056D001C88AD /* SDL_ttf.framework */,
+				EC4476F20CCC056D001C88AD /* SDL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EC4484D30CCD238B001C88AD /* libgencds */ = {
+			isa = PBXGroup;
+			children = (
+				EC44863A0CCE7B20001C88AD /* gencds-Info.plist */,
+				EC4484D40CCD238B001C88AD /* CMakeLists.txt */,
+				EC4484D50CCD238B001C88AD /* hashtable-private.h */,
+				EC4484D60CCD238B001C88AD /* hashtable.c */,
+				EC4484D70CCD238B001C88AD /* heap.c */,
+				EC4484D80CCD238B001C88AD /* list-private.h */,
+				EC4484D90CCD238B001C88AD /* list.c */,
+				EC4484DA0CCD238B001C88AD /* object-manager-private.h */,
+				EC4484DB0CCD238B001C88AD /* object-manager.c */,
+			);
+			path = libgencds;
+			sourceTree = "<group>";
+		};
+		EC4484E30CCD23C3001C88AD /* math */ = {
+			isa = PBXGroup;
+			children = (
+				EC4484E40CCD23C3001C88AD /* CMakeLists.txt */,
+				EC4484E50CCD23C3001C88AD /* constants.h */,
+				EC4484E60CCD23C3001C88AD /* linalg.c */,
+				EC4484E70CCD23C3001C88AD /* linalg.h */,
+				EC4484E80CCD23C3001C88AD /* quaternions.c */,
+				EC4484E90CCD23C3001C88AD /* quaternions.h */,
+				EC4484EA0CCD23C3001C88AD /* types.h */,
+			);
+			path = math;
+			sourceTree = "<group>";
+		};
+		EC4484F00CCD23E6001C88AD /* parsers */ = {
+			isa = PBXGroup;
+			children = (
+				EC4484F10CCD23E6001C88AD /* CMakeLists.txt */,
+				EC4484F20CCD23E6001C88AD /* tga.c */,
+				EC4484F30CCD23E6001C88AD /* tga.h */,
+			);
+			path = parsers;
+			sourceTree = "<group>";
+		};
+		EC4484F60CCD23F4001C88AD /* physics */ = {
+			isa = PBXGroup;
+			children = (
+				EC4484F70CCD23F4001C88AD /* CMakeLists.txt */,
+				EC4484F80CCD23F4001C88AD /* dynamics.c */,
+				EC4484F90CCD23F4001C88AD /* dynamics.h */,
+				EC4484FA0CCD23F4001C88AD /* kepler.c */,
+				EC4484FB0CCD23F4001C88AD /* kepler.h */,
+			);
+			path = physics;
+			sourceTree = "<group>";
+		};
+		EC4485060CCD242B001C88AD /* platform */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485070CCD242B001C88AD /* macosx */,
+				EC44850C0CCD242B001C88AD /* posix */,
+				EC44850D0CCD242B001C88AD /* win */,
+			);
+			path = platform;
+			sourceTree = "<group>";
+		};
+		EC4485070CCD242B001C88AD /* macosx */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485080CCD242B001C88AD /* res-manager.c */,
+				EC44850A0CCD242B001C88AD /* SDLMain.h */,
+				EC44850B0CCD242B001C88AD /* SDLMain.m */,
+			);
+			path = macosx;
+			sourceTree = "<group>";
+		};
+		EC44850C0CCD242B001C88AD /* posix */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = posix;
+			sourceTree = "<group>";
+		};
+		EC44850D0CCD242B001C88AD /* win */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = win;
+			sourceTree = "<group>";
+		};
+		EC4485100CCD243D001C88AD /* plugins */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485110CCD243D001C88AD /* example */,
+			);
+			path = plugins;
+			sourceTree = "<group>";
+		};
+		EC4485110CCD243D001C88AD /* example */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485120CCD243D001C88AD /* example-plugin.c */,
+			);
+			path = example;
+			sourceTree = "<group>";
+		};
+		EC4485130CCD2456001C88AD /* rendering */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485140CCD2456001C88AD /* camera.c */,
+				EC4485150CCD2456001C88AD /* camera.h */,
+				EC4485160CCD2456001C88AD /* colour.c */,
+				EC4485170CCD2456001C88AD /* colour.h */,
+				EC4485180CCD2456001C88AD /* render.c */,
+				EC4485190CCD2456001C88AD /* render.h */,
+				EC44851A0CCD2456001C88AD /* sky.c */,
+				EC44851B0CCD2456001C88AD /* sky.h */,
+				EC44851C0CCD2456001C88AD /* texture.c */,
+				EC44851D0CCD2456001C88AD /* texture.h */,
+			);
+			path = rendering;
+			sourceTree = "<group>";
+		};
+		EC4485230CCD2464001C88AD /* scripting */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485240CCD2464001C88AD /* CMakeLists.txt */,
+				EC4485250CCD2464001C88AD /* config.pyx */,
+				EC4485260CCD2464001C88AD /* io.pyx */,
+				EC4485270CCD2464001C88AD /* object-manager.pyx */,
+				EC4485280CCD2464001C88AD /* scripting.c */,
+				EC4485290CCD2464001C88AD /* scripting.h */,
+			);
+			path = scripting;
+			sourceTree = "<group>";
+		};
+		EC44852F0CCD247E001C88AD /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485300CCD247E001C88AD /* CMakeLists.txt */,
+				EC4485310CCD247E001C88AD /* common */,
+				EC4485340CCD247E001C88AD /* mock */,
+				EC4485370CCD247E001C88AD /* t000_hashtable */,
+				EC44853A0CCD247E001C88AD /* t001_heap */,
+				EC44853D0CCD247E001C88AD /* t002_tga */,
+				EC4485420CCD247E001C88AD /* t003_math */,
+				EC4485450CCD247E001C88AD /* t004_physics */,
+				EC4485480CCD247E001C88AD /* t005_object_manager */,
+				EC44854B0CCD247E001C88AD /* t006_list */,
+				EC44854E0CCD247E001C88AD /* template */,
+			);
+			path = tests;
+			sourceTree = "<group>";
+		};
+		EC4485310CCD247E001C88AD /* common */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485320CCD247E001C88AD /* CMakeLists.txt */,
+				EC4485330CCD247E001C88AD /* testdriver-main.c */,
+			);
+			path = common;
+			sourceTree = "<group>";
+		};
+		EC4485340CCD247E001C88AD /* mock */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485350CCD247E001C88AD /* mock.c */,
+				EC4485360CCD247E001C88AD /* mock.h */,
+			);
+			path = mock;
+			sourceTree = "<group>";
+		};
+		EC4485370CCD247E001C88AD /* t000_hashtable */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485380CCD247E001C88AD /* CMakeLists.txt */,
+				EC4485390CCD247E001C88AD /* hash-test.c */,
+			);
+			path = t000_hashtable;
+			sourceTree = "<group>";
+		};
+		EC44853A0CCD247E001C88AD /* t001_heap */ = {
+			isa = PBXGroup;
+			children = (
+				EC44853B0CCD247E001C88AD /* CMakeLists.txt */,
+				EC44853C0CCD247E001C88AD /* heap-test.c */,
+			);
+			path = t001_heap;
+			sourceTree = "<group>";
+		};
+		EC44853D0CCD247E001C88AD /* t002_tga */ = {
+			isa = PBXGroup;
+			children = (
+				EC44853E0CCD247E001C88AD /* CMakeLists.txt */,
+				EC44853F0CCD247E001C88AD /* rle.tga */,
+				EC4485400CCD247E001C88AD /* tga-test.c */,
+				EC4485410CCD247E001C88AD /* uncomp.tga */,
+			);
+			path = t002_tga;
+			sourceTree = "<group>";
+		};
+		EC4485420CCD247E001C88AD /* t003_math */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485430CCD247E001C88AD /* CMakeLists.txt */,
+				EC4485440CCD247E001C88AD /* math-test.c */,
+			);
+			path = t003_math;
+			sourceTree = "<group>";
+		};
+		EC4485450CCD247E001C88AD /* t004_physics */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485460CCD247E001C88AD /* CMakeLists.txt */,
+				EC4485470CCD247E001C88AD /* test-case.c */,
+			);
+			path = t004_physics;
+			sourceTree = "<group>";
+		};
+		EC4485480CCD247E001C88AD /* t005_object_manager */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485490CCD247E001C88AD /* CMakeLists.txt */,
+				EC44854A0CCD247E001C88AD /* om-test.c */,
+			);
+			path = t005_object_manager;
+			sourceTree = "<group>";
+		};
+		EC44854B0CCD247E001C88AD /* t006_list */ = {
+			isa = PBXGroup;
+			children = (
+				EC44854C0CCD247E001C88AD /* CMakeLists.txt */,
+				EC44854D0CCD247E001C88AD /* list-test.c */,
+			);
+			path = t006_list;
+			sourceTree = "<group>";
+		};
+		EC44854E0CCD247E001C88AD /* template */ = {
+			isa = PBXGroup;
+			children = (
+				EC44854F0CCD247E001C88AD /* CMakeLists.txt */,
+				EC4485500CCD247E001C88AD /* test-case.c */,
+			);
+			path = template;
+			sourceTree = "<group>";
+		};
+		EC4485510CCD2496001C88AD /* rsrc */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485520CCD2496001C88AD /* data */,
+				EC4485540CCD2496001C88AD /* models */,
+				EC4485560CCD2496001C88AD /* sounds */,
+				EC4485570CCD2496001C88AD /* textures */,
+			);
+			path = rsrc;
+			sourceTree = "<group>";
+		};
+		EC4485520CCD2496001C88AD /* data */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485530CCD2496001C88AD /* solarsystem.csv */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		EC4485540CCD2496001C88AD /* models */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485550CCD2496001C88AD /* w3d-test.obj */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		EC4485560CCD2496001C88AD /* sounds */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = sounds;
+			sourceTree = "<group>";
+		};
+		EC4485570CCD2496001C88AD /* textures */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = textures;
+			sourceTree = "<group>";
+		};
+		EC4485580CCD24C6001C88AD /* cmake */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485590CCD24C6001C88AD /* AddCMakeList.txt */,
+				EC44855A0CCD24C6001C88AD /* Bison.txt */,
+				EC44855B0CCD24C6001C88AD /* Flex.txt */,
+				EC44855C0CCD24C6001C88AD /* InstallMacRes.txt */,
+				EC44855D0CCD24C6001C88AD /* Pyrex.txt */,
+			);
+			path = cmake;
+			sourceTree = "<group>";
+		};
+		EC4485640CCD24C6001C88AD /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485650CCD24C6001C88AD /* hip-filter.py */,
+				EC4485660CCD24C6001C88AD /* init.py */,
+				EC4485670CCD24C6001C88AD /* install-mac-res.sh */,
+			);
+			path = scripts;
+			sourceTree = "<group>";
+		};
+		EC4485760CCD25C6001C88AD /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				EC44855F0CCD24C6001C88AD /* COPYING.txt */,
+				EC4485610CCD24C6001C88AD /* HACKING.txt */,
+				EC4485620CCD24C6001C88AD /* INSTALL.txt */,
+				EC4485630CCD24C6001C88AD /* README.txt */,
+			);
+			name = docs;
+			sourceTree = "<group>";
+		};
+		EC4485900CCD26A8001C88AD /* gencds */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485910CCD26A8001C88AD /* hashtable.h */,
+				EC4485920CCD26A8001C88AD /* heap.h */,
+				EC4485930CCD26A8001C88AD /* list.h */,
+				EC4485940CCD26A8001C88AD /* object-manager.h */,
+			);
+			path = gencds;
+			sourceTree = "<group>";
+		};
+		EC4485950CCD26A8001C88AD /* openorbit */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485960CCD26A8001C88AD /* ifaces */,
+				EC4485980CCD26A8001C88AD /* openorbit.h */,
+			);
+			path = openorbit;
+			sourceTree = "<group>";
+		};
+		EC4485960CCD26A8001C88AD /* ifaces */ = {
+			isa = PBXGroup;
+			children = (
+				EC4485970CCD26A8001C88AD /* control-if.h */,
+			);
+			path = ifaces;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		EC4486340CCE7B20001C88AD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC44863F0CCE7BC4001C88AD /* hashtable.h in Headers */,
+				EC4486400CCE7BC4001C88AD /* heap.h in Headers */,
+				EC4486410CCE7BC4001C88AD /* list.h in Headers */,
+				EC4486420CCE7BC4001C88AD /* object-manager.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		EC4476960CCBFF73001C88AD /* t000_hashtable */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC4476AF0CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t000_hashtable" */;
+			buildPhases = (
+				EC4476940CCBFF73001C88AD /* Sources */,
+				EC4476950CCBFF73001C88AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = t000_hashtable;
+			productName = t000_hashtable;
+			productReference = EC4476970CCBFF73001C88AD /* t000_hashtable */;
+			productType = "com.apple.product-type.tool";
+		};
+		EC44769D0CCBFF95001C88AD /* t001_heap */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC4476B20CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t001_heap" */;
+			buildPhases = (
+				EC44769B0CCBFF95001C88AD /* Sources */,
+				EC44769C0CCBFF95001C88AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = t001_heap;
+			productName = t001_heap;
+			productReference = EC44769E0CCBFF95001C88AD /* t001_heap */;
+			productType = "com.apple.product-type.tool";
+		};
+		EC4476A20CCBFFB1001C88AD /* t002_tga */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC4476B50CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t002_tga" */;
+			buildPhases = (
+				EC4476A00CCBFFB1001C88AD /* Sources */,
+				EC4476A10CCBFFB1001C88AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = t002_tga;
+			productName = t002_tga;
+			productReference = EC4476A30CCBFFB1001C88AD /* t002_tga */;
+			productType = "com.apple.product-type.tool";
+		};
+		EC4476A70CCBFFC3001C88AD /* t003_math */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC4476B80CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t003_math" */;
+			buildPhases = (
+				EC4476A50CCBFFC3001C88AD /* Sources */,
+				EC4476A60CCBFFC3001C88AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = t003_math;
+			productName = t003_math;
+			productReference = EC4476A80CCBFFC3001C88AD /* t003_math */;
+			productType = "com.apple.product-type.tool";
+		};
+		EC4476AC0CCBFFD8001C88AD /* t004_physics */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC4476BB0CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t004_physics" */;
+			buildPhases = (
+				EC4476AA0CCBFFD8001C88AD /* Sources */,
+				EC4476AB0CCBFFD8001C88AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = t004_physics;
+			productName = t004_physics;
+			productReference = EC4476AD0CCBFFD8001C88AD /* t004_physics */;
+			productType = "com.apple.product-type.tool";
+		};
+		EC4476C00CCBFFF9001C88AD /* t005_object_manager */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC4476D40CCC0038001C88AD /* Build configuration list for PBXNativeTarget "t005_object_manager" */;
+			buildPhases = (
+				EC4476BE0CCBFFF9001C88AD /* Sources */,
+				EC4476BF0CCBFFF9001C88AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = t005_object_manager;
+			productName = t005_object_manager;
+			productReference = EC4476C10CCBFFF9001C88AD /* t005_object_manager */;
+			productType = "com.apple.product-type.tool";
+		};
+		EC4476C50CCC0010001C88AD /* t006_list */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC4476D70CCC0038001C88AD /* Build configuration list for PBXNativeTarget "t006_list" */;
+			buildPhases = (
+				EC4476C30CCC0010001C88AD /* Sources */,
+				EC4476C40CCC0010001C88AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = t006_list;
+			productName = t006_list;
+			productReference = EC4476C60CCC0010001C88AD /* t006_list */;
+			productType = "com.apple.product-type.tool";
+		};
+		EC4476DD0CCC0076001C88AD /* Open Orbit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC4476E10CCC0077001C88AD /* Build configuration list for PBXNativeTarget "Open Orbit" */;
+			buildPhases = (
+				EC4476DA0CCC0076001C88AD /* Resources */,
+				EC4476DB0CCC0076001C88AD /* Sources */,
+				EC4476DC0CCC0076001C88AD /* Frameworks */,
+			);
+			buildRules = (
+				EC4485D50CCD4A19001C88AD /* PBXBuildRule */,
+			);
+			dependencies = (
+			);
+			name = "Open Orbit";
+			productName = "Open Orbit";
+			productReference = EC4476DE0CCC0076001C88AD /* Open Orbit.app */;
+			productType = "com.apple.product-type.application";
+		};
+		EC4486380CCE7B20001C88AD /* gencds */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC44863B0CCE7B21001C88AD /* Build configuration list for PBXNativeTarget "gencds" */;
+			buildPhases = (
+				EC4486340CCE7B20001C88AD /* Headers */,
+				EC4486350CCE7B20001C88AD /* Resources */,
+				EC4486360CCE7B20001C88AD /* Sources */,
+				EC4486370CCE7B20001C88AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = gencds;
+			productName = gencds;
+			productReference = EC4486390CCE7B20001C88AD /* gencds.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EC4476760CCBFEDB001C88AD /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = EC4476770CCBFEDB001C88AD /* Build configuration list for PBXProject "orbit" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 0;
+			mainGroup = EC4476740CCBFEDB001C88AD;
+			productRefGroup = EC4476850CCBFEFA001C88AD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EC4476DD0CCC0076001C88AD /* Open Orbit */,
+				EC4486380CCE7B20001C88AD /* gencds */,
+				EC4476890CCBFF1C001C88AD /* tests */,
+				EC4476960CCBFF73001C88AD /* t000_hashtable */,
+				EC44769D0CCBFF95001C88AD /* t001_heap */,
+				EC4476A20CCBFFB1001C88AD /* t002_tga */,
+				EC4476A70CCBFFC3001C88AD /* t003_math */,
+				EC4476AC0CCBFFD8001C88AD /* t004_physics */,
+				EC4476C00CCBFFF9001C88AD /* t005_object_manager */,
+				EC4476C50CCC0010001C88AD /* t006_list */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EC4476DA0CCC0076001C88AD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4486350CCE7B20001C88AD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EC4476940CCBFF73001C88AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC4485690CCD251E001C88AD /* testdriver-main.c in Sources */,
+				EC4485680CCD250C001C88AD /* hash-test.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC44769B0CCBFF95001C88AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC44856A0CCD252D001C88AD /* testdriver-main.c in Sources */,
+				EC4485700CCD2568001C88AD /* heap-test.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476A00CCBFFB1001C88AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC44856B0CCD253A001C88AD /* testdriver-main.c in Sources */,
+				EC4485710CCD2575001C88AD /* tga-test.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476A50CCBFFC3001C88AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC44856C0CCD2541001C88AD /* testdriver-main.c in Sources */,
+				EC4485720CCD2581001C88AD /* math-test.c in Sources */,
+				EC4484EE0CCD23C3001C88AD /* linalg.c in Sources */,
+				EC4484EF0CCD23C3001C88AD /* quaternions.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476AA0CCBFFD8001C88AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC44856D0CCD2547001C88AD /* testdriver-main.c in Sources */,
+				EC4485730CCD258E001C88AD /* test-case.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476BE0CCBFFF9001C88AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC44856F0CCD2553001C88AD /* testdriver-main.c in Sources */,
+				EC4485740CCD259D001C88AD /* om-test.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476C30CCC0010001C88AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC44856E0CCD254D001C88AD /* testdriver-main.c in Sources */,
+				EC4485750CCD25AB001C88AD /* list-test.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4476DB0CCC0076001C88AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC4485D60CCD4B11001C88AD /* config.pyx in Sources */,
+				EC4485D70CCD4B11001C88AD /* io.pyx in Sources */,
+				EC4484CD0CCD22CD001C88AD /* error.c in Sources */,
+				EC4484CE0CCD22CD001C88AD /* io-manager.c in Sources */,
+				EC4484CF0CCD22CD001C88AD /* main.c in Sources */,
+				EC4484D00CCD22CD001C88AD /* plugin-handler.c in Sources */,
+				EC4484D10CCD22CD001C88AD /* settings.c in Sources */,
+				EC4484D20CCD22CD001C88AD /* sim.c in Sources */,
+				EC4484EC0CCD23C3001C88AD /* linalg.c in Sources */,
+				EC4484ED0CCD23C3001C88AD /* quaternions.c in Sources */,
+				EC4484F50CCD23E6001C88AD /* tga.c in Sources */,
+				EC4484FD0CCD23F4001C88AD /* dynamics.c in Sources */,
+				EC4484FE0CCD23F4001C88AD /* kepler.c in Sources */,
+				EC44850E0CCD242B001C88AD /* res-manager.c in Sources */,
+				EC44850F0CCD242B001C88AD /* SDLMain.m in Sources */,
+				EC44851E0CCD2456001C88AD /* camera.c in Sources */,
+				EC44851F0CCD2456001C88AD /* colour.c in Sources */,
+				EC4485200CCD2456001C88AD /* render.c in Sources */,
+				EC4485210CCD2456001C88AD /* sky.c in Sources */,
+				EC4485220CCD2456001C88AD /* texture.c in Sources */,
+				EC44852E0CCD2464001C88AD /* scripting.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4486360CCE7B20001C88AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC4486440CCE7BDD001C88AD /* hashtable.c in Sources */,
+				EC4486450CCE7BDD001C88AD /* heap.c in Sources */,
+				EC4486470CCE7BDD001C88AD /* list.c in Sources */,
+				EC4486490CCE7BDD001C88AD /* object-manager.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EC44769A0CCBFF7B001C88AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC4476960CCBFF73001C88AD /* t000_hashtable */;
+			targetProxy = EC4476990CCBFF7B001C88AD /* PBXContainerItemProxy */;
+		};
+		EC4476C90CCC001A001C88AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC4476C50CCC0010001C88AD /* t006_list */;
+			targetProxy = EC4476C80CCC001A001C88AD /* PBXContainerItemProxy */;
+		};
+		EC4476CB0CCC001A001C88AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC4476C00CCBFFF9001C88AD /* t005_object_manager */;
+			targetProxy = EC4476CA0CCC001A001C88AD /* PBXContainerItemProxy */;
+		};
+		EC4476CD0CCC001A001C88AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC4476AC0CCBFFD8001C88AD /* t004_physics */;
+			targetProxy = EC4476CC0CCC001A001C88AD /* PBXContainerItemProxy */;
+		};
+		EC4476CF0CCC001A001C88AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC4476A70CCBFFC3001C88AD /* t003_math */;
+			targetProxy = EC4476CE0CCC001A001C88AD /* PBXContainerItemProxy */;
+		};
+		EC4476D10CCC001A001C88AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC4476A20CCBFFB1001C88AD /* t002_tga */;
+			targetProxy = EC4476D00CCC001A001C88AD /* PBXContainerItemProxy */;
+		};
+		EC4476D30CCC001A001C88AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC44769D0CCBFF95001C88AD /* t001_heap */;
+			targetProxy = EC4476D20CCC001A001C88AD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		EC4476780CCBFEDB001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		EC4476790CCBFEDB001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+		EC44768B0CCBFF3A001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = tests;
+			};
+			name = Debug;
+		};
+		EC44768C0CCBFF3A001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				PRODUCT_NAME = tests;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		EC4476B00CCBFFF7001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t000_hashtable;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC4476B10CCBFFF7001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t000_hashtable;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		EC4476B30CCBFFF7001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t001_heap;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC4476B40CCBFFF7001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t001_heap;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		EC4476B60CCBFFF7001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t002_tga;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC4476B70CCBFFF7001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t002_tga;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		EC4476B90CCBFFF7001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t003_math;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC4476BA0CCBFFF7001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t003_math;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		EC4476BC0CCBFFF7001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t004_physics;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC4476BD0CCBFFF7001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t004_physics;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		EC4476D50CCC0038001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t005_object_manager;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC4476D60CCC0038001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t005_object_manager;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		EC4476D80CCC0038001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t006_list;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC4476D90CCC0038001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = t006_list;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		EC4476E20CCC0077001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					WITH_PYTHON,
+					USE_ALTIVEC,
+				);
+				HEADER_SEARCH_PATHS = (
+					include,
+					/Library/Frameworks/Python.framework/Headers/,
+				);
+				INFOPLIST_FILE = "Open Orbit-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(LOCAL_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5/lib/python2.5/config\"";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "Open Orbit";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC4476E30CCC0077001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					WITH_PYTHON,
+					USE_ALTIVEC,
+				);
+				HEADER_SEARCH_PATHS = (
+					include,
+					/Library/Frameworks/Python.framework/Headers/,
+				);
+				INFOPLIST_FILE = "Open Orbit-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(LOCAL_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5/lib/python2.5/config\"";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "Open Orbit";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		EC44863C0CCE7B21001C88AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				HEADER_SEARCH_PATHS = include;
+				INFOPLIST_FILE = "src/libgencds/gencds-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = gencds;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC44863D0CCE7B21001C88AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				HEADER_SEARCH_PATHS = include;
+				INFOPLIST_FILE = "src/libgencds/gencds-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = gencds;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		EC4476770CCBFEDB001C88AD /* Build configuration list for PBXProject "orbit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4476780CCBFEDB001C88AD /* Debug */,
+				EC4476790CCBFEDB001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC44768A0CCBFF3A001C88AD /* Build configuration list for PBXAggregateTarget "tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC44768B0CCBFF3A001C88AD /* Debug */,
+				EC44768C0CCBFF3A001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC4476AF0CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t000_hashtable" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4476B00CCBFFF7001C88AD /* Debug */,
+				EC4476B10CCBFFF7001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC4476B20CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t001_heap" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4476B30CCBFFF7001C88AD /* Debug */,
+				EC4476B40CCBFFF7001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC4476B50CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t002_tga" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4476B60CCBFFF7001C88AD /* Debug */,
+				EC4476B70CCBFFF7001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC4476B80CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t003_math" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4476B90CCBFFF7001C88AD /* Debug */,
+				EC4476BA0CCBFFF7001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC4476BB0CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t004_physics" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4476BC0CCBFFF7001C88AD /* Debug */,
+				EC4476BD0CCBFFF7001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC4476D40CCC0038001C88AD /* Build configuration list for PBXNativeTarget "t005_object_manager" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4476D50CCC0038001C88AD /* Debug */,
+				EC4476D60CCC0038001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC4476D70CCC0038001C88AD /* Build configuration list for PBXNativeTarget "t006_list" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4476D80CCC0038001C88AD /* Debug */,
+				EC4476D90CCC0038001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC4476E10CCC0077001C88AD /* Build configuration list for PBXNativeTarget "Open Orbit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4476E20CCC0077001C88AD /* Debug */,
+				EC4476E30CCC0077001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC44863B0CCE7B21001C88AD /* Build configuration list for PBXNativeTarget "gencds" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC44863C0CCE7B21001C88AD /* Debug */,
+				EC44863D0CCE7B21001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EC4476760CCBFEDB001C88AD /* Project object */;
+}
