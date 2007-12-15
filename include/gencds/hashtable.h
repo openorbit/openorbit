@@ -50,6 +50,8 @@ extern "C" {
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include <gencds/list.h>
+    
 typedef struct _hashtable_t hashtable_t;
 
 /*! Hash function */
@@ -122,6 +124,16 @@ void *hashtable_lookup(const hashtable_t *ht, const char *key);
 int hashtable_insert(hashtable_t *ht, const char *key, void *obj);
 // returns the obj for the entry being deleted, NULL if the entry cannot be found
 void* hashtable_remove(hashtable_t *ht, const char *key);
+
+list_entry_t* hashtable_lookup_list_entry(const hashtable_t * restrict ht,
+                                          const char * restrict key);
+    
+    
+list_entry_t* hashtable_first(hashtable_t *ht);
+list_entry_t* hashtable_last(hashtable_t *ht);
+void* hashtable_entry_key(list_entry_t *entry);
+void* hashtable_entry_data(list_entry_t *entry);
+void* hashtable_entry_remove(hashtable_t *ht, list_entry_t *entry);
 
 void hashtable_print(hashtable_t *ht);
 #ifdef __cplusplus
