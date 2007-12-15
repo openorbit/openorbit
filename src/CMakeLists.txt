@@ -34,7 +34,7 @@ set(open_orbit_name "openorbit")
 set(open_orbit_debug_name "openorbit-dbg")
 
 if (APPLE)
-    aux_source_directory(macosx macosx_SRC)
+    aux_source_directory(platform/macosx macosx_SRC)
     list(APPEND openorbit_SRC ${macosx_SRC})
 	
     set(MACOSX_BUNDLE_INFO_STRING "Open Orbit, an interactive space flight simulator")
