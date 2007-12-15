@@ -38,6 +38,7 @@
 #include "sim.h"
 #include "physics/dynamics.h"
 
+#include "rendering/planet.h"
 // epoch = ???
 
 sim_state_t gSIM_state;
@@ -69,6 +70,11 @@ void
 sim_step(float dt)
 {
     gSIM_state.time ++;
+    // temporary to have something to look at...
+    for (int i = 0 ; i < MAX_PLANETS ; i ++) {
+        planet_rot_orig(&gPlanets[i], dt*0.1);
+        planet_rot_ax(&gPlanets[i], dt*0.5);
+    }
     
     // compute physics step
 //    ph_step(gSIM_state.world, dt);

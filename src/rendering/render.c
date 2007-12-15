@@ -48,6 +48,8 @@
 #include "settings.h"
 #include "camera.h"
 #include "sky.h"
+#include "texture.h"
+#include "planet.h"
 
 static void draw_gl(void);
 static void init_gl(void);
@@ -56,8 +58,6 @@ static void init_attributes(void);
 static void create_surface(void);
 
 static SDL_Surface *REND_screen;
-//extern settings_t SETTINGS;
-
 
 
 bool
@@ -72,7 +72,7 @@ init_renderer(void) {
     print_attributes();
     
     init_gl();
- //   tex_init();
+    tex_init();
     return true;
 }
 
@@ -100,7 +100,7 @@ init_gl(void)
     
     glViewport(0, 0, width, height);
     
-    ugly_load_and_init_of_test_texture();
+//    ugly_load_and_init_of_test_texture();
 }
 
 
@@ -178,48 +178,6 @@ create_surface(void)
 	}
 }
 
-void cam_hack(void);
-
-#include "parsers/tga.h"
-#include <assert.h>
-#define MY_TGA_FILE "/Users/holm/Desktop/earth.tga"
-GLUquadricObj *quadric;
-
-void
-ugly_load_and_init_of_test_texture(void)
-{
-    tga_image_t tex;
-    FILE *file;
-    file = fopen(MY_TGA_FILE, "r");
-    assert(file);
-    int res = tga_read_file(&tex, file);
-    assert(!res);
-    
-    glBindTexture(GL_TEXTURE_2D, 0); 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, tex.header.img_spec.width, 
-                 tex.header.img_spec.height, 0, GL_BGR, GL_UNSIGNED_BYTE, 
-                 tex.data);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                    GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-                    GL_NEAREST);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    
-    glEnable(GL_TEXTURE_2D);
-    glShadeModel(GL_SMOOTH);
-    
-    glPolygonMode(GL_FRONT,GL_FILL);
-    glPolygonMode(GL_BACK,GL_LINE);
-
-    quadric=gluNewQuadric();
-    gluQuadricNormals(quadric, GLU_SMOOTH);
-    gluQuadricTexture(quadric, GL_TRUE);
-}
-
 
 void exit_fullscreen()
 {
@@ -251,40 +209,12 @@ draw_gl(void)
     glLoadIdentity();
     
     // the drawing is not very well structured at the moment
-    // we should do the following: 1. traverse the scene graph and move the
-    // camera, 2. paint visible objects in the scene graph node, 3. there is no
-    // step 3...
-    cam_hack();
-    
-    glEnable(GL_DEPTH_TEST);
+    cam_move_global_camera();
 
-    GLfloat lightCol[] = {1.0,1.0,1.0,1.0};
-    GLfloat pos[] = {100.0, 0.0, 0.0, 0.0};
-    
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightCol);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, lightCol);
-    glLightfv(GL_LIGHT0, GL_POSITION, pos);
-    
     glPushMatrix();
-    
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-        
-    static float sphere_rot = 0.0f;
-    GLfloat col[] = {1.0f, 1.0f, 1.0f, 1.0f};
-        
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, col);
-    glColor3f(1.0f, 1.0f, 1.0f);
 
-    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef(sphere_rot, 0.0f, 0.0f, 1.0f);
-    gluSphere(quadric,1,64,64);
-//        sphere_rot = fmodf(sphere_rot - 0.1f, 360.0);
-    
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+    planet_draw_all();
     glPopMatrix();
     
     // axis, ugly, but this is a temporary hack

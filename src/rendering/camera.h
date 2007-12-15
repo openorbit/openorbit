@@ -77,6 +77,8 @@ typedef struct {
 } camera_t;
 
 bool init_cam(void);
+    
+void cam_move_global_camera(void);
 
 void cam_rotate(quaternion_t q);
 

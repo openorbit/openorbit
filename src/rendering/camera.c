@@ -157,7 +157,7 @@ cam_set_view(camera_t *cam)
     }
 }
 void
-cam_hack(void)
+cam_move_global_camera(void)
 {
     cam_set_view(gCam);
 }
