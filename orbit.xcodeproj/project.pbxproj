@@ -42,7 +42,6 @@
 		EC4484EF0CCD23C3001C88AD /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484E80CCD23C3001C88AD /* quaternions.c */; };
 		EC4484F50CCD23E6001C88AD /* tga.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484F20CCD23E6001C88AD /* tga.c */; };
 		EC4484FD0CCD23F4001C88AD /* dynamics.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484F80CCD23F4001C88AD /* dynamics.c */; };
-		EC4484FE0CCD23F4001C88AD /* kepler.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484FA0CCD23F4001C88AD /* kepler.c */; };
 		EC44850E0CCD242B001C88AD /* res-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485080CCD242B001C88AD /* res-manager.c */; };
 		EC44850F0CCD242B001C88AD /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = EC44850B0CCD242B001C88AD /* SDLMain.m */; };
 		EC44851E0CCD2456001C88AD /* camera.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485140CCD2456001C88AD /* camera.c */; };
@@ -76,6 +75,8 @@
 		EC4486470CCE7BDD001C88AD /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484D90CCD238B001C88AD /* list.c */; };
 		EC4486490CCE7BDD001C88AD /* object-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484DB0CCD238B001C88AD /* object-manager.c */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
+		ECA16A990D141B6A000CAE03 /* planet.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA16A980D141B6A000CAE03 /* planet.c */; };
+		ECA16AA00D143E13000CAE03 /* postinit.py in Resources */ = {isa = PBXBuildFile; fileRef = ECA16A9F0D143E13000CAE03 /* postinit.py */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -89,7 +90,7 @@
 				"$(DERIVED_FILES_DIR)/$(INPUT_FILE_BASE).c",
 				"$(DERIVED_FILES_DIR)/$(INPUT_FILE_BASE).h",
 			);
-			script = "/Library/Frameworks/Python.framework/Versions/Current/bin/pyrexc -o \"$(DERIVED_FILES_DIR)/$(INPUT_FILE_BASE).c\" $(INPUT_FILE_PATH)";
+			script = "export PYTHONPATH=/opt/pyrex\ncd \"${DERIVED_FILES_DIR}\"\n/opt/pyrex/bin/pyrexc \"${INPUT_FILE_PATH}\"";
 		};
 /* End PBXBuildRule section */
 
@@ -190,8 +191,6 @@
 		EC4484F70CCD23F4001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		EC4484F80CCD23F4001C88AD /* dynamics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dynamics.c; sourceTree = "<group>"; };
 		EC4484F90CCD23F4001C88AD /* dynamics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dynamics.h; sourceTree = "<group>"; };
-		EC4484FA0CCD23F4001C88AD /* kepler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kepler.c; sourceTree = "<group>"; };
-		EC4484FB0CCD23F4001C88AD /* kepler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kepler.h; sourceTree = "<group>"; };
 		EC4485080CCD242B001C88AD /* res-manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "res-manager.c"; sourceTree = "<group>"; };
 		EC44850A0CCD242B001C88AD /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLMain.h; sourceTree = "<group>"; };
 		EC44850B0CCD242B001C88AD /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDLMain.m; sourceTree = "<group>"; };
@@ -261,7 +260,18 @@
 		EC4486390CCE7B20001C88AD /* gencds.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = gencds.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC44863A0CCE7B20001C88AD /* gencds-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "gencds-Info.plist"; sourceTree = "<group>"; };
 		EC5B8BA00CD7DDBC00BDB22A /* res-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "res-manager.h"; sourceTree = "<group>"; };
+		EC76CC890D0163D200059CCB /* environment.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = environment.pyx; sourceTree = "<group>"; };
+		EC76CC8A0D016B4E00059CCB /* stars.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stars.csv; sourceTree = "<group>"; };
+		EC76CC8B0D016CFB00059CCB /* res.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = res.pyx; sourceTree = "<group>"; };
+		EC86B6F30D02DDAB00F6A396 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC86B7620D068FF600F6A396 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
+		ECA16A970D141B6A000CAE03 /* planet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = planet.h; sourceTree = "<group>"; };
+		ECA16A980D141B6A000CAE03 /* planet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = planet.c; sourceTree = "<group>"; };
+		ECA16A9A0D1421B4000CAE03 /* convert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = convert.h; sourceTree = "<group>"; };
+		ECA16A9D0D142E82000CAE03 /* texture.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = texture.pyx; sourceTree = "<group>"; };
+		ECA16A9E0D14359E000CAE03 /* solsystem.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = solsystem.csv; sourceTree = "<group>"; };
+		ECA16A9F0D143E13000CAE03 /* postinit.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = postinit.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -382,6 +392,7 @@
 		EC4476EB0CCC0117001C88AD /* src */ = {
 			isa = PBXGroup;
 			children = (
+				EC86B6F30D02DDAB00F6A396 /* CMakeLists.txt */,
 				EC4485230CCD2464001C88AD /* scripting */,
 				EC4485130CCD2456001C88AD /* rendering */,
 				EC4485100CCD243D001C88AD /* plugins */,
@@ -443,6 +454,7 @@
 				EC4484E80CCD23C3001C88AD /* quaternions.c */,
 				EC4484E90CCD23C3001C88AD /* quaternions.h */,
 				EC4484EA0CCD23C3001C88AD /* types.h */,
+				ECA16A9A0D1421B4000CAE03 /* convert.h */,
 			);
 			path = math;
 			sourceTree = "<group>";
@@ -463,8 +475,6 @@
 				EC4484F70CCD23F4001C88AD /* CMakeLists.txt */,
 				EC4484F80CCD23F4001C88AD /* dynamics.c */,
 				EC4484F90CCD23F4001C88AD /* dynamics.h */,
-				EC4484FA0CCD23F4001C88AD /* kepler.c */,
-				EC4484FB0CCD23F4001C88AD /* kepler.h */,
 			);
 			path = physics;
 			sourceTree = "<group>";
@@ -532,6 +542,8 @@
 				EC44851B0CCD2456001C88AD /* sky.h */,
 				EC44851C0CCD2456001C88AD /* texture.c */,
 				EC44851D0CCD2456001C88AD /* texture.h */,
+				ECA16A970D141B6A000CAE03 /* planet.h */,
+				ECA16A980D141B6A000CAE03 /* planet.c */,
 			);
 			path = rendering;
 			sourceTree = "<group>";
@@ -539,12 +551,16 @@
 		EC4485230CCD2464001C88AD /* scripting */ = {
 			isa = PBXGroup;
 			children = (
+				EC86B6FF0D068FA900F6A396 /* openorbit */,
 				EC4485240CCD2464001C88AD /* CMakeLists.txt */,
 				EC4485250CCD2464001C88AD /* config.pyx */,
 				EC4485260CCD2464001C88AD /* io.pyx */,
 				EC4485270CCD2464001C88AD /* object-manager.pyx */,
 				EC4485280CCD2464001C88AD /* scripting.c */,
 				EC4485290CCD2464001C88AD /* scripting.h */,
+				EC76CC890D0163D200059CCB /* environment.pyx */,
+				EC76CC8B0D016CFB00059CCB /* res.pyx */,
+				ECA16A9D0D142E82000CAE03 /* texture.pyx */,
 			);
 			path = scripting;
 			sourceTree = "<group>";
@@ -674,6 +690,8 @@
 			isa = PBXGroup;
 			children = (
 				EC4485530CCD2496001C88AD /* solarsystem.csv */,
+				EC76CC8A0D016B4E00059CCB /* stars.csv */,
+				ECA16A9E0D14359E000CAE03 /* solsystem.csv */,
 			);
 			path = data;
 			sourceTree = "<group>";
@@ -718,6 +736,7 @@
 				EC4485650CCD24C6001C88AD /* hip-filter.py */,
 				EC4485660CCD24C6001C88AD /* init.py */,
 				EC4485670CCD24C6001C88AD /* install-mac-res.sh */,
+				ECA16A9F0D143E13000CAE03 /* postinit.py */,
 			);
 			path = scripts;
 			sourceTree = "<group>";
@@ -759,6 +778,14 @@
 				EC4485970CCD26A8001C88AD /* control-if.h */,
 			);
 			path = ifaces;
+			sourceTree = "<group>";
+		};
+		EC86B6FF0D068FA900F6A396 /* openorbit */ = {
+			isa = PBXGroup;
+			children = (
+				EC86B7620D068FF600F6A396 /* __init__.py */,
+			);
+			path = openorbit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -958,6 +985,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECA16AA00D143E13000CAE03 /* postinit.py in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1052,7 +1080,6 @@
 				EC4484ED0CCD23C3001C88AD /* quaternions.c in Sources */,
 				EC4484F50CCD23E6001C88AD /* tga.c in Sources */,
 				EC4484FD0CCD23F4001C88AD /* dynamics.c in Sources */,
-				EC4484FE0CCD23F4001C88AD /* kepler.c in Sources */,
 				EC44850E0CCD242B001C88AD /* res-manager.c in Sources */,
 				EC44850F0CCD242B001C88AD /* SDLMain.m in Sources */,
 				EC44851E0CCD2456001C88AD /* camera.c in Sources */,
@@ -1061,6 +1088,7 @@
 				EC4485210CCD2456001C88AD /* sky.c in Sources */,
 				EC4485220CCD2456001C88AD /* texture.c in Sources */,
 				EC44852E0CCD2464001C88AD /* scripting.c in Sources */,
+				ECA16A990D141B6A000CAE03 /* planet.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

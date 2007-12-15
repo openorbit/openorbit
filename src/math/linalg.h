@@ -253,7 +253,7 @@ bool m_eq(mat_arr_t a, mat_arr_t b, scalar_t tol)
     m_translate(&(M), (x), (y), (z), (w))
 
 void m_translate(matrix_t *m, scalar_t x, scalar_t y, scalar_t z, scalar_t w);
-        
+
 #ifdef __cplusplus
 }
 #endif 
