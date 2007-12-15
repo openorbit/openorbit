@@ -29,23 +29,35 @@
 #   above, a recipient may use your version of this file under either the MPL,
 #   the GPL or the LGPL."
 
-
+ctypedef int bool
+    
 cdef extern from "settings.h":
-    void set_screen_size(short w, short h)
-    void set_fullscreen(int fs)
-    void toggle_fullscreen()
-    void set_screen_depth(short d)
+    int conf_set_bool(char *key, bool val)
+    int conf_get_bool(char *key, bool *val)    
+    int conf_set_int(char *key, int val)
+    int conf_get_int(char *key, int *val)
+    int conf_set_float(char *key, float val)
+    int conf_get_float(char *key, float *val)
+    int conf_set_str(char *key, char *val)
+    char* conf_get_str(char *key)
 
-cdef public int dummy
 
 def setScreenSize(short w, short h):
-    set_screen_size(w, h)
+    conf_set_int("video.width", w)
+    conf_set_int("video.height", h)
 
 def setFullscreen(int fs):
-    set_fullscreen(fs)
+    conf_set_bool("video.fullscreen", fs)
+
 
 def toggleFullscreen():
-    toggle_fullscreen()
+    cdef bool fs
+    res = conf_get_bool("video.fullscreen", &fs)
+    if fs == 1: # not fully correct, works with gcc though
+        conf_set_bool("video.fullscreen", 0)
+    else:
+        conf_set_bool("video.fullscreen", 1)
 
 def setScreenDepth(short d):
-    set_screen_depth(d)
+    conf_set_int("video.depth", d)
+

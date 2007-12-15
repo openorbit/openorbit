@@ -45,27 +45,25 @@ extern "C" {
  * with the notable exception of the IO configuraton that is handled by a
  * special IO subsystem.
  * 
- * NOTE: In the Python API, this system is called config. */
+ * NOTE: In the Python API, this system is called config.
+ */
+    
+void conf_init(void);
 
-typedef struct {
-    struct {
-        bool fullscreen;
-        int height;
-        int width;
-        int depth;
-    } video;
-    struct {
-        float sound_level;
-        bool music;
-        float music_level;
-    } audio;
-} settings_t;
+int conf_set_bool(const char *key, bool val);
+int conf_get_bool(const char *key, bool *val);    
 
-void set_screen_size(short w, short h);
-void set_fullscreen(bool fs);
-void toggle_fullscreen(void);
-void set_screen_depth(short d);
+int conf_set_int(const char *key, int val);
+int conf_get_int(const char *key, int *val);
 
+int conf_set_float(const char *key, float val);
+int conf_get_float(const char *key, float *val);
+
+int conf_set_str(const char *key, char *val);
+char* conf_get_str(const char *key);
+
+    
+    
 #ifdef __cplusplus
 }
 #endif

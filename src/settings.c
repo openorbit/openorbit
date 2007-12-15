@@ -34,32 +34,180 @@
 
 #include "settings.h"
 #include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <limits.h>
+#include <float.h>
 #include <gencds/hashtable.h>
+#include <assert.h>
 
-settings_t SETTINGS;
 
-/* TODO: kill the current window and make a new one */
+typedef enum {
+    CONF_int,
+    CONF_float,
+    CONF_str,
+    CONF_bool
+} conf_val_kind_t;
+
+typedef struct {
+    conf_val_kind_t kind;
+    union {
+        int i;
+        float f;
+        char *str;
+        bool b;
+    } u;
+} conf_val_t;
+
+
+hashtable_t *g_config;
 void
-set_screen_size(short w, short h)
+conf_init(void)
 {
-    SETTINGS.video.width = w;
-    SETTINGS.video.height = h;
+    g_config = hashtable_new_with_str_keys(512);
+    assert(g_config != NULL);
 }
 
-void
-set_fullscreen(bool fs)
+int
+conf_set_int(const char *key, int val)
 {
-    SETTINGS.video.fullscreen = fs;
+    conf_val_t *confval;
+    if (confval = hashtable_lookup(g_config, key)) {
+        if (confval->kind == CONF_str) {
+            free(confval->u.str);
+        }
+        confval->kind = CONF_int;
+        confval->u.i = val;
+    } else {
+        confval = malloc(sizeof(conf_val_t));
+        if (confval) {
+            confval->kind = CONF_int;
+            confval->u.i = val;
+            hashtable_insert(g_config, key, confval);
+        } else {
+            return -1;
+        }
+    }
+    return 0;
+}
+int
+conf_set_bool(const char *key, bool val)
+{
+    conf_val_t *confval;
+    
+    if (confval = hashtable_lookup(g_config, key)) {
+        if (confval->kind == CONF_str) {
+            free(confval->u.str);
+        }
+        confval->kind = CONF_bool;
+        confval->u.b = val;
+    } else {
+        confval = malloc(sizeof(conf_val_t));
+        if (confval) {
+            confval->kind = CONF_bool;
+            confval->u.b = val;
+            hashtable_insert(g_config, key, confval);
+        } else {
+            return -1;
+        }
+    }
+    return 0;
 }
 
-void
-toggle_fullscreen(void)
+int
+conf_set_float(const char *key, float val)
 {
-    SETTINGS.video.fullscreen = ! SETTINGS.video.fullscreen;
+    conf_val_t *confval;
+    if (confval = hashtable_lookup(g_config, key)) {
+        if (confval->kind == CONF_str) {
+            free(confval->u.str);
+        }
+        confval->kind = CONF_float;
+        confval->u.i = val;
+    } else {
+        confval = malloc(sizeof(conf_val_t));
+        if (confval) {
+            confval->kind = CONF_float;
+            confval->u.i = val;
+            hashtable_insert(g_config, key, confval);
+        } else {
+            return -1;
+        }
+    }
+    return 0;
 }
 
-void
-set_screen_depth(short d)
+int
+conf_set_str(const char *key, char *val)
 {
-    SETTINGS.video.depth = d;
+    conf_val_t *confval;
+    if (confval = hashtable_lookup(g_config, key)) {
+        if (confval->kind == CONF_str) {
+            free(confval->u.str);
+        }
+        confval->kind = CONF_str;
+        confval->u.str = strdup(val);
+    } else {
+        confval = malloc(sizeof(conf_val_t));
+        if (confval) {
+            confval->kind = CONF_int;
+            confval->u.str = strdup(val);
+            hashtable_insert(g_config, key, confval);
+        }
+    }
+    
+    if (! confval || ! confval->u.str) {
+        return -1;
+    }
+    
+    return 0;    
 }
+
+int
+conf_get_int(const char *key, int *val)
+{
+    conf_val_t *confval = hashtable_lookup(g_config, key);
+    if (confval && (confval->kind == CONF_int)) {
+        *val = confval->u.i;
+        return 0;
+    }
+    
+    return -1;
+}
+
+int
+conf_get_bool(const char *key, bool *val)
+{
+    conf_val_t *confval = hashtable_lookup(g_config, key);
+    if (confval && (confval->kind == CONF_bool)) {
+        *val = confval->u.b;
+        return 0;
+    }
+    
+    return -1;
+}
+
+
+int
+conf_get_float(const char *key, float *val)
+{
+    conf_val_t *confval = hashtable_lookup(g_config, key);
+    if (confval && (confval->kind == CONF_float)) {
+        *val = confval->u.f;
+        return 0;
+    }
+    
+    return -1;
+}
+
+char*
+conf_get_str(const char *key)
+{
+    conf_val_t *confval = hashtable_lookup(g_config, key);
+    if (confval && (confval->kind == CONF_str)) {
+        return confval->u.str;
+    }
+    
+    return NULL;    
+}
+

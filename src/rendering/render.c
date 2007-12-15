@@ -56,7 +56,7 @@ static void init_attributes(void);
 static void create_surface(void);
 
 static SDL_Surface *REND_screen;
-extern settings_t SETTINGS;
+//extern settings_t SETTINGS;
 
 
 
@@ -88,12 +88,17 @@ void ugly_load_and_init_of_test_texture(void);
 static void
 init_gl(void)
 {
+    int width, height;
+    
     glMatrixMode(GL_PROJECTION);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glLoadIdentity();
 	gluPerspective(/*fovy*/45.0, /*aspect*/1.33 , /*near*/0.001, /*far*/100.0);
     
-    glViewport(0, 0, SETTINGS.video.width, SETTINGS.video.height);
+    if (conf_get_int("video.width", &width)) width = 640;
+    if (conf_get_int("video.height", &height)) height = 480;
+    
+    glViewport(0, 0, width, height);
     
     ugly_load_and_init_of_test_texture();
 }
@@ -154,16 +159,20 @@ create_surface(void)
     Uint32 flags = 0;
     
     flags = SDL_OPENGL;
-    if (SETTINGS.video.fullscreen)
-        flags |= SDL_FULLSCREEN;
+    bool fullscreen;
+    int width, height;
     
+    if (conf_get_bool("video.fullscreen", &fullscreen)) fullscreen = true;
+    if (conf_get_int("video.width", &width)) width = 640;
+    if (conf_get_int("video.height", &height)) height = 480;
+
+    if (fullscreen) flags |= SDL_FULLSCREEN;
     // Create window
-    REND_screen = SDL_SetVideoMode(SETTINGS.video.width, SETTINGS.video.height,
-                                   0, flags);
+    REND_screen = SDL_SetVideoMode(width, height, 0, flags);
     if (REND_screen == NULL) {
 		
         fprintf(stderr, "Couldn't set %dx%d OpenGL video mode: %s\n",
-                SETTINGS.video.width, SETTINGS.video.height, SDL_GetError());
+                width, height, SDL_GetError());
 		SDL_Quit();
 		exit(2);
 	}

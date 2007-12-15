@@ -67,7 +67,7 @@
 #include "SDL.h"
 
 
-extern settings_t SETTINGS;
+//extern settings_t SETTINGS;
 
 
 static void
@@ -174,6 +174,7 @@ main_loop(void)
 void
 inner_main(void *data, int argc, char *argv[])
 {    
+    conf_init();
     // Setup IO-tables
     io_manager_init();
     init_cam();
