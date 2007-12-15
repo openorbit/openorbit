@@ -256,5 +256,8 @@ list_remove_entry(list_t *list, list_entry_t *entry)
 }
 
 
-
- 
+size_t
+list_length(const list_t *list)
+{
+    return list->entry_count;
+}

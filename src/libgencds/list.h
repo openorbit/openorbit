@@ -73,6 +73,7 @@ typedef struct _list_t list_t;
 list_t *list_new(void);
 void list_delete(list_t *list);
 
+size_t list_length(const list_t *list);
 list_entry_t *list_first(const list_t *list);
 list_entry_t *list_last(const list_t *list);
 list_entry_t *list_rank(const list_t *list, unsigned int rank);
