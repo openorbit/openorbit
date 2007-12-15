@@ -175,7 +175,7 @@ om_restore_ctxt(om_ctxt_t *ctxt)
     return 1;
 }
 int
-om_load_ctxt(om_ctxt_t *ctxt)
+om_load_ctxt(om_ctxt_t *ctxt, const char *fname)
 {
     return 1;   
 }
@@ -289,9 +289,14 @@ om_new_object(om_ctxt_t *ctxt, const char *class_name,
               object_name, class_name);
         return NULL;
     }
+    if (class_object->is_proxy) {
+        warn("om: cannot allocate %s, as the class %s is a proxy",
+             object_name, class_name);
+        return NULL;
+    }
     om_object_t *obj = malloc(sizeof(om_object_t));
     if (obj == NULL) {
-        warn("om: object allocation (objname = %s)", object_name);
+        warn("om: object allocation of %s failed", object_name);
         return NULL;
     }
     
@@ -307,7 +312,7 @@ om_new_object(om_ctxt_t *ctxt, const char *class_name,
 }
 
 om_object_t*
-om_new_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
+om_insert_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
                  const char *object_name, void *obj_addr)
 {
     assert(ctxt != NULL);
@@ -318,6 +323,12 @@ om_new_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
     om_class_t *class_object = om_get_class(ctxt, class_name);
     if (! class_object) {
         warnx("om: cannot insert proxy object %s (%s class not found)",
+              object_name, class_name);
+        return NULL;
+    }
+    
+    if (! class_object->is_proxy) {
+        warnx("om: cannot insert proxy object %s (%s is not a proxy class)",
               object_name, class_name);
         return NULL;
     }
@@ -773,6 +784,7 @@ om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name,          \
     _OM_SET_PROP_IDX_FN_(T, N, TC)
     
 
+_OM_ACCESSOR_PAIR_(bool, bool, OM_BOOL);
 _OM_ACCESSOR_PAIR_(char, char, OM_CHAR);
 _OM_ACCESSOR_PAIR_(short, short, OM_SHORT);
 _OM_ACCESSOR_PAIR_(unsigned short, ushort, OM_UNSIGNED|OM_SHORT);

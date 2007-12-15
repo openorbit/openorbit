@@ -152,6 +152,7 @@ struct typecode {
 };
 
 /* Simple types */
+/* integral types */
 #define OM_CHAR         (0)
 #define OM_SHORT        (1)
 #define OM_INT          (2)
@@ -161,12 +162,14 @@ struct typecode {
 #define OM_INT16        (6)
 #define OM_INT32        (7)
 #define OM_INT64        (8)
+#define OM_BOOL         (9)
 
-
+/* real types */
 #define OM_FLOAT        (16)
 #define OM_DOUBLE       (17)
 #define OM_QUAD         (18) // TODO: Support quad precision floats
 
+/* om special types */
 #define OM_OBJECT       (32)
 #define OM_HASHTABLE    (33) 
 #define OM_HEAP         (34)
@@ -175,25 +178,42 @@ struct typecode {
 
 /* Type specialisation */
 #define OM_ARRAY    (1 << 8)
-#define OM_REF      (1 << 9) // NOTE: Not supported at the moment
+#define OM_REF      (1 << 9)
 #define OM_UNSIGNED (1 << 10)  
-#define OM_PROXY    (1 << 11) // Not implemented at the moment
+#define OM_PROXY    (1 << 11) // TODO: shoud classes or objects be proxies
+
 /* Type simplification */
 #define OM_STRING   (OM_CHAR | OM_ARRAY)
 
+/*! Saves all objects in the context to memory 
+ 
+    When saving the context all the objects are serialised and placed in a
+    compacted in memory database. This database only keep the object data, all
+    other data (class and meta information) is ignored and assumed to be static.
+    
+    \param ctxt The context to save
+    \return The serialised data of the context.
+ */
 int om_save_ctxt(om_ctxt_t *ctxt); // save to memory
 int om_archive_ctxt(om_ctxt_t *ctxt, const char *fname); // save to disk
 int om_restore_ctxt(om_ctxt_t *ctxt); // restore ctxt
-int om_load_ctxt(om_ctxt_t *ctxt); // restore ctxt from disk
+int om_load_ctxt(om_ctxt_t *ctxt, const char *fname); // restore ctxt from disk
 
 om_ctxt_t* om_new_ctxt(void); // create new context
 
 void om_delete_ctxt(om_ctxt_t *ctxt); // Deletes a context and all the objects
 
-
+/*! Om_new_class creates a new class object in the given context
+ *  
+ *  \param ctxt The object manager context to create the class in
+ *  \param class_name The name of the class to be created
+ *  \param constr The object constructor function
+ *  \param destr The object destructor function (may be NULL)
+ *  \param size The size of the C-struct representing the object. 
+ */
 om_class_t* om_new_class(om_ctxt_t *ctxt, const char *class_name,
-                         om_object_constructor_f,
-                         om_object_destructor_f,
+                         om_object_constructor_f constr,
+                         om_object_destructor_f destr,
                          size_t size);
 
 om_class_t* om_new_proxy_class(om_ctxt_t *ctxt, const char *class_name);
@@ -205,9 +225,9 @@ om_object_t* om_new_object(om_ctxt_t *ctxt, const char *class_name,
                            const char *object_name);
 void om_delete_object(om_object_t *obj);
 
-// TODO: Implement
-om_object_t* om_new_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
-                              const char *object_name, void *obj_addr);
+    
+om_object_t* om_insert_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
+                                 const char *object_name, void *obj_addr);
 
 
 
@@ -273,6 +293,8 @@ void* om_get_concrete_prop(const om_object_t *obj, const char *prop_name);
     T om_get_ ## N ## _idx_prop(const om_object_t *obj, const char *prop_name, unsigned int idx);    \
     void om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name, unsigned int idx, T val);
     
+OM_ACCESSOR_PAIR_DEF(bool, bool);
+
 OM_ACCESSOR_PAIR_DEF(char, char);
 
 OM_ACCESSOR_PAIR_DEF(short, short);
