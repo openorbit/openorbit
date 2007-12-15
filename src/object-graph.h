@@ -56,16 +56,17 @@ typedef struct {
 
 
 typedef struct {
-    matrix_t tm; // translation matrix
-    matrix_t sm; // scaling matrix
+    matrix_t tm; // translation matrix (position of the node)
+    matrix_t sm; // scaling matrix (coordinate system scaling)
     quaternion_t q; // rotational quaternion
     vector_t com; // center of mass in parent coordinates
+    scalar_t m_acc; // mass accumulator for gravity calculations (kg) 
 
     list_t *subnodes; // list of subnodes
     list_t *objects; // list of objects in this node
 } node_t;
 
 bool init_object_graph(om_ctxt_t *ctxt);
-
+void default_step(object_t *self, scalar_t delta_t);
 
 #endif /* _OBJECT_GRAPH_H_ */

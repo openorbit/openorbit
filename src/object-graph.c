@@ -34,5 +34,71 @@
 
 
 #include "object-graph.h"
+#include "list.h"
+
+void*
+node_ctor(void)
+{
+    node_t *n = malloc(sizeof(node_t));
+    if (n == NULL) return NULL;
+    
+    memset(n, 0, sizeof(node_t));
+    
+    return n;
+}
+
+void
+node_dtor(void *node)
+{
+    free(node);
+}
+
+void*
+obj_ctor(void)
+{
+    obj_t *o = malloc(sizeof(obj_t)); 
+    if (o == NULL) return NULL;
+    
+    memset(o, 0, sizeof(obj_t));
+    
+    return o;
+}
+
+void
+obj_dtor(void *node)
+{
+    
+}
 
 
+bool
+init_object_graph(om_ctxt_t *ctxt)
+{
+    om_class_t *node_class = om_new_class(ctxt, "oo_node", node_ctor, node_dtor,
+                                          sizeof(node_t));
+    
+    om_reg_static_array_prop(node_class, "tm", OM_FLOAT, offsetof(node_t, tm),
+                             16);
+    om_reg_static_array_prop(node_class, "sm", OM_FLOAT, offsetof(node_t, sm),
+                             16);
+    om_reg_static_array_prop(node_class, "q", OM_FLOAT, offsetof(node_t, q), 4);
+    om_reg_static_array_prop(node_class, "com", OM_FLOAT, offsetof(node_t, com),
+                             4);
+    om_reg_prop(node_class, "m_acc", OM_FLOAT, offsetof(node_t, m_acc));
+                             
+                             
+    om_class_t *obj_class = om_new_class(ctxt, "oo_pobj", obj_ctor, obj_dtor,
+                                         sizeof(obj_t));
+}
+
+void
+default_sys_step(object_t *self, obj_t *obj, scalar_t delta_t)
+{
+    
+}
+
+void
+default_step(object_t *self, scalar_t delta_t)
+{
+    LIST_APPLY((obj_t*)self->sys, default_sys_step, (obj_t*)self, delta_t);
+}
