@@ -27,7 +27,7 @@ if(CMAKE_GENERATOR MATCHES "Xcode")
     source_group("Lex" FILES ${lex_l_files})
 #    source_group("Yacc" FILES ${yacc_y_files})
     liST(APPEND parser_src "CMakeLists.txt")
-    list(APPEND parser_src ${lex_l_files})
+#    list(APPEND parser_src ${lex_l_files})
     set_source_files_properties( CMakeLists.txt ${lex_l_files}
                                  PROPERTIES HEADER_FILE_ONLY yes )
 endif(CMAKE_GENERATOR MATCHES "Xcode")

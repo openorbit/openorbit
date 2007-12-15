@@ -60,11 +60,11 @@ endif (ENABLE_TESTS)
 # TODO: Support more compilers
 if (CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_C_FLAGS -std=c99)
-    set(CMAKE_C_FLAGS_DEBUG -std=c99)
-
+    set(CMAKE_C_FLAGS_DEBUG "-g -std=c99")
+    
     if (WITH_ALTIVEC)
         set(CMAKE_C_FLAGS "-std=c99 -faltivec")
-        set(CMAKE_C_FLAGS_DEBUG "-std=c99 -faltivec")
+        set(CMAKE_C_FLAGS_DEBUG "-g -std=c99 -faltivec")
         add_definitions(-DUSE_ALTIVEC)    
     endif (WITH_ALTIVEC)
 else (CMAKE_COMPILER_IS_GNUCC)

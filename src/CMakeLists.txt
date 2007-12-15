@@ -10,6 +10,10 @@ add_definitions(-DSO_EXT=${so_ext})
 
 include_directories(${OPENGL_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
 
+if (APPLE)
+    include_directories(platform/macosx/)
+endif (APPLE)
+
 add_subdirectory(libgencds)
 add_subdirectory(math)
 add_subdirectory(physics)
@@ -35,8 +39,9 @@ set(open_orbit_debug_name "openorbit-dbg")
 
 if (APPLE)
     aux_source_directory(platform/macosx macosx_SRC)
+    
     list(APPEND openorbit_SRC ${macosx_SRC})
-	
+    
     set(MACOSX_BUNDLE_INFO_STRING "Open Orbit, an interactive space flight simulator")
 #    SET(MACOSX_BUNDLE_ICON_FILE)
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "Open Orbit")
