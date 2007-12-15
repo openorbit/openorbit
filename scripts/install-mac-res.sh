@@ -53,12 +53,12 @@ do
     esac
 done
 
-RESDIR="${APPNAME}.app/Contents/Resources"
-if [ ! -d ${RESDIR} ]; then
-    if ! mkdir ${RESDIR}; then
+RESDIR="${APPNAME}/Contents/Resources/${RESSUBDIR}"
+if ! [ -d "${RESDIR}" ]; then
+    if ! mkdir -p "${RESDIR}"; then
         echo ${RESDIR}: could not create dir >&2
         exit 1
     fi
 fi
 
-cp -f "${FILENAME}" "${RESDIR}/${RESSUBDIR}"
+cp -f "${FILENAME}" "${RESDIR}"
