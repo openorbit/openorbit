@@ -30,8 +30,20 @@
     above, a recipient may use your version of this file under either the MPL,
     the GPL or the LGPL."
 */
+
+/*  
+    We will use a number of systems containing objects for the simulation
+    engine. Each system will have a fixed list of objects on which we will
+    iterate our solver. We will iterate over all objects in the system. Though
+    some of the objects can be disabled. A system can have one gravitational
+    centre and external gravitational sources (this is effectivelly a PIC
+    solver).
+ */ 
+
 #ifndef _DYNAMICS_H_
 #define _DYNAMICS_H_
+
+
 
 #include <stdbool.h>
 
@@ -63,12 +75,33 @@ typedef struct {
     ph_obj_t obj[];
 } ph_sys_t;
 
-
+// A sys is a group of semi independent systems (neighbouring systems have
+// effect)
 typedef struct {
-    size_t sys_asize;
-    size_t sys_count;
+    size_t a_sys;
     ph_sys_t sys[];
+} ph_sys_group_t;
+
+// A world is a number of system groups, a system group have gravitational
+// effect on all other system groups 
+typedef struct {
+    size_t sys_group_asize;
+    size_t sys_group_count;
+    ph_sys_group_t sys[];
 } ph_world_t;
+
+
+/*! Creates a new world of semi-isolated physics systems.
+ 
+ The new_world function, allocates a new world of physics systems with a maximum
+ system count of sys_count and a maximum object count in each system of
+ obj_count objects.
+ 
+ \param sys_count
+ \param obj_count
+ \return The new physics world.
+ */
+ph_world_t* ph_new_world(size_t sys_count, size_t obj_count);
 
 /*! Creates a new (almost) isolated physics system
     

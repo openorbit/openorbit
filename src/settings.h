@@ -39,13 +39,16 @@ extern "C" {
     
 #include <stdbool.h>
 
-/* The settings structure stores global information on the game such as video
- * and audio configuration parameters. This should be the central store for
- * most information abour the current game instance's more technical data,
- * with the notable exception of the IO configuraton that is handled by a
- * special IO subsystem.
+/*! The settings structure stores global information on the game such as video
+ *  and audio configuration parameters. This should be the central store for
+ *  most information abour the current game instance's more technical data,
+ *  with the notable exception of the IO configuraton that is handled by a
+ *  special IO subsystem.
  * 
- * NOTE: In the Python API, this system is called config.
+ *  \bug The information is stored in a global hashtable, and these
+ *      functions are not yet threadsafe.
+ * 
+ *  NOTE: In the Python API, this system is called config.
  */
     
 void conf_init(void);

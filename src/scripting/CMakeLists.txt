@@ -1,4 +1,4 @@
-set( pyrex_files io config environment res )
+set( pyrex_files io config environment res texture )
 set( pyrex_c_files )
 set( scripting_src scripting.c )
 set( scripting_FILES scripting.h CMakeLists.txt)

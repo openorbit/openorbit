@@ -49,7 +49,8 @@ res_get_path(const char *file_name)
 {
     assert(file_name != NULL);
     
-    
+    // The resources are located without the full name on the mac, we have to
+    // split up the name of the file and its extension
     char *end = strrchr(file_name, '\0');
     char *last_dot = strrchr(file_name, '.');
     char *last_slash = strrchr(file_name, '/');
@@ -154,3 +155,40 @@ res_get_fd(const char *file_name)
 
     return -1;
 }
+
+
+char*
+plugin_get_path(const char *file_name)
+{
+    
+}
+
+FILE*
+plugin_get_file(const char *file_name)
+{
+    char *path = plugin_get_path(file_name);
+    
+    if (path != NULL) {
+        FILE *file = fopen(path, "r");
+        free(path);
+        return file;
+    }
+    
+    return NULL;    
+}
+
+int
+plugin_get_fd(const char *file_name)
+{
+    char *path = plugin_get_path(file_name);
+    
+    if (path != NULL) {
+        int fd = open(path, O_RDONLY);
+        free(path);
+        
+        return fd;
+    }
+    
+    return -1;    
+}
+

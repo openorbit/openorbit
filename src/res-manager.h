@@ -53,4 +53,8 @@ char* res_get_path(const char *file_name);
 FILE* res_get_file(const char *file_name);
 int res_get_fd(const char *file_name);
 
+char* plugin_get_path(const char *file_name);
+FILE* plugin_get_file(const char *file_name);
+int plugin_get_fd(const char *file_name);
+
 #endif /* _RES_MANAGER_H_ */
