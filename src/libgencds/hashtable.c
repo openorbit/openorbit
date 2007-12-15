@@ -233,6 +233,25 @@ void
     return (entry) ? entry->object : NULL;
 }
 
+list_entry_t*
+hashtable_lookup_list_entry(const hashtable_t * restrict ht,
+                            const char * restrict key)
+{
+    assert(ht != NULL);
+    assert(key != NULL);
+    
+    unsigned int hash = HASH(ht, key);
+    
+    hashentry_t *entry = ht->t[hash];
+    
+    while (entry && ! ht->cmp(key, entry->key)) {
+        entry = entry->next;
+    }
+    
+    return (entry) ? entry->list_entry : NULL;
+}
+
+
 int
 hashtable_insert(hashtable_t * restrict ht, const char * restrict key,
                  void * restrict obj)
@@ -324,6 +343,58 @@ void
     // could not find entry matching the key
     return NULL;
 }
+
+list_entry_t*
+hashtable_first(hashtable_t *ht)
+{
+    assert(ht != NULL);
+    
+    return ht->hash_entry_list.first;
+}
+
+list_entry_t*
+hashtable_last(hashtable_t *ht)
+{
+    assert(ht != NULL);
+    
+    return ht->hash_entry_list.last;
+}
+
+void*
+hashtable_entry_key(list_entry_t *entry)
+{
+    assert(entry != NULL);
+    
+    hashentry_t *hashentry = (hashentry_t*)entry->data;
+    if (hashentry == NULL) return NULL;
+    return hashentry->key;
+}
+
+void*
+hashtable_entry_data(list_entry_t *entry)
+{
+    if (entry == NULL) return NULL;
+    hashentry_t *hashentry = (hashentry_t*)entry->data;
+    if (hashentry == NULL) return NULL;
+    return hashentry->object;
+}
+
+void*
+hashtable_entry_remove(hashtable_t *ht, list_entry_t *entry)
+{
+    // TODO: Delete with code in this function instead of calling the
+    //       hashtable_remove as we already have the entry to remove, but this
+    //       is easier and requires minimal testing. Also, if no one relies on
+    //       this for performance critical code, we should just leave it.
+    assert(ht != NULL);
+    assert(entry != NULL);
+    
+    hashentry_t *hashentry = (hashentry_t*)entry->data;
+    void *data = hashentry->object;
+    hashtable_remove(ht, hashentry->key);
+    return data;
+}
+
 
 void
 hashtable_print(hashtable_t *ht)

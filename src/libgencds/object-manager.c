@@ -36,6 +36,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <err.h>
 #include <assert.h>
 
 #include <gencds/object-manager.h>
@@ -60,25 +61,18 @@ om_ctxt_t
     }
     
     ctxt->class_dict = hashtable_new_with_str_keys(512);
-    ctxt->class_list = list_new();
     ctxt->object_dict = hashtable_new_with_str_keys(1024);
-    ctxt->object_list = list_new();
     ctxt->reverse_object_dict = hashtable_new_with_ptr_keys(1024);
 
     ctxt->interface_dict = hashtable_new_with_str_keys(1024);
-    ctxt->interface_list = list_new();
     
-    if ((!ctxt->class_dict) || (!ctxt->object_dict)
-    || (!ctxt->interface_dict) || (!ctxt->class_list)
-    || (!ctxt->object_list) || (!ctxt->interface_list)) {
+    if ((!ctxt->class_dict) || (!ctxt->object_dict) || (!ctxt->interface_dict)
+        || (!ctxt->reverse_object_dict)) {
+        
         hashtable_delete(ctxt->class_dict);
         hashtable_delete(ctxt->object_dict);
         hashtable_delete(ctxt->reverse_object_dict);
         hashtable_delete(ctxt->interface_dict);
-        
-        list_delete(ctxt->class_list);
-        list_delete(ctxt->object_list);
-        list_delete(ctxt->interface_list);
         
         free(ctxt);
         return NULL;
@@ -91,10 +85,26 @@ void
 om_delete_ctxt(om_ctxt_t *ctxt)
 {
     assert(ctxt != NULL);
+    list_entry_t *entry;
     
-    LIST_APPLY(ctxt->object_list, om_delete_object);
-    LIST_APPLY(ctxt->class_list, om_delete_class);
-    LIST_APPLY(ctxt->interface_list, om_delete_meta_interface);
+    entry = hashtable_first(ctxt->object_dict);
+    while (entry) {
+        om_delete_object(hashtable_entry_data(entry));
+        entry = list_entry_next(entry);
+    }
+    
+    entry = hashtable_first(ctxt->class_dict);
+    while (entry) {
+        om_delete_class(hashtable_entry_data(entry));
+        entry = list_entry_next(entry);
+    }
+    
+    entry = hashtable_first(ctxt->interface_dict);
+    while (entry) {
+        om_delete_meta_interface(hashtable_entry_data(entry));
+        entry = list_entry_next(entry);
+    }
+    
     
     // Delete the top level data
     hashtable_delete(ctxt->class_dict);
@@ -102,11 +112,6 @@ om_delete_ctxt(om_ctxt_t *ctxt)
     hashtable_delete(ctxt->interface_dict);
     hashtable_delete(ctxt->reverse_object_dict);
 
-    
-    list_delete(ctxt->class_list);
-    list_delete(ctxt->object_list);
-    list_delete(ctxt->interface_list);
-    
     free(ctxt);
 }
  
@@ -129,14 +134,17 @@ _write_object(om_object_t *obj, FILE *fp)
     om_class_t *cls = obj->cls;
     fprintf(fp, "%s : %s = {\n", obj->name, cls->class_name);
     
-//    list_entry_t *entry;
-//    entry = list_first(cls->property_list);
     
-//    while (entry != NULL) {
-//        struct _om_prop_t *prop = list_entry_data(entry);
-//        fprintf(fp, "    %s : ", prop->name);
-//        _print_type_code();
-//    } 
+    list_entry_t *entry = hashtable_first(cls->property_dict);
+
+    while (entry) {
+        //  data = hashtable_entry_data(entry);
+        //  struct _om_prop_t *prop = list_entry_data(entry);
+        //        fprintf(fp, "    %s : ", prop->name);
+        //        _print_type_code();
+        
+        entry = list_entry_next(entry);
+    }
     
     fprintf(fp, "}\n");
 }
@@ -149,9 +157,15 @@ om_archive_ctxt(om_ctxt_t *ctxt, const char *fname)
     FILE *fp = fopen(fname, "r");
     
     if ( fp == NULL ) return 1;
+
+    list_entry_t *entry = hashtable_first(ctxt->object_dict);
+    while (entry) {
+        //  data = hashtable_entry_data(entry);
+        //  _write_object(data, fp);
+        entry = list_entry_next(entry);
+    }
     
-    // For each object, write object to file
-    LIST_APPLY(ctxt->object_list, _write_object, fp);
+    
     return 1;
 }
 int
@@ -192,20 +206,15 @@ om_new_class(om_ctxt_t *ctxt, const char *class_name,
     
     class_obj->property_dict = hashtable_new_with_str_keys(32);
     class_obj->interface_dict = hashtable_new_with_str_keys(32);
-    class_obj->property_list = list_new();
-    class_obj->interface_list = list_new();
     
-    if (!(class_obj->property_dict) || !(class_obj->interface_dict)
-    || !(class_obj->property_list) || !(class_obj->interface_list)) {
+    if (!(class_obj->property_dict) || !(class_obj->interface_dict)) {
         hashtable_delete(class_obj->property_dict);
         hashtable_delete(class_obj->interface_dict);
-        list_delete(class_obj->property_list);
-        list_delete(class_obj->interface_list);
         return NULL;
     }
     
     hashtable_insert(ctxt->class_dict, class_name, class_obj);
-    list_insert(ctxt->class_list, class_obj);
+
     return class_obj;
 }
 
@@ -229,19 +238,14 @@ om_new_proxy_class(om_ctxt_t *ctxt, const char *class_name)
     
     class_obj->property_dict = hashtable_new_with_str_keys(32);
     class_obj->interface_dict = hashtable_new_with_str_keys(32);
-    class_obj->property_list = list_new();
-    class_obj->interface_list = list_new();
     
-    if (!(class_obj->property_dict) || !(class_obj->interface_dict)
-        || !(class_obj->property_list) || !(class_obj->interface_list)) {
+    if (!(class_obj->property_dict) || !(class_obj->interface_dict)) {
         hashtable_delete(class_obj->property_dict);
         hashtable_delete(class_obj->interface_dict);
-        list_delete(class_obj->property_list);
-        list_delete(class_obj->interface_list);
     }
     
     hashtable_insert(ctxt->class_dict, class_name, class_obj);
-    list_insert(ctxt->class_list, class_obj);
+
     return class_obj;
 }
 
@@ -250,11 +254,19 @@ om_delete_class(om_class_t *cls)
 {
     assert(cls != NULL);
     
-    LIST_APPLY(cls->interface_list, om_delete_iface_obj);
-    LIST_APPLY(cls->property_list, om_delete_prop_obj);
-    list_delete(cls->interface_list);
-    list_delete(cls->property_list);
-    
+    list_entry_t *entry;
+    entry = hashtable_first(cls->interface_dict);
+    while (entry) {
+        om_delete_iface_obj(hashtable_entry_data(entry));
+        entry = list_entry_next(entry);
+    }
+
+    entry = hashtable_first(cls->property_dict);
+    while (entry) {
+        om_delete_prop_obj(hashtable_entry_data(entry));
+        entry = list_entry_next(entry);
+    }
+        
     hashtable_delete(cls->interface_dict);
     hashtable_delete(cls->property_dict);
     
@@ -288,10 +300,7 @@ om_new_object(om_ctxt_t *ctxt, const char *class_name,
 
     
     hashtable_insert(ctxt->object_dict, object_name, obj);   
-    list_append(ctxt->object_list, obj);   
-    obj->list_entry = list_last(ctxt->object_list);    
     hashtable_insert(ctxt->reverse_object_dict, obj->data, obj);   
-    
     
     return obj;
 }
@@ -322,10 +331,7 @@ om_new_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
     obj->data = obj_addr;
     
     hashtable_insert(ctxt->object_dict, object_name, obj);   
-    list_append(ctxt->object_list, obj);   
-    obj->list_entry = list_last(ctxt->object_list);    
     hashtable_insert(ctxt->reverse_object_dict, obj->data, obj);   
-    
     
     return obj;
 }
@@ -338,10 +344,8 @@ om_delete_object(om_object_t *obj)
     
     hashtable_remove(obj->cls->ctxt->object_dict, obj->name);
     hashtable_remove(obj->cls->ctxt->reverse_object_dict, obj->data);
-    list_remove_entry(obj->cls->ctxt->object_list, obj->list_entry);
-    obj->list_entry = NULL;
     
-    // Delete object
+    // Delete object only if this is a non proxy class
     if (! obj->cls->is_proxy) {
         obj->cls->destroy(obj->data);
     }
@@ -369,17 +373,22 @@ om_new_meta_interface(om_ctxt_t *ctxt, const char *iface_name)
     mi->name = strdup(iface_name);
     
     hashtable_insert(ctxt->interface_dict, iface_name, mi);
-    list_append(ctxt->interface_list, mi);
 
     return mi;
 }
 
-// TODO: Delete from list
 void
 om_delete_meta_interface(om_meta_iface_t *iface)
 {
     assert(iface != NULL);
     
+    list_entry_t *entry = hashtable_first(iface->methods);
+    while (entry) {
+        // TODO: Delete from list, at the moment this is not strictly necisary
+        //       since no type signatures are registered and only the method
+        //       pointer
+        entry = list_entry_next(entry);
+    }
     hashtable_delete(iface->methods);
     free(iface->name);
     free(iface);
@@ -417,7 +426,7 @@ om_reg_prop(om_class_t *class_object, const char *name,
     prop->offset = offset;
     
     hashtable_insert(class_object->property_dict, name, prop);
-    list_append(class_object->property_list, prop);
+    //list_append(class_object->property_list, prop);
     
     return prop;
 }
@@ -459,8 +468,10 @@ om_reg_iface(om_class_t *class_object, const char *name, void *iface_addr)
     om_meta_iface_t *meta_iface =
         om_get_meta_iface(class_object->ctxt, name); 
     
-    if (meta_iface == NULL) return -1;
-    
+    if (meta_iface == NULL) {
+        warnx("om: tried to register a concrete inteface that have no meta interface");
+        return -1;
+    }
     om_iface_t *iface = malloc(sizeof(om_iface_t));
 
     iface->meta_interface = meta_iface;

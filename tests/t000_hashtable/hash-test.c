@@ -36,6 +36,7 @@
 
 
 #include <stdlib.h>
+#include <string.h>
 #include <check.h>
 
 
@@ -146,6 +147,45 @@ START_TEST(test_insert_and_remove)
 }
 END_TEST
 
+
+START_TEST(test_list_duality)
+{
+    hashtable_t *ht = hashtable_new_with_str_keys(512);
+    
+    hashtable_insert(ht, "key0", (void*)42);
+    list_entry_t* entry = hashtable_first(ht);
+    void *key = hashtable_entry_key(entry);
+    void *data = hashtable_entry_data(entry);
+    fail_unless(strcmp((char*)key, "key0") == 0,
+                "The first entry's key is not the one inserted");
+    fail_unless(data == (void*)42,
+                "The first entry's data is not the data inserted");
+    
+    // insert a new entry and remove the old one
+    hashtable_insert(ht, "key1", (void*)43);
+    hashtable_entry_remove(ht, entry);
+    entry = hashtable_first(ht);
+    key = hashtable_entry_key(entry);
+    data = hashtable_entry_data(entry);
+    fail_unless(strcmp((char*)key, "key1") == 0,
+                "The first entry's key is not the one inserted for key1");
+    fail_unless(data == (void*)43,
+                "The first entry's data is not the data inserted for key1");
+    
+    list_entry_t *looked_up_entry = hashtable_lookup_list_entry(ht, "key1");
+    fail_unless(looked_up_entry == entry,
+                "Tried to look up entry for key1, but returned entry is not the expected entry");
+    
+    void *old_deleted_entry = hashtable_lookup(ht, "key0");
+    fail_unless(old_deleted_entry == NULL,
+                "deleted entry successfully looked up (something rotten here)");
+    
+    
+    
+    hashtable_delete(ht);
+}
+END_TEST
+
 Suite
 *test_suite (int argc, char **argv)
 {
@@ -157,7 +197,7 @@ Suite
     tcase_add_test(tc_core, test_collisions);
     tcase_add_test(tc_core, test_hash_func);
     tcase_add_test(tc_core, test_insert_and_remove);
-    
+    tcase_add_test(tc_core, test_list_duality);
     suite_add_tcase(s, tc_core);
     
     return s;
