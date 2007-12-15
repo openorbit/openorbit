@@ -1,41 +1,36 @@
-/* Open Orbit - An interactive spacecraft simulator.
- * Copyright (C) 2006  Mattias Holm (mattias.holm@contra.nu)
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as published
- * by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- * Linking Open Orbit statically or dynamically with other modules is making a
- * combined work based on Open Orbit.  Thus, the terms and conditions of the
- * GNU General Public License cover the whole combination.
- *
- * As a special exception, the copyright holders of Open Orbit give you
- * permission to link Open Orbit with independent modules that communicate with
- * Open Orbit solely through the public interfaces (defined as such in the
- * documentation), regardless of the license terms of these independent
- * modules, and to copy and distribute the resulting combined work under terms
- * of your choice, provided that every copy of the combined work is accompanied
- * by a complete copy of the source code of Open Orbit (the version of Open
- * Orbit used to produce the combined work), being distributed under the terms
- * of the GNU General Public License plus this exception. An independent module
- * is a module which is not derived from or based on Open Orbit.
- *
- * Note that people who make modified versions of Open Orbit are not obligated
- * to grant this special exception for their modified versions; it is
- * their choice whether to do so.  The GNU General Public License gives
- * permission to release a modified version without this exception; this
- * exception also makes it possible to release a modified version which
- * carries forward this exception.
+/* 
+    The contents of this file are subject to the Mozilla Public License
+    Version 1.1 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+    http://www.mozilla.org/MPL/
+
+    Software distributed under the License is distributed on an "AS IS" basis,
+    WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+    for the specific language governing rights and limitations under the
+    License.
+
+    The Original Code is the Open Orbit space flight simulator.
+
+    The Initial Developer of the Original Code is Mattias Holm. Portions
+    created by the Initial Developer are Copyright (C) 2006 the
+    Initial Developer. All Rights Reserved.
+
+    Contributor(s):
+        Mattias Holm <mattias.holm(at)contra.nu>.
+
+    Alternatively, the contents of this file may be used under the terms of
+    either the GNU General Public License Version 2 or later (the "GPL"), or
+    the GNU Lesser General Public License Version 2.1 or later (the "LGPL"), in
+    which case the provisions of GPL or the LGPL License are applicable instead
+    of those above. If you wish to allow use of your version of this file only
+    under the terms of the GPL or the LGPL and not to allow others to use your
+    version of this file under the MPL, indicate your decision by deleting the
+    provisions above and replace  them with the notice and other provisions
+    required by the GPL or the LGPL.  If you do not delete the provisions
+    above, a recipient may use your version of this file under either the MPL,
+    the GPL or the LGPL."
  */
+
 
 #ifndef __IO_MANAGER_H__
 #define __IO_MANAGER_H__

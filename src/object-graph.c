@@ -35,18 +35,4 @@
 
 #include "object-graph.h"
 
-#include ""
 
-struct _obj {
-    
-}
-
-
-struct _node {
-    
-    size_t n_subnodes;
-    struct _node *node;
-    
-    size_t n_objects;
-    struct _obj *objs;
-};

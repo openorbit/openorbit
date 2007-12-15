@@ -77,6 +77,30 @@ init_cam(void)
 }
 
 void
+cam_set_free(vector_t p, quaternion_t q)
+{
+    matrix_t m;
+    vector_t up, rup, dir, rdir;
+    V_SET(up, 0.0f, 1.0f, 0.0f, 0.0f);
+    V_SET(dir, 0.0f, 0.0f, -1.0f, 0.0f);
+    
+    Q_M_CONVERT(m, q);
+    M_V_MUL(rup, m, up);
+    M_V_MUL(rdir, m, dir);
+
+    gluLookAt(p.s.x, p.s.y, p.s.z,
+              p.s.x + rdir.s.x, p.s.y + rdir.s.y, p.s.z + rdir.s.z,
+              rup.s.x, rup.s.y, rup.s.z);
+}
+
+void
+cam_set_polar(scalar_t len, scalar_t ra, scalar_t dec)
+{
+    
+}
+
+
+void
 cam_set_view(camera_t *cam)
 {
     matrix_t m;

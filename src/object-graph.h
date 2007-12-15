@@ -40,6 +40,30 @@
 #include <stdbool.h>
 
 #include "object-manager.h"
+#include "list.h"
+#include "physics/dynamics.h"
+
+typedef struct {
+    void (*step)(object_t *self, scalar_t delta_t);
+    void (*paint)(object_t *self);
+} sim_obj_iface;
+
+// note that an obj_t should conform to the sim_obj interface
+typedef struct {
+    dynamics_t dyn; // dynamics information on object
+    list_t *sys; // list of systems in the object that respond to sys_sim iface
+} obj_t;
+
+
+typedef struct {
+    matrix_t tm; // translation matrix
+    matrix_t sm; // scaling matrix
+    quaternion_t q; // rotational quaternion
+    vector_t com; // center of mass in parent coordinates
+
+    list_t *subnodes; // list of subnodes
+    list_t *objects; // list of objects in this node
+} node_t;
 
 bool init_object_graph(om_ctxt_t *ctxt);
 

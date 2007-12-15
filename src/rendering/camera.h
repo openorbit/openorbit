@@ -72,7 +72,8 @@ typedef struct {
 
 bool init_cam(void);
 
-void cam_set(vector_t p, quaternion_t q);
+void cam_set_free(vector_t p, quaternion_t q);
+void cam_set_polar(scalar_t len, scalar_t ra, scalar_t dec);
 
 /* Camera handling functions,  */
 void cam_move_forward(camera_t *cam, scalar_t distance);

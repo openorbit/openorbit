@@ -144,12 +144,13 @@ main_loop(void)
             case SDL_JOYBUTTONUP:
             case SDL_VIDEORESIZE:
             case SDL_VIDEOEXPOSE:
+                break;
             case SDL_USEREVENT:
                 switch (event.user.code) {
-                case SIM_STEP_EVENT:
+                case SIM_STEP_EVENT: // this event will make a time step
                     sim_step();
                     break;
-                case SIM_DEBUG_EVENT:
+                case SIM_DEBUG_EVENT: // display console?
                     break;
                 default:
                     break;

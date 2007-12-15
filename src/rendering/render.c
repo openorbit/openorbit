@@ -228,10 +228,13 @@ draw_gl(void)
     //glEnable(GL_DEPTH_TEST);
     
     // the drawing is not very well structured at the moment
+    // we should do the following: 1. traverse the scene graph and move the
+    // camera, 2. paint visible objects in the scene graph node, 3. there is no
+    // step 3...
     cam_hack();
     
     glEnable(GL_DEPTH_TEST);
-    //glTranslatef(-x, -y, -z);
+
     GLfloat lightCol[] = {1.0,1.0,1.0,1.0};
     GLfloat pos[] = {100.0, 0.0, 0.0, 0.0};
     
@@ -240,18 +243,21 @@ draw_gl(void)
     glLightfv(GL_LIGHT0, GL_POSITION, pos);
     
     glPushMatrix();
+    
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-        static float sphere_rot = 0.0f;
-        GLfloat col[] = {1.0f, 1.0f, 1.0f, 1.0f};
         
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, col);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(sphere_rot, 0.0f, 0.0f, 1.0f);
-        gluSphere(quadric,1,64,64);
+    static float sphere_rot = 0.0f;
+    GLfloat col[] = {1.0f, 1.0f, 1.0f, 1.0f};
+        
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, col);
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+    glRotatef(sphere_rot, 0.0f, 0.0f, 1.0f);
+    gluSphere(quadric,1,64,64);
 //        sphere_rot = fmodf(sphere_rot - 0.1f, 360.0);
     
     glDisable(GL_TEXTURE_2D);
