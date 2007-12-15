@@ -33,6 +33,8 @@
 
 
 #include <stdlib.h>
+#include <stdio.h>
+
 #include <check.h>
 
 #import <math/linalg.h>
@@ -50,13 +52,32 @@ START_TEST(test_m_v_mul)
     a.a[1][0] = a.a[1][1] = a.a[1][2] = a.a[1][3] = 2.0f;
     a.a[2][0] = a.a[2][1] = a.a[2][2] = a.a[2][3] = 3.0f;
     a.a[3][0] = a.a[3][1] = a.a[3][2] = a.a[3][3] = 4.0f;
-    
+
+    // first, test function
     m_v_mul(r.a, a.a, v.a);
     
-    fail_unless( ALMOST_EQUAL(r.a[0], 1.4f, 0.000001f), "Vector [0] outside bounds.");
-    fail_unless( ALMOST_EQUAL(r.a[1], 2.8f, 0.000001f), "Vector [1] outside bounds.");
-    fail_unless( ALMOST_EQUAL(r.a[2], 4.2f, 0.000001f), "Vector [2] outside bounds.");
-    fail_unless( ALMOST_EQUAL(r.a[3], 5.6f, 0.000001f), "Vector [3] outside bounds.");
+    fail_unless( ALMOST_EQUAL(r.a[0], 1.4f, 0.000001f),
+        "Vector [0] outside bounds. v[0] = (%f)", r.s.x);
+    fail_unless( ALMOST_EQUAL(r.a[1], 2.8f, 0.000001f),
+        "Vector [1] outside bounds. v[1] = (%f)", r.s.y);
+    fail_unless( ALMOST_EQUAL(r.a[2], 4.2f, 0.000001f),
+        "Vector [2] outside bounds. v[2] = (%f)", r.s.z);
+    fail_unless( ALMOST_EQUAL(r.a[3], 5.6f, 0.000001f),
+        "Vector [3] outside bounds. v[3] = (%f)", r.s.w);
+
+    // then, test optimised macro and compare with function, we allow some
+    // tolerance
+    vector_t r2;
+    M_V_MUL(r2, a, v);
+    
+    fail_unless( ALMOST_EQUAL(r2.a[0], r.a[0], 0.000001f),
+        "(r2[0] == %f) != (r[0] == (%f)", r2.s.x, r.s.x);
+    fail_unless( ALMOST_EQUAL(r2.a[1], r.a[1], 0.000001f),
+        "(r2[0] == %f) != (r[0] == (%f)", r2.s.x, r.s.x);
+    fail_unless( ALMOST_EQUAL(r2.a[2], r.a[2], 0.000001f),
+        "(r2[0] == %f) != (r[0] == (%f)", r2.s.x, r.s.x);
+    fail_unless( ALMOST_EQUAL(r2.a[3], r.a[3], 0.000001f),
+        "(r2[0] == %f) != (r[0] == (%f)", r2.s.x, r.s.x);
 }
 END_TEST
 
@@ -88,10 +109,49 @@ START_TEST(test_m_mul)
 }
 END_TEST
 
-// TODO: M_ADD test
 START_TEST(test_m_add)
 {
-
+    matrix_t r0, r1, a, b, ex;
+    
+    a.a[0][0] = a.a[0][1] = a.a[0][2] = a.a[0][3] = 1.0f;
+    a.a[1][0] = a.a[1][1] = a.a[1][2] = a.a[1][3] = 2.0f;
+    a.a[2][0] = a.a[2][1] = a.a[2][2] = a.a[2][3] = 3.0f;
+    a.a[3][0] = a.a[3][1] = a.a[3][2] = a.a[3][3] = 4.0f;
+    
+    b.a[0][0] = b.a[1][0] = b.a[2][0] = b.a[3][0] = 1.0f;
+    b.a[0][1] = b.a[1][1] = b.a[2][1] = b.a[3][1] = 2.0f;
+    b.a[0][2] = b.a[1][2] = b.a[2][2] = b.a[3][2] = 3.0f;
+    b.a[0][3] = b.a[1][3] = b.a[2][3] = b.a[3][3] = 4.0f;
+    
+    ex.a[0][0] = 2.0; ex.a[0][1] = 3.0; ex.a[0][2] = 4.0; ex.a[0][3] = 5.0;
+    ex.a[1][0] = 3.0; ex.a[1][1] = 4.0; ex.a[1][2] = 5.0; ex.a[1][3] = 6.0;
+    ex.a[2][0] = 4.0; ex.a[2][1] = 5.0; ex.a[2][2] = 6.0; ex.a[2][3] = 7.0;
+    ex.a[3][0] = 5.0; ex.a[3][1] = 6.0; ex.a[3][2] = 7.0; ex.a[3][3] = 8.0;
+    
+    // check m_add function
+    m_add(r0.a, a.a, b.a);
+    
+    for (int i = 0 ; i < 4 ; i ++) {
+        for (int j = 0 ; j < 4 ; j ++) {
+            fail_unless( ALMOST_EQUAL(r0.a[i][j], ex.a[i][j], 0.000001f),
+                "(r0[%d][%d] == %f) != (ex[%d][%d] == (%f)",
+                i, j, r0.a[i][j],
+                i, j, ex.a[i][j]);
+            
+        }
+    }
+    
+    // check potentially optimised macro
+    M_ADD(r1, a, b);
+    
+    for (int i = 0 ; i < 4 ; i ++) {
+        for (int j = 0 ; j < 4 ; j ++) {
+            fail_unless( ALMOST_EQUAL(r1.a[i][j], ex.a[i][j], 0.000001f),
+                "(r1[%d][%d] == %f) != (ex[%d][%d] == (%f)",
+                i, j, r1.a[i][j],
+                i, j, ex.a[i][j]);
+        }
+    }
 }
 END_TEST
 
