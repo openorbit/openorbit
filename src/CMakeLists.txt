@@ -8,6 +8,8 @@ if (APPLE)
 endif (APPLE)
 add_definitions(-DSO_EXT=${so_ext})
 
+include_directories(${OPENGL_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
+
 add_subdirectory(libgencds)
 add_subdirectory(math)
 add_subdirectory(physics)
@@ -16,8 +18,6 @@ add_subdirectory(parsers)
 
 aux_source_directory(rendering rendering_src)
 aux_source_directory(vessel vessel_src)
-
-include_directories(${OPENGL_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
 
 set(openorbit_SRC
 	main.c sim.c error.c settings.c io-manager.c plugin-handler.c
