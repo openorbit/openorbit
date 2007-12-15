@@ -37,14 +37,11 @@
 // Posix and UNIX headers
 #include <fcntl.h>
 #include <string.h>
+#include <limits.h>
 
 // Open Orbit headers
 #include "res-manager.h"
 
-
-
-// TODO: replace with system constant
-#define MAX_PATH_LEN 1024
 
 // TODO: More thurough error checking and handling
 char*
@@ -111,9 +108,9 @@ res_get_path(const char *file_name)
     
     CFURLRef url = CFBundleCopyResourceURL(bundle, resName, resType, resSubDir);
     
-    UInt8 *path = malloc(MAX_PATH_LEN+1);
+    UInt8 *path = malloc(PATH_MAX+1);
     // true if absolute path is to be used...
-    if (!CFURLGetFileSystemRepresentation(url, false, path, MAX_PATH_LEN)) {
+    if (!CFURLGetFileSystemRepresentation(url, false, path, PATH_MAX)) {
         free(path);
         path = NULL;
     }
