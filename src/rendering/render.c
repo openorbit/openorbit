@@ -83,8 +83,6 @@ render_scene(void) {
 }
 
 
-void ugly_load_and_init_of_test_texture(void);
-
 static void
 init_gl(void)
 {
