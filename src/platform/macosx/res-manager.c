@@ -31,8 +31,19 @@
     the GPL or the LGPL."
  */
 
+// OSX Headers
 #include <CoreFoundation/CoreFoundation.h>
+
+// Posix and UNIX headers
+#include <fcntl.h>
+
+// Open Orbit headers
 #include "res-manager.h"
+
+
+
+// TODO: replace with system constant
+#define MAX_PATH_LEN 1024
 
 // TODO: More thurough error checking and handling
 char*
@@ -49,9 +60,9 @@ res_get_path(const char *file_name)
         return NULL;
     }
 
-    const char *fileBase;
-    const char *fileType;
-    const char *fileSubDir;
+    char *fileBase;
+    char *fileType;
+    char *fileSubDir;
 
     if (last_slash) {
         fileBase = malloc(last_dot - last_slash + 1);
@@ -86,9 +97,9 @@ res_get_path(const char *file_name)
     
     CFURLRef url = CFBundleCopyResourceURL(bundle, resName, resType, resSubDir);
     
-    UInt8 path = malloc(MAX_PATH_LEN+1);
+    UInt8 *path = malloc(MAX_PATH_LEN+1);
     // true if absolute path is to be used...
-    if (!CFURLGetFileSystemRepresentation(url, false, path, MAX_PATH_LEN) {
+    if (!CFURLGetFileSystemRepresentation(url, false, path, MAX_PATH_LEN)) {
         free(path);
         path = NULL;
     }
@@ -101,7 +112,7 @@ res_get_path(const char *file_name)
     CFRelease(resSubDir);
     CFRelease(url);
     
-    return path;
+    return (char*)path;
 }
 
 FILE*
