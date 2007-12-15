@@ -38,19 +38,27 @@
 
 START_TEST(test_apply_force_at_pos)
 {
-    ph_apply_force_at_pos(ph_obj_t *obj, vector_t pos, vector_t f);
+    ph_obj_t obj;
+    vector_t pos, f;
+    ph_apply_force_at_pos(&obj, pos, f);
 }
 END_TEST
 
 START_TEST(test_apply_force_relative)
-{   
-    ph_apply_force_relative(ph_obj_t *obj, vector_t pos, vector_t f);
+{
+    ph_obj_t obj;
+    vector_t pos, f;
+
+    ph_apply_force_relative(&obj, pos, f);
 }
 END_TEST
 
 START_TEST(test_apply_force)
 {
-    ph_apply_force(ph_obj_t *obj, vector_t f);
+    ph_obj_t obj;
+    vector_t f;
+
+    ph_apply_force(&obj, f);
     
     fail_unless( 0 == 0, "mega error");
 }

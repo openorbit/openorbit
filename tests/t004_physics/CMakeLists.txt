@@ -1,8 +1,8 @@
 # Just change these variables for your own test case
-set(tc_TC_NAME "T666_xyz") 
+set(tc_TC_NAME "T004_physics") 
 set(tc_SRC test-case.c)
-set(tc_TGT t666_xyz)
-set(tc_LIBS)
+set(tc_TGT t004_physics)
+set(tc_LIBS ph math m gencds)
 set(tc_INCDIRS)
 
 include_directories(${tc_INCDIRS})

@@ -18,6 +18,6 @@ add_subdirectory(t000_hashtable)
 add_subdirectory(t001_heap)
 add_subdirectory(t002_tga)
 add_subdirectory(t003_math)
-
+add_subdirectory(t004_physics)
 add_subdirectory(t005_object_manager)
 add_subdirectory(t006_list)
