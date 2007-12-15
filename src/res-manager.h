@@ -30,7 +30,21 @@
     above, a recipient may use your version of this file under either the MPL,
     the GPL or the LGPL."
  */
-
+/*! 
+    Resource manager header
+ 
+    The resource manager is not a manager per see at the moment, but might
+    become one in the future. At the moment it supplies a number of functions
+    that can be used to locate resource files in a platform independent manner.
+    
+    Resource location is heavily dependant on the target platform. On the Mac
+    for example, resources are expected to be located in the application bundle
+    and we use the core foundataion API to locate these. On normal posix
+    systems (not including MacOS X), we will probably just look through
+    $PREFIX/share/openorbit/resources and $HOME/.openorbit/resources. On the Mac
+    the user directories will be
+    "~/Library/Application Support/Open Orbit/Resources".
+ */
 #ifndef _RES_MANAGER_H_
 #define _RES_MANAGER_H_
 #include <stdio.h>
