@@ -41,6 +41,9 @@
 #include "plugin-handler.h"
 #include "libgencds/hashtable.h"
 
+#ifndef SO_EXT
+#define SO_EXT ".so"
+#endif /* ! SO_EXT */
 
 static hashtable_t *PLUGIN_interface_dict = NULL;
 static hashtable_t *PLUGIN_dict = NULL;
@@ -88,12 +91,6 @@ load_so_plugin(char *filename)
     return plugin->key;
 }
 
-
-// TODO: Move preprocessor defs somewhere else
-#define SO_EXT ".dylib"
-#define SCM_EXT ".scm"
-
-
 // Check what kind of plugin is available in the search path and load it
 char*
 load_plugin(char *filename)
@@ -107,7 +104,8 @@ load_plugin(char *filename)
         strcat(file, SO_EXT);
         
         char *key = load_so_plugin(file);
-        
+
+#if 0        
         // try to load as scm script if the previous load failed
         if (!key) {
             free(file);
@@ -116,7 +114,7 @@ load_plugin(char *filename)
             strcat(file, SCM_EXT);
             key = load_scm_plugin(filename);
         }
-        
+#endif        
         free(file);
         
         return key;

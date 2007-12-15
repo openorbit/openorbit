@@ -1,12 +1,11 @@
-# Builds library of file readers, the OO3D and Hipparcos readers have their
-# tokenisers written in flex, the tga loader loads binary data and is written
-# in C. In order to keep stuff clean, place all file loaders here (this does
-# not include wrappers for loading abstract data, only the raw file loaders
+# Builds library of file readers, the tga loader loads binary data and is
+# written in C. In order to keep stuff clean, place all file loaders here (this
+# does not include wrappers for loading abstract data, only the raw file loaders
 # them self).
 
-set( lex_files hiparcos oo3d )
-set( lex_c_files )
-set( parser_src tga.c hiparcos.c oo3d.c )
+set( lex_files ) # set to the base name of any lexfiles that shall be built here
+set( lex_c_files ) # make sure that this is empty
+set( parser_src tga.c )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 

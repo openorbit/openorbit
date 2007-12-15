@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <assert.h>
 #include "object-manager.h"
 #include "hashtable.h"
@@ -196,19 +197,19 @@ om_save_ctxt(om_ctxt_t *ctxt)
 static void
 _write_object(om_object_t *obj, FILE *fp)
 {
-    fprintf("%s : %s = {\n", obj->name, obj->cls->name);
+    fprintf(fp, "%s : %s = {\n", obj->name, obj->cls->class_name);
     
     
     
-    fprintf("}\n");
+    fprintf(fp, "}\n");
 }
 
 int
-om_archive_ctxt(om_ctxt_t *ctxt, static char *fname)
+om_archive_ctxt(om_ctxt_t *ctxt, const char *fname)
 {
     assert(fname != NULL);
     
-    FILE *fp = fopen(fname);
+    FILE *fp = fopen(fname, "r");
     
     if ( fp == NULL ) return 1;
     

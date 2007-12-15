@@ -61,7 +61,7 @@ typedef struct {
     @param      ra Right ascension in radians
     @param      dec Declination in radians
 */
-void equ_cart_convert(vec_arr_t cart, angle_t ra, angle_t dec);
+void equ_cart_convert(vector_t *cart, angle_t ra, angle_t dec);
 star_list_t *initialise_star_list(const char *path);
 void add_star(double ra, double dec, double mag);
 void paint_sky(star_list_t *stars);

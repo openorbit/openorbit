@@ -158,8 +158,7 @@ typedef uint16_t om_prop_type_t;
 int
 om_save_ctxt(om_ctxt_t *ctxt); // save to memory
 
-int
-om_archive_ctxt(om_ctxt_t *ctxt); // save to disk
+int om_archive_ctxt(om_ctxt_t *ctxt, const char *fname); // save to disk
 
 int
 om_restore_ctxt(om_ctxt_t *ctxt); // restore ctxt

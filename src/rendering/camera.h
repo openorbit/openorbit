@@ -39,7 +39,6 @@ extern "C" {
 
 
 #include <math/types.h>
-#include <physics/types.h>
 
 #include <stdbool.h>
 
@@ -53,27 +52,27 @@ typedef struct {
     camera_type_t type;
     union {
         struct {
-            position_t p;   // has its own position
+            vector_t p;   // has its own position
             quaternion_t rq;
         } free_cam;
         
         struct {
-            position_t *p;   // position of center object
-            length_t d;      // distance between object and camera
+            vector_t *p;   // position of center object
+            scalar_t d;      // distance between object and camera
             angle_t ra;
             angle_t dec;
         } orbiting_cam;
         
         struct {
-            position_t *p;  // pos of chased object
-            position_t d;   // relative position to object
+            vector_t *p;  // pos of chased object
+            vector_t d;   // relative position to object
         } chase_cam;
     } u;
 } camera_t;
 
 bool init_cam(void);
 
-void cam_set(position_t p, quaternion_t q);
+void cam_set(vector_t p, quaternion_t q);
 
 /* Camera handling functions,  */
 void cam_move_forward(camera_t *cam, scalar_t distance);

@@ -2,9 +2,9 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${PYTHON_INCLUDE_PATH})
 
 # Set proper shared lib extension
-set(so_ext ".so")
+set(so_ext "\\\".so\\\"")
 if (APPLE)
-    SET(so_ext ".dylib")
+    SET(so_ext "\\\".dylib\\\"")
 endif (APPLE)
 add_definitions(-DSO_EXT=${so_ext})
 
@@ -59,7 +59,7 @@ set_target_properties(openorbit
                       DEBUG_OUTPUT_NAME "${open_orbit_debug_name}")
 
 target_link_libraries(openorbit
-  math physics scripting parsers dl gencds
+  math scripting parsers dl gencds
   ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${GLUT_LIBRARIES}
 )
 
