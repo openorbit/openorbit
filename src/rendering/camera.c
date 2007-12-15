@@ -43,7 +43,7 @@
 #include "math/constants.h"
 
 // TODO: Remove global camera
-static camera_t *gCam = NULL;
+camera_t *gCam = NULL;
 static scalar_t gDist = 0.1f;
 static angle_t gRot = 0.1f;
 
@@ -74,6 +74,22 @@ init_cam(void)
     io_register_button_handler("cam-roll-right", cam_roll_right_button_action);
     
     return true;
+}
+
+void
+cam_rotate(quaternion_t q)
+{
+    matrix_t m;
+    vector_t up, rup, dir, rdir;
+    V_SET(up, 0.0f, 1.0f, 0.0f, 0.0f);
+    V_SET(dir, 0.0f, 0.0f, -1.0f, 0.0f);
+    
+    Q_M_CONVERT(m, q);
+    M_V_MUL(rup, m, up);
+    M_V_MUL(rdir, m, dir);
+    
+    gluLookAt(0.0, 0.0, 0.0, rdir.s.x, rdir.s.y, rdir.s.z,
+              rup.s.x, rup.s.y, rup.s.z);
 }
 
 void
@@ -127,23 +143,10 @@ cam_set_polar(vector_t tgt, scalar_t len, scalar_t ra, scalar_t dec)
 
 void
 cam_set_view(camera_t *cam)
-{
-    matrix_t m;
-    vector_t up, rup, dir, rdir;
-    V_SET(up, 0.0f, 1.0f, 0.0f, 0.0f);
-    V_SET(dir, 0.0f, 0.0f, -1.0f, 0.0f);
-    
+{    
     switch (cam->type) {
         case CAM_FREE:
-            Q_M_CONVERT(m, cam->u.free_cam.rq);
-            M_V_MUL(rup, m, up);
-            M_V_MUL(rdir, m, dir);
-
-            gluLookAt(cam->u.free_cam.p.a[0], cam->u.free_cam.p.a[1], cam->u.free_cam.p.a[2],
-                      cam->u.free_cam.p.a[0] + rdir.a[0],
-                      cam->u.free_cam.p.a[1] + rdir.a[1],
-                      cam->u.free_cam.p.a[2] + rdir.a[2],
-                      rup.a[0], rup.a[1], rup.a[2]);            
+            cam_set_free(cam->u.free_cam.p, cam->u.free_cam.rq);
             break;
         case CAM_CHASE:
             break;

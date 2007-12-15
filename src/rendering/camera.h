@@ -49,6 +49,12 @@ typedef enum {
 } camera_type_t;
 
 typedef struct {
+    vector_t p;   // has its own position
+    quaternion_t rq;
+} free_cam_t;
+
+
+typedef struct {
     camera_type_t type;
     union {
         struct {
@@ -71,6 +77,8 @@ typedef struct {
 } camera_t;
 
 bool init_cam(void);
+
+void cam_rotate(quaternion_t q);
 
 /*! cam_set_free
     \param p
