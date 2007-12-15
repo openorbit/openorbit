@@ -46,6 +46,7 @@ print "Loading config..."
 import io       # I/O module, allowing the binding of key handlers
 import config   # config, allows one to set config values
 import ConfigParser
+import sys
 import os
 from os import environ
 
@@ -56,7 +57,7 @@ resSearchPaths = [home + "/Library/Application Support/Open Orbit/", home + "/.o
 # for preferences, we should create the directory if it does not exist
 for path in prefsSearchPaths:
     prefsPath = None
-    if os.path.isfile(os.path.join(path, "openorbit.conf"):
+    if os.path.isfile(os.path.join(path, "openorbit.conf")):
         prefsPath = path
         break
 
@@ -67,7 +68,7 @@ if prefsPath == None:
 # Find path with open orbit resources
 for path in resSearchPaths:
     resPath = None
-    if os.path.isfile(os.path.join(path, ""):
+    if os.path.isfile(os.path.join(path, "")):
         resPath = path
         break
 
@@ -79,19 +80,22 @@ if resPath == None:
 # A few default values for the config parser
 defaultValues = {'HOME' : home, 'RES': resPath}
 
-prefs = ConfigParser(defaultValues)
-prefs.read([path + "openorbit.conf" for path in searchPaths])
+prefs = ConfigParser.ConfigParser(defaultValues)
+prefs.read([path + "openorbit.conf" for path in prefsSearchPaths])
 
 # Populate the default preferences
 if not prefs.has_section("VIDEO"):
-    prefs.set("VIDEO", "WIDTH", 800)
-    prefs.set("VIDEO", "HEIGHT", 600)
-    prefs.set("VIDEO", "FULLSCREEN", False)
-
+    prefs.add_section("VIDEO")
+    prefs.set("VIDEO", "width", 800)
+    prefs.set("VIDEO", "height", 600)
+    prefs.set("VIDEO", "fullscreen", False)
+    prefs.set("VIDEO", "depth", 32)
+    
 if not prefs.has_section("AUDIO"):
-    pass
-
+    prefs.add_section("AUDIO")
+    
 if not prefs.has_section("KEYBOARD"):
+    prefs.add_section("KEYBOARD")
     prefs.set("KEYBOARD", "cam-fwd",        "e")
     prefs.set("KEYBOARD", "cam-back",       "d")
     prefs.set("KEYBOARD", "cam-left",       "s")
@@ -106,12 +110,11 @@ if not prefs.has_section("KEYBOARD"):
     prefs.set("KEYBOARD", "cam-roll-right", "r")
     
 if not prefs.has_section("MOUSE"):
-    pass
-
+    prefs.add_section("MOUSE")
 
 # Write all defaults to disk (maybe we should not write anything if there have
 # been no modifications?)
-fp = open(os.path.join(prefsPath, "openorbit.conf"), "w")
+fp = open(os.path.join(prefsSearchPaths[1], "openorbit.conf"), "w")
 prefs.write(fp)
 fp.close()
 
@@ -119,11 +122,11 @@ try:
     videoWidth = prefs.getint("VIDEO", "width")
     videoHeight = prefs.getint("VIDEO", "height")
     videoFullscreen = prefs.getboolean("VIDEO", "fullscreen")
-    videoDepth = prefs.getboolean("VIDEO", "depth")
-except NoOptionError:
+    videoDepth = prefs.getint("VIDEO", "depth")
+except ConfigParser.NoOptionError:
     print "Options width, height or fullscreen missing in section VIDEO"
     sys.exit(1)
-except NoSectionError:
+except ConfigParser.NoSectionError:
     print "VIDEO section missing"
     sys.exit(1)
     
@@ -140,10 +143,10 @@ for key in camControlActionKeys:
     try:
         keyCode = prefs.get("KEYBOARD", key)
         io.bindKeyDown(keyCode, 0, key)
-    except NoOptionError:
+    except ConfigParser.NoOptionError:
         # ignore missing bindings...
         pass
-    except NoSectionError:
+    except ConfigParser.NoSectionError:
         print "fatal error, no KEYBOARD section"
         sys.exit(1)
 

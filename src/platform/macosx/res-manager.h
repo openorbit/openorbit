@@ -33,6 +33,7 @@
 
 #ifndef _RES_MANAGER_H_
 #define _RES_MANAGER_H_
+#include <stdio.h>
 
 char* res_get_path(const char *file_name);
 FILE* res_get_file(const char *file_name);

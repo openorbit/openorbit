@@ -34,6 +34,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 
+#include "res-manager.h"
  
 #ifdef WITH_PYTHON
 
@@ -72,10 +73,11 @@ finilise_scripting(void)
 oo_error_t
 load_setup_script(void)
 {
-    char *home=getenv("HOME");
-    assert(home);
+    //char *home=getenv("HOME");
+    //assert(home);
     
-    char *path = malloc((strlen(home) +
+    char *path = res_get_path(SCR_INIT_SCRIPT_NAME);
+    /*char *path = malloc((strlen(home) +
                          strlen("/.openorbit/" SCR_INIT_SCRIPT_NAME)+1) *
                          sizeof(char));
     if (!path) {
@@ -84,6 +86,7 @@ load_setup_script(void)
     
     strcpy(path, home);
     strcat(path, "/.openorbit/" SCR_INIT_SCRIPT_NAME);    
+    */
     
     FILE *fp = fopen(path, "r");
     if (! fp) {

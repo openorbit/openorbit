@@ -36,6 +36,7 @@
 
 // Posix and UNIX headers
 #include <fcntl.h>
+#include <string.h>
 
 // Open Orbit headers
 #include "res-manager.h"
@@ -68,12 +69,25 @@ res_get_path(const char *file_name)
         fileBase = malloc(last_dot - last_slash + 1);
         fileType = malloc(end - last_dot + 1);
         fileSubDir = malloc(last_slash - file_name + 1);
+        
+        memset(fileBase, 0, last_dot - last_slash + 1);
+        memset(fileType, 0, end - last_dot + 1);
+        memset(fileSubDir, 0, last_slash - file_name + 1);
+        
+        memcpy(fileBase, last_slash + 1, last_dot - last_slash);
+        memcpy(fileType, last_dot + 1, end - last_dot);
+        memcpy(fileSubDir, file_name, last_slash - file_name);
     } else {
         fileBase = malloc(last_dot - file_name + 1);
         fileType = malloc(end - last_dot + 1);
         fileSubDir = NULL;
+
+        memset(fileBase, 0, last_dot - file_name + 1);
+        memset(fileType, 0, end - last_dot + 1);
+        
+        memcpy(fileBase, file_name, last_dot - file_name);
+        memcpy(fileType, last_dot + 1, end - last_dot);
     }
-    
 
     CFBundleRef bundle = CFBundleGetMainBundle();
     if (bundle == NULL) return NULL;
@@ -107,10 +121,10 @@ res_get_path(const char *file_name)
     free(fileBase);
     free(fileType);
     free(fileSubDir);
-    CFRelease(resName);
-    CFRelease(resType);
-    CFRelease(resSubDir);
-    CFRelease(url);
+    if (resName) CFRelease(resName);
+    if (resType) CFRelease(resType);
+    if (resSubDir) CFRelease(resSubDir);
+    if (url) CFRelease(url);
     
     return (char*)path;
 }
