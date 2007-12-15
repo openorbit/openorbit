@@ -34,7 +34,8 @@
 
 #include <stdlib.h>
 #include <check.h>
-#include "libgencds/heap.h"
+
+#include <gencds/heap.h>
 
 
 typedef struct {

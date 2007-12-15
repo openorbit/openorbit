@@ -31,7 +31,7 @@
     the GPL or the LGPL."
  */
 
-#include "libgencds/hashtable.h"
+#include <gencds/hashtable.h>
 #include "libgencds/hashtable-private.h"
 
 

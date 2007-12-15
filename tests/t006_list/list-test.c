@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <check.h>
 
-#include "libgencds/list.h"
+#include <gencds/list.h>
 
 
 START_TEST(test_list_append)
