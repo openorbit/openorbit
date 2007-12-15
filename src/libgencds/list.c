@@ -235,8 +235,13 @@ list_remove_entry(list_t *list, list_entry_t *entry)
 {
     assert(list != NULL);
     assert(entry != NULL);
-    // It is required that th entry is in the list, but that take O(n) to check
     assert(list->entry_count > 0);
+    // It is required that th entry is in the list, but that take O(n) to check
+    // It is not quite that bad, but if the entry is the first or the last
+    // entry in a list and the wrong list is supplied the list actually contain
+    // the entry will have its first / last object pointing to undefined data
+    // maybe there should be a debug version of this function that actually
+    // verify that the entry is in the list?
 
     list_entry_t *prev = entry->previous;
     list_entry_t *next = entry->next;

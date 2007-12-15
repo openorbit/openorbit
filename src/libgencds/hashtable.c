@@ -39,7 +39,10 @@
 
 
 #include <gencds/hashtable.h>
+#include <gencds/list.h>
+
 #include "hashtable-private.h"
+#include "list-private.h"
 
 
 #define IS_POWER_OF_2(val) ((!(val & (val-1))) && val)
@@ -159,7 +162,9 @@ hashtable_t
     ht->cmp = cmp;
     ht->cpy_key = cpy;
     ht->del_key = del;
-//    ht->hash_keys = {.first = NULL, .last = NULL, .entry_count = 0};
+    ht->hash_entry_list.first = NULL;
+    ht->hash_entry_list.last = NULL;
+    ht->hash_entry_list.entry_count = 0;
     
     return ht;
 }
@@ -197,6 +202,13 @@ hashtable_delete(hashtable_t *ht)
             free(entry);
             entry = next_entry;
         }
+    }
+    
+    list_entry_t *e = list_first(& ht->hash_entry_list);
+    while (e) {
+        list_entry_t *p = e;
+        e = list_entry_next(e);
+        free(p);
     }
     
     free(ht->t);
@@ -239,6 +251,9 @@ hashtable_insert(hashtable_t * restrict ht, const char * restrict key,
         free(new_entry);
         return -1;
     }
+    
+    list_append(&ht->hash_entry_list, new_entry);
+    new_entry->list_entry = list_last(&ht->hash_entry_list);
     new_entry->object = obj;
     
 
@@ -277,6 +292,9 @@ void
         ht->t[hash] = entry->next;
         
         ht->del_key(entry->key);
+        
+        list_remove_entry(&ht->hash_entry_list, entry->list_entry);
+
         free(entry);
         return obj;
     } else if (!entry) {
@@ -297,6 +315,8 @@ void
         void *obj = entry_to_delete->object;
         
         ht->del_key(entry_to_delete->key);
+        list_remove_entry(&ht->hash_entry_list, entry_to_delete->list_entry);
+
         free(entry_to_delete);
         return obj;
     }

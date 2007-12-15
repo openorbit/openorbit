@@ -37,7 +37,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
- 
+
+#include <gencds/list.h>
+
 struct _list_entry_t {
     void *data;
     struct _list_entry_t *next;

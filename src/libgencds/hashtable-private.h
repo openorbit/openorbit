@@ -37,10 +37,13 @@
 extern "C" {
 #endif
 
+#include "list-private.h"
+
 typedef struct _hashentry_t {
     struct _hashentry_t *next; /*!< Next entry in chained list */
     char *key; /*!< A C-string used for as a key when looking up an element */
     void *object; /*!< Pointer to the object associated to the key */
+    struct _list_entry_t *list_entry;
 } hashentry_t;
 
 struct _hashtable_t {
@@ -50,6 +53,7 @@ struct _hashtable_t {
     hash_cmp_fn_t cmp; /*!< The hash function used for this table */
     hash_key_copy_fn_t cpy_key;
     hash_key_del_fn_t del_key;
+    struct _list_t hash_entry_list;
 };
 
 #ifdef __cplusplus
