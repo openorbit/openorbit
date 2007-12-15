@@ -60,13 +60,6 @@ set_target_properties(openorbit
                       RELEASE_OUTPUT_NAME "${open_orbit_name}"
                       DEBUG_OUTPUT_NAME "${open_orbit_debug_name}")
 
-#if (APPLE)
-#    add_custom_command(TARGET openorbit
-#                       POST_BUILD
-#                       COMMAND install-mac-res.sh ARGS args1
-#                       WORKING_DIRECTORY dir
-#                       COMMENT comment] [VERBATIM])
-#endif (APPLE)
 
 target_link_libraries(openorbit
   math scripting parsers dl gencds

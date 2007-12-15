@@ -1,12 +1,13 @@
-MACRO(INSTALL_MAC_RES target files)
-	IF (APPLE)
-    	
-		FOREACH (file ${files})
-        	#    add_custom_command(TARGET openorbit
-            #                       POST_BUILD
-            #                       COMMAND install-mac-res.sh ARGS args1
-            #                       WORKING_DIRECTORY dir
-            #                       COMMENT comment] [VERBATIM])
-    	ENDFOREACH (file)
-	ENDIF (APPLE)
-ENDMACRO(INSTALL_MAC_RES target files)
+MACRO(INSTALL_MAC_RES target config files)
+	if (APPLE)
+        get_target_property(outName_conf ${target} ${config}_OUTPUT_NAME)
+        
+		foreach (file ${files})
+            add_custom_command(TARGET ${target}
+                               POST_BUILD
+                               COMMAND ${CMAKE_SOURCE_DIR}/scripts/install-mac-res.sh
+                                   ARGS -f ${file} -a ${outName_conf}
+                               WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    	endforeach (file)
+	endif (APPLE)
+ENDMACRO(INSTALL_MAC_RES target config files)
