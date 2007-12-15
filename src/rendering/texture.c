@@ -35,13 +35,14 @@
 
 
 #include <stdlib.h>
-
+#include <assert.h>
 #include <gencds/hashtable.h>
+#include "SDL_opengl.h"
 
 #include "texture.h"
 #include "parsers/tga.h"
 
-#include "platform/macosx/res-manager.h"
+#include "res-manager.h"
 
 hashtable_t *gTEX_dict;
 
@@ -61,7 +62,7 @@ tex_load(const char *key, const char *name)
     gl_tex_t *tex = malloc(sizeof(gl_tex_t));
     assert(tex != NULL);
     
-    assert(tga_read_file(&img, file) == 0):
+    assert(tga_read_file(&img, fp) == 0);
     
     if ((img.header.img_spec.depth == 32) && (img.header.img_spec.alpha_bits == 8)) {
         tex->textype = GL_BGRA;
@@ -81,12 +82,12 @@ tex_load(const char *key, const char *name)
     glBindTexture(GL_TEXTURE_2D, texnum); 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
-    if tex->textype == GL_BGR {
+    if (tex->textype == GL_BGR) {
         glTexImage2D(GL_TEXTURE_2D, 0, 3, tex->width, tex->height, 0, GL_BGR,
-                     GL_UNSIGNED_BYTE, tex.data);
-    } else if {
+                     GL_UNSIGNED_BYTE, tex->data);
+    } else {
         glTexImage2D(GL_TEXTURE_2D, 0, 4, tex->width, tex->height, 0, GL_BGRA,
-                     GL_UNSIGNED_BYTE, tex.data);
+                     GL_UNSIGNED_BYTE, tex->data);
     }
     
     hashtable_insert(gTEX_dict, key, tex);

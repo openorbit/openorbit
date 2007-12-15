@@ -38,6 +38,7 @@
 extern "C" {
 #endif 
 
+#include "SDL_opengl.h"
 typedef struct {
     GLint width, height;
     GLuint texid;
