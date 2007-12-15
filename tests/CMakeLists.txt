@@ -1,9 +1,15 @@
 find_library(CHECK_LIB check)
+find_path(CHECK_INCLUDES check.h)
 
 if (NOT CHECK_LIB)
     message(FATAL_ERROR "Bulding tests requires that check is installed")
 endif (NOT CHECK_LIB)
 
+if (NOT CHECK_INCLUDES)
+    message(FATAL_ERROR "Cannot find check headers")
+endif (NOT CHECK_INCLUDES)
+
+include_directories(${CHECK_INCLUDES})
 add_subdirectory(common)
 
 include_directories(common ${CMAKE_SOURCE_DIR}/src)
