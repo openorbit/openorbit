@@ -40,17 +40,20 @@ extern "C" {
 
 #include <stdbool.h>
 
+#include "libgencds/object-manager.h"
+
 // All OSes do not support resolving backlinks, so we export an interface with
 // pointers to all the functions in the API
 typedef struct {
-    char *name;
-    char *key;
-    char *description;
-    void *dynlib_handle;
+    char *name; //!< Proper name of the plugin (e.g. "Space Shuttle")
+    unsigned rev; //!< Revision number, greater is later
+    char *key; //!< Hashkey (e.g. "SPACE_SHTL")
+    char *description; //!< Long string describing the plugin, e.g. "All shuttle components"
+    void *dynlib_handle; //!< Admin data, filled in automatically, do not touch
 } plugin_t;
 
-typedef plugin_t *(*init_f)(void);
-#define PLUGIN_INIT_SYMBOL "oo_init"
+typedef plugin_t* (*init_f)(om_ctxt_t*);
+#define PLUGIN_INIT_SYMBOL "plugin_init"
 
 
 bool init_plugin_manager(void);
@@ -76,6 +79,8 @@ bool init_plugin_manager(void);
         Linux and .dylib on MacOS X or .scm for Scheme plugins).
     \return A zero terminated c-string containing the identifier of the plugin.
 */
+
+bool load_plugins(void);
 char *load_plugin(char *filename);
 void unload_plugin(char *key);
 
