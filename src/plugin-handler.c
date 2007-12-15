@@ -51,15 +51,15 @@
 #define INSTALL_PREFIX "/usr/local"
 #endif /* ! INSTALL_PREFIX */
 
-static hashtable_t *PLUGIN_interface_dict = NULL;
-static hashtable_t *PLUGIN_dict = NULL;
+static hashtable_t *gPLUGIN_interface_dict = NULL;
+static hashtable_t *gPLUGIN_dict = NULL;
 
 bool
 init_plugin_manager(void)
 {
-    if (! (PLUGIN_interface_dict = hashtable_new_with_str_keys(512)) ) return false;
-    if (! (PLUGIN_dict = hashtable_new_with_str_keys(512)) ) {
-        hashtable_delete(PLUGIN_interface_dict);
+    if (! (gPLUGIN_interface_dict = hashtable_new_with_str_keys(512)) ) return false;
+    if (! (gPLUGIN_dict = hashtable_new_with_str_keys(512)) ) {
+        hashtable_delete(gPLUGIN_interface_dict);
         return false;
     }
     return true;
@@ -128,7 +128,7 @@ load_so_plugin(char *filename)
     plugin->dynlib_handle = plugin_handle; // this is a runtime param not set by the plugin itself
     
     /* insert plugin in our plugin registry */
-    hashtable_insert(PLUGIN_dict, plugin->key, plugin);
+    hashtable_insert(gPLUGIN_dict, plugin->key, plugin);
     
     return plugin->key;
 }
@@ -162,7 +162,7 @@ load_plugin(char *filename)
 void
 unload_plugin(char *key)
 {
-    plugin_t *plugin = hashtable_remove(PLUGIN_dict, key);
+    plugin_t *plugin = hashtable_remove(gPLUGIN_dict, key);
     
     if (! plugin) return;
     
@@ -173,11 +173,11 @@ unload_plugin(char *key)
 void
 register_plugin_interface(char *interface_key, void *interface)
 {
-    hashtable_insert(PLUGIN_interface_dict, interface_key, interface);
+    hashtable_insert(gPLUGIN_interface_dict, interface_key, interface);
 }
 
 void
 remove_plugin_interface(char *interface_key)
 {
-    hashtable_remove(PLUGIN_interface_dict, interface_key);
+    hashtable_remove(gPLUGIN_interface_dict, interface_key);
 }
