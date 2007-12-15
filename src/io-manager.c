@@ -34,7 +34,7 @@
 #include <stdbool.h>
 
 #include <gencds/hashtable.h>
-
+#include "sim.h"
 #include "io-manager.h"
 #include "SDL.h"
 
@@ -52,7 +52,7 @@ static hashtable_t *gIO_key_table;
 static io_bindings_t IO_bindings;
 
 static void
-io_event_def(sim_event_t eid, void *data)
+io_event_def(sim_event_kind_t eid, void *data)
 {
     assert(eid == SIM_io_event);
     io_event_t *e = (io_event_t*)data;
@@ -129,6 +129,19 @@ io_register_event_handler_script(const char *key, scr_func_t f,
     
     hashtable_insert(gIO_event_handler_table, key, cont);
     return true;
+}
+
+int
+io_bind_event(const char *key, ...)
+{
+    io_event_handler_container_t *cont;
+    cont = hashtable_lookup(gIO_event_handler_table, key);
+    
+    if (cont == NULL) {
+        return -1;
+    } 
+    
+    //IO_bindings.
 }
 
 void
@@ -217,6 +230,8 @@ io_dispatch_event(const io_event_t *e)
         assert(0);
     }
 }
+
+
 
 static void
 io_button_action_def(void)
@@ -444,7 +459,7 @@ io_manager_init(void)
     io_init_keytable();
     io_init_actiontable();
     
-	return ERROR_NONE;
+	return ERR_none;
 }
 
 

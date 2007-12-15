@@ -143,7 +143,6 @@ typedef struct {
     io_event_handler_t down;
 } io_key_handler_t;
 
-
 typedef struct {
 	// should make this more complex in order to support unicode
 	// should handle special keys like shift and return
@@ -164,8 +163,16 @@ bool io_register_event_handler(const char *key, sim_event_handler_t f,
                                io_event_kind_t kind);
 int io_register_event_handler_script(const char *key, scr_func_t f,
                                      io_event_kind_t kind);
+//int io_dispatch_event(io_event_kind_t kind, ...);
+void io_dispatch_event(const io_event_t *e);
 
-
+// bind registered event handler to a certain action with certain parameters
+// when the event is a button handler the first param is an int where 0 is the
+// keyboard, 1 is the mouse and 2 .. n is a joystick, the second param is also
+// an int and it will determine whether to connect the event as a button down
+// or a button up handler (0 is down, 1 is up).
+int io_bind_event(const char *key, ...);
+    
 typedef enum {
     IO_ACTION_BUTTON,
     IO_ACTION_CLICK,

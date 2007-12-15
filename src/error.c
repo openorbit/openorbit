@@ -40,9 +40,9 @@
 typedef struct {
 	char *str;
 	bool fatal;
-} error_info_t;
+} oo_error_info_t;
 
-static error_info_t ERROR_info[] = {
+static oo_error_info_t OOERR_info[] = {
 	{"no error", false},
 	{"file not found", false},
 	{"invalid parameter", false},
@@ -53,25 +53,25 @@ static error_info_t ERROR_info[] = {
 };
 
 inline char
-*get_error_string(oo_error_t err)
+*oo_get_err_str(oo_error_t err)
 {
-	return ERROR_info[err].str;
+	return OOERR_info[err].str;
 }
 
 static inline bool
-error_is_fatal(oo_error_t err)
+oo_err_is_fatal(oo_error_t err)
 {
-	return ERROR_info[err].fatal;
+	return OOERR_info[err].fatal;
 }
 
 void
-print_error_message(oo_error_t err)
+oo_print_err_msg(oo_error_t err)
 {
-	if (error_is_fatal(err)) {
-		printf("openorbit: %s (fatal error, terminating app)\n",
-		       get_error_string(err));
+	if (oo_err_is_fatal(err)) {
+		fprintf(stderr, "openorbit: %s (fatal error, terminating app)\n",
+		       oo_get_err_str(err));
 		exit(1);
 	}
 	
-	printf("openorbit: %s\n", get_error_string(err));
+	fprintf(stderr, "openorbit: %s\n", oo_get_err_str(err));
 }

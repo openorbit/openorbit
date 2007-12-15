@@ -40,16 +40,16 @@ extern "C" {
 #endif
 
 typedef enum {
-	ERROR_NONE = 0,
-	ERROR_FILE_NOT_FOUND,
-	ERROR_INVALID_PARAMS,
-	ERROR_MEM,
-	ERROR_NET,
-    ERROR_SCRIPT
+	ERR_none = 0,
+	ERR_file_not_found,
+	ERR_invalid_par,
+	ERR_mem,
+	ERR_net,
+    ERR_script
 } oo_error_t;
 
-char *get_error_string(oo_error_t err);
-void print_error_message(oo_error_t err);
+char *oo_get_err_str(oo_error_t err);
+void oo_print_err_msg(oo_error_t err);
 
 
 #ifdef __cplusplus
