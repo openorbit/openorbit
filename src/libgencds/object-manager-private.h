@@ -85,6 +85,8 @@ extern "C" {
 
         om_object_constructor_f create; /*!< Object constructor */
         om_object_destructor_f destroy; /*!< Object destructor */
+        
+        bool is_proxy; /*!< Whether the class is a proxy class (i.e. unmanaged) */
     };
 
 

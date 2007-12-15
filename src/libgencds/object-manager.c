@@ -118,11 +118,25 @@ om_save_ctxt(om_ctxt_t *ctxt)
 }
 
 static void
+_print_type_code(om_prop_type_t tc)
+{
+    
+}
+
+static void
 _write_object(om_object_t *obj, FILE *fp)
 {
-    fprintf(fp, "%s : %s = {\n", obj->name, obj->cls->class_name);
+    om_class_t *cls = obj->cls;
+    fprintf(fp, "%s : %s = {\n", obj->name, cls->class_name);
     
+//    list_entry_t *entry;
+//    entry = list_first(cls->property_list);
     
+//    while (entry != NULL) {
+//        struct _om_prop_t *prop = list_entry_data(entry);
+//        fprintf(fp, "    %s : ", prop->name);
+//        _print_type_code();
+//    } 
     
     fprintf(fp, "}\n");
 }
@@ -174,6 +188,7 @@ om_new_class(om_ctxt_t *ctxt, const char *class_name,
     class_obj->create = constr;
     class_obj->destroy = dest;
     class_obj->object_size = size;
+    class_obj->is_proxy = false;
     
     class_obj->property_dict = hashtable_new_with_str_keys(32);
     class_obj->interface_dict = hashtable_new_with_str_keys(32);
@@ -182,6 +197,43 @@ om_new_class(om_ctxt_t *ctxt, const char *class_name,
     
     if (!(class_obj->property_dict) || !(class_obj->interface_dict)
     || !(class_obj->property_list) || !(class_obj->interface_list)) {
+        hashtable_delete(class_obj->property_dict);
+        hashtable_delete(class_obj->interface_dict);
+        list_delete(class_obj->property_list);
+        list_delete(class_obj->interface_list);
+        return NULL;
+    }
+    
+    hashtable_insert(ctxt->class_dict, class_name, class_obj);
+    list_insert(ctxt->class_list, class_obj);
+    return class_obj;
+}
+
+om_class_t*
+om_new_proxy_class(om_ctxt_t *ctxt, const char *class_name)
+{
+    assert(ctxt != NULL);
+    assert(class_name != NULL);
+    
+    om_class_t *class_obj = malloc(sizeof(om_class_t));
+    if (! class_obj) {
+        return NULL;
+    }
+    
+    class_obj->class_name = strdup(class_name);
+    class_obj->ctxt = ctxt;
+    class_obj->create = NULL; // only neeeded for allocation
+    class_obj->destroy = NULL; // only nedded for deallocation
+    class_obj->object_size = 0; // only needed for allocation
+    class_obj->is_proxy = true;
+    
+    class_obj->property_dict = hashtable_new_with_str_keys(32);
+    class_obj->interface_dict = hashtable_new_with_str_keys(32);
+    class_obj->property_list = list_new();
+    class_obj->interface_list = list_new();
+    
+    if (!(class_obj->property_dict) || !(class_obj->interface_dict)
+        || !(class_obj->property_list) || !(class_obj->interface_list)) {
         hashtable_delete(class_obj->property_dict);
         hashtable_delete(class_obj->interface_dict);
         list_delete(class_obj->property_list);
@@ -219,9 +271,16 @@ om_new_object(om_ctxt_t *ctxt, const char *class_name,
     assert(object_name != NULL);
         
     om_class_t *class_object = om_get_class(ctxt, class_name);
-    if (! class_object) return NULL;
-    
+    if (! class_object) {
+        warnx("om: cannot allocate object %s (%s class not found)",
+              object_name, class_name);
+        return NULL;
+    }
     om_object_t *obj = malloc(sizeof(om_object_t));
+    if (obj == NULL) {
+        warn("om: object allocation (objname = %s)", object_name);
+        return NULL;
+    }
     
     obj->cls = class_object;
     obj->name = strdup(object_name);
@@ -237,6 +296,41 @@ om_new_object(om_ctxt_t *ctxt, const char *class_name,
     return obj;
 }
 
+om_object_t*
+om_new_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
+                 const char *object_name, void *obj_addr)
+{
+    assert(ctxt != NULL);
+    assert(class_name != NULL);
+    assert(object_name != NULL);
+    assert(obj_addr != NULL);
+    
+    om_class_t *class_object = om_get_class(ctxt, class_name);
+    if (! class_object) {
+        warnx("om: cannot insert proxy object %s (%s class not found)",
+              object_name, class_name);
+        return NULL;
+    }
+    
+    om_object_t *obj = malloc(sizeof(om_object_t));
+    if (obj == NULL) {
+        warn("om: proxy object allocation (objname = %s)", object_name);
+        return NULL;
+    }
+    obj->cls = class_object;
+    obj->name = strdup(object_name);
+    obj->data = obj_addr;
+    
+    hashtable_insert(ctxt->object_dict, object_name, obj);   
+    list_append(ctxt->object_list, obj);   
+    obj->list_entry = list_last(ctxt->object_list);    
+    hashtable_insert(ctxt->reverse_object_dict, obj->data, obj);   
+    
+    
+    return obj;
+}
+
+
 void
 om_delete_object(om_object_t *obj)
 {
@@ -248,7 +342,9 @@ om_delete_object(om_object_t *obj)
     obj->list_entry = NULL;
     
     // Delete object
-    obj->cls->destroy(obj->data);
+    if (! obj->cls->is_proxy) {
+        obj->cls->destroy(obj->data);
+    }
     
     free(obj->name);
     free(obj);
@@ -548,6 +644,15 @@ om_delete_iface_obj(om_iface_t *iface)
     
     free(iface);
 }
+
+// temporary, when it is working it will be broken up into pieces
+//#include <Python.h>
+static void
+om_python_integration(om_ctxt_t *ctxt)
+{
+    
+}
+
 // TODO: Ensure that runtime errors are propagated on invalid prop names
 #define _OM_GET_PROP_FN_(T, N, TC)                                      \
 T                                                                       \

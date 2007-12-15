@@ -144,6 +144,12 @@ typedef struct _om_iface_t om_iface_t;
  * called FOO_OM_SCALAR that is equal to either OM_FLOAT OR OM_DOUBLE.
  */
 typedef uint16_t om_prop_type_t;
+struct typecode {
+    unsigned proxy:1;
+    unsigned array:2;
+    unsigned ref:1;
+    unsigned base:8;
+};
 
 /* Simple types */
 #define OM_CHAR         (0)
@@ -190,9 +196,7 @@ om_class_t* om_new_class(om_ctxt_t *ctxt, const char *class_name,
                          om_object_destructor_f,
                          size_t size);
 
-// TODO: Implement
-om_class_t* om_new_proxy_class(om_ctxt_t *ctxt, const char *class_name,
-                               size_t size);
+om_class_t* om_new_proxy_class(om_ctxt_t *ctxt, const char *class_name);
 
                          
 void om_delete_class(om_class_t *cls);
@@ -296,6 +300,14 @@ OM_ACCESSOR_PAIR_DEF(int64_t, int64);
 OM_ACCESSOR_PAIR_DEF(uint64_t, uint64);
 
 OM_ACCESSOR_PAIR_DEF(void*, object);
+
+
+// Object manager predefined interfaces
+typedef struct {
+    void (*save)(void*);
+    void (*restore)(void*);
+} om_serialisation_if;
+#define OM_SERIALISATION_IF_KEY "om.serialisation"
 
 
 #ifdef __cplusplus
