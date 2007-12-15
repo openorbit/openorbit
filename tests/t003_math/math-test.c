@@ -81,97 +81,70 @@ START_TEST(test_q_mul)
 }
 END_TEST
 
+// TODO: M_MUL test
 START_TEST(test_m_mul)
 {
 
 }
 END_TEST
 
-
+// TODO: M_ADD test
 START_TEST(test_m_add)
 {
 
 }
 END_TEST
 
+// TODO: V_ADD test
 START_TEST(test_v_add)
 {
 
 }
 END_TEST
 
+// TODO: V_SUB test
 START_TEST(test_v_sub)
 {
 
 }
 END_TEST
 
+// TODO: V_S_MUL test
 START_TEST(test_v_s_mul)
 {
 
 }
 END_TEST
 
+// TODO: V_CROSS test
 START_TEST(test_v_cross)
 {
 
 }
 END_TEST
 
+// TODO: V_DOT test
 START_TEST(test_v_dot)
 {
 
 }
 END_TEST
 
+// TODO: V_NORMALISE test
 START_TEST(test_v_normalise)
 {
 
 }
 END_TEST
 
+// TODO: V_ABS test
 START_TEST(test_v_abs)
 {
 
 }
 END_TEST
 
-START_TEST(test_m_axis_rot_x)
-{
-
-}
-END_TEST
-
-START_TEST(test_m_axis_rot_y)
-{
-
-}
-END_TEST
-
-START_TEST(test_m_axis_rot_z)
-{
-
-}
-END_TEST
-
-START_TEST(test_m_vec_rot_x)
-{
-
-}
-END_TEST
-
-START_TEST(test_m_vec_rot_y)
-{
-
-}
-END_TEST
-
-START_TEST(test_m_vec_rot_z)
-{
-
-}
-END_TEST
-
+// TODO: M_UNIT test
 START_TEST(test_m_unit)
 {
 
