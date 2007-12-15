@@ -10,7 +10,10 @@ hopefully be re-factored.
 
 1. ARCHITECTURE
 
-A brief architectural description of open orbit should be here.
+The source is in the src directory, public includes are in the include
+directory.
+
+Libraries part of openorbit place public includes in include/"libname".
 
 2. CODE STYLE
 Open Orbit is written in C and tries to confirm to the C99 standard.
