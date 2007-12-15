@@ -159,7 +159,7 @@ void q_div(quat_arr_t res, const quat_arr_t a, const quat_arr_t b)
  * The q_rot function creates a rotation quaternion for a right hand rotation
  * of alpha radians around the specified axis.
  * 
- * \param q     A referense to the new quaternion
+ * \param q     A reference to the new quaternion
  * \param axis  A unit vector describing the axis of rotation 
  * \param alpha Rotation in radians.
 */
@@ -168,6 +168,29 @@ void q_rot(quat_arr_t q, const axis_arr_t axis, const angle_t alpha)
 
 #define Q_ROT(q, ax, ang) \
     q_rot((q).a, (ax).a, ang)
+
+#define Q_ROT_X(q, r)                                            \
+    do {                                                         \
+        vector_t v = {.s.x = S_CONST(1.0), .s.y = S_CONST(0.0),  \
+                      .s.z = S_CONST(0.0), .s.w = S_CONST(0.0)}; \
+        q_rot((q).a, v.a, r);                                    \
+    } while (0)
+
+#define Q_ROT_Y(q, r)                                            \
+    do {                                                         \
+        vector_t v = {.s.x = S_CONST(0.0), .s.y = S_CONST(1.0),  \
+                      .s.z = S_CONST(0.0), .s.w = S_CONST(0.0)}; \
+        q_rot((q).a, v.a, r);                                    \
+    } while (0)
+
+
+#define Q_ROT_Z(q, r)                                            \
+    do {                                                         \
+        vector_t v = {.s.x = S_CONST(0.0), .s.y = S_CONST(0.0),  \
+                      .s.z = S_CONST(1.0), .s.w = S_CONST(0.0)}; \
+        q_rot((q).a, v.a, r);                                    \
+    } while (0)
+
 
 void q_normalise(quat_arr_t q)
     __attribute__ ((__nonnull__));
