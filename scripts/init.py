@@ -45,25 +45,122 @@ print "Loading config..."
 
 import io       # I/O module, allowing the binding of key handlers
 import config   # config, allows one to set config values
+import ConfigParser
+import os
+from os import environ
+
+home = environ["HOME"]
+resSearchPaths = [home + "/Library/Preferences/", home + "/.openorbit/"]
+prefsSearchPaths = [home + "/Library/Application Support/Open Orbit/", home + "/.openorbit/"]
+# Find path that contains the openorbit.conf file, this path is our default dir
+# for preferences, we should create the directory if it does not exist
+for path in prefsSearchPaths:
+    prefsPath = None
+    if os.path.isfile(os.path.join(path, "openorbit.conf"):
+        prefsPath = path
+        break
+
+if prefsPath == None:
+    # not found
+    pass
+
+# Find path with open orbit resources
+for path in resSearchPaths:
+    resPath = None
+    if os.path.isfile(os.path.join(path, ""):
+        resPath = path
+        break
+
+if resPath == None:
+    # not found
+    pass
+
+    
+# A few default values for the config parser
+defaultValues = {'HOME' : home, 'RES': resPath}
+
+prefs = ConfigParser(defaultValues)
+prefs.read([path + "openorbit.conf" for path in searchPaths])
+
+# Populate the default preferences
+if not prefs.has_section("VIDEO"):
+    prefs.set("VIDEO", "WIDTH", 800)
+    prefs.set("VIDEO", "HEIGHT", 600)
+    prefs.set("VIDEO", "FULLSCREEN", False)
+
+if not prefs.has_section("AUDIO"):
+    pass
+
+if not prefs.has_section("KEYBOARD"):
+    prefs.set("KEYBOARD", "cam-fwd",        "e")
+    prefs.set("KEYBOARD", "cam-back",       "d")
+    prefs.set("KEYBOARD", "cam-left",       "s")
+    prefs.set("KEYBOARD", "cam-right",      "f")
+    prefs.set("KEYBOARD", "cam-up",         "a")
+    prefs.set("KEYBOARD", "cam-down",       "z")
+    prefs.set("KEYBOARD", "cam-pitch-up",   "g")
+    prefs.set("KEYBOARD", "cam-pitch-down", "t")
+    prefs.set("KEYBOARD", "cam-yaw-right",  "v")
+    prefs.set("KEYBOARD", "cam-yaw-left",   "x")
+    prefs.set("KEYBOARD", "cam-roll-left",  "w")
+    prefs.set("KEYBOARD", "cam-roll-right", "r")
+    
+if not prefs.has_section("MOUSE"):
+    pass
 
 
-config.setScreenSize(800, 600)
-#config.setFullscreen(1)
-#config.setScreenDepth(32)
+# Write all defaults to disk (maybe we should not write anything if there have
+# been no modifications?)
+fp = open(os.path.join(prefsPath, "openorbit.conf"), "w")
+prefs.write(fp)
+fp.close()
 
-def foo():
-    print "button pressed"
+try:
+    videoWidth = prefs.getint("VIDEO", "width")
+    videoHeight = prefs.getint("VIDEO", "height")
+    videoFullscreen = prefs.getboolean("VIDEO", "fullscreen")
+    videoDepth = prefs.getboolean("VIDEO", "depth")
+except NoOptionError:
+    print "Options width, height or fullscreen missing in section VIDEO"
+    sys.exit(1)
+except NoSectionError:
+    print "VIDEO section missing"
+    sys.exit(1)
+    
+config.setScreenSize(videoWidth, videoHeight)
+config.setFullscreen(videoFullscreen)
+config.setScreenDepth(videoDepth)
 
-def bar(a, b):
-    print a, b
+camControlActionKeys = ["cam-fwd", "cam-back", "cam-left", "cam-right",
+                        "cam-up", "cam-down", "cam-pitch-up", "cam-pitch-down",
+                        "cam-yaw-right", "cam-yaw-left", "cam-roll-left",
+                        "cam-roll-right"]
 
-def drag(a, b):
-    print "drag" + str((a, b))
+for key in camControlActionKeys:
+    try:
+        keyCode = prefs.get("KEYBOARD", key)
+        io.bindKeyDown(keyCode, 0, key)
+    except NoOptionError:
+        # ignore missing bindings...
+        pass
+    except NoSectionError:
+        print "fatal error, no KEYBOARD section"
+        sys.exit(1)
+
+
+#def foo():
+#    print "button pressed"
+
+#def bar(a, b):
+#    print a, b
+
+#def drag(a, b):
+#    print "drag" + str((a, b))
 
 # Register the function above as an action handler
-io.registerButtonHandler("foo", foo)
-io.registerClickHandler("bar", bar)
-io.registerDragHandler("drag", drag)
+#io.registerButtonHandler("foo", foo)
+#io.registerClickHandler("bar", bar)
+#io.registerDragHandler("drag", drag)
 
 
 # io.bindKeyUp can bind both C-function and Python functions to button presses
@@ -74,19 +171,3 @@ io.registerDragHandler("drag", drag)
 #io.bindMouseDown(io.LEFT, "bar")
 #io.bindMouseDown(io.RIGHT, "foo")
 #io.bindMouseDrag(io.LEFT, "drag")
-
-# Translation movements
-io.bindKeyDown("e", 0, "cam-fwd")
-io.bindKeyDown("d", 0, "cam-back")
-io.bindKeyDown("s", 0, "cam-left")
-io.bindKeyDown("f", 0, "cam-right")
-io.bindKeyDown("a", 0, "cam-up")
-io.bindKeyDown("z", 0, "cam-down")
-
-# Rotation
-io.bindKeyDown("g", 0, "cam-pitch-up")
-io.bindKeyDown("t", 0, "cam-pitch-down")
-io.bindKeyDown("v", 0, "cam-yaw-right")
-io.bindKeyDown("x", 0, "cam-yaw-left")
-io.bindKeyDown("w", 0, "cam-roll-left")
-io.bindKeyDown("r", 0, "cam-roll-right")
