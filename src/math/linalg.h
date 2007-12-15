@@ -180,7 +180,7 @@ void v_normalise(vec_arr_t v) __attribute__ ((__nonnull__));
 #define V_ABS(s, va) \
     (s) = v_abs((va).a)
     
-__inline__ scalar_t v_abs(const vec_arr_t v)
+ scalar_t v_abs(const vec_arr_t v)
     __attribute__ ((__pure__, __nonnull__));
 
 #define M_TRANSPOSE(MT, M) \

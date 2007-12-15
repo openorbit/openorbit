@@ -40,7 +40,7 @@
 #include <math/quaternions.h>
 #include <assert.h>
 
-inline scalar_t
+ scalar_t
 q_scalar(const quat_arr_t q)
 {
     return QUAT_W(q);
@@ -163,7 +163,7 @@ m_q_convert(quat_arr_t q, mat_arr_t m)
 }
 
 
-inline void
+ void
 q_add(quat_arr_t r, quat_arr_t a, const quat_arr_t b)
 {
     v_add(r, a, b);
@@ -187,25 +187,25 @@ q_s_div(quat_arr_t r, const quat_arr_t q, const scalar_t d)
     QUAT_W(r) = QUAT_W(q) / d;
 }
 
-inline scalar_t
+ scalar_t
 q_dot(const quat_arr_t a, const quat_arr_t b)
 {
     return v_dot(a, b);
 }
 
-inline void
+ void
 q_cross(vec_arr_t r, const quat_arr_t a, const quat_arr_t b)
 {
     v_cross(r, a, b);
 }
 
-inline scalar_t
+ scalar_t
 q_abs(const quat_arr_t q)
 {
     return v_abs(q);
 }
 
-inline void
+void
 q_conj(quat_arr_t qp, const quat_arr_t q)
 {
     QUAT_X(qp) = -QUAT_X(q);

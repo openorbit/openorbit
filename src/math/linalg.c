@@ -125,7 +125,7 @@ v_normalise(vec_arr_t v)
 }
 
 
-__inline__ scalar_t
+scalar_t
 v_abs(const vec_arr_t v)
 {
     return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + v[3]*v[3]);

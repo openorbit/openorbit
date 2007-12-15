@@ -56,7 +56,7 @@ extern "C" {
 #define Q_SCALAR(s, q) \
     (s) = q_scalar((q).a)
     
-inline scalar_t q_scalar(const quat_arr_t q)
+ scalar_t q_scalar(const quat_arr_t q)
     __attribute__ ((__pure__, __nonnull__));
 
 #define Q_VECTOR(v, q) \
@@ -102,7 +102,7 @@ void m_q_convert(quat_arr_t q, mat_arr_t m) __attribute__ ((__nonnull__));
 #define Q_ADD(qa, qb, qc) \
     q_add((qa).a, (qb).a, (qc).a)
     
-inline void q_add(quat_arr_t r, quat_arr_t a, const quat_arr_t b)
+ void q_add(quat_arr_t r, quat_arr_t a, const quat_arr_t b)
     __attribute__ ((__nonnull__));
 
 #define Q_MUL(qa, qb, qc) \
@@ -120,25 +120,25 @@ void q_s_div(quat_arr_t r, const quat_arr_t q, const scalar_t d)
 #define Q_DOT(s, qa, qb) \
     (s) = q_dot((qa).a, (qb).a)
 
-inline scalar_t q_dot(const quat_arr_t a, const quat_arr_t b)
+ scalar_t q_dot(const quat_arr_t a, const quat_arr_t b)
     __attribute__ ((__pure__, __nonnull__));
 
 #define Q_CROSS(qr, qa, qb) \
     q_cross((qr).a, (qa).a, (qb).a)
     
-inline void q_cross(vec_arr_t r, const quat_arr_t a, const quat_arr_t b)
+ void q_cross(vec_arr_t r, const quat_arr_t a, const quat_arr_t b)
     __attribute__ ((__nonnull__));
 
 #define Q_ABS(s, q) \
     (s) = q_abs((q).a)
     
-inline scalar_t q_abs(const quat_arr_t q)
+ scalar_t q_abs(const quat_arr_t q)
     __attribute__ ((__pure__, __nonnull__));
 
 #define Q_CONJ(qr, qa) \
     q_conj((qr).a, (qa).a)
     
-inline void q_conj(quat_arr_t qp, const quat_arr_t q)
+ void q_conj(quat_arr_t qp, const quat_arr_t q)
     __attribute__ ((__nonnull__));
 
 #define Q_REPR(qr, qa) \
