@@ -45,6 +45,8 @@ if (APPLE)
 #    SET(MACOSX_BUNDLE_SHORT_VERSION_STRING)
 #    SET(MACOSX_BUNDLE_BUNDLE_VERSION)
     set(MACOSX_BUNDLE_COPYRIGHT "Mattias Holm")
+
+    # update name for the mac
     set(open_orbit_name "Open Orbit")
     set(open_orbit_debug_name "Open Orbit Debug")
 endif (APPLE)
@@ -57,6 +59,14 @@ set_target_properties(openorbit
                       OUTPUT_NAME "${open_orbit_name}"
                       RELEASE_OUTPUT_NAME "${open_orbit_name}"
                       DEBUG_OUTPUT_NAME "${open_orbit_debug_name}")
+
+#if (APPLE)
+#    add_custom_command(TARGET openorbit
+#                       POST_BUILD
+#                       COMMAND install-mac-res.sh ARGS args1
+#                       WORKING_DIRECTORY dir
+#                       COMMENT comment] [VERBATIM])
+#endif (APPLE)
 
 target_link_libraries(openorbit
   math scripting parsers dl gencds

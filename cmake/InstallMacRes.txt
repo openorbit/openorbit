@@ -2,7 +2,11 @@ MACRO(INSTALL_MAC_RES target files)
 	IF (APPLE)
     	
 		FOREACH (file ${files})
-        	
+        	#    add_custom_command(TARGET openorbit
+            #                       POST_BUILD
+            #                       COMMAND install-mac-res.sh ARGS args1
+            #                       WORKING_DIRECTORY dir
+            #                       COMMENT comment] [VERBATIM])
     	ENDFOREACH (file)
 	ENDIF (APPLE)
 ENDMACRO(INSTALL_MAC_RES target files)
