@@ -43,10 +43,12 @@
 #include "list.h"
 #include "physics/dynamics.h"
 
+// OM-INTERFACE BEGIN
 typedef struct {
     void (*step)(object_t *self, scalar_t delta_t);
     void (*paint)(object_t *self);
 } sim_obj_iface;
+// OM-INTERFACE END
 
 // note that an obj_t should conform to the sim_obj interface
 typedef struct {
@@ -68,5 +70,9 @@ typedef struct {
 
 bool init_object_graph(om_ctxt_t *ctxt);
 void default_step(object_t *self, scalar_t delta_t);
+
+void traverse_object_tree(node_t *n);
+void handle_object(object_t *n);
+
 
 #endif /* _OBJECT_GRAPH_H_ */

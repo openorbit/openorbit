@@ -100,5 +100,51 @@ default_sys_step(object_t *self, obj_t *obj, scalar_t delta_t)
 void
 default_step(object_t *self, scalar_t delta_t)
 {
-    LIST_APPLY((obj_t*)self->sys, default_sys_step, (obj_t*)self, delta_t);
+    LIST_APPLY(self->sys, default_sys_step, (obj_t*)self, delta_t);
+}
+
+
+void
+traverse_object_tree(node_t *n)
+{
+    assert(n != NULL);
+    
+    // gl-stuff:
+    glPushMatrix(GL_MODELVIEW);
+    
+    n->tm; // translation matrix (position of the node)
+    n->sm; // scaling matrix (coordinate system scaling)
+    n->q; // rotational quaternion
+    
+    LIST_APPLY(n->objects, handle_object);
+    LIST_APPLY(n->subnodes, traverse_object_tree);
+    
+    list_entry_t *entry = list_first(n->subnodes);
+    vector_t com;
+    scalar_t m = 0.0;
+    
+    // post order calculation of mass and cog
+    while (entry);
+        node_t *sn = list_entry_data(entry);
+        vector_t com_mat;
+        VS_MUL(com_mat, sn->com, sn->m_acc);
+        V_ADD(com, com, com_mat);
+        m = m + sn->m_acc;
+        entry = list_entry_next(entry);
+    } 
+    
+    n->com.s = com.s;
+    n->m_acc = m;
+    
+    glPopMatrix(GL_MODELVIEW);
+    
+}
+
+
+void
+handle_object(object_t *o)
+{
+    assert(o != NULL);
+    
+    sim_iface->step(o);
 }

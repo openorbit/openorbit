@@ -92,7 +92,7 @@ init_gl(void)
     glMatrixMode(GL_PROJECTION);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glLoadIdentity();
-	gluPerspective(/*fovy*/45.0, /*aspect*/1.33 , /*near*/0.5, /*far*/100.0);
+	gluPerspective(/*fovy*/45.0, /*aspect*/1.33 , /*near*/0.00001, /*far*/100.0);
     
     glViewport(0, 0, SETTINGS.video.width, SETTINGS.video.height);
     

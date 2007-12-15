@@ -1,4 +1,5 @@
-#include <openorbit/plugin-handler.h>
+#include <openorbit/openorbit.h>
+#include <openorbit/ifaces/control-if.h>
 
 static plugin_t gEx_plug_desc;
 

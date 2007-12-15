@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// epoch = ???
 uint64_t SIM_time = 0;
 
 
@@ -69,4 +70,7 @@ sim_step(void)
 {
     SIM_time ++;
     // compute physics step, etc...
+    
+    // check event queue
+    
 }
