@@ -73,7 +73,7 @@ init_renderer(void) {
     print_attributes();
     
     init_gl();
-        
+    tex_init();
     return true;
 }
 
@@ -96,7 +96,7 @@ init_gl(void)
     
     glViewport(0, 0, SETTINGS.video.width, SETTINGS.video.height);
     
-    ugly_load_and_init_of_test_texture();
+   // ugly_load_and_init_of_test_texture();
 }
 
 
@@ -212,6 +212,21 @@ ugly_load_and_init_of_test_texture(void)
     gluQuadricNormals(quadric, GLU_SMOOTH);
     gluQuadricTexture(quadric, GL_TRUE);
     
+}
+
+
+void exit_fullscreen()
+{
+    SDL_surface *window =  SDL_SetVideoMode(SETTINGS.video.width,
+                                            SETTINGS.video.height,
+                                            0, SDL_OPENGL);
+}
+
+void enter_fullscreen()
+{
+    SDL_surface *window =  SDL_SetVideoMode(SETTINGS.video.width,
+                                            SETTINGS.video.height,
+                                            0, SDL_OPENGL|SDL_FULLSCREEN);
 }
 
 

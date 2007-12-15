@@ -38,19 +38,34 @@
 extern "C" {
 #endif 
 
-typedef enum {
-    TEX_RGB = 0,
-    TEX_RGBA
-} texture_type_t;
-
 typedef struct {
-    int width, height;
-    texture_type_t type;
+    GLint width, height;
+    GLuint texid;
+    GLenum textype;
     void *data;
-} texture_t;
+} gl_tex_t;
 
-texture_t *load_texture(const char *name);
-void destroy_texture(texture_t *texture);
+/*! \brief initialises the texture manager objects */
+void    tex_init(void);
+
+/*! \brief loads a named resource texture file */
+int     tex_load(const char *key, const char *name);
+/*! \brief binds the texture specified by key as the current texture
+ 
+    Do not use the bind function to much, it is acceptable to use it in non
+    performant rendering code (e.g. user interfaces). In normal cases, use
+    tex_num and cache the texid.
+ */
+int     tex_bind(const char *key);
+
+/*! \brief Get the OpenGL texture name associated with the key */    
+GLuint  tex_num(const char *key);
+/*! \brief Remove a texture from the global texture dictionary.
+ 
+    Also deletes the texture name 
+ */
+int     tex_unload(const char *key);
+
 
 #ifdef __cplusplus
 }

@@ -35,99 +35,104 @@
 
 
 #include <stdlib.h>
+
+#include <gencds/hashtable.h>
+
 #include "texture.h"
 #include "parsers/tga.h"
 
+#include "platform/macosx/res-manager.h"
 
-texture_t
-*load_texture(const char *name)
-{
-    tga_image_t img;
-    FILE *file = fopen(name, "r");
-    
-    if (!file) {
-        fprintf(stderr, "Can not open %s for reading\n", name);
-        return NULL;
-    }
-
-    texture_t *tex = malloc(sizeof(texture_t));
-    if (!tex) {
-        fprintf(stderr, "Can not allocate memory for texture %s\n", name);
-        fclose(file);
-        return NULL;
-    }
-    
-    if (!tga_read_file(&img, file)) {
-        if ((img.header.img_type != TGA_UNCOMP_TRUE_COL_IMG)
-            && (img.header.img_type != TGA_RLE_TRUE_COL_IMG)) {
-            
-            fprintf(stderr, "Does not support B/W or CLUTted textures\n");
-            free(tex);
-            free(img.data);
-            fclose(file);
-            return NULL;
-        }
-
-        if ((img.header.img_spec.depth == 32) && (img.header.img_spec.alpha_bits == 8)) {
-            tex->type = TEX_RGBA;
-        } else if ((img.header.img_spec.depth == 24) && (img.header.img_spec.alpha_bits == 0)) {
-            tex->type = TEX_RGB;
-        } else {
-            fprintf(stderr, "%s: Texture of unsupported type\n", name);
-            free(tex);
-            free(img.data);
-            fclose(file);
-            return NULL;
-        }
-
-        tex->width = img.header.img_spec.width;
-        tex->height = img.header.img_spec.height;
-        
-        // Unfortiounatelly, TGAs are ABGR/BGR, so we need to byte swap these on loads
-        tex->data = img.data;
-        for (int i = 0 ; i < tex->height ; i ++) {
-            for (int j = 0 ; j < tex->width ; j ++) {
-                if (tex->type = TEX_RGBA) {
-                    uint8_t *pixel = (uint8_t*)(tex->data) + (i * tex->width + j) * 4;
-                    uint8_t tmp[4];
-                    tmp[0] = pixel[0];
-                    tmp[1] = pixel[1];
-                    tmp[2] = pixel[2];
-                    tmp[3] = pixel[3];
-                    
-                    pixel[0] = tmp[3];
-                    pixel[1] = tmp[2];
-                    pixel[2] = tmp[1];
-                    pixel[3] = tmp[0];                    
-                } else {
-                    uint8_t *pixel = (uint8_t*)(tex->data) + (i * tex->width + j) * 3;
-                    uint8_t tmp[3];
-                    tmp[0] = pixel[0];
-                    tmp[1] = pixel[1];
-                    tmp[2] = pixel[2];
-                    
-                    pixel[0] = tmp[2];
-                    pixel[1] = tmp[1];
-                    pixel[2] = tmp[0];
-                }
-            }
-        }
-    } else {
-        fprintf(stderr, "Not a valid TGA file\n");
-        free(tex);
-        free(img.data);
-        fclose(file);
-        return NULL;
-    }
-    
-    return tex;
-}
+hashtable_t *gTEX_dict;
 
 void
-destroy_texture(texture_t *texture)
+tex_init(void)
 {
-    if (texture) {
-        free(texture->data);
-        free(texture);
-    }
+    gTEX_dict = hashtable_new_with_str_keys(128);
 }
+
+int
+tex_load(const char *key, const char *name)
+{
+    FILE *fp = res_get_file(name);
+    assert(fp != NULL);
+
+    tga_image_t img;
+    gl_tex_t *tex = malloc(sizeof(gl_tex_t));
+    assert(tex != NULL);
+    
+    assert(tga_read_file(&img, file) == 0):
+    
+    if ((img.header.img_spec.depth == 32) && (img.header.img_spec.alpha_bits == 8)) {
+        tex->textype = GL_BGRA;
+    } else if ((img.header.img_spec.depth == 24) && (img.header.img_spec.alpha_bits == 0)) {
+        tex->textype = GL_BGR;
+    }
+    
+    tex->width = img.header.img_spec.width;
+    tex->height = img.header.img_spec.height;
+    tex->data = img.data;
+    
+    GLuint texnum;
+    glGenTextures(1, &texnum);
+    
+    tex->texid = texnum;
+    
+    glBindTexture(GL_TEXTURE_2D, texnum); 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    
+    if tex->textype == GL_BGR {
+        glTexImage2D(GL_TEXTURE_2D, 0, 3, tex->width, tex->height, 0, GL_BGR,
+                     GL_UNSIGNED_BYTE, tex.data);
+    } else if {
+        glTexImage2D(GL_TEXTURE_2D, 0, 4, tex->width, tex->height, 0, GL_BGRA,
+                     GL_UNSIGNED_BYTE, tex.data);
+    }
+    
+    hashtable_insert(gTEX_dict, key, tex);
+    return 0;
+}
+
+int
+tex_bind(const char *key)
+{
+    gl_tex_t *tex = hashtable_lookup(gTEX_dict, key);
+    if (tex != NULL) {
+        glBindTexture(GL_TEXTURE_2D, tex->texid);
+        return 0;
+    }
+    
+    return -1;
+}
+
+GLuint
+tex_num(const char *key)
+{
+    gl_tex_t *tex = hashtable_lookup(gTEX_dict, key);
+    
+    if (tex != NULL) {
+        return tex->texid;
+    }
+    
+    return 0;
+}
+
+int
+tex_unload(const char *key)
+{
+    gl_tex_t *tex = hashtable_lookup(gTEX_dict, key);
+    
+    if (tex == NULL) {
+        return -1;
+    }
+    
+    hashtable_remove(gTEX_dict, key);
+    glDeleteTextures(1, &tex->texid);
+
+    free(tex->data);
+    free(tex);
+    
+    return 0;
+}
+
+
