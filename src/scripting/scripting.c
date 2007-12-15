@@ -40,10 +40,11 @@
 
 #include <Python.h>
 
-#include "io.h"
-#include "config.h"
-#include "res.h"
-#include "environment.h"
+extern void initio(void);
+extern void initconfig(void);
+extern void initres(void);
+extern void initenvironment(void);
+extern void inittexture(void);
 
 #endif /* WITH_PYTHON */
  
@@ -53,10 +54,11 @@
 bool
 init_scripting(void)
 {
-    Py_Initialize();
+    Py_InitializeEx(0);
     initio();
     initconfig();
     initres();
+    inittexture();
     initenvironment();
     
     oo_error_t err = load_setup_script();
@@ -107,6 +109,28 @@ load_setup_script(void)
     free(path);
     return ERR_none;
 }
+
+bool
+run_post_init_script(void)
+{
+    char *path = res_get_path(SCR_POST_INIT_SCRIPT_NAME);
+    
+    FILE *fp = fopen(path, "r");
+    if (! fp) {
+        printf("%s\n", path);
+        free(path);
+        return false;
+    }
+    if (PyRun_SimpleFile(fp, SCR_POST_INIT_SCRIPT_NAME)) {
+        free(path);
+        return false;
+    }
+    
+    free(path);
+    return true;
+    
+}
+
 
 #elif defined(WITH_GUILE)
 bool

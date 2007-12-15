@@ -67,6 +67,8 @@ extern "C" {
     typedef PyObject* scr_str_t;
     typedef PyObject* scr_float_t;
     #define SCR_INIT_SCRIPT_NAME "init.py"
+    #define SCR_POST_INIT_SCRIPT_NAME "postinit.py"
+
 #else /* WITH_PYTHON */
     #error "Need to have either Guile or Python enabled"
 #endif /* ! WITH_PYTHON */
@@ -78,7 +80,7 @@ extern "C" {
  * whith the scripting subsystem.
  * */
 bool init_scripting(void);
-
+bool run_post_init_script(void);
 /*!
  * \brief Cleans up and shuts down the scripting system.
  * 

@@ -29,11 +29,23 @@
 #   above, a recipient may use your version of this file under either the MPL,
 #   the GPL or the LGPL."
 
+import texture
+import res
+
+cdef extern from "rendering/planet.h":
+    int planet_add(float x, float y, float z, float radius, float mass, char *tex_key)
+
 cdef extern from "rendering/sky.h":
     int add_star(double ra, double dec, double mag, double bv)
 
-cdef public int dummy
+
 
 def insertStar(ra, dec, mag, bv):
     add_star(ra, dec, mag, bv);
+
+
+def addOrbitalObject(dist, period, radius, mass, textureName):
+    texture.load(textureName, textureName)
+    planet_add(dist, 0.0, 0.0, radius, mass, textureName)
+
     

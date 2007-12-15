@@ -195,11 +195,17 @@ inner_main(void *data, int argc, char *argv[])
                 SDL_GetError());
 		exit(1);
 	}
+    // Init GL state
+    init_renderer();
+
+    if (! run_post_init_script()) {
+        fprintf(stderr, "Failed to run post init script\n");
+        exit(1);
+    }
+    
     
     atexit(SDL_Quit);
     
-    // Init GL state
-    init_renderer();
         
     // Draw, get events...
     main_loop();

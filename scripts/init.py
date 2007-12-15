@@ -41,7 +41,7 @@
 # For the moment there is a slight problem with running this, since the
 # graphics system is not initialised, this will change in the future however
 
-print "Loading config..."
+print "Running init script..."
 
 import io       # I/O module, allowing the binding of key handlers
 import config   # config, allows one to set config values
@@ -160,13 +160,6 @@ for key in camControlActionKeys:
 
 #def foo():
 #    print "button pressed"
-def loadStars():
-    f = open(res.getPath("stars.csv"))
-    for line in f:
-        vmag, ra, dec, btmag, vtmag, b_v, v_i = tuple(line.split(","))
-        environment.insertStar(math.radians(float(ra)), math.radians(float(dec)), float(vmag), float(b_v))
-
-loadStars()
 #def bar(a, b):
 #    print a, b
 

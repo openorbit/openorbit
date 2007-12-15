@@ -41,6 +41,11 @@ cdef extern from "object-manager.h":
 	void* om_get_concrete_prop(void *obj, const char *prop_name)
 	
 	
-# Force generation of header-file
-cdef public int dummy
+# Meta class for object manager objects, this is used as a class factory to
+# create separate classes for all the om classes
 
+class OMClass(type):
+    def __getattr__(key):
+        pass
+    def __setattr__(key, val):
+        pass

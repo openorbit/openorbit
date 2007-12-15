@@ -29,18 +29,34 @@
 #   above, a recipient may use your version of this file under either the MPL,
 #   the GPL or the LGPL."
 
-cdef extern from "res-manager.h":
-    char* res_get_path(char *file_name)
+import io       # I/O module, allowing the binding of key handlers
+import config   # config, allows one to set config values
+import environment
+import res
 
-cdef extern from "stdlib.h":
-    void free(void*)
+import math
+import ConfigParser
+import sys
+import os
+from os import environ
+
+print "Running post init script..."
+
+def loadStars():
+    f = open(res.getPath("stars.csv"))
+    for line in f:
+        vmag, ra, dec, btmag, vtmag, b_v, v_i = tuple(line.split(","))
+        environment.insertStar(math.radians(float(ra)), math.radians(float(dec)), float(vmag), float(b_v))
+    f.close()
+loadStars()
+
+def loadSolsystem():
+    f = open(res.getPath("solsystem.csv"))
+    for line in f:
+        dist, size, tex = tuple([s.strip() for s in line.split(",")])
+        environment.addOrbitalObject(float(dist), 0.0, float(size), 0.0, tex)
+    f.close()
+
+loadSolsystem()
 
 
-
-def getPath(str):
-    cdef char *path
-    path = res_get_path(str)
-    pstr = path
-    free(path)
-    return pstr
-    

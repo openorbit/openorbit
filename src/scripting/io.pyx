@@ -49,7 +49,6 @@ cdef extern from "io-manager.h":
     int io_register_joystic_axis_handler_script(char *key, object f)
 
 # Force generation of header-file
-cdef public int dummy 
 
 SHIFT = 0x01
 ALT = 0x02

@@ -29,11 +29,11 @@
 #   above, a recipient may use your version of this file under either the MPL,
 #   the GPL or the LGPL."
 
-ctypedef int bool
+ctypedef int _Bool
     
 cdef extern from "settings.h":
-    int conf_set_bool(char *key, bool val)
-    int conf_get_bool(char *key, bool *val)    
+    int conf_set_bool(char *key, _Bool val)
+    int conf_get_bool(char *key, _Bool *val)    
     int conf_set_int(char *key, int val)
     int conf_get_int(char *key, int *val)
     int conf_set_float(char *key, float val)
@@ -51,9 +51,13 @@ def setFullscreen(int fs):
 
 
 def toggleFullscreen():
-    cdef bool fs
-    res = conf_get_bool("video.fullscreen", &fs)
-    if fs == 1: # not fully correct, works with gcc though
+    cdef _Bool fs
+    fs = 0
+    # generates a warning as fs is an int here, but we cannot really work it
+    # out in any other way a c-bool will be less then or equal in size to an int
+    # so we can assume that this actually is technically correct
+    res = conf_get_bool("video.fullscreen", &fs) 
+    if fs != 0: # not fully correct, works with gcc though
         conf_set_bool("video.fullscreen", 0)
     else:
         conf_set_bool("video.fullscreen", 1)
