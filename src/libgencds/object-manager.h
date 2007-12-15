@@ -116,7 +116,8 @@ typedef struct _om_iface_t om_iface_t;
  * The supported types include all standard int and float types, and the
  * fixed size (8, 16, 32 and 64) int types defined in stdint.h. Note that it is
  * also possible to specify a poperty as an object reference, and arrays of the
- * base types.
+ * base types. Further the libgencds datastructures list_t, hashtable_t and
+ * heap_t are also supported.
  *
  * Some type codes are illegal, it is for example not allowed to define a type
  * as an unsigned double, or to define a reference to an object, since this is
@@ -125,26 +126,35 @@ typedef struct _om_iface_t om_iface_t;
  * Example: unsigned int: OM_UNSIGNED | OM_INT
  * Example: uint16_t: OM_UNSIGNED | OM_INT16
  * Example: char[]: OM_ARRAY | OM_CHAR
+ * 
+ * If you make derrived types (whose basetype may depend on preprocessor
+ * definitions), it is recommended that you define additional typecodes based
+ * on the one below. For example, assume we have a scalar_t type defined in the
+ * module foo as either a float or a double, you would define another typcode
+ * called FOO_OM_SCALAR that is equal to either OM_FLOAT OR OM_DOUBLE.
  */
 typedef uint16_t om_prop_type_t;
 
 /* Simple types */
-#define OM_CHAR     (0)
-#define OM_SHORT    (1)
-#define OM_INT      (2)
-#define OM_LONG     (3)
-#define OM_LONGLONG (4)
-#define OM_INT8     (5)
-#define OM_INT16    (6)
-#define OM_INT32    (7)
-#define OM_INT64    (8)
+#define OM_CHAR         (0)
+#define OM_SHORT        (1)
+#define OM_INT          (2)
+#define OM_LONG         (3)
+#define OM_LONGLONG     (4)
+#define OM_INT8         (5)
+#define OM_INT16        (6)
+#define OM_INT32        (7)
+#define OM_INT64        (8)
 
 
-#define OM_FLOAT    (16)
-#define OM_DOUBLE   (17)
-#define OM_QUAD     (18) // TODO: Support quad precision floats
+#define OM_FLOAT        (16)
+#define OM_DOUBLE       (17)
+#define OM_QUAD         (18) // TODO: Support quad precision floats
 
-#define OM_OBJECT   (32)
+#define OM_OBJECT       (32)
+#define OM_HASHTABLE    (33) 
+#define OM_HEAP         (34)
+#define OM_LIST         (35)
 
 
 /* Type specialisation */
@@ -152,7 +162,7 @@ typedef uint16_t om_prop_type_t;
 #define OM_REF      (1 << 9) // NOTE: Not supported at the moment
 #define OM_UNSIGNED (1 << 10)  
 
-/* Type simplivication */
+/* Type simplification */
 #define OM_STRING   (OM_CHAR | OM_ARRAY)
 
 int
@@ -202,6 +212,20 @@ om_prop_t*
 om_reg_static_array_prop(om_class_t *class_object, const char *name,
                          om_prop_type_t type, ptrdiff_t offset, size_t length);
             
+/*! Om_reg_dynamic_array_prop registers a dynamically allocated array property.
+ *  A dynamic array property requires that the length of the array is tracked,
+ * hence, the need to specify the property name of the length tracking variable.
+ * \param class_object
+ * \param name
+ * \param type
+ * \param offset
+ * \param length_prop The name of the property containing the length of the
+ *        array. This property must already be registered.
+ */
+om_prop_t*
+om_reg_dynamic_array_prop(om_class_t *class_object, const char *name,
+                          om_prop_type_t type, ptrdiff_t offset,
+                          char *length_prop);
 
 int
 om_reg_iface(om_class_t *class_object, const char *name, void *iface_addr);
