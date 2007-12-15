@@ -49,6 +49,7 @@ typedef struct {
     vector_t t_acc;   //!< torque accumulator in Nm
     quaternion_t q;   //!< rotation quat
     quaternion_t w;   //!< rotational speed quat
+    scalar_t i;       //!< scalar moment of inertia
 } ph_obj_t;
 
 typedef struct {
@@ -112,4 +113,4 @@ void ph_apply_force_relative(ph_obj_t *obj, vector_t pos, vector_t f);
 void ph_migrate_object(ph_sys_t *dst_sys, ph_sys_t *src_sys, ph_obj_t *obj);
 
 
-#endif /* _DYNAMICS_H_ */
+#endif /* ! _DYNAMICS_H_ */

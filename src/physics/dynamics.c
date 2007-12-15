@@ -75,6 +75,7 @@ ph_new_system(size_t obj_count)
 // Euler step
 // v(t+dt) = v(t) + a(t)dt
 // r(t+dt) = r(t) + v(t)dt
+// Iw = N
 void
 ph_dynamics_step(ph_sys_t *sys, scalar_t step)
 {
@@ -106,9 +107,18 @@ ph_dynamics_step(ph_sys_t *sys, scalar_t step)
             V_CPY(sys->obj[i].r, r);
             V_CPY(sys->obj[i].v, v);
             
-            // rotate object
-
-
+            // rotate object, we should probably optimise this
+            vector_t delta_w;
+            V_S_DIV(delta_w, sys->obj[i].t_acc, sys->obj[i].i);
+            quaternion_t qr0, qr1, q0, q1, q2;
+            Q_ROT_X(q0, delta_w.s.x);
+            Q_ROT_Y(q1, delta_w.s.y);
+            Q_ROT_Z(q2, delta_w.s.z);
+            Q_MUL(qr0, q0, q1);
+            Q_MUL(qr1, qr0, q2);
+            Q_MUL(qr0, sys->obj[i].w, qr1);
+            V_CPY(sys->obj[i].w, qr0);
+            
             m += sys->obj[i].m;
             V_S_MUL(cm_tmp, sys->obj[i].r, sys->obj[i].m);
             V_ADD(cm, cm, cm_tmp);
