@@ -50,8 +50,8 @@ import os
 from os import environ
 
 home = environ["HOME"]
-resSearchPaths = [home + "/Library/Preferences/", home + "/.openorbit/"]
-prefsSearchPaths = [home + "/Library/Application Support/Open Orbit/", home + "/.openorbit/"]
+prefsSearchPaths = [home + "/Library/Preferences/", home + "/.openorbit/"]
+resSearchPaths = [home + "/Library/Application Support/Open Orbit/", home + "/.openorbit/"]
 # Find path that contains the openorbit.conf file, this path is our default dir
 # for preferences, we should create the directory if it does not exist
 for path in prefsSearchPaths:
