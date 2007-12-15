@@ -34,7 +34,7 @@
 
 #include "settings.h"
 #include <string.h>
-#include "libgencds/hashtable.h"
+#include <gencds/hashtable.h>
 
 settings_t SETTINGS;
 

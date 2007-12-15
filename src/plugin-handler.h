@@ -40,7 +40,7 @@ extern "C" {
 
 #include <stdbool.h>
 
-#include "libgencds/object-manager.h"
+#include <gencds/object-manager.h>
 
 // All OSes do not support resolving backlinks, so we export an interface with
 // pointers to all the functions in the API

@@ -33,9 +33,10 @@
 
 #include <stdbool.h>
 
+#include <gencds/hashtable.h>
+
 #include "io-manager.h"
 #include "SDL.h"
-#include "libgencds/hashtable.h"
 
 // Default grounding functions
 static void io_init_actiontable(void);

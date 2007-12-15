@@ -39,8 +39,9 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <gencds/hashtable.h>
+
 #include "plugin-handler.h"
-#include "libgencds/hashtable.h"
 
 #ifndef SO_EXT
 #define SO_EXT ".so"
