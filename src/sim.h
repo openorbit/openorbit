@@ -44,18 +44,34 @@ extern "C" {
 typedef enum {
 	SIM_io_event,
 	SIM_time_event
+} sim_event_kind_t;
+
+    
+typedef void (*sim_event_handler_t)(sim_event_kind_t e, void *data);
+    
+typedef struct {
+    sim_event_kind_t kind;
+    sim_event_handler_t handler;
+    void *data;
 } sim_event_t;
-
-typedef void (*sim_event_handler_t)(sim_event_t e, void *data);
-
+    
+    
+typedef struct {
+    uint64_t time;
+    uint16_t step_size;
+//    ph_world_t *world;
+    // 
+} sim_state_t;
+    
 /* Simulator SDL events */
 #define SIM_STEP_EVENT 0
 #define SIM_DEBUG_EVENT 1
-    // 25Hz
+    
+// 25Hz
 #define SIM_STEP_PERIOD 40
 
 Uint32 sim_step_event(Uint32 interval, void *param);
-void sim_step(void);
+void sim_step(float dt);
 
 #ifdef __cplusplus
 }

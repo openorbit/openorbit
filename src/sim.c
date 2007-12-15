@@ -31,16 +31,16 @@
     the GPL or the LGPL."
  */
 
-
-#include "sim.h"
-
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-// epoch = ???
-uint64_t SIM_time = 0;
+#include "sim.h"
+#include "physics/dynamics.h"
 
+// epoch = ???
+
+sim_state_t gSIM_state;
 
 Uint32
 sim_step_event(Uint32 interval, void *param)
@@ -66,11 +66,16 @@ sim_step_event(Uint32 interval, void *param)
 
 
 void
-sim_step(void)
+sim_step(float dt)
 {
-    SIM_time ++;
-    // compute physics step, etc...
+    gSIM_state.time ++;
+    
+    // compute physics step
+//    ph_step(gSIM_state.world, dt);
+    
+    // do system simulation
+    // sys_step(gSIM_state->systems, dt);
     
     // check event queue
-    
+    // sim_event_check(gSIM_state->events, );
 }

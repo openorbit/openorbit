@@ -66,7 +66,6 @@
 #include "SDL.h"
 
 
-
 extern settings_t SETTINGS;
 
 
@@ -148,7 +147,7 @@ main_loop(void)
             case SDL_USEREVENT:
                 switch (event.user.code) {
                 case SIM_STEP_EVENT: // this event will make a time step
-                    sim_step();
+                    sim_step(0.05);
                     break;
                 case SIM_DEBUG_EVENT: // display console?
                     break;
