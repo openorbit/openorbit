@@ -46,6 +46,8 @@
 extern "C" {
 #endif
 
+#include <stdlib.h>
+
 /*!
  * \brief A node in the list.
  * 
@@ -81,6 +83,9 @@ list_entry_t *list_rank(const list_t *list, unsigned int rank);
 list_entry_t *list_entry_next(const list_entry_t *entry);
 list_entry_t *list_entry_previous(const list_entry_t *entry);
 void *list_entry_data(const list_entry_t *entry);
+
+list_entry_t* list_find_entry(list_t *list, void *obj);
+
 
 void list_append(list_t *list, void *obj);
 void list_insert(list_t *list, void *obj);

@@ -34,12 +34,15 @@
 
 
 /*!
-    @header heap
-    @abstract   Functions and structures for working with a generic heap type.
-    @discussion The heap can be used as an priority queue, this was actually the reason it was implemented, in order to
-        be used for keeping track on events that are to be triggered on some time in the future. THe heap structure is
-        designed to be thread safe by default. This mean that when modifying the heap with an insert or remove, the heap
-        will be locked and prevent other operations on it.
+    \file heap
+    \brief   Functions and structures for working with a generic heap type.
+    
+    The heap can be used as an priority queue, this was actually the reason it
+    was implemented, in order to be used for keeping track on events that are
+    to be triggered on some time in the future. THe heap structure is designed
+    to be thread safe by default. This mean that when modifying the heap with
+    an insert or remove, the heap will be locked and prevent other operations
+    on it.
 */
 
 

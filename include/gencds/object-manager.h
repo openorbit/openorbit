@@ -79,6 +79,16 @@
     If one want to add a struct as an object member, this is possible by
     registering the member variables one by one. It is not possible to add
     arrays of structs (in any simple way).
+    
+    In normal circumstances, memory management is carried out by the om_
+    functions, however in some cases this is not desirable (e.g. out of
+    performance reasons, or that an existing code base cannot be moved to use
+    the object manager). For these situations one can use proxy objects, these
+    are instansiated from proxy classes and allows the user full introspection
+    of the object, but not to allocate instances of it. One example would be
+    a simulation where structs get packed into arrays in order to better utilise
+    the CPUs cache, it would in this case be possible to register a proxy class
+    and supply the object pointers manualy.
  */
 
 #ifndef OBJECT_MANAGER__H__
@@ -161,56 +171,55 @@ typedef uint16_t om_prop_type_t;
 #define OM_ARRAY    (1 << 8)
 #define OM_REF      (1 << 9) // NOTE: Not supported at the moment
 #define OM_UNSIGNED (1 << 10)  
-
+#define OM_PROXY    (1 << 11) // Not implemented at the moment
 /* Type simplification */
 #define OM_STRING   (OM_CHAR | OM_ARRAY)
 
-int
-om_save_ctxt(om_ctxt_t *ctxt); // save to memory
-
+int om_save_ctxt(om_ctxt_t *ctxt); // save to memory
 int om_archive_ctxt(om_ctxt_t *ctxt, const char *fname); // save to disk
+int om_restore_ctxt(om_ctxt_t *ctxt); // restore ctxt
+int om_load_ctxt(om_ctxt_t *ctxt); // restore ctxt from disk
 
-int
-om_restore_ctxt(om_ctxt_t *ctxt); // restore ctxt
+om_ctxt_t* om_new_ctxt(void); // create new context
 
-int
-om_load_ctxt(om_ctxt_t *ctxt); // restore ctxt from disk
-
-om_ctxt_t*
-om_new_ctxt(void); // create new context
-
-void
-om_delete_ctxt(om_ctxt_t *ctxt); // Deletes a context and all the objects
+void om_delete_ctxt(om_ctxt_t *ctxt); // Deletes a context and all the objects
 
 
-om_class_t*
-om_new_class(om_ctxt_t *ctxt, const char *class_name,
-             om_object_constructor_f, om_object_destructor_f, size_t size);
+om_class_t* om_new_class(om_ctxt_t *ctxt, const char *class_name,
+                         om_object_constructor_f,
+                         om_object_destructor_f,
+                         size_t size);
+
+// TODO: Implement
+om_class_t* om_new_proxy_class(om_ctxt_t *ctxt, const char *class_name,
+                               size_t size);
+
+                         
 void om_delete_class(om_class_t *cls);
 
-om_object_t*
-om_new_object(om_ctxt_t *ctxt, const char *class_name,
-              const char *object_name);
+om_object_t* om_new_object(om_ctxt_t *ctxt, const char *class_name,
+                           const char *object_name);
 void om_delete_object(om_object_t *obj);
 
+// TODO: Implement
+om_object_t* om_new_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
+                              const char *object_name, void *obj_addr);
 
-om_meta_iface_t*
-om_new_meta_interface(om_ctxt_t *ctxt, const char *iface_name);
 
+
+om_meta_iface_t* om_new_meta_interface(om_ctxt_t *ctxt, const char *iface_name);
 void om_delete_meta_interface(om_meta_iface_t *iface);
 
 
-int
-om_reg_method(om_meta_iface_t *meta_iface, const char *method_name,
-              ptrdiff_t offset);
+int om_reg_method(om_meta_iface_t *meta_iface, const char *method_name,
+                  ptrdiff_t offset);
 
-om_prop_t*
-om_reg_prop(om_class_t *class_object, const char *name,
-            om_prop_type_t type, ptrdiff_t offset);
+om_prop_t* om_reg_prop(om_class_t *class_object, const char *name,
+                       om_prop_type_t type, ptrdiff_t offset);
 
-om_prop_t*
-om_reg_static_array_prop(om_class_t *class_object, const char *name,
-                         om_prop_type_t type, ptrdiff_t offset, size_t length);
+om_prop_t* om_reg_static_array_prop(om_class_t *class_object, const char *name,
+                                    om_prop_type_t type, ptrdiff_t offset,
+                                    size_t length);
             
 /*! Om_reg_dynamic_array_prop registers a dynamically allocated array property.
  *  A dynamic array property requires that the length of the array is tracked,
@@ -227,57 +236,32 @@ om_reg_dynamic_array_prop(om_class_t *class_object, const char *name,
                           om_prop_type_t type, ptrdiff_t offset,
                           char *length_prop);
 
-int
-om_reg_iface(om_class_t *class_object, const char *name, void *iface_addr);
+int om_reg_iface(om_class_t *class_object, const char *name, void *iface_addr);
 
-const char*
-om_get_object_name(const om_object_t *obj);
-void*
-om_get_object_data(const om_object_t *obj);
+const char* om_get_object_name(const om_object_t *obj);
+void* om_get_object_data(const om_object_t *obj);
 
 
-om_object_t*
-om_get_object_from_ptr(const om_ctxt_t *ctxt, void *address);
+om_object_t* om_get_object_from_ptr(const om_ctxt_t *ctxt, void *address);
 
-bool
-om_object_is_class(const om_object_t *obj,
-                   const char *class_name);
+bool om_object_is_class(const om_object_t *obj, const char *class_name);
+bool om_conforms_to_iface(const om_object_t *obj, const char *iface);
 
+om_class_t* om_get_class(const om_ctxt_t *ctxt, const char *class_name);
+om_object_t* om_get_object(const om_ctxt_t *ctxt, const char *object_name);
+om_meta_iface_t* om_get_meta_iface(const om_ctxt_t *ctxt,
+                                   const char *iface_name);
 
-bool
-om_conforms_to_iface(const om_object_t *obj,
-                     const char *iface);
+om_iface_t* om_get_iface(const om_class_t *cls, const char *iface_name);
+om_prop_t* om_get_prop(const om_class_t *cls, const char *prop_name);
 
-om_class_t*
-om_get_class(const om_ctxt_t *ctxt, const char *class_name);
+om_class_t* om_get_object_class(const om_object_t *obj);
 
-om_object_t*
-om_get_object(const om_ctxt_t *ctxt, const char *object_name);
-
-om_meta_iface_t*
-om_get_meta_iface(const om_ctxt_t *ctxt, const char *iface_name);
-
-om_iface_t*
-om_get_iface(const om_class_t *cls, const char *iface_name);
-
-om_prop_t*
-om_get_prop(const om_class_t *cls, const char *prop_name);
-
-om_class_t*
-om_get_object_class(const om_object_t *obj);
-
-void*
-om_get_concrete_obj(const om_ctxt_t *ctxt, const char *object_name);
-
-void*
-om_get_concrete_method(const om_class_t *cls, const char *iface_name,
-                       const char *method_name);
-
-void*
-om_get_concrete_iface(const om_class_t *obj, const char *iface_name);
-
-void*
-om_get_concrete_prop(const om_object_t *obj, const char *prop_name);
+void* om_get_concrete_obj(const om_ctxt_t *ctxt, const char *object_name);
+void* om_get_concrete_method(const om_class_t *cls, const char *iface_name,
+                             const char *method_name);
+void* om_get_concrete_iface(const om_class_t *obj, const char *iface_name);
+void* om_get_concrete_prop(const om_object_t *obj, const char *prop_name);
 
 #define OM_ACCESSOR_PAIR_DEF(T, N) \
     T om_get_ ## N ## _prop(const om_object_t *obj, const char *prop_name);    \
