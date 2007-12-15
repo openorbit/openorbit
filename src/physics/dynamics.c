@@ -39,10 +39,33 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <gencds/object-manager.h>
+
 #include "math/constants.h"
 #include "math/linalg.h"
 #include "math/quaternions.h"
 
+
+void
+ph_init(om_ctxt_t *ctxt)
+{
+    om_class_t *obj_cls = om_new_proxy_class(ctxt, "ph_obj");
+    //bool is_valid;
+    //bool is_enabled;
+    
+    om_reg_prop(obj_cls, "valid", OM_BOOL, offsetof(ph_obj_t, is_valid));
+    om_reg_prop(obj_cls, "enabled", OM_BOOL, offsetof(ph_obj_t, is_enabled));
+    
+    om_reg_prop(obj_cls, "m", OM_FLOAT, offsetof(ph_obj_t, m));
+    om_reg_prop(obj_cls, "i", OM_FLOAT, offsetof(ph_obj_t, i));
+    om_reg_static_array_prop(obj_cls, "r", OM_FLOAT, offsetof(ph_obj_t, r), 4);
+    om_reg_static_array_prop(obj_cls, "v", OM_FLOAT, offsetof(ph_obj_t, v), 4);
+    om_reg_static_array_prop(obj_cls, "f_acc", OM_FLOAT, offsetof(ph_obj_t, f_acc), 4);
+    om_reg_static_array_prop(obj_cls, "t_acc", OM_FLOAT, offsetof(ph_obj_t, t_acc), 4);
+    om_reg_static_array_prop(obj_cls, "q", OM_FLOAT, offsetof(ph_obj_t, q), 4);
+    om_reg_static_array_prop(obj_cls, "w", OM_FLOAT, offsetof(ph_obj_t, w), 4);
+    
+}
 
 ph_sys_t*
 ph_new_system(size_t obj_count)

@@ -35,6 +35,7 @@
 
 #include <stdbool.h>
 
+#include <gencds/object-manager.h>
 #include <gencds/list.h>
 #include "math/types.h"
 
@@ -120,5 +121,6 @@ void ph_apply_force_relative(ph_obj_t *obj, vector_t pos, vector_t f);
 */
 void ph_migrate_object(ph_sys_t *dst_sys, ph_sys_t *src_sys, ph_obj_t *obj);
 
-
+// Initialise the physics subsystem
+void ph_init(om_ctxt_t *ctxt);
 #endif /* ! _DYNAMICS_H_ */
