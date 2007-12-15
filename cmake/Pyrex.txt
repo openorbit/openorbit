@@ -1,4 +1,4 @@
-# Add a source group for the CMakeLists file
+# Locate pyrexc and define new command for invoking it
 
 find_program(PYREXC pyrexc)
 if (NOT PYREXC)
