@@ -122,6 +122,9 @@ fp = open(os.path.join(prefsSearchPaths[1], "openorbit.conf"), "w")
 prefs.write(fp)
 fp.close()
 
+prefs = ConfigParser.ConfigParser(defaultValues)
+prefs.read([path + "openorbit.conf" for path in prefsSearchPaths])
+
 try:
     videoWidth = prefs.getint("VIDEO", "width")
     videoHeight = prefs.getint("VIDEO", "height")
