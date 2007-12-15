@@ -48,6 +48,9 @@ else (WITH_DOUBLE_PRECISION)
     add_definitions(-DUSE_SINGLE_FP_MATH)
 endif (WITH_DOUBLE_PRECISION)
 
+option(WITH_ALTIVEC "Enable altivec optimisations" off)
+
+
 # Turn on testing system, our tests are located in the test directory
 option(ENABLE_TESTS "Enable the testing system" off)
 if (ENABLE_TESTS)
@@ -58,15 +61,25 @@ endif (ENABLE_TESTS)
 if (CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_C_FLAGS -std=c99)
     set(CMAKE_C_FLAGS_DEBUG -std=c99)
+
+    if (WITH_ALTIVEC)
+        set(CMAKE_C_FLAGS "-std=c99 -faltivec")
+        set(CMAKE_C_FLAGS_DEBUG "-std=c99 -faltivec")
+        add_definitions(-DUSE_ALTIVEC)    
+    endif (WITH_ALTIVEC)
 else (CMAKE_COMPILER_IS_GNUCC)
     message(FATAL_ERROR "Only GCC supported for the moment")
 endif (CMAKE_COMPILER_IS_GNUCC)
 
+
+
 # Support command when working with Xcode
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/AddCMakeList.txt)
 
+include_directories(include)
 add_subdirectory(src)
-# add_subdirectory(rsrc)
+add_subdirectory(include)
+#add_subdirectory(rsrc)
 
 if (ENABLE_TESTS)
     add_subdirectory(tests)
