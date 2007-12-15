@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-uint8_t g_temp_colour_table[][3] = {
+uint8_t gCOLOUR_temperature_tbl[][3] = {
 	{255, 56, 0}, // 1000K
 	{255, 71, 0},
 	{255, 83, 0},
@@ -448,6 +448,6 @@ uint8_t
 	
 	int index = temp / 100 - 10;
 	
-	return g_temp_colour_table[index];
+	return gCOLOUR_temperature_tbl[index];
 }
 
