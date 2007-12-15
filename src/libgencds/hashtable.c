@@ -31,13 +31,16 @@
     the GPL or the LGPL."
  */
 
-#include "hashtable.h"
-#include "hashtable-private.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
+
+
+#include <gencds/hashtable.h>
+#include "hashtable-private.h"
+
 
 #define IS_POWER_OF_2(val) ((!(val & (val-1))) && val)
 #define HASH(ht, key) (ht->hash(key) & (ht->ts - 1))

@@ -35,10 +35,12 @@
 
 
 
-#include "heap.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+
+#include <gencds/heap.h>
+
 
 heap_t
 *heap_new(size_t n_levels, compute_rank_f f)

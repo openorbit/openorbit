@@ -37,11 +37,12 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <assert.h>
-#include "object-manager.h"
+
+#include <gencds/object-manager.h>
 #include "object-manager-private.h"
 
-#include "hashtable.h"
-#include "list.h"
+#include <gencds/hashtable.h>
+#include <gencds/list.h>
 
 #define IS_POWER_OF_2(val) ((!((val) & ((val)-1))) && (val))
 

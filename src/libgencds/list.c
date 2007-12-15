@@ -35,20 +35,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "list.h"
-
-
-struct _list_entry_t {
-    void *data;
-    struct _list_entry_t *next;
-    struct _list_entry_t *previous;
-};
-
-struct _list_t {
-    list_entry_t *first;
-    list_entry_t *last;
-    size_t entry_count;
-};
+#include <gencds/list.h>
+#include "list-private.h"
 
 list_t*
 list_new(void)
@@ -182,6 +170,19 @@ list_insert(list_t *list, void *obj)
     
     list->first->data = obj;
     list->entry_count ++;
+}
+
+list_entry_t*
+list_find_entry(list_t *list, void *obj)
+{
+    list_entry_t *e = list->first;
+    
+    while (e && e->data != obj) {
+        e = e->next;
+    }
+    
+    // Will return the entry if found, otherwise NULL as ends are grounded
+    return e;
 }
 
 
