@@ -15,12 +15,12 @@ A brief architectural description of open orbit should be here.
 2. CODE STYLE
 Open Orbit is written in C and tries to confirm to the C99 standard.
 GNU-extensions are only allowed when they are not strictly needed for the code
-to work.
+to work (e.g. attributes).
 
 The naming of symbols is not done with CamelCase, but with underscores. All
 macros should be in ALL_CAPS. Global variables shall have a prefix in caps
 identifying the module where the variable is defined and then named as a normal
-variable, e.g. FOO_bar. 
+variable, e.g. FOO_bar. All defined types ends with _t.
 
 2.1 Lines
 The line length may not be more than 80 characters for code and documentation.
@@ -29,7 +29,8 @@ The line length may not be more than 80 characters for code and documentation.
 Functions are declared in the headers on one line if possible. When they appear
 in the C-files, the return type is written on a separate line and the open
 brace as well. The pointer splat is considered part of the return type. Note
-that normal pointers have the splat adjacent to the variable name.
+that normal pointers have the splat adjacent to the variable name due to
+semantical issues with C.
 
 int*
 foobar(int foo, int bar)
@@ -53,3 +54,39 @@ line.
 while ( FOO ) {
 
 }
+
+2.4 Object Manager
+In order to facilitate future automation of interface generation, you should
+finish any interface name, and only interface names with iface:
+
+typedef struct {
+    ...
+} foo_bar_iface;
+
+2.5 Macros
+All preprocessor macro names are in ALL_CAPS. When writing a macro consisting of
+several lines, add a do {} while (0) block around the lines. Enclose all
+parameters in parentheses as they may be statements.
+
+Example:
+#define MY_MACRO(a, b, c)   \
+    do {                    \
+		foo x = (a) * (b);	\
+    } while (0)
+
+2.6 Constants
+C constants are preprocessor macros and should be in all caps.
+
+E.g.
+#define PI 3.14
+
+2.7 Enums
+typedef enum {
+    FOO_xyz,
+    FOO_bar
+} foo_t;
+
+2.8 Global Variables
+Exported global variables must be defined with a 'g' and a package prefix. For
+example, if there is a package or library named foo, that exports a global named
+bar; the name of the symbol would be "gFOO_bar".
