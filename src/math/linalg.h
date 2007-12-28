@@ -56,7 +56,7 @@ extern "C" {
 void m_v_mul(vec_arr_t res, mat_arr_t a, const vec_arr_t v)
     __attribute__ ((__nonnull__));
 
-#if USE_ALTIVEC
+#if ENABLE_VECTORISE
     #undef M_V_MUL
     #define M_V_MUL(vr, M, vx) \
         do { \
@@ -87,7 +87,7 @@ void m_mul(mat_arr_t res, mat_arr_t a, mat_arr_t b)
 void m_add(mat_arr_t res, mat_arr_t a, mat_arr_t b)
     __attribute__ ((__nonnull__));
 
-#if USE_ALTIVEC
+#if ENABLE_VECTORISE
     #undef M_ADD
     #define M_ADD(vr, va, vb)           \
        do {                             \
@@ -105,7 +105,7 @@ void m_add(mat_arr_t res, mat_arr_t a, mat_arr_t b)
 void v_add(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
     __attribute__ ((__nonnull__));
 
-#if USE_ALTIVEC
+#if ENABLE_VECTORISE
     #undef V_ADD
     #define V_ADD(vr, va, vb) vr.v = va.v + vb.v
 #endif
@@ -116,7 +116,7 @@ void v_add(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
 void v_sub(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
     __attribute__ ((__nonnull__));
 
-#if USE_ALTIVEC
+#if ENABLE_VECTORISE
     #undef V_SUB
     #define V_SUB(vr, va, vb) vr.v = va.v - vb.v
 #endif
@@ -128,7 +128,7 @@ void v_sub(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
 void v_s_mul(vec_arr_t res, vec_arr_t a, scalar_t s)
     __attribute__ ((__nonnull__));
 
-#if USE_ALTIVEC
+#if ENABLE_VECTORISE
     #undef V_S_MUL
     #define V_S_MUL(vr, va, sc) \
         do {\
@@ -146,7 +146,7 @@ void v_s_div(vec_arr_t res, vec_arr_t a, scalar_t s)
     __attribute__ ((__nonnull__));
 
 
-#if USE_ALTIVEC
+#if ENABLE_VECTORISE
     #undef V_S_DIV
     #define V_S_DIV(vr, va, sc) \
         do {\

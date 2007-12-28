@@ -53,6 +53,10 @@ typedef float scalar_t;
 
 typedef float vec_arr_t[4];
 
+#ifdef ENABLE_VECTORISE
+typedef scalar_t __attribute__((vector_size (16))) scalar_vec_t;
+#endif
+
 typedef struct {
     float x, y, z, w;
 } vec_str_t;
@@ -60,8 +64,8 @@ typedef struct {
 typedef union {
     vec_arr_t a;
     vec_str_t s;
-#ifdef USE_ALTIVEC
-    vector float v;
+#ifdef ENABLE_VECTORISE
+    scalar_vec_t v;
 #endif
 } vector_t;
 
@@ -69,8 +73,8 @@ typedef float mat_arr_t[4][4];
 
 typedef union {
     mat_arr_t a;
-#ifdef USE_ALTIVEC
-    vector float v[4];
+#ifdef ENABLE_VECTORISE
+    scalar_vec_t v[4];
 #endif
 } matrix_t;
 

@@ -2,6 +2,11 @@
 
 project(openorbit)
 
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+        "Choose the type of build, options are: None Debug Release."
+        FORCE)
+endif (NOT CMAKE_BUILD_TYPE)
 
 # If we are to enable buildinc the docs, locate the doxygen and LaTeX programs
 # Doxygen is mandatory for this, LaTeX is optional
@@ -52,7 +57,7 @@ else (WITH_DOUBLE_PRECISION)
     add_definitions(-DUSE_SINGLE_FP_MATH)
 endif (WITH_DOUBLE_PRECISION)
 
-option(WITH_ALTIVEC "Enable altivec optimisations" off)
+option(ENABLE_VECTORISE "Enable SIMD vectorisation" on)
 
 
 # Turn on testing system, our tests are located in the test directory
@@ -62,15 +67,9 @@ if (ENABLE_TESTS)
 endif (ENABLE_TESTS)
 
 # TODO: Support more compilers
+# TODO: Move compiler flags to file in cmake/arch-flags.cmake
 if (CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_C_FLAGS -std=c99)
-    set(CMAKE_C_FLAGS_DEBUG "-g -std=c99")
-    
-    if (WITH_ALTIVEC)
-        set(CMAKE_C_FLAGS "-std=c99 -faltivec")
-        set(CMAKE_C_FLAGS_DEBUG "-g -std=c99 -faltivec")
-        add_definitions(-DUSE_ALTIVEC)    
-    endif (WITH_ALTIVEC)
+    include(cmake/arch-flags.cmake)
 else (CMAKE_COMPILER_IS_GNUCC)
     message(FATAL_ERROR "Only GCC supported for the moment")
 endif (CMAKE_COMPILER_IS_GNUCC)
