@@ -51,6 +51,7 @@
 #include <gencds/list.h>
 #include "math/types.h"
 
+#define PH_G 6.6732e-11 //Nm^2 kg^-2
 // invariant: is_valid == false && is_enabled == true
 typedef struct {
     bool is_valid;
@@ -65,61 +66,44 @@ typedef struct {
     scalar_t i;       //!< scalar moment of inertia
 } ph_obj_t;
 
-typedef struct {
+
+//! A system of several objects
+typedef struct _ph_sys_t {
     vector_t r; //!< position of the system in parent world coords
     scalar_t m; //!< mass of system in kg
     vector_t g; //!< gravity
+
+    size_t child_alen;
+    size_t child_count;
+    struct _ph_sys_t **children;
     
     list_t *free_obj_list; //!< for quickly inserting objects
     size_t alloc_size; //!< size of obj array
+    
     ph_obj_t obj[];
 } ph_sys_t;
 
-// A sys is a group of semi independent systems (neighbouring systems have
-// effect)
-typedef struct {
-    size_t a_sys;
-    ph_sys_t sys[];
-} ph_sys_group_t;
 
-// A world is a number of system groups, a system group have gravitational
-// effect on all other system groups 
-typedef struct {
-    size_t sys_group_asize;
-    size_t sys_group_count;
-    ph_sys_group_t sys[];
-} ph_world_t;
-
-
-/*! Creates a new world of semi-isolated physics systems.
- 
- The new_world function, allocates a new world of physics systems with a maximum
- system count of sys_count and a maximum object count in each system of
- obj_count objects.
- 
- \param sys_count
- \param obj_count
- \return The new physics world.
- */
-ph_world_t* ph_new_world(size_t sys_count, size_t obj_count);
 
 /*! Creates a new (almost) isolated physics system
     
     The new_sys function, allocates a new physics system with a maximum object
     count of obj_count objects.
     
+    \param parent The parent system where the created system is to be inserted.
+        If the param is NULL, then a root system is created.
     \param obj_count
     \return The new physics system.
  */
-ph_sys_t* ph_new_sys(size_t obj_count);
+ph_sys_t* ph_new_sys(ph_sys_t *parent, size_t obj_count);
+
 
 /*! Does a time step in the simulation of the given physics system
     
     \param sys 
     \param step The time in seconds, should be sufficiently small.
  */
-void ph_dynamics_step(ph_sys_t *sys, scalar_t step);
-void ph_step(ph_world_t *world, scalar_t step);
+void ph_step(ph_sys_t *sys, scalar_t step);
 
 /*! Applies an external global force on the entire system
     
@@ -154,6 +138,13 @@ void ph_apply_force_relative(ph_obj_t *obj, vector_t pos, vector_t f);
 */
 void ph_migrate_object(ph_sys_t *dst_sys, ph_sys_t *src_sys, ph_obj_t *obj);
 
-// Initialise the physics subsystem
+/*!
+    Initialise the physics subsystem
+    
+    Initialises the physics system by creating the relevant classes in the
+    object manager. It will for example insert the ph_obj_t class in the om.
+    
+    \param ctxt Tho object manager context where the classes are to be created.
+ */ 
 void ph_init(om_ctxt_t *ctxt);
 #endif /* ! _DYNAMICS_H_ */

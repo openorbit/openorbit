@@ -38,6 +38,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
+#include <err.h>
 
 #include <gencds/object-manager.h>
 
@@ -68,9 +69,15 @@ ph_init(om_ctxt_t *ctxt)
 }
 
 ph_sys_t*
-ph_new_system(size_t obj_count)
+ph_new_system(ph_sys_t *parent, size_t obj_count)
 {
     ph_sys_t *sys;
+    
+    if (parent && (parent->child_alen <= parent->child_count)) {
+        warnx("ph: sys full");
+        return NULL;
+    }
+    
     sys = malloc(sizeof(ph_sys_t) + sizeof(ph_obj_t)*obj_count);
     
     if (sys == NULL) {
@@ -92,6 +99,11 @@ ph_new_system(size_t obj_count)
     
     sys->alloc_size = obj_count;
     
+    if (parent) {
+        parent->children[parent->child_count] = sys;
+        parent->child_count ++;
+    }
+    
     return sys;
 }
 
@@ -100,7 +112,7 @@ ph_new_system(size_t obj_count)
 // r(t+dt) = r(t) + v(t)dt
 // Iw = N
 void
-ph_dynamics_step(ph_sys_t *sys, scalar_t step)
+ph_step(ph_sys_t *sys, scalar_t step)
 {
     assert(sys != NULL);
     assert(step > S_CONST(0.0));
@@ -108,6 +120,13 @@ ph_dynamics_step(ph_sys_t *sys, scalar_t step)
     vector_t cm = {.s.x = 0.0, .s.y = 0.0, .s.z = 0.0, .s.w = 0.0};
     vector_t cm_tmp;
     scalar_t m = S_CONST(0.0);
+    vector_t g; // gravity
+    // for all subsystems
+    for (int i = 0 ; i < sys->child_count ; i ++) {
+        ph_apply_gravity(sys->children[i], g);
+        ph_step(sys->children[i], step);
+    }
+    
     // for all enabled objects update their positions, sum together their
     // masses, and their average cm
     for (int i = 0 ; i < sys->alloc_size ; i ++) {
@@ -152,11 +171,6 @@ ph_dynamics_step(ph_sys_t *sys, scalar_t step)
     sys->m = m;
 }
 
-void
-ph_step(ph_world_t *world, scalar_t dt)
-{
-    ph_dynamics_step(&(world->sys[0]), dt);
-}
 
 void
 ph_apply_gravity(ph_sys_t *sys, vector_t g)
