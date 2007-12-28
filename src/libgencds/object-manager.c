@@ -333,17 +333,33 @@ om_insert_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
         return NULL;
     }
     
-    om_object_t *obj = malloc(sizeof(om_object_t));
-    if (obj == NULL) {
-        warn("om: proxy object allocation (objname = %s)", object_name);
-        return NULL;
-    }
-    obj->cls = class_object;
-    obj->name = strdup(object_name);
-    obj->data = obj_addr;
+    om_object_t *obj = hashtable_lookup(ctxt->object_dict, object_name);
     
-    hashtable_insert(ctxt->object_dict, object_name, obj);   
-    hashtable_insert(ctxt->reverse_object_dict, obj->data, obj);   
+    if (obj = NULL) {
+        obj = malloc(sizeof(om_object_t));
+        if (obj == NULL) {
+            warn("om: proxy object allocation (objname = %s)", object_name);
+            return NULL;
+        }
+        obj->cls = class_object;
+        obj->name = strdup(object_name);
+        obj->data = obj_addr;
+    
+        hashtable_insert(ctxt->object_dict, object_name, obj);
+        hashtable_insert(ctxt->reverse_object_dict, obj->data, obj);
+    } else {
+        // object exist and of the same class
+        if (obj->cls == class_object) {
+            // remove old reverse pointer and insert the new one
+            hashtable_remove(ctxt->reverse_object_dict, obj->data);
+            obj->data = obj_addr;
+            hashtable_insert(ctxt->reverse_object_dict, obj->data, obj);
+        } else {
+            warnx("om: proxy insertion class error (objname = %s, prev = %s, "
+                  "new = %s)", object_name, obj->cls->class_name, class_name);
+            return NULL;
+        }
+    }
     
     return obj;
 }

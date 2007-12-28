@@ -225,7 +225,21 @@ om_object_t* om_new_object(om_ctxt_t *ctxt, const char *class_name,
                            const char *object_name);
 void om_delete_object(om_object_t *obj);
 
+/*!
+    Om_insert_proxy_obj will insert the object pointer so that it is available
+    from the object manager for introspection.
     
+    If the named object already exist and it is a proxy object, the proxy
+    object will be replaced.
+    
+    \param ctxt The object manager context
+    \param class_name The name of the class to which the object is supposed to
+        belong.
+    \param object_name The name of the new proxy object, if the name already
+        exist and the existing object is a proxy object of the same class, the
+        existing object will be replaced.
+    \param obj_addr The address of the new proxy object.
+*/
 om_object_t* om_insert_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
                                  const char *object_name, void *obj_addr);
 
