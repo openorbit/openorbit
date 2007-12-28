@@ -171,6 +171,16 @@ void v_cross(vec_arr_t res, const vec_arr_t a, const vec_arr_t b)
 scalar_t v_dot(const vec_arr_t a, const vec_arr_t b)
     __attribute__ ((__pure__, __nonnull__));
 
+#if ENABLE_VECTORISE
+    #undef V_DOT
+    #define V_DOT(s, va, vb)                                                \
+        do {                                                                \
+            vector_t vec_res_;                                              \
+            vec_res_ = (va).v * (vb).v);                                    \
+            (s) = vec_res_.s.x + vec_res_.s.y + vec_res_.s.z + vec_res_.s.w;\
+        } while (0)
+#endif
+
 #define V_NORMALISE(va) \
     v_normalise((va).a)
     
@@ -218,10 +228,26 @@ void m_zero(mat_arr_t m) __attribute__ ((__nonnull__));
     
 void v_cpy(vec_arr_t dst, const vec_arr_t src) __attribute__ ((__nonnull__));
 
+#if ENABLE_VECTORISE
+    #undef V_CPY
+    #define V_CPY(dst, src) \
+        (dst).v = (src).v
+#endif
+
 #define M_CPY(dst, src) \
     m_cpy((dst).a, (src).a)
 
 void m_cpy(mat_arr_t dst, mat_arr_t src) __attribute__ ((__nonnull__));
+
+#if ENABLE_VECTORISE
+    #undef M_CPY
+    #define M_CPY(dst, src)     \
+        (dst).v[0] = (src).v[0];\
+        (dst).v[1] = (src).v[1];\
+        (dst).v[2] = (src).v[2];\
+        (dst).v[3] = (src).v[3];
+#endif
+
 
 #define V_SET(vr, x, y, z, w) \
     v_set((vr).a, x, y, z, w)
