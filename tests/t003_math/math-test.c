@@ -363,9 +363,9 @@ START_TEST(test_m_inv)
         .a = {S_CONST( 1.000),S_CONST(0.0),S_CONST( 0.0),S_CONST(0.0),
               S_CONST(-0.500),S_CONST(0.5),S_CONST(0.0),S_CONST(0.0),
               S_CONST(-0.500),S_CONST(-1.0)/S_CONST(6.0),
-                S_CONST(-1.0)/S_CONST(3.0),S_CONST(0.0),
+                S_CONST(1.0)/S_CONST(3.0),S_CONST(0.0),
               S_CONST( 0.125),S_CONST(-5.0)/S_CONST(24.0),
-                S_CONST( 5.0),S_CONST(0.25)}};
+                S_CONST( -1.0)/S_CONST(12.0),S_CONST(0.25)}};
 
     matrix_t inv = m_inv(&m);
 
