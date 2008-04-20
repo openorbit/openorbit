@@ -37,8 +37,7 @@
 
 #include <check.h>
 
-#import <math/linalg.h>
-#import <math/quaternions.h>
+#import <vmath/vmath.h>
 
 #define ALMOST_EQUAL(x, y, tol) (((y - (tol)) < (x)) && ((x) < ((y) + (tol))))
 
@@ -105,7 +104,22 @@ END_TEST
 // TODO: M_MUL test
 START_TEST(test_m_mul)
 {
-
+    matrix_t a0, b0, c0;
+    matrix_t a1, b1, c1;
+    
+    for (int i = 0; i < 4 ; i ++) {
+        for (int j = 0; j < 4 ; j ++) {
+            b0.a[i][j] = (float)i*(float)j;
+            c0.a[i][j] = (float)i+(float)j;
+            b1.a[i][j] = (float)i*(float)j;
+            c1.a[i][j] = (float)i+(float)j;
+        }
+    }
+    
+    m_mul(a0.a, b0.a, c0.a);
+    
+//    M_MUL(a1, b1, c1);
+    
 }
 END_TEST
 
@@ -291,7 +305,79 @@ START_TEST(test_v_eq)
 }
 END_TEST
 
+START_TEST(test_m_det)
+{
+    matrix_t m = {.a =
+         {S_CONST( 1.0),S_CONST(-2.0),S_CONST( 0.0),S_CONST(3.0),
+          S_CONST( 0.0),S_CONST( 4.0),S_CONST(-1.0),S_CONST(2.0),
+          S_CONST(-1.0),S_CONST( 0.0),S_CONST(-3.0),S_CONST(1.0),
+          S_CONST( 0.0),S_CONST( 2.0),S_CONST( 5.0),S_CONST(0.0)}};
+    
+    
+    scalar_t det = m_det(&m);
+    fail_unless( ALMOST_EQUAL(det, S_CONST(-96.0), 0.0001f),
+                "Deteriminant expected -96.0, but got %f", det);
+    
+}
+END_TEST
 
+START_TEST(test_m_subdet3)
+{
+    matrix_t m = {.a =
+         {S_CONST( 1.0),S_CONST(-2.0),S_CONST( 0.0),S_CONST(3.0),
+          S_CONST( 0.0),S_CONST( 4.0),S_CONST(-1.0),S_CONST(2.0),
+          S_CONST(-1.0),S_CONST( 0.0),S_CONST(-3.0),S_CONST(1.0),
+          S_CONST( 0.0),S_CONST( 2.0),S_CONST( 5.0),S_CONST(0.0)}};
+
+    scalar_t det = m_subdet3(&m, 0, 0);
+    fail_unless( ALMOST_EQUAL(det, S_CONST(-10.0), 0.0001f),
+                "Sub deteriminant[0][0] expected -10.0, but got %f", det);
+
+    det = m_subdet3(&m, 0, 1);
+    fail_unless( ALMOST_EQUAL(det, S_CONST(-10.0), 0.0001f),
+                "Sub deteriminant[0][1] expected -10.0, but got %f", det);
+    
+    det = m_subdet3(&m, 0, 2);
+    fail_unless( ALMOST_EQUAL(det, S_CONST(-4.0), 0.0001f),
+                "Sub deteriminant[0][2] expected 0.0, but got %f", det);
+
+    det = m_subdet3(&m, 0, 3);
+    fail_unless( ALMOST_EQUAL(det, S_CONST(22.0), 0.0001f),
+                "Sub deteriminant[0][3] expected 22.0, but got %f", det);
+
+    det = m_subdet3(&m, 2, 1);
+    fail_unless( ALMOST_EQUAL(det, S_CONST(-10.0), 0.0001f),
+                "Sub deteriminant[2][1] expected 10.0, but got %f", det);
+}
+END_TEST
+
+
+START_TEST(test_m_inv)
+{
+    matrix_t m = {
+        .a = {S_CONST(1.0),S_CONST(0.0),S_CONST(0.0),S_CONST(0.0),
+              S_CONST(1.0),S_CONST(2.0),S_CONST(0.0),S_CONST(0.0),
+              S_CONST(2.0),S_CONST(1.0),S_CONST(3.0),S_CONST(0.0),
+              S_CONST(1.0),S_CONST(2.0),S_CONST(1.0),S_CONST(4.0)}};
+    matrix_t m_ex = {
+        .a = {S_CONST( 1.000),S_CONST(0.0),S_CONST( 0.0),S_CONST(0.0),
+              S_CONST(-0.500),S_CONST(0.5),S_CONST(0.0),S_CONST(0.0),
+              S_CONST(-0.500),S_CONST(-1.0)/S_CONST(6.0),
+                S_CONST(-1.0)/S_CONST(3.0),S_CONST(0.0),
+              S_CONST( 0.125),S_CONST(-5.0)/S_CONST(24.0),
+                S_CONST( 5.0),S_CONST(0.25)}};
+
+    matrix_t inv = m_inv(&m);
+
+    for (int i = 0 ; i < 4 ; i ++) {
+        for (int j = 0 ; j < 4 ; j ++) {
+            fail_unless( ALMOST_EQUAL(inv.a[i][j], m_ex.a[i][j], 0.000001f),
+                        "inv[%d][%d] = %f, should be %f",
+                        i, j, inv.a[i][j], m_ex.a[i][j]);
+        }
+    }
+}
+END_TEST
 
 Suite
 *test_suite (void)
@@ -319,6 +405,9 @@ Suite
     tcase_add_test(tc_core, test_v_set);
     tcase_add_test(tc_core, test_m_eq);
     tcase_add_test(tc_core, test_v_eq);
+    tcase_add_test(tc_core, test_m_det);
+    tcase_add_test(tc_core, test_m_subdet3);
+    tcase_add_test(tc_core, test_m_inv);
 
     /* Quaternion functions */
     tcase_add_test(tc_core, test_q_mul);
