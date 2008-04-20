@@ -34,10 +34,13 @@ import config   # config, allows one to set config values
 import environment
 import res
 
+import yaml
+
 import math
 import ConfigParser
 import sys
 import os
+
 from os import environ
 
 print "Running post init script..."
@@ -48,15 +51,193 @@ def loadStars():
         vmag, ra, dec, btmag, vtmag, b_v, v_i = tuple(line.split(","))
         environment.insertStar(math.radians(float(ra)), math.radians(float(dec)), float(vmag), float(b_v))
     f.close()
-loadStars()
 
+# Load sol system, this is a csv file that contain the following info:
+# object name, parent object, orbital radius (au or m), orbital tilt, object radius
+# mass (solar or kg), texture
 def loadSolsystem():
     f = open(res.getPath("solsystem.csv"))
     for line in f:
-        dist, size, tex = tuple([s.strip() for s in line.split(",")])
-        environment.addOrbitalObject(float(dist), 0.0, float(size), 0.0, tex)
+        name, parent, orbitalRadius, orbitalTilt, objectRadius, mass, tex = tuple([s.strip() for s in line.split(",")])
+        environment.addOrbitalObject(float(orbitalRadius), 0.0, float(objectRadius), 0.0, tex)
     f.close()
 
+    
+class UnitParseError(Exception):
+    def __init__(self, descr):
+        self.descr = descr
+    def __str__(self):
+        return repr(self.descr)
+
+class UnitRangeError(Exception):
+    def __init__(self, descr):
+        self.descr = descr
+    def __str__(self):
+        return repr(self.descr)
+
+
+def parseMass(str):
+    tokens = str.split()
+    if len(tokens) != 2:
+        raise UnitParseError("Token count wrong")
+
+    if tokens[1] == "kg":
+        return float(tokens[0])
+    else:
+        raise UnitParseError("Unknown unit in mass context: " + tokens[1])
+
+def parseAngle(str):
+    tokens = str.split()
+    if len(tokens) != 2:
+        raise UnitParseError("Token count wrong")
+
+    if tokens[1] == "rad":
+        return float(tokens[0])
+    elif tokens[1] == "deg":
+        return radians(float(tokens[0]))
+    else:
+        raise UnitParseError("Unknown unit in angle context: " + tokens[1])
+
+def parseDistance(str):
+    tokens = str.split()
+    if len(tokens) != 2:
+        raise UnitParseError("Token count wrong")
+
+    if tokens[1] == "m":
+        return float(tokens[0])
+    elif tokens[1] == "km":
+        return float(tokens[0])
+    elif tokens[1] == "au":
+        return float(tokens[0])
+    elif tokens[1] == "ly":
+        return float(tokens[0])
+    elif tokens[1] == "pc":
+        return float(tokens[0])    
+    else:
+        raise UnitParseError("Unknown unit in distance context: " + tokens[1])
+
+def parsePreasure(str):
+    tokens = str.split()
+    if len(tokens) != 2:
+        raise UnitParseError("Token count wrong")
+
+    if tokens[1] == "kPa":
+        return float(tokens[0]) * 1000.0
+    elif tokens[1] == "Pa":
+        return float(tokens[0])
+    else:
+        raise UnitParseError("Unknown unit in preasure context: " + tokens[1])
+
+
+def parseTemp(str):
+    tokens = str.split()
+    if len(tokens) != 2:
+        raise UnitParseError("Token count wrong")
+
+    if tokens[1] == "K":
+        val = float(tokens[0])
+        if val < 0.0:
+            raise UnitRangeError("Temperature may not be less than 0 K")
+        return val
+    elif tokens[1] == "C":
+        val = float(tokens[0]) + 273.15
+        if val < 0.0:
+            raise UnitRangeError("Temperature may not be less than -273.15 C")
+        return val
+    else:
+        raise UnitParseError("Unknown unit in temp context: " + tokens[1])
+
+def parseTime(str):
+    tokens = str.split()
+    if len(tokens) == 2:
+        if tokens[1] == "days":
+            return float(tokens[0]) * 3600.0 * 24.0
+        elif tokens[1] == "s":
+            return float(tokens[0])
+        elif tokens[1] == "min":
+            return float(tokens[0]) * 60.0
+        else:
+            raise UnitParseError("Unknown unit in time context: " + tokens[1])
+    elif len(tokens) == 6:
+        if tokens[1] == "h" and tokens[3] == "min" and tokens[5] == "s":
+            return float(tokens[0]) * 3600.0 + float(tokens[2]) * 60.0\
+                + float(tokens[4])
+        else:
+            raise UnitParseError("Unknown unit in time context: "
+                                 + tokens[1] + " "
+                                 + tokens[3] + " "
+                                 + tokens[5])
+    else:
+        raise UnitParseError("Token count wrong")
+
+    
+    
+
+def addStar(body):
+    mass = parseMass(body["mass"])
+    radius = parseDistance(body["radius"])
+    axialPeriod = parseAngle(body["axial-period"])
+    model = body["model"]
+
+    for sat in body["satellites"]:
+        addBody(sat)
+
+def addPlanet(body):
+    mass = parseMass(body["mass"])
+    radius = parseDistance(body["radius"])
+    axialPeriod = parseAngle(body["axial-period"])
+    model = body["model"]
+
+    for sat in body["satellites"]:
+        addBody(sat)
+
+def addMoon(body):
+    mass = parseMass(body["mass"])
+    radius = parseDistance(body["radius"])
+    axialPeriod = parseAngle(body["axial-period"])
+    model = body["model"]
+
+    for sat in body["satellites"]:
+        addBody(sat)
+
+    
+def addBody(body):
+    """docstring for addBody"""
+    # get known attributes of a body
+    if body["kind"] == "star":
+        addStar(body)
+    elif body["kind"] == "planet":
+        addPlanet(body)
+    elif body["kind"] == "moon":
+        addMoon(body)
+        
+    
+
+def loadSolYaml():
+    """Loads the yaml description of the solar system"""
+    f = file(res.getPath("solsystem.yaml"))
+    solsys = yaml.load(f)
+    f.close()
+    for key in solsys.keys():
+        addBody(solsys[key])
+        
+def _test():
+    val = parseTime("1.0 days")
+    assert(val == 3600.0*24.0)
+    val = parseTime("2.0 h 20 min 30 s")
+    assert(val == 2.0*3600.0 + 20.0*60.0 + 30.0)
+    val = parseDistance("20 m")
+    assert(val == 20.0)
+    val = parsePreasure("100.0 kPa")
+    assert(val == 100.0 * 1000.0)
+    val = parsePreasure("100.0 Pa")
+    assert(val == 100.0)
+    
+    
+    
+#if __name__ == "__main__":
+#    _test()
+#else:
+loadStars()
 loadSolsystem()
-
-
+    

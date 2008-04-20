@@ -1,10 +1,9 @@
-0.0,1.0,sol.tga
-2.0,0.5,mercury.tga
-4.0,0.5,venus.tga
-5.0,0.5,earth.tga
-7.0,0.5,moon.tga
-10.0,0.5,mars.tga
-14.0,0.5,jupiter.tga
-20.0,0.5,saturn.tga
-25.0,0.5,uranus.tga
-30.0,0.5,neptune.tga
+"Sol", "root",    0.0,   0.0, 6.955e8, 1.9891e30,sol.tga
+"Mercury","Sol",  0.387, 0.0, 0.382, 0.06,mercury.tga
+"Venus","Sol",    0.72,   0.0, 0.949, 0.82,venus.tga
+"Terra","Sol",    1.00,   0.0, 1.0, 1.0,earth.tga
+"Mars","Sol",     1.52,   0.0, 0.53, 0.11,mars.tga
+"Jupiter","Sol",  5.20,   0.0, 11.2, 318,jupiter.tga
+"Saturn","Sol",   9.54,   0.0, 9.41, 95,saturn.tga
+"Uranus","Sol",   19.22,   0.0, 3.98, 14.6,uranus.tga
+"Neptune","Sol",  30.06,   0.0, 3.81, 17.2,neptune.tga

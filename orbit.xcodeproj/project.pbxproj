@@ -74,6 +74,7 @@
 		EC4486450CCE7BDD001C88AD /* heap.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484D70CCD238B001C88AD /* heap.c */; };
 		EC4486470CCE7BDD001C88AD /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484D90CCD238B001C88AD /* list.c */; };
 		EC4486490CCE7BDD001C88AD /* object-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484DB0CCD238B001C88AD /* object-manager.c */; };
+		EC62134C0D510EA600681104 /* untitled in Resources */ = {isa = PBXBuildFile; fileRef = EC62134B0D510EA600681104 /* untitled */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
 		ECA16A990D141B6A000CAE03 /* planet.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA16A980D141B6A000CAE03 /* planet.c */; };
 		ECA16AA00D143E13000CAE03 /* postinit.py in Resources */ = {isa = PBXBuildFile; fileRef = ECA16A9F0D143E13000CAE03 /* postinit.py */; };
@@ -147,6 +148,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EC0D27A60D6CF41E00EB583D /* solsystem.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = solsystem.yaml; sourceTree = "<group>"; };
 		EC4476970CCBFF73001C88AD /* t000_hashtable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t000_hashtable; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC44769E0CCBFF95001C88AD /* t001_heap */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t001_heap; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4476A30CCBFFB1001C88AD /* t002_tga */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t002_tga; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -260,6 +262,7 @@
 		EC4486390CCE7B20001C88AD /* gencds.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = gencds.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC44863A0CCE7B20001C88AD /* gencds-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "gencds-Info.plist"; sourceTree = "<group>"; };
 		EC5B8BA00CD7DDBC00BDB22A /* res-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "res-manager.h"; sourceTree = "<group>"; };
+		EC62134B0D510EA600681104 /* untitled */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = untitled; sourceTree = "<group>"; };
 		EC76CC890D0163D200059CCB /* environment.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = environment.pyx; sourceTree = "<group>"; };
 		EC76CC8A0D016B4E00059CCB /* stars.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stars.csv; sourceTree = "<group>"; };
 		EC76CC8B0D016CFB00059CCB /* res.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = res.pyx; sourceTree = "<group>"; };
@@ -692,6 +695,8 @@
 				EC4485530CCD2496001C88AD /* solarsystem.csv */,
 				EC76CC8A0D016B4E00059CCB /* stars.csv */,
 				ECA16A9E0D14359E000CAE03 /* solsystem.csv */,
+				EC62134B0D510EA600681104 /* untitled */,
+				EC0D27A60D6CF41E00EB583D /* solsystem.yaml */,
 			);
 			path = data;
 			sourceTree = "<group>";
@@ -986,6 +991,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ECA16AA00D143E13000CAE03 /* postinit.py in Resources */,
+				EC62134C0D510EA600681104 /* untitled in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
