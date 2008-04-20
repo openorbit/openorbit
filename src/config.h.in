@@ -1,0 +1,5 @@
+#cmakedefine HAVE_ALTIVEC
+#cmakedefine HAVE_SSE3
+#cmakedefine HAVE_SSE4
+#cmakedefine IS_BIG_ENDIAN
+#cmakedefine SO_EXT
