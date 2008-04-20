@@ -1,6 +1,7 @@
 # Root CMakeList file
 
 project(openorbit)
+cmake_minimum_required(VERSION 2.6)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -79,7 +80,14 @@ endif (CMAKE_COMPILER_IS_GNUCC)
 # Support command when working with Xcode
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/AddCMakeList.txt)
 
+if (HAVE_ALTIVEC)
+    add_definitions(-DENABLE_VECTORISE)
+endif (HAVE_ALTIVEC)
+
+
+
 include_directories(include)
+add_subdirectory(rsrc)
 add_subdirectory(src)
 add_subdirectory(include)
 #add_subdirectory(rsrc)

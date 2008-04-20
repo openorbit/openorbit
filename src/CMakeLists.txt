@@ -15,7 +15,7 @@ if (APPLE)
 endif (APPLE)
 
 add_subdirectory(libgencds)
-add_subdirectory(math)
+add_subdirectory(vmath)
 add_subdirectory(physics)
 add_subdirectory(scripting)
 add_subdirectory(parsers)
@@ -57,38 +57,25 @@ if (APPLE)
 endif (APPLE)
 
 
-add_executable(openorbit MACOSX_BUNDLE ${openorbit_SRC} ${openorbit_FILES})
+add_executable(openorbit MACOSX_BUNDLE
+               ${openorbit_SRC}
+               ${openorbit_FILES}
+               ${ORBIT_RES_TEX}
+               ${ORBIT_RES_DATA})
 
 set_target_properties(openorbit
                       PROPERTIES
                       RELEASE_OUTPUT_NAME "${open_orbit_name}"
                       DEBUG_OUTPUT_NAME "${open_orbit_debug_name}")
 
-
 target_link_libraries(openorbit
-  math scripting parsers dl gencds
-  ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${GLUT_LIBRARIES}
-)
+                      math scripting parsers dl gencds
+                      ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${GLUT_LIBRARIES})
 
 
-# This is not really maintainable, and should be fixed in the future...
-if (APPLE)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/data/stars.csv)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/data/solsystem.csv)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/scripts/init.py)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/scripts/postinit.py)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/sol.tga)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/mercury.tga)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/venus.tga)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/earth.tga)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/moon.tga)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/mars.tga)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/jupiter.tga)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/saturn.tga)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/uranus.tga)
-    install_mac_res(openorbit ${CMAKE_SOURCE_DIR}/rsrc/textures/neptune.tga)
-endif (APPLE)
 
 
 install(TARGETS openorbit
-        RUNTIME DESTINATION bin )
+        RUNTIME DESTINATION bin
+        RESOURCE DESTINATION share/openorbit/
+        BUNDLE DESTINATION Applications )
