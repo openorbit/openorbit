@@ -1,0 +1,54 @@
+#! /bin/sh
+
+# This is a conveniance script for configuring the open orbit builds.
+# Note that this will generate a build tree under the build directory, you must
+# cd to this directory after the configure script has been run in order to do
+# a make.
+
+# Supported options: --debug, --enable-tests
+
+debug = 0
+tests = 0
+vectorise = 1
+
+while [ $# != 0 ]
+do
+    case $1 in
+    "--debug")
+        debug = 1
+        ;;
+        ;;
+    "--enable-test")
+    "--enable-tests")
+        tests = 1
+        ;;
+    *)
+        echo $1: unknown option >&2
+        echo "Usage: ./configure [--debug] [--enable-tests]"
+        exit 1
+        ;;
+    esac
+done
+
+
+
+if [ ! -d build ]; then
+    mkdir build || return 1
+fi
+
+if [ $debug == 1 ]; then
+    buildtype = "Debug"
+else
+    buildtype = "Release"
+fi
+
+if [ $tests == 1 ]; then
+    testflags = "-DENABLE_TESTS:bool=true"
+else
+    testflags = ""
+fi
+
+
+pushd build
+cmake -DCMAKE_BUILD_TYPE:string=$buildtype $testflags ../
+popd
