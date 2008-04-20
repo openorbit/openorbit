@@ -39,9 +39,9 @@ extern "C" {
 #endif 
 
 
-#include <math/types.h>
-#include <math/constants.h>
-#include <math/linalg.h>
+#include <vmath/vmath-types.h>
+#include <vmath/vmath-constants.h>
+#include <vmath/vmath-matvec.h>
 
 #define Q_X 0
 #define Q_Y 1

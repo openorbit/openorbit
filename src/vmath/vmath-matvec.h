@@ -33,7 +33,7 @@
 
 
 /*!
- * \file linalg.h
+ * \file vmath-matvec.h
  * \brief Declarations of the linear algebra routines.
  * 
  * In Open Orbit, there is a lot of linear algebra going on. Especially in the
@@ -48,7 +48,25 @@ extern "C" {
 #endif 
 
 #include <stdbool.h>
-#include <math/types.h>
+#include <vmath/vmath-types.h>
+
+
+#define V_DOT(s, va, vb) \
+    (s) = v_dot((va).a, (vb).a)
+
+scalar_t v_dot(const vec_arr_t a, const vec_arr_t b)
+    __attribute__ ((__pure__, __nonnull__));
+
+#if ENABLE_VECTORISE
+    #undef V_DOT
+    #define V_DOT(s, va, vb)                                                \
+        do {                                                                \
+            vector_t vec_res_;                                              \
+            vec_res_ = (va).v * (vb).v);                                    \
+            (s) = vec_res_.s.x + vec_res_.s.y + vec_res_.s.z + vec_res_.s.w;\
+        } while (0)
+#endif
+
 
 #define M_V_MUL(vr, M, vx) \
     m_v_mul((vr).a, (M).a, (vx).a)
@@ -61,24 +79,42 @@ void m_v_mul(vec_arr_t res, mat_arr_t a, const vec_arr_t v)
     #define M_V_MUL(vr, M, vx) \
         do { \
             matrix_t p;\
-            p.v[0] = M.v[0] * vx.v;\
-            p.v[1] = M.v[1] * vx.v;\
-            p.v[2] = M.v[2] * vx.v;\
-            p.v[3] = M.v[3] * vx.v;\
+            p.v[0] = (M).v[0] * (vx).v;\
+            p.v[1] = (M).v[1] * (vx).v;\
+            p.v[2] = (M).v[2] * (vx).v;\
+            p.v[3] = (M).v[3] * (vx).v;\
             \
-            vr.s.x = p.a[0][0] + p.a[0][1] + p.a[0][2] + p.a[0][3];\
-            vr.s.y = p.a[1][0] + p.a[1][1] + p.a[1][2] + p.a[1][3];\
-            vr.s.z = p.a[2][0] + p.a[2][1] + p.a[2][2] + p.a[2][3];\
-            vr.s.w = p.a[3][0] + p.a[3][1] + p.a[3][2] + p.a[3][3];\
+            (vr).s.x = p.a[0][0] + p.a[0][1] + p.a[0][2] + p.a[0][3];\
+            (vr).s.y = p.a[1][0] + p.a[1][1] + p.a[1][2] + p.a[1][3];\
+            (vr).s.z = p.a[2][0] + p.a[2][1] + p.a[2][2] + p.a[2][3];\
+            (vr).s.w = p.a[3][0] + p.a[3][1] + p.a[3][2] + p.a[3][3];\
         } while (0)
 #endif
 
+#define M_TRANSPOSE(MT, M) \
+    m_transpose((MT).a, (M).a)
+    
+void m_transpose(mat_arr_t mt, mat_arr_t m) __attribute__ ((__nonnull__));
 
 #define M_MUL(A, B, C) \
     m_mul((A).a, (B).a, (C).a)
 
 void m_mul(mat_arr_t res, mat_arr_t a, mat_arr_t b)
     __attribute__ ((__nonnull__));    
+
+#if ENABLE_VECTORISE
+    #undef M_MUL
+    #define M_MUL(A, B, C) \
+        do { \
+            matrix_t tmp_res, tmp_c;\
+            M_TRANSPOSE(tmp_c, (C));\
+            for (int i = 0 ; i < 4 ; i ++) {\
+                for (int j = 0; j < 4 ; j ++) {\
+                    V_DOT(tmp_res.a[i][j], (B).v[i], tmp_c.v[j]);\
+                }\
+            }\
+        } while (0)
+#endif
     
     
 #define M_ADD(A, B, C) \
@@ -165,22 +201,6 @@ void v_s_div(vec_arr_t res, vec_arr_t a, scalar_t s)
 void v_cross(vec_arr_t res, const vec_arr_t a, const vec_arr_t b)
     __attribute__ ((__nonnull__));
 
-#define V_DOT(s, va, vb) \
-    (s) = v_dot((va).a, (vb).a)
-    
-scalar_t v_dot(const vec_arr_t a, const vec_arr_t b)
-    __attribute__ ((__pure__, __nonnull__));
-
-#if ENABLE_VECTORISE
-    #undef V_DOT
-    #define V_DOT(s, va, vb)                                                \
-        do {                                                                \
-            vector_t vec_res_;                                              \
-            vec_res_ = (va).v * (vb).v);                                    \
-            (s) = vec_res_.s.x + vec_res_.s.y + vec_res_.s.z + vec_res_.s.w;\
-        } while (0)
-#endif
-
 #define V_NORMALISE(va) \
     v_normalise((va).a)
     
@@ -193,10 +213,13 @@ void v_normalise(vec_arr_t v) __attribute__ ((__nonnull__));
  scalar_t v_abs(const vec_arr_t v)
     __attribute__ ((__pure__, __nonnull__));
 
-#define M_TRANSPOSE(MT, M) \
-    m_transpose((MT).a, (M).a)
-    
-void m_transpose(mat_arr_t mt, mat_arr_t m) __attribute__ ((__nonnull__));
+/*! Compute determinant of 4x4 matrix M */
+scalar_t m_det(const matrix_t *M);
+/*! Compute subdet with respect to position k, l */
+scalar_t m_subdet3(const matrix_t *M, int k, int l);
+
+/*! Compute inverse of 4x4 matrix M */
+matrix_t m_inv(const matrix_t *M);
 
 
 /* creates rotation matrices, these are untested and might not work */

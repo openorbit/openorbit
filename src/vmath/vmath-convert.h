@@ -34,7 +34,7 @@
 #ifndef MATH_CONVERT_H__
 #define MATH_CONVERT_H__
 
-#include "constants.h"
+#include <vmath/vmath-constants.h>
 
 #define DEG_TO_RAD(d) ((d) * S_PI/180.0f)
 #define RAD_TO_DEG(r) ((r) * 180.0f/S_PI)

@@ -34,10 +34,10 @@
 
 #include <tgmath.h>
 
-#include <math/types.h>
-#include <math/constants.h>
-#include <math/linalg.h>
-#include <math/quaternions.h>
+#include <vmath/vmath-types.h>
+#include <vmath/vmath-constants.h>
+#include <vmath/vmath-matvec.h>
+#include <vmath/vmath-quaternions.h>
 #include <assert.h>
 
  scalar_t

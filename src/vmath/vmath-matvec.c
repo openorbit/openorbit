@@ -35,8 +35,8 @@
 #include <tgmath.h>
 #include <string.h>
 
-#include <math/linalg.h>
-#include <math/constants.h>
+#include <vmath/vmath-matvec.h>
+#include <vmath/vmath-constants.h>
 
 /* standard non vectorised routines */
 void
@@ -115,13 +115,150 @@ v_s_div(vec_arr_t res, vec_arr_t a, scalar_t s)
     res[2] = a[2] * d;
     res[3] = a[3] * d;
 }
-    
+
+void
+m_lu(const matrix_t *a, matrix_t *l, matrix_t *u)
+{
+    // compute L, U in A=LU, where L, U are triangular
+//    m_cpy(u, a);
+//    m_zero(l);
+//    for (int i = 0 ; i < 4 ; i ++) {
+//        vector_t v;
+//        v_s_div(&v, u.a[i], u.a[i][i]);
+//        v_s_mul(&v, &v, u.a[i+1][j]);
+        
+//    }
+    return;
+}
 
 void
 v_normalise(vec_arr_t v)
 {
     scalar_t norm = v_abs(v);
     v_s_mul(v, v, S_ONE/norm);
+}
+
+scalar_t
+m_det(const matrix_t *m)
+{
+    // compute the four subdeterminants (Saurrus)
+    // note, this version has been written to work, not to be efficient in any
+    // way
+    scalar_t sub_det[4];
+    
+    sub_det[0] =  MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 3);
+    sub_det[0] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 1); 
+    sub_det[0] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 2); 
+    sub_det[0] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 3); 
+    sub_det[0] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 1); 
+    sub_det[0] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 2); 
+
+    sub_det[1] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 3); 
+    sub_det[1] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 0); 
+    sub_det[1] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 2); 
+    sub_det[1] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 3); 
+    sub_det[1] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 0); 
+    sub_det[1] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 2); 
+    
+    sub_det[2] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 3); 
+    sub_det[2] += MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 0); 
+    sub_det[2] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 1); 
+    sub_det[2] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 3); 
+    sub_det[2] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 0); 
+    sub_det[2] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 1); 
+    
+    sub_det[3] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 2); 
+    sub_det[3] += MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 0); 
+    sub_det[3] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 1); 
+    sub_det[3] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 2); 
+    sub_det[3] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 0); 
+    sub_det[3] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 1); 
+    
+    scalar_t det = MAT_ELEM(*m, 0, 0) * sub_det[0]
+                 - MAT_ELEM(*m, 0, 1) * sub_det[1]
+                 + MAT_ELEM(*m, 0, 2) * sub_det[2]
+                 - MAT_ELEM(*m, 0, 3) * sub_det[3];
+    
+    return det;
+}
+
+scalar_t
+m_subdet3(const matrix_t *m, int k, int l)
+{
+    scalar_t acc = S_CONST(0.0);
+    matrix_t m_prim;
+    // copy the relevant matrix elements
+    for (int i0 = 0, i1 = 0 ; i0 < 4 ; i0 ++) {
+        if (k == i0) continue; // skip row for sub det
+        for(int j0 = 0, j1 = 0 ; j0 < 4 ; j0 ++) {
+            if (l == j0) continue; // skip col for subdet
+            MAT_ELEM(m_prim, i1, j1) = MAT_ELEM(*m, i0, j0);
+            j1 ++;
+        }
+        i1 ++;
+    }
+
+    
+    // Apply Sarrus
+    for (int i = 0 ; i < 3 ; i ++) {
+        acc += MAT_ELEM(m_prim, 0, (0+i) % 3) * MAT_ELEM(m_prim, 1, (1+i) % 3)
+             * MAT_ELEM(m_prim, 2, (2+i) % 3);
+        
+        acc -= MAT_ELEM(m_prim, 2, (0+i) % 3) * MAT_ELEM(m_prim, 1, (1+i) % 3)
+             * MAT_ELEM(m_prim, 0, (2+i) % 3);
+    }
+
+    return acc;
+}
+
+matrix_t
+m_adj(const matrix_t *m)
+{
+    matrix_t M_adj;
+    scalar_t sign = S_CONST(1.0);
+    for (int i = 0 ; i < 4 ; i ++) {
+        for(int j = 0; j < 4 ; j ++) {
+            MAT_ELEM(M_adj, j, i) = sign * m_subdet3(m, i, j);
+            sign *= S_CONST(-1.0); 
+        }
+    }
+    
+    for (int i = 0; i < 4 ; i ++) {
+        printf("adj: %vf\n", M_adj.v[i]);
+    }
+    
+    return M_adj;
+}
+
+matrix_t
+m_inv(const matrix_t *M)
+{
+    // Very brute force, there are more efficient ways to do this
+    scalar_t det = m_det(M);
+    matrix_t M_adj = m_adj(M);
+    matrix_t M_inv;
+    
+    if (det != S_CONST(0.0)) {
+        scalar_t sign = S_CONST(1.0);
+        for (int i = 0 ; i < 4 ; i ++) {
+            for (int j = 0 ; j < 4 ; j ++) {
+                MAT_ELEM(M_inv, i, j) = MAT_ELEM(M_adj, i, j) / det;
+            }
+        }
+    } else {
+        // If the determinant is zero, then the matrix is not invertible
+        // thus, return NANs in all positions
+        for (int i = 0; i < 4; i ++) {
+            for (int j = 0; j < 4; j ++) {
+                MAT_ELEM(M_inv, i, j) = NAN;
+            }
+        }
+    }
+    
+    for (int i = 0; i < 4 ; i ++) {
+        printf("inverse: %vf\n", M_inv.v[i]);
+    }
+    return M_inv;
 }
 
 
