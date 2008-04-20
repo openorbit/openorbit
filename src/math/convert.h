@@ -36,8 +36,8 @@
 
 #include "constants.h"
 
-#define DEG_TO_RAD(d) ((d) * 180.0f/S_PI)
-#define RAD_TO_DEG(r) ((r) * S_PI/180.0f)
+#define DEG_TO_RAD(d) ((d) * S_PI/180.0f)
+#define RAD_TO_DEG(r) ((r) * 180.0f/S_PI)
 
 
 #endif /* ! MATH_CONVERT_H__ */
