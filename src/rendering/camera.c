@@ -38,9 +38,7 @@
 
 #include "camera.h"
 #include "io-manager.h"
-#include "math/linalg.h"
-#include "math/quaternions.h"
-#include "math/constants.h"
+#include <vmath/vmath.h>
 
 // TODO: Remove global camera
 camera_t *gCam = NULL;

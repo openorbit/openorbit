@@ -41,32 +41,64 @@
 #include <err.h>
 
 #include <gencds/object-manager.h>
+#include <vmath/vmath.h>
 
-#include "math/constants.h"
-#include "math/linalg.h"
-#include "math/quaternions.h"
+static om_ctxt_t *_ctxt; // Context pointer
 
+
+void*
+ph_creat_obj(void)
+{
+    ph_obj_t *obj = malloc(sizeof(ph_obj_t));
+    memset(obj, 0, sizeof(obj));
+    return obj;
+}
+
+void
+ph_delete_obj(void *obj)
+{
+    free(obj);
+}
 
 void
 ph_init(om_ctxt_t *ctxt)
 {
-    om_class_t *obj_cls = om_new_proxy_class(ctxt, "ph_obj");
-    //bool is_valid;
-    //bool is_enabled;
-    
+    _ctxt = ctxt;
+    om_class_t *obj_cls = om_new_class(ctxt, "ph_obj",
+                                       ph_creat_obj, ph_delete_obj,
+                                       sizeof(ph_obj_t));
+                                       
     om_reg_prop(obj_cls, "valid", OM_BOOL, offsetof(ph_obj_t, is_valid));
     om_reg_prop(obj_cls, "enabled", OM_BOOL, offsetof(ph_obj_t, is_enabled));
     
     om_reg_prop(obj_cls, "m", OM_FLOAT, offsetof(ph_obj_t, m));
-    om_reg_prop(obj_cls, "i", OM_FLOAT, offsetof(ph_obj_t, i));
+    //om_reg_prop(obj_cls, "i", OM_FLOAT, offsetof(ph_obj_t, i));
     om_reg_static_array_prop(obj_cls, "r", OM_FLOAT, offsetof(ph_obj_t, r), 4);
     om_reg_static_array_prop(obj_cls, "v", OM_FLOAT, offsetof(ph_obj_t, v), 4);
-    om_reg_static_array_prop(obj_cls, "f_acc", OM_FLOAT, offsetof(ph_obj_t, f_acc), 4);
-    om_reg_static_array_prop(obj_cls, "t_acc", OM_FLOAT, offsetof(ph_obj_t, t_acc), 4);
+    om_reg_static_array_prop(obj_cls, "f_acc", OM_FLOAT,
+                             offsetof(ph_obj_t, f_acc), 4);
+    om_reg_static_array_prop(obj_cls, "t_acc", OM_FLOAT,
+                             offsetof(ph_obj_t, t_acc), 4);
     om_reg_static_array_prop(obj_cls, "q", OM_FLOAT, offsetof(ph_obj_t, q), 4);
     om_reg_static_array_prop(obj_cls, "w", OM_FLOAT, offsetof(ph_obj_t, w), 4);
     
+    
+    om_class_t *sys_cls = om_new_proxy_class(ctxt, "ph_sys");
+    om_reg_prop(sys_cls, "m", OM_FLOAT, offsetof(ph_sys_t, m));
+    om_reg_static_array_prop(obj_cls, "r", OM_FLOAT, offsetof(ph_sys_t, r), 4);
+   // om_reg_static_array_prop(obj_cls, "g", OM_FLOAT, offsetof(ph_sys_t, g), 4);
 }
+
+
+ph_obj_t*
+ph_new_obj(ph_sys_t *sys, const char *name)
+{
+    ph_obj_t *obj = (ph_obj_t*) om_new_object(_ctxt, "ph_obj", name);
+    //ph_insert_obj(sys, obj);
+    
+    return obj;
+}
+
 
 ph_sys_t*
 ph_new_system(ph_sys_t *parent, size_t obj_count)
@@ -78,7 +110,7 @@ ph_new_system(ph_sys_t *parent, size_t obj_count)
         return NULL;
     }
     
-    sys = malloc(sizeof(ph_sys_t) + sizeof(ph_obj_t)*obj_count);
+    sys = malloc(sizeof(ph_sys_t));
     
     if (sys == NULL) {
         return NULL;
@@ -123,6 +155,11 @@ ph_step(ph_sys_t *sys, scalar_t step)
     vector_t g; // gravity
     // for all subsystems
     for (int i = 0 ; i < sys->child_count ; i ++) {
+        // move system, systems move relative to each other according to keplers
+        // law, for now we assume perfect circular orbits, this will obviously
+        // change later on
+        (sys->children[i]->r);
+        
         ph_apply_gravity(sys->children[i], g);
         ph_step(sys->children[i], step);
     }
@@ -132,37 +169,38 @@ ph_step(ph_sys_t *sys, scalar_t step)
     for (int i = 0 ; i < sys->alloc_size ; i ++) {
         vector_t a, at, v, vt, r, f;
         
-        if (sys->obj[i].is_enabled) {
+        if (sys->obj[i]->is_enabled) {
+            ph_obj_t *obj = sys->obj[i];
             // comp total force and acceleration
-            V_ADD(f, sys->g, sys->obj[i].f_acc);
-            V_S_DIV(a, f, sys->obj[i].m);
+            //V_ADD(f, sys->g, obj[i].f_acc);
+            V_S_DIV(a, f, obj->m);
             
             // comp new velocity
             V_S_MUL(at, a, step);
-            V_ADD(v, sys->obj[i].v, at);
+            V_ADD(v, obj->v, at);
             
             // comp new position
-            V_S_MUL(vt, sys->obj[i].v, step);
-            V_ADD(r, sys->obj[i].r, vt);
+            V_S_MUL(vt, obj->v, step);
+            V_ADD(r, obj->r, vt);
             
             // apply changes
-            V_CPY(sys->obj[i].r, r);
-            V_CPY(sys->obj[i].v, v);
+            V_CPY(obj->r, r);
+            V_CPY(obj->v, v);
             
             // rotate object, we should probably optimise this
             vector_t delta_w;
-            V_S_DIV(delta_w, sys->obj[i].t_acc, sys->obj[i].i);
+//            V_S_DIV(delta_w, obj->t_acc, obj->i);
             quaternion_t qr0, qr1, q0, q1, q2;
             Q_ROT_X(q0, delta_w.s.x);
             Q_ROT_Y(q1, delta_w.s.y);
             Q_ROT_Z(q2, delta_w.s.z);
             Q_MUL(qr0, q0, q1);
             Q_MUL(qr1, qr0, q2);
-            Q_MUL(qr0, sys->obj[i].w, qr1);
-            V_CPY(sys->obj[i].w, qr0);
+            Q_MUL(qr0, obj->w, qr1);
+            V_CPY(obj->w, qr0);
             
-            m += sys->obj[i].m;
-            V_S_MUL(cm_tmp, sys->obj[i].r, sys->obj[i].m);
+            m += obj->m;
+            V_S_MUL(cm_tmp, obj->r, obj->m);
             V_ADD(cm, cm, cm_tmp);
         }
     }
@@ -177,7 +215,7 @@ ph_apply_gravity(ph_sys_t *sys, vector_t g)
 {
     assert(sys != NULL);
     
-    V_ADD(sys->g, sys->g, g);    
+//    V_ADD(sys->g, sys->g, g);    
 }
 
 void

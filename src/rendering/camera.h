@@ -38,7 +38,7 @@ extern "C" {
 #endif 
 
 
-#include <math/types.h>
+#include <vmath/vmath.h>
 
 #include <stdbool.h>
 

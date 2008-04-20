@@ -37,7 +37,7 @@
 extern "C" {
 #endif 
 
-#include <math/types.h>
+#include <vmath/vmath.h>
 #include <tgmath.h>
 
 #include "SDL_opengl.h"

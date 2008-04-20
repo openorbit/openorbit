@@ -34,7 +34,7 @@
 #ifndef PLANET_H__
 #define PLANET_H__
 #include "SDL_opengl.h"
-#include "math/types.h"
+#include <vmath/vmath.h>
 
 /* Most of the stuff here should be moved to the dynamics system later on */
 

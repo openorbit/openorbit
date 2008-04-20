@@ -49,9 +49,10 @@
 
 #include <gencds/object-manager.h>
 #include <gencds/list.h>
-#include "math/types.h"
+#include <vmath/vmath.h>
 
 #define PH_G 6.6732e-11 //Nm^2 kg^-2
+
 // invariant: is_valid == false && is_enabled == true
 typedef struct {
     bool is_valid;
@@ -63,24 +64,33 @@ typedef struct {
     vector_t t_acc;   //!< torque accumulator in Nm
     quaternion_t q;   //!< rotation quat
     quaternion_t w;   //!< rotational speed quat
-    scalar_t i;       //!< scalar moment of inertia
+    matrix_t I;       //!< Inertial tensor
+    matrix_t I_rep;   //!< Inverse of inertial tensor
 } ph_obj_t;
 
 
-//! A system of several objects
+/*! A system of several objects
+
+    Note that each system has an object seen as the main system object that is
+    generating gravity and other nice things.
+*/
 typedef struct _ph_sys_t {
     vector_t r; //!< position of the system in parent world coords
+    scalar_t radius; //!< Distance to orbiting point in parent units
+    quaternion_t w; //!< Rotational quaternion with respect to starting point
+    quaternion_t p; //!< Preccession quaternion
+    
     scalar_t m; //!< mass of system in kg
-    vector_t g; //!< gravity
-
+    
     size_t child_alen;
     size_t child_count;
     struct _ph_sys_t **children;
     
     list_t *free_obj_list; //!< for quickly inserting objects
-    size_t alloc_size; //!< size of obj array
+    size_t alloc_size; //!< size of obj array (in no of objects)
     
-    ph_obj_t obj[];
+    ph_obj_t **obj; //! List of current objects in the system
+
 } ph_sys_t;
 
 
@@ -92,11 +102,18 @@ typedef struct _ph_sys_t {
     
     \param parent The parent system where the created system is to be inserted.
         If the param is NULL, then a root system is created.
-    \param obj_count
+    \param obj_count The initial size of the object array in the system.
     \return The new physics system.
  */
 ph_sys_t* ph_new_sys(ph_sys_t *parent, size_t obj_count);
 
+/*! Creates a new object in the given system
+  
+  \param sys The system in which the object is placed initially.
+  \param name The name of the object for the object manager.
+  \return The new object
+*/
+ph_obj_t* ph_new_obj(ph_sys_t *sys, const char *name);
 
 /*! Does a time step in the simulation of the given physics system
     
@@ -106,6 +123,9 @@ ph_sys_t* ph_new_sys(ph_sys_t *parent, size_t obj_count);
 void ph_step(ph_sys_t *sys, scalar_t step);
 
 /*! Applies an external global force on the entire system
+
+    Note, this does not apply the gravity on any individual objects, only the
+    system (i.e. for simulating orbits).
     
     \param sys
     \param g Gravity vector in Nm
@@ -132,9 +152,12 @@ void ph_apply_force_relative(ph_obj_t *obj, vector_t pos, vector_t f);
     system is optimised to keep in-system calculations fast at the expense of
     migration cost.
     
+    Migration is basically the feat of copying a pointer and translating the
+    object coordinates to the target systems local coordinate space.
+    
     \param dst_sys
     \param src_sys
-    \param obj_id
+    \param obj
 */
 void ph_migrate_object(ph_sys_t *dst_sys, ph_sys_t *src_sys, ph_obj_t *obj);
 

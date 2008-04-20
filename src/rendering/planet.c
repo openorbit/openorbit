@@ -33,8 +33,7 @@
 
 #include "planet.h"
 #include "texture.h"
-#include "math/quaternions.h"
-#include "math/convert.h"
+#include <vmath/vmath.h>
 
 
 #include "SDL_opengl.h"
@@ -92,7 +91,11 @@ planet_rot_orig(planet_t *planet, float rot_rad)
     Q_CPY(planet->rot_orig, res);
 }
 
-
+//void
+//planet_draw2(planet2_t *planet)
+//{
+ //   
+//}
 
 void
 planet_draw(planet_t *planet)
