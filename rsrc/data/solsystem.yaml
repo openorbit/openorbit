@@ -14,246 +14,246 @@ Sol:
     axial-period: 27 days
     model: "sphere"
     satellites:
-    -Mercury:
-        kind: "planet"
-        mass: 3.18e23 kg
-        radius: 2.43e6 m
-        axial-period: 58.646 days
-        axial-inclination: 0 deg
-        orbit:
-            semi-major-axis: 0.3871 au
-            eccentricity: 0.206
-            inclination: 7.00 deg
-            period: 87.969 days
-        model: "sphere"
-        texture: "mercury.tga"
-    -Venus:
-        kind: "planet"
-        mass: 4.88e24 kg
-        radius: 6.06e6 m
-        axial-period: -243.019 days
-        axial-inclination: -2 deg
-        orbit:  
-            semi-major-axis: 0.7233 au
-            eccentricity: 0.007
-            inclination: 7.00 deg
-            period: 224.701 days
-        pressure: 92000 kPa
-        surface-temp: 750 K
-        model: "sphere"
-        texture: "venus.tga"
-    -Earth:
-        kind: "planet"
-        mass: 5.98e24 kg
-        radius: 6.37e6 m
-        axial-period: 23 h 56 min 22.7 s
-        axial-inclination: 23.45 deg
-        orbit:
-            semi-major-axis: 1.0 au
-            eccentricity: 0.017
-            inclination: 0.00 deg
-            period: 365.256 days
-        pressure: 100 kPa
-        surface-temp: 285 K
-        model: "sphere"
-        texture: "earth.tga"
-        
-        satellites:
-        -Luna:
-            kind: "moon"
-            mass: 7.36e22 kg
-            radius: 1.74e6 m      
-            axial-period: 27.322 days
-            axial-inclination: 6.68 deg
+        - Mercury:
+            kind: "planet"
+            mass: 3.18e23 kg
+            radius: 2.43e6 m
+            axial-period: 58.646 days
+            axial-inclination: 0 deg
             orbit:
-                semi-major-axis: 0.871 m
+                semi-major-axis: 0.3871 au
                 eccentricity: 0.206
-                period: 27.322 days
+                inclination: 7.00 deg
+                period: 87.969 days
             model: "sphere"
-            texture: "moon.tga"
-    -Mars:
-        kind: "planet"
-        mass: 6.48e23 kg
-        radius: 3.37e6 m
-        axial-period: 24 h 37 min 22.6 s
-        axial-inclination: 23.98 deg
-        orbit:
-            semi-major-axis: 1.5237 au
-            eccentricity: 0.093
-            inclination: 1.85 deg
-            period: 686.980 days
-        pressure: 0.6 kPa
-        surface-temp: 220 K
-        model: "sphere"
-        texture: "mars.tga"
+            texture: "mercury.tga"
+        - Venus:
+            kind: "planet"
+            mass: 4.88e24 kg
+            radius: 6.06e6 m
+            axial-period: -243.019 days
+            axial-inclination: -2 deg
+            orbit:  
+                semi-major-axis: 0.7233 au
+                eccentricity: 0.007
+                inclination: 7.00 deg
+                period: 224.701 days
+            pressure: 92000 kPa
+            surface-temp: 750 K
+            model: "sphere"
+            texture: "venus.tga"
+        - Earth:
+            kind: "planet"
+            mass: 5.98e24 kg
+            radius: 6.37e6 m
+            axial-period: 23 h 56 min 22.7 s
+            axial-inclination: 23.45 deg
+            orbit:
+                semi-major-axis: 1.0 au
+                eccentricity: 0.017
+                inclination: 0.00 deg
+                period: 365.256 days
+            pressure: 100 kPa
+            surface-temp: 285 K
+            model: "sphere"
+            texture: "earth.tga"
         
-        satellites:
-        -Phobos:
-            kind: "moon"
+            satellites:
+            - Luna:
+                kind: "moon"
+                mass: 7.36e22 kg
+                radius: 1.74e6 m      
+                axial-period: 27.322 days
+                axial-inclination: 6.68 deg
+                orbit:
+                    semi-major-axis: 0.871 m
+                    eccentricity: 0.206
+                    period: 27.322 days
+                model: "sphere"
+                texture: "moon.tga"
+        - Mars:
+            kind: "planet"
+            mass: 6.48e23 kg
+            radius: 3.37e6 m
+            axial-period: 24 h 37 min 22.6 s
+            axial-inclination: 23.98 deg
             orbit:
-                period: 0.319 days
-                eccentricity: 0.015
-                inclination: 1.02
-        -Deimos:
-            kind: "moon"
+                semi-major-axis: 1.5237 au
+                eccentricity: 0.093
+                inclination: 1.85 deg
+                period: 686.980 days
+            pressure: 0.6 kPa
+            surface-temp: 220 K
+            model: "sphere"
+            texture: "mars.tga"
+        
+            satellites:
+                - Phobos:
+                    kind: "moon"
+                    orbit:
+                        period: 0.319 days
+                        eccentricity: 0.015
+                        inclination: 1.02
+                - Deimos:
+                    kind: "moon"
+                    orbit:
+                        period: 1.262 days
+                        eccentricity: 0.001
+                        inclination: 1.82
+        - Jupiter:
+            kind: "planet"            
+            mass: 1.9e27 kg
+            radius: 6.99e7 m
+            axial-period: 9 h 50 min
+            axial-inclination: 3.08 deg
             orbit:
-                period: 1.262 days
-                eccentricity: 0.001
-                inclination: 1.82
-    -Jupiter:
-        kind: "planet"            
-        mass: 1.9e27 kg
-        radius: 6.99e7 m
-        axial-period: 9 h 50 min
-        axial-inclination: 3.08 deg
-        orbit:
-            semi-major-axis: 5.2028 au
-            eccentricity: 0.048
-            inclination: 1.31 deg
-            period: 4332.589 days
-        model: "sphere"
-        texture: "jupiter.tga"
-        satellites:
-        -Metis:
-            kind: "moon"
-        -Adrastea:
-            kind: "moon"
-        -Amalthea:
-            kind: "moon"
-        -Thebe:
-            kind: "moon"
-        -Io:
-            kind: "moon"
-        -Europa:
-            kind: "moon"
-        -Gaynamede:
-            kind: "moon"
-        -Callisto:
-            kind: "moon"
-        -Leda:
-            kind: "moon"
-        -Himalia:
-            kind: "moon"
-        -Lysithea:
-            kind: "moon"
-        -Elara:
-            kind: "moon"
-        -Ananke:
-            kind: "moon"
-        -Carme:
-            kind: "moon"
-        -Pasiphae:
-            kind: "moon"
-        -Sinope:
-            kind: "moon"
-    -Saturn:
-        kind: "planet"
-        mass: 5.68e26 kg
-        radius: 5.85e7 m
-        axial-period: 10 h 15 min
-        axial-inclination: 29 deg
-        orbit:
-            semi-major-axis: 9.5388 au
-            eccentricity: 0.056
-            inclination: 2.49 deg
-            period: 10759.22 days
-        model: "sphere"
-        texture: "saturn.tga"
-        satellites:
-        -Atlas:
-            kind: "moon"
-        -S27:
-            kind: "moon"
-        -S26:
-            kind: "moon"
-        -Janus:
-            kind: "moon"
-        -Epimetheus:
-            kind: "moon"
-        -Mimas:
-            kind: "moon"
-        -Enceladus:
-            kind: "moon"
-        -Tethys:
-            kind: "moon"
-        -Telesto:
-            kind: "moon"
-        -Calypso:
-            kind: "moon"
-        -Dione:
-            kind: "moon"
-        -S6:
-            kind: "moon"
-        -Rhea:
-            kind: "moon"
-        -Titan:
-            kind: "moon"
-            pressure: 150 kPa
-            surface-temp: 95 K
-        -Hyperion:
-            kind: "moon"
-        -Iapetus:
-            kind: "moon"
-        -Phoebe:
-            kind: "moon"
-    -Uranus:
-        kind: "planet"
-        mass: 8.68e25 kg
-        radius: 2.33e7 m
-        axial-period: 17 h 50 min
-        axial-inclination: 97.92 deg
-        orbit:
-            semi-major-axis: 19.1914 au
-            eccentricity: 0.046
-            inclination: 0.77 deg
-            period: 30685.4 days
-        model: "sphere"
-        texture: "uranus.tga"
-        satellites:
-        -Miranda:
-            kind: "moon"
-        -Ariel:
-            kind: "moon"
-        -Umbriel:
-            kind: "moon"
-        -Titania:
-            kind: "moon"
-        -Oberon:
-            kind: "moon"
-    -Neptune:
-        kind: "planet"
-        mass: 1.03e26 kg
-        radius: 2.21e7 m
-        axial-period: 19 h 10 min
-        axial-inclination: 28.8 deg
-        orbit:
-            semi-major-axis: 30.0611 au
-            eccentricity: 0.010
-            inclination: 1.77 deg
-            period: 60189.0 days
-        model: "sphere"
-        texture: "neptune.tga"
-        satellites:
-        -Triton:
-            kind: "moon"
-        -Nereid:
-            kind: "moon"
-    # For pluto and Charon, their system is really noticably rotating around the
-    # barycentre, but we leave this as is for now until anyone complain.
-    # We could possibly create a joint system with both objects as children.
-    -Pluto:
-        kind: "dwarf-planet"
-        mass: 1.4e22 kg
-        radius: 1.5e6 m
-        axial-period: 6.387 days
-        axial-inclination: 50 deg # TODO
-        orbit:
-            semi-major-axis: 39.5294 au
-            eccentricity: 0.248
-            inclination: 17.15 deg
-            period: 90465.0 days
-        surface-temp: 40 K
-        model: "sphere"
-        satellites:
-        -Charon:
-            kind: "moon"
+                semi-major-axis: 5.2028 au
+                eccentricity: 0.048
+                inclination: 1.31 deg
+                period: 4332.589 days
+            model: "sphere"
+            texture: "jupiter.tga"
+            satellites:
+                - Metis:
+                    kind: "moon"
+                - Adrastea:
+                    kind: "moon"
+                - Amalthea:
+                    kind: "moon"
+                - Thebe:
+                    kind: "moon"
+                - Io:
+                    kind: "moon"
+                - Europa:
+                    kind: "moon"
+                - Gaynamede:
+                    kind: "moon"
+                - Callisto:
+                    kind: "moon"
+                - Leda:
+                    kind: "moon"
+                - Himalia:
+                    kind: "moon"
+                - Lysithea:
+                    kind: "moon"
+                - Elara:
+                    kind: "moon"
+                - Ananke:
+                    kind: "moon"
+                - Carme:
+                    kind: "moon"
+                - Pasiphae:
+                    kind: "moon"
+                - Sinope:
+                    kind: "moon"
+        - Saturn:
+            kind: "planet"
+            mass: 5.68e26 kg
+            radius: 5.85e7 m
+            axial-period: 10 h 15 min
+            axial-inclination: 29 deg
+            orbit:
+                semi-major-axis: 9.5388 au
+                eccentricity: 0.056
+                inclination: 2.49 deg
+                period: 10759.22 days
+            model: "sphere"
+            texture: "saturn.tga"
+            satellites:
+                - Atlas:
+                    kind: "moon"
+                - S27:
+                    kind: "moon"
+                - S26:
+                    kind: "moon"
+                - Janus:
+                    kind: "moon"
+                - Epimetheus:
+                    kind: "moon"
+                - Mimas:
+                    kind: "moon"
+                - Enceladus:
+                    kind: "moon"
+                - Tethys:
+                    kind: "moon"
+                - Telesto:
+                    kind: "moon"
+                - Calypso:
+                    kind: "moon"
+                - Dione:
+                    kind: "moon"
+                - S6:
+                    kind: "moon"
+                - Rhea:
+                    kind: "moon"
+                - Titan:
+                    kind: "moon"
+                    pressure: 150 kPa
+                    surface-temp: 95 K
+                - Hyperion:
+                    kind: "moon"
+                - Iapetus:
+                    kind: "moon"
+                - Phoebe:
+                    kind: "moon"
+        - Uranus:
+            kind: "planet"
+            mass: 8.68e25 kg
+            radius: 2.33e7 m
+            axial-period: 17 h 50 min
+            axial-inclination: 97.92 deg
+            orbit:
+                semi-major-axis: 19.1914 au
+                eccentricity: 0.046
+                inclination: 0.77 deg
+                period: 30685.4 days
+            model: "sphere"
+            texture: "uranus.tga"
+            satellites:
+                - Miranda:
+                    kind: "moon"
+                - Ariel:
+                    kind: "moon"
+                - Umbriel:
+                    kind: "moon"
+                - Titania:
+                    kind: "moon"
+                - Oberon:
+                    kind: "moon"
+        - Neptune:
+            kind: "planet"
+            mass: 1.03e26 kg
+            radius: 2.21e7 m
+            axial-period: 19 h 10 min
+            axial-inclination: 28.8 deg
+            orbit:
+                semi-major-axis: 30.0611 au
+                eccentricity: 0.010
+                inclination: 1.77 deg
+                period: 60189.0 days
+            model: "sphere"
+            texture: "neptune.tga"
+            satellites:
+                - Triton:
+                    kind: "moon"
+                - Nereid:
+                    kind: "moon"
+        # For pluto and Charon, their system is really noticably rotating around the
+        # barycentre, but we leave this as is for now until anyone complain.
+        # We could possibly create a joint system with both objects as children.
+        - Pluto:
+            kind: "dwarf-planet"
+            mass: 1.4e22 kg
+            radius: 1.5e6 m
+            axial-period: 6.387 days
+            axial-inclination: 50 deg # TODO
+            orbit:
+                semi-major-axis: 39.5294 au
+                eccentricity: 0.248
+                inclination: 17.15 deg
+                period: 90465.0 days
+            surface-temp: 40 K
+            model: "sphere"
+            satellites:
+                - Charon:
+                    kind: "moon"
