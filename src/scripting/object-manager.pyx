@@ -41,11 +41,12 @@ cdef extern from "object-manager.h":
 	void* om_get_concrete_prop(void *obj, const char *prop_name)
 	
 	
-# Meta class for object manager objects, this is used as a class factory to
-# create separate classes for all the om classes
+# Generci class for object manager object
 
-class OMClass(type):
-    def __getattr__(key):
+class OMObject(object):
+    def __init__(self, class, name):
         pass
-    def __setattr__(key, val):
+    def __getattribute__(self, key):
+        pass
+    def __setattr__(self, key, val):
         pass
