@@ -219,12 +219,9 @@ m_adj(const matrix_t *m)
     for (int i = 0 ; i < 4 ; i ++) {
         for(int j = 0; j < 4 ; j ++) {
             MAT_ELEM(M_adj, j, i) = sign * m_subdet3(m, i, j);
-            sign *= S_CONST(-1.0); 
+            sign *= S_CONST(-1.0);
         }
-    }
-    
-    for (int i = 0; i < 4 ; i ++) {
-        printf("adj: %vf\n", M_adj.v[i]);
+        sign *= S_CONST(-1.0);
     }
     
     return M_adj;
@@ -254,10 +251,7 @@ m_inv(const matrix_t *M)
             }
         }
     }
-    
-    for (int i = 0; i < 4 ; i ++) {
-        printf("inverse: %vf\n", M_inv.v[i]);
-    }
+
     return M_inv;
 }
 
