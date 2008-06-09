@@ -54,13 +54,16 @@ int
 tex_load(const char *key, const char *name)
 {
     FILE *fp = res_get_file(name);
-    assert(fp != NULL);
+    if (fp == NULL) return -1;
 
     tga_image_t img;
-    gl_tex_t *tex = malloc(sizeof(gl_tex_t));
-    assert(tex != NULL);
     
-    assert(tga_read_file(&img, fp) == 0);
+    gl_tex_t *tex = malloc(sizeof(gl_tex_t));
+    if (tex == NULL) return -1;
+    
+    int res = tga_read_file(&img, fp); 
+    if (res != 0) return -1;
+    
     
     if ((img.header.img_spec.depth == 32) && (img.header.img_spec.alpha_bits == 8)) {
         tex->textype = GL_BGRA;
