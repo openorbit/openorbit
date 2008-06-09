@@ -33,6 +33,13 @@
 
 /*
     This header is the master include file for the vectorised math routines.
+	The main layout of the headers and the files are the following:
+		vmath/vmath-xxx.c: scalar function and implementations
+		vmath/arch/xxx/: Overrided inline versions (architecture speciffic, may use
+						 intrinsics for the CPU).
+		vmath/vmath-xxx.h: headers with function declarations
+		vmath/vmath-xxx.inl: Generic vectorised and inline header (gcc specific,
+							 but arch independent)
 */
 
 #ifndef VMATH_H__

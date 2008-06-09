@@ -81,11 +81,14 @@ ph_init(om_ctxt_t *ctxt)
                              offsetof(ph_obj_t, t_acc), 4);
     om_reg_static_array_prop(obj_cls, "q", OM_FLOAT, offsetof(ph_obj_t, q), 4);
     om_reg_static_array_prop(obj_cls, "w", OM_FLOAT, offsetof(ph_obj_t, w), 4);
+    om_reg_static_array_prop(obj_cls, "I", OM_FLOAT, offsetof(ph_obj_t, I), 16);
+    om_reg_static_array_prop(obj_cls, "I_rep", OM_FLOAT,
+                             offsetof(ph_obj_t, I_rep), 16);
     
     
     om_class_t *sys_cls = om_new_proxy_class(ctxt, "ph_sys");
-    om_reg_prop(sys_cls, "m", OM_FLOAT, offsetof(ph_sys_t, m));
-    om_reg_static_array_prop(obj_cls, "r", OM_FLOAT, offsetof(ph_sys_t, r), 4);
+   // om_reg_prop(sys_cls, "m", OM_FLOAT, offsetof(ph_sys_t, m));
+  //  om_reg_static_array_prop(obj_cls, "r", OM_FLOAT, offsetof(ph_sys_t, r), 4);
    // om_reg_static_array_prop(obj_cls, "g", OM_FLOAT, offsetof(ph_sys_t, g), 4);
 }
 
@@ -149,17 +152,22 @@ ph_step(ph_sys_t *sys, scalar_t step)
     assert(sys != NULL);
     assert(step > S_CONST(0.0));
 
-    vector_t cm = {.s.x = 0.0, .s.y = 0.0, .s.z = 0.0, .s.w = 0.0};
+    vector_t cm = {.s.x = S_CONST(0.0), .s.y = S_CONST(0.0),
+                   .s.z = S_CONST(0.0), .s.w = S_CONST(0.0)};
     vector_t cm_tmp;
     scalar_t m = S_CONST(0.0);
     vector_t g; // gravity
     // for all subsystems
     for (int i = 0 ; i < sys->child_count ; i ++) {
-        // move system, systems move relative to each other according to keplers
-        // law, for now we assume perfect circular orbits, this will obviously
-        // change later on
-        (sys->children[i]->r);
+        // Note, we move the systems following newton, at the moment we ignore
+        // the constraints that we should keep ourself to an elliptic orbit.
+        // The consequences of this is that in the long run, nummerical effects
+        // will make the systems spiral outwards
+        // TODO: Ensure constraints of orbits
         
+        // Apply the parent systems gravity on the subsystem
+        // Compute gravity from mass
+     //   V_S_ADD(g, g, sys->sysinfo.m);
         ph_apply_gravity(sys->children[i], g);
         ph_step(sys->children[i], step);
     }
@@ -168,45 +176,54 @@ ph_step(ph_sys_t *sys, scalar_t step)
     // masses, and their average cm
     for (int i = 0 ; i < sys->alloc_size ; i ++) {
         vector_t a, at, v, vt, r, f;
+        scalar_t g; // scalar gravity
         
         if (sys->obj[i]->is_enabled) {
             ph_obj_t *obj = sys->obj[i];
-            // comp total force and acceleration
-            //V_ADD(f, sys->g, obj[i].f_acc);
-            V_S_DIV(a, f, obj->m);
+            // comp total force and acceleration, first the gravity imposed
+            // by the system centre
+            
+            // TODO: Compute gravity for this object
+            // Apply computed gravity for this object
+            f = obj->r; // copy position vector
+            f = v_normalise(f);
+            f = v_s_mul(f, g); // this apply the gravity
+            f = v_add(f, obj->f_acc); // total force on obj including gravitation
+            
+            a = v_s_div(f, obj->m); // Compute accelleration
             
             // comp new velocity
-            V_S_MUL(at, a, step);
-            V_ADD(v, obj->v, at);
+            at = v_s_mul(a, step);
+            v = v_add(obj->v, at);
             
             // comp new position
-            V_S_MUL(vt, obj->v, step);
-            V_ADD(r, obj->r, vt);
+            vt = v_s_mul(obj->v, step);
+            r = v_add(obj->r, vt);
             
             // apply changes
-            V_CPY(obj->r, r);
-            V_CPY(obj->v, v);
+            obj->r = r;
+            obj->v = v;
             
             // rotate object, we should probably optimise this
             vector_t delta_w;
 //            V_S_DIV(delta_w, obj->t_acc, obj->i);
-            quaternion_t qr0, qr1, q0, q1, q2;
-            Q_ROT_X(q0, delta_w.s.x);
-            Q_ROT_Y(q1, delta_w.s.y);
-            Q_ROT_Z(q2, delta_w.s.z);
-            Q_MUL(qr0, q0, q1);
-            Q_MUL(qr1, qr0, q2);
-            Q_MUL(qr0, obj->w, qr1);
-            V_CPY(obj->w, qr0);
+//            quaternion_t qr0, qr1, q0, q1, q2;
+//            Q_ROT_X(q0, delta_w.s.x);
+//            Q_ROT_Y(q1, delta_w.s.y);
+//            Q_ROT_Z(q2, delta_w.s.z);
+//            Q_MUL(qr0, q0, q1);
+//            Q_MUL(qr1, qr0, q2);
+//            Q_MUL(qr0, obj->w, qr1);
+//            V_CPY(obj->w, qr0);
             
             m += obj->m;
-            V_S_MUL(cm_tmp, obj->r, obj->m);
-            V_ADD(cm, cm, cm_tmp);
+            cm_tmp = v_s_mul(obj->r, obj->m);
+            cm = v_add(cm, cm_tmp);
         }
     }
     
-    V_CPY(sys->r, cm);
-    sys->m = m;
+   // V_CPY(sys->r, cm);
+    //sys->m = m;
 }
 
 
@@ -223,7 +240,7 @@ ph_apply_force(ph_obj_t *obj, vector_t f)
 {
     assert(obj != NULL);
     
-    V_ADD(obj->f_acc, obj->f_acc, f);
+    obj->f_acc = v_add(obj->f_acc, f);
 }
 
 void
@@ -236,11 +253,11 @@ ph_apply_force_at_pos(ph_obj_t *obj, vector_t pos, vector_t f)
     /* Compute torque (wrt the cm).
         NOTE: This is not entirely correct as it violates energy conversation
         principles. */
-    V_SUB(r, pos, obj->r);    
-    V_CROSS(t, r, f);
+    r = v_sub(pos, obj->r);    
+    t = v_cross(r, f);
     
-    V_ADD(obj->f_acc, obj->f_acc, f); // force
-    V_ADD(obj->t_acc, obj->t_acc, t); // torque
+    obj->f_acc = v_add(obj->f_acc, f); // force
+    obj->t_acc = v_add(obj->t_acc, t); // torque
 }
 
 
@@ -253,16 +270,16 @@ ph_apply_force_relative(ph_obj_t *obj, vector_t pos, vector_t f)
     vector_t pt, ft, t;
     matrix_t rm;
     
-    Q_M_CONVERT(rm, obj->q);
+    q_m_convert(&rm, obj->q);
     
-    M_V_MUL(pt, rm, pos);
-    M_V_MUL(ft, rm, f);
+    pt = m_v_mul(&rm, pos);
+    ft = m_v_mul(&rm, f);
     
     // Torque
-    V_CROSS(t, pt, ft);
+    t = v_cross(pt, ft);
     
-    V_ADD(obj->f_acc, obj->f_acc, ft); // force
-    V_ADD(obj->t_acc, obj->t_acc, t); // torque
+    obj->f_acc = v_add(obj->f_acc, ft); // force
+    obj->t_acc = v_add(obj->t_acc, t); // torque
 
 }
 
@@ -289,4 +306,40 @@ ph_migrate_object(ph_sys_t *dst_sys, ph_sys_t *src_sys, ph_obj_t *obj)
         fprintf(stderr, "No space in destination system, cannot migrate object");
     }
     
+}
+
+
+void
+ph_set_mass(ph_obj_t *obj, scalar_t m) {
+    obj->m = m;
+}
+
+void
+ph_reduce_mass(ph_obj_t *obj, scalar_t dm)
+{
+    obj->m -= dm;
+}
+
+bool
+ph_reduce_mass_min(ph_obj_t *obj, scalar_t dm, scalar_t min)
+{
+    if (obj->m - dm < min) {
+        obj->m = min;
+        return false;
+    }
+    obj->m -= dm;
+    return true;
+}
+
+void
+ph_increase_mass(ph_obj_t *obj, scalar_t dm)
+{
+    obj->m += dm;
+}
+
+void
+ph_set_inertial_tensor(ph_obj_t *obj, matrix_t *new_I)
+{
+    obj->I = *new_I; // set the tensor itself
+    obj->I_rep = m_inv(new_I); // set the inverse of the tensor as well
 }

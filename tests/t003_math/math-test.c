@@ -53,7 +53,7 @@ START_TEST(test_m_v_mul)
     a.a[3][0] = a.a[3][1] = a.a[3][2] = a.a[3][3] = 4.0f;
 
     // first, test function
-    m_v_mul(r.a, a.a, v.a);
+    r = m_v_mul(&a, v);
     
     fail_unless( ALMOST_EQUAL(r.a[0], 1.4f, 0.000001f),
         "Vector [0] outside bounds. v[0] = (%f)", r.s.x);
@@ -64,39 +64,26 @@ START_TEST(test_m_v_mul)
     fail_unless( ALMOST_EQUAL(r.a[3], 5.6f, 0.000001f),
         "Vector [3] outside bounds. v[3] = (%f)", r.s.w);
 
-    // then, test optimised macro and compare with function, we allow some
-    // tolerance
-    vector_t r2;
-    M_V_MUL(r2, a, v);
-    
-    fail_unless( ALMOST_EQUAL(r2.a[0], r.a[0], 0.000001f),
-        "(r2[0] == %f) != (r[0] == (%f)", r2.s.x, r.s.x);
-    fail_unless( ALMOST_EQUAL(r2.a[1], r.a[1], 0.000001f),
-        "(r2[0] == %f) != (r[0] == (%f)", r2.s.x, r.s.x);
-    fail_unless( ALMOST_EQUAL(r2.a[2], r.a[2], 0.000001f),
-        "(r2[0] == %f) != (r[0] == (%f)", r2.s.x, r.s.x);
-    fail_unless( ALMOST_EQUAL(r2.a[3], r.a[3], 0.000001f),
-        "(r2[0] == %f) != (r[0] == (%f)", r2.s.x, r.s.x);
 }
 END_TEST
 
 START_TEST(test_q_mul)
 {
-    quat_arr_t r, a, b;
+    quaternion_t r, a, b;
     
-    QUAT_X(a) = 1.4; QUAT_Y(a) = 5.7; QUAT_Z(a) = 2.0; QUAT_W(a) = -2.1;
-    QUAT_X(b) = 0.2; QUAT_Y(b) = 0.1; QUAT_Z(b) = 1.0; QUAT_W(b) = 8.0;
+    a.s.x = 1.4; a.s.y = 5.7; a.s.z = 2.0; a.s.w = -2.1;
+    b.s.x = 0.2; b.s.y = 0.1; b.s.z = 1.0; b.s.w = 8.0;
     
-    q_mul(r, a, b);
+    r = q_mul(a, b);
     
-    fail_unless( ALMOST_EQUAL(QUAT_X(r), 16.280f, 0.00001f),
-                 "Vector [0] of quaternion outside bounds (%f)", QUAT_X(r));
-    fail_unless( ALMOST_EQUAL(QUAT_Y(r), 44.390f, 0.00001f),
-                 "Vector [1] of quaternion outside bounds (%f)", QUAT_Y(r));
-    fail_unless( ALMOST_EQUAL(QUAT_Z(r), 12.900f, 0.00001f),
-                 "Vector [2] of quaternion outside bounds (%f)", QUAT_Z(r));
-    fail_unless( ALMOST_EQUAL(QUAT_W(r), -19.65f, 0.00001f),
-                 "Scalar part of quaternion outside bounds (%f)", QUAT_W(r));
+    fail_unless( ALMOST_EQUAL(r.s.x, 16.280f, 0.00001f),
+                 "Vector [0] of quaternion outside bounds (%f)", r.s.x);
+    fail_unless( ALMOST_EQUAL(r.s.y, 44.390f, 0.00001f),
+                 "Vector [1] of quaternion outside bounds (%f)", r.s.y);
+    fail_unless( ALMOST_EQUAL(r.s.z, 12.900f, 0.00001f),
+                 "Vector [2] of quaternion outside bounds (%f)", r.s.z);
+    fail_unless( ALMOST_EQUAL(r.s.w, -19.65f, 0.00001f),
+                 "Scalar part of quaternion outside bounds (%f)", r.s.w);
     
 }
 END_TEST
@@ -116,10 +103,8 @@ START_TEST(test_m_mul)
         }
     }
     
-    m_mul(a0.a, b0.a, c0.a);
-    
-//    M_MUL(a1, b1, c1);
-    
+    m_mul(&a0, &b0, &c0);
+        
 }
 END_TEST
 
@@ -143,7 +128,7 @@ START_TEST(test_m_add)
     ex.a[3][0] = 5.0; ex.a[3][1] = 6.0; ex.a[3][2] = 7.0; ex.a[3][3] = 8.0;
     
     // check m_add function
-    m_add(r0.a, a.a, b.a);
+    m_add(&r0, &a, &b);
     
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
@@ -152,18 +137,6 @@ START_TEST(test_m_add)
                 i, j, r0.a[i][j],
                 i, j, ex.a[i][j]);
             
-        }
-    }
-    
-    // check potentially optimised macro
-    M_ADD(r1, a, b);
-    
-    for (int i = 0 ; i < 4 ; i ++) {
-        for (int j = 0 ; j < 4 ; j ++) {
-            fail_unless( ALMOST_EQUAL(r1.a[i][j], ex.a[i][j], 0.000001f),
-                "(r1[%d][%d] == %f) != (ex[%d][%d] == (%f)",
-                i, j, r1.a[i][j],
-                i, j, ex.a[i][j]);
         }
     }
 }
@@ -232,7 +205,7 @@ START_TEST(test_m_zero)
     m.a[0][0] = 1.0;
     m.a[0][3] = 54.0;
     
-    m_zero(m.a);
+    m_zero(&m);
     
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
@@ -243,28 +216,12 @@ START_TEST(test_m_zero)
 }
 END_TEST
 
-START_TEST(test_v_cpy)
-{
-    vec_arr_t a, b;
- 
-    for (int i = 0 ; i < 4 ; i ++) {
-        b[i] = (float) i + 1.0;
-    }
-    
-    v_cpy(a, b);
-    
-    for (int i = 0 ; i < 4 ; i ++) {
-        fail_unless(a[i] == b[i],
-            "Copying vector did not produce exact copy");
-    }
-}
-END_TEST
 
 START_TEST(test_m_cpy)
 {
     matrix_t a, b, z;
-    m_zero(a.a);
-    m_zero(z.a);
+    m_zero(&a);
+    m_zero(&z);
 
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
@@ -272,7 +229,7 @@ START_TEST(test_m_cpy)
         }
     }
     
-    m_cpy(a.a, b.a);
+    m_cpy(&a, &b);
     
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
@@ -400,7 +357,6 @@ Suite
     tcase_add_test(tc_core, test_v_abs);
     tcase_add_test(tc_core, test_m_unit);
     tcase_add_test(tc_core, test_m_zero);
-    tcase_add_test(tc_core, test_v_cpy);
     tcase_add_test(tc_core, test_m_cpy);
     tcase_add_test(tc_core, test_v_set);
     tcase_add_test(tc_core, test_m_eq);

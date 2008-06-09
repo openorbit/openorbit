@@ -77,8 +77,8 @@ planet_rot_ax(planet_t *planet, float rot_rad)
     quaternion_t res, rot;
     Q_ROT_Y(rot, rot_rad);
 
-    Q_MUL(res, planet->rot_ax, rot);
-    Q_CPY(planet->rot_ax, res);
+    res = q_mul(planet->rot_ax, rot);
+    planet->rot_ax = res;
 }
 
 void
@@ -87,8 +87,8 @@ planet_rot_orig(planet_t *planet, float rot_rad)
     quaternion_t res, rot;
     Q_ROT_Y(rot, rot_rad);
     
-    Q_MUL(res, planet->rot_orig, rot);
-    Q_CPY(planet->rot_orig, res);
+    res = q_mul(planet->rot_orig, rot);
+    planet->rot_orig = res;
 }
 
 //void
@@ -107,8 +107,8 @@ planet_draw(planet_t *planet)
         
     matrix_t rot_orig;
     matrix_t rot_ax;
-    Q_M_CONVERT(rot_orig, planet->rot_orig);
-    Q_M_CONVERT(rot_ax, planet->rot_ax);
+    q_m_convert(rot_orig.a, planet->rot_orig);
+    q_m_convert(rot_ax.a, planet->rot_ax);
     
     glMultMatrixf((GLfloat*)rot_orig.a);
     glTranslatef(planet->pos.s.x, planet->pos.s.y, planet->pos.s.z );

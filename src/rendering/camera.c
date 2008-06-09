@@ -51,11 +51,8 @@ init_cam(void)
 {
     gCam = calloc(1, sizeof(camera_t));// TODO: Remove global camera
     gCam->type = CAM_FREE;
-    V_SET(gCam->u.free_cam.p, 0.0f, 0.0f, 0.0f, 0.0f);
-    
-    axis_t a;
-    V_SET(a, 0.0f, 0.0f, 1.0f, 0.0f);
-    Q_ROT(gCam->u.free_cam.rq, a, 0.0);
+	gCam->u.free_cam.p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
+	gCam->u.free_cam.rq = q_rot(0.0f,0.0f,1.0f,0.0f);
     
     // Register camera actions
     io_register_button_handler("cam-fwd", cam_move_forward_button_action);        
@@ -79,12 +76,12 @@ cam_rotate(quaternion_t q)
 {
     matrix_t m;
     vector_t up, rup, dir, rdir;
-    V_SET(up, 0.0f, 1.0f, 0.0f, 0.0f);
-    V_SET(dir, 0.0f, 0.0f, -1.0f, 0.0f);
+    up = v_set(0.0f, 1.0f, 0.0f, 0.0f);
+    dir = v_set(0.0f, 0.0f, -1.0f, 0.0f);
     
-    Q_M_CONVERT(m, q);
-    M_V_MUL(rup, m, up);
-    M_V_MUL(rdir, m, dir);
+    q_m_convert(&m, q);
+    rup = m_v_mul(&m, up);
+    rdir = m_v_mul(&m, dir);
     
     gluLookAt(0.0, 0.0, 0.0, rdir.s.x, rdir.s.y, rdir.s.z,
               rup.s.x, rup.s.y, rup.s.z);
@@ -95,12 +92,12 @@ cam_set_free(vector_t p, quaternion_t q)
 {
     matrix_t m;
     vector_t up, rup, dir, rdir;
-    V_SET(up, 0.0f, 1.0f, 0.0f, 0.0f);
-    V_SET(dir, 0.0f, 0.0f, -1.0f, 0.0f);
+    up = v_set(0.0f, 1.0f, 0.0f, 0.0f);
+    dir = v_set(0.0f, 0.0f, -1.0f, 0.0f);
     
-    Q_M_CONVERT(m, q);
-    M_V_MUL(rup, m, up);
-    M_V_MUL(rdir, m, dir);
+    q_m_convert(&m, q);
+    rup = m_v_mul(&m, up);
+    rdir = m_v_mul(&m, dir);
 
     gluLookAt(p.s.x, p.s.y, p.s.z,
               p.s.x + rdir.s.x, p.s.y + rdir.s.y, p.s.z + rdir.s.z,
@@ -114,22 +111,22 @@ cam_set_polar(vector_t tgt, scalar_t len, scalar_t ra, scalar_t dec)
     vector_t cam_pos, rot_cam_pos, up, rot_up, right, rot_right;
     quaternion_t q0, q1, qr;
     
-    V_SET(cam_pos, 0.0f, 0.0f, 1.0f, 0.0f);
-    V_SET(up, 0.0f, 1.0f, 0.0f, 0.0f);
-    V_SET(right, 1.0f, 0.0f, 0.0f, 0.0f);
+    cam_pos = v_set(0.0f, 0.0f, 1.0f, 0.0f);
+    up = v_set(0.0f, 1.0f, 0.0f, 0.0f);
+    right = v_set(1.0f, 0.0f, 0.0f, 1.0f);
 
-    Q_ROT(q0, up, ra);
-    Q_M_CONVERT(m, q0);
-    M_V_MUL(rot_right, m, right);
-    Q_ROT(q1, rot_right, dec);
+    q0 = q_rot(0.0f, 1.0f, 0.0f, ra);
+    q_m_convert(&m, q0);
+    rot_right = m_v_mul(&m, right);
+    q1 = q_rotv(rot_right, dec);
     
-    Q_MUL(qr, q0, q1);
-    Q_M_CONVERT(m, qr);
+    qr = q_mul(q0, q1);
+    q_m_convert(&m, qr);
     
-    M_V_MUL(rot_cam_pos, m, cam_pos);
-    M_V_MUL(rot_up, m, up);
+    rot_cam_pos = m_v_mul(&m, cam_pos);
+    rot_up = m_v_mul(&m, up);
     
-    V_S_MUL(rot_cam_pos, rot_cam_pos, len);
+    rot_cam_pos = v_s_mul(rot_cam_pos, len);
     
     gluLookAt(tgt.s.x, tgt.s.y, tgt.s.z,
               tgt.s.x + rot_cam_pos.s.x,
@@ -166,15 +163,15 @@ cam_move_forward(camera_t *cam, scalar_t distance)
 {
     vector_t v, vb;
     matrix_t rm;
-    V_SET(vb, 0.0, 0.0, 1.0, 0.0);
+    vb = v_set(0.0, 0.0, 1.0, 0.0);
     
     switch (cam->type) {
     case CAM_FREE:
-        Q_M_CONVERT(rm, cam->u.free_cam.rq);
-        M_V_MUL(v, rm, vb);
+        q_m_convert(&rm, cam->u.free_cam.rq);
+        v = m_v_mul(&rm, vb);
         
-        V_S_MUL(vb, v, distance);
-        V_SUB(cam->u.free_cam.p, cam->u.free_cam.p, vb);
+        vb = v_s_mul(v, distance);
+        cam->u.free_cam.p = v_sub(cam->u.free_cam.p, vb);
         break;
     case CAM_CHASE:
         break;
@@ -190,15 +187,15 @@ cam_move_back(camera_t *cam, scalar_t distance)
 {
     vector_t v, vb;
     matrix_t rm;
-    V_SET(vb, 0.0, 0.0, 1.0, 0.0);
+    vb = v_set(0.0, 0.0, 1.0, 0.0);
     
     switch (cam->type) {
     case CAM_FREE:
-        Q_M_CONVERT(rm, cam->u.free_cam.rq);
-        M_V_MUL(v, rm, vb);
+        q_m_convert(&rm, cam->u.free_cam.rq);
+        v = m_v_mul(&rm, vb);
         
-        V_S_MUL(vb, v, distance);
-        V_ADD(cam->u.free_cam.p, cam->u.free_cam.p, vb);
+        vb = v_s_mul(v, distance);
+        cam->u.free_cam.p = v_add(cam->u.free_cam.p, vb);
         break;
     case CAM_CHASE:
         break;
@@ -214,15 +211,15 @@ cam_move_left(camera_t *cam, scalar_t distance)
 {
     vector_t v, vr;
     matrix_t rm;
-    V_SET(vr, 1.0, 0.0, 0.0, 0.0);
+    vr = v_set(1.0, 0.0, 0.0, 0.0);
 
     switch (cam->type) {
     case CAM_FREE:
-        Q_M_CONVERT(rm, cam->u.free_cam.rq);
-        M_V_MUL(v, rm, vr);
+        q_m_convert(&rm, cam->u.free_cam.rq);
+        v = m_v_mul(&rm, vr);
         
-        V_S_MUL(vr, v, distance);
-        V_SUB(cam->u.free_cam.p, cam->u.free_cam.p, vr);
+        vr = v_s_mul(v, distance);
+        cam->u.free_cam.p = v_sub(cam->u.free_cam.p, vr);
         break;
     case CAM_CHASE:
         break;
@@ -238,15 +235,15 @@ cam_move_right(camera_t *cam, scalar_t distance)
 {
     vector_t v, vr;
     matrix_t rm;
-    V_SET(vr, 1.0, 0.0, 0.0, 0.0);
+    vr = v_set(1.0, 0.0, 0.0, 0.0);
     
     switch (cam->type) {
     case CAM_FREE:
-        Q_M_CONVERT(rm, cam->u.free_cam.rq);
-        M_V_MUL(v, rm, vr);
+        q_m_convert(&rm, cam->u.free_cam.rq);
+        v = m_v_mul(&rm, vr);
         
-        V_S_MUL(vr, v, distance);
-        V_ADD(cam->u.free_cam.p, cam->u.free_cam.p, vr);
+        vr = v_s_mul(v, distance);
+        cam->u.free_cam.p = v_add(cam->u.free_cam.p, vr);
         break;
     case CAM_CHASE:
         break;
@@ -262,15 +259,14 @@ cam_move_up(camera_t *cam, scalar_t distance)
 {
     vector_t v, vup;
     matrix_t rm;
-    V_SET(vup, 0.0, 1.0, 0.0, 0.0);
+    vup = v_set(0.0, 1.0, 0.0, 0.0);
 
     switch (cam->type) {
         case CAM_FREE:
-            Q_M_CONVERT(rm, cam->u.free_cam.rq);
-            M_V_MUL(v, rm, vup);
-            
-            V_S_MUL(vup, v, distance);
-            V_ADD(cam->u.free_cam.p, cam->u.free_cam.p, vup);
+            q_m_convert(&rm, cam->u.free_cam.rq);
+            v = m_v_mul(&rm, vup);
+            vup = v_s_mul(v, distance);
+            cam->u.free_cam.p = v_add(cam->u.free_cam.p, vup);
             break;
         case CAM_CHASE:
             break;
@@ -286,14 +282,14 @@ cam_move_down(camera_t *cam, scalar_t distance)
 {
     vector_t v, vup;
     matrix_t rm;
-    V_SET(vup, 0.0, 1.0, 0.0, 0.0);
+    vup = v_set(0.0, 1.0, 0.0, 0.0);
     switch (cam->type) {
         case CAM_FREE:
-            Q_M_CONVERT(rm, cam->u.free_cam.rq);
-            M_V_MUL(v, rm, vup);
+            q_m_convert(&rm, cam->u.free_cam.rq);
+            v = m_v_mul(&rm, vup);
             
-            V_S_MUL(vup, v, distance);
-            V_SUB(cam->u.free_cam.p, cam->u.free_cam.p, vup);
+            vup = v_s_mul(v, distance);
+            cam->u.free_cam.p = v_sub(cam->u.free_cam.p, vup);
             break;
         case CAM_CHASE:
             break;
@@ -312,19 +308,19 @@ cam_rotate_alpha(camera_t *cam, angle_t ang)
     matrix_t mrot;
     vector_t side, rotside;
     
-    V_SET(side, S_CONST(1.0), S_CONST(0.0), S_CONST(0.0), S_CONST(0.0));
+    side = v_set(S_CONST(1.0), S_CONST(0.0), S_CONST(0.0), S_CONST(1.0));
     
     
     switch (cam->type) {
         case CAM_FREE:
-            Q_M_CONVERT(mrot, cam->u.free_cam.rq);
-            M_V_MUL(rotside, mrot, side);
+            q_m_convert(&mrot, cam->u.free_cam.rq);
+            rotside = m_v_mul(&mrot, side);
 
-            Q_ROT(rot, side, ang);
-            V_CPY(rq, cam->u.free_cam.rq);
+            rot = q_rotv(side, ang);
+            rq = cam->u.free_cam.rq;
             
-            Q_MUL(cam->u.free_cam.rq, rq, rot);
-            Q_NORMALISE(cam->u.free_cam.rq);
+            cam->u.free_cam.rq = q_mul(rq, rot);
+            cam->u.free_cam.rq = q_normalise(cam->u.free_cam.rq);
             
             break;
         case CAM_CHASE:
@@ -344,18 +340,18 @@ cam_rotate_beta(camera_t *cam, angle_t ang)
     matrix_t mrot;
     vector_t up, rotup;
     
-    V_SET(up, S_CONST(0.0), S_CONST(1.0), S_CONST(0.0), S_CONST(0.0));
+    up = v_set(S_CONST(0.0), S_CONST(1.0), S_CONST(0.0), S_CONST(1.0));
     
     switch (cam->type) {
         case CAM_FREE:            
-            Q_M_CONVERT(mrot, cam->u.free_cam.rq);
-            M_V_MUL(rotup, mrot, up);
+            q_m_convert(&mrot, cam->u.free_cam.rq);
+            rotup = m_v_mul(&mrot, up);
 
-            Q_ROT(rot, up, ang);
-            V_CPY(rq, cam->u.free_cam.rq);
+            rot = q_rotv(up, ang);
+            rq  = cam->u.free_cam.rq;
         
-            Q_MUL(cam->u.free_cam.rq, rq, rot);
-            Q_NORMALISE(cam->u.free_cam.rq);
+            cam->u.free_cam.rq = q_mul(rq, rot);
+            cam->u.free_cam.rq = q_normalise(cam->u.free_cam.rq);
             
             break;
         case CAM_CHASE:
@@ -376,18 +372,18 @@ cam_rotate_gamma(camera_t *cam, angle_t ang)
     vector_t fwd, rotfwd;
     matrix_t mrot;
     
-    V_SET(fwd, S_CONST(0.0), S_CONST(0.0), S_CONST(-1.0), S_CONST(0.0));
+    fwd = v_set(S_CONST(0.0), S_CONST(0.0), S_CONST(-1.0), S_CONST(1.0));
 
     switch (cam->type) {
         case CAM_FREE:
-            Q_M_CONVERT(mrot, cam->u.free_cam.rq);
-            M_V_MUL(rotfwd, mrot, fwd);
+            q_m_convert(&mrot, cam->u.free_cam.rq);
+            rotfwd = m_v_mul(&mrot, fwd);
 
-            Q_ROT(rot, fwd, ang);
-            V_CPY(rq, cam->u.free_cam.rq);
+            rot = q_rotv(fwd, ang);
+            rq = cam->u.free_cam.rq;
         
-            Q_MUL(cam->u.free_cam.rq, rq, rot);
-            Q_NORMALISE(cam->u.free_cam.rq);
+            cam->u.free_cam.rq = q_mul(rq, rot);
+            cam->u.free_cam.rq = q_normalise(cam->u.free_cam.rq);
             
             break;
         case CAM_CHASE:

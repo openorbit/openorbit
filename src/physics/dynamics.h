@@ -69,19 +69,21 @@ typedef struct {
 } ph_obj_t;
 
 
+typedef struct _ph_sys_info_t {
+    vector_t r; //!< position of the system in parent world coords
+    scalar_t radius; //!< Distance to orbiting point in parent units, derived from r
+    quaternion_t w; //!< Rotational quaternion with respect to starting point
+    quaternion_t p; //!< Preccession quaternion
+    scalar_t m; //!< mass of system in kg    
+} ph_sys_info_t;
+
 /*! A system of several objects
 
     Note that each system has an object seen as the main system object that is
     generating gravity and other nice things.
 */
 typedef struct _ph_sys_t {
-    vector_t r; //!< position of the system in parent world coords
-    scalar_t radius; //!< Distance to orbiting point in parent units
-    quaternion_t w; //!< Rotational quaternion with respect to starting point
-    quaternion_t p; //!< Preccession quaternion
-    
-    scalar_t m; //!< mass of system in kg
-    
+    ph_sys_info_t data; //!< Physical data
     size_t child_alen;
     size_t child_count;
     struct _ph_sys_t **children;
@@ -90,7 +92,6 @@ typedef struct _ph_sys_t {
     size_t alloc_size; //!< size of obj array (in no of objects)
     
     ph_obj_t **obj; //! List of current objects in the system
-
 } ph_sys_t;
 
 
@@ -134,6 +135,11 @@ void ph_apply_gravity(ph_sys_t *sys, vector_t g);
 void ph_apply_force(ph_obj_t *obj, vector_t f);
 void ph_apply_force_at_pos(ph_obj_t *obj, vector_t pos, vector_t f);
 void ph_apply_force_relative(ph_obj_t *obj, vector_t pos, vector_t f);
+void ph_set_mass(ph_obj_t *obj, scalar_t m);
+void ph_reduce_mass(ph_obj_t *obj, scalar_t dm);
+bool ph_reduce_mass_min(ph_obj_t *obj, scalar_t dm, scalar_t min);
+void ph_increase_mass(ph_obj_t *obj, scalar_t dm);
+void ph_set_inertial_tensor(ph_obj_t *obj, matrix_t *new_I);
 
 /*!
     Moves an object from one system to another

@@ -55,16 +55,12 @@ extern "C" {
 #define QUAT_Z(q) (q)[Q_Z]
 #define QUAT_W(q) (q)[Q_W]
 
-#define Q_SCALAR(s, q) \
-    (s) = q_scalar((q).a)
     
- scalar_t q_scalar(const quat_arr_t q)
+ scalar_t q_scalar(const quaternion_t q)
     __attribute__ ((__pure__, __nonnull__));
 
-#define Q_VECTOR(v, q) \
-    q_vector((v).a, (q).a)
 
-void q_vector(vec_arr_t r, const quat_arr_t q)
+vector_t q_vector(const quaternion_t q)
     __attribute__ ((__nonnull__));
 
 
@@ -78,10 +74,8 @@ void q_vector(vec_arr_t r, const quat_arr_t q)
  * \param m A reference to the resulting matrix.
  * \param q The quaternion.
  */
-#define Q_M_CONVERT(M, q) \
-    q_m_convert((M).a, (q).a)
 
-void q_m_convert(mat_arr_t m, const quat_arr_t q)
+void q_m_convert(matrix_t *m, const quaternion_t q)
     __attribute__ ((__nonnull__));
 
 /*!
@@ -96,63 +90,44 @@ void q_m_convert(mat_arr_t m, const quat_arr_t q)
  * \param m The rotational matrix.
  */
 
-#define M_Q_CONVERT(q, M) \
-    m_q_convert((q).a, (M).a)
+void m_q_convert(quaternion_t q, matrix_t *m) __attribute__ ((__nonnull__));
 
-void m_q_convert(quat_arr_t q, mat_arr_t m) __attribute__ ((__nonnull__));
-
-#define Q_ADD(qa, qb, qc) \
-    q_add((qa).a, (qb).a, (qc).a)
     
- void q_add(quat_arr_t r, quat_arr_t a, const quat_arr_t b)
+ quaternion_t q_add(const quaternion_t a, const quaternion_t b)
     __attribute__ ((__nonnull__));
 
-#define Q_MUL(qa, qb, qc) \
-    q_mul((qa).a, (qb).a, (qc).a)
 
-void q_mul(quat_arr_t r, const quat_arr_t a, const quat_arr_t b)
+quaternion_t
+q_mul(const quaternion_t a, const quaternion_t b)
     __attribute__ ((__nonnull__));
     
-#define Q_S_DIV(qr, qa, qb) \
-    q_s_div((qr).a, (qa).a, (qb).a)
     
-void q_s_div(quat_arr_t r, const quat_arr_t q, const scalar_t d)
+quaternion_t q_s_div(const quaternion_t q, const scalar_t d)
     __attribute__ ((__nonnull__));
 
-#define Q_DOT(s, qa, qb) \
-    (s) = q_dot((qa).a, (qb).a)
 
- scalar_t q_dot(const quat_arr_t a, const quat_arr_t b)
+ scalar_t q_dot(const quaternion_t a, const quaternion_t b)
     __attribute__ ((__pure__, __nonnull__));
 
-#define Q_CROSS(qr, qa, qb) \
-    q_cross((qr).a, (qa).a, (qb).a)
     
- void q_cross(vec_arr_t r, const quat_arr_t a, const quat_arr_t b)
+ vector_t q_cross(const quaternion_t a, const quaternion_t b)
     __attribute__ ((__nonnull__));
 
-#define Q_ABS(s, q) \
-    (s) = q_abs((q).a)
     
- scalar_t q_abs(const quat_arr_t q)
+ scalar_t q_abs(const quaternion_t q)
     __attribute__ ((__pure__, __nonnull__));
 
-#define Q_CONJ(qr, qa) \
-    q_conj((qr).a, (qa).a)
     
- void q_conj(quat_arr_t qp, const quat_arr_t q)
+quaternion_t
+q_conj(const quaternion_t q)
     __attribute__ ((__nonnull__));
 
-#define Q_REPR(qr, qa) \
-    q_repr((qr).a, (qa).a)
 
-void q_repr(quat_arr_t res, const quat_arr_t q)
+quaternion_t q_repr(const quaternion_t q)
     __attribute__ ((__nonnull__));
 
-#define Q_DIV(qr, qa, qb) \
-    q_div((qr).a, (qa).a, (qb).a)
 
-void q_div(quat_arr_t res, const quat_arr_t a, const quat_arr_t b)
+quaternion_t q_div(const quaternion_t a, const quaternion_t b)
     __attribute__ ((__nonnull__));
 
 /*!
@@ -165,40 +140,38 @@ void q_div(quat_arr_t res, const quat_arr_t a, const quat_arr_t b)
  * \param axis  A unit vector describing the axis of rotation 
  * \param alpha Rotation in radians.
 */
-void q_rot(quat_arr_t q, const axis_arr_t axis, const angle_t alpha)
+quaternion_t q_rotv(const quaternion_t axis, const angle_t alpha)
     __attribute__ ((__nonnull__));
 
-#define Q_ROT(q, ax, ang) \
-    q_rot((q).a, (ax).a, ang)
+quaternion_t
+q_rot(scalar_t x, scalar_t y, scalar_t z, scalar_t alpha);
 
 #define Q_ROT_X(q, r)                                            \
     do {                                                         \
-        vector_t v = {.s.x = S_CONST(1.0), .s.y = S_CONST(0.0),  \
-                      .s.z = S_CONST(0.0), .s.w = S_CONST(0.0)}; \
-        q_rot((q).a, v.a, r);                                    \
+        vector_t _v = {.s.x = S_CONST(1.0), .s.y = S_CONST(0.0),  \
+                      .s.z = S_CONST(0.0), .s.w = S_CONST(1.0)}; \
+        (q) = q_rotv(_v, r);                                       \
     } while (0)
 
 #define Q_ROT_Y(q, r)                                            \
     do {                                                         \
-        vector_t v = {.s.x = S_CONST(0.0), .s.y = S_CONST(1.0),  \
-                      .s.z = S_CONST(0.0), .s.w = S_CONST(0.0)}; \
-        q_rot((q).a, v.a, r);                                    \
+        vector_t _v = {.s.x = S_CONST(0.0), .s.y = S_CONST(1.0),  \
+                      .s.z = S_CONST(0.0), .s.w = S_CONST(1.0)}; \
+        (q) = q_rotv(_v, r);                                    \
     } while (0)
 
 
 #define Q_ROT_Z(q, r)                                            \
     do {                                                         \
-        vector_t v = {.s.x = S_CONST(0.0), .s.y = S_CONST(0.0),  \
-                      .s.z = S_CONST(1.0), .s.w = S_CONST(0.0)}; \
-        q_rot((q).a, v.a, r);                                    \
+        vector_t _v = {.s.x = S_CONST(0.0), .s.y = S_CONST(0.0),  \
+                      .s.z = S_CONST(1.0), .s.w = S_CONST(1.0)}; \
+        (q) = q_rotv(_v, r);                                    \
     } while (0)
 
 
-void q_normalise(quat_arr_t q)
+quaternion_t q_normalise(quaternion_t q)
     __attribute__ ((__nonnull__));
 
-#define Q_NORMALISE(q) \
-    q_normalise((q).a)
 
 #ifdef __cplusplus
 }

@@ -39,81 +39,105 @@
 #include <vmath/vmath-constants.h>
 
 /* standard non vectorised routines */
-void
-m_v_mul(vec_arr_t res, mat_arr_t a, const vec_arr_t v) {
-    for (int i = 0 ; i < 4 ; i ++) {
-        res[i] = a[i][0] * v[0] + a[i][1] * v[1] + a[i][2] * v[2] + a[i][3] * v[3];
+vector_t
+m_v_mul(matrix_t *a, const vector_t v) {
+	vector_t res;
+	for (int i = 0 ; i < 4 ; i ++) {
+        res.a[i] = a->a[i][0] * v.a[0] + a->a[i][1] * v.a[1]
+                 + a->a[i][2] * v.a[2] + a->a[i][3] * v.a[3];
     }
+	return res;
 }
 
 void
-m_mul(mat_arr_t res, mat_arr_t a, mat_arr_t b) {
+m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b) {
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
-            res[i][j] = a[i][0]*b[0][j] + a[i][1]*b[1][j] + a[i][2]*b[2][j] + a[i][3]*b[3][j];
+            res->a[i][j] = a->a[i][0]*b->a[0][j]
+                         + a->a[i][1]*b->a[1][j]
+                         + a->a[i][2]*b->a[2][j]
+                         + a->a[i][3]*b->a[3][j];
         }
     }
 }
 
 
 void
-m_add(mat_arr_t res, mat_arr_t a, mat_arr_t b)
+m_add(matrix_t *res, matrix_t *a, matrix_t *b)
 {
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
-            res[i][j] = a[i][j] + b[i][j];
+            res->a[i][j] = a->a[i][j] + b->a[i][j];
         }
     }
 }
 
-void
-v_add(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
+vector_t
+v_s_add(vector_t *a, scalar_t b)
 {
-    for (int i = 0 ; i < 4 ; i ++) {
-        res[i] = a[i] + b[i];
-    }
+	vector_t c = {.s.x = b, .s.y = b, .s.z = b, .s.w = b};
+	vector_t r;
+	r = v_add(*a, c);
+	return r;
 }
 
-void
-v_sub(vec_arr_t res, vec_arr_t a, const vec_arr_t b)
+vector_t
+v_add(vector_t a, const vector_t b)
 {
+	vector_t res;
     for (int i = 0 ; i < 4 ; i ++) {
-        res[i] = a[i] - b[i];
+        res.a[i] = a.a[i] + b.a[i];
     }
+	return res;
+}
+
+vector_t
+v_sub(vector_t a, const vector_t b)
+{
+	vector_t res;
+    for (int i = 0 ; i < 4 ; i ++) {
+        res.a[i] = a.a[i] - b.a[i];
+    }
+	return res;
 }
 
 
-void
-v_cross(vec_arr_t res, const vec_arr_t a, const vec_arr_t b)
+vector_t
+v_cross(vector_t a, vector_t b)
 {
-    res[0] = a[1]*b[2]-a[2]*b[1];
-    res[1] = a[2]*b[0]-a[0]*b[2];
-    res[2] = a[0]*b[1]-a[1]*b[0];
+    vector_t res;
+    res.a[0] = a.a[1]*b.a[2]-a.a[2]*b.a[1];
+    res.a[1] = a.a[2]*b.a[0]-a.a[0]*b.a[2];
+    res.a[2] = a.a[0]*b.a[1]-a.a[1]*b.a[0];
+    return res;
 }
 
 scalar_t
-v_dot(const vec_arr_t a, const vec_arr_t b)
+v_dot(const vector_t a, const vector_t b)
 {
-    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
+    return a.a[0]*b.a[0] + a.a[1]*b.a[1] + a.a[2]*b.a[2] + a.a[3]*b.a[3];
 }
 
-void
-v_s_mul(vec_arr_t res, vec_arr_t a, scalar_t s)
+vector_t
+v_s_mul(vector_t a, scalar_t s)
 {
-    res[0] = a[0] * s;
-    res[1] = a[1] * s;
-    res[2] = a[2] * s;
-    res[3] = a[3] * s;
+	vector_t res;
+    res.a[0] = a.a[0] * s;
+    res.a[1] = a.a[1] * s;
+    res.a[2] = a.a[2] * s;
+    res.a[3] = a.a[3] * s;
 }
 
-void
-v_s_div(vec_arr_t res, vec_arr_t a, scalar_t s)
+vector_t
+v_s_div(vector_t a, scalar_t s)
 {
+    vector_t res;
     scalar_t d = S_CONST(1.0) / s;
-    res[0] = a[0] * d;
-    res[1] = a[1] * d;
-    res[2] = a[2] * d;
-    res[3] = a[3] * d;
+    res.a[0] = a.a[0] * d;
+    res.a[1] = a.a[1] * d;
+    res.a[2] = a.a[2] * d;
+    res.a[3] = a.a[3] * d;
+    return res;
 }
 
 void
@@ -131,11 +155,11 @@ m_lu(const matrix_t *a, matrix_t *l, matrix_t *u)
     return;
 }
 
-void
-v_normalise(vec_arr_t v)
+vector_t
+v_normalise(vector_t v)
 {
     scalar_t norm = v_abs(v);
-    v_s_mul(v, v, S_ONE/norm);
+    return v_s_mul(v, S_ONE/norm);
 }
 
 scalar_t
@@ -257,146 +281,135 @@ m_inv(const matrix_t *M)
 
 
 scalar_t
-v_abs(const vec_arr_t v)
+v_abs(const vector_t v)
 {
-    return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + v[3]*v[3]);
+    return sqrt(v.a[0]*v.a[0] + v.a[1]*v.a[1] + v.a[2]*v.a[2] + v.a[3]*v.a[3]);
 }
 
 void
-m_transpose(mat_arr_t mt, mat_arr_t m)
+m_transpose(matrix_t *mt, matrix_t *m)
 {
     for ( unsigned int i = 0; i < 4; i += 1 ) {
         for ( unsigned int j = 0; j < 4; j += 1 ) {
-            mt[j][i] = m[i][j];
+            mt->a[j][i] = m->a[i][j];
         }
     }
 }
 
 void
-m_axis_rot_x(mat_arr_t m, const angle_t a)
+m_axis_rot_x(matrix_t *m, const angle_t a)
 {
     scalar_t sin_a = sin(a);
     scalar_t cos_a = cos(a);
-    memset(m, 0, sizeof(mat_arr_t));
-    m[0][0] = S_ONE;
-    m[1][1] = cos_a; m[1][1] = sin_a; 
-    m[2][1] = -sin_a; m[2][1] = cos_a;
-    m[3][3] = S_ONE;
+    memset(m, 0, sizeof(matrix_t));
+    m->a[0][0] = S_ONE;
+    m->a[1][1] = cos_a; m->a[1][1] = sin_a; 
+    m->a[2][1] = -sin_a; m->a[2][1] = cos_a;
+    m->a[3][3] = S_ONE;
 }
 
 void
-m_axis_rot_y(mat_arr_t m, const angle_t a)
+m_axis_rot_y(matrix_t *m, scalar_t a)
 {
     scalar_t sin_a = sin(a);
     scalar_t cos_a = cos(a);
-    memset(m, 0, sizeof(mat_arr_t));
-    m[0][0] = cos_a; m[0][2] = -sin_a;
-    m[1][1] = S_ONE;
-    m[2][0] = sin_a; m[2][2] = cos_a;
-    m[3][3] = S_ONE;
+    memset(m, 0, sizeof(matrix_t));
+    m->a[0][0] = cos_a; m->a[0][2] = -sin_a;
+    m->a[1][1] = S_ONE;
+    m->a[2][0] = sin_a; m->a[2][2] = cos_a;
+    m->a[3][3] = S_ONE;
 }
 
 void
-m_axis_rot_z(mat_arr_t m, const angle_t a)
+m_axis_rot_z(matrix_t *m, scalar_t a)
 {
     scalar_t sin_a = sin(a);
     scalar_t cos_a = cos(a);
-    memset(m, 0, sizeof(mat_arr_t));
-    m[0][0] = cos_a; m[0][1] = sin_a;
-    m[1][0] = -sin_a; m[1][1] = cos_a;
-    m[2][2] = S_ONE;
-    m[3][3] = S_ONE;
+    memset(m, 0, sizeof(matrix_t));
+    m->a[0][0] = cos_a; m->a[0][1] = sin_a;
+    m->a[1][0] = -sin_a; m->a[1][1] = cos_a;
+    m->a[2][2] = S_ONE;
+    m->a[3][3] = S_ONE;
 }
 
 
 void
-m_vec_rot_x(mat_arr_t m, const angle_t a)
+m_vec_rot_x(matrix_t *m, scalar_t a)
 {
     scalar_t sin_a = sin(a);
     scalar_t cos_a = cos(a);
-    memset(m, 0, sizeof(mat_arr_t));
-    m[0][0] = S_ONE;
-    m[1][1] = cos_a; m[1][1] = -sin_a; 
-    m[2][1] = sin_a; m[2][1] = cos_a;
-    m[3][3] = S_ONE;
+    memset(m, 0, sizeof(matrix_t));
+    m->a[0][0] = S_ONE;
+    m->a[1][1] = cos_a; m->a[1][1] = -sin_a; 
+    m->a[2][1] = sin_a; m->a[2][1] = cos_a;
+    m->a[3][3] = S_ONE;
 }
 
 void
-m_vec_rot_y(mat_arr_t m, const angle_t a)
+m_vec_rot_y(matrix_t *m, scalar_t a)
 {
     scalar_t sin_a = sin(a);
     scalar_t cos_a = cos(a);
-    memset(m, 0, sizeof(mat_arr_t));
-    m[0][0] = cos_a; m[0][2] = sin_a;
-    m[1][1] = S_ONE;
-    m[2][0] = -sin_a; m[2][2] = cos_a;
-    m[3][3] = S_ONE;
+    memset(m, 0, sizeof(matrix_t));
+    m->a[0][0] = cos_a; m->a[0][2] = sin_a;
+    m->a[1][1] = S_ONE;
+    m->a[2][0] = -sin_a; m->a[2][2] = cos_a;
+    m->a[3][3] = S_ONE;
 }
 
 void
-m_vec_rot_z(mat_arr_t m, const angle_t a)
+m_vec_rot_z(matrix_t *m, scalar_t a)
 {
     scalar_t sin_a = sin(a);
     scalar_t cos_a = cos(a);
-    memset(m, 0, sizeof(mat_arr_t));
-    m[0][0] = cos_a; m[0][1] = -sin_a;
-    m[1][0] = sin_a; m[1][1] = cos_a;
-    m[2][2] = S_ONE;
-    m[3][3] = S_ONE;
+    memset(m, 0, sizeof(matrix_t));
+    m->a[0][0] = cos_a; m->a[0][1] = -sin_a;
+    m->a[1][0] = sin_a; m->a[1][1] = cos_a;
+    m->a[2][2] = S_ONE;
+    m->a[3][3] = S_ONE;
 }
 
 void
-m_unit(mat_arr_t m)
+m_unit(matrix_t *m)
 {
-    memset(m, 0, sizeof(mat_arr_t));
-    m[0][0] = S_ONE;
-    m[1][1] = S_ONE;
-    m[2][2] = S_ONE;
-    m[3][3] = S_ONE;
+    memset(m, 0, sizeof(matrix_t));
+    m->a[0][0] = S_ONE;
+    m->a[1][1] = S_ONE;
+    m->a[2][2] = S_ONE;
+    m->a[3][3] = S_ONE;
 }
 
 void
-m_zero(mat_arr_t m)
+m_zero(matrix_t *m)
 {
-    memset(m, 0, sizeof(mat_arr_t));
+    memset(m, 0, sizeof(matrix_t));
 }
 
 
 void
-v_cpy(vec_arr_t dst, const vec_arr_t src)
-{
-    dst[0] = src[0];
-    dst[1] = src[1];
-    dst[2] = src[2];
-    dst[3] = src[3];
-}
-
-void
-m_cpy(mat_arr_t dst, mat_arr_t src)
+m_cpy(matrix_t * restrict dst, matrix_t * restrict src)
 {
     for (int i = 0 ; i < 4 ; i ++) {
-        dst[i][0] = src[i][0];
-        dst[i][1] = src[i][1];
-        dst[i][2] = src[i][2];
-        dst[i][3] = src[i][3];
+        dst->a[i][0] = src->a[i][0];
+        dst->a[i][1] = src->a[i][1];
+        dst->a[i][2] = src->a[i][2];
+        dst->a[i][3] = src->a[i][3];
     }
 }
 
 
-void
-v_set(vec_arr_t v, scalar_t v0, scalar_t v1, scalar_t v2, scalar_t v3)
+vector_t
+v_set(scalar_t v0, scalar_t v1, scalar_t v2, scalar_t v3)
 {
-    v[0] = v0;
-    v[1] = v1;
-    v[2] = v2;
-    v[3] = v3;    
+	vector_t v = {.s.x = v0, .s.y = v1, .s.z = v2, .s.w = v3};
+	return v;
 }
 
 bool
-v_eq(const vec_arr_t a, const vec_arr_t b, scalar_t tol)
+v_eq(vector_t a, vector_t  b, scalar_t tol)
 {
     for (int i = 0 ; i < 4 ; i ++) {
-        if (!((a[i] <= b[i]+tol) && (a[i] >= b[i]-tol))) {
+        if (!((a.a[i] <= b.a[i]+tol) && (a.a[i] >= b.a[i]-tol))) {
             return false;
         }
     }
@@ -405,11 +418,11 @@ v_eq(const vec_arr_t a, const vec_arr_t b, scalar_t tol)
 }
 
 bool
-m_eq(mat_arr_t a, mat_arr_t b, scalar_t tol)
+m_eq(const matrix_t *a, const matrix_t *b, scalar_t tol)
 {
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
-            if (!((a[i][j] <= b[i][j]+tol) && (a[i][j] >= b[i][j]-tol))) {
+            if (!((a->a[i][j] <= b->a[i][j]+tol) && (a->a[i][j] >= b->a[i][j]-tol))) {
                 return false;
             }
         }

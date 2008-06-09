@@ -41,53 +41,55 @@
 #include <assert.h>
 
  scalar_t
-q_scalar(const quat_arr_t q)
+q_scalar(const quaternion_t q)
 {
-    return QUAT_W(q);
+    return q.s.w;
+}
+
+vector_t
+q_vector(const quaternion_t q)
+{
+    vector_t r;
+    r.a[0] = q.s.x;
+    r.a[1] = q.s.y;
+    r.a[2] = q.s.z;
+    r.a[3] = S_ZERO;
+    return r;
 }
 
 void
-q_vector(vec_arr_t r, const quat_arr_t q)
-{
-    r[0] = QUAT_X(q);
-    r[1] = QUAT_Y(q);
-    r[2] = QUAT_Z(q);
-    r[3] = S_ZERO;
-}
-
-void
-q_m_convert(mat_arr_t m, const quat_arr_t q)
+q_m_convert(matrix_t *m, const quaternion_t q)
 {
     scalar_t n = q_dot(q, q);
     scalar_t a = (n > S_ZERO) ? S_TWO / n : S_ZERO;
     
-    scalar_t xa = QUAT_X(q)*a;
-    scalar_t ya = QUAT_Y(q)*a;
-    scalar_t za = QUAT_Z(q)*a;
+    scalar_t xa = QUAT_X(q.a)*a;
+    scalar_t ya = QUAT_Y(q.a)*a;
+    scalar_t za = QUAT_Z(q.a)*a;
     
-    scalar_t xy = QUAT_X(q)*ya;
-    scalar_t xz = QUAT_X(q)*za;
-    scalar_t yz = QUAT_Y(q)*za;
+    scalar_t xy = QUAT_X(q.a)*ya;
+    scalar_t xz = QUAT_X(q.a)*za;
+    scalar_t yz = QUAT_Y(q.a)*za;
+
+    scalar_t wx = QUAT_W(q.a)*xa;
+    scalar_t wy = QUAT_W(q.a)*ya;
+    scalar_t wz = QUAT_W(q.a)*za;
+
+    scalar_t xx = QUAT_X(q.a)*xa;
+    scalar_t yy = QUAT_Y(q.a)*ya;
+    scalar_t zz = QUAT_Z(q.a)*za;
     
-    scalar_t wx = QUAT_W(q)*xa;
-    scalar_t wy = QUAT_W(q)*ya;
-    scalar_t wz = QUAT_W(q)*za;
+    m->a[0][0] = S_ONE-(yy+zz); m->a[0][1] =        xy-wz;
+    m->a[0][2] =        xz+wy;  m->a[0][3] = S_ZERO;
     
-    scalar_t xx = QUAT_X(q)*xa;
-    scalar_t yy = QUAT_Y(q)*ya;
-    scalar_t zz = QUAT_Z(q)*za;
+    m->a[1][0] =        xy+wz;  m->a[1][1] = S_ONE-(xx+zz);
+    m->a[1][2] =        yz-wx;  m->a[1][3] = S_ZERO;
     
-    m[0][0] = S_ONE-(yy+zz); m[0][1] =        xy-wz;
-    m[0][2] =        xz+wy;  m[0][3] = S_ZERO;
+    m->a[2][0] =        xz-wy;  m->a[2][1] =        yz+wx;
+    m->a[2][2] = S_ONE-(xx+yy); m->a[2][3] = S_ZERO;
     
-    m[1][0] =        xy+wz;  m[1][1] = S_ONE-(xx+zz);
-    m[1][2] =        yz-wx;  m[1][3] = S_ZERO;
-    
-    m[2][0] =        xz-wy;  m[2][1] =        yz+wx;
-    m[2][2] = S_ONE-(xx+yy); m[2][3] = S_ZERO;
-    
-    m[3][0] = S_ZERO;        m[3][1] = S_ZERO;
-    m[3][2] = S_ZERO;        m[3][3] = S_ONE;
+    m->a[3][0] = S_ZERO;        m->a[3][1] = S_ZERO;
+    m->a[3][2] = S_ZERO;        m->a[3][3] = S_ONE;
 }
 #if 0
 void
@@ -123,29 +125,29 @@ q_m_convert(mat_arr_t m, const quat_arr_t q)
 
 
 void
-m_q_convert(quat_arr_t q, mat_arr_t m)
+m_q_convert(quaternion_t q, matrix_t *m)
 {
     scalar_t tr, s;
-    tr = m[0][0] + m[1][1] + m[2][2];
+    tr = m->a[0][0] + m->a[1][1] + m->a[2][2];
     if (tr >= S_ZERO) {
-        s = sqrt(tr+m[3][3]);
-        QUAT_W(q) = s*S_POINT_FIVE;
+        s = sqrt(tr+m->a[3][3]);
+        q.s.w = s*S_POINT_FIVE;
         s = S_POINT_FIVE / s;
-        QUAT_X(q) = (m[2][1] - m[1][2]) * s;
-        QUAT_Y(q) = (m[0][2] - m[2][0]) * s;
-        QUAT_Z(q) = (m[1][0] - m[0][1]) * s;
+        q.s.x = (m->a[2][1] - m->a[1][2]) * s;
+        q.s.y = (m->a[0][2] - m->a[2][0]) * s;
+        q.s.z = (m->a[1][0] - m->a[0][1]) * s;
     } else {
         int h = 0;
-        if (m[1][1] > m[0][0]) h = 1;
-        if (m[2][2] > m[h][h]) h = 2;
+        if (m->a[1][1] > m->a[0][0]) h = 1;
+        if (m->a[2][2] > m->a[h][h]) h = 2;
         switch (h) {
 #define CASE_MACRO(i,j,k,I,J,K)                                     \
         case I:                                                     \
-            s = sqrt( (m[I][I] - (m[J][J]+m[K][K])) + m[3][3] );  \
-            q[i] = s*S_POINT_FIVE;                                  \
-            q[j] = (m[I][J] + m[J][I]) * s;                         \
-            q[k] = (m[K][I] + m[I][K]) * s;                         \
-            QUAT_W(q) = (m[K][J] - m[J][K]) * s;                       \
+            s = sqrt( (m->a[I][I] - (m->a[J][J]+m->a[K][K])) + m->a[3][3] );  \
+            q.a[i] = s*S_POINT_FIVE;                                  \
+            q.a[j] = (m->a[I][J] + m->a[J][I]) * s;                         \
+            q.a[k] = (m->a[K][I] + m->a[I][K]) * s;                         \
+            q.s.w = (m->a[K][J] - m->a[J][K]) * s;                       \
             break
         CASE_MACRO(Q_X, Q_Y, Q_Z, 0, 1, 2);
         CASE_MACRO(Q_Y, Q_Z, Q_X, 1, 2, 0);
@@ -156,94 +158,118 @@ m_q_convert(quat_arr_t q, mat_arr_t m)
         }
     }
     
-    if (m[3][3] != S_ZERO) {
-        s = S_ONE / sqrt(m[3][3]);
-        QUAT_X(q) *= s; QUAT_Y(q) *= s; QUAT_Z(q) *= s; QUAT_Z(q) *= s;
+    // QUERY: Is the last ref to z correct? 
+    if (m->a[3][3] != S_ZERO) {
+        s = S_ONE / sqrt(m->a[3][3]);
+        q.s.x *= s; q.s.y *= s; q.s.z *= s; q.s.z *= s;
     }
 }
 
 
- void
-q_add(quat_arr_t r, quat_arr_t a, const quat_arr_t b)
+quaternion_t
+q_add(const quaternion_t a, const quaternion_t b)
 {
-    v_add(r, a, b);
+ 	return v_add(a, b);
 }
 
-void
-q_mul(quat_arr_t r, const quat_arr_t a, const quat_arr_t b)
+quaternion_t
+q_mul(const quaternion_t a, const quaternion_t b)
 {
-    QUAT_X(r) = QUAT_X(a)*QUAT_W(b) + QUAT_W(a)*QUAT_X(b) + QUAT_Y(a)*QUAT_Z(b) - QUAT_Z(a)*QUAT_Y(b);
-    QUAT_Y(r) = QUAT_Y(a)*QUAT_W(b) + QUAT_W(a)*QUAT_Y(b) + QUAT_Z(a)*QUAT_X(b) - QUAT_X(a)*QUAT_Z(b);
-    QUAT_Z(r) = QUAT_Z(a)*QUAT_W(b) + QUAT_W(a)*QUAT_Z(b) + QUAT_X(a)*QUAT_Y(b) - QUAT_Y(a)*QUAT_X(b);
-    QUAT_W(r) = QUAT_W(a)*QUAT_W(b) - QUAT_X(a)*QUAT_X(b) - QUAT_Y(a)*QUAT_Y(b) - QUAT_Z(a)*QUAT_Z(b);
+	quaternion_t r;
+    QUAT_X(r.a) = QUAT_X(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_X(b.a)
+   				+ QUAT_Y(a.a)*QUAT_Z(b.a) - QUAT_Z(a.a)*QUAT_Y(b.a);
+    QUAT_Y(r.a) = QUAT_Y(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_Y(b.a)
+				+ QUAT_Z(a.a)*QUAT_X(b.a) - QUAT_X(a.a)*QUAT_Z(b.a);
+    QUAT_Z(r.a) = QUAT_Z(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_Z(b.a)
+ 				+ QUAT_X(a.a)*QUAT_Y(b.a) - QUAT_Y(a.a)*QUAT_X(b.a);
+    QUAT_W(r.a) = QUAT_W(a.a)*QUAT_W(b.a) - QUAT_X(a.a)*QUAT_X(b.a)
+				- QUAT_Y(a.a)*QUAT_Y(b.a) - QUAT_Z(a.a)*QUAT_Z(b.a);
+
+    return r;
 }
 
-void
-q_s_div(quat_arr_t r, const quat_arr_t q, const scalar_t d)
+quaternion_t
+q_s_div(const quaternion_t q, const scalar_t d)
 {
-    QUAT_X(r) = QUAT_X(q) / d;
-    QUAT_Y(r) = QUAT_Y(q) / d;
-    QUAT_Z(r) = QUAT_Z(q) / d;
-    QUAT_W(r) = QUAT_W(q) / d;
+	quaternion_t r;
+    r.s.x = q.s.x / d;
+    r.s.y = q.s.y / d;
+    r.s.z = q.s.z / d;
+    r.s.w = q.s.w / d;
+    return r;
 }
 
  scalar_t
-q_dot(const quat_arr_t a, const quat_arr_t b)
+q_dot(const quaternion_t a, const quaternion_t b)
 {
     return v_dot(a, b);
 }
 
- void
-q_cross(vec_arr_t r, const quat_arr_t a, const quat_arr_t b)
+vector_t
+q_cross(const quaternion_t a, const quaternion_t b)
 {
-    v_cross(r, a, b);
+    return v_cross(a, b);
 }
 
- scalar_t
-q_abs(const quat_arr_t q)
+scalar_t
+q_abs(const quaternion_t q)
 {
     return v_abs(q);
 }
 
-void
-q_conj(quat_arr_t qp, const quat_arr_t q)
+quaternion_t
+q_conj(const quaternion_t q)
 {
-    QUAT_X(qp) = -QUAT_X(q);
-    QUAT_Y(qp) = -QUAT_Y(q);
-    QUAT_Z(qp) = -QUAT_Z(q);
-    QUAT_W(qp) = QUAT_W(q);
+	quaternion_t qp;
+    QUAT_X(qp.a) = -QUAT_X(q.a);
+    QUAT_Y(qp.a) = -QUAT_Y(q.a);
+    QUAT_Z(qp.a) = -QUAT_Z(q.a);
+    QUAT_W(qp.a) = QUAT_W(q.a);
 }
 
-void
-q_repr(quat_arr_t res, const quat_arr_t q)
+quaternion_t
+q_repr(const quaternion_t q)
 {
-    quat_arr_t qp;
-    q_conj(qp, q);
+	quaternion_t res;
+    quaternion_t qp;
+    qp = q_conj(q);
     scalar_t d = q_dot(q, q);
-    q_s_div(res, qp, d);
+    res = q_s_div(qp, d);
+	return res;
 }
 
-void
-q_div(quat_arr_t res, const quat_arr_t a, const quat_arr_t b)
+quaternion_t
+q_div(const quaternion_t a, const quaternion_t b)
 {
-    quat_arr_t br;
-    q_repr(br, b);
-    q_mul(res, a, br);
+	quaternion_t res;
+    quaternion_t br;
+    br = q_repr(b);
+    
+	res = q_mul(a, br);
+	return res;
 }
 
-void
-q_rot(quat_arr_t q, const axis_arr_t axis, const angle_t alpha)
+quaternion_t
+q_rotv(const vector_t axis, const angle_t alpha)
 {
+	quaternion_t q;
     scalar_t Omega = alpha * S_POINT_FIVE;
     scalar_t sin_Omega = sin(Omega);
-    QUAT_X(q) = axis[0] * sin_Omega;
-    QUAT_Y(q) = axis[1] * sin_Omega;
-    QUAT_Z(q) = axis[2] * sin_Omega;
-    QUAT_W(q) = cos(Omega);
-}
+    QUAT_X(q.a) = axis.a[0] * sin_Omega;
+    QUAT_Y(q.a) = axis.a[1] * sin_Omega;
+    QUAT_Z(q.a) = axis.a[2] * sin_Omega;
+    QUAT_W(q.a) = cos(Omega);
 
-void
-q_normalise(quat_arr_t q)
+	return q;
+}
+quaternion_t
+q_rot(scalar_t x, scalar_t y, scalar_t z, scalar_t alpha)
 {
-    v_normalise(q);
+	vector_t axis = {.s.x = x, .s.y = y, .s.z = z, .s.w = S_ONE};
+	return q_rotv(axis, alpha);
+}
+quaternion_t
+q_normalise(quaternion_t q)
+{
+    return v_normalise(q);
 }
