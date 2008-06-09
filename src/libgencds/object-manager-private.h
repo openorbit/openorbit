@@ -58,12 +58,10 @@ extern "C" {
      * */
     struct _om_ctxt_t {
         hashtable_t *class_dict; /*!< Dictionary of all class objects */
-        //list_t *class_list; /*!< Iterable list of all classes */
 
         hashtable_t *object_dict; /*!< Dictionary of all objects */    
         /*! Dictionary of all objects, indexed by object pointers */
         hashtable_t *reverse_object_dict;    
-        //list_t *object_list; /*!< Iterable list of all objects */
 
         hashtable_t *interface_dict; /*!< Dictionary of all meta interfaces */
         list_t *interface_list; /*!< Iterable list of all meta interfaces */
@@ -77,11 +75,9 @@ extern "C" {
         size_t object_size; /*!< Size of an instance of this class in bytes */
 
         hashtable_t *property_dict; /*!< A list of all properties */
-        //list_t *property_list;
 
         /*! All interfaces that the class implements to */
         hashtable_t *interface_dict;
-        //list_t *interface_list; // TODO: Verify that we need this
 
         om_object_constructor_f create; /*!< Object constructor */
         om_object_destructor_f destroy; /*!< Object destructor */
