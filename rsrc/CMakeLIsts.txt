@@ -1,14 +1,18 @@
 # Get sounds, textures and relevant data
 
 # Textures
-file(GLOB ORBIT_RES_TEX "textures/*.tga")
+file(GLOB ORBIT_RES_TEX_LOCAL "textures/*.tga")
+set(ORBIT_RES_TEX ${ORBIT_RES_TEX_LOCAL} PARENT_SCOPE)
 set_source_files_properties(${ORBIT_RES_TEX}
-							PROPERTIES
-  							MACOSX_PACKAGE_LOCATION Resources/textures)
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/textures)
+
+
 
 
 # Data
-file(GLOB ORBIT_RES_DATA "data/*.csv" "data/*.yaml")
-set_source_files_properties(${ORBIT_RES_TEX}
-							PROPERTIES
-  							MACOSX_PACKAGE_LOCATION Resources/data)
+file(GLOB ORBIT_RES_DATA_LOCAL "data/*.csv" "data/*.yaml")
+set(ORBIT_RES_DATA ${ORBIT_RES_DATA_LOCAL} PARENT_SCOPE)
+set_source_files_properties(${ORBIT_RES_DATA}
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/data)

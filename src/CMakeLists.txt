@@ -56,12 +56,25 @@ if (APPLE)
     set(open_orbit_debug_name "Open Orbit Debug")
 endif (APPLE)
 
+set_source_files_properties(${ORBIT_RES_TEX}
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/)
+
+set_source_files_properties(${ORBIT_RES_DATA}
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/)
+
+set_source_files_properties(${ORBIT_SCRIPTS}
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/)
+
 
 add_executable(openorbit MACOSX_BUNDLE
                ${openorbit_SRC}
                ${openorbit_FILES}
                ${ORBIT_RES_TEX}
-               ${ORBIT_RES_DATA})
+               ${ORBIT_RES_DATA}
+               ${ORBIT_SCRIPTS})
 
 set_target_properties(openorbit
                       PROPERTIES

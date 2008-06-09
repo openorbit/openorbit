@@ -88,9 +88,9 @@ endif (HAVE_ALTIVEC)
 
 include_directories(include)
 add_subdirectory(rsrc)
+add_subdirectory(scripts)
 add_subdirectory(src)
 add_subdirectory(include)
-#add_subdirectory(rsrc)
 
 if (ENABLE_TESTS)
     add_subdirectory(tests)
