@@ -172,15 +172,11 @@ quaternion_t
 q_mul(const quaternion_t a, const quaternion_t b)
 {
 	quaternion_t r;
-    r.x = QUAT_X(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_X(b.a)
-   				+ QUAT_Y(a.a)*QUAT_Z(b.a) - QUAT_Z(a.a)*QUAT_Y(b.a);
-    r.y = QUAT_Y(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_Y(b.a)
-				+ QUAT_Z(a.a)*QUAT_X(b.a) - QUAT_X(a.a)*QUAT_Z(b.a);
-    r.z = QUAT_Z(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_Z(b.a)
- 				+ QUAT_X(a.a)*QUAT_Y(b.a) - QUAT_Y(a.a)*QUAT_X(b.a);
-    r.w = QUAT_W(a.a)*QUAT_W(b.a) - QUAT_X(a.a)*QUAT_X(b.a)
-				- QUAT_Y(a.a)*QUAT_Y(b.a) - QUAT_Z(a.a)*QUAT_Z(b.a);
-
+    r.x = a.x*b.w + a.w*b.x	+ a.y*b.z - a.z*b.y;
+    r.y = a.y*b.w + a.w*b.y	+ a.z*b.x - a.x*b.z;
+    r.z = a.z*b.w + a.w*b.z	+ a.x*b.y - a.y*b.x;
+    r.w = a.w*b.w - a.x*b.x	- a.y*b.y - a.z*b.z;
+    
     return r;
 }
 
