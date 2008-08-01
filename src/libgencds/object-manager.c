@@ -335,7 +335,7 @@ om_insert_proxy_obj(om_ctxt_t *ctxt, const char *class_name,
     
     om_object_t *obj = hashtable_lookup(ctxt->object_dict, object_name);
     
-    if (obj = NULL) {
+    if (obj == NULL) {
         obj = malloc(sizeof(om_object_t));
         if (obj == NULL) {
             warn("om: proxy object allocation (objname = %s)", object_name);
