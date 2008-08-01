@@ -2,9 +2,9 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${PYTHON_INCLUDE_PATH})
 
 # Set proper shared lib extension
-set(so_ext "\\\".so\\\"")
+set(so_ext "\".so\"")
 if (APPLE)
-    SET(so_ext "\\\".dylib\\\"")
+    SET(so_ext "\".dylib\"")
 endif (APPLE)
 add_definitions(-DSO_EXT=${so_ext})
 
@@ -32,6 +32,9 @@ set(openorbit_FILES
 	CMakeLists.txt)
 
 add_cmake_list()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+add_definitions(-DHAVE_CONFIG)
 
 # Default target names for open orbit app
 set(open_orbit_name "openorbit")

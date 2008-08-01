@@ -43,9 +43,9 @@
 
 #include "plugin-handler.h"
 
-//#ifndef SO_EXT
+#ifndef SO_EXT
 #define SO_EXT ".so"
-//#endif /* ! SO_EXT */
+#endif /* ! SO_EXT */
 
 #ifndef INSTALL_PREFIX
 #define INSTALL_PREFIX "/usr/local"
