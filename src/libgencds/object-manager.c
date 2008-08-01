@@ -433,6 +433,22 @@ om_reg_method(om_meta_iface_t *meta_iface, const char *method_name,
 }
 
 /* TODO: Support complex types (arrays, objects, refs, et.c.) */
+
+om_prop_t*
+om_reg_overloaded_prop(om_class_t *class_object, const char *name,
+                       om_prop_type_t type, ptrdiff_t offset,
+                       void *getter, void *setter, void *reader, void *writer)
+{
+    om_prop_t *prop = om_reg_prop(class_object, name, type, offset);
+    if (prop != NULL) {
+        prop->get = getter;
+        prop->set = setter;
+        prop->rd = reader;
+        prop->wr = writer;
+    }
+    return prop;                
+}
+
 om_prop_t*
 om_reg_prop(om_class_t *class_object, const char *name,
             om_prop_type_t type, ptrdiff_t offset)
@@ -446,12 +462,16 @@ om_reg_prop(om_class_t *class_object, const char *name,
     // Currently allowed base types
     assert(type & (OM_CHAR|OM_SHORT|OM_INT|OM_FLOAT|OM_DOUBLE|OM_OBJECT));
     
-
+    
     om_prop_t *prop = malloc(sizeof(om_prop_t));
     prop->name = strdup(name);
     
     prop->type_code = type;
     prop->offset = offset;
+    prop->get = NULL;
+    prop->set = NULL;
+    prop->rd = NULL;
+    prop->wr = NULL;
     
     hashtable_insert(class_object->property_dict, name, prop);
     //list_append(class_object->property_list, prop);
@@ -463,26 +483,63 @@ om_prop_t*
 om_reg_static_array_prop(om_class_t *class_object, const char *name,
                          om_prop_type_t type, ptrdiff_t offset, size_t length)
 {
+    assert(class_object != NULL);
+    assert(name != NULL);
+    
     om_prop_t *prop = om_reg_prop(class_object, name, OM_ARRAY|type, offset);
+    if (prop == NULL) return NULL;
     prop->info.static_array.length = length;
     
     return prop;
 }
+
+
+om_prop_t*
+om_reg_overloaded_static_array_prop(om_class_t *class_object, const char *name,
+                                    om_prop_type_t type, ptrdiff_t offset,
+                                    size_t length,
+                                    void *getter, void *setter, void *reader, void *writer)
+{
+                                                   
+}
+
 
 om_prop_t*
 om_reg_dynamic_array_prop(om_class_t *class_object, const char *name,
                           om_prop_type_t type, ptrdiff_t offset,
                           char *length_prop)
 {
+    assert(class_object != NULL);
+    assert(name != NULL);
+
     om_prop_t *prop = om_reg_prop(class_object, name, OM_REF|OM_ARRAY|type,
                                   offset);
-    assert(prop != NULL);
+
+    if (prop == NULL) return NULL;
     
     prop->info.dynamic_array.length = om_get_prop(class_object, length_prop);
     assert(prop->info.dynamic_array.length != NULL);
     
     return prop;
 }
+
+om_prop_t*
+om_reg_overloaded_dynamic_array_prop(om_class_t *class_object, const char *name,
+                                     om_prop_type_t type, ptrdiff_t offset,
+                                     char *length_prop,
+                                     void *getter, void *setter, void *reader, void *writer)
+{
+    om_prop_t *prop = om_reg_dynamic_array_prop(class_object, name, type, offset, length_prop);
+
+    if (prop != NULL) {
+        prop->get = getter;
+        prop->set = setter;
+        prop->rd = reader;
+        prop->wr = writer;
+    }
+    return prop;                
+}
+
 
 
 int
@@ -527,6 +584,9 @@ bool
 om_object_is_class(const om_object_t *obj,
                    const char *class_name)
 {
+    assert(obj != NULL);
+    assert(class_name != NULL);
+    
     if (strcmp(obj->cls->class_name, class_name)) {
         return false;
     }
@@ -537,6 +597,9 @@ om_object_is_class(const om_object_t *obj,
 om_object_t*
 om_get_object_from_ptr(const om_ctxt_t *ctxt, void *address)
 {
+    assert(ctxt != NULL);
+    assert(address != NULL);
+
     om_object_t *obj = hashtable_lookup(ctxt->reverse_object_dict, address);
 
     return obj;

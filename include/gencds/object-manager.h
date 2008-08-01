@@ -151,6 +151,32 @@ struct typecode {
     unsigned base:8;
 };
 
+/* Getter and setter function types */
+typedef void (*om_set_char_f)(void*, char);
+typedef char (*om_get_char_f)(void*);
+typedef void (*om_set_str_f)(void*, char*);
+typedef char* (*om_get_str_f)(void*);
+typedef void (*om_set_int_f)(void*, int);
+typedef int (*om_get_int_f)(void*);
+typedef void (*om_set_short_f)(void*, short);
+typedef short (*om_get_short_f)(void*);
+typedef void (*om_set_uint_f)(void*, unsigned int);
+typedef unsigned int (*om_get_uint_f)(void*);
+typedef void (*om_set_uint32_f)(void*, uint32_t);
+typedef uint32_t (*om_get_uint32_f)(void*);
+typedef void (*om_set_uint16_f)(void*, uint16_t);
+typedef uint16_t (*om_get_uint16_f)(void*);
+typedef void (*om_set_uint64_f)(void*, uint64_t);
+typedef uint64_t (*om_get_uint64_f)(void*);
+typedef void (*om_set_uint8_f)(void*, uint8_t);
+typedef uint8_t (*om_get_uint8_f)(void*);
+typedef void (*om_set_float_f)(void*, float);
+typedef float (*om_get_float_f)(void*);
+typedef void (*om_set_double_f)(void*, double);
+typedef double (*om_get_double_f)(void*);
+
+
+
 /* Simple types */
 /* integral types */
 #define OM_CHAR         (0)
@@ -255,10 +281,20 @@ int om_reg_method(om_meta_iface_t *meta_iface, const char *method_name,
 om_prop_t* om_reg_prop(om_class_t *class_object, const char *name,
                        om_prop_type_t type, ptrdiff_t offset);
 
+om_prop_t* om_reg_overloaded_prop(om_class_t *class_object, const char *name,
+                                  om_prop_type_t type, ptrdiff_t offset,
+                                  void *getter, void *setter, void *reader, void *writer);
+
 om_prop_t* om_reg_static_array_prop(om_class_t *class_object, const char *name,
                                     om_prop_type_t type, ptrdiff_t offset,
                                     size_t length);
-            
+
+om_prop_t* om_reg_overloaded_static_array_prop(om_class_t *class_object, const char *name,
+                                               om_prop_type_t type, ptrdiff_t offset,
+                                               size_t length,
+                                               void *getter, void *setter, void *reader, void *writer);
+
+
 /*! Om_reg_dynamic_array_prop registers a dynamically allocated array property.
  *  A dynamic array property requires that the length of the array is tracked,
  * hence, the need to specify the property name of the length tracking variable.
@@ -273,6 +309,12 @@ om_prop_t*
 om_reg_dynamic_array_prop(om_class_t *class_object, const char *name,
                           om_prop_type_t type, ptrdiff_t offset,
                           char *length_prop);
+
+om_prop_t*
+om_reg_overloaded_dynamic_array_prop(om_class_t *class_object, const char *name,
+                                     om_prop_type_t type, ptrdiff_t offset,
+                                     char *length_prop,
+                                     void *getter, void *setter, void *reader, void *writer);
 
 int om_reg_iface(om_class_t *class_object, const char *name, void *iface_addr);
 

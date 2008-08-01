@@ -108,6 +108,7 @@ extern "C" {
             } dynamic_array;
         } info;
 
+        void *get, *set, *rd, *wr; // overloaded accessors
         ptrdiff_t offset; // offset from struct start
     };
 
