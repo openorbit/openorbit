@@ -46,7 +46,7 @@ START_TEST(test_m_v_mul)
     vector_t r, v;
     matrix_t a;
     
-    v.s.x = 0.2; v.s.y = 0.3; v.s.z = 0.4; v.s.w = 0.5;
+    v.x = 0.2; v.y = 0.3; v.z = 0.4; v.w = 0.5;
     a.a[0][0] = a.a[0][1] = a.a[0][2] = a.a[0][3] = 1.0f;
     a.a[1][0] = a.a[1][1] = a.a[1][2] = a.a[1][3] = 2.0f;
     a.a[2][0] = a.a[2][1] = a.a[2][2] = a.a[2][3] = 3.0f;
@@ -56,13 +56,13 @@ START_TEST(test_m_v_mul)
     r = m_v_mul(&a, v);
     
     fail_unless( ALMOST_EQUAL(r.a[0], 1.4f, 0.000001f),
-        "Vector [0] outside bounds. v[0] = (%f)", r.s.x);
+        "Vector [0] outside bounds. v[0] = (%f)", r.x);
     fail_unless( ALMOST_EQUAL(r.a[1], 2.8f, 0.000001f),
-        "Vector [1] outside bounds. v[1] = (%f)", r.s.y);
+        "Vector [1] outside bounds. v[1] = (%f)", r.y);
     fail_unless( ALMOST_EQUAL(r.a[2], 4.2f, 0.000001f),
-        "Vector [2] outside bounds. v[2] = (%f)", r.s.z);
+        "Vector [2] outside bounds. v[2] = (%f)", r.z);
     fail_unless( ALMOST_EQUAL(r.a[3], 5.6f, 0.000001f),
-        "Vector [3] outside bounds. v[3] = (%f)", r.s.w);
+        "Vector [3] outside bounds. v[3] = (%f)", r.w);
 
 }
 END_TEST
@@ -71,19 +71,19 @@ START_TEST(test_q_mul)
 {
     quaternion_t r, a, b;
     
-    a.s.x = 1.4; a.s.y = 5.7; a.s.z = 2.0; a.s.w = -2.1;
-    b.s.x = 0.2; b.s.y = 0.1; b.s.z = 1.0; b.s.w = 8.0;
+    a.x = 1.4; a.y = 5.7; a.z = 2.0; a.w = -2.1;
+    b.x = 0.2; b.y = 0.1; b.z = 1.0; b.w = 8.0;
     
     r = q_mul(a, b);
     
-    fail_unless( ALMOST_EQUAL(r.s.x, 16.280f, 0.00001f),
-                 "Vector [0] of quaternion outside bounds (%f)", r.s.x);
-    fail_unless( ALMOST_EQUAL(r.s.y, 44.390f, 0.00001f),
-                 "Vector [1] of quaternion outside bounds (%f)", r.s.y);
-    fail_unless( ALMOST_EQUAL(r.s.z, 12.900f, 0.00001f),
-                 "Vector [2] of quaternion outside bounds (%f)", r.s.z);
-    fail_unless( ALMOST_EQUAL(r.s.w, -19.65f, 0.00001f),
-                 "Scalar part of quaternion outside bounds (%f)", r.s.w);
+    fail_unless( ALMOST_EQUAL(r.x, 16.280f, 0.00001f),
+                 "Vector [0] of quaternion outside bounds (%f)", r.x);
+    fail_unless( ALMOST_EQUAL(r.y, 44.390f, 0.00001f),
+                 "Vector [1] of quaternion outside bounds (%f)", r.y);
+    fail_unless( ALMOST_EQUAL(r.z, 12.900f, 0.00001f),
+                 "Vector [2] of quaternion outside bounds (%f)", r.z);
+    fail_unless( ALMOST_EQUAL(r.w, -19.65f, 0.00001f),
+                 "Scalar part of quaternion outside bounds (%f)", r.w);
     
 }
 END_TEST

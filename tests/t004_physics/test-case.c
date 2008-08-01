@@ -67,18 +67,18 @@ START_TEST(test_apply_force)
 
     ph_apply_force(&obj, f);
     
-    fail_unless( obj.f_acc.s.x == 4.0, "apply force failed");
-    fail_unless( obj.f_acc.s.y == 4.0, "apply force failed");
-    fail_unless( obj.f_acc.s.z == 4.0, "apply force failed");
-    fail_unless( obj.f_acc.s.w == 0.0, "apply force failed");
+    fail_unless( obj.f_acc.x == 4.0, "apply force failed");
+    fail_unless( obj.f_acc.y == 4.0, "apply force failed");
+    fail_unless( obj.f_acc.z == 4.0, "apply force failed");
+    fail_unless( obj.f_acc.w == 0.0, "apply force failed");
 
     vector_t f2 = {1.0, 2.0, 3.0, 0.0};
     ph_apply_force(&obj, f2);
 
-    fail_unless( obj.f_acc.s.x == 5.0, "apply force failed");
-    fail_unless( obj.f_acc.s.y == 6.0, "apply force failed");
-    fail_unless( obj.f_acc.s.z == 7.0, "apply force failed");
-    fail_unless( obj.f_acc.s.w == 0.0, "apply force failed");
+    fail_unless( obj.f_acc.x == 5.0, "apply force failed");
+    fail_unless( obj.f_acc.y == 6.0, "apply force failed");
+    fail_unless( obj.f_acc.z == 7.0, "apply force failed");
+    fail_unless( obj.f_acc.w == 0.0, "apply force failed");
     
 }
 END_TEST

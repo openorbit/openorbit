@@ -43,17 +43,13 @@
  scalar_t
 q_scalar(const quaternion_t q)
 {
-    return q.s.w;
+    return q.w;
 }
 
 vector_t
 q_vector(const quaternion_t q)
 {
-    vector_t r;
-    r.a[0] = q.s.x;
-    r.a[1] = q.s.y;
-    r.a[2] = q.s.z;
-    r.a[3] = S_ZERO;
+    vector_t r = {.a = {q.x, q.y, q.z, S_ZERO}};
     return r;
 }
 
@@ -131,11 +127,11 @@ m_q_convert(quaternion_t q, matrix_t *m)
     tr = m->a[0][0] + m->a[1][1] + m->a[2][2];
     if (tr >= S_ZERO) {
         s = sqrt(tr+m->a[3][3]);
-        q.s.w = s*S_POINT_FIVE;
+        q.w = s*S_POINT_FIVE;
         s = S_POINT_FIVE / s;
-        q.s.x = (m->a[2][1] - m->a[1][2]) * s;
-        q.s.y = (m->a[0][2] - m->a[2][0]) * s;
-        q.s.z = (m->a[1][0] - m->a[0][1]) * s;
+        q.x = (m->a[2][1] - m->a[1][2]) * s;
+        q.y = (m->a[0][2] - m->a[2][0]) * s;
+        q.z = (m->a[1][0] - m->a[0][1]) * s;
     } else {
         int h = 0;
         if (m->a[1][1] > m->a[0][0]) h = 1;
@@ -147,7 +143,7 @@ m_q_convert(quaternion_t q, matrix_t *m)
             q.a[i] = s*S_POINT_FIVE;                                  \
             q.a[j] = (m->a[I][J] + m->a[J][I]) * s;                         \
             q.a[k] = (m->a[K][I] + m->a[I][K]) * s;                         \
-            q.s.w = (m->a[K][J] - m->a[J][K]) * s;                       \
+            q.w = (m->a[K][J] - m->a[J][K]) * s;                       \
             break
         CASE_MACRO(Q_X, Q_Y, Q_Z, 0, 1, 2);
         CASE_MACRO(Q_Y, Q_Z, Q_X, 1, 2, 0);
@@ -161,7 +157,7 @@ m_q_convert(quaternion_t q, matrix_t *m)
     // QUERY: Is the last ref to z correct? 
     if (m->a[3][3] != S_ZERO) {
         s = S_ONE / sqrt(m->a[3][3]);
-        q.s.x *= s; q.s.y *= s; q.s.z *= s; q.s.z *= s;
+        q.x *= s; q.y *= s; q.z *= s; q.z *= s;
     }
 }
 
@@ -176,13 +172,13 @@ quaternion_t
 q_mul(const quaternion_t a, const quaternion_t b)
 {
 	quaternion_t r;
-    QUAT_X(r.a) = QUAT_X(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_X(b.a)
+    r.x = QUAT_X(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_X(b.a)
    				+ QUAT_Y(a.a)*QUAT_Z(b.a) - QUAT_Z(a.a)*QUAT_Y(b.a);
-    QUAT_Y(r.a) = QUAT_Y(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_Y(b.a)
+    r.y = QUAT_Y(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_Y(b.a)
 				+ QUAT_Z(a.a)*QUAT_X(b.a) - QUAT_X(a.a)*QUAT_Z(b.a);
-    QUAT_Z(r.a) = QUAT_Z(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_Z(b.a)
+    r.z = QUAT_Z(a.a)*QUAT_W(b.a) + QUAT_W(a.a)*QUAT_Z(b.a)
  				+ QUAT_X(a.a)*QUAT_Y(b.a) - QUAT_Y(a.a)*QUAT_X(b.a);
-    QUAT_W(r.a) = QUAT_W(a.a)*QUAT_W(b.a) - QUAT_X(a.a)*QUAT_X(b.a)
+    r.w = QUAT_W(a.a)*QUAT_W(b.a) - QUAT_X(a.a)*QUAT_X(b.a)
 				- QUAT_Y(a.a)*QUAT_Y(b.a) - QUAT_Z(a.a)*QUAT_Z(b.a);
 
     return r;
@@ -192,10 +188,10 @@ quaternion_t
 q_s_div(const quaternion_t q, const scalar_t d)
 {
 	quaternion_t r;
-    r.s.x = q.s.x / d;
-    r.s.y = q.s.y / d;
-    r.s.z = q.s.z / d;
-    r.s.w = q.s.w / d;
+    r.x = q.x / d;
+    r.y = q.y / d;
+    r.z = q.z / d;
+    r.w = q.w / d;
     return r;
 }
 
@@ -220,11 +216,8 @@ q_abs(const quaternion_t q)
 quaternion_t
 q_conj(const quaternion_t q)
 {
-	quaternion_t qp;
-    QUAT_X(qp.a) = -QUAT_X(q.a);
-    QUAT_Y(qp.a) = -QUAT_Y(q.a);
-    QUAT_Z(qp.a) = -QUAT_Z(q.a);
-    QUAT_W(qp.a) = QUAT_W(q.a);
+	quaternion_t qp = {.a = {-q.x, -q.y, -q.z, q.w}};
+    return qp;
 }
 
 quaternion_t
@@ -255,17 +248,17 @@ q_rotv(const vector_t axis, const angle_t alpha)
 	quaternion_t q;
     scalar_t Omega = alpha * S_POINT_FIVE;
     scalar_t sin_Omega = sin(Omega);
-    QUAT_X(q.a) = axis.a[0] * sin_Omega;
-    QUAT_Y(q.a) = axis.a[1] * sin_Omega;
-    QUAT_Z(q.a) = axis.a[2] * sin_Omega;
-    QUAT_W(q.a) = cos(Omega);
+    q.x = axis.x * sin_Omega;
+    q.y = axis.y * sin_Omega;
+    q.z = axis.z * sin_Omega;
+    q.w = cos(Omega);
 
 	return q;
 }
 quaternion_t
 q_rot(scalar_t x, scalar_t y, scalar_t z, scalar_t alpha)
 {
-	vector_t axis = {.s.x = x, .s.y = y, .s.z = z, .s.w = S_ONE};
+	vector_t axis = {.a = {x, y, z, S_ONE}};
 	return q_rotv(axis, alpha);
 }
 quaternion_t

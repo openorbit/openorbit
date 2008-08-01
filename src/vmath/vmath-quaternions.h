@@ -146,25 +146,25 @@ quaternion_t q_rotv(const quaternion_t axis, const angle_t alpha)
 quaternion_t
 q_rot(scalar_t x, scalar_t y, scalar_t z, scalar_t alpha);
 
-#define Q_ROT_X(q, r)                                            \
-    do {                                                         \
-        vector_t _v = {.s.x = S_CONST(1.0), .s.y = S_CONST(0.0),  \
-                      .s.z = S_CONST(0.0), .s.w = S_CONST(1.0)}; \
-        (q) = q_rotv(_v, r);                                       \
+#define Q_ROT_X(q, r)                                           \
+    do {                                                        \
+        vector_t _v = {.a = {S_CONST(1.0), S_CONST(0.0),        \
+                             S_CONST(0.0), S_CONST(1.0)}};      \
+        (q) = q_rotv(_v, r);                                    \
     } while (0)
 
-#define Q_ROT_Y(q, r)                                            \
-    do {                                                         \
-        vector_t _v = {.s.x = S_CONST(0.0), .s.y = S_CONST(1.0),  \
-                      .s.z = S_CONST(0.0), .s.w = S_CONST(1.0)}; \
+#define Q_ROT_Y(q, r)                                           \
+    do {                                                        \
+        vector_t _v = {.a = {S_CONST(0.0), S_CONST(1.0),        \
+                             S_CONST(0.0), S_CONST(1.0)}};      \
         (q) = q_rotv(_v, r);                                    \
     } while (0)
 
 
-#define Q_ROT_Z(q, r)                                            \
-    do {                                                         \
-        vector_t _v = {.s.x = S_CONST(0.0), .s.y = S_CONST(0.0),  \
-                      .s.z = S_CONST(1.0), .s.w = S_CONST(1.0)}; \
+#define Q_ROT_Z(q, r)                                           \
+    do {                                                        \
+        vector_t _v = {.a = {S_CONST(0.0), S_CONST(0.0),        \
+                             S_CONST(1.0), S_CONST(1.0)}};      \
         (q) = q_rotv(_v, r);                                    \
     } while (0)
 

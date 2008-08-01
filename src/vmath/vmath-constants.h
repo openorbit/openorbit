@@ -42,13 +42,7 @@ extern "C" {
 
 #include <vmath/vmath-types.h>
 
-#ifdef USE_SINGLE_FP_MATH
 #define S_CONST(a) (a ## f)
-#elif defined (USE_DOUBLE_FP_MATH)
-#define S_CONST(a) (a)
-#else
-#error "Floating point precision must be defined"
-#endif
     
 
 #define S_PI            S_CONST(3.14159265)

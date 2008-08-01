@@ -83,8 +83,8 @@ cam_rotate(quaternion_t q)
     rup = m_v_mul(&m, up);
     rdir = m_v_mul(&m, dir);
     
-    gluLookAt(0.0, 0.0, 0.0, rdir.s.x, rdir.s.y, rdir.s.z,
-              rup.s.x, rup.s.y, rup.s.z);
+    gluLookAt(0.0, 0.0, 0.0, rdir.x, rdir.y, rdir.z,
+              rup.x, rup.y, rup.z);
 }
 
 void
@@ -99,9 +99,9 @@ cam_set_free(vector_t p, quaternion_t q)
     rup = m_v_mul(&m, up);
     rdir = m_v_mul(&m, dir);
 
-    gluLookAt(p.s.x, p.s.y, p.s.z,
-              p.s.x + rdir.s.x, p.s.y + rdir.s.y, p.s.z + rdir.s.z,
-              rup.s.x, rup.s.y, rup.s.z);
+    gluLookAt(p.x, p.y, p.z,
+              p.x + rdir.x, p.y + rdir.y, p.z + rdir.z,
+              rup.x, rup.y, rup.z);
 }
 
 void
@@ -128,11 +128,11 @@ cam_set_polar(vector_t tgt, scalar_t len, scalar_t ra, scalar_t dec)
     
     rot_cam_pos = v_s_mul(rot_cam_pos, len);
     
-    gluLookAt(tgt.s.x, tgt.s.y, tgt.s.z,
-              tgt.s.x + rot_cam_pos.s.x,
-              tgt.s.y + rot_cam_pos.s.y,
-              tgt.s.z + rot_cam_pos.s.z,
-              rot_up.s.x, rot_up.s.y, rot_up.s.z);
+    gluLookAt(tgt.x, tgt.y, tgt.z,
+              tgt.x + rot_cam_pos.x,
+              tgt.y + rot_cam_pos.y,
+              tgt.z + rot_cam_pos.z,
+              rot_up.x, rot_up.y, rot_up.z);
 }
 
 

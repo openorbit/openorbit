@@ -152,8 +152,8 @@ ph_step(ph_sys_t *sys, scalar_t step)
     assert(sys != NULL);
     assert(step > S_CONST(0.0));
 
-    vector_t cm = {.s.x = S_CONST(0.0), .s.y = S_CONST(0.0),
-                   .s.z = S_CONST(0.0), .s.w = S_CONST(0.0)};
+    vector_t cm = {.a = {S_CONST(0.0), S_CONST(0.0),
+                         S_CONST(0.0), S_CONST(0.0)}};
     vector_t cm_tmp;
     scalar_t m = S_CONST(0.0);
     vector_t g; // gravity
@@ -311,18 +311,23 @@ ph_migrate_object(ph_sys_t *dst_sys, ph_sys_t *src_sys, ph_obj_t *obj)
 
 void
 ph_set_mass(ph_obj_t *obj, scalar_t m) {
+    assert(obj != NULL);
     obj->m = m;
 }
 
 void
 ph_reduce_mass(ph_obj_t *obj, scalar_t dm)
 {
+    assert(obj != NULL);
+    
     obj->m -= dm;
 }
 
 bool
 ph_reduce_mass_min(ph_obj_t *obj, scalar_t dm, scalar_t min)
 {
+    assert(obj != NULL);
+    
     if (obj->m - dm < min) {
         obj->m = min;
         return false;
@@ -334,12 +339,18 @@ ph_reduce_mass_min(ph_obj_t *obj, scalar_t dm, scalar_t min)
 void
 ph_increase_mass(ph_obj_t *obj, scalar_t dm)
 {
+    assert(obj != NULL);
+    
     obj->m += dm;
 }
 
 void
 ph_set_inertial_tensor(ph_obj_t *obj, matrix_t *new_I)
 {
+    assert(obj != NULL);
+    assert(new_I != NULL);
+    
+    
     obj->I = *new_I; // set the tensor itself
     obj->I_rep = m_inv(new_I); // set the inverse of the tensor as well
 }

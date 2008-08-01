@@ -73,11 +73,11 @@ m_add(matrix_t *res, matrix_t *a, matrix_t *b)
 }
 
 vector_t
-v_s_add(vector_t *a, scalar_t b)
+v_s_add(vector_t a, scalar_t b)
 {
-	vector_t c = {.s.x = b, .s.y = b, .s.z = b, .s.w = b};
+	vector_t c = {.a = {b,b,b,b}};
 	vector_t r;
-	r = v_add(*a, c);
+	r = v_add(a, c);
 	return r;
 }
 
@@ -401,7 +401,7 @@ m_cpy(matrix_t * restrict dst, matrix_t * restrict src)
 vector_t
 v_set(scalar_t v0, scalar_t v1, scalar_t v2, scalar_t v3)
 {
-	vector_t v = {.s.x = v0, .s.y = v1, .s.z = v2, .s.w = v3};
+	vector_t v = {.a = {v0,v1,v2,v3}};
 	return v;
 }
 

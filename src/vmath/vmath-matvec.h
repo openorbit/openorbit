@@ -83,7 +83,7 @@ void m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
 void m_add(matrix_t *res, matrix_t *a, matrix_t *b)
     __attribute__ ((__nonnull__));
 
-vector_t v_s_add(vector_t *a, scalar_t b);
+vector_t v_s_add(vector_t a, scalar_t b);
 
 vector_t v_add(vector_t a, const vector_t b)
     __attribute__ ((__nonnull__));

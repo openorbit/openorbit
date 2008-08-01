@@ -48,53 +48,28 @@ extern "C" {
 /* all functions take restricted pointers as arguments */
 
 /*************** Basic types ****************/
-#if defined(USE_SINGLE_FP_MATH)
 typedef float scalar_t;
 
 typedef float vec_arr_t[4];
 
-#ifdef ENABLE_VECTORISE
 typedef scalar_t __attribute__((vector_size (16))) scalar_vec_t;
-#endif
 
-typedef struct {
-    float x, y, z, w;
-} vec_str_t;
 
 typedef union {
     vec_arr_t a;
-    vec_str_t s;
-#ifdef ENABLE_VECTORISE
+    struct {
+        scalar_t x, y, z, w;
+    };
     scalar_vec_t v;
-#endif
 } vector_t;
 
 typedef float mat_arr_t[4][4];
 
 typedef union {
     mat_arr_t a;
-#ifdef ENABLE_VECTORISE
     scalar_vec_t v[4];
-#endif
 } matrix_t;
 
-#elif defined(USE_DOUBLE_FP_MATH) 
-typedef double scalar_t;
-
-typedef double vec_arr_t[4];
-typedef struct {
-    double x, y, z, w;
-} vec_str_t;
-
-typedef union {
-    vec_arr_t a;
-    vec_str_t s;
-} vector_t;
-
-typedef double matrix_t[4][4];
-#else
-#error "Floating point precision must be defined"
-#endif
 
 
 #define MAT_ELEM(M, i, j) ((M).a[i][j])
@@ -110,8 +85,6 @@ typedef double matrix_t[4][4];
  * and w the scalar part of the quaternion.
  */
 
-typedef vec_arr_t quat_arr_t;
-typedef vec_str_t quat_str_t;
 typedef vector_t quaternion_t;
 
 typedef vec_arr_t axis_arr_t;
