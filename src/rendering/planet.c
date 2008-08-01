@@ -107,8 +107,8 @@ planet_draw(planet_t *planet)
         
     matrix_t rot_orig;
     matrix_t rot_ax;
-    q_m_convert(rot_orig.a, planet->rot_orig);
-    q_m_convert(rot_ax.a, planet->rot_ax);
+    q_m_convert(&rot_orig, planet->rot_orig);
+    q_m_convert(&rot_ax, planet->rot_ax);
     
     glMultMatrixf((GLfloat*)rot_orig.a);
     glTranslatef(planet->pos.s.x, planet->pos.s.y, planet->pos.s.z );

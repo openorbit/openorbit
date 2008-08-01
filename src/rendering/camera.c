@@ -51,8 +51,8 @@ init_cam(void)
 {
     gCam = calloc(1, sizeof(camera_t));// TODO: Remove global camera
     gCam->type = CAM_FREE;
-	gCam->u.free_cam.p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
-	gCam->u.free_cam.rq = q_rot(0.0f,0.0f,1.0f,0.0f);
+	gCam->free_cam.p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
+	gCam->free_cam.rq = q_rot(0.0f,0.0f,1.0f,0.0f);
     
     // Register camera actions
     io_register_button_handler("cam-fwd", cam_move_forward_button_action);        
@@ -141,7 +141,7 @@ cam_set_view(camera_t *cam)
 {    
     switch (cam->type) {
         case CAM_FREE:
-            cam_set_free(cam->u.free_cam.p, cam->u.free_cam.rq);
+            cam_set_free(cam->free_cam.p, cam->free_cam.rq);
             break;
         case CAM_CHASE:
             break;
@@ -167,11 +167,11 @@ cam_move_forward(camera_t *cam, scalar_t distance)
     
     switch (cam->type) {
     case CAM_FREE:
-        q_m_convert(&rm, cam->u.free_cam.rq);
+        q_m_convert(&rm, cam->free_cam.rq);
         v = m_v_mul(&rm, vb);
         
         vb = v_s_mul(v, distance);
-        cam->u.free_cam.p = v_sub(cam->u.free_cam.p, vb);
+        cam->free_cam.p = v_sub(cam->free_cam.p, vb);
         break;
     case CAM_CHASE:
         break;
@@ -191,11 +191,11 @@ cam_move_back(camera_t *cam, scalar_t distance)
     
     switch (cam->type) {
     case CAM_FREE:
-        q_m_convert(&rm, cam->u.free_cam.rq);
+        q_m_convert(&rm, cam->free_cam.rq);
         v = m_v_mul(&rm, vb);
         
         vb = v_s_mul(v, distance);
-        cam->u.free_cam.p = v_add(cam->u.free_cam.p, vb);
+        cam->free_cam.p = v_add(cam->free_cam.p, vb);
         break;
     case CAM_CHASE:
         break;
@@ -215,11 +215,11 @@ cam_move_left(camera_t *cam, scalar_t distance)
 
     switch (cam->type) {
     case CAM_FREE:
-        q_m_convert(&rm, cam->u.free_cam.rq);
+        q_m_convert(&rm, cam->free_cam.rq);
         v = m_v_mul(&rm, vr);
         
         vr = v_s_mul(v, distance);
-        cam->u.free_cam.p = v_sub(cam->u.free_cam.p, vr);
+        cam->free_cam.p = v_sub(cam->free_cam.p, vr);
         break;
     case CAM_CHASE:
         break;
@@ -239,11 +239,11 @@ cam_move_right(camera_t *cam, scalar_t distance)
     
     switch (cam->type) {
     case CAM_FREE:
-        q_m_convert(&rm, cam->u.free_cam.rq);
+        q_m_convert(&rm, cam->free_cam.rq);
         v = m_v_mul(&rm, vr);
         
         vr = v_s_mul(v, distance);
-        cam->u.free_cam.p = v_add(cam->u.free_cam.p, vr);
+        cam->free_cam.p = v_add(cam->free_cam.p, vr);
         break;
     case CAM_CHASE:
         break;
@@ -263,10 +263,10 @@ cam_move_up(camera_t *cam, scalar_t distance)
 
     switch (cam->type) {
         case CAM_FREE:
-            q_m_convert(&rm, cam->u.free_cam.rq);
+            q_m_convert(&rm, cam->free_cam.rq);
             v = m_v_mul(&rm, vup);
             vup = v_s_mul(v, distance);
-            cam->u.free_cam.p = v_add(cam->u.free_cam.p, vup);
+            cam->free_cam.p = v_add(cam->free_cam.p, vup);
             break;
         case CAM_CHASE:
             break;
@@ -285,11 +285,11 @@ cam_move_down(camera_t *cam, scalar_t distance)
     vup = v_set(0.0, 1.0, 0.0, 0.0);
     switch (cam->type) {
         case CAM_FREE:
-            q_m_convert(&rm, cam->u.free_cam.rq);
+            q_m_convert(&rm, cam->free_cam.rq);
             v = m_v_mul(&rm, vup);
             
             vup = v_s_mul(v, distance);
-            cam->u.free_cam.p = v_sub(cam->u.free_cam.p, vup);
+            cam->free_cam.p = v_sub(cam->free_cam.p, vup);
             break;
         case CAM_CHASE:
             break;
@@ -313,14 +313,14 @@ cam_rotate_alpha(camera_t *cam, angle_t ang)
     
     switch (cam->type) {
         case CAM_FREE:
-            q_m_convert(&mrot, cam->u.free_cam.rq);
+            q_m_convert(&mrot, cam->free_cam.rq);
             rotside = m_v_mul(&mrot, side);
 
             rot = q_rotv(side, ang);
-            rq = cam->u.free_cam.rq;
+            rq = cam->free_cam.rq;
             
-            cam->u.free_cam.rq = q_mul(rq, rot);
-            cam->u.free_cam.rq = q_normalise(cam->u.free_cam.rq);
+            cam->free_cam.rq = q_mul(rq, rot);
+            cam->free_cam.rq = q_normalise(cam->free_cam.rq);
             
             break;
         case CAM_CHASE:
@@ -344,14 +344,14 @@ cam_rotate_beta(camera_t *cam, angle_t ang)
     
     switch (cam->type) {
         case CAM_FREE:            
-            q_m_convert(&mrot, cam->u.free_cam.rq);
+            q_m_convert(&mrot, cam->free_cam.rq);
             rotup = m_v_mul(&mrot, up);
 
             rot = q_rotv(up, ang);
-            rq  = cam->u.free_cam.rq;
+            rq  = cam->free_cam.rq;
         
-            cam->u.free_cam.rq = q_mul(rq, rot);
-            cam->u.free_cam.rq = q_normalise(cam->u.free_cam.rq);
+            cam->free_cam.rq = q_mul(rq, rot);
+            cam->free_cam.rq = q_normalise(cam->free_cam.rq);
             
             break;
         case CAM_CHASE:
@@ -376,14 +376,14 @@ cam_rotate_gamma(camera_t *cam, angle_t ang)
 
     switch (cam->type) {
         case CAM_FREE:
-            q_m_convert(&mrot, cam->u.free_cam.rq);
+            q_m_convert(&mrot, cam->free_cam.rq);
             rotfwd = m_v_mul(&mrot, fwd);
 
             rot = q_rotv(fwd, ang);
-            rq = cam->u.free_cam.rq;
+            rq = cam->free_cam.rq;
         
-            cam->u.free_cam.rq = q_mul(rq, rot);
-            cam->u.free_cam.rq = q_normalise(cam->u.free_cam.rq);
+            cam->free_cam.rq = q_mul(rq, rot);
+            cam->free_cam.rq = q_normalise(cam->free_cam.rq);
             
             break;
         case CAM_CHASE:

@@ -158,7 +158,7 @@ paint_sky(star_list_t *stars)
     glLoadIdentity();
 
     extern camera_t *gCam;
-    cam_rotate(gCam->u.free_cam.rq);
+    cam_rotate(gCam->free_cam.rq);
 
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);

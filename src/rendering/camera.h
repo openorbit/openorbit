@@ -73,7 +73,7 @@ typedef struct {
             vector_t *p;  // pos of chased object
             vector_t d;   // relative position to object
         } chase_cam;
-    } u;
+    };
 } camera_t;
 
 bool init_cam(void);
