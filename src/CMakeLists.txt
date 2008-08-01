@@ -86,6 +86,7 @@ set_target_properties(openorbit
 
 target_link_libraries(openorbit
                       math scripting parsers dl gencds
+                      ${ODE_LIB}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${GLUT_LIBRARIES})
 
 

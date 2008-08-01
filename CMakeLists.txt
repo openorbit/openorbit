@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.6)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
-        "Choose the type of build, options are: None Debug Release."
+        "Choose the type of build, options are: None Debug Analyse Release."
         FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 
@@ -20,6 +20,11 @@ endif (ENABLE_DOCS)
 find_package(SDL REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
+
+find_library(ODE_LIB ode)
+if (NOT ODE_LIB)
+    message(FATAL_ERROR "Could not find libode")
+endif (NOT ODE_LIB)
 
 # Enable later when sound system has been added
 # find_package(OpenAL REQUIRED)
