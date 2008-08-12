@@ -33,9 +33,11 @@
 
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <err.h>
 #include <assert.h>
 #include <sysexits.h>
@@ -424,7 +426,7 @@ om_delete_meta_interface(om_meta_iface_t *iface)
 
 int
 om_reg_method(om_meta_iface_t *meta_iface, const char *method_name,
-              ptrdiff_t offset)
+              const char *convention, ptrdiff_t offset)
 {
     assert(meta_iface != NULL);
     assert(method_name != NULL);
@@ -500,7 +502,15 @@ om_reg_overloaded_static_array_prop(om_class_t *class_object, const char *name,
                                     size_t length,
                                     void *getter, void *setter, void *reader, void *writer)
 {
-                                                   
+    om_prop_t *prop = om_reg_static_array_prop(class_object, name, type, offset, length);
+    
+    if (prop != NULL) {
+        prop->get = getter;
+        prop->set = setter;
+        prop->rd = reader;
+        prop->wr = writer;
+    }
+    return prop;                                                   
 }
 
 
@@ -747,44 +757,93 @@ om_delete_iface_obj(om_iface_t *iface)
     free(iface);
 }
 
-// temporary, when it is working it will be broken up into pieces
-//#include <Python.h>
-static void
-om_python_integration(om_ctxt_t *ctxt)
+void
+om_call_method(const char *obj_name, const char *iface, const char *method,
+               void *res, ...)
 {
+    // Look up method pointer and object pointer
+    // Build up call stack from this method and
+    // get the result from the method
+    // NOTE: This method is not very fast and does not intend to be fast, it exists to
+    //       allow the object manager to be easibly integrated with a scripting system
+    //       if objects are accessed in C, make sure that you know the type and use the
+    //       real interfaces
+    // Calling conventions: i/I int/uint
+    //                      s/S short/ushort
+    //                      l/L long/ulong
+    //                      f/F float/double
+    //                      c   char
+    //                      p   pointer
+    //                      b/B int8
+    //                      h/H int16
+    //                      w/W int32
+    //                      d/D int64
     
+    
+    char c;
+    va_list vl;
+    va_start(vl, res);
+    while (0) {
+        switch (c) {
+        case 'i': va_arg(vl, int);
+        case 'I': va_arg(vl, unsigned int);
+        case 's':(short)va_arg(vl, int);
+        case 'S':(unsigned short)va_arg(vl, unsigned int);
+        case 'l':va_arg(vl, long);
+        case 'L':va_arg(vl, unsigned long);
+        case 'f':(float)va_arg(vl, double);
+        case 'F':va_arg(vl, double);
+        case 'c':(char)va_arg(vl, int);
+        case 'p':va_arg(vl, void*);
+        case 'b':(int8_t)va_arg(vl, int);
+        case 'B':(uint8_t)va_arg(vl, int);
+        case 'h':(int16_t)va_arg(vl, int);
+        case 'H':(uint16_t)va_arg(vl, int);
+        case 'w':va_arg(vl, int32_t);
+        case 'W':va_arg(vl, uint32_t);
+        case 'd':va_arg(vl, int64_t);
+        case 'D':va_arg(vl, uint64_t);
+            
+        }
+    }
+    va_end(vl);    
 }
 
 // TODO: Ensure that runtime errors are propagated on invalid prop names
-#define _OM_GET_PROP_FN_(T, N, TC)                                      \
-T                                                                       \
-om_get_ ## N ## _prop(const om_object_t *obj, const char *prop_name)    \
-{                                                                       \
-    assert(obj != NULL);                                                \
-    assert(prop_name != NULL);                                          \
-                                                                        \
-	om_prop_t *prop = om_get_prop(obj->cls, prop_name);                 \
-    if (prop && prop->type_code == (TC)) {                              \
-        T *concrete_prop = om_get_concrete_prop(obj, prop_name);        \
-        return *concrete_prop;                                          \
-    }                                                                   \
-    return (T)0;                                                        \
-}
-
-
-// TODO: Ensure that runtime errors are propagated on invalid prop names
-#define _OM_SET_PROP_FN_(T, N, TC)                                          \
-void                                                                        \
-om_set_ ## N ## _prop(om_object_t *obj, const char *prop_name, T val)       \
+#define _OM_GET_PROP_FN_(T, N, TC)                                          \
+T                                                                           \
+om_get_ ## N ## _prop(const om_object_t *obj, const char *prop_name)        \
 {                                                                           \
     assert(obj != NULL);                                                    \
     assert(prop_name != NULL);                                              \
                                                                             \
 	om_prop_t *prop = om_get_prop(obj->cls, prop_name);                     \
     if (prop && prop->type_code == (TC)) {                                  \
+        if (prop->get) return ((om_get_ ## N ## _f)prop->get)(obj->data);   \
         T *concrete_prop = om_get_concrete_prop(obj, prop_name);            \
-        *concrete_prop = val;                                               \
+        return *concrete_prop;                                              \
     }                                                                       \
+    return (T)0;                                                            \
+}
+
+
+// TODO: Ensure that runtime errors are propagated on invalid prop names
+#define _OM_SET_PROP_FN_(T, N, TC)                                      \
+void                                                                    \
+om_set_ ## N ## _prop(om_object_t *obj, const char *prop_name, T val)   \
+{                                                                       \
+    assert(obj != NULL);                                                \
+    assert(prop_name != NULL);                                          \
+                                                                        \
+	om_prop_t *prop = om_get_prop(obj->cls, prop_name);                 \
+    if (prop && prop->type_code == (TC)) {                              \
+        if (prop->set) {                                                \
+            ((om_set_ ## N ## _f)prop->set)(obj->data, val);            \
+        } else {                                                        \
+            T *concrete_prop = om_get_concrete_prop(obj, prop_name);    \
+            *concrete_prop = val;                                       \
+        }                                                               \
+    }                                                                   \
 }
 
 // TODO: Ensure that runtime errors are propagated on invalid prop names,
@@ -800,8 +859,12 @@ om_get_ ## N ## _idx_prop(const om_object_t *obj, const char *prop_name,    \
     om_prop_t *prop = om_get_prop(obj->cls, prop_name);                     \
     if (prop && prop->type_code == (OM_ARRAY|(TC))) {                       \
         if (idx < prop->info.static_array.length) {                         \
-            T *concrete_prop = (T*)(obj->data + prop->offset);              \
-            return concrete_prop[idx];                                      \
+            if (prop->get) {                                                \
+                return ((om_idx_get_ ## N ## _f)prop->get)(obj->data, idx); \
+            } else {                                                        \
+                T *concrete_prop = (T*)(obj->data + prop->offset);          \
+                return concrete_prop[idx];                                  \
+            }                                                               \
         } else {                                                            \
             errx(EX_SOFTWARE,                                               \
                  "om: index out of static bounds (idx = %d, maxidx = %d)",  \
@@ -810,9 +873,13 @@ om_get_ ## N ## _idx_prop(const om_object_t *obj, const char *prop_name,    \
     } else if (prop && prop->type_code == (OM_ARRAY|OM_REF|(TC))) {         \
         om_prop_t *length_prop = prop->info.dynamic_array.length;           \
         size_t *sz = obj->data + length_prop->offset;                       \
-        if (idx < *sz ) {                                                   \
-            T **concrete_prop = om_get_concrete_prop(obj, prop_name);       \
-            return (*concrete_prop)[idx];                                   \
+        if (idx < *sz) {                                                    \
+            if (prop->get) {                                                \
+                return ((om_idx_get_ ## N ## _f)prop->get)(obj->data, idx); \
+            } else {                                                        \
+                T **concrete_prop = om_get_concrete_prop(obj, prop_name);   \
+                return (*concrete_prop)[idx];                               \
+            }                                                               \
         } else {                                                            \
             errx(EX_SOFTWARE,                                               \
                  "om: index out of dynamic bounds (idx = %d, maxidx = %d)", \
@@ -835,8 +902,12 @@ om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name,          \
 	om_prop_t *prop = om_get_prop(obj->cls, prop_name);                     \
     if (prop && prop->type_code == (OM_ARRAY|(TC))) {                       \
         if (idx < prop->info.static_array.length) {                         \
-            T *concrete_prop = (T*)(obj->data + prop->offset);              \
-            concrete_prop[idx] = val;                                       \
+            if (prop->set) {                                                \
+                ((om_idx_set_ ## N ## _f)prop->set)(obj->data, idx, val);   \
+            } else {                                                        \
+                T *concrete_prop = (T*)(obj->data + prop->offset);          \
+                concrete_prop[idx] = val;                                   \
+            }                                                               \
         } else {                                                            \
             errx(EX_SOFTWARE,                                               \
                  "om: index out of static bounds (idx = %d, maxidx = %d)",  \
@@ -846,8 +917,12 @@ om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name,          \
         om_prop_t *length_prop = prop->info.dynamic_array.length;           \
         size_t *sz = obj->data + length_prop->offset;                       \
         if (idx < *sz ) {                                                   \
-            T **concrete_prop = om_get_concrete_prop(obj, prop_name);       \
-            (*concrete_prop)[idx] = val;                                    \
+            if (prop->set) {                                                \
+                ((om_idx_set_ ## N ## _f)prop->set)(obj->data, idx, val);   \
+            } else {                                                        \
+                T **concrete_prop = om_get_concrete_prop(obj, prop_name);   \
+                (*concrete_prop)[idx] = val;                                \
+            }                                                               \
         } else {                                                            \
             errx(EX_SOFTWARE,                                               \
                  "om: index out of dynamic bounds (idx = %d, maxidx = %d)", \
@@ -861,9 +936,17 @@ om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name,          \
     _OM_SET_PROP_FN_(T, N, TC)          \
     _OM_GET_PROP_IDX_FN_(T, N, TC)      \
     _OM_SET_PROP_IDX_FN_(T, N, TC)
-    
 
-_OM_ACCESSOR_PAIR_(bool, bool, OM_BOOL);
+
+//_OM_ACCESSOR_PAIR_(bool, bool, OM_BOOL);
+// bool is a macro that expands to _Bool, we have to define this here locally
+// as the submacros would otherwise be passed as _Bool 
+_OM_GET_PROP_FN_(bool, bool, OM_BOOL)
+_OM_SET_PROP_FN_(bool, bool, OM_BOOL)
+_OM_GET_PROP_IDX_FN_(bool, bool, OM_BOOL)
+_OM_SET_PROP_IDX_FN_(bool, bool, OM_BOOL)
+
+
 _OM_ACCESSOR_PAIR_(char, char, OM_CHAR);
 _OM_ACCESSOR_PAIR_(short, short, OM_SHORT);
 _OM_ACCESSOR_PAIR_(unsigned short, ushort, OM_UNSIGNED|OM_SHORT);

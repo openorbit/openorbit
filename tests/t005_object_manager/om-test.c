@@ -111,9 +111,9 @@ START_TEST(test_interfaces)
     om_meta_iface_t *mi = om_new_meta_interface(ctxt, "test-iface");
     fail_if(mi == NULL, "om_new_meta_iface returned NULL");
     
-    om_reg_method(mi, "foo", offsetof(test_iface_t, foo));
-    om_reg_method(mi, "bar", offsetof(test_iface_t, bar));
-    om_reg_method(mi, "baz", offsetof(test_iface_t, baz));
+    om_reg_method(mi, "foo", "p", offsetof(test_iface_t, foo));
+    om_reg_method(mi, "bar", "pi", offsetof(test_iface_t, bar));
+    om_reg_method(mi, "baz", "pf", offsetof(test_iface_t, baz));
     
     om_class_t *cls = om_new_class(ctxt, "test-class", to_const, to_dest,
                                    sizeof(test_object_t));

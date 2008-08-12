@@ -151,30 +151,39 @@ struct typecode {
     unsigned base:8;
 };
 
-/* Getter and setter function types */
-typedef void (*om_set_char_f)(void*, char);
-typedef char (*om_get_char_f)(void*);
-typedef void (*om_set_str_f)(void*, char*);
-typedef char* (*om_get_str_f)(void*);
-typedef void (*om_set_int_f)(void*, int);
-typedef int (*om_get_int_f)(void*);
-typedef void (*om_set_short_f)(void*, short);
-typedef short (*om_get_short_f)(void*);
-typedef void (*om_set_uint_f)(void*, unsigned int);
-typedef unsigned int (*om_get_uint_f)(void*);
-typedef void (*om_set_uint32_f)(void*, uint32_t);
-typedef uint32_t (*om_get_uint32_f)(void*);
-typedef void (*om_set_uint16_f)(void*, uint16_t);
-typedef uint16_t (*om_get_uint16_f)(void*);
-typedef void (*om_set_uint64_f)(void*, uint64_t);
-typedef uint64_t (*om_get_uint64_f)(void*);
-typedef void (*om_set_uint8_f)(void*, uint8_t);
-typedef uint8_t (*om_get_uint8_f)(void*);
-typedef void (*om_set_float_f)(void*, float);
-typedef float (*om_get_float_f)(void*);
-typedef void (*om_set_double_f)(void*, double);
-typedef double (*om_get_double_f)(void*);
+#define GET_SET_TYPES(NAME, TYPE)                                   \
+    typedef void (*om_set_##NAME##_f)(void*, TYPE);                 \
+    typedef TYPE (*om_get_##NAME##_f)(void*);                       \
+    typedef void (*om_idx_set_##NAME##_f)(void*, unsigned, TYPE);   \
+    typedef TYPE (*om_idx_get_##NAME##_f)(void*, unsigned);
+    
+// Standard discrete C types
+GET_SET_TYPES(char, char)
+GET_SET_TYPES(bool, bool)
+GET_SET_TYPES(str, char*)
+GET_SET_TYPES(int, int)
+GET_SET_TYPES(uint, unsigned int)
+GET_SET_TYPES(short, short)
+GET_SET_TYPES(ushort, unsigned short)
+GET_SET_TYPES(long, long)
+GET_SET_TYPES(ulong, unsigned long)
 
+// Generic pointer
+GET_SET_TYPES(object, void*)
+
+// Stdint fixed length types
+GET_SET_TYPES(uint8, uint8_t)
+GET_SET_TYPES(uint16, uint16_t)
+GET_SET_TYPES(uint32, uint32_t)
+GET_SET_TYPES(uint64, uint64_t)
+GET_SET_TYPES(int8, int8_t)
+GET_SET_TYPES(int16, int16_t)
+GET_SET_TYPES(int32, int32_t)
+GET_SET_TYPES(int64, int64_t)
+
+// FP types
+GET_SET_TYPES(float, float)
+GET_SET_TYPES(double, double)
 
 
 /* Simple types */
@@ -276,7 +285,8 @@ void om_delete_meta_interface(om_meta_iface_t *iface);
 
 
 int om_reg_method(om_meta_iface_t *meta_iface, const char *method_name,
-                  ptrdiff_t offset);
+    const char *convention, ptrdiff_t offset);
+
 
 om_prop_t* om_reg_prop(om_class_t *class_object, const char *name,
                        om_prop_type_t type, ptrdiff_t offset);
@@ -292,7 +302,8 @@ om_prop_t* om_reg_static_array_prop(om_class_t *class_object, const char *name,
 om_prop_t* om_reg_overloaded_static_array_prop(om_class_t *class_object, const char *name,
                                                om_prop_type_t type, ptrdiff_t offset,
                                                size_t length,
-                                               void *getter, void *setter, void *reader, void *writer);
+                                               void *getter, void *setter,
+                                               void *reader, void *writer);
 
 
 /*! Om_reg_dynamic_array_prop registers a dynamically allocated array property.
@@ -314,7 +325,8 @@ om_prop_t*
 om_reg_overloaded_dynamic_array_prop(om_class_t *class_object, const char *name,
                                      om_prop_type_t type, ptrdiff_t offset,
                                      char *length_prop,
-                                     void *getter, void *setter, void *reader, void *writer);
+                                     void *getter, void *setter,
+                                     void *reader, void *writer);
 
 int om_reg_iface(om_class_t *class_object, const char *name, void *iface_addr);
 
