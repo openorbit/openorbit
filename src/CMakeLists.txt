@@ -1,5 +1,6 @@
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${PYTHON_INCLUDE_PATH})
+include_directories(${ODE_INC})
 
 # Set proper shared lib extension
 set(so_ext "\".so\"")

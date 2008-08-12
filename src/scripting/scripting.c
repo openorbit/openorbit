@@ -36,7 +36,6 @@
 
 #include "res-manager.h"
  
-#ifdef WITH_PYTHON
 
 #include <Python.h>
 
@@ -46,11 +45,9 @@ extern void initres(void);
 extern void initenvironment(void);
 extern void inittexture(void);
 
-#endif /* WITH_PYTHON */
  
 #include "scripting.h"
 
-#ifdef WITH_PYTHON
 bool
 init_scripting(void)
 {
@@ -72,28 +69,15 @@ init_scripting(void)
 }
 
 void
-finilise_scripting(void)
+finalise_scripting(void)
 {
     Py_Finalize();
 }
 
 oo_error_t
 load_setup_script(void)
-{
-    //char *home=getenv("HOME");
-    //assert(home);
-    
+{    
     char *path = res_get_path(SCR_INIT_SCRIPT_NAME);
-    /*char *path = malloc((strlen(home) +
-                         strlen("/.openorbit/" SCR_INIT_SCRIPT_NAME)+1) *
-                         sizeof(char));
-    if (!path) {
-        return ERROR_MEM;
-    }
-    
-    strcpy(path, home);
-    strcat(path, "/.openorbit/" SCR_INIT_SCRIPT_NAME);    
-    */
     
     FILE *fp = fopen(path, "r");
     if (! fp) {
@@ -132,47 +116,3 @@ run_post_init_script(void)
 }
 
 
-#elif defined(WITH_GUILE)
-bool
-init_scripting(void)
-{
-    oo_error_t err = load_setup_script();
-    
-    if (err) {
-        print_error_message(err);
-        return true;
-    }
-    
-    return false;
-}
-
-void
-finilise_scripting(void)
-{
-}
-
-oo_error_t
-load_setup_script(void)
-{
-    char *home=getenv("HOME");
-    assert(home);
-    
-    char *path = malloc((strlen(home) +
-                         strlen("/.openorbit/" SCR_INIT_SCRIPT_NAME)+1) *
-                         sizeof(char));
-    if (!path) {
-        return ERROR_MEM;
-    }
-    
-    strcpy(path, home);
-    strcat(path, "/.openorbit/" SCR_INIT_SCRIPT_NAME);
-    
-    scm_c_primitive_load(path);
-
-    free(path);
-    return ERROR_NONE;
-}
-
-#else /* WITH_GUILE */
-    #error "Enable Guile or Python"
-#endif 

@@ -22,9 +22,16 @@ find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
 find_library(ODE_LIB ode)
+find_path(ODE_INC "ode/ode.h")
+
 if (NOT ODE_LIB)
     message(FATAL_ERROR "Could not find libode")
 endif (NOT ODE_LIB)
+
+if (NOT ODE_INC)
+    message(FATAL_ERROR "Could not find ode/ode.h")
+endif (NOT ODE_INC)
+
 
 # Enable later when sound system has been added
 # find_package(OpenAL REQUIRED)
@@ -34,13 +41,8 @@ include(TestBigEndian)
 test_big_endian(BIG_ENDIAN)
 
 # Need python libraries, and also the pyrexc compiler
-option(WITH_PYTHON "Enable Python Scripting" on)
-
-if (WITH_PYTHON)
-    find_package(PythonLibs REQUIRED)
-    add_definitions(-DWITH_PYTHON)
-    include(cmake/Pyrex.txt)
-endif (WITH_PYTHON)
+find_package(PythonLibs REQUIRED)
+include(cmake/Pyrex.txt)
 
 if (APPLE)
     include(cmake/InstallMacRes.txt)

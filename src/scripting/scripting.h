@@ -51,27 +51,20 @@ extern "C" {
 #include <stdbool.h>
 #include "error.h"
 
-#ifdef WITH_GUILE
-#include <libguile.h>
-    typedef SCM scr_f;
-    typedef SCM scr_bool;
-    typedef SCM scr_int;
-    typedef SCM scr_str;
-    typedef SCM scr_float;
-    #define SCR_INIT_SCRIPT_NAME "init.scm"
-#elif defined(WITH_PYTHON) /* WITH_GUILE */
+#ifdef PYTHON_FWORK
+#include <Python/Python.h>
+#else
 #include <Python.h>
-    typedef PyObject* scr_func_t;
-    typedef PyObject* scr_bool_t;
-    typedef PyObject* scr_int_t;
-    typedef PyObject* scr_str_t;
-    typedef PyObject* scr_float_t;
-    #define SCR_INIT_SCRIPT_NAME "init.py"
-    #define SCR_POST_INIT_SCRIPT_NAME "postinit.py"
+#endif
 
-#else /* WITH_PYTHON */
-    #error "Need to have either Guile or Python enabled"
-#endif /* ! WITH_PYTHON */
+typedef PyObject* scr_func_t;
+typedef PyObject* scr_bool_t;
+typedef PyObject* scr_int_t;
+typedef PyObject* scr_str_t;
+typedef PyObject* scr_float_t;
+#define SCR_INIT_SCRIPT_NAME "init.py"
+#define SCR_POST_INIT_SCRIPT_NAME "postinit.py"
+
 
 /*!
  * \brief Initialises the scripting system.
@@ -86,7 +79,7 @@ bool run_post_init_script(void);
  * 
  * Call this at exit.
  * */
-void finilise_scripting(void);
+void finalise_scripting(void);
 
 /*!
  * \brief Loads and executes the init script.
