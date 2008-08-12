@@ -4,9 +4,21 @@ static inline scalar_t
 v_dot(vector_t a, vector_t b) {
 	vector_t vres;
     vres.v = a.v * b.v;
-    return vres.s.x + vres.s.y + vres.s.z + vres.s.w;
+    return vres.x + vres.y + vres.z + vres.w;
 }
 
+static inline void
+m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
+{
+    matrix_t tmp_res, bT;
+    m_transpose(&bT, b);
+    for (int i = 0 ; i < 4 ; i ++) {
+        for (int j = 0; j < 4 ; j ++) {
+            tmp_res.a[i][j] = v_dot(a.v[i], bT.v[j]);
+        }
+    }
+    res = tmp_res;
+}
 
 static inline vector_t
 m_v_mul(const matrix_t a, const vector_t v)
@@ -18,10 +30,10 @@ m_v_mul(const matrix_t a, const vector_t v)
     p.v[2] = a.v[2] * v.v;
     p.v[3] = a.v[3] * v.v;
     
-    vr.s.x = p.a[0][0] + p.a[0][1] + p.a[0][2] + p.a[0][3];
-    vr.s.y = p.a[1][0] + p.a[1][1] + p.a[1][2] + p.a[1][3];
-    vr.s.z = p.a[2][0] + p.a[2][1] + p.a[2][2] + p.a[2][3];
-    vr.s.w = p.a[3][0] + p.a[3][1] + p.a[3][2] + p.a[3][3];
+    vr.x = p.a[0][0] + p.a[0][1] + p.a[0][2] + p.a[0][3];
+    vr.y = p.a[1][0] + p.a[1][1] + p.a[1][2] + p.a[1][3];
+    vr.z = p.a[2][0] + p.a[2][1] + p.a[2][2] + p.a[2][3];
+    vr.w = p.a[3][0] + p.a[3][1] + p.a[3][2] + p.a[3][3];
 
 	return vr;
 }
@@ -40,7 +52,7 @@ m_add(const matrix_t a, const matrix_t b)
 static inline vector_t
 v_s_add(vector_t a, scalar_t b)
 {
-	vector_t bv = {.s.x = b,.s.y = b,.s.z = b,.s.w = b};
+	vector_t b = {.a = {b,b,b,b}};
 	return a.v + b.v;
 }
 
@@ -60,20 +72,20 @@ v_sub(vector_t a, vector_t b)
 static inline vector_t
 v_s_mul(vector_t a, scalar_t b)
 {
-	vector_t bv = {.s.x = b,.s.y = b,.s.z = b,.s.w = b};
+	vector_t b = {.a = {b,b,b,b}};
 	return a.v * b.v;
 }
 
 static inline vector_t
 v_s_div(vector_t a, scalar_t b)
 {
-	vector_t bv = {.s.x = b,.s.y = b,.s.z = b,.s.w = b};
+	vector_t b = {.a = {b,b,b,b}};
 	return a.v / b.v;
 }
 
 static inline vector_t
 v_set(scalar_t v0, scalar_t v1, scalar_t v2, scalar_t v3)
 {
-	vector_t v = {.s.x = v0,.s.y = v1,.s.z = v2,.s.w = v3};
+	vector_t v = {.a = {v0,v1,v2,v3}};
 	return v;
 }

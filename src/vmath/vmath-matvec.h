@@ -63,22 +63,6 @@ void m_transpose(matrix_t *mt, matrix_t *m) __attribute__ ((__nonnull__));
 
 void m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
     __attribute__ ((__nonnull__));    
-
-#if ENABLE_VECTORISE
-    #undef M_MUL
-    #define M_MUL(A, B, C) \
-        do { \
-            matrix_t tmp_res, tmp_c;\
-            M_TRANSPOSE(tmp_c, (C));\
-            for (int i = 0 ; i < 4 ; i ++) {\
-                for (int j = 0; j < 4 ; j ++) {\
-                    V_DOT(tmp_res.a[i][j], (B).v[i], tmp_c.v[j]);\
-                }\
-            }\
-        } while (0)
-#endif
-    
-    
     
 void m_add(matrix_t *res, matrix_t *a, matrix_t *b)
     __attribute__ ((__nonnull__));
@@ -86,27 +70,27 @@ void m_add(matrix_t *res, matrix_t *a, matrix_t *b)
 vector_t v_s_add(vector_t a, scalar_t b);
 
 vector_t v_add(vector_t a, const vector_t b)
-    __attribute__ ((__nonnull__));
+    __attribute__ ((__pure__,__nonnull__));
 
 
 vector_t v_sub(vector_t a, const vector_t b)
-    __attribute__ ((__nonnull__));
+    __attribute__ ((__pure__,__nonnull__));
 
 
 vector_t v_s_mul(vector_t a, scalar_t s)
-    __attribute__ ((__nonnull__));
+    __attribute__ ((__pure__,__nonnull__));
 
 
 vector_t v_s_div(vector_t a, scalar_t s)
-    __attribute__ ((__nonnull__));
+    __attribute__ ((__pure__,__nonnull__));
 
 
 /* This is really a 3d x product */
     
 vector_t v_cross(vector_t a, vector_t b)
-    __attribute__ ((__nonnull__));
+    __attribute__ ((__pure__,__nonnull__));
     
-vector_t v_normalise(vector_t v) __attribute__ ((__nonnull__));
+vector_t v_normalise(vector_t v) __attribute__ ((__pure__,__nonnull__));
     
  scalar_t v_abs(const vector_t v)
     __attribute__ ((__pure__, __nonnull__));
