@@ -39,6 +39,7 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
 #include "SDL.h"
 
 typedef enum {
