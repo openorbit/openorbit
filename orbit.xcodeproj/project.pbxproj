@@ -36,10 +36,6 @@
 		EC4484D00CCD22CD001C88AD /* plugin-handler.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484C70CCD22CD001C88AD /* plugin-handler.c */; };
 		EC4484D10CCD22CD001C88AD /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484C90CCD22CD001C88AD /* settings.c */; };
 		EC4484D20CCD22CD001C88AD /* sim.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484CB0CCD22CD001C88AD /* sim.c */; };
-		EC4484EC0CCD23C3001C88AD /* linalg.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484E60CCD23C3001C88AD /* linalg.c */; };
-		EC4484ED0CCD23C3001C88AD /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484E80CCD23C3001C88AD /* quaternions.c */; };
-		EC4484EE0CCD23C3001C88AD /* linalg.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484E60CCD23C3001C88AD /* linalg.c */; };
-		EC4484EF0CCD23C3001C88AD /* quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484E80CCD23C3001C88AD /* quaternions.c */; };
 		EC4484F50CCD23E6001C88AD /* tga.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484F20CCD23E6001C88AD /* tga.c */; };
 		EC4484FD0CCD23F4001C88AD /* dynamics.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484F80CCD23F4001C88AD /* dynamics.c */; };
 		EC44850E0CCD242B001C88AD /* res-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485080CCD242B001C88AD /* res-manager.c */; };
@@ -74,6 +70,8 @@
 		EC4486450CCE7BDD001C88AD /* heap.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484D70CCD238B001C88AD /* heap.c */; };
 		EC4486470CCE7BDD001C88AD /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484D90CCD238B001C88AD /* list.c */; };
 		EC4486490CCE7BDD001C88AD /* object-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4484DB0CCD238B001C88AD /* object-manager.c */; };
+		EC5D22F40E51780B00802AE4 /* vmath-matvec.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5D22EE0E51780B00802AE4 /* vmath-matvec.c */; };
+		EC5D22F50E51780B00802AE4 /* vmath-quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5D22F00E51780B00802AE4 /* vmath-quaternions.c */; };
 		EC62134C0D510EA600681104 /* untitled in Resources */ = {isa = PBXBuildFile; fileRef = EC62134B0D510EA600681104 /* untitled */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
 		ECA16A990D141B6A000CAE03 /* planet.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA16A980D141B6A000CAE03 /* planet.c */; };
@@ -157,7 +155,7 @@
 		EC4476C10CCBFFF9001C88AD /* t005_object_manager */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t005_object_manager; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4476C60CCC0010001C88AD /* t006_list */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t006_list; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4476DE0CCC0076001C88AD /* Open Orbit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Open Orbit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Open Orbit-Info.plist"; sourceTree = "<group>"; };
+		EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Open Orbit-Info.plist"; sourceTree = "<group>"; };
 		EC4476F00CCC056D001C88AD /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = /Library/Frameworks/SDL_image.framework; sourceTree = "<absolute>"; };
 		EC4476F10CCC056D001C88AD /* SDL_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_ttf.framework; path = /Library/Frameworks/SDL_ttf.framework; sourceTree = "<absolute>"; };
 		EC4476F20CCC056D001C88AD /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
@@ -181,12 +179,6 @@
 		EC4484DA0CCD238B001C88AD /* object-manager-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "object-manager-private.h"; sourceTree = "<group>"; };
 		EC4484DB0CCD238B001C88AD /* object-manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "object-manager.c"; sourceTree = "<group>"; };
 		EC4484E40CCD23C3001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
-		EC4484E50CCD23C3001C88AD /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constants.h; sourceTree = "<group>"; };
-		EC4484E60CCD23C3001C88AD /* linalg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = linalg.c; sourceTree = "<group>"; };
-		EC4484E70CCD23C3001C88AD /* linalg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linalg.h; sourceTree = "<group>"; };
-		EC4484E80CCD23C3001C88AD /* quaternions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternions.c; sourceTree = "<group>"; };
-		EC4484E90CCD23C3001C88AD /* quaternions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quaternions.h; sourceTree = "<group>"; };
-		EC4484EA0CCD23C3001C88AD /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
 		EC4484F10CCD23E6001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		EC4484F20CCD23E6001C88AD /* tga.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tga.c; sourceTree = "<group>"; };
 		EC4484F30CCD23E6001C88AD /* tga.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tga.h; sourceTree = "<group>"; };
@@ -260,8 +252,16 @@
 		EC4485980CCD26A8001C88AD /* openorbit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = openorbit.h; sourceTree = "<group>"; };
 		EC4485990CCD26B5001C88AD /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		EC4486390CCE7B20001C88AD /* gencds.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = gencds.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		EC44863A0CCE7B20001C88AD /* gencds-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "gencds-Info.plist"; sourceTree = "<group>"; };
+		EC44863A0CCE7B20001C88AD /* gencds-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "gencds-Info.plist"; sourceTree = "<group>"; };
 		EC5B8BA00CD7DDBC00BDB22A /* res-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "res-manager.h"; sourceTree = "<group>"; };
+		EC5D22EC0E51780B00802AE4 /* vmath-constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-constants.h"; sourceTree = "<group>"; };
+		EC5D22ED0E51780B00802AE4 /* vmath-convert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-convert.h"; sourceTree = "<group>"; };
+		EC5D22EE0E51780B00802AE4 /* vmath-matvec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-matvec.c"; sourceTree = "<group>"; };
+		EC5D22EF0E51780B00802AE4 /* vmath-matvec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-matvec.h"; sourceTree = "<group>"; };
+		EC5D22F00E51780B00802AE4 /* vmath-quaternions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-quaternions.c"; sourceTree = "<group>"; };
+		EC5D22F10E51780B00802AE4 /* vmath-quaternions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-quaternions.h"; sourceTree = "<group>"; };
+		EC5D22F20E51780B00802AE4 /* vmath-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-types.h"; sourceTree = "<group>"; };
+		EC5D22F30E51780B00802AE4 /* vmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vmath.h; sourceTree = "<group>"; };
 		EC62134B0D510EA600681104 /* untitled */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = untitled; sourceTree = "<group>"; };
 		EC76CC890D0163D200059CCB /* environment.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = environment.pyx; sourceTree = "<group>"; };
 		EC76CC8A0D016B4E00059CCB /* stars.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stars.csv; sourceTree = "<group>"; };
@@ -271,7 +271,6 @@
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		ECA16A970D141B6A000CAE03 /* planet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = planet.h; sourceTree = "<group>"; };
 		ECA16A980D141B6A000CAE03 /* planet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = planet.c; sourceTree = "<group>"; };
-		ECA16A9A0D1421B4000CAE03 /* convert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = convert.h; sourceTree = "<group>"; };
 		ECA16A9D0D142E82000CAE03 /* texture.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = texture.pyx; sourceTree = "<group>"; };
 		ECA16A9E0D14359E000CAE03 /* solsystem.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = solsystem.csv; sourceTree = "<group>"; };
 		ECA16A9F0D143E13000CAE03 /* postinit.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = postinit.py; sourceTree = "<group>"; };
@@ -402,7 +401,7 @@
 				EC4485060CCD242B001C88AD /* platform */,
 				EC4484F60CCD23F4001C88AD /* physics */,
 				EC4484F00CCD23E6001C88AD /* parsers */,
-				EC4484E30CCD23C3001C88AD /* math */,
+				EC4484E30CCD23C3001C88AD /* vmath */,
 				EC4484D30CCD238B001C88AD /* libgencds */,
 				EC4484C20CCD22CD001C88AD /* error.c */,
 				EC4484C30CCD22CD001C88AD /* error.h */,
@@ -447,19 +446,20 @@
 			path = libgencds;
 			sourceTree = "<group>";
 		};
-		EC4484E30CCD23C3001C88AD /* math */ = {
+		EC4484E30CCD23C3001C88AD /* vmath */ = {
 			isa = PBXGroup;
 			children = (
+				EC5D22EC0E51780B00802AE4 /* vmath-constants.h */,
+				EC5D22ED0E51780B00802AE4 /* vmath-convert.h */,
+				EC5D22EE0E51780B00802AE4 /* vmath-matvec.c */,
+				EC5D22EF0E51780B00802AE4 /* vmath-matvec.h */,
+				EC5D22F00E51780B00802AE4 /* vmath-quaternions.c */,
+				EC5D22F10E51780B00802AE4 /* vmath-quaternions.h */,
+				EC5D22F20E51780B00802AE4 /* vmath-types.h */,
+				EC5D22F30E51780B00802AE4 /* vmath.h */,
 				EC4484E40CCD23C3001C88AD /* CMakeLists.txt */,
-				EC4484E50CCD23C3001C88AD /* constants.h */,
-				EC4484E60CCD23C3001C88AD /* linalg.c */,
-				EC4484E70CCD23C3001C88AD /* linalg.h */,
-				EC4484E80CCD23C3001C88AD /* quaternions.c */,
-				EC4484E90CCD23C3001C88AD /* quaternions.h */,
-				EC4484EA0CCD23C3001C88AD /* types.h */,
-				ECA16A9A0D1421B4000CAE03 /* convert.h */,
 			);
-			path = math;
+			path = vmath;
 			sourceTree = "<group>";
 		};
 		EC4484F00CCD23E6001C88AD /* parsers */ = {
@@ -1038,8 +1038,6 @@
 			files = (
 				EC44856C0CCD2541001C88AD /* testdriver-main.c in Sources */,
 				EC4485720CCD2581001C88AD /* math-test.c in Sources */,
-				EC4484EE0CCD23C3001C88AD /* linalg.c in Sources */,
-				EC4484EF0CCD23C3001C88AD /* quaternions.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1082,8 +1080,6 @@
 				EC4484D00CCD22CD001C88AD /* plugin-handler.c in Sources */,
 				EC4484D10CCD22CD001C88AD /* settings.c in Sources */,
 				EC4484D20CCD22CD001C88AD /* sim.c in Sources */,
-				EC4484EC0CCD23C3001C88AD /* linalg.c in Sources */,
-				EC4484ED0CCD23C3001C88AD /* quaternions.c in Sources */,
 				EC4484F50CCD23E6001C88AD /* tga.c in Sources */,
 				EC4484FD0CCD23F4001C88AD /* dynamics.c in Sources */,
 				EC44850E0CCD242B001C88AD /* res-manager.c in Sources */,
@@ -1095,6 +1091,8 @@
 				EC4485220CCD2456001C88AD /* texture.c in Sources */,
 				EC44852E0CCD2464001C88AD /* scripting.c in Sources */,
 				ECA16A990D141B6A000CAE03 /* planet.c in Sources */,
+				EC5D22F40E51780B00802AE4 /* vmath-matvec.c in Sources */,
+				EC5D22F50E51780B00802AE4 /* vmath-quaternions.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1410,6 +1408,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					PYTHON_FWORK,
 					WITH_PYTHON,
 					USE_ALTIVEC,
 				);
