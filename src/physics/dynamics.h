@@ -51,9 +51,14 @@
 #include <gencds/list.h>
 #include <vmath/vmath.h>
 
+
+#include <ode/ode.h>
+
+
 #define PH_G 6.6732e-11 //Nm^2 kg^-2
 
 // invariant: is_valid == false && is_enabled == true
+#if 0
 typedef struct {
     bool is_valid;
     bool is_enabled;
@@ -67,8 +72,14 @@ typedef struct {
     matrix_t I;       //!< Inertial tensor
     matrix_t I_rep;   //!< Inverse of inertial tensor
 } ph_obj_t;
+#endif
+
+typedef struct _ph_obj_t ph_obj_t;
+typedef struct _ph_sys_t ph_sys_t;
 
 
+
+#if 0
 typedef struct _ph_sys_info_t {
     vector_t r; //!< position of the system in parent world coords
     scalar_t radius; //!< Distance to orbiting point in parent units, derived from r
@@ -93,7 +104,7 @@ typedef struct _ph_sys_t {
     
     ph_obj_t **obj; //! List of current objects in the system
 } ph_sys_t;
-
+#endif
 
 
 /*! Creates a new (almost) isolated physics system
@@ -134,7 +145,7 @@ void ph_step(ph_sys_t *sys, scalar_t step);
 void ph_apply_gravity(ph_sys_t *sys, vector_t g);
 void ph_apply_force(ph_obj_t *obj, vector_t f);
 void ph_apply_force_at_pos(ph_obj_t *obj, vector_t pos, vector_t f);
-void ph_apply_force_relative(ph_obj_t *obj, vector_t pos, vector_t f);
+void ph_apply_force_relative(ph_obj_t *obj, vector_t f);
 void ph_set_mass(ph_obj_t *obj, scalar_t m);
 void ph_reduce_mass(ph_obj_t *obj, scalar_t dm);
 bool ph_reduce_mass_min(ph_obj_t *obj, scalar_t dm, scalar_t min);
