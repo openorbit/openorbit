@@ -62,14 +62,14 @@ typedef struct {
 
 hashtable_t *g_config;
 void
-conf_init(void)
+ooConfInit(void)
 {
     g_config = hashtable_new_with_str_keys(512);
     assert(g_config != NULL);
 }
 
 int
-conf_set_int(const char *key, int val)
+ooConfSetInt(const char *key, int val)
 {
     conf_val_t *confval;
     if (confval = hashtable_lookup(g_config, key)) {
@@ -91,7 +91,7 @@ conf_set_int(const char *key, int val)
     return 0;
 }
 int
-conf_set_bool(const char *key, bool val)
+ooConfSetBool(const char *key, bool val)
 {
     conf_val_t *confval;
     
@@ -115,7 +115,31 @@ conf_set_bool(const char *key, bool val)
 }
 
 int
-conf_set_float(const char *key, float val)
+ooConfSetBoolAsInt(const char *key, int val)
+{
+    conf_val_t *confval;
+    
+    if (confval = hashtable_lookup(g_config, key)) {
+        if (confval->kind == CONF_str) {
+            free(confval->u.str);
+        }
+        confval->kind = CONF_bool;
+        confval->u.b = val;
+    } else {
+        confval = malloc(sizeof(conf_val_t));
+        if (confval) {
+            confval->kind = CONF_bool;
+            confval->u.b = (bool)val;
+            hashtable_insert(g_config, key, confval);
+        } else {
+            return -1;
+        }
+    }
+    return 0;
+}
+
+int
+ooConfSetFloat(const char *key, float val)
 {
     conf_val_t *confval;
     if (confval = hashtable_lookup(g_config, key)) {
@@ -138,7 +162,7 @@ conf_set_float(const char *key, float val)
 }
 
 int
-conf_set_str(const char *key, char *val)
+ooConfSetStr(const char *key, char *val)
 {
     conf_val_t *confval;
     if (confval = hashtable_lookup(g_config, key)) {
@@ -164,7 +188,7 @@ conf_set_str(const char *key, char *val)
 }
 
 int
-conf_get_int(const char *key, int *val)
+ooConfGetInt(const char *key, int *val)
 {
     conf_val_t *confval = hashtable_lookup(g_config, key);
     if (confval && (confval->kind == CONF_int)) {
@@ -176,7 +200,7 @@ conf_get_int(const char *key, int *val)
 }
 
 int
-conf_get_bool(const char *key, bool *val)
+ooConfGetBool(const char *key, bool *val)
 {
     conf_val_t *confval = hashtable_lookup(g_config, key);
     if (confval && (confval->kind == CONF_bool)) {
@@ -187,9 +211,22 @@ conf_get_bool(const char *key, bool *val)
     return -1;
 }
 
+int
+ooConfGetBoolAsInt(const char *key, int *val)
+{
+    conf_val_t *confval = hashtable_lookup(g_config, key);
+    if (confval && (confval->kind == CONF_bool)) {
+        *val = (int)confval->u.b;
+        return 0;
+    }
+    
+    return -1;
+}
+
+
 
 int
-conf_get_float(const char *key, float *val)
+ooConfGetFloat(const char *key, float *val)
 {
     conf_val_t *confval = hashtable_lookup(g_config, key);
     if (confval && (confval->kind == CONF_float)) {
@@ -201,7 +238,7 @@ conf_get_float(const char *key, float *val)
 }
 
 char*
-conf_get_str(const char *key)
+ooConfGetStr(const char *key)
 {
     conf_val_t *confval = hashtable_lookup(g_config, key);
     if (confval && (confval->kind == CONF_str)) {

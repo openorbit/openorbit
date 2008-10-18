@@ -86,7 +86,7 @@ set_target_properties(openorbit
                       DEBUG_OUTPUT_NAME "${open_orbit_debug_name}")
 
 target_link_libraries(openorbit
-                      math scripting parsers dl gencds
+                      math scripting parsers dl gencds ph
                       ${ODE_LIB}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${GLUT_LIBRARIES})
 

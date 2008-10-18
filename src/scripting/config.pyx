@@ -29,39 +29,35 @@
 #   above, a recipient may use your version of this file under either the MPL,
 #   the GPL or the LGPL."
 
-ctypedef int _Bool
     
 cdef extern from "settings.h":
-    int conf_set_bool(char *key, _Bool val)
-    int conf_get_bool(char *key, _Bool *val)    
-    int conf_set_int(char *key, int val)
-    int conf_get_int(char *key, int *val)
-    int conf_set_float(char *key, float val)
-    int conf_get_float(char *key, float *val)
-    int conf_set_str(char *key, char *val)
-    char* conf_get_str(char *key)
+    int ooConfSetBoolAsInt(char *key, int val)
+    int ooConfGetBoolAsInt(char *key, int *val)    
+    int ooConfSetInt(char *key, int val)
+    int ooConfGetInt(char *key, int *val)
+    int ooConfSetFloat(char *key, float val)
+    int ooConfGetFloat(char *key, float *val)
+    int ooConfSetStr(char *key, char *val)
+    char* ooConfGetStr(char *key)
 
 
 def setScreenSize(short w, short h):
-    conf_set_int("video.width", w)
-    conf_set_int("video.height", h)
+    ooConfSetInt("video.width", w)
+    ooConfSetInt("video.height", h)
 
 def setFullscreen(int fs):
-    conf_set_bool("video.fullscreen", fs)
+    ooConfSetBoolAsInt("video.fullscreen", fs)
 
 
 def toggleFullscreen():
-    cdef _Bool fs
+    cdef int fs
     fs = 0
-    # generates a warning as fs is an int here, but we cannot really work it
-    # out in any other way a c-bool will be less then or equal in size to an int
-    # so we can assume that this actually is technically correct
-    res = conf_get_bool("video.fullscreen", &fs) 
-    if fs != 0: # not fully correct, works with gcc though
-        conf_set_bool("video.fullscreen", 0)
+    res = ooConfGetBoolAsInt("video.fullscreen", &fs) 
+    if fs != 0:
+        ooConfSetBoolAsInt("video.fullscreen", 0)
     else:
-        conf_set_bool("video.fullscreen", 1)
+        ooConfSetBoolAsInt("video.fullscreen", 1)
 
 def setScreenDepth(short d):
-    conf_set_int("video.depth", d)
+    ooConfSetInt("video.depth", d)
 

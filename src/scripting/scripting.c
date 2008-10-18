@@ -44,6 +44,8 @@ extern void initconfig(void);
 extern void initres(void);
 extern void initenvironment(void);
 extern void inittexture(void);
+extern void initsg(void);
+extern void initsim(void);
 
  
 #include "scripting.h"
@@ -51,12 +53,16 @@ extern void inittexture(void);
 bool
 init_scripting(void)
 {
-    Py_InitializeEx(0);
+//    Py_InitializeEx(0);
+    Py_Initialize();
+
     initio();
     initconfig();
     initres();
     inittexture();
     initenvironment();
+    initsg();
+    initsim();
     
     oo_error_t err = load_setup_script();
     

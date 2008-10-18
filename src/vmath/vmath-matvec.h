@@ -49,16 +49,19 @@ extern "C" {
 
 #include <stdbool.h>
 #include <vmath/vmath-types.h>
+#include <vmath/vmath-matvec.inl>
 
+
+vector_t v_neg(vector_t v) __attribute__((__pure__));
 
 scalar_t v_dot(const vector_t a, const vector_t b)
-    __attribute__ ((__pure__, __nonnull__));
+    __attribute__ ((__pure__));
 
 
-vector_t m_v_mul(matrix_t *a, const vector_t v);
+vector_t m_v_mul(const matrix_t *a, const vector_t v);
 
     
-void m_transpose(matrix_t *mt, matrix_t *m) __attribute__ ((__nonnull__));
+void m_transpose(matrix_t *mt, const matrix_t *m) __attribute__ ((__nonnull__));
 
 
 void m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
@@ -145,6 +148,7 @@ bool m_eq(const matrix_t *a, const matrix_t *b, scalar_t tol)
 
 
 void m_translate(matrix_t *m, scalar_t x, scalar_t y, scalar_t z, scalar_t w);
+
 
 #ifdef __cplusplus
 }

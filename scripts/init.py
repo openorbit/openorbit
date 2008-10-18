@@ -156,27 +156,3 @@ for key in camControlActionKeys:
     except ConfigParser.NoSectionError:
         print "fatal error, no KEYBOARD section"
         sys.exit(1)
-
-
-#def foo():
-#    print "button pressed"
-#def bar(a, b):
-#    print a, b
-
-#def drag(a, b):
-#    print "drag" + str((a, b))
-
-# Register the function above as an action handler
-#io.registerButtonHandler("foo", foo)
-#io.registerClickHandler("bar", bar)
-#io.registerDragHandler("drag", drag)
-
-
-# io.bindKeyUp can bind both C-function and Python functions to button presses
-# This is why you have to register the button handler function, i.e. to make
-# the interface identical, independent of whether you are using C or Python.    
-
-#io.bindKeyDown("a", 0, "foo")
-#io.bindMouseDown(io.LEFT, "bar")
-#io.bindMouseDown(io.RIGHT, "foo")
-#io.bindMouseDrag(io.LEFT, "drag")

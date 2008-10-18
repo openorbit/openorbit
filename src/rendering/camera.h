@@ -37,10 +37,8 @@
 extern "C" {
 #endif 
 
-
-#include <vmath/vmath.h>
-
 #include <stdbool.h>
+#include <vmath/vmath.h>
 
 typedef enum {
     CAM_FREE,
@@ -107,19 +105,6 @@ void cam_rotate_alpha(camera_t *cam, angle_t ang);
 void cam_rotate_beta(camera_t *cam, angle_t ang);
 void cam_rotate_gamma(camera_t *cam, angle_t ang);
 
-/* Camera actions, registered as action handlers */
-void cam_move_forward_button_action(void);
-void cam_move_back_button_action(void);
-void cam_move_left_button_action(void);
-void cam_move_right_button_action(void);
-void cam_move_up_button_action(void);
-void cam_move_down_button_action(void);
-void cam_roll_left_button_action(void);
-void cam_roll_right_button_action(void);
-void cam_yaw_left_button_action(void);
-void cam_yaw_right_button_action(void);
-void cam_pitch_down_button_action(void);
-void cam_pitch_up_button_action(void);
 
 #ifdef __cplusplus
 }

@@ -72,7 +72,7 @@ init_renderer(void) {
     print_attributes();
     
     init_gl();
-    tex_init();
+    ooTexInit();
     return true;
 }
 
@@ -93,8 +93,8 @@ init_gl(void)
     glLoadIdentity();
 	gluPerspective(/*fovy*/45.0, /*aspect*/1.33 , /*near*/0.001, /*far*/100.0);
     
-    if (conf_get_int("video.width", &width)) width = 640;
-    if (conf_get_int("video.height", &height)) height = 480;
+    if (ooConfGetInt("video.width", &width)) width = 640;
+    if (ooConfGetInt("video.height", &height)) height = 480;
     
     glViewport(0, 0, width, height);
     
@@ -160,9 +160,9 @@ create_surface(void)
     bool fullscreen;
     int width, height;
     
-    if (conf_get_bool("video.fullscreen", &fullscreen)) fullscreen = true;
-    if (conf_get_int("video.width", &width)) width = 640;
-    if (conf_get_int("video.height", &height)) height = 480;
+    if (ooConfGetBool("video.fullscreen", &fullscreen)) fullscreen = true;
+    if (ooConfGetInt("video.width", &width)) width = 640;
+    if (ooConfGetInt("video.height", &height)) height = 480;
 
     if (fullscreen) flags |= SDL_FULLSCREEN;
     // Create window
@@ -197,13 +197,12 @@ void enter_fullscreen()
 static void
 draw_gl(void)
 {
-    extern star_list_t *gSKY_stars;
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     // first, lets draw the nightsky, z-buffer disabled
-    paint_sky(gSKY_stars);
+    
     glLoadIdentity();
     
     // the drawing is not very well structured at the moment

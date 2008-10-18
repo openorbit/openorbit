@@ -41,15 +41,16 @@
 #include <assert.h>
 #include <stdlib.h>
 
-star_list_t *gSKY_stars = NULL;
 
-void
-equ_cart_convert(vector_t *cart, angle_t ra, angle_t dec)
+vector_t
+ooEquToCart(angle_t ra, angle_t dec)
 {
+    vector_t cart;
     scalar_t cosdec = cos(dec);
-    cart->a[0] = cosdec * cos(ra);
-    cart->a[1] = cosdec * sin(ra);
-    cart->a[2] = sin(dec);
+    cart.x = cosdec * cos(ra);
+    cart.y = cosdec * sin(ra);
+    cart.z = sin(dec);
+    return cart;
 }
 
 // the minimum and maximum magnetude values that correspond to alpha 255 and 0
@@ -59,7 +60,7 @@ equ_cart_convert(vector_t *cart, angle_t ra, angle_t dec)
 #define MAG_BASE 2.512
 #define TOTAL_MAG_DIFF (MAX_MAG-MIN_MAG)
 double
-vmag_to_alpha(double vmag)
+ooVmagToAlpha(double vmag)
 {
     double total_diff = pow(MAG_BASE, TOTAL_MAG_DIFF);
     double vmag_diff = pow(MAG_BASE, MAX_MAG-vmag);
@@ -69,15 +70,15 @@ vmag_to_alpha(double vmag)
     return normalised_lin_diff;
 }
 
-int
-add_star(double ra, double dec, double mag, double bv)
+void
+ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
 {
     vector_t cart;
-    equ_cart_convert(&cart, ra, dec);
+    cart = ooEquToCart(ra, dec);
     
     // star list full?
-    if (gSKY_stars->a_len <= gSKY_stars->n_stars) {
-        return -1;
+    if (stars->a_len <= stars->n_stars) {
+        return;
     }
     
     double temp = bv_to_temp(bv);
@@ -85,18 +86,16 @@ add_star(double ra, double dec, double mag, double bv)
     if (temp > 40000.0) temp = 40000.0;
     uint8_t *tempRGB = get_temp_colour((int)temp);
     
-    gSKY_stars->data[gSKY_stars->n_stars].x = cart.a[0];
-    gSKY_stars->data[gSKY_stars->n_stars].y = cart.a[1];
-    gSKY_stars->data[gSKY_stars->n_stars].z = cart.a[2];
-    gSKY_stars->data[gSKY_stars->n_stars].r = *tempRGB;
-    gSKY_stars->data[gSKY_stars->n_stars].g = *(tempRGB+1);
-    gSKY_stars->data[gSKY_stars->n_stars].b = *(tempRGB+2);
-    gSKY_stars->data[gSKY_stars->n_stars].a = vmag_to_alpha(mag) * 255;
-    if (gSKY_stars->data[gSKY_stars->n_stars].a < 40) gSKY_stars->data[gSKY_stars->n_stars].a = 40;
+    stars->data[stars->n_stars].x = cart.x;
+    stars->data[stars->n_stars].y = cart.y;
+    stars->data[stars->n_stars].z = cart.z;
+    stars->data[stars->n_stars].r = *tempRGB;
+    stars->data[stars->n_stars].g = *(tempRGB+1);
+    stars->data[stars->n_stars].b = *(tempRGB+2);
+    stars->data[stars->n_stars].a = ooVmagToAlpha(mag) * 255;
+    if (stars->data[stars->n_stars].a < 40) stars->data[stars->n_stars].a = 40;
     
-    gSKY_stars->n_stars ++;
-    
-    return 0;
+    stars->n_stars ++;
 }
 
 double deg2rad(double deg) {
@@ -104,22 +103,22 @@ double deg2rad(double deg) {
 }
 
 
-star_list_t*
-random_stars(void)
+OOstars*
+ooSkyRandomStars(void)
 {
-    assert(sizeof(star_t) == 4*sizeof(char)+3*sizeof(float));
+    assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
     vector_t cart;
     float ra, dec;
     
-    star_list_t *stars = malloc(sizeof(star_list_t) +  STAR_CNT*sizeof(star_t));
+    OOstars *stars = malloc(sizeof(OOstars) +  STAR_CNT*sizeof(OOstar));
     
     for (int i = 0; i < STAR_CNT ; i ++) {
         ra = deg2rad(random() % 360-180);
         dec = deg2rad(random() % 180-90);
-        equ_cart_convert(&cart, ra, dec);
-        stars->data[i].x = cart.a[0];
-        stars->data[i].y = cart.a[1];
-        stars->data[i].z = cart.a[2];
+        cart = ooEquToCart(ra, dec);
+        stars->data[i].x = cart.x;
+        stars->data[i].y = cart.y;
+        stars->data[i].z = cart.z;
         stars->data[i].r = 255;
         stars->data[i].g = 255;
         stars->data[i].b = 255;
@@ -133,26 +132,20 @@ random_stars(void)
 }
 
 
-star_list_t*
-initialise_star_list(int star_count)
+OOstars*
+ooSkyInitStars(int star_count)
 {
-    assert(sizeof(star_t) == 4*sizeof(char)+3*sizeof(float));
+    assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
 
-    star_list_t *stars = malloc(sizeof(star_list_t) + star_count*sizeof(star_t));
+    OOstars *stars = malloc(sizeof(OOstars) + star_count*sizeof(OOstar));
     stars->a_len = star_count;
     stars->n_stars = 0;
     return stars;
 }
 
-void
-init_sky(void) 
-{
-    gSKY_stars = initialise_star_list(STAR_CNT);
-}
-
 #include "camera.h"
 void
-paint_sky(star_list_t *stars)
+ooSkyDrawStars(OOstars *stars)
 {
     glPushMatrix();
     glLoadIdentity();
@@ -170,3 +163,4 @@ paint_sky(star_list_t *stars)
     glEnable(GL_DEPTH_TEST);
     glPopMatrix();
 }
+

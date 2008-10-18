@@ -12,11 +12,11 @@
     The Original Code is the Open Orbit space flight simulator.
 
     The Initial Developer of the Original Code is Mattias Holm. Portions
-    created by the Initial Developer are Copyright (C) 2006 the
+    created by the Initial Developer are Copyright (C) 2006,2008 the
     Initial Developer. All Rights Reserved.
 
     Contributor(s):
-        Mattias Holm <mattias.holm(at)contra.nu>.
+        Mattias Holm <mattias.holm(at)openorbit.org>.
 
     Alternatively, the contents of this file may be used under the terms of
     either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -32,850 +32,365 @@
  */
 
 #include <stdbool.h>
-
+#include <err.h>
 #include <gencds/hashtable.h>
 #include "sim.h"
 #include "io-manager.h"
 #include "SDL.h"
 
-// Default grounding functions
-static void io_init_actiontable(void);
-static void io_init_keytable(void);
 
 
-static io_manager_t gIO_manager;
-
-static hashtable_t *gIO_action_table;
-static hashtable_t *gIO_event_handler_table;
-static hashtable_t *gIO_key_table;
-
-static io_bindings_t IO_bindings;
-
-static void
-io_event_def(sim_event_kind_t eid, void *data)
-{
-    assert(eid == SIM_io_event);
-    io_event_t *e = (io_event_t*)data;
-}
-
-void
-io_bindings_init(void)
-{
-    for (int i = 0 ; i < IO_MAX_KEYS ; i ++) {
-        for (int j = 0 ; j < IO_MAX_MOD_COMBOS ; j ++) {
-            IO_bindings.keyboard.key[i][j].modifier_mask = false;
-            IO_bindings.keyboard.key[i][j].up.is_script = false;
-            IO_bindings.keyboard.key[i][j].up.u.c = io_event_def;
-            IO_bindings.keyboard.key[i][j].down.is_script = false;
-            IO_bindings.keyboard.key[i][j].down.u.c = io_event_def;
-        }
-    }
-    for (int i = 0 ; i < IO_MAX_MOUSE_BUTTONS ; i ++) {
-        IO_bindings.mouse.button[i].up.is_script = false;
-        IO_bindings.mouse.button[i].up.u.c = io_event_def;
-        IO_bindings.mouse.button[i].down.is_script = false;
-        IO_bindings.mouse.button[i].down.u.c = io_event_def;
-        
-        IO_bindings.mouse.drag[i].is_script = false;
-        IO_bindings.mouse.drag[i].u.c = io_event_def;
-    }
-    
-    for (int i = 0 ; i < IO_MAX_JOYSTICKS ; i ++) {
-		for (int j = 0 ; j < IO_MAX_JOYSTICK_BUTTONS ; j ++) { 
-			IO_bindings.joystick[i].button[j].up.is_script = false;
-            IO_bindings.joystick[i].button[j].up.u.c = io_event_def;
-            
-            IO_bindings.joystick[i].button[j].down.is_script = false;
-            IO_bindings.joystick[i].button[j].down.u.c = io_event_def;
-        }
-		for (int j = 0 ; j < IO_MAX_JOYSTICK_AXIS ; j ++) { 
-            IO_bindings.joystick[i].axis[j].is_script = false;
-            IO_bindings.joystick[i].axis[j].u.c = io_event_def;
-        }
-	}
-}
-
-bool
-io_register_event_handler(const char *key, sim_event_handler_t f,
-                          io_event_kind_t kind)
-{
-    io_event_handler_container_t *cont;
-    
-    cont = malloc(sizeof(io_event_handler_container_t));
-    if (! cont) return false;
-    
-    cont->kind = kind;
-    cont->handler.is_script = false;
-    cont->handler.u.c = f;
-    
-    hashtable_insert(gIO_event_handler_table, key, cont);
-    return true;
-}
-
-int
-io_register_event_handler_script(const char *key, scr_func_t f,
-                                 io_event_kind_t kind)
-{
-    io_event_handler_container_t *cont;
-    
-    cont = malloc(sizeof(io_event_handler_container_t));
-    if (! cont) return false;
-
-    Py_INCREF(f);
-    
-    cont->kind = kind;
-    cont->handler.is_script = true;
-    cont->handler.u.s = f;
-    
-    hashtable_insert(gIO_event_handler_table, key, cont);
-    return true;
-}
-
-int
-io_bind_event(const char *key, ...)
-{
-    io_event_handler_container_t *cont;
-    cont = hashtable_lookup(gIO_event_handler_table, key);
-    
-    if (cont == NULL) {
-        return -1;
-    } 
-    
-    //IO_bindings.
-}
-
-void
-io_dispatch_event(const io_event_t *e)
-{
-    switch (e->kind) {
-    case IO_ev_axis:
-        if (IO_bindings.joystick[e->u.axis.joystick_id]
-                       .axis[e->u.axis.axis_id].is_script) {
-            
-        } else {
-            IO_bindings.joystick[e->u.axis.joystick_id]
-                       .axis[e->u.axis.axis_id].u.c(SIM_io_event, (void*)e);
-        }
-        break;
-    case IO_ev_button:
-        if (e->u.button.down) {
-            if (IO_bindings.joystick[e->u.button.joystick_id]
-                .button[e->u.button.button_id].down.is_script) {
-                
-            } else {
-                IO_bindings.joystick[e->u.button.joystick_id]
-                .button[e->u.button.button_id].down.u.c(SIM_io_event, (void*)e);
-            }                    
-        } else {
-            if (IO_bindings.joystick[e->u.button.joystick_id]
-                .button[e->u.button.button_id].up.is_script) {
-                
-            } else {
-                IO_bindings.joystick[e->u.button.joystick_id]
-                .button[e->u.button.button_id].up.u.c(SIM_io_event, (void*)e);
-            }                                
-        }
-        break;
-    case IO_ev_key:
-        for (int i = 0 ; i < IO_MAX_MOD_COMBOS ; i ++) {
-            if (! (IO_bindings.keyboard.key[e->u.key.key_id][i].modifier_mask
-                   ^ e->u.key.modifiers)) {
-                if (e->u.key.down) {
-                    if (IO_bindings.keyboard.key[e->u.key.key_id][i]
-                                                .down.is_script) {
-                    
-                    } else {
-                        IO_bindings.keyboard.key[e->u.key.key_id][i]
-                            .down.u.c(SIM_io_event, (void*)e);
-                    }
-                } else {
-                    if (IO_bindings.keyboard.key[e->u.key.key_id][i]
-                                                .up.is_script) {
-                        //IO_script(IO_bindings.keyboard.key[e->u.key.key_id][i]
-                        //.up.u.s, (void*)e);
-                    } else {
-                        IO_bindings.keyboard.key[e->u.key.key_id][i]
-                            .up.u.c(SIM_io_event, (void*)e);
-                    }
-                }
-                break;
-            }
-        }
-        break;
-    case IO_ev_click:
-        if (e->u.click.down) {
-            if (IO_bindings.mouse.button[e->u.click.button].down.is_script) {
-                
-            } else {
-                IO_bindings.mouse.button[e->u.click.button].down.u.c(SIM_io_event, (void*)e);
-            }
-        } else {
-            if (IO_bindings.mouse.button[e->u.click.button].up.is_script) {
-                
-            } else {
-                IO_bindings.mouse.button[e->u.click.button].up.u.c(SIM_io_event, (void*)e);
-            }
-        }
-        break;
-    case IO_ev_drag:
-        if (IO_bindings.mouse.drag[e->u.drag.button].is_script) {
-            
-        } else {
-            IO_bindings.mouse.drag[e->u.drag.button].u.c(SIM_io_event, (void*)e);
-        }
-        break;
-    case IO_ev_any:
-        /* fall through, ambiguous events may not be dispatched */
-    default:
-        assert(0);
-    }
-}
-
-
-
-static void
-io_button_action_def(void)
-{
-	return;
-}
-
-static void
-io_click_action_def(float x, float y)
-{
-	return;
-}
-
-static void
-io_drag_action_def(float dx, float dy)
-{
-	return;
-}
-
-static void
-io_axis_action_def(float value)
-{
-	return;
-}
-
-
-static void
-io_init_actiontable(void)
-{
-    gIO_action_table = hashtable_new_with_str_keys(4096);
-}
-
-
-// when porting to something else than SDL, you have to replace the constants
-// here with the new keycodes we store a integers in this hashtable, so we cast
-// this number to a pointer in order to save heap space
-static void
-io_init_keytable(void)
-{
-    gIO_key_table = hashtable_new_with_str_keys(2048);
-    
-    hashtable_insert(gIO_key_table, "lshift", (void*)SDLK_LSHIFT);
-    hashtable_insert(gIO_key_table, "rshift", (void*)SDLK_RSHIFT);
-    hashtable_insert(gIO_key_table, "lmeta",  (void*)SDLK_LMETA);
-    hashtable_insert(gIO_key_table, "rmeta",  (void*)SDLK_RMETA);
-    hashtable_insert(gIO_key_table, "lctrl",  (void*)SDLK_LCTRL);
-    hashtable_insert(gIO_key_table, "rctrl",  (void*)SDLK_RCTRL);
-    hashtable_insert(gIO_key_table, "lsuper", (void*)SDLK_LSUPER);
-    hashtable_insert(gIO_key_table, "rsuper", (void*)SDLK_RSUPER);
-
-    hashtable_insert(gIO_key_table, "mode",           (void*)SDLK_MODE);
-    hashtable_insert(gIO_key_table, "help",           (void*)SDLK_HELP);
-    hashtable_insert(gIO_key_table, "print-screen",   (void*)SDLK_PRINT);
-    hashtable_insert(gIO_key_table, "sys-req",        (void*)SDLK_SYSREQ);
-    hashtable_insert(gIO_key_table, "break",          (void*)SDLK_BREAK);
-    hashtable_insert(gIO_key_table, "menu",           (void*)SDLK_MENU);
-    hashtable_insert(gIO_key_table, "power",          (void*)SDLK_POWER);
-    hashtable_insert(gIO_key_table, "euro",           (void*)SDLK_EURO);
-        
-    hashtable_insert(gIO_key_table, "return",     (void*)SDLK_RETURN);
-    hashtable_insert(gIO_key_table, "space",      (void*)SDLK_SPACE);
-    hashtable_insert(gIO_key_table, "tab",        (void*)SDLK_TAB);
-    hashtable_insert(gIO_key_table, "backspace",  (void*)SDLK_BACKSPACE);
-    hashtable_insert(gIO_key_table, "esc",        (void*)SDLK_ESCAPE);
-    hashtable_insert(gIO_key_table, ".",          (void*)SDLK_PERIOD);
-    hashtable_insert(gIO_key_table, ",",          (void*)SDLK_COMMA);
-    hashtable_insert(gIO_key_table, "`",          (void*)SDLK_BACKQUOTE);
-    hashtable_insert(gIO_key_table, "clear",      (void*)SDLK_CLEAR);
-    hashtable_insert(gIO_key_table, "pause",      (void*)SDLK_PAUSE);
-    hashtable_insert(gIO_key_table, "!",          (void*)SDLK_EXCLAIM);
-    hashtable_insert(gIO_key_table, "\"",         (void*)SDLK_QUOTEDBL);
-    hashtable_insert(gIO_key_table, "#",          (void*)SDLK_HASH);
-    hashtable_insert(gIO_key_table, "$",          (void*)SDLK_DOLLAR);
-    hashtable_insert(gIO_key_table, "&",          (void*)SDLK_AMPERSAND);
-    hashtable_insert(gIO_key_table, "'",          (void*)SDLK_QUOTE);
-    hashtable_insert(gIO_key_table, "(",          (void*)SDLK_LEFTPAREN);
-    hashtable_insert(gIO_key_table, ")",          (void*)SDLK_RIGHTPAREN);
-    hashtable_insert(gIO_key_table, "*",          (void*)SDLK_ASTERISK);
-    hashtable_insert(gIO_key_table, "+",          (void*)SDLK_PLUS);
-    hashtable_insert(gIO_key_table, "-",          (void*)SDLK_MINUS);
-    hashtable_insert(gIO_key_table, "/",          (void*)SDLK_SLASH);
-            
-    hashtable_insert(gIO_key_table, ":",  (void*)SDLK_COLON);
-    hashtable_insert(gIO_key_table, ";",  (void*)SDLK_SEMICOLON);
-    hashtable_insert(gIO_key_table, "<",  (void*)SDLK_LESS);
-    hashtable_insert(gIO_key_table, "=",  (void*)SDLK_EQUALS);
-    hashtable_insert(gIO_key_table, ">",  (void*)SDLK_GREATER);
-    hashtable_insert(gIO_key_table, "?",  (void*)SDLK_QUESTION);
-    hashtable_insert(gIO_key_table, "@",  (void*)SDLK_AT);
-    hashtable_insert(gIO_key_table, "[",  (void*)SDLK_LEFTBRACKET);
-    hashtable_insert(gIO_key_table, "\\", (void*)SDLK_BACKSLASH);
-    hashtable_insert(gIO_key_table, "]",  (void*)SDLK_RIGHTBRACKET);
-    hashtable_insert(gIO_key_table, "^",  (void*)SDLK_CARET);
-    hashtable_insert(gIO_key_table, "_",  (void*)SDLK_UNDERSCORE);
-    
-    hashtable_insert(gIO_key_table, "0", (void*)SDLK_0);
-    hashtable_insert(gIO_key_table, "1", (void*)SDLK_1);
-    hashtable_insert(gIO_key_table, "2", (void*)SDLK_2);
-    hashtable_insert(gIO_key_table, "3", (void*)SDLK_3);
-    hashtable_insert(gIO_key_table, "4", (void*)SDLK_4);
-    hashtable_insert(gIO_key_table, "5", (void*)SDLK_5);
-    hashtable_insert(gIO_key_table, "6", (void*)SDLK_6);
-    hashtable_insert(gIO_key_table, "7", (void*)SDLK_7);
-    hashtable_insert(gIO_key_table, "8", (void*)SDLK_8);
-    hashtable_insert(gIO_key_table, "9", (void*)SDLK_9);
-
-    hashtable_insert(gIO_key_table, "kp 0", (void*)SDLK_KP0);
-    hashtable_insert(gIO_key_table, "kp 1", (void*)SDLK_KP1);
-    hashtable_insert(gIO_key_table, "kp 2", (void*)SDLK_KP2);
-    hashtable_insert(gIO_key_table, "kp 3", (void*)SDLK_KP3);
-    hashtable_insert(gIO_key_table, "kp 4", (void*)SDLK_KP4);
-    hashtable_insert(gIO_key_table, "kp 5", (void*)SDLK_KP5);
-    hashtable_insert(gIO_key_table, "kp 6", (void*)SDLK_KP6);
-    hashtable_insert(gIO_key_table, "kp 7", (void*)SDLK_KP7);
-    hashtable_insert(gIO_key_table, "kp 8", (void*)SDLK_KP8);
-    hashtable_insert(gIO_key_table, "kp 9", (void*)SDLK_KP9);    
- 
-    hashtable_insert(gIO_key_table, "kp .",   (void*)SDLK_KP_PERIOD);
-    hashtable_insert(gIO_key_table, "kp /",   (void*)SDLK_KP_DIVIDE);
-    hashtable_insert(gIO_key_table, "kp *",   (void*)SDLK_KP_MULTIPLY);
-    hashtable_insert(gIO_key_table, "kp -",   (void*)SDLK_KP_MINUS);
-    hashtable_insert(gIO_key_table, "kp +",   (void*)SDLK_KP_PLUS);
-    hashtable_insert(gIO_key_table, "enter",  (void*)SDLK_KP_ENTER);
-    hashtable_insert(gIO_key_table, "kp =",   (void*)SDLK_KP_EQUALS);
-    hashtable_insert(gIO_key_table, "delete", (void*)SDLK_DELETE);
-        
-    hashtable_insert(gIO_key_table, "a", (void*)SDLK_a);
-    hashtable_insert(gIO_key_table, "b", (void*)SDLK_b);
-    hashtable_insert(gIO_key_table, "c", (void*)SDLK_c);
-    hashtable_insert(gIO_key_table, "d", (void*)SDLK_d);
-    hashtable_insert(gIO_key_table, "e", (void*)SDLK_e);
-    hashtable_insert(gIO_key_table, "f", (void*)SDLK_f);
-    hashtable_insert(gIO_key_table, "g", (void*)SDLK_g);
-    hashtable_insert(gIO_key_table, "h", (void*)SDLK_h);
-    hashtable_insert(gIO_key_table, "i", (void*)SDLK_i);
-    hashtable_insert(gIO_key_table, "j", (void*)SDLK_j);
-    hashtable_insert(gIO_key_table, "k", (void*)SDLK_k);
-    hashtable_insert(gIO_key_table, "l", (void*)SDLK_l);
-    hashtable_insert(gIO_key_table, "m", (void*)SDLK_m);
-    hashtable_insert(gIO_key_table, "n", (void*)SDLK_n);
-    hashtable_insert(gIO_key_table, "o", (void*)SDLK_o);
-    hashtable_insert(gIO_key_table, "p", (void*)SDLK_p);
-    hashtable_insert(gIO_key_table, "q", (void*)SDLK_q);
-    hashtable_insert(gIO_key_table, "r", (void*)SDLK_r);
-    hashtable_insert(gIO_key_table, "s", (void*)SDLK_s);
-    hashtable_insert(gIO_key_table, "t", (void*)SDLK_t);
-    hashtable_insert(gIO_key_table, "u", (void*)SDLK_u);
-    hashtable_insert(gIO_key_table, "v", (void*)SDLK_v);
-    hashtable_insert(gIO_key_table, "w", (void*)SDLK_w);
-    hashtable_insert(gIO_key_table, "x", (void*)SDLK_x);
-    hashtable_insert(gIO_key_table, "y", (void*)SDLK_y);
-    hashtable_insert(gIO_key_table, "z", (void*)SDLK_z);
-    
-    hashtable_insert(gIO_key_table, "f1",     (void*)SDLK_F1);
-    hashtable_insert(gIO_key_table, "f2",     (void*)SDLK_F2);
-    hashtable_insert(gIO_key_table, "f3",     (void*)SDLK_F3);
-    hashtable_insert(gIO_key_table, "f4",     (void*)SDLK_F4);
-    hashtable_insert(gIO_key_table, "f5",     (void*)SDLK_F5);
-    hashtable_insert(gIO_key_table, "f6",     (void*)SDLK_F6);
-    hashtable_insert(gIO_key_table, "f7",     (void*)SDLK_F7);
-    hashtable_insert(gIO_key_table, "f8",     (void*)SDLK_F8);
-    hashtable_insert(gIO_key_table, "f9",     (void*)SDLK_F9);
-    hashtable_insert(gIO_key_table, "f10",    (void*)SDLK_F10);
-    hashtable_insert(gIO_key_table, "f11",    (void*)SDLK_F11);
-    hashtable_insert(gIO_key_table, "f12",    (void*)SDLK_F12);
-    hashtable_insert(gIO_key_table, "f13",    (void*)SDLK_F13);
-    hashtable_insert(gIO_key_table, "f14",    (void*)SDLK_F14);
-    hashtable_insert(gIO_key_table, "f15",    (void*)SDLK_F15);
-
-    hashtable_insert(gIO_key_table, "up",     (void*)SDLK_UP);
-    hashtable_insert(gIO_key_table, "down",   (void*)SDLK_DOWN);
-    hashtable_insert(gIO_key_table, "left",   (void*)SDLK_LEFT);
-    hashtable_insert(gIO_key_table, "right",  (void*)SDLK_RIGHT);
-
-    hashtable_insert(gIO_key_table, "insert",     (void*)SDLK_INSERT);
-    hashtable_insert(gIO_key_table, "home",       (void*)SDLK_HOME);
-    hashtable_insert(gIO_key_table, "end",        (void*)SDLK_END);
-    hashtable_insert(gIO_key_table, "page up",    (void*)SDLK_PAGEUP);
-    hashtable_insert(gIO_key_table, "page down",  (void*)SDLK_PAGEDOWN);
-        
-}
-
-oo_error_t
-io_manager_init(void)
-{
-	// ground all keyboard actions
-	for (int i = 0 ; i < IO_MAX_KEYS ; i ++) {
-		gIO_manager.keyboard.button[i].up.is_script = false;
-        gIO_manager.keyboard.button[i].up.u.c = io_button_action_def;
-        
-        gIO_manager.keyboard.button[i].down.is_script = false;
-        gIO_manager.keyboard.button[i].down.u.c = io_button_action_def;
-   	}
-    
-	// ground all mouse actions	
-	for (int i = 0 ; i < IO_MAX_MOUSE_BUTTONS ; i ++) {
-		gIO_manager.mouse.button[i].up.is_click_action = true;
-        gIO_manager.mouse.button[i].up.u.click.is_script = false;
-        gIO_manager.mouse.button[i].up.u.click.u.c = io_click_action_def;
-        
-        gIO_manager.mouse.button[i].down.is_click_action = true;
-        gIO_manager.mouse.button[i].down.u.click.is_script = false;
-        gIO_manager.mouse.button[i].down.u.click.u.c = io_click_action_def;
-        
-        gIO_manager.mouse.button[i].drag.is_script = false;
-        gIO_manager.mouse.button[i].drag.u.c = io_drag_action_def;        
-	}
-	
-	// ground all joystick actions
-	
-	for (int i = 0 ; i < IO_MAX_JOYSTICKS ; i ++) {
-		for (int j = 0 ; j < IO_MAX_JOYSTICK_BUTTONS ; j ++) { 
-			gIO_manager.joystick[i].button[j].up.is_script = false;
-            gIO_manager.joystick[i].button[j].up.u.c = io_button_action_def;
-
-            gIO_manager.joystick[i].button[j].down.is_script = false;
-            gIO_manager.joystick[i].button[j].down.u.c = io_button_action_def;
-        }
-		for (int j = 0 ; j < IO_MAX_JOYSTICK_AXIS ; j ++) { 
-            gIO_manager.joystick[i].axis[j].is_script = false;
-            gIO_manager.joystick[i].axis[j].u.c = io_axis_action_def;
-        }
-	}
-    
-    io_init_keytable();
-    io_init_actiontable();
-    
-	return ERR_none;
-}
+static const char * gIoSdlKeyStringMap[SDLK_LAST];
+static const char * gIoSdlMouseStringMap[7];
+static hashtable_t *gIoBoundKeyTable;
+static hashtable_t *gIoButtonHandlers;
 
 
 void
-io_handle_key_down(uint32_t key, uint16_t special)
+ooButtonHandlerGnd(bool buttonUp, void *data)
 {
-    // TODO: Error on to high numbers...
-    if (gIO_manager.keyboard.button[key].down.is_script) {
-        PyObject *f = gIO_manager.keyboard.button[key].down.u.s;
-            
-            PyObject *res = PyObject_CallFunction(f, "");
-            if (! res) PyErr_Print();
-            Py_XDECREF(res);
-    } else {
-        gIO_manager.keyboard.button[key].down.u.c();
-    }
+    /*Nothing*/
 }
+
+typedef struct {
+    bool isScript;
+    union {
+        OObuttonhandlerfunc cHandler;
+        PyObject *pyHandler;
+    };
+} OObuttonhandler;
+
+typedef struct _OOkeyevent {
+    struct {
+        bool upIsScript;
+        union {
+            OObuttonhandlerfunc cUp;
+            PyObject *pyUp;
+        };
+    };
+    
+    struct {
+        bool downIsScript;
+        union {
+            OObuttonhandlerfunc cDown;
+            PyObject *pyDown;
+        };
+    };
+    
+    uint16_t modMask;
+    void *data;
+    struct _OOkeyevent *next;
+} OOkeyevent;
 
 void
-io_handle_key_up(uint32_t key, uint16_t special)
+ooIoRegCKeyHandler(const char *name, OObuttonhandlerfunc handlerFunc)
 {
-    // TODO: Error on to high numbers...
-    if (gIO_manager.keyboard.button[key].up.is_script) {
-            PyObject *f = gIO_manager.keyboard.button[key].up.u.s;
-            
-            PyObject *res = PyObject_CallFunction(f, "");
-            if (! res) PyErr_Print();
-            Py_XDECREF(res);
-    } else {
-        gIO_manager.keyboard.button[key].up.u.c();
-    }
-}
-
-
-void
-io_handle_mouse_down(short button, float x, float y)
-{
-    // TODO: Error on to high numbers...
-    if (gIO_manager.mouse.button[button].down.is_click_action) {
-        if (gIO_manager.mouse.button[button].down.u.click.is_script) {
-            
-            PyObject *f = gIO_manager.mouse.button[button].down.u.click.u.s;
-            
-            PyObject *res = PyObject_CallFunction(f, "(dd)", (double)x, (double)y);
-            if (! res) PyErr_Print();
-            Py_XDECREF(res);
-        } else {     
-            gIO_manager.mouse.button[button].down.u.click.u.c(x, y);            
-        }
-    } else {
-        if (gIO_manager.mouse.button[button].down.u.button.is_script) {
-            PyObject *f = gIO_manager.mouse.button[button].down.u.button.u.s;
-            PyObject *res = PyObject_CallFunction(f, "");
-            if (! res) PyErr_Print();
-            Py_XDECREF(res);
-        } else {
-            gIO_manager.mouse.button[button].down.u.button.u.c();            
-        }
-    }
-}
-
-void
-io_handle_mouse_up(short button, float x, float y)
-{
-    // TODO: Error on to high numbers...
-    if (gIO_manager.mouse.button[button].up.is_click_action) {
-        if (gIO_manager.mouse.button[button].up.u.click.is_script) {
-            PyObject *f = gIO_manager.mouse.button[button].up.u.click.u.s;
-            
-            PyObject *res = PyObject_CallFunction(f, "(dd)", (double)x, (double)y);
-            if (! res) PyErr_Print();
-
-            Py_XDECREF(res);
-        } else {
-            gIO_manager.mouse.button[button].up.u.click.u.c(x, y);            
-        }
-    } else {
-        if (gIO_manager.mouse.button[button].up.u.button.is_script) {
-            PyObject *f = gIO_manager.mouse.button[button].up.u.button.u.s;
-            PyObject *res = PyObject_CallFunction(f, "");
-            if (! res) PyErr_Print();
-            Py_XDECREF(res);
-        } else {
-            gIO_manager.mouse.button[button].up.u.button.u.c();
-        }
-    }
-}
-
-
-void
-io_handle_mouse_drag(short button, float dx, float dy)
-{
-    if (gIO_manager.mouse.button[button].drag.is_script) {
-            PyObject *f = gIO_manager.mouse.button[button].drag.u.s;
-
-            PyObject *res = PyObject_CallFunction(f, "(dd)", (double)dx, (double)dy);
-            if (! res) PyErr_Print();
-            Py_XDECREF(res);
-        } else {
-            gIO_manager.mouse.button[button].drag.u.c(dx, dy);            
-        }
-}
-
-void
-io_handle_joystick_button_down(short joystick, short button)
-{
-    if (gIO_manager.joystick[joystick].button[button].down.is_script) {
-        PyObject *f = gIO_manager.joystick[joystick].button[button].down.u.s;
-        PyObject *res = PyObject_CallFunction(f, "");
-        if (! res) PyErr_Print();
-        Py_XDECREF(res);
-    } else {
-        gIO_manager.joystick[joystick].button[button].down.u.c();
-    }
-}
-
-void
-io_handle_joystick_button_up(short joystick, short button)
-{
-    if (gIO_manager.joystick[joystick].button[button].up.is_script) {
-        PyObject *f = gIO_manager.joystick[joystick].button[button].up.u.s;
-        PyObject *res = PyObject_CallFunction(f, "");
-        if (! res) PyErr_Print();
-        Py_XDECREF(res);
-    } else {
-        gIO_manager.joystick[joystick].button[button].up.u.c();
-    }
-}
-
-void
-io_handle_joystick_axis(short joystick, short axis, float val)
-{
-    if (gIO_manager.joystick[joystick].axis[axis].is_script) {
-        PyObject *f = gIO_manager.joystick[joystick].axis[axis].u.s;
-
-        PyObject *res = PyObject_CallFunction(f, "(d)", (double)val);
-        if (! res) PyErr_Print();
-
-        Py_XDECREF(res);
-    } else {
-        gIO_manager.joystick[joystick].axis[axis].u.c(val);
-    }
-}
-    
-bool
-io_register_mouse_click_handler(const char *key, io_click_action_f f) {
-    io_action_t *ah;
-    if (! (ah = malloc(sizeof(io_action_t))) ) {
-        return false;
-    }
-    
-    ah->t = IO_ACTION_CLICK;
-    ah->u.click = f;
-    
-    hashtable_insert(gIO_action_table, key, ah);
-    
-    return true;
-}
-bool
-io_register_button_handler(const char *key, io_button_action_f f)
-{
-    io_action_t *ah;
-    if (! (ah = malloc(sizeof(io_action_t))) ) {
-        return false;
-    }
-
-    ah->t = IO_ACTION_BUTTON;
-    ah->u.button = f;
-
-    if (hashtable_insert(gIO_action_table, key, ah)) return false;
-        
-    return true;
-}
-
-bool
-io_register_mouse_drag_handler(const char *key, io_drag_action_f f)
-{
-    io_action_t *ah;
-    if (! (ah = malloc(sizeof(io_action_t))) ) {
-        return false;
-    }
-    
-    ah->t = IO_ACTION_DRAG;
-    ah->u.drag = f;
-    
-    hashtable_insert(gIO_action_table, key, ah);
-    return true;
-}
-
-bool
-io_register_joystic_axis_handler(const char *key, io_axis_action_f f)
-{
-    io_action_t *ah;
-    if (! (ah = malloc(sizeof(io_action_t))) ) {
-        return false;
-    }
-    
-    ah->t = IO_ACTION_AXIS;
-    ah->u.axis = f;
-    
-    hashtable_insert(gIO_action_table, key, ah);
-    return true;
-}
-
-int
-io_register_mouse_click_handler_script(const char *key, scr_func_t f)
-{
-    io_action_t *ah;    
-    if (! (ah = malloc(sizeof(io_action_t))) ) {
-        return 1;
-    }
-    
-    if (! f) return 1;
-    
-    Py_INCREF(f);
-    
-    ah->t = IO_ACTION_CLICK_SCRIPT;
-    ah->u.script = f;
-    
-    hashtable_insert(gIO_action_table, key, ah);
-    return 0;
-}
-int
-io_register_button_handler_script(const char *key, scr_func_t f)
-{
-    io_action_t *ah;    
-    if (! (ah = malloc(sizeof(io_action_t))) ) {
-        return 1;
-    }
-    
-    if (! f) return 1;
-    
-    Py_INCREF(f);
-    ah->t = IO_ACTION_BUTTON_SCRIPT;
-    ah->u.script = f;
-   
-    hashtable_insert(gIO_action_table, key, ah);
-    return 0;
-}
-
-int
-io_register_mouse_drag_handler_script(const char *key, scr_func_t f)
-{
-    io_action_t *ah;    
-    if (! (ah = malloc(sizeof(io_action_t))) ) {
-        return 1;
-    }
-    
-    if (! f) return 1;
-    
-    Py_INCREF(f);
-    ah->t = IO_ACTION_DRAG_SCRIPT;
-    ah->u.script = f;
-   
-    hashtable_insert(gIO_action_table, key, ah);
-    return 0;
-}
-
-int
-io_register_joystic_axis_handler_script(const char *key, scr_func_t f)
-{
-    io_action_t *ah;    
-    if (! (ah = malloc(sizeof(io_action_t))) ) {
-        return 1;
-    }
-    
-    if (! f) return 1;
-    
-    Py_INCREF(f);
-    ah->t = IO_ACTION_AXIS_SCRIPT;
-    ah->u.script = f;
-   
-    hashtable_insert(gIO_action_table, key, ah);
-    return 0;
-}
-
-
-
-void
-io_bind_key_down(char *key, short mod, char *action_key)
-{
-    int key_code;
-    io_action_t *action;
-    
-    key_code = (int) hashtable_lookup(gIO_key_table, key);
-    action = (io_action_t*) hashtable_lookup(gIO_action_table, action_key);
-    // silently fail on key code 0 (hashtable returns null if it cannot find the key)
-    // this mean that keycode 0 cannot be mapped, though if we use SDL, this represent unknown keys anyway
-    if (! key_code)  printf("could not find key code \"%s\"\n", key);
-    if (! action)  printf("could not find action key code \"%s\"\n", action_key);
-    
-    if ((! key_code) || (! action)) {
+    OObuttonhandler *handler
+        = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, name);
+    if (handler != NULL) {
+        warnx("%s already registered as button handler", name);
         return;
     }
     
-    if (action->t == IO_ACTION_BUTTON) {
-        gIO_manager.keyboard.button[key_code].down.is_script = false;
-        gIO_manager.keyboard.button[key_code].down.u.c = action->u.button;
-    } else if (action->t == IO_ACTION_BUTTON_SCRIPT) {
-        gIO_manager.keyboard.button[key_code].down.is_script = true;
-        gIO_manager.keyboard.button[key_code].down.u.s = action->u.script;
-    }
+    handler = malloc(sizeof(OObuttonhandler));
+    handler->isScript = false;
+    handler->cHandler = handlerFunc;
+    
+    hashtable_insert(gIoButtonHandlers, name, handler);
 }
 
 void
-io_bind_key_up(char *key, short mod, char *action_key)
+ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc)
 {
-    int key_code;
-    io_action_t *action;
-    
-    key_code = (int) hashtable_lookup(gIO_key_table, key);
-    action = (io_action_t*) hashtable_lookup(gIO_action_table, action_key);
-    // silently fail on key code 0 (hashtable returns null if it cannot find the key)
-    // this mean that keycode 0 cannot be mapped, though if we use SDL, this represent unknown keys anyway
-    if ((! key_code) || (! action)) {
+    OObuttonhandler *handler
+        = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, name);
+    if (handler != NULL) {
+        warnx("%s already registered as button handler", name);
         return;
     }
     
-    if (action->t == IO_ACTION_BUTTON) {
-        gIO_manager.keyboard.button[key_code].up.is_script = false;
-        gIO_manager.keyboard.button[key_code].up.u.c = action->u.button;
-    } else if (action->t == IO_ACTION_BUTTON_SCRIPT) {
-        gIO_manager.keyboard.button[key_code].up.is_script = true;
-        gIO_manager.keyboard.button[key_code].up.u.s = action->u.script;
-    }
+    handler = malloc(sizeof(OObuttonhandler));
+    handler->isScript = true;
+    handler->pyHandler = handlerFunc;
+    
+    hashtable_insert(gIoButtonHandlers, name, handler);
 }
 
-void
-io_bind_mouse_down(short button, char *action_key)
-{
-    io_action_t *action;
-    
-    action = (io_action_t*) hashtable_lookup(gIO_action_table, action_key);
 
-    
-    if ( ! action ) {
-        return;
-    }
-      
-    if (action->t == IO_ACTION_BUTTON) {        
-        gIO_manager.mouse.button[button].down.is_click_action = false;
-        gIO_manager.mouse.button[button].down.u.button.is_script = false;
-        gIO_manager.mouse.button[button].down.u.button.u.c = action->u.button;
-    } else if (action->t == IO_ACTION_BUTTON_SCRIPT) {
-        gIO_manager.mouse.button[button].down.is_click_action = false;
-        gIO_manager.mouse.button[button].down.u.button.is_script = true;
-        gIO_manager.mouse.button[button].down.u.button.u.s = action->u.script;
-    } else if (action->t == IO_ACTION_CLICK) {
-        gIO_manager.mouse.button[button].down.is_click_action = true;
-        gIO_manager.mouse.button[button].down.u.click.is_script = false;
-        gIO_manager.mouse.button[button].down.u.click.u.c = action->u.click;
-    } else if (action->t == IO_ACTION_CLICK_SCRIPT) {
-        gIO_manager.mouse.button[button].down.is_click_action = true;
-        gIO_manager.mouse.button[button].down.u.click.is_script = true;
-        gIO_manager.mouse.button[button].down.u.click.u.s = action->u.script;
-    }
-}
 void
-io_bind_mouse_up(short button, char *action_key)
+ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up, uint16_t mask)
 {
-    io_action_t *action;
-    
-    action = (io_action_t*) hashtable_lookup(gIO_action_table, action_key);
+    OOkeyevent *ev = hashtable_lookup(gIoBoundKeyTable, keyName);
+    OOkeyevent *firstEv = ev;
 
-    if ( ! action ) {
+    OObuttonhandler *keyHandler = hashtable_lookup(gIoButtonHandlers, keyAction);
+    if (keyHandler == NULL) {
+        warnx("%s not found in button handler dictionary", keyAction);
         return;
     }
     
-    if (action->t == IO_ACTION_BUTTON) {
-        gIO_manager.mouse.button[button].up.is_click_action = false;
-        gIO_manager.mouse.button[button].up.u.button.is_script = false;
-        gIO_manager.mouse.button[button].up.u.button.u.c = action->u.button;
-    } else if (action->t == IO_ACTION_BUTTON_SCRIPT) {
-        gIO_manager.mouse.button[button].up.is_click_action = false;
-        gIO_manager.mouse.button[button].up.u.button.is_script = true;
-        gIO_manager.mouse.button[button].up.u.button.u.s = action->u.script;
-    } else if (action->t == IO_ACTION_CLICK) {
-        gIO_manager.mouse.button[button].up.is_click_action = true;
-        gIO_manager.mouse.button[button].up.u.click.is_script = false;
-        gIO_manager.mouse.button[button].up.u.click.u.c = action->u.click;
-    } else if (action->t == IO_ACTION_CLICK_SCRIPT) {
-        gIO_manager.mouse.button[button].up.is_click_action = true;
-        gIO_manager.mouse.button[button].up.u.click.is_script = true;
-        gIO_manager.mouse.button[button].up.u.click.u.s = action->u.script;
-    }
-}
-
-void
-io_bind_mouse_drag(short button, char *action_key)
-{
-    io_action_t *action;
-    
-    action = (io_action_t*) hashtable_lookup(gIO_action_table, action_key);
-
-    if ( ! action ) {
-        return;
+    while (ev && (ev->modMask != mask)) {
+        ev = ev->next;
     }
     
-    if (action->t == IO_ACTION_DRAG) {
-        gIO_manager.mouse.button[button].drag.is_script = false;
-        gIO_manager.mouse.button[button].drag.u.c = action->u.drag;
-    } else if (action->t == IO_ACTION_DRAG_SCRIPT) {
-        gIO_manager.mouse.button[button].drag.is_script = true;
-        gIO_manager.mouse.button[button].drag.u.s = action->u.script;
+    if (ev != NULL) {
+        // does the event handler already exist, if so just replace the mapping
+        if (up) {
+            if (ev->upIsScript) Py_XDECREF(ev->pyUp);
+            ev->upIsScript = keyHandler->isScript;
+            if (keyHandler->isScript) ev->pyUp = keyHandler->pyHandler;
+            else ev->cUp = keyHandler->cHandler;
+        } else {
+            if (ev->downIsScript) Py_XDECREF(ev->pyDown);
+            ev->downIsScript = keyHandler->isScript;
+            if (keyHandler->isScript) ev->pyDown = keyHandler->pyHandler;
+            else ev->cDown = keyHandler->cHandler;
+        }
+    } else {
+        ev = malloc(sizeof(OOkeyevent));
+        
+        if (up) {
+            ev->upIsScript = keyHandler->isScript;
+            if (keyHandler->isScript) ev->pyUp = keyHandler->pyHandler;
+            else ev->cUp = keyHandler->cHandler;
+            
+            ev->modMask = mask;
+            ev->data = NULL;
+            ev->downIsScript = false;
+            ev->cDown = ooButtonHandlerGnd;
+            ev->next = NULL;
+        } else {
+            ev->downIsScript = keyHandler->isScript;
+            if (keyHandler->isScript) ev->pyDown = keyHandler->pyHandler;
+            else ev->cDown = keyHandler->cHandler;
+            ev->modMask = mask;
+            ev->data = NULL;
+            ev->upIsScript = false;
+            ev->cUp = ooButtonHandlerGnd;
+            ev->next = NULL;
+        }
+        
+        /* Insert in hashtable */
+        if (firstEv == NULL) {
+            hashtable_insert(gIoBoundKeyTable, keyName, ev);
+        } else {
+            // After first event since this is the simplest
+            ev->next = firstEv->next;
+            firstEv->next = ev;
+        }
     }
 }
 
+
 void
-io_bind_joystick_axis(int joystick_id, int axis, char *action)
+ooIoDispatchKeyUp(const char *name, uint16_t mask)
 {
+    OOkeyevent *ev = (OOkeyevent*)hashtable_lookup(gIoBoundKeyTable, name);
+
+    while (ev && (ev->modMask & mask) != mask) {
+        ev = ev->next;
+    }
+    
+    if (ev != NULL) {
+        if (ev->upIsScript) {
+            //PyObject *res = PyObject_CallFunction(f, "(dd)", (double)dx, (double)dy);
+            //if (! res) PyErr_Print();
+            //Py_XDECREF(res);
+            ;
+        } else {
+            ev->cUp(true, ev->data);
+        }
+    }
 }
+
+
 void
-io_bind_joystick_button_down(int joystick_id, int button, char *action)
+ooIoDispatchKeyDown(const char *name, uint16_t mask)
 {
+    OOkeyevent *ev = (OOkeyevent*)hashtable_lookup(gIoBoundKeyTable, name);
+
+    while (ev && (ev->modMask & mask) != mask) {
+        ev = ev->next;
+    }
+    
+    if (ev != NULL) {
+        if (ev->downIsScript) {
+            ;
+        } else {
+            ev->cDown(false, ev->data);
+        }
+    }
 }
-void
-io_bind_joystick_button_up(int joystick_id, int button, char *action)
+
+const char *
+ooIoSdlKeyNameLookup(SDLKey keyId)
 {
+    if (keyId >= SDLK_LAST) return NULL;
+    return gIoSdlKeyStringMap[keyId];
 }
+
+const char *
+ooIoSdlMouseButtonNameLookup(unsigned buttonId)
+{
+    if (buttonId > 7) return NULL;
+    return gIoSdlMouseStringMap[buttonId-1];
+}
+
+
+void ooIoInitSdlStringMap(void)
+{
+    memset(gIoSdlKeyStringMap, 0, SDLK_LAST * sizeof(const char*));
+    
+    gIoBoundKeyTable = hashtable_new_with_str_keys(128);
+    gIoButtonHandlers = hashtable_new_with_str_keys(256);
+
+    gIoSdlMouseStringMap[SDL_BUTTON_LEFT-1]	= "mouse-left";
+    gIoSdlMouseStringMap[SDL_BUTTON_MIDDLE-1] =	"mouse-middle";
+    gIoSdlMouseStringMap[SDL_BUTTON_RIGHT-1] = "mouse-right";
+    gIoSdlMouseStringMap[SDL_BUTTON_WHEELUP-1] = "mouse-up";
+    gIoSdlMouseStringMap[SDL_BUTTON_WHEELDOWN-1] = "mouse-down";
+    gIoSdlMouseStringMap[SDL_BUTTON_X1-1] = "mouse-x1";
+    gIoSdlMouseStringMap[SDL_BUTTON_X2-1] = "mouse-x2";
+    
+    
+    gIoSdlKeyStringMap[SDLK_LSHIFT] = "lshift";
+    gIoSdlKeyStringMap[SDLK_RSHIFT] = "rshift";
+    gIoSdlKeyStringMap[SDLK_LMETA] = "lmeta";
+    gIoSdlKeyStringMap[SDLK_RMETA] = "rmeta";
+    gIoSdlKeyStringMap[SDLK_LCTRL] = "lctrl";
+    gIoSdlKeyStringMap[SDLK_RCTRL] = "rctrl";
+    gIoSdlKeyStringMap[SDLK_LSUPER] = "lsuper";
+    gIoSdlKeyStringMap[SDLK_RSUPER] = "rsuper";
+    
+    gIoSdlKeyStringMap[SDLK_MODE] = "mode";
+    gIoSdlKeyStringMap[SDLK_HELP] = "help";
+    gIoSdlKeyStringMap[SDLK_PRINT] = "print-screen";
+    gIoSdlKeyStringMap[SDLK_SYSREQ] = "sys-req";
+    gIoSdlKeyStringMap[SDLK_BREAK] = "break";
+    gIoSdlKeyStringMap[SDLK_MENU] = "menu";
+    gIoSdlKeyStringMap[SDLK_POWER] = "power";
+    gIoSdlKeyStringMap[SDLK_EURO] = "euro";
+
+    gIoSdlKeyStringMap[SDLK_RETURN] = "return";
+    gIoSdlKeyStringMap[SDLK_SPACE] = "space";
+    gIoSdlKeyStringMap[SDLK_TAB] = "tab";
+    gIoSdlKeyStringMap[SDLK_BACKSPACE] = "backspace";
+    gIoSdlKeyStringMap[SDLK_ESCAPE] = "esc";
+    gIoSdlKeyStringMap[SDLK_PERIOD] = ".";
+    gIoSdlKeyStringMap[SDLK_COMMA] = ",";
+    gIoSdlKeyStringMap[SDLK_BACKQUOTE] = "`";
+    gIoSdlKeyStringMap[SDLK_CLEAR] = "clear";
+    gIoSdlKeyStringMap[SDLK_PAUSE] = "pause";
+    gIoSdlKeyStringMap[SDLK_EXCLAIM] = "!";
+    gIoSdlKeyStringMap[SDLK_QUOTEDBL] = "\"";
+    gIoSdlKeyStringMap[SDLK_HASH] = "#";
+    gIoSdlKeyStringMap[SDLK_DOLLAR] = "$";
+    gIoSdlKeyStringMap[SDLK_AMPERSAND] = "&";
+    gIoSdlKeyStringMap[SDLK_QUOTE] = "'";
+    gIoSdlKeyStringMap[SDLK_LEFTPAREN] = "(";
+    gIoSdlKeyStringMap[SDLK_RIGHTPAREN] = ")";
+    gIoSdlKeyStringMap[SDLK_ASTERISK] = "*";
+    gIoSdlKeyStringMap[SDLK_PLUS] = "+";
+    gIoSdlKeyStringMap[SDLK_MINUS] = "-";
+    gIoSdlKeyStringMap[SDLK_SLASH] = "/";
+
+    gIoSdlKeyStringMap[SDLK_COLON] = ":";
+    gIoSdlKeyStringMap[SDLK_SEMICOLON] = ";";
+    gIoSdlKeyStringMap[SDLK_LESS] = "<";
+    gIoSdlKeyStringMap[SDLK_EQUALS] = "=";
+    gIoSdlKeyStringMap[SDLK_GREATER] = ">";
+    gIoSdlKeyStringMap[SDLK_QUESTION] = "?";
+    gIoSdlKeyStringMap[SDLK_AT] = "@";
+    gIoSdlKeyStringMap[SDLK_LEFTBRACKET] = "[";
+    gIoSdlKeyStringMap[SDLK_BACKSLASH] = "\\";
+    gIoSdlKeyStringMap[SDLK_RIGHTBRACKET] = "]";
+    gIoSdlKeyStringMap[SDLK_CARET] = "^";
+    gIoSdlKeyStringMap[SDLK_UNDERSCORE] = "_";
+
+    gIoSdlKeyStringMap[SDLK_0] = "0";
+    gIoSdlKeyStringMap[SDLK_1] = "1";
+    gIoSdlKeyStringMap[SDLK_2] = "2";
+    gIoSdlKeyStringMap[SDLK_3] = "3";
+    gIoSdlKeyStringMap[SDLK_4] = "4";
+    gIoSdlKeyStringMap[SDLK_5] = "5";
+    gIoSdlKeyStringMap[SDLK_6] = "6";
+    gIoSdlKeyStringMap[SDLK_7] = "7";
+    gIoSdlKeyStringMap[SDLK_8] = "8";
+    gIoSdlKeyStringMap[SDLK_9] = "9";
+    
+    gIoSdlKeyStringMap[SDLK_KP0] = "kp 0";
+    gIoSdlKeyStringMap[SDLK_KP1] = "kp 1";
+    gIoSdlKeyStringMap[SDLK_KP2] = "kp 2";
+    gIoSdlKeyStringMap[SDLK_KP3] = "kp 3";
+    gIoSdlKeyStringMap[SDLK_KP4] = "kp 4";
+    gIoSdlKeyStringMap[SDLK_KP5] = "kp 5";
+    gIoSdlKeyStringMap[SDLK_KP6] = "kp 6";
+    gIoSdlKeyStringMap[SDLK_KP7] = "kp 7";
+    gIoSdlKeyStringMap[SDLK_KP8] = "kp 8";
+    gIoSdlKeyStringMap[SDLK_KP9] = "kp 9";    
+
+    gIoSdlKeyStringMap[SDLK_KP_PERIOD] = "kp .";
+    gIoSdlKeyStringMap[SDLK_KP_DIVIDE] = "kp /";
+    gIoSdlKeyStringMap[SDLK_KP_MULTIPLY] = "kp *";
+    gIoSdlKeyStringMap[SDLK_KP_MINUS] = "kp -";
+    gIoSdlKeyStringMap[SDLK_KP_PLUS] = "kp +";
+    gIoSdlKeyStringMap[SDLK_KP_ENTER] = "enter";
+    gIoSdlKeyStringMap[SDLK_KP_EQUALS] = "kp =";
+    gIoSdlKeyStringMap[SDLK_DELETE] = "delete";
+
+    gIoSdlKeyStringMap[SDLK_a] = "a";
+    gIoSdlKeyStringMap[SDLK_b] = "b";
+    gIoSdlKeyStringMap[SDLK_c] = "c";
+    gIoSdlKeyStringMap[SDLK_d] = "d";
+    gIoSdlKeyStringMap[SDLK_e] = "e";
+    gIoSdlKeyStringMap[SDLK_f] = "f";
+    gIoSdlKeyStringMap[SDLK_g] = "g";
+    gIoSdlKeyStringMap[SDLK_h] = "h";
+    gIoSdlKeyStringMap[SDLK_i] = "i";
+    gIoSdlKeyStringMap[SDLK_j] = "j";
+    gIoSdlKeyStringMap[SDLK_k] = "k";
+    gIoSdlKeyStringMap[SDLK_l] = "l";
+    gIoSdlKeyStringMap[SDLK_m] = "m";
+    gIoSdlKeyStringMap[SDLK_n] = "n";
+    gIoSdlKeyStringMap[SDLK_o] = "o";
+    gIoSdlKeyStringMap[SDLK_p] = "p";
+    gIoSdlKeyStringMap[SDLK_q] = "q";
+    gIoSdlKeyStringMap[SDLK_r] = "r";
+    gIoSdlKeyStringMap[SDLK_s] = "s";
+    gIoSdlKeyStringMap[SDLK_t] = "t";
+    gIoSdlKeyStringMap[SDLK_u] = "u";
+    gIoSdlKeyStringMap[SDLK_v] = "v";
+    gIoSdlKeyStringMap[SDLK_w] = "w";
+    gIoSdlKeyStringMap[SDLK_x] = "x";
+    gIoSdlKeyStringMap[SDLK_y] = "y";
+    gIoSdlKeyStringMap[SDLK_z] = "z";
+
+    gIoSdlKeyStringMap[SDLK_F1] = "f1";
+    gIoSdlKeyStringMap[SDLK_F2] = "f2";
+    gIoSdlKeyStringMap[SDLK_F3] = "f3";
+    gIoSdlKeyStringMap[SDLK_F4] = "f4";
+    gIoSdlKeyStringMap[SDLK_F5] = "f5";
+    gIoSdlKeyStringMap[SDLK_F6] = "f6";
+    gIoSdlKeyStringMap[SDLK_F7] = "f7";
+    gIoSdlKeyStringMap[SDLK_F8] = "f8";
+    gIoSdlKeyStringMap[SDLK_F9] = "f9";
+    gIoSdlKeyStringMap[SDLK_F10] = "f10";
+    gIoSdlKeyStringMap[SDLK_F11] = "f11";
+    gIoSdlKeyStringMap[SDLK_F12] = "f12";
+    gIoSdlKeyStringMap[SDLK_F13] = "f13";
+    gIoSdlKeyStringMap[SDLK_F14] = "f14";
+    gIoSdlKeyStringMap[SDLK_F15] = "f15";
+
+    gIoSdlKeyStringMap[SDLK_UP] = "up";
+    gIoSdlKeyStringMap[SDLK_DOWN] = "down";
+    gIoSdlKeyStringMap[SDLK_LEFT] = "left";
+    gIoSdlKeyStringMap[SDLK_RIGHT] = "right";
+
+    gIoSdlKeyStringMap[SDLK_INSERT] = "insert";
+    gIoSdlKeyStringMap[SDLK_HOME] = "home";
+    gIoSdlKeyStringMap[SDLK_END] = "end";
+    gIoSdlKeyStringMap[SDLK_PAGEUP] = "page up";
+    gIoSdlKeyStringMap[SDLK_PAGEDOWN] = "page down";
+}
+
+

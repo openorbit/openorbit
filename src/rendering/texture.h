@@ -41,31 +41,31 @@ extern "C" {
 #include "SDL_opengl.h"
 typedef struct {
     GLint width, height;
-    GLuint texid;
-    GLenum textype;
+    GLuint texId;
+    GLenum texType;
     void *data;
-} gl_tex_t;
+} OOtexture;
 
 /*! \brief initialises the texture manager objects */
-void    tex_init(void);
+void    ooTexInit(void);
 
 /*! \brief loads a named resource texture file */
-int     tex_load(const char *key, const char *name);
+int     ooTexLoad(const char *key, const char *name);
 /*! \brief binds the texture specified by key as the current texture
  
     Do not use the bind function to much, it is acceptable to use it in non
     performant rendering code (e.g. user interfaces). In normal cases, use
     tex_num and cache the texid.
  */
-int     tex_bind(const char *key);
+int     ooTexBind(const char *key);
 
 /*! \brief Get the OpenGL texture name associated with the key */    
-GLuint  tex_num(const char *key);
+GLuint  ooTexNum(const char *key);
 /*! \brief Remove a texture from the global texture dictionary.
  
     Also deletes the texture name 
  */
-int     tex_unload(const char *key);
+int     ooTexUnload(const char *key);
 
 
 #ifdef __cplusplus

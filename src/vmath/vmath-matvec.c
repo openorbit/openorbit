@@ -39,6 +39,22 @@
 #include <vmath/vmath-constants.h>
 
 /* standard non vectorised routines */
+
+#ifndef VM_V4_NEG
+#define VM_V4_NEG
+
+vector_t
+v_neg(vector_t v)
+{
+    vector_t res = {.a = {-v.x, -v.y, -v.z, -v.w}};
+    return res;
+}
+
+#endif /* VM_V4_NEG */
+
+#ifndef VM_M4_V4_MUL
+#define VM_M4_V4_MUL
+
 vector_t
 m_v_mul(matrix_t *a, const vector_t v) {
 	vector_t res;
@@ -48,6 +64,12 @@ m_v_mul(matrix_t *a, const vector_t v) {
     }
 	return res;
 }
+#endif /*VM_M4_V4_MUL*/
+
+
+
+#ifndef VM_M4_MUL
+#define VM_M4_MUL
 
 void
 m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b) {
@@ -60,7 +82,7 @@ m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b) {
         }
     }
 }
-
+#endif
 
 void
 m_add(matrix_t *res, matrix_t *a, matrix_t *b)
@@ -112,11 +134,16 @@ v_cross(vector_t a, vector_t b)
     return res;
 }
 
+#ifndef VM_V4_DOT
+#define VM_V4_DOT
+
 scalar_t
 v_dot(const vector_t a, const vector_t b)
 {
     return a.a[0]*b.a[0] + a.a[1]*b.a[1] + a.a[2]*b.a[2] + a.a[3]*b.a[3];
 }
+
+#endif /* VM_V4_DOT */
 
 vector_t
 v_s_mul(vector_t a, scalar_t s)
@@ -159,7 +186,7 @@ vector_t
 v_normalise(vector_t v)
 {
     scalar_t norm = v_abs(v);
-    return v_s_mul(v, S_ONE/norm);
+    return v_s_mul(v, 1.0f/norm);
 }
 
 scalar_t
@@ -283,11 +310,11 @@ m_inv(const matrix_t *M)
 scalar_t
 v_abs(const vector_t v)
 {
-    return sqrt(v.a[0]*v.a[0] + v.a[1]*v.a[1] + v.a[2]*v.a[2] + v.a[3]*v.a[3]);
+    return sqrt(v.x*v.x + v.y*v.y + v.z*v.z + v.w*v.w);
 }
 
 void
-m_transpose(matrix_t *mt, matrix_t *m)
+m_transpose(matrix_t *mt, const matrix_t *m)
 {
     for ( unsigned int i = 0; i < 4; i += 1 ) {
         for ( unsigned int j = 0; j < 4; j += 1 ) {
@@ -352,9 +379,9 @@ m_vec_rot_y(matrix_t *m, scalar_t a)
     scalar_t cos_a = cos(a);
     memset(m, 0, sizeof(matrix_t));
     m->a[0][0] = cos_a; m->a[0][2] = sin_a;
-    m->a[1][1] = S_ONE;
+    m->a[1][1] = 1.0f;
     m->a[2][0] = -sin_a; m->a[2][2] = cos_a;
-    m->a[3][3] = S_ONE;
+    m->a[3][3] = 1.0f;
 }
 
 void

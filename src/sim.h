@@ -40,7 +40,12 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+
 #include "SDL.h"
+
+#include "physics/orbit.h"
+#include "rendering/scenegraph.h"
+
 
 typedef enum {
 	SIM_io_event,
@@ -55,15 +60,18 @@ typedef struct {
     sim_event_handler_t handler;
     void *data;
 } sim_event_t;
-    
+
     
 typedef struct {
-    uint64_t time;
-    uint16_t step_size;
-//    ph_world_t *world;
-    // 
-} sim_state_t;
-    
+    uint64_t timeStamp;
+    float stepSize;
+    orb_sys_t *orbSys;
+    OOnode *sg;
+} SIMstate;
+
+void ooSimSetSg(OOnode *sg);
+void ooSimSetOrbSys(orb_sys_t *osys);
+
 /* Simulator SDL events */
 #define SIM_STEP_EVENT 0
 #define SIM_DEBUG_EVENT 1
@@ -72,7 +80,7 @@ typedef struct {
 #define SIM_STEP_PERIOD 40
 
 Uint32 sim_step_event(Uint32 interval, void *param);
-void sim_step(float dt);
+void ooSimStep(float dt);
 
 #ifdef __cplusplus
 }

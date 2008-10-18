@@ -35,72 +35,37 @@
 # assigned through the same interface
 
 cdef extern from "io-manager.h":
-    void io_bind_key_down(char *key, short mod, char *action)
-    void io_bind_key_up(char *key, short mod, char *action)
-    void io_bind_mouse_down(short button, char *action)
-    void io_bind_mouse_up(short button, char *action)
-    void io_bind_mouse_drag(short button, char *action_key)
-    void io_bind_joystick_axis(short joystick_id, short axis, char *action)
-    void io_bind_joystick_button_down(short joystick_id, short button, char *action)
-    void io_bind_joystick_button_up(short joystick_id, short button, char *action)
-    int io_register_mouse_click_handler_script(char *key, object f)
-    int io_register_button_handler_script(char *key, object f)
-    int io_register_mouse_drag_handler_script(char *key, object f)
-    int io_register_joystic_axis_handler_script(char *key, object f)
+    void ooIoRegPyKeyHandler(char *name, object handlerFunc)
+    void ooIoBindKeyHandler(char *keyName, char *keyAction, int up,
+                            unsigned short mask)
 
 # Force generation of header-file
 
-SHIFT = 0x01
-ALT = 0x02
-META = 0x04
-CTRL = 0x08
+OO_IO_MOD_NONE   = 0x0000
+OO_IO_MOD_LSHIFT = 0x0001
+OO_IO_MOD_RSHIFT = 0x0002
+OO_IO_MOD_LCTRL  = 0x0040
+OO_IO_MOD_RCTRL  = 0x0080
+OO_IO_MOD_LALT   = 0x0100
+OO_IO_MOD_RALT   = 0x0200
+OO_IO_MOD_LMETA  = 0x0400
+OO_IO_MOD_RMETA  = 0x0800
+OO_IO_MOD_NUM    = 0x1000
+OO_IO_MOD_CAPS   = 0x2000
+OO_IO_MOD_MODE   = 0x4000
 
 LEFT = 1
 MIDDLE = 2
 RIGHT = 3
 
 def bindKeyUp(char *key, int modMask, char *action):
-    io_bind_key_up(key, modMask, action)
+    ooIoBindKeyHandler(key, action, 1, modMask)
+#    io_bind_key_up(key, modMask, action)
 	
 def bindKeyDown(char *key, int modMask, char *action):
-    io_bind_key_down(key, modMask, action)
-
-def bindMouseDown(int button, char *action):
-    io_bind_mouse_down(button, action)
-    
-def bindMouseUp(int button, char *action):
-    io_bind_mouse_up(button, action)
-
-def bindMouseDrag(int button, char *action):
-    io_bind_mouse_drag(button, action)
-    
-
-def bindJoystickAxis(int joystick_id, int axis, char *action):
-    io_bind_joystick_axis(joystick_id, axis, action)
-
-def bindJoystickButtonDown(int joystickId, int button, char *action):
-    io_bind_joystick_button_down(joystickId, button, action)
-
-def bindJoystickButtonUp(int joystickId, int button, char *action):    
-    io_bind_joystick_button_up(joystickId, button, action)
+    ooIoBindKeyHandler(key, action, 0, modMask)
 
 # Should throw exceptions instead...
 def registerButtonHandler(char *key, object f):
-    if io_register_button_handler_script(key, f) == 0:
-        return False
-    return True
-    
-def registerClickHandler(char *key, object f):
-    if io_register_mouse_click_handler_script(key, f) == 0:
-        return False
-    return True
-    
-def registerDragHandler(char *key, object f):
-    if io_register_mouse_drag_handler_script(key, f) == 0:
-        return False
-    return True
-    
-def registerAxisHandler(char *key, object f):
-    if io_register_joystick_axis_handler_script(key, f) == 0:
-        return False
-    return True
+    ooIoRegPyKeyHandler(key, f)
+

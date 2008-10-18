@@ -41,7 +41,18 @@
 #include "rendering/planet.h"
 // epoch = ???
 
-sim_state_t gSIM_state;
+SIMstate gSIM_state;
+
+void
+ooSimSetSg(OOnode *sg)
+{
+    gSIM_state.sg = sg;
+}
+void
+ooSimSetOrbSys(orb_sys_t *osys)
+{
+    gSIM_state.orbSys = osys;
+}
 
 Uint32
 sim_step_event(Uint32 interval, void *param)
@@ -66,16 +77,29 @@ sim_step_event(Uint32 interval, void *param)
 }
 
 
+#include "physics/orbit.h"
+#include <sys/time.h>
 void
-sim_step(float dt)
+ooSimStep(float dt)
 {
-    gSIM_state.time ++;
+    gSIM_state.timeStamp ++;
     // temporary to have something to look at...
     for (int i = 0 ; i < MAX_PLANETS ; i ++) {
         planet_rot_orig(&gPlanets[i], dt*0.1);
         planet_rot_ax(&gPlanets[i], dt*0.5);
     }
     
+    struct timeval start;
+    struct timeval end;
+    gettimeofday(&start, NULL);
+    
+    extern orb_sys_t *gOrb_root_system;
+    orbit_clear(gOrb_root_system);
+    orbit_step(gOrb_root_system, dt);
+    
+    gettimeofday(&end, NULL);
+    
+    printf("\tsimstep time: %lu\n",  (end.tv_usec - start.tv_usec) % 1000000L);
     // compute physics step
 //    ph_step(gSIM_state.world, dt);
     

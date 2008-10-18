@@ -49,7 +49,7 @@ planet_add(float x, float y, float z, float radius, float mass, const char *tex_
         return -1;
     }
     
-    gPlanets[planet_count].texid = tex_num(tex_key);
+    gPlanets[planet_count].texid = ooTexNum(tex_key);
     glBindTexture(GL_TEXTURE_2D, gPlanets[planet_count].texid);
     
     

@@ -7,253 +7,704 @@
     # time: h m s, days, s
     # angles: deg, rad
     # temperature: K, C
+# Epoch is an element that is defining the date and time of the initial conditions
+# for the orbits
+# Models are expected to support a number of variants, e.g.  rocky-planet,
+# gas-giant or "star", this will control what kind of renderer is used.
+epoch: 2000-01-01 00:00
+
 Sol:
     kind: "star"
+    system-name: "Solar system"
+    name: "Sol"
     mass: 1.991e30 kg
     radius: 6.96e8 m
-    axial-period: 27 days
-    model: "sphere"
+    orbit:
+        initial: 0 deg
+        axial-period: 27 days
+    rendering:
+        model: "sphere"
+        texture: "sol.tga"
     satellites:
-        - Mercury:
+        Mercury:
             kind: "planet"
+            system-name: "Mercurial system"
+            name: "Mercury"
             mass: 3.18e23 kg
             radius: 2.43e6 m
-            axial-period: 58.646 days
-            axial-inclination: 0 deg
             orbit:
+                initial: 0 deg
+                axial-period: 58.646 days
+                axial-inclination: 0 deg
                 semi-major-axis: 0.3871 au
                 eccentricity: 0.206
                 inclination: 7.00 deg
                 period: 87.969 days
-            model: "sphere"
-            texture: "mercury.tga"
-        - Venus:
+            rendering:
+                model: "sphere"
+                texture: "mercury.tga"
+        Venus:
             kind: "planet"
+            system-name: "Mercurial system"
+            name: "Venus"
             mass: 4.88e24 kg
             radius: 6.06e6 m
-            axial-period: -243.019 days
-            axial-inclination: -2 deg
             orbit:  
+                initial: 0 deg
+                axial-period: -243.019 days
+                axial-inclination: -2 deg
                 semi-major-axis: 0.7233 au
                 eccentricity: 0.007
                 inclination: 7.00 deg
                 period: 224.701 days
             pressure: 92000 kPa
             surface-temp: 750 K
-            model: "sphere"
-            texture: "venus.tga"
-        - Earth:
+            rendering:
+                model: "sphere"
+                texture: "venus.tga"
+        Earth:
             kind: "planet"
+            system-name: "Terran system"
+            name: "Earth"
             mass: 5.98e24 kg
             radius: 6.37e6 m
-            axial-period: 23 h 56 min 22.7 s
-            axial-inclination: 23.45 deg
             orbit:
+                initial: 0 deg
+                axial-period: 23 h 56 min 22.7 s
+                axial-inclination: 23.45 deg
                 semi-major-axis: 1.0 au
                 eccentricity: 0.017
                 inclination: 0.00 deg
                 period: 365.256 days
             pressure: 100 kPa
             surface-temp: 285 K
-            model: "sphere"
-            texture: "earth.tga"
+            rendering:
+                model: "sphere"
+                texture: "earth.tga"
         
             satellites:
-            - Luna:
-                kind: "moon"
-                mass: 7.36e22 kg
-                radius: 1.74e6 m      
-                axial-period: 27.322 days
-                axial-inclination: 6.68 deg
-                orbit:
-                    semi-major-axis: 0.871 m
-                    eccentricity: 0.206
-                    period: 27.322 days
-                model: "sphere"
-                texture: "moon.tga"
-        - Mars:
+                Luna:
+                    kind: "moon"
+                    system-name: "Lunar system"
+                    name: "Moon"
+                    mass: 7.36e22 kg
+                    radius: 1.74e6 m      
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 27.322 days
+                        axial-inclination: 6.68 deg
+                        semi-major-axis: 0.871 m
+                        eccentricity: 0.206
+                        period: 27.322 days
+                    rendering:
+                        model: "sphere"
+                        texture: "moon.tga"
+        Mars:
             kind: "planet"
+            system-name: "Martian system"
+            name: "Mars"
             mass: 6.48e23 kg
             radius: 3.37e6 m
-            axial-period: 24 h 37 min 22.6 s
-            axial-inclination: 23.98 deg
             orbit:
+                initial: 0 deg
+                axial-period: 24 h 37 min 22.6 s
+                axial-inclination: 23.98 deg
                 semi-major-axis: 1.5237 au
                 eccentricity: 0.093
                 inclination: 1.85 deg
                 period: 686.980 days
             pressure: 0.6 kPa
             surface-temp: 220 K
-            model: "sphere"
-            texture: "mars.tga"
+            rendering:
+                model: "sphere"
+                texture: "mars.tga"
         
             satellites:
-                - Phobos:
+                Phobos:
                     kind: "moon"
+                    name: "Phobos"
+                    mass: 999 kg
                     orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
                         period: 0.319 days
                         eccentricity: 0.015
                         inclination: 1.02
-                - Deimos:
+                    radius: 999 m
+                    rendering:
+                        model: "sphere"
+                
+                Deimos:
                     kind: "moon"
+                    name: "Deimos"
+                    
+                    mass: 999 kg
+                    radius: 999 m
+                    rendering:
+                        model: "sphere"
+                    
                     orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
                         period: 1.262 days
                         eccentricity: 0.001
                         inclination: 1.82
-        - Jupiter:
+        Jupiter:
             kind: "planet"            
+            system-name: "Jovan system"
+            name: "Jupiter"
             mass: 1.9e27 kg
             radius: 6.99e7 m
-            axial-period: 9 h 50 min
-            axial-inclination: 3.08 deg
             orbit:
+                initial: 0 deg
+                axial-period: 9 h 50 min
+                axial-inclination: 3.08 deg
                 semi-major-axis: 5.2028 au
                 eccentricity: 0.048
                 inclination: 1.31 deg
                 period: 4332.589 days
-            model: "sphere"
-            texture: "jupiter.tga"
+            rendering:
+                model: "sphere"
+                texture: "jupiter.tga"
             satellites:
-                - Metis:
+                Metis:
                     kind: "moon"
-                - Adrastea:
+                    name: "Metis"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Adrastea:
                     kind: "moon"
-                - Amalthea:
+                    name: "Adrastea"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Amalthea:
                     kind: "moon"
-                - Thebe:
+                    name: "Amalthea"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Thebe:
                     kind: "moon"
-                - Io:
+                    name: "Thebe"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Io:
                     kind: "moon"
-                - Europa:
+                    name: "Io"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Europa:
                     kind: "moon"
-                - Gaynamede:
+                    name: "Europa"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Gaynamede:
                     kind: "moon"
-                - Callisto:
+                    name: "Gaynamede"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Callisto:
                     kind: "moon"
-                - Leda:
+                    name: "Callisto"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Leda:
+                    name: "Leda"
                     kind: "moon"
-                - Himalia:
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Himalia:
                     kind: "moon"
-                - Lysithea:
+                    name: "Himalia"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Lysithea:
                     kind: "moon"
-                - Elara:
+                    name: "Lysithea"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Elara:
                     kind: "moon"
-                - Ananke:
+                    name: "Elara"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Ananke:
                     kind: "moon"
-                - Carme:
+                    name: "Ananke"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Carme:
                     kind: "moon"
-                - Pasiphae:
+                    name: "Carme"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Pasiphae:
                     kind: "moon"
-                - Sinope:
+                    name: "Pasiphae"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+                Sinope:
                     kind: "moon"
-        - Saturn:
+                    name: "Sinope"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
+        Saturn:
             kind: "planet"
+            system-name: "Saturnian system"
+            name: "Saturn"
             mass: 5.68e26 kg
             radius: 5.85e7 m
-            axial-period: 10 h 15 min
-            axial-inclination: 29 deg
             orbit:
+                initial: 0 deg
+                axial-period: 10 h 15 min
+                axial-inclination: 29 deg
                 semi-major-axis: 9.5388 au
                 eccentricity: 0.056
                 inclination: 2.49 deg
                 period: 10759.22 days
-            model: "sphere"
-            texture: "saturn.tga"
+            rendering:
+                model: "sphere"
+                texture: "saturn.tga"
             satellites:
-                - Atlas:
+                Atlas:
                     kind: "moon"
-                - S27:
+                    name: "Atlas"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                S27:
                     kind: "moon"
-                - S26:
+                    name: "S27"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                S26:
                     kind: "moon"
-                - Janus:
+                    name: "S26"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Janus:
                     kind: "moon"
-                - Epimetheus:
+                    name: "Janus"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Epimetheus:
                     kind: "moon"
-                - Mimas:
+                    name: "Epimetheus"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Mimas:
                     kind: "moon"
-                - Enceladus:
+                    name: "Mimas"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Enceladus:
                     kind: "moon"
-                - Tethys:
+                    name: "Enceladus"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Tethys:
                     kind: "moon"
-                - Telesto:
+                    name: "Tethys"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Telesto:
                     kind: "moon"
-                - Calypso:
+                    name: "Telesto"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Calypso:
                     kind: "moon"
-                - Dione:
+                    name: "Calypso"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Dione:
                     kind: "moon"
-                - S6:
+                    name: "Dione"
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    mass: 999 kg
+                S6:
                     kind: "moon"
-                - Rhea:
+                    name: "S6"
+                    radius: 999 m
+                    orbit:
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    mass: 999 kg
+                Rhea:
                     kind: "moon"
-                - Titan:
+                    name: "Rhea"
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    mass: 999 kg
+                Titan:
                     kind: "moon"
+                    name: "Titan"
+                    mass: 999 kg
                     pressure: 150 kPa
                     surface-temp: 95 K
-                - Hyperion:
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Hyperion:
                     kind: "moon"
-                - Iapetus:
+                    name: "Hyperion"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Iapetus:
                     kind: "moon"
-                - Phoebe:
+                    name: "Iapetus"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Phoebe:
                     kind: "moon"
-        - Uranus:
+                    name: "Phoebe"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+        Uranus:
             kind: "planet"
+            system-name: "Uranian system"
+            name: "Uranus"
             mass: 8.68e25 kg
             radius: 2.33e7 m
-            axial-period: 17 h 50 min
-            axial-inclination: 97.92 deg
             orbit:
+                initial: 0 deg
+                axial-period: 17 h 50 min
+                axial-inclination: 97.92 deg
                 semi-major-axis: 19.1914 au
                 eccentricity: 0.046
                 inclination: 0.77 deg
                 period: 30685.4 days
-            model: "sphere"
-            texture: "uranus.tga"
+            rendering:
+                model: "sphere"
+                texture: "uranus.tga"
             satellites:
-                - Miranda:
+                Miranda:
                     kind: "moon"
-                - Ariel:
+                    name: "Miranda"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Ariel:
                     kind: "moon"
-                - Umbriel:
+                    name: "Ariel"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Umbriel:
                     kind: "moon"
-                - Titania:
+                    name: "Umbriel"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Titania:
                     kind: "moon"
-                - Oberon:
+                    name: "Titania"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+                Oberon:
                     kind: "moon"
-        - Neptune:
+                    name: "Oberon"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    
+        Neptune:
             kind: "planet"
+            system-name: "Neptunian system"
+            name: "Neptune"
             mass: 1.03e26 kg
             radius: 2.21e7 m
-            axial-period: 19 h 10 min
-            axial-inclination: 28.8 deg
             orbit:
+                initial: 0 deg
+                axial-period: 19 h 10 min
+                axial-inclination: 28.8 deg
                 semi-major-axis: 30.0611 au
                 eccentricity: 0.010
                 inclination: 1.77 deg
                 period: 60189.0 days
-            model: "sphere"
-            texture: "neptune.tga"
+            rendering:
+                model: "sphere"
+                texture: "neptune.tga"
             satellites:
-                - Triton:
+                Triton:
                     kind: "moon"
-                - Nereid:
+                    name: "Triton"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                Nereid:
                     kind: "moon"
+                    name: "Nereid"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                        axial-inclination: 999 deg
+                    rendering:
+                        model: "sphere"
+                    
         # For pluto and Charon, their system is really noticably rotating around the
         # barycentre, but we leave this as is for now until anyone complain.
         # We could possibly create a joint system with both objects as children.
-        - Pluto:
-            kind: "dwarf-planet"
+        Pluto:
+            kind: "planet" # Change to dwarf planet
+            system-name: "Pluto-Charon system"
+            name: "Pluto"
             mass: 1.4e22 kg
             radius: 1.5e6 m
-            axial-period: 6.387 days
-            axial-inclination: 50 deg # TODO
             orbit:
+                initial: 0 deg
+                axial-period: 6.387 days
+                axial-inclination: 50 deg # TODO
                 semi-major-axis: 39.5294 au
                 eccentricity: 0.248
                 inclination: 17.15 deg
                 period: 90465.0 days
             surface-temp: 40 K
-            model: "sphere"
+            rendering:
+                model: "sphere"
             satellites:
-                - Charon:
+                Charon:
                     kind: "moon"
+                    name: "Charon"
+                    mass: 999 kg
+                    radius: 999 m
+                    orbit:
+                        initial: 0 deg
+                        axial-period: 99 h 99 min
+                    rendering:
+                        model: "sphere"
+                    

@@ -8,7 +8,7 @@ endif (NOT PYREXC)
 
 MACRO(USE_PYREX file)
     add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${file}.c ${CMAKE_CURRENT_BINARY_DIR}/${file}.h
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${file}.c
         COMMAND ${PYREXC}
                 ${CMAKE_CURRENT_SOURCE_DIR}/${file}.pyx
                 -o ${CMAKE_CURRENT_BINARY_DIR}/${file}.c

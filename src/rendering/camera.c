@@ -30,15 +30,27 @@
     above, a recipient may use your version of this file under either the MPL,
     the GPL or the LGPL."
  */
-
 #include <stdbool.h>
-#include <tgmath.h>
+#include <stdlib.h>
 
 #include "SDL_opengl.h"
-
-#include "camera.h"
-#include "io-manager.h"
 #include <vmath/vmath.h>
+#include "io-manager.h"
+#include "camera.h"
+
+/* Camera actions, registered as action handlers */
+void cam_move_forward_button_action(bool up, void *data);
+void cam_move_back_button_action(bool up, void *data);
+void cam_move_left_button_action(bool up, void *data);
+void cam_move_right_button_action(bool up, void *data);
+void cam_move_up_button_action(bool up, void *data);
+void cam_move_down_button_action(bool up, void *data);
+void cam_roll_left_button_action(bool up, void *data);
+void cam_roll_right_button_action(bool up, void *data);
+void cam_yaw_left_button_action(bool up, void *data);
+void cam_yaw_right_button_action(bool up, void *data);
+void cam_pitch_down_button_action(bool up, void *data);
+void cam_pitch_up_button_action(bool up, void *data);
 
 // TODO: Remove global camera
 camera_t *gCam = NULL;
@@ -55,6 +67,7 @@ init_cam(void)
 	gCam->free_cam.rq = q_rot(0.0f,0.0f,1.0f,0.0f);
     
     // Register camera actions
+#if 0
     io_register_button_handler("cam-fwd", cam_move_forward_button_action);        
     io_register_button_handler("cam-back", cam_move_back_button_action);
     io_register_button_handler("cam-left", cam_move_left_button_action);
@@ -67,7 +80,21 @@ init_cam(void)
     io_register_button_handler("cam-yaw-right", cam_yaw_right_button_action);
     io_register_button_handler("cam-roll-left", cam_roll_left_button_action);
     io_register_button_handler("cam-roll-right", cam_roll_right_button_action);
-    
+#endif
+    ooIoRegCKeyHandler("cam-fwd", cam_move_forward_button_action);        
+    ooIoRegCKeyHandler("cam-back", cam_move_back_button_action);
+    ooIoRegCKeyHandler("cam-left", cam_move_left_button_action);
+    ooIoRegCKeyHandler("cam-right", cam_move_right_button_action);
+    ooIoRegCKeyHandler("cam-up", cam_move_up_button_action);
+    ooIoRegCKeyHandler("cam-down", cam_move_down_button_action);
+    ooIoRegCKeyHandler("cam-pitch-up", cam_pitch_up_button_action);
+    ooIoRegCKeyHandler("cam-pitch-down", cam_pitch_down_button_action);
+    ooIoRegCKeyHandler("cam-yaw-left", cam_yaw_left_button_action);
+    ooIoRegCKeyHandler("cam-yaw-right", cam_yaw_right_button_action);
+    ooIoRegCKeyHandler("cam-roll-left", cam_roll_left_button_action);
+    ooIoRegCKeyHandler("cam-roll-right", cam_roll_right_button_action);
+
+
     return true;
 }
 
@@ -308,7 +335,7 @@ cam_rotate_alpha(camera_t *cam, angle_t ang)
     matrix_t mrot;
     vector_t side, rotside;
     
-    side = v_set(S_CONST(1.0), S_CONST(0.0), S_CONST(0.0), S_CONST(1.0));
+    side = v_set(1.0f, 0.0f, 0.0f, 1.0f);
     
     
     switch (cam->type) {
@@ -316,7 +343,7 @@ cam_rotate_alpha(camera_t *cam, angle_t ang)
             q_m_convert(&mrot, cam->free_cam.rq);
             rotside = m_v_mul(&mrot, side);
 
-            rot = q_rotv(side, ang);
+            rot = q_rotv(rotside, ang);
             rq = cam->free_cam.rq;
             
             cam->free_cam.rq = q_mul(rq, rot);
@@ -340,14 +367,14 @@ cam_rotate_beta(camera_t *cam, angle_t ang)
     matrix_t mrot;
     vector_t up, rotup;
     
-    up = v_set(S_CONST(0.0), S_CONST(1.0), S_CONST(0.0), S_CONST(1.0));
+    up = v_set(0.0f, 1.0f, 0.0f, 1.0f);
     
     switch (cam->type) {
         case CAM_FREE:            
             q_m_convert(&mrot, cam->free_cam.rq);
             rotup = m_v_mul(&mrot, up);
 
-            rot = q_rotv(up, ang);
+            rot = q_rotv(rotup, ang);
             rq  = cam->free_cam.rq;
         
             cam->free_cam.rq = q_mul(rq, rot);
@@ -372,14 +399,14 @@ cam_rotate_gamma(camera_t *cam, angle_t ang)
     vector_t fwd, rotfwd;
     matrix_t mrot;
     
-    fwd = v_set(S_CONST(0.0), S_CONST(0.0), S_CONST(-1.0), S_CONST(1.0));
+    fwd = v_set(0.0f, 0.0f, -1.0f, 1.0f);
 
     switch (cam->type) {
         case CAM_FREE:
             q_m_convert(&mrot, cam->free_cam.rq);
             rotfwd = m_v_mul(&mrot, fwd);
 
-            rot = q_rotv(fwd, ang);
+            rot = q_rotv(rotfwd, ang);
             rq = cam->free_cam.rq;
         
             cam->free_cam.rq = q_mul(rq, rot);
@@ -397,68 +424,68 @@ cam_rotate_gamma(camera_t *cam, angle_t ang)
 
 /* Camera actions, registered as action handlers */
 void
-cam_move_forward_button_action(void)
+cam_move_forward_button_action(bool up, void *data)
 {
     cam_move_forward(gCam, gDist);
 }
 
 void
-cam_move_back_button_action(void)
+cam_move_back_button_action(bool up, void *data)
 {
     cam_move_back(gCam, gDist);    
 }
 void
-cam_move_left_button_action(void)
+cam_move_left_button_action(bool up, void *data)
 {
     cam_move_left(gCam, gDist);
 }
 void
-cam_move_right_button_action(void)
+cam_move_right_button_action(bool up, void *data)
 {
     cam_move_right(gCam, gDist);
 }
 void
-cam_move_up_button_action(void)
+cam_move_up_button_action(bool up, void *data)
 {
     cam_move_up(gCam, gDist);
 }
 void
-cam_move_down_button_action(void)
+cam_move_down_button_action(bool up, void *data)
 {
     cam_move_down(gCam, gDist);
 }
 void
-cam_roll_left_button_action(void)
+cam_roll_left_button_action(bool up, void *data)
 {
     cam_rotate_gamma(gCam, -gRot);
 }
 void
-cam_roll_right_button_action(void)
+cam_roll_right_button_action(bool up, void *data)
 {
     cam_rotate_gamma(gCam, gRot);    
 }
 
 void
-cam_yaw_left_button_action(void)
+cam_yaw_left_button_action(bool up, void *data)
 {
     cam_rotate_beta(gCam, gRot);
 }
 
 void
-cam_yaw_right_button_action(void)
+cam_yaw_right_button_action(bool up, void *data)
 {
     cam_rotate_beta(gCam, -gRot);
 }
 
 void
-cam_pitch_down_button_action(void)
+cam_pitch_down_button_action(bool up, void *data)
 {
     cam_rotate_alpha(gCam, -gRot);
 }
 
 
 void
-cam_pitch_up_button_action(void)
+cam_pitch_up_button_action(bool up, void *data)
 {
     cam_rotate_alpha(gCam, gRot);
 }

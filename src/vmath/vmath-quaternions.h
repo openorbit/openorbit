@@ -93,42 +93,34 @@ void q_m_convert(matrix_t *m, const quaternion_t q)
 void m_q_convert(quaternion_t q, matrix_t *m) __attribute__ ((__nonnull__));
 
     
- quaternion_t q_add(const quaternion_t a, const quaternion_t b)
-    __attribute__ ((__nonnull__));
+ quaternion_t q_add(const quaternion_t a, const quaternion_t b);
 
 
 quaternion_t
-q_mul(const quaternion_t a, const quaternion_t b)
-    __attribute__ ((__nonnull__));
+q_mul(const quaternion_t a, const quaternion_t b);
     
     
-quaternion_t q_s_div(const quaternion_t q, const scalar_t d)
-    __attribute__ ((__nonnull__));
+quaternion_t q_s_div(const quaternion_t q, const scalar_t d);
 
 
  scalar_t q_dot(const quaternion_t a, const quaternion_t b)
-    __attribute__ ((__pure__, __nonnull__));
+    __attribute__ ((__pure__));
 
     
- vector_t q_cross(const quaternion_t a, const quaternion_t b)
-    __attribute__ ((__nonnull__));
+ vector_t q_cross(const quaternion_t a, const quaternion_t b);
 
     
- scalar_t q_abs(const quaternion_t q)
-    __attribute__ ((__pure__, __nonnull__));
+ scalar_t q_abs(const quaternion_t q);
 
     
 quaternion_t
-q_conj(const quaternion_t q)
-    __attribute__ ((__nonnull__));
+q_conj(const quaternion_t q);
 
 
-quaternion_t q_repr(const quaternion_t q)
-    __attribute__ ((__nonnull__));
+quaternion_t q_repr(const quaternion_t q);
 
 
-quaternion_t q_div(const quaternion_t a, const quaternion_t b)
-    __attribute__ ((__nonnull__));
+quaternion_t q_div(const quaternion_t a, const quaternion_t b);
 
 /*!
  * \brief   Creates a rotation quaternion
@@ -140,8 +132,7 @@ quaternion_t q_div(const quaternion_t a, const quaternion_t b)
  * \param axis  A unit vector describing the axis of rotation 
  * \param alpha Rotation in radians.
 */
-quaternion_t q_rotv(const quaternion_t axis, const angle_t alpha)
-    __attribute__ ((__nonnull__));
+quaternion_t q_rotv(const quaternion_t axis, const angle_t alpha);
 
 quaternion_t
 q_rot(scalar_t x, scalar_t y, scalar_t z, scalar_t alpha);
@@ -169,8 +160,7 @@ q_rot(scalar_t x, scalar_t y, scalar_t z, scalar_t alpha);
     } while (0)
 
 
-quaternion_t q_normalise(quaternion_t q)
-    __attribute__ ((__nonnull__));
+quaternion_t q_normalise(quaternion_t q);
 
 
 #ifdef __cplusplus

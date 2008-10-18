@@ -12,11 +12,11 @@
     The Original Code is the Open Orbit space flight simulator.
 
     The Initial Developer of the Original Code is Mattias Holm. Portions
-    created by the Initial Developer are Copyright (C) 2006 the
+    created by the Initial Developer are Copyright (C) 2006,2008 the
     Initial Developer. All Rights Reserved.
 
     Contributor(s):
-        Mattias Holm <mattias.holm(at)contra.nu>.
+        Mattias Holm <mattias.holm(at)openorbit.org>.
 
     Alternatively, the contents of this file may be used under the terms of
     either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -62,7 +62,7 @@
 #include "rendering/render.h"
 #include "rendering/camera.h"
 #include "rendering/sky.h"
-
+#include "scripting/scripting.h"
 
 #include "SDL.h"
 
@@ -73,69 +73,45 @@
 static void
 main_loop(void)
 {
+    extern SIMstate gSIM_state;
     SDL_Event event;
+    const char *evName;
     int done = 0;
-  
-//    SDL_TimerID sim_step_timer =
     SDL_AddTimer(SIM_STEP_PERIOD, sim_step_event, NULL);
         
     while ( !done ) {
-        
 		/* Check for events, will do the initial io-decoding */
 		while ( SDL_PollEvent (&event) ) {
-//            io_event_t e;
 			switch (event.type) {
             case SDL_ACTIVEEVENT:
                 break;
             case SDL_MOUSEMOTION:
                 if (event.motion.state) {
-#if 0
-                    e.kind = IO_EV_Drag;
-                    e.u.drag.button = SDL_BUTTON(event.motion.state);
-                    e.u.drag.dx = (float)event.motion.xrel;
-                    e.u.drag.dy = (float)event.motion.yrel;
-                    io_dispatch_event(&e);
-#endif
-                    io_handle_mouse_drag(SDL_BUTTON(event.motion.state), 
-                                         (float)event.motion.xrel,
-                                         (float)event.motion.yrel);                        
+//                    io_handle_mouse_drag(SDL_BUTTON(event.motion.state), 
+//                                         (float)event.motion.xrel,
+//                                         (float)event.motion.yrel);                        
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
-#if 0
-                e.kind = IO_EV_Click;
-                e.u.click.button = event.button.button;
-                e.u.click.down = true;
-                e.u.click.x = (float)event.button.x;
-                e.u.click.y = (float)event.button.y;
-                io_dispatch_event(&e);
-#endif
-                io_handle_mouse_down(event.button.button,
-                                    (float)event.button.x,
-                                    (float)event.button.y);
+//                io_handle_mouse_down(event.button.button,
+//                                    (float)event.button.x,
+//                                    (float)event.button.y);
                 break;
             case SDL_MOUSEBUTTONUP:
-#if 0
-                e.kind = IO_EV_Click;
-                e.u.click.button = event.button.button;
-                e.u.click.down = false;
-                e.u.click.x = (float)event.button.x;
-                e.u.click.y = (float)event.button.y;
-                io_dispatch_event(&e);
-#endif
-                
-                io_handle_mouse_up(event.button.button,
-                                   (float)event.button.x,
-                                   (float)event.button.y);
+//                io_handle_mouse_up(event.button.button,
+//                                   (float)event.button.x,
+//                                   (float)event.button.y);
                 break;
             case SDL_KEYDOWN:
-                io_handle_key_down(event.key.keysym.sym,
-                                   event.key.keysym.mod);
+                evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
+                ooIoDispatchKeyDown(evName, event.key.keysym.mod);
                 break;
             case SDL_KEYUP:
                 if (event.key.keysym.sym == SDLK_q) done = 1;
-                else io_handle_key_up(event.key.keysym.sym,
-                                      event.key.keysym.mod);
+                else {
+                    evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
+                    ooIoDispatchKeyDown(evName, event.key.keysym.mod);
+                }
                 break;
             case SDL_JOYAXISMOTION:
             case SDL_JOYBALLMOTION:
@@ -148,7 +124,7 @@ main_loop(void)
             case SDL_USEREVENT:
                 switch (event.user.code) {
                 case SIM_STEP_EVENT: // this event will make a time step
-                    sim_step(0.05);
+                    ooSimStep(0.05);
                     break;
                 case SIM_DEBUG_EVENT: // display console?
                     break;
@@ -166,7 +142,9 @@ main_loop(void)
         
         // draw as often as possible, should interpolate between steps depending
         // on passed time
-        render_scene();
+//        render_scene();
+        ooSgDraw(gSIM_state.sg);
+        SDL_GL_SwapBuffers();
 	}
 }
 
@@ -174,11 +152,12 @@ main_loop(void)
 void
 inner_main(void *data, int argc, char *argv[])
 {    
-    conf_init();
+    ooConfInit();
     // Setup IO-tables
-    io_manager_init();
+    ooIoInitSdlStringMap();
+    
     init_cam();
-    init_sky();
+
     if (! init_plugin_manager() ) exit(1);
     
     // Load and run initialisation script

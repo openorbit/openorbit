@@ -12,7 +12,7 @@
     The Original Code is the Open Orbit space flight simulator.
 
     The Initial Developer of the Original Code is Mattias Holm. Portions
-    created by the Initial Developer are Copyright (C) 2006,2008 the
+    created by the Initial Developer are Copyright (C) 2008 the
     Initial Developer. All Rights Reserved.
 
     Contributor(s):
@@ -30,54 +30,74 @@
     above, a recipient may use your version of this file under either the MPL,
     the GPL or the LGPL."
  */
+#ifndef SCENEGRAPH_H_
+#define SCENEGRAPH_H_
+
+#include <ode/ode.h>
+
+#include <vmath/vmath.h>
+#include "texture.h"
+
+typedef void OOobject;
+typedef void (*OOdrawfunc)(OOobject*);
+
+typedef struct OOnode_ {
+    OOdrawfunc draw;
+    OOdrawfunc postDraw;
+    OOobject *obj;
+    struct OOnode_ *next;
+    struct OOnode_ *children;
+} OOnode;
+
+OOnode* ooSgNewNode(OOobject *obj, OOdrawfunc df, OOdrawfunc postDf);
+void ooSgAddChild(OOnode *parent, OOnode *child);
+void ooSgDraw(OOnode *node);
 
 
-#ifndef __IO_MANAGER_H__
-#define __IO_MANAGER_H__
-#ifdef __cplusplus
-extern "C" {
-#endif
-    
+typedef struct {
+    matrix_t t;
+    quaternion_t q;
+} OOtransform;
 
-#include <stdbool.h>
-#include <Python.h>
-//#include "scripting/scripting.h"
-#include "error.h"
-#include "sim.h"
+typedef struct {
+    dWorldID world;
+    dBodyID body;
+} OOodetransform;
+
+typedef struct {
+    float uv[2];
+    float rgba[4];
+    float norm[3];
+    float vert[3];
+} OOvertex;
+
+typedef struct {
+    size_t vCount;
+    OOvertex *vertices;
+    GLuint texId;
+} OOmesh;
+
+typedef struct {
+    GLuint texId;
+    GLUquadricObj *quadratic;
+    GLfloat radius;
+} OOsphere;
+
+/* Allocators */
+OOnode* ooSgNewMesh(OOtexture *tex);
+OOnode* ooSgNewTransform(float dx, float dy, float dz,
+                         float rx, float ry, float rz, float rot);
+OOnode* ooSgNewOdeTransform(dWorldID world, dBodyID body);
+OOnode* ooSgNewSphere(OOtexture *tex);
+OOnode* ooSgNewSky(void);
+
+/* Draw functions */
+void ooSgDrawMesh(OOmesh *mesh);
+void ooSgTransform(OOtransform *t);
+void ooSgPostTransform(OOtransform *t);
+void ooSgOdeTransform(OOodetransform *t);
+void ooSgDrawSphere(OOsphere *sphere);
 
 
-/* These use the same values as SDL, so for porting (to not use SDL) they must be
-   translated in some way */
-#define OO_IO_MOD_NONE   0x0000
-#define OO_IO_MOD_LSHIFT 0x0001
-#define OO_IO_MOD_RSHIFT 0x0002
-#define OO_IO_MOD_LCTRL  0x0040
-#define OO_IO_MOD_RCTRL  0x0080
-#define OO_IO_MOD_LALT   0x0100
-#define OO_IO_MOD_RALT   0x0200
-#define OO_IO_MOD_LMETA  0x0400
-#define OO_IO_MOD_RMETA  0x0800
-#define OO_IO_MOD_NUM    0x1000
-#define OO_IO_MOD_CAPS   0x2000
-#define OO_IO_MOD_MODE   0x4000
 
-
-void ooIoInitSdlStringMap(void);
-typedef void (*OObuttonhandlerfunc)(bool buttonUp, void *data);
-void ooIoRegCKeyHandler(const char *name, OObuttonhandlerfunc handlerFunc);
-void ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc);
-
-void ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up,
-                        uint16_t mask);
-
-void ooIoDispatchKeyUp(const char *name, uint16_t mask);
-void ooIoDispatchKeyDown(const char *name, uint16_t mask);
-
-const char *ooIoSdlKeyNameLookup(SDLKey keyId);
-const char *ooIoSdlMouseButtonNameLookup(unsigned buttonId);
-
-#ifdef __cplusplus
-}
-#endif
-    
-#endif /* ! __IO_MANAGER_H */
+#endif /* SCENEGRAPH_H_ */

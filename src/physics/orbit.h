@@ -40,8 +40,9 @@
 typedef struct _orb_obj_t orb_obj_t;
 typedef struct _orb_sys_t orb_sys_t;
 
-void orbit_add_sys(orb_sys_t *parent, const char *name, float radius, float w0);
-void orbit_add_obj(orb_sys_t *sys, const char *name, float radius, float w0, float m);
+orb_sys_t* orbit_add_sys(orb_sys_t *parent, const char *name, float radius, float w0);
+orb_obj_t* orbit_add_obj(orb_sys_t *sys, const char *name, float radius, float w0, float m);
 
-
+void orbit_step(orb_sys_t *sys,float stepsize);
+void orbit_clear(orb_sys_t *sys);
 #endif /* ! _ORBIT_H_ */

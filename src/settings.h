@@ -51,19 +51,23 @@ extern "C" {
  *  NOTE: In the Python API, this system is called config.
  */
     
-void conf_init(void);
+void ooConfInit(void);
 
-int conf_set_bool(const char *key, bool val);
-int conf_get_bool(const char *key, bool *val);    
+int ooConfSetBool(const char *key, bool val);
+int ooConfGetBool(const char *key, bool *val);    
 
-int conf_set_int(const char *key, int val);
-int conf_get_int(const char *key, int *val);
+/* Workaround for missing _Bool support in pyrex */
+int ooConfSetBoolAsInt(const char *key, int val);
+int ooConfGetBoolAsInt(const char *key, int *val); 
 
-int conf_set_float(const char *key, float val);
-int conf_get_float(const char *key, float *val);
+int ooConfSetInt(const char *key, int val);
+int ooConfGetInt(const char *key, int *val);
 
-int conf_set_str(const char *key, char *val);
-char* conf_get_str(const char *key);
+int ooConfSetFloat(const char *key, float val);
+int ooConfGetFloat(const char *key, float *val);
+
+int ooConfSetStr(const char *key, char *val);
+char* ooConfGetStr(const char *key);
 
     
     

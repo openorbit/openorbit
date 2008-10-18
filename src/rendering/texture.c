@@ -42,23 +42,23 @@
 
 #include "res-manager.h"
 
-hashtable_t *gTEX_dict;
+hashtable_t *gOOtexDict;
 
 void
-tex_init(void)
+ooTexInit(void)
 {
-    gTEX_dict = hashtable_new_with_str_keys(128);
+    gOOtexDict = hashtable_new_with_str_keys(128);
 }
 
 int
-tex_load(const char *key, const char *name)
+ooTexLoad(const char *key, const char *name)
 {
     FILE *fp = res_get_file(name);
     if (fp == NULL) return -1;
 
     tga_image_t img;
     
-    gl_tex_t *tex = malloc(sizeof(gl_tex_t));
+    OOtexture *tex = malloc(sizeof(OOtexture));
     if (tex == NULL) return -1;
     
     int res = tga_read_file(&img, fp); 
@@ -66,21 +66,21 @@ tex_load(const char *key, const char *name)
     
     
     if ((img.header.img_spec.depth == 32) && (img.header.img_spec.alpha_bits == 8)) {
-        tex->textype = GL_BGRA;
+        tex->texType = GL_BGRA;
     } else if ((img.header.img_spec.depth == 24) && (img.header.img_spec.alpha_bits == 0)) {
-        tex->textype = GL_BGR;
+        tex->texType = GL_BGR;
     }
     
     tex->width = img.header.img_spec.width;
     tex->height = img.header.img_spec.height;
     tex->data = img.data;
     glEnable(GL_TEXTURE_2D);
-    glGenTextures(1, &tex->texid);
+    glGenTextures(1, &tex->texId);
     
-    glBindTexture(GL_TEXTURE_2D, tex->texid); 
+    glBindTexture(GL_TEXTURE_2D, tex->texId); 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
-    if (tex->textype == GL_BGR) {
+    if (tex->texType == GL_BGR) {
         glTexImage2D(GL_TEXTURE_2D, 0, 3, tex->width, tex->height, 0, GL_BGR,
                      GL_UNSIGNED_BYTE, tex->data);
     } else {
@@ -94,16 +94,16 @@ tex_load(const char *key, const char *name)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
                     GL_NEAREST);
     
-    hashtable_insert(gTEX_dict, key, tex);
+    hashtable_insert(gOOtexDict, key, tex);
     return 0;
 }
 
 int
-tex_bind(const char *key)
+ooTexBind(const char *key)
 {
-    gl_tex_t *tex = hashtable_lookup(gTEX_dict, key);
+    OOtexture *tex = hashtable_lookup(gOOtexDict, key);
     if (tex != NULL) {
-        glBindTexture(GL_TEXTURE_2D, tex->texid);
+        glBindTexture(GL_TEXTURE_2D, tex->texId);
         return 0;
     }
     
@@ -111,28 +111,28 @@ tex_bind(const char *key)
 }
 
 GLuint
-tex_num(const char *key)
+ooTexNum(const char *key)
 {
-    gl_tex_t *tex = hashtable_lookup(gTEX_dict, key);
+    OOtexture *tex = hashtable_lookup(gOOtexDict, key);
     
     if (tex != NULL) {
-        return tex->texid;
+        return tex->texId;
     }
     
     return 0;
 }
 
 int
-tex_unload(const char *key)
+ooTexUnload(const char *key)
 {
-    gl_tex_t *tex = hashtable_lookup(gTEX_dict, key);
+    OOtexture *tex = hashtable_lookup(gOOtexDict, key);
     
     if (tex == NULL) {
         return -1;
     }
     
-    hashtable_remove(gTEX_dict, key);
-    glDeleteTextures(1, &tex->texid);
+    hashtable_remove(gOOtexDict, key);
+    glDeleteTextures(1, &tex->texId);
 
     free(tex->data);
     free(tex);

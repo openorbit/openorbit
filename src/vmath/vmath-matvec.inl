@@ -1,4 +1,19 @@
-#include <vmath/vmath.h>
+/* Note that this is an umbrella file as well as a default definition file, there
+might be more architectural specialised files further down from here
+*/
+
+#ifndef VM_V4_NEG
+#define VM_V4_NEG
+
+static inline vector_t
+v_neg(vector_t v)
+{
+    return (vector_t)-v.v;
+}
+#endif /* VM_V4_NEG */
+
+#ifndef VM_V4_DOT
+#define VM_V4_DOT
 
 static inline scalar_t
 v_dot(vector_t a, vector_t b) {
@@ -7,6 +22,12 @@ v_dot(vector_t a, vector_t b) {
     return vres.x + vres.y + vres.z + vres.w;
 }
 
+#endif /* VM_V4_DOT */
+
+
+#ifndef VM_M4_MUL
+#define VM_M4_MUL
+void m_transpose(matrix_t *bT, const matrix_t *b);
 static inline void
 m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
 {
@@ -14,21 +35,25 @@ m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
     m_transpose(&bT, b);
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0; j < 4 ; j ++) {
-            tmp_res.a[i][j] = v_dot(a.v[i], bT.v[j]);
+            tmp_res.a[i][j] = v_dot((vector_t)a->v[i], (vector_t)bT.v[j]);
         }
     }
-    res = tmp_res;
+    *res = tmp_res;
 }
+#endif
+
+#ifndef VM_M4_V4_MUL
+#define VM_M4_V4_MUL
 
 static inline vector_t
-m_v_mul(const matrix_t a, const vector_t v)
+m_v_mul(const matrix_t *a, const vector_t v)
 {
 	vector_t vr;
 	matrix_t p;
-    p.v[0] = a.v[0] * v.v;
-    p.v[1] = a.v[1] * v.v;
-    p.v[2] = a.v[2] * v.v;
-    p.v[3] = a.v[3] * v.v;
+    p.v[0] = a->v[0] * v.v;
+    p.v[1] = a->v[1] * v.v;
+    p.v[2] = a->v[2] * v.v;
+    p.v[3] = a->v[3] * v.v;
     
     vr.x = p.a[0][0] + p.a[0][1] + p.a[0][2] + p.a[0][3];
     vr.y = p.a[1][0] + p.a[1][1] + p.a[1][2] + p.a[1][3];
@@ -37,7 +62,9 @@ m_v_mul(const matrix_t a, const vector_t v)
 
 	return vr;
 }
+#endif /*VM_M4_V4_MUL*/
 
+#if 0
 static inline matrix_t
 m_add(const matrix_t a, const matrix_t b)
 {
@@ -89,3 +116,4 @@ v_set(scalar_t v0, scalar_t v1, scalar_t v2, scalar_t v3)
 	vector_t v = {.a = {v0,v1,v2,v3}};
 	return v;
 }
+#endif

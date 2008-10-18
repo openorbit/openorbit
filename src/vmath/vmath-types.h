@@ -54,6 +54,12 @@ typedef float vec_arr_t[4];
 
 typedef scalar_t __attribute__((vector_size (16))) scalar_vec_t;
 
+typedef float __attribute__((vector_size (16))) v4f_t;
+typedef float __attribute__((vector_size (64))) m4f_t;
+
+typedef float ma4_t[4][4];
+
+
 
 typedef union {
     vec_arr_t a;

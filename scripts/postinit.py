@@ -31,8 +31,8 @@
 
 import io       # I/O module, allowing the binding of key handlers
 import config   # config, allows one to set config values
-import environment
-import res
+from environment import *
+import res, sg, sim
 
 import yaml
 
@@ -47,9 +47,13 @@ print "Running post init script..."
 
 def loadStars():
     f = open(res.getPath("stars.csv"))
+    skyObj = sg.SkyNode()
     for line in f:
         vmag, ra, dec, btmag, vtmag, b_v, v_i = tuple(line.split(","))
-        environment.insertStar(math.radians(float(ra)), math.radians(float(dec)), float(vmag), float(b_v))
+        skyObj.addStar(math.radians(float(ra)), math.radians(float(dec)),
+                       float(vmag), float(b_v))
+        
+    sim.setSg(skyObj)
     f.close()
 
 # Load sol system, this is a csv file that contain the following info:
@@ -167,51 +171,80 @@ def parseTime(str):
                                  + tokens[1] + " "
                                  + tokens[3] + " "
                                  + tokens[5])
+    elif len(tokens) == 4:
+        if tokens[1] == "h" and tokens[3] == "min":
+             return float(tokens[0]) * 3600.0 + float(tokens[2]) * 60.0
+        else:
+            raise UnitParseError("Unknown unit in time context: "
+                  + tokens[1] + " "
+                  + tokens[3])
     else:
-        raise UnitParseError("Token count wrong")
+        raise UnitParseError("Token count wrong in %s" % (str))
 
     
     
 
-def addStar(body):
-    mass = parseMass(body["mass"])
-    radius = parseDistance(body["radius"])
-    axialPeriod = parseAngle(body["axial-period"])
-    model = body["model"]
+def addStar(parent, name, body):
+    try:
+        orbit = body["orbit"]
+        mass = parseMass(body["mass"])
+        radius = parseDistance(body["radius"])
+        axialPeriod = parseTime(orbit["axial-period"])
+        rendOpts = body["rendering"]
+    except KeyError, err:
+        print "error: missing key in star %s (%s)" % (name, err.args)
+        sys.exit(1)
+    star = OrbitSys(parent, name, radius, 0.0)
+    star.addObj(name, radius, 0.0, mass)
 
-    for sat in body["satellites"]:
-        addBody(sat)
+    if body.has_key("satellites"):
+        for key in body["satellites"].keys():
+            addBody(star, key, body["satellites"][key])
 
-def addPlanet(body):
-    mass = parseMass(body["mass"])
-    radius = parseDistance(body["radius"])
-    axialPeriod = parseAngle(body["axial-period"])
-    model = body["model"]
+def addPlanet(parent, name, body):
+    try:
+        orbit = body["orbit"]
+        mass = parseMass(body["mass"])
+        radius = parseDistance(body["radius"])
+        axialPeriod = parseTime(orbit["axial-period"])
+        rendOpts = body["rendering"]
+    except KeyError, err:
+        print "error: missing key in planet %s (%s)" % (name, err.args)
+        sys.exit(1)
 
-    for sat in body["satellites"]:
-        addBody(sat)
-
-def addMoon(body):
-    mass = parseMass(body["mass"])
-    radius = parseDistance(body["radius"])
-    axialPeriod = parseAngle(body["axial-period"])
-    model = body["model"]
-
-    for sat in body["satellites"]:
-        addBody(sat)
+    planet = OrbitSys(parent, name, radius, 0.0)
+    planet.addObj(name, radius, 0.0, mass)
+    
+    if body.has_key("satellites"):
+        for key in body["satellites"].keys():
+            addBody(planet, key, body["satellites"][key])
+        
+def addMoon(parent, name, body):
+    try:
+        orbit = body["orbit"]
+        mass = parseMass(body["mass"])
+        radius = parseDistance(body["radius"])
+        axialPeriod = parseTime(orbit["axial-period"])
+        rendOpts = body["rendering"]
+    except KeyError, err:
+        print "error: missing key in moon %s (%s)" % (name, err.args)
+        sys.exit(1)
+    parent.addObj(name, radius, 0.0, 0.0)
 
     
-def addBody(body):
+def addBody(parent, name, body):
     """docstring for addBody"""
     # get known attributes of a body
-    if body["kind"] == "star":
-        addStar(body)
-    elif body["kind"] == "planet":
-        addPlanet(body)
-    elif body["kind"] == "moon":
-        addMoon(body)
-        
-    
+    try:
+        if body["kind"] == "star":
+            addStar(parent, name, body)
+        elif body["kind"] == "planet":
+            addPlanet(parent, name, body)
+        elif body["kind"] == "moon":
+            addMoon(parent, name, body)
+    except KeyError:
+        print "key error in body (no key 'kind' in %s)" % (name)
+        sys.exit(1)
 
 def loadSolYaml():
     """Loads the yaml description of the solar system"""
@@ -219,8 +252,9 @@ def loadSolYaml():
     solsys = yaml.load(f)
     f.close()
     for key in solsys.keys():
-        addBody(solsys[key])
-        
+        if key != "epoch":
+            addBody(None, key, solsys[key])
+    
 def _test():
     val = parseTime("1.0 days")
     assert(val == 3600.0*24.0)
@@ -233,11 +267,12 @@ def _test():
     val = parsePreasure("100.0 Pa")
     assert(val == 100.0)
     
-    
+
     
 #if __name__ == "__main__":
 #    _test()
 #else:
 loadStars()
 loadSolsystem()
+loadSolYaml()
     
