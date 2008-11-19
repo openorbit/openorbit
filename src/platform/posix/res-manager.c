@@ -50,7 +50,7 @@
 //       The base path is defined as INSTALL_BASE in config.h
 // TODO: More thurough error checking and handling
 char*
-res_get_path(const char *file_name)
+ooResGetPath(const char *file_name)
 {
     if (file_name == NULL) {
         fprintf(stderr, "res_get_path called with NULL file_name\n");
@@ -94,9 +94,9 @@ res_get_path(const char *file_name)
 }
 
 FILE*
-res_get_file(const char *file_name)
+ooResGetFile(const char *file_name)
 {
-    char *path = res_get_path(file_name);
+    char *path = ooResGetPath(file_name);
     
     if (path != NULL) {
         FILE *file = fopen(path, "r");
@@ -108,9 +108,9 @@ res_get_file(const char *file_name)
 }
 
 int
-res_get_fd(const char *file_name)
+ooResGetFd(const char *file_name)
 {
-    char *path = res_get_path(file_name);
+    char *path = ooResGetPath(file_name);
     
     if (path != NULL) {
         int fd = open(path, O_RDONLY);
@@ -124,15 +124,15 @@ res_get_fd(const char *file_name)
 
 
 char*
-plugin_get_path(const char *file_name)
+ooPluginGetPath(const char *file_name)
 {
     
 }
 
 FILE*
-plugin_get_file(const char *file_name)
+ooPluginGetFile(const char *file_name)
 {
-    char *path = plugin_get_path(file_name);
+    char *path = ooPluginGetPath(file_name);
     
     if (path != NULL) {
         FILE *file = fopen(path, "r");
@@ -144,9 +144,9 @@ plugin_get_file(const char *file_name)
 }
 
 int
-plugin_get_fd(const char *file_name)
+ooPluginGetFd(const char *file_name)
 {
-    char *path = plugin_get_path(file_name);
+    char *path = ooPluginGetPath(file_name);
     
     if (path != NULL) {
         int fd = open(path, O_RDONLY);

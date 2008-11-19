@@ -53,7 +53,7 @@ ooTexInit(void)
 int
 ooTexLoad(const char *key, const char *name)
 {
-    FILE *fp = res_get_file(name);
+    FILE *fp = ooResGetFile(name);
     if (fp == NULL) return -1;
 
     tga_image_t img;
