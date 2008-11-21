@@ -73,6 +73,17 @@ ooSgAddChild(OOnode *parent, OOnode *child)
     }    
 }
 
+static void
+ooSgDraw2(OOnode *node)
+{
+    while (node) {
+        node->draw(node->obj);
+        if (node->children) ooSgDraw2(node->children);
+        node->postDraw(node->obj);
+        node = node->next;
+    }
+}
+
 void
 ooSgDraw(OOnode *node)
 {
@@ -82,9 +93,7 @@ ooSgDraw(OOnode *node)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 	
-    node->draw(node->obj);
-    
-    node->postDraw(node->obj);
+    ooSgDraw2(node);
 }
 
 void
