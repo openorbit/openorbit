@@ -43,6 +43,53 @@
 
 SIMstate gSIM_state;
 
+#define OO_EVENT_QUEUE_INIT_LEN 100
+OOeventqueue*
+ooSimNewEventQueue(void)
+{
+    OOeventqueue *queue = malloc(sizeof(OOeventqueue));
+    queue->freeEvents = malloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
+    
+    for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
+        queue->freeEvents[i].next = &queue->freeEvents[i+1];
+        queue->freeEvents[i].data = NULL;
+        queue->freeEvents[i].handler = NULL;
+        queue->freeEvents[i].fireOffset = 0;
+    }
+    
+    return queue;
+}
+
+int
+ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *data)
+{
+    OOevent *e = q->first;
+    int tsCnt = e->fireOffset;
+    while (tsCnt < offset) {
+        e = e->next;
+        tsCnt += e->fireOffset;
+    }
+}
+
+int
+ooSimHandleNextEvent(OOeventqueue *q)
+{
+    if (q->first && (-- q->first->fireOffset <= 0)) {
+        OOevent *ev = q->first;
+        q->first = q->first->next;
+        ev->handler(ev->data);
+        
+        ev->next = q->freeEvents;
+        q->freeEvents = ev;
+        
+        return 0;
+    }
+    
+    if (q->first == NULL) return -1;
+    return q->first->fireOffset;
+}
+
+
 void
 ooSimSetSg(OOnode *sg)
 {
@@ -52,28 +99,6 @@ void
 ooSimSetOrbSys(orb_sys_t *osys)
 {
     gSIM_state.orbSys = osys;
-}
-
-Uint32
-sim_step_event(Uint32 interval, void *param)
-{
-    SDL_Event event;
-    SDL_UserEvent userevent;
-    
-    /* In this example, our callback pushes an SDL_USEREVENT event
-        into the queue, and causes ourself to be called again at the
-        same interval: */
-    
-    userevent.type = SDL_USEREVENT;
-    userevent.code = SIM_STEP_EVENT;
-    userevent.data1 = NULL;
-    userevent.data2 = NULL;
-    
-    event.type = SDL_USEREVENT;
-    event.user = userevent;
-    
-    SDL_PushEvent(&event);
-    return interval;
 }
 
 

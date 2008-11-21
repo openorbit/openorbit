@@ -68,7 +68,30 @@
 
 
 //extern settings_t SETTINGS;
+/* Simulator SDL events */
+#define SIM_STEP_EVENT 0
+#define SIM_DEBUG_EVENT 1
+ 
+// 25Hz
+#define SIM_STEP_PERIOD 40
 
+Uint32
+sim_step_event(Uint32 interval, void *param)
+{
+    SDL_Event event;
+    SDL_UserEvent userevent;
+
+    userevent.type = SDL_USEREVENT;
+    userevent.code = SIM_STEP_EVENT;
+    userevent.data1 = NULL;
+    userevent.data2 = NULL;
+
+    event.type = SDL_USEREVENT;
+    event.user = userevent;
+
+    SDL_PushEvent(&event);
+    return interval;
+}
 
 static void
 main_loop(void)
@@ -87,27 +110,18 @@ main_loop(void)
                 break;
             case SDL_MOUSEMOTION:
                 if (event.motion.state) {
-//                    io_handle_mouse_drag(SDL_BUTTON(event.motion.state), 
-//                                         (float)event.motion.xrel,
-//                                         (float)event.motion.yrel);                        
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
-//                io_handle_mouse_down(event.button.button,
-//                                    (float)event.button.x,
-//                                    (float)event.button.y);
                 break;
             case SDL_MOUSEBUTTONUP:
-//                io_handle_mouse_up(event.button.button,
-//                                   (float)event.button.x,
-//                                   (float)event.button.y);
                 break;
             case SDL_KEYDOWN:
                 evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
                 ooIoDispatchKeyDown(evName, event.key.keysym.mod);
                 break;
             case SDL_KEYUP:
-                if (event.key.keysym.sym == SDLK_q) done = 1;
+                if (event.key.keysym.sym == SDLK_q) done = 1; // for now dont remap q
                 else {
                     evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
                     ooIoDispatchKeyDown(evName, event.key.keysym.mod);
@@ -140,17 +154,15 @@ main_loop(void)
 			}
 		}
         
-        // draw as often as possible, should interpolate between steps depending
-        // on passed time
-//        render_scene();
+        // draw as often as possible
         ooSgDraw(gSIM_state.sg);
         SDL_GL_SwapBuffers();
 	}
 }
 
 
-void
-inner_main(void *data, int argc, char *argv[])
+int
+main(int argc, char*argv[])
 {    
     ooConfInit();
     // Setup IO-tables
@@ -190,18 +202,6 @@ inner_main(void *data, int argc, char *argv[])
     main_loop();
     
 	printf("Shutting down normally...");
-    exit(0);
-    
-}
-
-int
-main(int argc, char *argv[])
-{
-#ifdef WITH_GUILE
-    scm_boot_guile(argc, argv, inner_main, NULL); // never returns
-#else
-    inner_main(NULL, argc, argv); // never returns
-#endif /* ! WITH_GUILE */
-    
     return 0;
 }
+
