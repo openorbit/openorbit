@@ -45,15 +45,15 @@
 
 // TODO: More thurough error checking and handling
 char*
-res_get_path(const char *file_name)
+ooResGetPath(const char *fileName)
 {
-    assert(file_name != NULL);
+    assert(fileName != NULL);
     
     // The resources are located without the full name on the mac, we have to
     // split up the name of the file and its extension
-    char *end = strrchr(file_name, '\0');
-    char *last_dot = strrchr(file_name, '.');
-    char *last_slash = strrchr(file_name, '/');
+    char *end = strrchr(fileName, '\0');
+    char *last_dot = strrchr(fileName, '.');
+    char *last_slash = strrchr(fileName, '/');
     
     if (! last_dot) {
         return NULL;
@@ -66,24 +66,24 @@ res_get_path(const char *file_name)
     if (last_slash) {
         fileBase = malloc(last_dot - last_slash + 1);
         fileType = malloc(end - last_dot + 1);
-        fileSubDir = malloc(last_slash - file_name + 1);
+        fileSubDir = malloc(last_slash - fileName + 1);
         
         memset(fileBase, 0, last_dot - last_slash + 1);
         memset(fileType, 0, end - last_dot + 1);
-        memset(fileSubDir, 0, last_slash - file_name + 1);
+        memset(fileSubDir, 0, last_slash - fileName + 1);
         
         memcpy(fileBase, last_slash + 1, last_dot - last_slash);
         memcpy(fileType, last_dot + 1, end - last_dot);
-        memcpy(fileSubDir, file_name, last_slash - file_name);
+        memcpy(fileSubDir, fileName, last_slash - fileName);
     } else {
-        fileBase = malloc(last_dot - file_name + 1);
+        fileBase = malloc(last_dot - fileName + 1);
         fileType = malloc(end - last_dot + 1);
         fileSubDir = NULL;
 
-        memset(fileBase, 0, last_dot - file_name + 1);
+        memset(fileBase, 0, last_dot - fileName + 1);
         memset(fileType, 0, end - last_dot + 1);
         
-        memcpy(fileBase, file_name, last_dot - file_name);
+        memcpy(fileBase, fileName, last_dot - fileName);
         memcpy(fileType, last_dot + 1, end - last_dot);
     }
 
@@ -128,9 +128,9 @@ res_get_path(const char *file_name)
 }
 
 FILE*
-res_get_file(const char *file_name)
+ooResGetFile(const char *fileName)
 {
-    char *path = res_get_path(file_name);
+    char *path = ooResGetPath(fileName);
     
     if (path != NULL) {
         FILE *file = fopen(path, "r");
@@ -142,9 +142,9 @@ res_get_file(const char *file_name)
 }
 
 int
-res_get_fd(const char *file_name)
+ooResGetFd(const char *fileName)
 {
-    char *path = res_get_path(file_name);
+    char *path = ooResGetPath(fileName);
     
     if (path != NULL) {
         int fd = open(path, O_RDONLY);
@@ -158,15 +158,15 @@ res_get_fd(const char *file_name)
 
 
 char*
-plugin_get_path(const char *file_name)
+ooPluginGetPath(const char *fileName)
 {
     
 }
 
 FILE*
-plugin_get_file(const char *file_name)
+ooPluginGetFile(const char *fileName)
 {
-    char *path = plugin_get_path(file_name);
+    char *path = ooPluginGetPath(fileName);
     
     if (path != NULL) {
         FILE *file = fopen(path, "r");
@@ -178,9 +178,9 @@ plugin_get_file(const char *file_name)
 }
 
 int
-plugin_get_fd(const char *file_name)
+ooPluginGetFd(const char *fileName)
 {
-    char *path = plugin_get_path(file_name);
+    char *path = ooPluginGetPath(fileName);
     
     if (path != NULL) {
         int fd = open(path, O_RDONLY);

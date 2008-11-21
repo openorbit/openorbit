@@ -30,7 +30,7 @@
 #   the GPL or the LGPL."
 
 cdef extern from "res-manager.h":
-    char* res_get_path(char *file_name)
+    char* ooResGetPath(char *fileName)
 
 cdef extern from "stdlib.h":
     void free(void*)
@@ -39,7 +39,7 @@ cdef extern from "stdlib.h":
 
 def getPath(str):
     cdef char *path
-    path = res_get_path(str)
+    path = ooResGetPath(str)
     pstr = path
     free(path)
     return pstr

@@ -49,12 +49,12 @@
 #define _RES_MANAGER_H_
 #include <stdio.h>
 
-char* res_get_path(const char *file_name);
-FILE* res_get_file(const char *file_name);
-int res_get_fd(const char *file_name);
+char* ooResGetPath(const char *fileName);
+FILE* ooResGetFile(const char *fileName);
+int ooResGetFd(const char *fileName);
 
-char* plugin_get_path(const char *file_name);
-FILE* plugin_get_file(const char *file_name);
-int plugin_get_fd(const char *file_name);
+char* ooPluginGetPath(const char *fileName);
+FILE* ooPluginGetFile(const char *fileName);
+int ooPluginGetFd(const char *fileName);
 
 #endif /* _RES_MANAGER_H_ */

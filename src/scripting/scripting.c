@@ -83,7 +83,7 @@ finalise_scripting(void)
 oo_error_t
 load_setup_script(void)
 {    
-    char *path = res_get_path(SCR_INIT_SCRIPT_NAME);
+    char *path = ooResGetPath(SCR_INIT_SCRIPT_NAME);
     
     FILE *fp = fopen(path, "r");
     if (! fp) {
@@ -103,7 +103,7 @@ load_setup_script(void)
 bool
 run_post_init_script(void)
 {
-    char *path = res_get_path(SCR_POST_INIT_SCRIPT_NAME);
+    char *path = ooResGetPath(SCR_POST_INIT_SCRIPT_NAME);
     
     FILE *fp = fopen(path, "r");
     if (! fp) {
