@@ -40,10 +40,9 @@ extern "C" {
     
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <Python.h>
-//#include "scripting/scripting.h"
-#include "error.h"
-#include "sim.h"
+#include "SDL.h"
 
 
 /* These use the same values as SDL, so for porting (to not use SDL) they must be
@@ -61,14 +60,28 @@ extern "C" {
 #define OO_IO_MOD_CAPS   0x2000
 #define OO_IO_MOD_MODE   0x4000
 
+/*! Initialises map between SDL key / button IDs and the internal hashtable keys
 
+    \pre None
+*/
 void ooIoInitSdlStringMap(void);
 typedef void (*OObuttonhandlerfunc)(bool buttonUp, void *data);
+/*! Register key handler C function */
 void ooIoRegCKeyHandler(const char *name, OObuttonhandlerfunc handlerFunc);
+/*! Register key handler Python function */
 void ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc);
 
+/*! Bind keyboard with keyName to the keyAction key
+
+    \param keyName String key for the keyboard button
+    \param keyAction Key corresponding to the registered action
+    \param up 0 if the handler should fire on button down, otherwise it will fire on
+        button up.
+    \param mask ored mask from the OO_IO_MOD* constants 
+*/
 void ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up,
                         uint16_t mask);
+
 
 void ooIoDispatchKeyUp(const char *name, uint16_t mask);
 void ooIoDispatchKeyDown(const char *name, uint16_t mask);
