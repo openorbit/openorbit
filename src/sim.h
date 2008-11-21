@@ -41,26 +41,28 @@ extern "C" {
 
 #include <stdint.h>
 
-#include "SDL.h"
-
 #include "physics/orbit.h"
 #include "rendering/scenegraph.h"
 
 
-typedef enum {
-	SIM_io_event,
-	SIM_time_event
-} sim_event_kind_t;
-
     
-typedef void (*sim_event_handler_t)(sim_event_kind_t e, void *data);
+typedef void (*OOeventhandler)(void *data);
     
-typedef struct {
-    sim_event_kind_t kind;
-    sim_event_handler_t handler;
+typedef struct _OOevent {
+    signed fireOffset;
+    OOeventhandler handler;
     void *data;
-} sim_event_t;
+    struct _OOevent *next;
+} OOevent;
 
+typedef struct {
+    OOevent *first;
+    OOevent *freeEvents;
+} OOeventqueue;
+
+OOeventqueue* ooSimNewEventQueue(void);
+int ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *data);
+int ooSimHandleNextEvent(OOeventqueue *q);
     
 typedef struct {
     uint64_t timeStamp;
@@ -72,14 +74,6 @@ typedef struct {
 void ooSimSetSg(OOnode *sg);
 void ooSimSetOrbSys(orb_sys_t *osys);
 
-/* Simulator SDL events */
-#define SIM_STEP_EVENT 0
-#define SIM_DEBUG_EVENT 1
-    
-// 25Hz
-#define SIM_STEP_PERIOD 40
-
-Uint32 sim_step_event(Uint32 interval, void *param);
 void ooSimStep(float dt);
 
 #ifdef __cplusplus
