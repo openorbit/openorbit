@@ -42,8 +42,8 @@
 
 static const char * gIoSdlKeyStringMap[SDLK_LAST];
 static const char * gIoSdlMouseStringMap[7];
-static hashtable_t *gIoBoundKeyTable;
-static hashtable_t *gIoButtonHandlers;
+static hashtable_t *gIoBoundKeyTable;  // of type OOkeyevent
+static hashtable_t *gIoButtonHandlers; // of type OObuttonhandler
 
 
 void
