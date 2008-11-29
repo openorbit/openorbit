@@ -173,7 +173,7 @@ main(int argc, char*argv[])
     if (! init_plugin_manager() ) exit(1);
     
     // Load and run initialisation script
-    if (init_scripting()) {
+    if (ooScriptingInit()) {
         fprintf(stderr, "Failed to init scripting system\n");
         exit(1);
     }
@@ -189,7 +189,7 @@ main(int argc, char*argv[])
     // Init GL state
     init_renderer();
 
-    if (! run_post_init_script()) {
+    if (! ooScriptingRunPostInit()) {
         fprintf(stderr, "Failed to run post init script\n");
         exit(1);
     }
