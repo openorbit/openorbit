@@ -25,7 +25,7 @@ aux_source_directory(rendering rendering_src)
 aux_source_directory(vessel vessel_src)
 
 set(openorbit_SRC
-	main.c sim.c error.c settings.c io-manager.c plugin-handler.c
+	main.c sim.c error.c settings.c io-manager.c plugin-handler.c log.c
 	${rendering_src} ${vessel_src} )
 
 set(openorbit_FILES

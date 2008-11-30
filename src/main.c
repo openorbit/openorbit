@@ -54,6 +54,7 @@
 #include <math.h>
 #include <assert.h>
 
+#include "log.h"
 #include "error.h"
 #include "settings.h"
 #include "io-manager.h"
@@ -80,6 +81,7 @@ sim_step_event(Uint32 interval, void *param)
 {
     SDL_Event event;
     SDL_UserEvent userevent;
+
 
     userevent.type = SDL_USEREVENT;
     userevent.code = SIM_STEP_EVENT;
@@ -163,8 +165,10 @@ main_loop(void)
 
 int
 main(int argc, char*argv[])
-{    
+{   
     ooConfInit();
+    
+    ooLogInit(stderr);
     // Setup IO-tables
     ooIoInitSdlStringMap();
     
@@ -173,10 +177,7 @@ main(int argc, char*argv[])
     if (! init_plugin_manager() ) exit(1);
     
     // Load and run initialisation script
-    if (init_scripting()) {
-        fprintf(stderr, "Failed to init scripting system\n");
-        exit(1);
-    }
+    ooScriptingInit();
 	
     // Initialise SDL, GL and AL
     
@@ -189,7 +190,7 @@ main(int argc, char*argv[])
     // Init GL state
     init_renderer();
 
-    if (! run_post_init_script()) {
+    if (! ooScriptingRunPostInit()) {
         fprintf(stderr, "Failed to run post init script\n");
         exit(1);
     }

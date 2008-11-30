@@ -57,11 +57,6 @@ extern "C" {
 #include <Python.h>
 #endif
 
-typedef PyObject* scr_func_t;
-typedef PyObject* scr_bool_t;
-typedef PyObject* scr_int_t;
-typedef PyObject* scr_str_t;
-typedef PyObject* scr_float_t;
 #define SCR_INIT_SCRIPT_NAME "init.py"
 #define SCR_POST_INIT_SCRIPT_NAME "postinit.py"
 
@@ -72,14 +67,14 @@ typedef PyObject* scr_float_t;
  * Brings any internal scripting modules online. E.g. it registers C-functions
  * whith the scripting subsystem.
  * */
-bool init_scripting(void);
-bool run_post_init_script(void);
+void ooScriptingInit(void);
+bool ooScriptingRunPostInit(void);
 /*!
  * \brief Cleans up and shuts down the scripting system.
  * 
  * Call this at exit.
  * */
-void finalise_scripting(void);
+void ooScriptingFinalise(void);
 
 /*!
  * \brief Loads and executes the init script.
@@ -87,8 +82,9 @@ void finalise_scripting(void);
  * The init script is executed before the graphics system is enabled and is
  * responsible for setting up items such as video modes, controls and so forth.
  * */
-oo_error_t load_setup_script(void);
+oo_error_t ooScriptingRunInit(void);
 
+bool ooScriptingRunFile(const char *fname);
 
 #ifdef __cplusplus
 }

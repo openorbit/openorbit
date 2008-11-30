@@ -35,7 +35,7 @@
 #include <stdint.h>
 
 #include "res-manager.h"
- 
+#include "log.h"
 
 #include <Python.h>
 
@@ -50,8 +50,8 @@ extern void initsim(void);
  
 #include "scripting.h"
 
-bool
-init_scripting(void)
+void
+ooScriptingInit(void)
 {
 //    Py_InitializeEx(0);
     Py_Initialize();
@@ -64,61 +64,73 @@ init_scripting(void)
     initsg();
     initsim();
     
-    oo_error_t err = load_setup_script();
+    
+    oo_error_t err = ooScriptingRunInit();
     
     if (err) {
         oo_print_err_msg(err);
-        return true;
+        ooLogFatal("init script failed to run");
     }
-    
-    return false;
 }
 
 void
-finalise_scripting(void)
+ooScriptingFinalise(void)
 {
     Py_Finalize();
 }
 
 oo_error_t
-load_setup_script(void)
+ooScriptingRunInit(void)
 {    
-    char *path = ooResGetPath(SCR_INIT_SCRIPT_NAME);
+    FILE *fp = ooResGetFile(SCR_INIT_SCRIPT_NAME);
     
-    FILE *fp = fopen(path, "r");
     if (! fp) {
-        printf("%s\n", path);
-        free(path);
+        fprintf(stderr, "could not open %s\n", SCR_INIT_SCRIPT_NAME);
         return ERR_file_not_found;
     }
     if (PyRun_SimpleFile(fp, SCR_INIT_SCRIPT_NAME)) {
-        free(path);
+        fclose(fp);
         return ERR_script;
     }
     
-    free(path);
+    fclose(fp);
     return ERR_none;
 }
 
 bool
-run_post_init_script(void)
+ooScriptingRunPostInit(void)
 {
-    char *path = ooResGetPath(SCR_POST_INIT_SCRIPT_NAME);
+    FILE *fp = ooResGetFile(SCR_POST_INIT_SCRIPT_NAME);
     
-    FILE *fp = fopen(path, "r");
     if (! fp) {
-        printf("%s\n", path);
-        free(path);
+        fprintf(stderr, "could not open %s\n", SCR_POST_INIT_SCRIPT_NAME);
         return false;
     }
     if (PyRun_SimpleFile(fp, SCR_POST_INIT_SCRIPT_NAME)) {
-        free(path);
+        fprintf(stderr, "execution of script %s failed\n", SCR_POST_INIT_SCRIPT_NAME);
+        fclose(fp);
         return false;
     }
     
-    free(path);
+    fclose(fp);
     return true;
-    
 }
 
-
+bool
+ooScriptingRunFile(const char *fname)
+{
+  FILE *fp = ooResGetFile(fname);
+  
+  if (! fp) {
+      fprintf(stderr, "could not open %s\n", fname);
+      return false;
+  }
+  if (PyRun_SimpleFile(fp, fname)) {
+      fprintf(stderr, "execution of script %s failed\n", fname);
+      fclose(fp);
+      return false;
+  }
+  
+  fclose(fp);
+  return true;  
+}
