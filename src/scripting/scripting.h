@@ -67,7 +67,7 @@ extern "C" {
  * Brings any internal scripting modules online. E.g. it registers C-functions
  * whith the scripting subsystem.
  * */
-bool ooScriptingInit(void);
+void ooScriptingInit(void);
 bool ooScriptingRunPostInit(void);
 /*!
  * \brief Cleans up and shuts down the scripting system.
