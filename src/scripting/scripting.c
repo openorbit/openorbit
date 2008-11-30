@@ -35,7 +35,7 @@
 #include <stdint.h>
 
 #include "res-manager.h"
- 
+#include "log.h"
 
 #include <Python.h>
 
@@ -50,7 +50,7 @@ extern void initsim(void);
  
 #include "scripting.h"
 
-bool
+void
 ooScriptingInit(void)
 {
 //    Py_InitializeEx(0);
@@ -65,15 +65,12 @@ ooScriptingInit(void)
     initsim();
     
     
-    
     oo_error_t err = ooScriptingRunInit();
     
     if (err) {
         oo_print_err_msg(err);
-        return true;
+        ooLogFatal("init script failed to run");
     }
-    
-    return false;
 }
 
 void

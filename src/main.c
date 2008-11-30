@@ -54,6 +54,7 @@
 #include <math.h>
 #include <assert.h>
 
+#include "log.h"
 #include "error.h"
 #include "settings.h"
 #include "io-manager.h"
@@ -163,8 +164,10 @@ main_loop(void)
 
 int
 main(int argc, char*argv[])
-{    
+{   
     ooConfInit();
+    
+    ooLogInit(stderr);
     // Setup IO-tables
     ooIoInitSdlStringMap();
     
@@ -173,10 +176,7 @@ main(int argc, char*argv[])
     if (! init_plugin_manager() ) exit(1);
     
     // Load and run initialisation script
-    if (ooScriptingInit()) {
-        fprintf(stderr, "Failed to init scripting system\n");
-        exit(1);
-    }
+    ooScriptingInit();
 	
     // Initialise SDL, GL and AL
     
