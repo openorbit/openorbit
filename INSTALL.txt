@@ -1,13 +1,21 @@
 Build instructions
 
+This document details how to build Open Orbit from sources. In order to build Open Orbit,
+there is first a few dependencies that must be satisfied.
 
 1. Dependencies
 
-	* Pyrex
-	* Python
-	* CMake
-	* check
-	* SDL
+Required tools and libraries are the following, Open Orbit is impossible to build without 
+these (and you need the developer packages for these):
+	* Pyrex: Python / C bridge and wrappers
+	* Python: Scripting langage (embedded in Open Orbit)
+	* CMake: Cross platform configuration of software builds
+	* libSDL: Library for creating windows and handling I/O
+	* libODE: Physics / Dynamics simulation library
+
+The following tools and libraries are optional, they add additional functionality only:
+	* libcheck: Required if regression tests are to be built. It is recommended that
+		you build these if you have checked out Open Orbit from the SCM. 
 
 
 2. Configuration
@@ -17,6 +25,9 @@ Create a separate build directory, enter the directory and run cmake on the top
 level CMakeLists.txt file.
 
 Type make, and then make install
+
+There is also a convenience script called configure that let you do the normal
+./configure dance (except for the fact that it will not run in the src directory).
 
 2.2. Mac OS X
 See 2.1 (UNIX like systems)
