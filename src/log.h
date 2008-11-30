@@ -35,9 +35,28 @@
 #define LOG_H_
 #include <stdio.h>
 
+typedef enum {
+    OOLog_Notify = 0,
+    OOLog_Warning,
+    OOLog_Critical
+} OOloglev;
+
+typedef enum {
+    OOErr_None = 0,
+    OOErr_Script,
+    OOErr_FileIO,
+    OOErr_FileOpen,
+    OOErr_Mem,
+    OOErr_InvalidPar,
+    OOErr_NetIO,
+    OOErr_NetAddr
+} OOerr;
+
 void ooLogInit(FILE *logPath);
-void ooLogMsg(const char *msg);
-void ooLogWarn(const char *msg);
-void ooLogFatal(const char *msg) __attribute__((noret));
+void ooLogSetLevel(OOloglev lev);
+void ooLogNotify(const char *msg, ...);
+void ooLogWarn(const char *msg, ...);
+void ooLogFatal(const char *msg, ...) __attribute__((__noreturn__));
+void ooLogMsg(OOloglev lev, const char *msg, ...);
 
 #endif /* _LOG_H_ */

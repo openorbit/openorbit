@@ -32,34 +32,74 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
 #include <sysexits.h>
 
 #include "log.h"
 
 static FILE *sLogFile;
+static OOloglev sLogLev;
+static char* sLogNames[] = {"note", "warning", "error"};
+
+static void
+ooLogWriteV(OOloglev lev, const char *msg, va_list vaList)
+{
+    if (lev >= sLogLev) {
+        fprintf(sLogFile, "oo: %s: ", sLogNames[lev]);
+        vfprintf(sLogFile, msg, vaList);
+    }
+}
 
 void
 ooLogInit(FILE *logFile)
 {
     sLogFile = logFile;
+    sLogLev = OOLog_Notify;
 }
 
 void
-ooLogMsg(const char *msg)
+ooLogSetLevel(OOloglev lev)
 {
-    fprintf(sLogFile, "oo: msg: %s\n", msg);
+    sLogLev = lev;
 }
 
 
 void
-ooLogWarn(const char *msg)
+ooLogNotify(const char *msg, ...)
 {
-    fprintf(sLogFile, "oo: warning: %s\n", msg);
+    va_list vaList;
+    va_start(vaList, msg);
+    ooLogWriteV(OOLog_Notify, msg, vaList);
+    va_end(vaList);
+}
+
+
+void
+ooLogWarn(const char *msg, ...)
+{
+    va_list vaList;
+    va_start(vaList, msg);
+    ooLogWriteV(OOLog_Warning, msg, vaList);
+    va_end(vaList);
 }
 
 void
-ooLogFatal(const char *msg)
+ooLogFatal(const char *msg, ...)
 {
-    fprintf(sLogFile, "oo: error: %s\n", msg);
+    va_list vaList;
+    va_start(vaList, msg);
+    ooLogWriteV(OOLog_Critical, msg, vaList);
+    va_end(vaList);
     exit(EX_SOFTWARE);
+}
+
+void
+ooLogMsg(OOloglev lev, const char *msg, ...)
+{
+    va_list vaList;
+    va_start(vaList, msg);
+    ooLogWriteV(lev, msg, vaList);
+    va_end(vaList);
+    if (lev = OOLog_Critical) exit(EX_SOFTWARE);
 }
