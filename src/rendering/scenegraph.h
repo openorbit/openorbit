@@ -60,6 +60,10 @@ typedef struct {
 } OOtransform;
 
 typedef struct {
+    scalar_t s;
+} OOscale;
+
+typedef struct {
     dWorldID world;
     dBodyID body;
 } OOodetransform;
@@ -90,6 +94,7 @@ OOnode* ooSgNewTransform(float dx, float dy, float dz,
 OOnode* ooSgNewOdeTransform(dWorldID world, dBodyID body);
 OOnode* ooSgNewSphere(OOtexture *tex);
 OOnode* ooSgNewSky(void);
+OOnode* ooSgNewScale(float scale);
 
 /* Draw functions */
 void ooSgDrawMesh(OOmesh *mesh);
@@ -98,6 +103,7 @@ void ooSgPostTransform(OOtransform *t);
 void ooSgOdeTransform(OOodetransform *t);
 void ooSgDrawSphere(OOsphere *sphere);
 
-
+void ooSgScale(OOscale *scale);
+void ooSgPostScale(OOscale *scale);
 
 #endif /* SCENEGRAPH_H_ */

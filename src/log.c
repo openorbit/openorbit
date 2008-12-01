@@ -48,6 +48,7 @@ ooLogWriteV(OOloglev lev, const char *msg, va_list vaList)
     if (lev >= sLogLev) {
         fprintf(sLogFile, "oo: %s: ", sLogNames[lev]);
         vfprintf(sLogFile, msg, vaList);
+        fprintf(sLogFile, "\n");
     }
 }
 

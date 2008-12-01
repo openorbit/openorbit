@@ -41,90 +41,41 @@
 
 // Open Orbit headers
 #include "res-manager.h"
+#include "log.h"
 
+const char*
+ooResGetBasePath(void)
+{
+    static UInt8 base[PATH_MAX+1] = {0};
+    
+    // If first call, get the path to the bundle's resource directory
+    if (base[0] == '\0') {
+        CFBundleRef bundle = CFBundleGetMainBundle();
+        CFURLRef resUrl = CFBundleCopyResourcesDirectoryURL(bundle);        
+        // use absolute path
+        if (!CFURLGetFileSystemRepresentation(resUrl, true, base, PATH_MAX)) {
+            // Something went wrong
+            CFRelease(resUrl);
+            ooLogFatal("%s:%d:base path not found", __FILE__, __LINE__); // no ret
+        }
+        
+        CFRelease(resUrl);
+        
+        ooLogNotify("res base = %s", base);
+    }
+    
+    return (const char*)base;
+}
 
-// TODO: More thurough error checking and handling
 char*
 ooResGetPath(const char *fileName)
 {
-    assert(fileName != NULL);
-    
-    // The resources are located without the full name on the mac, we have to
-    // split up the name of the file and its extension
-    char *end = strrchr(fileName, '\0');
-    char *last_dot = strrchr(fileName, '.');
-    char *last_slash = strrchr(fileName, '/');
-    
-    if (! last_dot) {
-        return NULL;
-    }
-
-    char *fileBase;
-    char *fileType;
-    char *fileSubDir;
-
-    if (last_slash) {
-        fileBase = malloc(last_dot - last_slash + 1);
-        fileType = malloc(end - last_dot + 1);
-        fileSubDir = malloc(last_slash - fileName + 1);
+    assert(fileName != NULL && "File name cannot be null");
         
-        memset(fileBase, 0, last_dot - last_slash + 1);
-        memset(fileType, 0, end - last_dot + 1);
-        memset(fileSubDir, 0, last_slash - fileName + 1);
-        
-        memcpy(fileBase, last_slash + 1, last_dot - last_slash);
-        memcpy(fileType, last_dot + 1, end - last_dot);
-        memcpy(fileSubDir, fileName, last_slash - fileName);
-    } else {
-        fileBase = malloc(last_dot - fileName + 1);
-        fileType = malloc(end - last_dot + 1);
-        fileSubDir = NULL;
-
-        memset(fileBase, 0, last_dot - fileName + 1);
-        memset(fileType, 0, end - last_dot + 1);
-        
-        memcpy(fileBase, fileName, last_dot - fileName);
-        memcpy(fileType, last_dot + 1, end - last_dot);
-    }
-
-    CFBundleRef bundle = CFBundleGetMainBundle();
-    if (bundle == NULL) return NULL;
+    char *path;
+    asprintf(&path, "%s/%s\0", ooResGetBasePath(), fileName);
     
-    CFStringRef resName = CFStringCreateWithCString(kCFAllocatorDefault,
-                                                    fileBase,
-                                                    kCFStringEncodingUTF8);
-
-    CFStringRef resType = CFStringCreateWithCString(kCFAllocatorDefault,
-                                                    fileType,
-                                                    kCFStringEncodingUTF8);
-
-    CFStringRef resSubDir;
-    if (fileSubDir != NULL) {
-        resSubDir = CFStringCreateWithCString(kCFAllocatorDefault,
-                                              fileSubDir,
-                                              kCFStringEncodingUTF8);
-    } else {
-        resSubDir = NULL;
-    }
-    
-    CFURLRef url = CFBundleCopyResourceURL(bundle, resName, resType, resSubDir);
-    
-    UInt8 *path = malloc(PATH_MAX+1);
-    // true if absolute path is to be used...
-    if (!CFURLGetFileSystemRepresentation(url, false, path, PATH_MAX)) {
-        free(path);
-        path = NULL;
-    }
-    
-    free(fileBase);
-    free(fileType);
-    free(fileSubDir);
-    if (resName) CFRelease(resName);
-    if (resType) CFRelease(resType);
-    if (resSubDir) CFRelease(resSubDir);
-    if (url) CFRelease(url);
-    
-    return (char*)path;
+    return path; // Note, asprintf sets this to NULL if it fails
 }
 
 FILE*
@@ -134,7 +85,9 @@ ooResGetFile(const char *fileName)
     
     if (path != NULL) {
         FILE *file = fopen(path, "r");
+        if (!file) ooLogWarn("file %s not readable", path);
         free(path);
+        
         return file;
     }
 
@@ -148,6 +101,9 @@ ooResGetFd(const char *fileName)
     
     if (path != NULL) {
         int fd = open(path, O_RDONLY);
+        
+        if (fd == -1) ooLogWarn("file %s not readable", path);
+        
         free(path);
         
         return fd;
