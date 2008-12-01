@@ -223,3 +223,31 @@ ooSgNewSky(void)
 
     return node;
 }
+
+
+void
+ooSgScale(OOscale *scale)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    
+    glScalef(scale->s, scale->s, scale->s);
+}
+
+void
+ooSgPostScale(OOscale *scale)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+}
+
+
+OOnode*
+ooSgNewScale(float scale)
+{
+    OOscale *scaleNode = (OOscale*) malloc(sizeof(OOscale));
+    scaleNode->s = scale;
+    
+    OOnode *node = ooSgNewNode(scaleNode, (OOdrawfunc)ooSgScale, (OOdrawfunc)ooSgPostScale);
+    return node;
+}

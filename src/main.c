@@ -82,6 +82,7 @@ sim_step_event(Uint32 interval, void *param)
     SDL_Event event;
     SDL_UserEvent userevent;
 
+
     userevent.type = SDL_USEREVENT;
     userevent.code = SIM_STEP_EVENT;
     userevent.data1 = NULL;
