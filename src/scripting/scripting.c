@@ -50,12 +50,15 @@ extern void initsim(void);
  
 #include "scripting.h"
 
+// TODO: move to configure or something like that
+#define OO_PATH_SEP ":"
+
 void
 ooScriptingInit(void)
 {
-//    Py_InitializeEx(0);
-    Py_Initialize();
-
+    
+    Py_InitializeEx(0); // note that ex(0) prevents python from stealing sighandlers
+    
     initio();
     initconfig();
     initres();
@@ -64,13 +67,21 @@ ooScriptingInit(void)
     initsg();
     initsim();
     
+    // insert app-specific python path
+    char *ooPyPath = ooResGetPath("python/");
+    if (! ooPyPath) ooLogFatal("cannot generate python path");
     
-    oo_error_t err = ooScriptingRunInit();
+    const char *pyPath = Py_GetPath();
     
-    if (err) {
-        oo_print_err_msg(err);
-        ooLogFatal("init script failed to run");
-    }
+    char *newOoPyPath;
+    asprintf(&newOoPyPath, "%s" OO_PATH_SEP "%s", ooPyPath, pyPath);
+    
+    PySys_SetPath(newOoPyPath);
+    
+    free(ooPyPath);
+    free(newOoPyPath);
+    
+//    ooScriptingRunInit();
 }
 
 void
@@ -79,41 +90,16 @@ ooScriptingFinalise(void)
     Py_Finalize();
 }
 
-oo_error_t
+void
 ooScriptingRunInit(void)
 {    
-    FILE *fp = ooResGetFile(SCR_INIT_SCRIPT_NAME);
-    
-    if (! fp) {
-        fprintf(stderr, "could not open %s\n", SCR_INIT_SCRIPT_NAME);
-        return ERR_file_not_found;
-    }
-    if (PyRun_SimpleFile(fp, SCR_INIT_SCRIPT_NAME)) {
-        fclose(fp);
-        return ERR_script;
-    }
-    
-    fclose(fp);
-    return ERR_none;
+    ooScriptingRunFile(SCR_INIT_SCRIPT_NAME);
 }
 
 bool
 ooScriptingRunPostInit(void)
 {
-    FILE *fp = ooResGetFile(SCR_POST_INIT_SCRIPT_NAME);
-    
-    if (! fp) {
-        fprintf(stderr, "could not open %s\n", SCR_POST_INIT_SCRIPT_NAME);
-        return false;
-    }
-    if (PyRun_SimpleFile(fp, SCR_POST_INIT_SCRIPT_NAME)) {
-        fprintf(stderr, "execution of script %s failed\n", SCR_POST_INIT_SCRIPT_NAME);
-        fclose(fp);
-        return false;
-    }
-    
-    fclose(fp);
-    return true;
+    ooScriptingRunFile(SCR_POST_INIT_SCRIPT_NAME);
 }
 
 bool
@@ -122,13 +108,14 @@ ooScriptingRunFile(const char *fname)
   FILE *fp = ooResGetFile(fname);
   
   if (! fp) {
+      ooLogWarn("could not open %s", fname);
       fprintf(stderr, "could not open %s\n", fname);
       return false;
   }
   if (PyRun_SimpleFile(fp, fname)) {
-      fprintf(stderr, "execution of script %s failed\n", fname);
       fclose(fp);
-      return false;
+      ooLogFatal("execution of %s failed", fname);
+      //return false;
   }
   
   fclose(fp);

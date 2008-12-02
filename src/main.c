@@ -178,7 +178,11 @@ main(int argc, char*argv[])
     
     // Load and run initialisation script
     ooScriptingInit();
-	
+    
+	if (!ooScriptingRunFile("script/postinit.py")) {
+        ooLogFatal("script/init.py missing");
+	}
+    
     // Initialise SDL, GL and AL
     
 	// Init SDL video subsystem
@@ -190,10 +194,9 @@ main(int argc, char*argv[])
     // Init GL state
     init_renderer();
 
-    if (! ooScriptingRunPostInit()) {
-        fprintf(stderr, "Failed to run post init script\n");
-        exit(1);
-    }
+	if (!ooScriptingRunFile("script/postinit.py")) {
+        ooLogFatal("script/postinit.py missing");
+	}
     
     
     atexit(SDL_Quit);

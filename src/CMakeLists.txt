@@ -62,15 +62,15 @@ endif (APPLE)
 
 set_source_files_properties(${ORBIT_RES_TEX}
                             PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/)
+                            MACOSX_PACKAGE_LOCATION Resources/tex/)
 
 set_source_files_properties(${ORBIT_RES_DATA}
                             PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/)
+                            MACOSX_PACKAGE_LOCATION Resources/data/)
 
 set_source_files_properties(${ORBIT_SCRIPTS}
                             PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/)
+                            MACOSX_PACKAGE_LOCATION Resources/script/)
 
 
 add_executable(openorbit MACOSX_BUNDLE

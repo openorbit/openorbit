@@ -57,8 +57,8 @@ extern "C" {
 #include <Python.h>
 #endif
 
-#define SCR_INIT_SCRIPT_NAME "init.py"
-#define SCR_POST_INIT_SCRIPT_NAME "postinit.py"
+#define SCR_INIT_SCRIPT_NAME "script/init.py"
+#define SCR_POST_INIT_SCRIPT_NAME "script/postinit.py"
 
 
 /*!
@@ -82,7 +82,7 @@ void ooScriptingFinalise(void);
  * The init script is executed before the graphics system is enabled and is
  * responsible for setting up items such as video modes, controls and so forth.
  * */
-oo_error_t ooScriptingRunInit(void);
+void ooScriptingRunInit(void);
 
 bool ooScriptingRunFile(const char *fname);
 
