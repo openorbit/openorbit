@@ -32,6 +32,7 @@
 import io       # I/O module, allowing the binding of key handlers
 import config   # config, allows one to set config values
 from environment import *
+import environment
 import res, sg, sim
 
 import yaml
@@ -55,17 +56,6 @@ def loadStars():
         
     sim.setSg(skyObj)
     f.close()
-
-# Load sol system, this is a csv file that contain the following info:
-# object name, parent object, orbital radius (au or m), orbital tilt, object radius
-# mass (solar or kg), texture
-def loadSolsystem():
-    f = open(res.getPath("solsystem.csv"))
-    for line in f:
-        name, parent, orbitalRadius, orbitalTilt, objectRadius, mass, tex = tuple([s.strip() for s in line.split(",")])
-        environment.addOrbitalObject(float(orbitalRadius), 0.0, float(objectRadius), 0.0, tex)
-    f.close()
-
     
 class UnitParseError(Exception):
     def __init__(self, descr):
@@ -273,6 +263,5 @@ def _test():
 #    _test()
 #else:
 loadStars()
-loadSolsystem()
 loadSolYaml()
     

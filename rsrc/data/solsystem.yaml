@@ -24,7 +24,7 @@ Sol:
         axial-period: 27 days
     rendering:
         model: "sphere"
-        texture: "sol.tga"
+        texture: "tex/sol.tga"
     satellites:
         Mercury:
             kind: "planet"
@@ -42,7 +42,7 @@ Sol:
                 period: 87.969 days
             rendering:
                 model: "sphere"
-                texture: "mercury.tga"
+                texture: "tex/mercury.tga"
         Venus:
             kind: "planet"
             system-name: "Mercurial system"
@@ -61,7 +61,7 @@ Sol:
             surface-temp: 750 K
             rendering:
                 model: "sphere"
-                texture: "venus.tga"
+                texture: "tex/venus.tga"
         Earth:
             kind: "planet"
             system-name: "Terran system"
@@ -80,7 +80,7 @@ Sol:
             surface-temp: 285 K
             rendering:
                 model: "sphere"
-                texture: "earth.tga"
+                texture: "tex/earth.tga"
         
             satellites:
                 Luna:
@@ -98,7 +98,7 @@ Sol:
                         period: 27.322 days
                     rendering:
                         model: "sphere"
-                        texture: "moon.tga"
+                        texture: "tex/moon.tga"
         Mars:
             kind: "planet"
             system-name: "Martian system"
@@ -117,7 +117,7 @@ Sol:
             surface-temp: 220 K
             rendering:
                 model: "sphere"
-                texture: "mars.tga"
+                texture: "tex/mars.tga"
         
             satellites:
                 Phobos:
@@ -165,7 +165,7 @@ Sol:
                 period: 4332.589 days
             rendering:
                 model: "sphere"
-                texture: "jupiter.tga"
+                texture: "tex/jupiter.tga"
             satellites:
                 Metis:
                     kind: "moon"
@@ -375,7 +375,7 @@ Sol:
                 period: 10759.22 days
             rendering:
                 model: "sphere"
-                texture: "saturn.tga"
+                texture: "tex/saturn.tga"
             satellites:
                 Atlas:
                     kind: "moon"
@@ -578,7 +578,7 @@ Sol:
                 period: 30685.4 days
             rendering:
                 model: "sphere"
-                texture: "uranus.tga"
+                texture: "tex/uranus.tga"
             satellites:
                 Miranda:
                     kind: "moon"
@@ -651,7 +651,7 @@ Sol:
                 period: 60189.0 days
             rendering:
                 model: "sphere"
-                texture: "neptune.tga"
+                texture: "tex/neptune.tga"
             satellites:
                 Triton:
                     kind: "moon"
