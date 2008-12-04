@@ -40,7 +40,7 @@
 
 static FILE *sLogFile;
 static OOloglev sLogLev;
-static char* sLogNames[] = {"note", "warning", "error"};
+static char* sLogNames[] = {"trace", "info", "warning", "error", "fatal"};
 
 static void
 ooLogWriteV(OOloglev lev, const char *msg, va_list vaList)
@@ -56,7 +56,7 @@ void
 ooLogInit(FILE *logFile)
 {
     sLogFile = logFile;
-    sLogLev = OOLog_Notify;
+    sLogLev = OOLog_Info;
 }
 
 void
@@ -67,11 +67,21 @@ ooLogSetLevel(OOloglev lev)
 
 
 void
-ooLogNotify(const char *msg, ...)
+ooLogTrace(const char *msg, ...)
 {
     va_list vaList;
     va_start(vaList, msg);
-    ooLogWriteV(OOLog_Notify, msg, vaList);
+    ooLogWriteV(OOLog_Trace, msg, vaList);
+    va_end(vaList);
+}
+
+
+void
+ooLogInfo(const char *msg, ...)
+{
+    va_list vaList;
+    va_start(vaList, msg);
+    ooLogWriteV(OOLog_Info, msg, vaList);
     va_end(vaList);
 }
 
@@ -81,7 +91,17 @@ ooLogWarn(const char *msg, ...)
 {
     va_list vaList;
     va_start(vaList, msg);
-    ooLogWriteV(OOLog_Warning, msg, vaList);
+    ooLogWriteV(OOLog_Warn, msg, vaList);
+    va_end(vaList);
+}
+
+
+void
+ooLogError(const char *msg, ...)
+{
+    va_list vaList;
+    va_start(vaList, msg);
+    ooLogWriteV(OOLog_Error, msg, vaList);
     va_end(vaList);
 }
 
@@ -90,7 +110,7 @@ ooLogFatal(const char *msg, ...)
 {
     va_list vaList;
     va_start(vaList, msg);
-    ooLogWriteV(OOLog_Critical, msg, vaList);
+    ooLogWriteV(OOLog_Fatal, msg, vaList);
     va_end(vaList);
     exit(EX_SOFTWARE);
 }
@@ -102,5 +122,5 @@ ooLogMsg(OOloglev lev, const char *msg, ...)
     va_start(vaList, msg);
     ooLogWriteV(lev, msg, vaList);
     va_end(vaList);
-    if (lev = OOLog_Critical) exit(EX_SOFTWARE);
+    if (lev = OOLog_Fatal) exit(EX_SOFTWARE);
 }

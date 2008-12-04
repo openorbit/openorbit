@@ -36,9 +36,11 @@
 #include <stdio.h>
 
 typedef enum {
-    OOLog_Notify = 0,
-    OOLog_Warning,
-    OOLog_Critical
+    OOLog_Trace = 0,
+    OOLog_Info,
+    OOLog_Warn,
+    OOLog_Error,
+    OOLog_Fatal
 } OOloglev;
 
 typedef enum {
@@ -54,8 +56,11 @@ typedef enum {
 
 void ooLogInit(FILE *logPath);
 void ooLogSetLevel(OOloglev lev);
-void ooLogNotify(const char *msg, ...);
+
+void ooLogTrace(const char *msg, ...);
+void ooLogInfo(const char *msg, ...);
 void ooLogWarn(const char *msg, ...);
+void ooLogError(const char *msg, ...);
 void ooLogFatal(const char *msg, ...) __attribute__((__noreturn__));
 void ooLogMsg(OOloglev lev, const char *msg, ...);
 

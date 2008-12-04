@@ -61,7 +61,7 @@ ooResGetBasePath(void)
         
         CFRelease(resUrl);
         
-        ooLogNotify("res base = %s", base);
+        ooLogTrace("res base = %s", base);
     }
     
     return (const char*)base;
