@@ -41,6 +41,7 @@
 #include <gencds/hashtable.h>
 #include <assert.h>
 
+#include "log.h"
 
 typedef enum {
     CONF_int,
@@ -196,6 +197,7 @@ ooConfGetInt(const char *key, int *val)
         return 0;
     }
     
+    ooLogWarn("settings:no integer %s exists", key);
     return -1;
 }
 
@@ -208,6 +210,7 @@ ooConfGetBool(const char *key, bool *val)
         return 0;
     }
     
+    ooLogWarn("settings:no boolean %s exists", key);
     return -1;
 }
 
@@ -220,6 +223,7 @@ ooConfGetBoolAsInt(const char *key, int *val)
         return 0;
     }
     
+    ooLogWarn("settings:no boolean %s exists", key);    
     return -1;
 }
 
@@ -234,6 +238,7 @@ ooConfGetFloat(const char *key, float *val)
         return 0;
     }
     
+    ooLogWarn("settings:no real %s exists", key);
     return -1;
 }
 
@@ -245,6 +250,7 @@ ooConfGetStr(const char *key)
         return confval->u.str;
     }
     
+    ooLogWarn("settings:no string %s exists", key);
     return NULL;    
 }
 

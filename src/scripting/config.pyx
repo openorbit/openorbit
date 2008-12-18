@@ -46,8 +46,10 @@ def setScreenSize(short w, short h):
     ooConfSetInt("video.height", h)
 
 def setFullscreen(int fs):
-    ooConfSetBoolAsInt("video.fullscreen", fs)
-
+    if fs:
+        ooConfSetBoolAsInt("video.fullscreen", 1)
+    else:
+        ooConfSetBoolAsInt("video.fullscreen", 0)
 
 def toggleFullscreen():
     cdef int fs
