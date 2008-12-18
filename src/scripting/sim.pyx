@@ -1,17 +1,22 @@
-cimport sg, environment
-import sg, environment
+cimport sg, orbits
+import sg, orbits
 
 
 cdef extern from "sim.h":
     void ooSimSetSg(sg.OOnode *sg)
-    void ooSimSetOrbSys(environment.orb_sys_t *osys)
+    void ooSimSetCam(sg.OOcam *cam)
+    void ooSimSetOrbSys(orbits.OOorbsys *osys)
     
     ctypedef struct SIMstate:
-        environment.orb_sys_t *orbSys
+        orbits.OOorbsys *orbSys
         sg.OOnode *sg
+        sg.OOcam *cam
 
 def setSg(sg.Node node):
     ooSimSetSg(node.node)
     
-def setOrbSys(environment.OrbitSys sys):
-    ooSimSetOrbSys(sys.orb_sys)
+def setOrbSys(orbits.OrbitSys sys):
+    ooSimSetOrbSys(sys.osys)
+
+def setCam(sg.Cam cam):
+    ooSimSetCam(cam.cam)

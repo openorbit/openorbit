@@ -37,6 +37,98 @@
 #include "SDL_opengl.h"
 #include "scenegraph.h"
 #include "sky.h"
+#include "log.h"
+#include <vmath/vmath.h>
+
+OOcam*
+ooSgNewFreeCam(OOnode *node,
+               float x, float y, float z, float rx, float ry, float rz)
+{
+    OOcam *cam = malloc(sizeof(OOcam));
+    cam->camData = malloc(sizeof(OOfreecam));
+    cam->kind = OOCam_Free;
+    
+    cam->attachedNode = node;
+    ((OOfreecam*)cam->camData)->p = v_set(x,y,z,1.0f);
+    ((OOfreecam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
+    return cam;
+}
+
+OOcam*
+ooSgNewFixedCam(OOnode *node, dBodyID body,
+                float dx, float dy, float dz, float rx, float ry, float rz)
+{
+    OOcam *cam = malloc(sizeof(OOcam));
+    cam->camData = malloc(sizeof(OOfixedcam));
+    cam->kind = OOCam_Fixed;
+
+    cam->attachedNode = node;
+    ((OOfixedcam*)cam->camData)->body = body;
+    ((OOfixedcam*)cam->camData)->r = v_set(dx,dy,dz,1.0f);
+    ((OOfixedcam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
+
+    return cam;    
+}
+
+OOcam*
+ooSgNewOrbitCam(OOnode *node, dBodyID body, float dx, float dy, float dz)
+{
+    OOcam *cam = malloc(sizeof(OOcam));
+    cam->camData = malloc(sizeof(OOorbitcam));
+    cam->kind = OOCam_Orbit;
+
+    cam->attachedNode = node;
+    ((OOorbitcam*)cam->camData)->body = body;
+    ((OOorbitcam*)cam->camData)->r = v_set(dx,dy,dz,1.0f);
+
+    return cam;
+}
+
+void
+ooSgCamMove(OOcam *cam)
+{
+    assert(cam != NULL && "cam not set");
+    glPushMatrix();
+    
+    switch (cam->kind) {
+    case OOCam_Orbit:
+        {
+            const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
+            const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
+            gluLookAt(  ((OOorbitcam*)cam->camData)->r.x + pos[0],
+         	            ((OOorbitcam*)cam->camData)->r.y + pos[1],
+         	            ((OOorbitcam*)cam->camData)->r.x + pos[2],
+         	            pos[0], pos[1], pos[2], // center
+                        0.0, 1.0, 0.0); // up
+        }
+        break;
+    case OOCam_Fixed:
+        {
+            const dReal *pos = dBodyGetPosition(((OOfixedcam*)cam->camData)->body);
+            const dReal *rot = dBodyGetRotation(((OOfixedcam*)cam->camData)->body);
+            glTranslatef(((OOfixedcam*)cam->camData)->r.x + pos[0],
+                         ((OOfixedcam*)cam->camData)->r.y + pos[1],
+                         ((OOfixedcam*)cam->camData)->r.z + pos[2]);
+            
+        }
+        break;
+    case OOCam_Free:
+        glTranslatef(((OOfreecam*)cam->camData)->p.x,
+                     ((OOfreecam*)cam->camData)->p.y,
+                     ((OOfreecam*)cam->camData)->p.z);
+        break;
+    default:
+        assert(0 && "illegal case statement");
+    }
+}
+
+void
+ooSgCamPopMove(OOcam *cam)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+}
+
 
 void
 ooSgDrawFuncGnd(OOobject*obj)
@@ -74,18 +166,31 @@ ooSgAddChild(OOnode *parent, OOnode *child)
 }
 
 static void
-ooSgDraw2(OOnode *node)
+ooSgDraw2(OOnode *node, OOcam *cam)
 {
+    assert(node != NULL && "node null");
+    assert(cam != NULL && "cam null");
+    
     while (node) {
+        // Check if camera transforms should be done
+        if (node == cam->attachedNode) {
+            ooSgCamMove(cam);
+        }
+        
         node->draw(node->obj);
-        if (node->children) ooSgDraw2(node->children);
+        if (node->children) ooSgDraw2(node->children, cam);
         node->postDraw(node->obj);
+
+        if (node == cam->attachedNode) {
+            ooSgCamPopMove(cam);
+        }
+
         node = node->next;
     }
 }
 
 void
-ooSgDraw(OOnode *node)
+ooSgDraw(OOnode *node, OOcam *cam)
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -93,7 +198,7 @@ ooSgDraw(OOnode *node)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 	
-    ooSgDraw2(node);
+    ooSgDraw2(node, cam);
 }
 
 void
@@ -147,8 +252,31 @@ ooSgNewMesh(OOtexture *tex)
     mesh->vCount = 0;
     mesh->texId = tex->texId;
     
+    mesh->vertices = calloc(32, sizeof(OOvertex));
+    mesh->vSize = 32;
+    
     return node;
 }
+
+void
+ooSgMeshPushVert(OOnode *node, const OOvertex *v)
+{
+    OOmesh *mesh = node->obj;
+    
+    if (mesh->vCount = mesh->vSize) {
+        OOvertex *newVerts = realloc(mesh->vertices,
+                                     mesh->vSize * 2 * sizeof(OOvertex));
+        
+        if (!newVerts) ooLogFatal("vertex buffer expansion failed");
+        mesh->vSize = mesh->vSize * 2;
+        mesh->vertices = newVerts;
+    }
+    
+    mesh->vertices[mesh->vCount] = *v;
+    mesh->vCount ++;
+}
+
+
 
 OOnode*
 ooSgNewTransform(float dx, float dy, float dz, float rx, float ry, float rz, float rot)

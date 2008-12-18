@@ -39,9 +39,11 @@
 #include "physics/dynamics.h"
 
 #include "rendering/planet.h"
+
+#include "log.h"
 // epoch = ???
 
-SIMstate gSIM_state;
+SIMstate gSIM_state = {0, 0.05, NULL, NULL, NULL};
 
 #define OO_EVENT_QUEUE_INIT_LEN 100
 OOeventqueue*
@@ -96,11 +98,16 @@ ooSimSetSg(OOnode *sg)
     gSIM_state.sg = sg;
 }
 void
-ooSimSetOrbSys(orb_sys_t *osys)
+ooSimSetOrbSys(OOorbsys *osys)
 {
     gSIM_state.orbSys = osys;
 }
 
+void
+ooSimSetCam(OOcam *cam)
+{
+    gSIM_state.cam = cam;
+}
 
 #include "physics/orbit.h"
 #include <sys/time.h>
@@ -109,22 +116,23 @@ ooSimStep(float dt)
 {
     gSIM_state.timeStamp ++;
     // temporary to have something to look at...
-    for (int i = 0 ; i < MAX_PLANETS ; i ++) {
-        planet_rot_orig(&gPlanets[i], dt*0.1);
-        planet_rot_ax(&gPlanets[i], dt*0.5);
-    }
+    //for (int i = 0 ; i < MAX_PLANETS ; i ++) {
+    //    planet_rot_orig(&gPlanets[i], dt*0.1);
+    //    planet_rot_ax(&gPlanets[i], dt*0.5);
+    //}
     
     struct timeval start;
     struct timeval end;
     gettimeofday(&start, NULL);
     
-    extern orb_sys_t *gOrb_root_system;
-    orbit_clear(gOrb_root_system);
-    orbit_step(gOrb_root_system, dt);
+//    extern OOorbsys *gOrb_root_system;
+    ooOrbitClear(gSIM_state.orbSys);
+    ooOrbitStep(gSIM_state.orbSys, dt);
     
     gettimeofday(&end, NULL);
     
-    printf("\tsimstep time: %lu\n",  (end.tv_usec - start.tv_usec) % 1000000L);
+    ooLogInfo("simstep time: %lu", ((end.tv_sec*1000000 + end.tv_usec) -
+                                    (start.tv_sec*1000000 + start.tv_usec)));
     // compute physics step
 //    ph_step(gSIM_state.world, dt);
     

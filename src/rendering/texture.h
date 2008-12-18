@@ -67,6 +67,7 @@ GLuint  ooTexNum(const char *key);
  */
 int     ooTexUnload(const char *key);
 
+OOtexture *ooTexGet(const char *key);
 
 #ifdef __cplusplus
 }

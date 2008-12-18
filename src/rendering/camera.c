@@ -35,6 +35,7 @@
 
 #include "SDL_opengl.h"
 #include <vmath/vmath.h>
+#include "log.h"
 #include "io-manager.h"
 #include "camera.h"
 
@@ -67,20 +68,6 @@ init_cam(void)
 	gCam->free_cam.rq = q_rot(0.0f,0.0f,1.0f,0.0f);
     
     // Register camera actions
-#if 0
-    io_register_button_handler("cam-fwd", cam_move_forward_button_action);        
-    io_register_button_handler("cam-back", cam_move_back_button_action);
-    io_register_button_handler("cam-left", cam_move_left_button_action);
-    io_register_button_handler("cam-right", cam_move_right_button_action);
-    io_register_button_handler("cam-up", cam_move_up_button_action);
-    io_register_button_handler("cam-down", cam_move_down_button_action);
-    io_register_button_handler("cam-pitch-up", cam_pitch_up_button_action);
-    io_register_button_handler("cam-pitch-down", cam_pitch_down_button_action);
-    io_register_button_handler("cam-yaw-left", cam_yaw_left_button_action);
-    io_register_button_handler("cam-yaw-right", cam_yaw_right_button_action);
-    io_register_button_handler("cam-roll-left", cam_roll_left_button_action);
-    io_register_button_handler("cam-roll-right", cam_roll_right_button_action);
-#endif
     ooIoRegCKeyHandler("cam-fwd", cam_move_forward_button_action);        
     ooIoRegCKeyHandler("cam-back", cam_move_back_button_action);
     ooIoRegCKeyHandler("cam-left", cam_move_left_button_action);
@@ -182,6 +169,8 @@ void
 cam_move_global_camera(void)
 {
     cam_set_view(gCam);
+    
+    ooLogInfo("%vf\n", gCam->free_cam.rq);
 }
 
 /* Camera handling functions,  */
@@ -422,6 +411,8 @@ cam_rotate_gamma(camera_t *cam, angle_t ang)
     }        
 }
 
+#include "sim.h"
+extern SIMstate gSIM_state;
 /* Camera actions, registered as action handlers */
 void
 cam_move_forward_button_action(bool up, void *data)

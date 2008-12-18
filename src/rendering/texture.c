@@ -140,4 +140,9 @@ ooTexUnload(const char *key)
     return 0;
 }
 
+OOtexture*
+ooTexGet(const char *key)
+{
+    return hashtable_lookup(gOOtexDict, key);
+}
 

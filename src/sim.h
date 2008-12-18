@@ -67,12 +67,14 @@ int ooSimHandleNextEvent(OOeventqueue *q);
 typedef struct {
     uint64_t timeStamp;
     float stepSize;
-    orb_sys_t *orbSys;
+    OOorbsys *orbSys;
     OOnode *sg;
+    OOcam *cam;
 } SIMstate;
 
 void ooSimSetSg(OOnode *sg);
-void ooSimSetOrbSys(orb_sys_t *osys);
+void ooSimSetOrbSys(OOorbsys *osys);
+void ooSimSetCam(OOcam *cam);
 
 void ooSimStep(float dt);
 

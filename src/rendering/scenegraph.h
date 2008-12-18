@@ -49,10 +49,50 @@ typedef struct OOnode_ {
     struct OOnode_ *children;
 } OOnode;
 
+typedef enum {
+    OOCam_Free,
+    OOCam_Fixed,
+    OOCam_Orbit
+} OOcamtype;
+
+typedef struct {
+    vector_t p;
+    quaternion_t q;
+} OOfreecam;
+
+typedef struct {
+    dBodyID body;
+    
+    vector_t r;
+    quaternion_t q;   
+} OOfixedcam;
+
+typedef struct {
+    dBodyID body;
+    
+    vector_t r;
+} OOorbitcam;
+
+typedef struct {
+    OOcamtype kind;
+    OOnode *attachedNode;
+    void *camData;
+} OOcam;
+
 OOnode* ooSgNewNode(OOobject *obj, OOdrawfunc df, OOdrawfunc postDf);
 void ooSgAddChild(OOnode *parent, OOnode *child);
-void ooSgDraw(OOnode *node);
+void ooSgDraw(OOnode *node, OOcam *cam);
 
+OOcam* ooSgNewFreeCam(OOnode *node,
+                      float x, float y, float z, 
+                      float rx, float ry, float rz);
+                      
+OOcam* ooSgNewFixedCam(OOnode *node, dBodyID body,
+                       float dx, float dy, float dz, 
+                       float rx, float ry, float rz);
+
+OOcam* ooSgNewOrbitCam(OOnode *node, dBodyID body,
+                       float dx, float dy, float dz);
 
 typedef struct {
     matrix_t t;
@@ -75,7 +115,9 @@ typedef struct {
     float vert[3];
 } OOvertex;
 
+
 typedef struct {
+    size_t vSize;
     size_t vCount;
     OOvertex *vertices;
     GLuint texId;
@@ -95,6 +137,8 @@ OOnode* ooSgNewOdeTransform(dWorldID world, dBodyID body);
 OOnode* ooSgNewSphere(OOtexture *tex);
 OOnode* ooSgNewSky(void);
 OOnode* ooSgNewScale(float scale);
+
+void ooSgMeshPushVert(OOnode *node, const OOvertex *v);
 
 /* Draw functions */
 void ooSgDrawMesh(OOmesh *mesh);

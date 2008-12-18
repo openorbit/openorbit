@@ -157,7 +157,7 @@ main_loop(void)
 		}
         
         // draw as often as possible
-        ooSgDraw(gSIM_state.sg);
+        ooSgDraw(gSIM_state.sg, gSIM_state.cam);
         SDL_GL_SwapBuffers();
 	}
 }
@@ -179,7 +179,7 @@ main(int argc, char*argv[])
     // Load and run initialisation script
     ooScriptingInit();
     
-	if (!ooScriptingRunFile("script/postinit.py")) {
+	if (!ooScriptingRunFile("script/init.py")) {
         ooLogFatal("script/init.py missing");
 	}
     

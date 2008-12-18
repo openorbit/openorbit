@@ -31,8 +31,7 @@
 
 import io       # I/O module, allowing the binding of key handlers
 import config   # config, allows one to set config values
-from environment import *
-import environment
+import orbits
 import res, sg, sim
 
 import yaml
@@ -47,7 +46,7 @@ from os import environ
 print "Running post init script..."
 
 def loadStars():
-    f = open(res.getPath("stars.csv"))
+    f = open(res.getPath("data/stars.csv"))
     skyObj = sg.SkyNode()
     for line in f:
         vmag, ra, dec, btmag, vtmag, b_v, v_i = tuple(line.split(","))
@@ -55,6 +54,10 @@ def loadStars():
                        float(vmag), float(b_v))
         
     sim.setSg(skyObj)
+    cam = sg.FreeCam()#)
+    cam.setParams(skyObj, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    sim.setCam(cam)
+    
     f.close()
     
 class UnitParseError(Exception):
@@ -184,12 +187,17 @@ def addStar(parent, name, body):
     except KeyError, err:
         print "error: missing key in star %s (%s)" % (name, err.args)
         sys.exit(1)
-    star = OrbitSys(parent, name, radius, 0.0)
+    star = orbits.OrbitSys(name, radius, 0.0)
+    if parent:
+        parent.addChild(star)
     star.addObj(name, radius, 0.0, mass)
 
     if body.has_key("satellites"):
         for key in body["satellites"].keys():
             addBody(star, key, body["satellites"][key])
+
+    # not pretty, but works for now (i.e. will bomb with more than one star)
+    sim.setOrbSys(star)
 
 def addPlanet(parent, name, body):
     try:
@@ -202,7 +210,9 @@ def addPlanet(parent, name, body):
         print "error: missing key in planet %s (%s)" % (name, err.args)
         sys.exit(1)
 
-    planet = OrbitSys(parent, name, radius, 0.0)
+    planet = orbits.OrbitSys(name, radius, 0.0)
+    if parent:
+        parent.addChild(planet)
     planet.addObj(name, radius, 0.0, mass)
     
     if body.has_key("satellites"):
@@ -238,7 +248,7 @@ def addBody(parent, name, body):
 
 def loadSolYaml():
     """Loads the yaml description of the solar system"""
-    f = file(res.getPath("solsystem.yaml"))
+    f = file(res.getPath("data/solsystem.yaml"))
     solsys = yaml.load(f)
     f.close()
     for key in solsys.keys():
@@ -264,4 +274,3 @@ def _test():
 #else:
 loadStars()
 loadSolYaml()
-    
