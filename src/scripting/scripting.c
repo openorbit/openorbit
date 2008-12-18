@@ -42,7 +42,7 @@
 extern void initio(void);
 extern void initconfig(void);
 extern void initres(void);
-extern void initenvironment(void);
+extern void initorbits(void);
 extern void inittexture(void);
 extern void initsg(void);
 extern void initsim(void);
@@ -63,7 +63,7 @@ ooScriptingInit(void)
     initconfig();
     initres();
     inittexture();
-    initenvironment();
+    initorbits();
     initsg();
     initsim();
     

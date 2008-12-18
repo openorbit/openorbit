@@ -32,50 +32,19 @@
 import texture
 import res
 
-
 cdef class OrbitSys:
-    def __cinit__(self, parent, char *name, float radius, float w0):
-        self.orb_sys = NULL
-        cdef orb_sys_t *osys
-        if parent is None:
-            self.orb_sys = orbit_add_sys(NULL, name, radius, w0)
-        elif isinstance(parent, OrbitSys):
-            osys = (<OrbitSys>parent).orb_sys
-            self.orb_sys = orbit_add_sys(osys, name, radius, w0)
-        else:
-            raise TypeError("Parent not an OrbitObj object or None")
+    def __cinit__(self, char *name, float radius, float w0):
+        #texture.load(textureName, textureName)
+        self.osys = ooOrbitNewSys(name, radius, w0)
     def __dealloc__(self):
         # C function call to delete obj_sys object.
         pass
     def addObj(self, name, rad, w0, m):
-        cdef orb_obj_t *obj
-        obj = orbit_add_obj(self.orb_sys, name, rad, w0, m)
+        cdef OOorbobj *obj
+        obj = ooOrbitAddObj(<OOorbsys*>self.osys, name, rad, w0, m)
         if obj == NULL:
             raise TypeError("null returned")
+    
+    def addChild(self, OrbitSys child):
+        ooOrbitAddChildSys(self.osys, child.osys)
 
-cdef class Stars:
-    def __cinit__(self, int maxCount):
-        self.stars = ooSkyInitStars(maxCount)
-    def addStar(self, ra, dec, mag, bv):
-        ooSkyAddStar(self.stars, ra, dec, mag, bv)
-
-        
-
-def insertStar(ra, dec, mag, bv):
-    ooSkyAddStar(<OOstars*>NULL, ra, dec, mag, bv);
-
-
-def addOrbitalObject(dist, period, radius, mass, textureName):
-    texture.load(textureName, textureName)
-    planet_add(dist, 0.0, 0.0, radius, mass, textureName)
-
-#def addOrbitalSys(name, radius, w0):
-#    sys = orbit_add_sys(NULL, name, radius, w0)
-#    return sys
-
-#def addOrbitalSysWithParent(parent, name, radius, w0):
-#    return orbit_add_sys(parent, name, radius, w0)
-
-
-#def addOrbitalObj(sys, name, radius, w0, m):
-#    return orbit_add_obj(sys, name, radius, w0, m)

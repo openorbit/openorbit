@@ -37,12 +37,47 @@
 #ifndef _ORBIT_H_
 #define _ORBIT_H_
 
-typedef struct _orb_obj_t orb_obj_t;
-typedef struct _orb_sys_t orb_sys_t;
+#include <ode/ode.h>
+#include <vmath/vmath.h>
 
-orb_sys_t* orbit_add_sys(orb_sys_t *parent, const char *name, float radius, float w0);
-orb_obj_t* orbit_add_obj(orb_sys_t *sys, const char *name, float radius, float w0, float m);
 
-void orbit_step(orb_sys_t *sys,float stepsize);
-void orbit_clear(orb_sys_t *sys);
+typedef struct __OOorbobj {
+    char *name;
+    dBodyID id;
+    vector_t pos;
+    scalar_t m;
+    struct __OOorbobj *next;
+} OOorbobj;
+
+
+typedef struct _OOorbsys {
+    dBodyID id; // in parent system this system has an object id
+    dWorldID world;
+    char *name;
+    
+    float scale; //!< Scale of system in spatial dimentions (1.0 = m)
+    struct {
+        float G; //!< Gravitational constant (6.67428e-11)
+    } k;
+    
+    vector_t pos;
+    float m; // sum of subsystem masses
+    
+    OOorbobj *obj;
+    
+    struct _OOorbsys *parent; // parent
+    struct _OOorbsys *next; // siblings
+    struct _OOorbsys *child; // children
+} OOorbsys;
+
+void ooOrbitSetRoot(OOorbsys *sys);
+
+OOorbsys* ooOrbitNewSys(const char *name, float radius, float w0);
+OOorbobj* ooOrbitAddObj(OOorbsys *sys, const char *name, float radius, float w0, float m);
+void ooOrbitAddChildSys(OOorbsys * restrict sys, OOorbsys * restrict child);
+void ooOrbitSetConstant(OOorbsys *sys, const char *key, float k);
+
+void ooOrbitStep(OOorbsys *sys, float stepsize);
+void ooOrbitClear(OOorbsys *sys);
+
 #endif /* ! _ORBIT_H_ */

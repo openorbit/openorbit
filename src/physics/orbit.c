@@ -38,63 +38,38 @@
 
 #include <vmath/vmath.h>
 
-struct _orb_obj_t {
-    char *name;
-    dBodyID id;
-    vector_t pos;
-    scalar_t m;
-};
-
-typedef struct _orb_obj_node_t {
-    orb_obj_t *obj;
-    struct _orb_obj_node_t *next;
-} orb_obj_node_t;
+#include "log.h"
 
 
-typedef struct _orb_sys_node_t {
-    orb_sys_t *sys;
-    struct _orb_sys_node_t *next;
-} orb_sys_node_t;
 
-struct _orb_sys_t {
-    dBodyID id; // in parent system this system has an object id
-    dWorldID world;
-    char *name;
-    orb_sys_t *parent;
-    
-    vector_t pos;
-    float m; // sum of subsystem masses
-    
-    orb_obj_node_t *obj;
-    orb_sys_node_t *subsys;
-};
 
-orb_sys_t *gOrb_root_system;
 
-orb_sys_t*
-orbit_add_sys(  orb_sys_t *parent, const char *name, float radius, float w0)
+static OOorbsys *gOrb_root_system;
+
+void
+ooOrbitSetRoot(OOorbsys *sys)
 {
-    orb_sys_t *sys = malloc(sizeof(orb_sys_t));
+    ooLogTrace("root system %s added\n", sys->name);
+    gOrb_root_system = sys;
+}
+
+OOorbsys*
+ooOrbitNewSys(const char *name, float radius, float w0)
+{
+    OOorbsys *sys = malloc(sizeof(OOorbsys));
     if (sys == NULL) goto malloc_failed;
     
     sys->world = dWorldCreate();
     sys->name = strdup(name);
     if (sys->name == NULL) goto malloc_failed;
 
-    sys->parent = parent;
-    if (parent) {
-        orb_sys_node_t *subsysnode = malloc(sizeof(orb_sys_node_t));
-        if (subsysnode == NULL) goto malloc_failed;
-        
-        subsysnode->next = parent->subsys;
-        subsysnode->sys = sys;
-        parent->subsys = subsysnode;
-        sys->id = dBodyCreate(parent->world);
-    } else {
-        printf("root system %s added\n", name);
-        // This is the root system
-        gOrb_root_system = sys;
-    }
+    sys->parent = NULL;
+    sys->child = NULL;
+    sys->next = NULL;
+    sys->obj = NULL;
+    sys->id = 0;
+    
+    sys->k.G = 6.67428e-11;
     
     return sys;
     
@@ -105,35 +80,30 @@ malloc_failed:
         free(sys->name);        
         free(sys);
     }
-    return NULL;
+    ooLogFatal("failed malloc when adding %s system\n", name);
 }
 
-orb_obj_t*
-orbit_add_obj(orb_sys_t *sys, const char *name, float radius, float w0, float m)
+OOorbobj*
+ooOrbitAddObj(OOorbsys *sys, const char *name, float radius, float w0, float m)
 {
     assert(sys != NULL);
-    orb_obj_t *obj = malloc(sizeof(orb_obj_t));
-    orb_obj_node_t *node = malloc(sizeof(orb_obj_node_t));
-    if (obj == NULL || node == NULL) {
+    OOorbobj *obj = malloc(sizeof(OOorbobj));
+    if (obj == NULL) {
         free(obj);
-        free(node);
-
         return NULL;
     }
     
     obj->name = strdup(name);
-    
-    node->obj = obj;
     obj->id = dBodyCreate(sys->world);
 
     // Insert as first object
-    node->next = sys->obj;
-    sys->obj = node;
+    obj->next = sys->obj;
+    sys->obj = obj;
         
     // Add mass to parent systems, note that this assumes that the orbital mass
     // is in the same unit
     obj->m = m;
-    orb_sys_t *sp = sys;
+    OOorbsys *sp = sys;
     while (sp) {
         sp->m += m;
         sp = sp->parent;
@@ -144,13 +114,22 @@ orbit_add_obj(orb_sys_t *sys, const char *name, float radius, float w0, float m)
 
 
 void
-orbit_init_obj(orb_obj_t *obj)
+ooOrbitAddChildSys(OOorbsys * restrict parent, OOorbsys * restrict child)
+{        
+    child->id = dBodyCreate(parent->world);
+    child->next = parent->child;
+    parent->child = child;
+}
+#if 0
+
+void
+orbit_init_obj(OOorbobj *obj)
 {
     
 }
 // Initalises the necissary physical parameters for the simulation system
 void
-orbit_init_sys(orb_sys_t *sys)
+orbit_init_sys(OOorbsys *sys)
 {
     orb_obj_node_t *onode = sys->obj;
     while (onode) {
@@ -166,70 +145,73 @@ orbit_init_sys(orb_sys_t *sys)
 
     
 }
-
+#endif
 void
-orbit_clear(orb_sys_t *sys)
+ooOrbitClear(OOorbsys *sys)
 {
-    dBodySetForce(sys->id, 0.0f, 0.0f, 0.0f);
-    dBodySetTorque(sys->id, 0.0f, 0.0f, 0.0f);
+    if (sys == NULL) return;
     
-    orb_obj_node_t *onode = sys->obj;
-    while (onode) {
-        dBodySetForce(onode->obj->id, 0.0f, 0.0f, 0.0f);
-        dBodySetTorque(onode->obj->id, 0.0f, 0.0f, 0.0f);
+    if (sys->parent != NULL) {
+        dBodySetForce(sys->id, 0.0f, 0.0f, 0.0f);
+        dBodySetTorque(sys->id, 0.0f, 0.0f, 0.0f);
+    }
+    OOorbobj *obj = sys->obj;
+    while (obj) {
+        dBodySetForce(obj->id, 0.0f, 0.0f, 0.0f);
+        dBodySetTorque(obj->id, 0.0f, 0.0f, 0.0f);
 
-        onode = onode->next;
+        obj = obj->next;
     }
     
-    orb_sys_node_t *snode = sys->subsys;
-    while (snode) {
-        orbit_clear(snode->sys);
-        snode = snode->next;
-    }
+    ooOrbitClear(sys->child); // children
+    ooOrbitClear(sys->next); // siblings
 }
 
 #define P_G 6.67428e-11 
 void
-orbit_step(orb_sys_t *sys, float stepsize)
+ooOrbitStep(OOorbsys *sys, float stepsize)
 {
+    if (sys == NULL) return;
+    
     // Solves mutual force equations for all objects in the system, and then solves them
     // for each subsystem
-    orb_obj_node_t *onode0 = sys->obj;
+    OOorbobj *onode0 = sys->obj;
     while (onode0) {
-        const dReal *ode_o0p = dBodyGetPosition (onode0->obj->id);
+        const dReal *ode_o0p = dBodyGetPosition (onode0->id);
         vector_t o0p = v_set(ode_o0p[0], ode_o0p[1], ode_o0p[2], 0.0f);
-        orb_obj_node_t *onode1 = onode0->next;
+        OOorbobj *onode1 = onode0->next;
         while (onode1) {
-            const dReal *ode_o1p = dBodyGetPosition (onode1->obj->id);
+            const dReal *ode_o1p = dBodyGetPosition (onode1->id);
             vector_t o1p = v_set(ode_o1p[0], ode_o1p[1], ode_o1p[2], 0.0f);            
             vector_t dist = v_sub(o1p, o0p);
 
             scalar_t r12 = v_abs(dist);
             r12 = r12 * r12;
             vector_t f12 = v_s_mul(v_normalise(dist),
-                                -P_G*onode0->obj->m * onode1->obj->m / r12);
+                                  -sys->k.G*onode0->m * onode1->m / r12);
             vector_t f21 = v_neg(f12);
             
-            dBodyAddForce(onode0->obj->id, f12.x, f12.y, f12.z);
-            dBodyAddForce(onode1->obj->id, f21.x, f21.y, f21.z);
+            dBodyAddForce(onode0->id, f12.x, f12.y, f12.z);
+            dBodyAddForce(onode1->id, f21.x, f21.y, f21.z);
 
             onode1 = onode1->next;
         }
         
-        orb_sys_node_t *snode = sys->subsys;
+        // all system children and objects
+        OOorbsys *snode = sys->child;
         while (snode) {
-            const dReal *ode_s1p = dBodyGetPosition (snode->sys->id);
+            const dReal *ode_s1p = dBodyGetPosition (snode->id);
             vector_t s1p = v_set(ode_s1p[0], ode_s1p[1], ode_s1p[2], 0.0f);            
             vector_t dist = v_sub(s1p, o0p);
 
             scalar_t r12 = v_abs(dist);
             r12 = r12 * r12;
             vector_t f12 = v_s_mul(v_normalise(dist),
-                                -P_G*onode0->obj->m * snode->sys->m / r12);
+                                   -sys->k.G*onode0->m * snode->m / r12);
             vector_t f21 = v_neg(f12);
             
-            dBodyAddForce(onode0->obj->id, f21.x, f21.y, f21.z);
-            dBodyAddForce(snode->sys->id, f12.x, f12.y, f12.z);
+            dBodyAddForce(onode0->id, f21.x, f21.y, f21.z);
+            dBodyAddForce(snode->id, f12.x, f12.y, f12.z);
 
             snode = snode->next;
         }
@@ -239,10 +221,20 @@ orbit_step(orb_sys_t *sys, float stepsize)
     
     dWorldStep(sys->world, stepsize);
     
-    orb_sys_node_t *snode = sys->subsys;
-    while (snode) {
-        orbit_step(snode->sys, stepsize);
-        snode = snode->next;
-    }
+    // all siblings
+    ooOrbitStep(sys->next, stepsize);
+
+    // handle children    
+    ooOrbitStep(sys->child, stepsize);
 }
 
+void
+ooOrbitSetConstant(OOorbsys *sys, const char *key, float k)
+{
+    assert(sys != NULL && "sys is null");
+    assert(key != NULL && "key is null");
+    
+    if (!strcmp(key, "G")) {
+        sys->k.G = k;
+    }
+}
