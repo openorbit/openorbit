@@ -45,7 +45,6 @@ print "Running init script..."
 
 import io       # I/O module, allowing the binding of key handlers
 import config   # config, allows one to set config values
-import environment
 import res
 
 import math
