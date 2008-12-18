@@ -7,16 +7,30 @@
     # time: h m s, days, s
     # angles: deg, rad
     # temperature: K, C
-# Epoch is an element that is defining the date and time of the initial conditions
-# for the orbits
+# Note: Due to policy, imperial units will never be supported in Open Orbit.
+# Epoch is an element that is defining the date and time of the initial
+# conditions for the orbits, this is set globally in the file
 # Models are expected to support a number of variants, e.g.  rocky-planet,
-# gas-giant or "star", this will control what kind of renderer is used.
+# gas-giant or "star", this will control what kind of renderer is used,
+# however at the moment, the only supported model tag is "sphere", but the
+# following are forseen:
+    # sphere: plain sphere with the given texture
+    # rocky-planet: rocky planet, this will need a pointer to a directory/file
+    #               containing elevation data
+    # gas-giant: gas giant like saturn or jupiter, et.c
+    # star: Star, this renderer will need parameters for the star colour and
+    #       will probably have someway of drawing sunspots
+    # mesh: Need a mesh file. These need to be used to describe objects that
+    #       are not round from gravity (i.e. asteroids)
+    # comet: similar to mesh, but will draw a comet tail, maybe
+
 epoch: 2000-01-01 00:00
 
 Sol:
     kind: "star"
     system-name: "Solar system"
     name: "Sol"
+    strings: ["periapsis": "perihelion", "apoapsis": "apohelion"]
     mass: 1.991e30 kg
     radius: 6.96e8 m
     orbit:
@@ -30,6 +44,7 @@ Sol:
             kind: "planet"
             system-name: "Mercurial system"
             name: "Mercury"
+            strings: ["periapsis": "perihermion", "apoapsis": "apohermion"]
             mass: 3.18e23 kg
             radius: 2.43e6 m
             orbit:
@@ -47,6 +62,7 @@ Sol:
             kind: "planet"
             system-name: "Mercurial system"
             name: "Venus"
+            strings: ["periapsis": "pericytherion", "apoapsis": "apocytherion"]
             mass: 4.88e24 kg
             radius: 6.06e6 m
             orbit:  
@@ -66,6 +82,7 @@ Sol:
             kind: "planet"
             system-name: "Terran system"
             name: "Earth"
+            strings: ["periapsis": "perigee", "apoapsis": "apogee"]
             mass: 5.98e24 kg
             radius: 6.37e6 m
             orbit:
@@ -88,6 +105,7 @@ Sol:
                     system-name: "Lunar system"
                     name: "Moon"
                     mass: 7.36e22 kg
+                    strings: ["periapsis": "periselene", "apoapsis": "aposelene"]
                     radius: 1.74e6 m      
                     orbit:
                         initial: 0 deg
@@ -103,6 +121,7 @@ Sol:
             kind: "planet"
             system-name: "Martian system"
             name: "Mars"
+            strings: ["periapsis": "periareion", "apoapsis": "apoareion"]
             mass: 6.48e23 kg
             radius: 3.37e6 m
             orbit:
@@ -153,6 +172,7 @@ Sol:
             kind: "planet"            
             system-name: "Jovan system"
             name: "Jupiter"
+            strings: ["periapsis": "perijove", "apoapsis": "apojove"]
             mass: 1.9e27 kg
             radius: 6.99e7 m
             orbit:
@@ -363,6 +383,7 @@ Sol:
             kind: "planet"
             system-name: "Saturnian system"
             name: "Saturn"
+            strings: ["periapsis": "perikrone", "apoapsis": "apokrone"]
             mass: 5.68e26 kg
             radius: 5.85e7 m
             orbit:
@@ -567,6 +588,7 @@ Sol:
             system-name: "Uranian system"
             name: "Uranus"
             mass: 8.68e25 kg
+            strings: ["periapsis": "periuranion", "apoapsis": "apouranion"]
             radius: 2.33e7 m
             orbit:
                 initial: 0 deg
@@ -639,6 +661,7 @@ Sol:
             kind: "planet"
             system-name: "Neptunian system"
             name: "Neptune"
+            strings: ["periapsis": "periposeidion", "apoapsis": "apoposeidion"]
             mass: 1.03e26 kg
             radius: 2.21e7 m
             orbit:
@@ -683,6 +706,7 @@ Sol:
             kind: "planet" # Change to dwarf planet
             system-name: "Pluto-Charon system"
             name: "Pluto"
+            strings: ["periapsis": "perihadion", "apoapsis": "apohadion"]
             mass: 1.4e22 kg
             radius: 1.5e6 m
             orbit:
