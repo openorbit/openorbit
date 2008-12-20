@@ -45,9 +45,38 @@ typedef struct OOnode_ {
     OOdrawfunc draw;
     OOdrawfunc postDraw;
     OOobject *obj;
-    struct OOnode_ *next;
+    struct OOnode_ *parent;
     struct OOnode_ *children;
+    struct OOnode_ *next;
+    size_t vSizeChildren;
+    size_t aSizeChildren;
 } OOnode;
+
+typedef struct {
+    size_t size;
+    size_t use;
+    OOobject **elems;
+} OOobjvector;
+
+void ooSgVecInit(OOobjvector *vec);
+void ooSgVecPush(OOobjvector *vec, OOobject *obj);
+OOobject* ooSgVecPop(OOobjvector *vec);
+
+typedef struct OOscene_ {
+    struct OOscene_ *parent;
+    
+    vector_t t;
+    quaternion_t q;
+    vector_t s;
+    
+    OOobjvector scenes;
+    OOobjvector objs;
+} OOscene;
+
+OOscene* ooSgNewScene();
+OOscene* ooSgSceneGetRoot(OOscene *sc);
+void ooSgSceneAddChild(OOscene *parent, OOscene *child);
+void ooSgSceneAddObj(OOscene *sc, OOobject *object);
 
 typedef enum {
     OOCam_Free,
@@ -76,6 +105,7 @@ typedef struct {
 typedef struct {
     OOcamtype kind;
     OOnode *attachedNode;
+    OOscene *scene;
     void *camData;
 } OOcam;
 

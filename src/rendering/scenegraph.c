@@ -40,6 +40,95 @@
 #include "log.h"
 #include <vmath/vmath.h>
 
+
+OOscene*
+ooSgNewScene()
+{
+    OOscene *sc = malloc(sizeof(OOscene));
+    sc->parent = NULL;
+    
+    ooSgVecInit(&sc->scenes);
+    ooSgVecInit(&sc->objs);
+
+    return sc;
+}
+
+void
+ooSgSceneAddChild(OOscene *parent, OOscene *child)
+{
+    ooSgVecPush(&parent->scenes, child);
+    child->parent = parent;
+}
+
+void
+ooSgSceneAddObj(OOscene *sc, OOobject *object)
+{
+    ooSgVecPush(&sc->objs, object);
+}
+
+OOscene*
+ooSgSceneGetRoot(OOscene *sc)
+{
+    assert(sc != NULL);
+    
+    while (sc->parent) sc = sc->parent;
+    return sc;
+}
+
+
+
+void
+ooSgSceneDraw(OOscene *sc)
+{
+    assert(sc != NULL);
+    
+    // Apply scene transforms
+    for (size_t i = 0 ; i < sc->scenes.use ; i ++) {
+        ooSgSceneDraw(sc->scenes.elems[i]);
+    }
+
+    // Pop scene transform
+}
+// Drawing is done as follows:
+//   when drawing is commanded with a camera, we get the cameras scene and
+//   paint that, after that, we go to the cam scenes parent and inverse
+//   any rotations and transforms and paint that
+void
+ooSgPaint(OOcam *cam)
+{
+    assert(cam != NULL);
+    
+    ooSgSceneDraw(cam->scene);
+}
+
+
+void
+ooSgVecInit(OOobjvector *vec)
+{
+    vec->size = 16;
+    vec->use = 0;
+    vec->elems = calloc(vec->size, sizeof(OOobject*));
+}
+
+void
+ooSgVecPush(OOobjvector *vec, OOobject *obj)
+{
+    if (vec->use >= vec->size) {
+        OOobject *newVec = realloc(vec->elems,
+                                   vec->size * sizeof(OOobject*) * 2);
+        if (newVec == NULL) ooLogFatal("realloc of vector failed");
+        vec->size *= 2;
+    }
+    vec->elems[vec->use ++] = obj;
+}
+
+
+OOobject*
+ooSgVecPop(OOobjvector *vec)
+{    
+    return vec->elems[vec->use --];
+}
+
 OOcam*
 ooSgNewFreeCam(OOnode *node,
                float x, float y, float z, float rx, float ry, float rz)
