@@ -174,7 +174,7 @@ main(int argc, char*argv[])
     
     init_cam();
 
-    if (! init_plugin_manager() ) exit(1);
+    ooPluginInit();
     
     // Load and run initialisation script
     ooScriptingInit();

@@ -30,16 +30,16 @@
 #   the GPL or the LGPL."
 
 cdef extern from "plugin-handler.h":
-    int load_plugins()
-    char *load_plugin(char *filename)
-    void unload_plugin(char *key)
+    int ooPluginLoadAll()
+    char *ooPluginLoad(char *filename)
+    void ooPluginUnload(char *key)
 	
 def LoadAll():
-    load_plugins()
+    ooPluginLoadAll()
     
 def Load(name):
-    return load_plugin(name)
+    return ooPluginLoad(name)
     
 def Unload(key):
-    unload_plugin(key)
+    ooPluginUnload(key)
     

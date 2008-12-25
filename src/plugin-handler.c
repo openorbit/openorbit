@@ -42,6 +42,7 @@
 #include <gencds/hashtable.h>
 
 #include "plugin-handler.h"
+#include "log.h"
 
 #ifndef SO_EXT
 #define SO_EXT ".so"
@@ -54,20 +55,21 @@
 static hashtable_t *gPLUGIN_interface_dict = NULL;
 static hashtable_t *gPLUGIN_dict = NULL;
 
-bool
-init_plugin_manager(void)
+void
+ooPluginInit(void)
 {
-    if (! (gPLUGIN_interface_dict = hashtable_new_with_str_keys(512)) ) return false;
+    if (! (gPLUGIN_interface_dict = hashtable_new_with_str_keys(512)) ) {
+      ooLogFatal("plugin: interface dictionary not created");
+    }
     if (! (gPLUGIN_dict = hashtable_new_with_str_keys(512)) ) {
         hashtable_delete(gPLUGIN_interface_dict);
-        return false;
+        ooLogFatal("plugin: plugin dictionary not created");
     }
-    return true;
 }
 
 /* read in all dynlibs in the plug-in directories */
 bool
-load_plugins(void)
+ooPluginLoadAll(void)
 {
 
 //#ifdef _UNIX_
@@ -93,10 +95,9 @@ load_plugins(void)
                 if (!strncmp(dp->d_name + dp->d_namlen - strlen(SO_EXT),
                              SO_EXT, strlen(SO_EXT))) {
                     // Make an absolute path
-                    char *file_name = malloc(strlen(path) + dp->d_namlen + 1);
-                    strcpy(file_name, path);
-                    strcat(file_name, dp->d_name);
-                    load_plugin(file_name);
+                    char *file_name;
+                    asprintf(&file_name, "%s/%s", path, dp->d_name);
+                    ooPluginLoad(file_name);
                     free(file_name);
                 }
             }
@@ -107,7 +108,7 @@ load_plugins(void)
 
 
 static char*
-load_so_plugin(char *filename)
+ooPluginLoadSO(char *filename)
 {
     void *plugin_handle = dlopen(filename, RTLD_NOW|RTLD_LOCAL);
     
@@ -115,27 +116,35 @@ load_so_plugin(char *filename)
         return NULL;
     }
     
+    OOpluginversion *vers = dlsym(plugin_handle, "oopluginversion");
+    
     init_f init_func = dlsym(plugin_handle, PLUGIN_INIT_SYMBOL);
     
     if (! init_func) {
-        fprintf(stderr, "plugin %s does not supply " PLUGIN_INIT_SYMBOL "()\n",
-                filename);
+        ooLogError("plugin %s does not supply " PLUGIN_INIT_SYMBOL "()",
+                   filename);
         dlclose(plugin_handle);
         return NULL;
     }
     
-    plugin_t *plugin = init_func(0);
-    plugin->dynlib_handle = plugin_handle; // this is a runtime param not set by the plugin itself
+    if (vers && *vers == OO_Plugin_Ver_1_00) {
+      OOplugincontext_v1 ctxt = { NULL };
+      OOplugin *plugin = init_func(&ctxt);
+      plugin->dynlib_handle = plugin_handle; // this is a runtime param not set by the plugin itself
+      /* insert plugin in our plugin registry */
+      hashtable_insert(gPLUGIN_dict, plugin->key, plugin);
     
-    /* insert plugin in our plugin registry */
-    hashtable_insert(gPLUGIN_dict, plugin->key, plugin);
-    
-    return plugin->key;
+      return plugin->key;
+    } else {
+      if (!vers) ooLogError("plugin %s does not specify oopluginversion", filename);
+      else ooLogError("plugin %s incompatible (plugin v = %d, supported = %d)",
+                      filename, *vers, OO_Plugin_Ver_1_00);
+    }
 }
 
 // Check what kind of plugin is available in the search path and load it
 char*
-load_plugin(char *filename)
+ooPluginLoad(char *filename)
 {
     if (! filename) return NULL;
     
@@ -145,7 +154,7 @@ load_plugin(char *filename)
         strcpy(file, filename);
         strcat(file, SO_EXT);
         
-        char *key = load_so_plugin(file);
+        char *key = ooPluginLoadSO(file);
 
         free(file);
         
@@ -154,7 +163,7 @@ load_plugin(char *filename)
     
     // this is an absolute path, we should load the file as is
     
-    return load_so_plugin(filename);
+    return ooPluginLoadSO(filename);
         
     return NULL;
 }
@@ -162,7 +171,7 @@ load_plugin(char *filename)
 void
 unload_plugin(char *key)
 {
-    plugin_t *plugin = hashtable_remove(gPLUGIN_dict, key);
+    OOplugin *plugin = hashtable_remove(gPLUGIN_dict, key);
     
     if (! plugin) return;
     

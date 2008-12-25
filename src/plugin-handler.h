@@ -50,13 +50,23 @@ typedef struct {
     char *key; //!< Hashkey (e.g. "SPACE_SHTL")
     char *description; //!< Long string describing the plugin, e.g. "All shuttle components"
     void *dynlib_handle; //!< Admin data, filled in automatically, do not touch
-} plugin_t;
+} OOplugin;
 
-typedef plugin_t* (*init_f)(om_ctxt_t*);
-#define PLUGIN_INIT_SYMBOL "plugin_init"
+// Note tat in order to maintain backward compatibility, this structure may
+// not change, thus, it is versioned for future extensions.
+typedef struct {
+  om_ctxt_t *objectManager;
+} OOplugincontext_v1;
+
+typedef enum {
+  OO_Plugin_Ver_1_00 = 0
+} OOpluginversion; // Exported by each plugin in the ooplugversion symbol
+
+typedef OOplugin* (*init_f)(OOplugincontext_v1 *);
+#define PLUGIN_INIT_SYMBOL "ooplugininit"
 
 
-bool init_plugin_manager(void);
+void ooPluginInit(void);
 
 /*!
     Loads a plugin
@@ -80,12 +90,12 @@ bool init_plugin_manager(void);
     \return A zero terminated c-string containing the identifier of the plugin.
 */
 
-bool load_plugins(void);
-char *load_plugin(char *filename);
-void unload_plugin(char *key);
+bool ooPluginLoadAll(void);
+char *ooPluginLoad(char *filename);
+void ooPluginUnload(char *key);
 
-void register_plugin_interface(char *interface_key, void *interface);
-void remove_plugin_interface(char *interface_key);
+void ooPluginRegisterInterface(char *interface_key, void *interface);
+void ooPluginRemoveInterface(char *interface_key);
 
 #ifdef __cplusplus
 }
