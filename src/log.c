@@ -106,6 +106,18 @@ ooLogError(const char *msg, ...)
 }
 
 void
+ooLogFatalIfNull(const void *ptr, const char *msg, ...)
+{
+  if (ptr == NULL) {
+    va_list vaList;
+    va_start(vaList, msg);
+    ooLogWriteV(OOLog_Fatal, msg, vaList);
+    va_end(vaList);
+    exit(EX_SOFTWARE);
+  }
+}
+
+void
 ooLogFatal(const char *msg, ...)
 {
     va_list vaList;

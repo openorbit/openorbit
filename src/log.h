@@ -61,6 +61,7 @@ void ooLogTrace(const char *msg, ...);
 void ooLogInfo(const char *msg, ...);
 void ooLogWarn(const char *msg, ...);
 void ooLogError(const char *msg, ...);
+void ooLogFatalIfNull(const void *ptr, const char *msg, ...);
 void ooLogFatal(const char *msg, ...) __attribute__((__noreturn__));
 void ooLogMsg(OOloglev lev, const char *msg, ...);
 
