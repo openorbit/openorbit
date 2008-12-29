@@ -52,8 +52,6 @@ typedef float scalar_t;
 
 typedef float vec_arr_t[4];
 
-typedef scalar_t __attribute__((vector_size (16))) scalar_vec_t;
-
 typedef float __attribute__((vector_size (16))) v4f_t;
 typedef float __attribute__((vector_size (64))) m4f_t;
 
@@ -66,14 +64,14 @@ typedef union {
     struct {
         scalar_t x, y, z, w;
     };
-    scalar_vec_t v;
+    v4f_t v;
 } vector_t;
 
 typedef float mat_arr_t[4][4];
 
 typedef union {
     mat_arr_t a;
-    scalar_vec_t v[4];
+    v4f_t v[4];
 } matrix_t;
 
 
@@ -96,6 +94,17 @@ typedef vector_t quaternion_t;
 typedef vec_arr_t axis_arr_t;
 typedef vector_t axis_t;
 typedef scalar_t angle_t;
+
+static inline v4f_t
+v4f_make(float x, float y, float z, float w)
+{
+  vector_t v;
+  v.x = x;
+  v.y = y;
+  v.z = z;
+  v.w = w;
+  return v.v;
+}
 
 #ifdef __cplusplus
 }
