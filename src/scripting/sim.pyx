@@ -3,17 +3,17 @@ import sg, orbits
 
 
 cdef extern from "sim.h":
-    void ooSimSetSg(sg.OOnode *sg)
+    void ooSimSetSg(sg.OOscenegraph *sg)
     void ooSimSetCam(sg.OOcam *cam)
     void ooSimSetOrbSys(orbits.OOorbsys *osys)
     
     ctypedef struct SIMstate:
         orbits.OOorbsys *orbSys
-        sg.OOnode *sg
         sg.OOcam *cam
+        sg.OOscenegraph *sg
 
-def setSg(sg.Node node):
-    ooSimSetSg(node.node)
+def setSg(sg.Scenegraph sg):
+    ooSimSetSg(sg.sg)
     
 def setOrbSys(orbits.OrbitSys sys):
     ooSimSetOrbSys(sys.osys)

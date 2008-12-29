@@ -39,12 +39,36 @@
 #ifndef OPENORBIT_H__
 #define OPENORBIT_H__
 
+typedef void OOobject;
+
+typedef struct {
+    size_t asize; //!< Size of elems array in objects
+    size_t length; //!< Usage of elems array in objects
+    OOobject **elems;
+} OOobjvector;
+
+void ooObjVecInit(OOobjvector *vec);
+void ooObjVecPush(OOobjvector *vec, OOobject *obj);
+OOobject* ooObjVecPop(OOobjvector *vec);
+
+/*!
+ * Reads out the i:th element in vec
+ *
+ * The function should not be used in normal cases as it introduce a high
+ * overhead, however it should be used from scripts as it ensurese that the
+ * index is within bounds.
+ */
+OOobject* ooObjVecGet(OOobjvector *vec, size_t i);
+void ooObjVecSet(OOobjvector *vec, size_t i, OOobject *obj);
+
+#define FOR_EACH(I, VEC) for (size_t I = 0 ; I < VEC.length ; I ++)
+
 #include <gencds/object-manager.h>
 #include <gencds/hashtable.h>
 #include <gencds/list.h>
 #include <gencds/heap.h>
  
-#include <openorbit/plugin-handler.h>
+//#include <openorbit/plugin-handler.h>
 
 #endif /* ! OPENORBIT_H__ */
  

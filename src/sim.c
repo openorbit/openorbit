@@ -91,12 +91,13 @@ ooSimHandleNextEvent(OOeventqueue *q)
     return q->first->fireOffset;
 }
 
-
 void
-ooSimSetSg(OOnode *sg)
+ooSimSetSg(OOscenegraph *sg)
 {
-    gSIM_state.sg = sg;
+  gSIM_state.sg = sg;
 }
+
+
 void
 ooSimSetOrbSys(OOorbsys *osys)
 {

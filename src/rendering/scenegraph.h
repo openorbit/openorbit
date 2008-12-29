@@ -36,47 +36,13 @@
 #include <ode/ode.h>
 
 #include <vmath/vmath.h>
+
+#include <openorbit/openorbit.h>
 #include "texture.h"
 
-typedef void OOobject;
+//typedef void OOobject;
 typedef void (*OOdrawfunc)(OOobject*);
 
-typedef struct OOnode_ {
-    OOdrawfunc draw;
-    OOdrawfunc postDraw;
-    OOobject *obj;
-    struct OOnode_ *parent;
-    struct OOnode_ *children;
-    struct OOnode_ *next;
-    size_t vSizeChildren;
-    size_t aSizeChildren;
-} OOnode;
-
-typedef struct {
-    size_t size;
-    size_t use;
-    OOobject **elems;
-} OOobjvector;
-
-void ooSgVecInit(OOobjvector *vec);
-void ooSgVecPush(OOobjvector *vec, OOobject *obj);
-OOobject* ooSgVecPop(OOobjvector *vec);
-
-typedef struct OOscene_ {
-    struct OOscene_ *parent;
-    
-    vector_t t;
-    quaternion_t q;
-    vector_t s;
-    
-    OOobjvector scenes;
-    OOobjvector objs;
-} OOscene;
-
-OOscene* ooSgNewScene();
-OOscene* ooSgSceneGetRoot(OOscene *sc);
-void ooSgSceneAddChild(OOscene *parent, OOscene *child);
-void ooSgSceneAddObj(OOscene *sc, OOobject *object);
 
 typedef enum {
     OOCam_Free,
@@ -102,27 +68,109 @@ typedef struct {
     vector_t r;
 } OOorbitcam;
 
+
+typedef struct {
+  OOobject *obj;
+  OOdrawfunc draw;
+} OOdrawable;
+
+OOdrawable* ooSgNewDrawable(OOobject *obj, OOdrawfunc df);
+
+typedef struct OOscene_ {
+    struct OOscene_ *parent;
+    char *name;
+
+    OOobject *data;
+    OOdrawfunc preStepUpdate;
+        
+    vector_t t;
+    quaternion_t q;
+    scalar_t s; // scale with respect to parent s
+    scalar_t si; // inverse of s
+    
+    OOobjvector scenes;
+    OOobjvector objs;
+} OOscene;
+
 typedef struct {
     OOcamtype kind;
-    OOnode *attachedNode;
     OOscene *scene;
-    void *camData;
+    OOobject *camData;
 } OOcam;
 
-OOnode* ooSgNewNode(OOobject *obj, OOdrawfunc df, OOdrawfunc postDf);
-void ooSgAddChild(OOnode *parent, OOnode *child);
-void ooSgDraw(OOnode *node, OOcam *cam);
 
-OOcam* ooSgNewFreeCam(OOnode *node,
+typedef struct {
+  OOtexture *tex;
+  float x, y;
+  float w, h;
+} OOoverlay;
+
+void ooSgDrawOverlay(OOoverlay *overlay);
+
+typedef struct {
+  OOscene *root;
+  OOcam *currentCam;
+  OOobjvector cams;
+
+  OOdrawable *sky;
+  OOobjvector overlays;
+} OOscenegraph;
+
+OOscenegraph* ooSgNewSceneGraph();
+void ooSgPaint(OOscenegraph *sg);
+
+/*!
+ * Sets the current camera in the scenegraph to cam. The camera should be in the
+ * list of known cameras kept by the scenegraph, but this property is not
+ * checked unless -DDEBUG is specifyed when building.
+ * \param sg The scenegraph in question
+ * \param cam A camera pointer to a camera known by the scenegraph
+ * \pre sg != NULL
+ * \pre cam != NULL
+ */
+void ooSgSetCam(OOscenegraph *sg, OOcam *cam);
+
+/*!
+ * Create a new scene. If parent is NULL, the scene is inserted in the parent's
+ * scene vector. In case of null a root scene is created. Note that
+ * ooSgNewSceneGraph creates a root scene by default so you should normally pass
+ * in a valid pointer to it.
+ */
+OOscene* ooSgNewScene(OOscene *parent, const char *name);
+void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj);
+
+/*!
+  Finds the root scene from the a given scene. Note that in most cases you want
+  to use the OOscenegraph member root for getting the scene, since member
+  access is O(1) and locating the root for a given scene is O(treeHeight).
+  \param sc Scene from which to find the root scene 
+  \result The root of sc
+  \pre sc != NULL
+*/
+OOscene* ooSgSceneGetRoot(OOscene *sc);
+void ooSgSceneAddChild(OOscene *parent, OOscene *child);
+void ooSgSceneAddObj(OOscene *sc, OOobject *object);
+
+//OOnode* ooSgNewNode(OOobject *obj, OOdrawfunc df, OOdrawfunc postDf);
+//void ooSgAddChild(OOnode *parent, OOnode *child);
+//void ooSgDraw(OOnode *node, OOcam *cam);
+
+// Makes a scene synchronise with an ODE object
+void ooSgSceneAttachOdeObj(OOscene *sc, dBodyID body);
+
+OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
                       float x, float y, float z, 
                       float rx, float ry, float rz);
                       
-OOcam* ooSgNewFixedCam(OOnode *node, dBodyID body,
+OOcam* ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
                        float dx, float dy, float dz, 
                        float rx, float ry, float rz);
 
-OOcam* ooSgNewOrbitCam(OOnode *node, dBodyID body,
+OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
                        float dx, float dy, float dz);
+
+void ooSgCamMove(OOcam *cam);
+
 
 typedef struct {
     matrix_t t;
@@ -160,24 +208,24 @@ typedef struct {
 } OOsphere;
 
 /* Allocators */
-OOnode* ooSgNewMesh(OOtexture *tex);
-OOnode* ooSgNewTransform(float dx, float dy, float dz,
-                         float rx, float ry, float rz, float rot);
-OOnode* ooSgNewOdeTransform(dWorldID world, dBodyID body);
-OOnode* ooSgNewSphere(OOtexture *tex);
-OOnode* ooSgNewSky(void);
-OOnode* ooSgNewScale(float scale);
+//OOnode* ooSgNewMesh(OOtexture *tex);
+//OOnode* ooSgNewTransform(float dx, float dy, float dz,
+//                         float rx, float ry, float rz, float rot);
+//OOnode* ooSgNewOdeTransform(dWorldID world, dBodyID body);
+//OOnode* ooSgNewSphere(OOtexture *tex);
+//OOnode* ooSgNewSky(void);
+//OOnode* ooSgNewScale(float scale);
 
-void ooSgMeshPushVert(OOnode *node, const OOvertex *v);
+//void ooSgMeshPushVert(OOnode *node, const OOvertex *v);
 
 /* Draw functions */
-void ooSgDrawMesh(OOmesh *mesh);
-void ooSgTransform(OOtransform *t);
-void ooSgPostTransform(OOtransform *t);
-void ooSgOdeTransform(OOodetransform *t);
-void ooSgDrawSphere(OOsphere *sphere);
+//void ooSgDrawMesh(OOmesh *mesh);
+//void ooSgTransform(OOtransform *t);
+//void ooSgPostTransform(OOtransform *t);
+//void ooSgOdeTransform(OOodetransform *t);
+//void ooSgDrawSphere(OOsphere *sphere);
 
-void ooSgScale(OOscale *scale);
-void ooSgPostScale(OOscale *scale);
+//void ooSgScale(OOscale *scale);
+//void ooSgPostScale(OOscale *scale);
 
 #endif /* SCENEGRAPH_H_ */

@@ -39,6 +39,8 @@ extern "C" {
 
 #include <vmath/vmath.h>
 
+#include "scenegraph.h"
+
 #include "SDL_opengl.h"
 
 #define STAR_CNT 5000
@@ -51,7 +53,7 @@ typedef struct {
 typedef struct {
     size_t n_stars; //!< Number of stars loaded
     size_t a_len; //!< Length of data
-    OOstar data[];
+    OOstar *data;
 } OOstars;
 
 
@@ -67,11 +69,13 @@ typedef struct {
 vector_t ooEquToCart(angle_t ra, angle_t dec);
 OOstars* ooSkyInitStars(int starCount);
 OOstars *ooSkyRandomStars(void);
-
     
 void ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv);
     
 void ooSkyDrawStars(OOstars *stars);
+
+OOdrawable *ooSkyNewDrawable();
+
 
 #ifdef __cplusplus
 }

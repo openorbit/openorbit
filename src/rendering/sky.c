@@ -76,9 +76,12 @@ ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
     vector_t cart;
     cart = ooEquToCart(ra, dec);
     
-    // star list full?
+    // star list full, then extend block?
     if (stars->a_len <= stars->n_stars) {
-        return;
+      OOstar *newData = realloc(stars->data, stars->a_len * 2 * sizeof(OOstar));
+      stars->data = newData;
+      stars->a_len *= 2;
+      return;
     }
     
     double temp = bv_to_temp(bv);
@@ -137,7 +140,8 @@ ooSkyInitStars(int star_count)
 {
     assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
 
-    OOstars *stars = malloc(sizeof(OOstars) + star_count*sizeof(OOstar));
+    OOstars *stars = malloc(sizeof(OOstars));
+    stars->data = malloc(star_count*sizeof(OOstar));
     stars->a_len = star_count;
     stars->n_stars = 0;
     return stars;
@@ -150,8 +154,8 @@ ooSkyDrawStars(OOstars *stars)
     glPushMatrix();
     glLoadIdentity();
 
-    extern camera_t *gCam;
-    cam_rotate(gCam->free_cam.rq);
+    //extern camera_t *gCam;
+    //cam_rotate(gCam->free_cam.rq);
 
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -162,5 +166,16 @@ ooSkyDrawStars(OOstars *stars)
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glPopMatrix();
+}
+
+
+OOdrawable*
+ooSkyNewDrawable()
+{
+  OOdrawable *sky = malloc(sizeof(OOdrawable));
+  sky->obj = ooSkyInitStars(1024);
+  sky->draw = (OOdrawfunc)ooSkyDrawStars;
+  
+  return sky;
 }
 

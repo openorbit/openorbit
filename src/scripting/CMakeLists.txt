@@ -1,4 +1,4 @@
-set( pyrex_files io config orbits res texture plugin sg sim )
+set( pyrex_files io config ode orbits res texture plugin sg sim)
 set( pyrex_c_files )
 set( scripting_src scripting.c )
 set( scripting_FILES scripting.h CMakeLists.txt)
@@ -15,5 +15,6 @@ endforeach(file)
 add_cmake_list()
 
 
-add_library( scripting STATIC ${scripting_src} ${pyrex_c_files} ${pyrex_pyx_files} ${scripting_FILES})
+add_library( scripting STATIC ${scripting_src} ${pyrex_c_files}
+                              ${pyrex_pyx_files} ${scripting_FILES})
 target_link_libraries( scripting ${PYTHON_LIBRARIES})

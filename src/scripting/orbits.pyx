@@ -32,6 +32,9 @@
 import texture
 import res
 
+import ode
+cimport ode
+
 cdef class OrbitSys:
     def __cinit__(self, char *name, float radius, float w0):
         #texture.load(textureName, textureName)
@@ -48,3 +51,8 @@ cdef class OrbitSys:
     def addChild(self, OrbitSys child):
         ooOrbitAddChildSys(self.osys, child.osys)
 
+    def getBody(self):
+        cdef ode.OdeBody body
+        body.body = self.osys.id
+        return body
+    

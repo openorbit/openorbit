@@ -72,13 +72,20 @@ set_source_files_properties(${ORBIT_SCRIPTS}
                             PROPERTIES
                             MACOSX_PACKAGE_LOCATION Resources/script/)
 
+set_source_files_properties(${ORBIT_DEP_YAML}
+							PROPERTIES
+							MACOSX_PACKAGE_LOCATION Resources/python/yaml)
+
+
+
 
 add_executable(openorbit MACOSX_BUNDLE
                ${openorbit_SRC}
                ${openorbit_FILES}
                ${ORBIT_RES_TEX}
                ${ORBIT_RES_DATA}
-               ${ORBIT_SCRIPTS})
+               ${ORBIT_SCRIPTS}
+			   ${ORBIT_DEP_YAML})
 
 set_target_properties(openorbit
                       PROPERTIES

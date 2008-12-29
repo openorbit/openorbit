@@ -68,11 +68,12 @@ typedef struct {
     uint64_t timeStamp;
     float stepSize;
     OOorbsys *orbSys;
-    OOnode *sg;
     OOcam *cam;
+    OOscenegraph *sg;
 } SIMstate;
 
-void ooSimSetSg(OOnode *sg);
+void ooSimSetSg(OOscenegraph *sg);
+
 void ooSimSetOrbSys(OOorbsys *osys);
 void ooSimSetCam(OOcam *cam);
 

@@ -64,8 +64,8 @@ init_cam(void)
 {
     gCam = calloc(1, sizeof(camera_t));// TODO: Remove global camera
     gCam->type = CAM_FREE;
-	gCam->free_cam.p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
-	gCam->free_cam.rq = q_rot(0.0f,0.0f,1.0f,0.0f);
+    gCam->free_cam.p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
+    gCam->free_cam.rq = q_rot(0.0f,0.0f,1.0f,0.0f);
     
     // Register camera actions
     ooIoRegCKeyHandler("cam-fwd", cam_move_forward_button_action);        

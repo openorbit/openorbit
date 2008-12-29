@@ -70,7 +70,7 @@
 
 //extern settings_t SETTINGS;
 /* Simulator SDL events */
-#define SIM_STEP_EVENT 0
+#define SIM_STEP_EVENT 0 // Make physics step
 #define SIM_DEBUG_EVENT 1
  
 // 25Hz
@@ -95,6 +95,16 @@ sim_step_event(Uint32 interval, void *param)
     return interval;
 }
 
+static unsigned frames = 0;
+
+Uint32
+fps_event(Uint32 interval, void *param)
+{
+  ooLogInfo("fps = %d", frames);
+  frames = 0;
+  return interval;
+}
+
 static void
 main_loop(void)
 {
@@ -103,6 +113,7 @@ main_loop(void)
     const char *evName;
     int done = 0;
     SDL_AddTimer(SIM_STEP_PERIOD, sim_step_event, NULL);
+    SDL_AddTimer(1000, fps_event, NULL);
         
     while ( !done ) {
 		/* Check for events, will do the initial io-decoding */
@@ -157,8 +168,11 @@ main_loop(void)
 		}
         
         // draw as often as possible
-        ooSgDraw(gSIM_state.sg, gSIM_state.cam);
+        //ooSgDraw(gSIM_state.sg, gSIM_state.cam);
+        ooSgPaint(gSIM_state.sg);
+        
         SDL_GL_SwapBuffers();
+        frames ++;
 	}
 }
 
@@ -179,24 +193,23 @@ main(int argc, char*argv[])
     // Load and run initialisation script
     ooScriptingInit();
     
-	if (!ooScriptingRunFile("script/init.py")) {
-        ooLogFatal("script/init.py missing");
-	}
+    if (!ooScriptingRunFile("script/init.py")) {
+      ooLogFatal("script/init.py missing");
+    }
     
     // Initialise SDL, GL and AL
     
-	// Init SDL video subsystem
-	if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {
-        fprintf(stderr, "Couldn't initialize SDL: %s\n",
-                SDL_GetError());
-		exit(1);
-	}
+    // Init SDL video subsystem
+    if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {
+      ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
+    }
+    
     // Init GL state
     init_renderer();
 
-	if (!ooScriptingRunFile("script/postinit.py")) {
-        ooLogFatal("script/postinit.py missing");
-	}
+    if (!ooScriptingRunFile("script/postinit.py")) {
+      ooLogFatal("script/postinit.py missing");
+    }
     
     
     atexit(SDL_Quit);
@@ -205,7 +218,7 @@ main(int argc, char*argv[])
     // Draw, get events...
     main_loop();
     
-	printf("Shutting down normally...");
+    ooLogInfo("Shutting down normally...");
     return 0;
 }
 

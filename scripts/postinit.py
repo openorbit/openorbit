@@ -32,7 +32,7 @@
 import io       # I/O module, allowing the binding of key handlers
 import config   # config, allows one to set config values
 import orbits
-import res, sg, sim
+import res, sg, sim, texture
 
 import yaml
 
@@ -47,18 +47,15 @@ print "Running post init script..."
 
 def loadStars():
     f = open(res.getPath("data/stars.csv"))
-    skyObj = sg.SkyNode()
+    skyDrawable = sg.SkyDrawable()
     for line in f:
         vmag, ra, dec, btmag, vtmag, b_v, v_i = tuple(line.split(","))
-        skyObj.addStar(math.radians(float(ra)), math.radians(float(dec)),
-                       float(vmag), float(b_v))
-        
-    sim.setSg(skyObj)
-    cam = sg.FreeCam()#)
-    cam.setParams(skyObj, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-    sim.setCam(cam)
+        skyDrawable.addStar(math.radians(float(ra)), math.radians(float(dec)),
+                            float(vmag), float(b_v))
+    
     
     f.close()
+    return skyDrawable
     
 class UnitParseError(Exception):
     def __init__(self, descr):
@@ -175,9 +172,14 @@ def parseTime(str):
         raise UnitParseError("Token count wrong in %s" % (str))
 
     
-    
-
-def addStar(parent, name, body):
+def addSgObj(scene, renderOpts):
+  if renderOpts["model"] == "sphere":
+    pass
+  elif renderOpts["model"] == "mesh":
+    pass
+  #texture.load(renderOpts["texture"], renderOpts["texture"])
+  
+def addStar(scene, parent, name, body):
     try:
         orbit = body["orbit"]
         mass = parseMass(body["mass"])
@@ -194,12 +196,18 @@ def addStar(parent, name, body):
 
     if body.has_key("satellites"):
         for key in body["satellites"].keys():
-            addBody(star, key, body["satellites"][key])
+            newScene = sg.Scene().init(key)
+            scene.addChild(newScene)
+            addBody(newScene, star, key, body["satellites"][key])
 
     # not pretty, but works for now (i.e. will bomb with more than one star)
     sim.setOrbSys(star)
-
-def addPlanet(parent, name, body):
+    
+    #scene.connectToOdeObj(star.getBody())
+    
+    addSgObj(scene, rendOpts)
+    
+def addPlanet(scene, parent, name, body):
     try:
         orbit = body["orbit"]
         mass = parseMass(body["mass"])
@@ -217,9 +225,12 @@ def addPlanet(parent, name, body):
     
     if body.has_key("satellites"):
         for key in body["satellites"].keys():
-            addBody(planet, key, body["satellites"][key])
-        
-def addMoon(parent, name, body):
+            addBody(scene, planet, key, body["satellites"][key])
+
+    scene.connectToOdeObj(planet.getBody())
+    addSgObj(scene, rendOpts)
+    
+def addMoon(scene, parent, name, body):
     try:
         orbit = body["orbit"]
         mass = parseMass(body["mass"])
@@ -230,30 +241,30 @@ def addMoon(parent, name, body):
         print "error: missing key in moon %s (%s)" % (name, err.args)
         sys.exit(1)
     parent.addObj(name, radius, 0.0, 0.0)
-
+    addSgObj(scene, rendOpts)
     
-def addBody(parent, name, body):
+def addBody(scene, parent, name, body):
     """docstring for addBody"""
     # get known attributes of a body
     try:
         if body["kind"] == "star":
-            addStar(parent, name, body)
+            addStar(scene, parent, name, body)
         elif body["kind"] == "planet":
-            addPlanet(parent, name, body)
+            addPlanet(scene, parent, name, body)
         elif body["kind"] == "moon":
-            addMoon(parent, name, body)
+            addMoon(scene, parent, name, body)
     except KeyError:
         print "key error in body (no key 'kind' in %s)" % (name)
         sys.exit(1)
 
-def loadSolYaml():
+def loadSolYaml(sgr):
     """Loads the yaml description of the solar system"""
     f = file(res.getPath("data/solsystem.yaml"))
     solsys = yaml.load(f)
     f.close()
     for key in solsys.keys():
         if key != "epoch":
-            addBody(None, key, solsys[key])
+            addBody(sgr.getRoot(), None, key, solsys[key])
     
 def _test():
     val = parseTime("1.0 days")
@@ -272,5 +283,15 @@ def _test():
 #if __name__ == "__main__":
 #    _test()
 #else:
-loadStars()
-loadSolYaml()
+stars = loadStars()
+
+sgr = sg.Scenegraph().new()
+sgr.setBackground(stars)
+cam = sg.FreeCam()
+cam.setParams(sgr, sgr.getRoot(), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+sgr.setCam(cam)
+
+sim.setSg(sgr)
+
+
+loadSolYaml(sgr)
