@@ -37,6 +37,7 @@
 #include <gencds/hashtable.h>
 #include "SDL_opengl.h"
 
+#include "log.h"
 #include "texture.h"
 #include "parsers/tga.h"
 
@@ -53,6 +54,10 @@ ooTexInit(void)
 int
 ooTexLoad(const char *key, const char *name)
 {
+    if (hashtable_lookup(gOOtexDict, key)) {
+        ooLogWarn("Tried to load texture '%s' which is already loaded", key);
+        return -1;
+    }
     FILE *fp = ooResGetFile(name);
     if (fp == NULL) return -1;
 
