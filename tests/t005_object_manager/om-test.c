@@ -38,7 +38,7 @@
 #include <check.h>
 
 #include <gencds/object-manager.h>
-
+#include <gencds/object-manager2.h>
 typedef struct {
     int a;
     int b;
@@ -257,6 +257,17 @@ START_TEST(test_properties)
 }
 END_TEST
 
+
+//void omDbgDumpTree(OMtreenode *root);
+
+START_TEST(test_om2)
+{
+  //OMtreenode *root = malloc(sizeof(OMtreenode));
+
+//  omDbgDumpTree(root);
+}
+END_TEST
+
 Suite
 *test_suite (void)
 {
@@ -269,6 +280,7 @@ Suite
     tcase_add_test(tc_core, test_objects);
     tcase_add_test(tc_core, test_properties);
  
+    tcase_add_test(tc_core, test_om2);
     
     suite_add_tcase(s, tc_core);
     
