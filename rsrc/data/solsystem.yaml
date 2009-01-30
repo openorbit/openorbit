@@ -23,7 +23,7 @@
     # mesh: Need a mesh file. These need to be used to describe objects that
     #       are not round from gravity (i.e. asteroids)
     # comet: similar to mesh, but will draw a comet tail, maybe
-
+# TODO: Add Eris, Sedna, Ceres
 epoch: 2000-01-01 00:00
 
 Sol:
@@ -142,14 +142,14 @@ Sol:
                 Phobos:
                     kind: "moon"
                     name: "Phobos"
-                    mass: 999 kg
+                    mass: 0.0107 Zg
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
                         period: 0.319 days
                         eccentricity: 0.015
                         inclination: 1.02
-                    radius: 999 m
+                    radius: 11.1 km
                     rendering:
                         model: "sphere"
                 
@@ -157,8 +157,8 @@ Sol:
                     kind: "moon"
                     name: "Deimos"
                     
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.00148 Zg
+                    radius: 6.2 km
                     rendering:
                         model: "sphere"
                     
@@ -190,7 +190,7 @@ Sol:
                 Metis:
                     kind: "moon"
                     name: "Metis"
-                    mass: 999 kg
+                    mass: 0.036 Zg
                     radius: 999 m
                     orbit:
                         initial: 0 deg
@@ -202,7 +202,7 @@ Sol:
                 Adrastea:
                     kind: "moon"
                     name: "Adrastea"
-                    mass: 999 kg
+                    mass: 0.02 Zg
                     radius: 999 m
                     orbit:
                         initial: 0 deg
@@ -214,20 +214,20 @@ Sol:
                 Amalthea:
                     kind: "moon"
                     name: "Amalthea"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 2.08 Zg
+                    radius: 83.5 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
                         axial-inclination: 999 deg
                     rendering:
-                        model: "sphere"
+                        model: "sphere" # TODO: irregular
                     
                 Thebe:
                     kind: "moon"
                     name: "Thebe"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.43 Zg
+                    radius: 49 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -238,8 +238,8 @@ Sol:
                 Io:
                     kind: "moon"
                     name: "Io"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 89.3 Yg
+                    radius: 1821.5 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -250,8 +250,8 @@ Sol:
                 Europa:
                     kind: "moon"
                     name: "Europa"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 48 Yg
+                    radius: 1561 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -262,8 +262,8 @@ Sol:
                 Gaynamede:
                     kind: "moon"
                     name: "Gaynamede"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 148.2 Yg
+                    radius: 2631.2 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -274,8 +274,8 @@ Sol:
                 Callisto:
                     kind: "moon"
                     name: "Callisto"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 107.6 Yg
+                    radius: 2410.3 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -286,7 +286,7 @@ Sol:
                 Leda:
                     name: "Leda"
                     kind: "moon"
-                    mass: 999 kg
+                    mass: 0.011 Zg
                     radius: 999 m
                     orbit:
                         initial: 0 deg
@@ -298,8 +298,8 @@ Sol:
                 Himalia:
                     kind: "moon"
                     name: "Himalia"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 6.7 Zg
+                    radius: 85 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -310,8 +310,8 @@ Sol:
                 Lysithea:
                     kind: "moon"
                     name: "Lysithea"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.063 Zg
+                    radius: 18 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -322,8 +322,8 @@ Sol:
                 Elara:
                     kind: "moon"
                     name: "Elara"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.87 Zg
+                    radius: 43 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -334,7 +334,7 @@ Sol:
                 Ananke:
                     kind: "moon"
                     name: "Ananke"
-                    mass: 999 kg
+                    mass: 0.03 Zg
                     radius: 999 m
                     orbit:
                         initial: 0 deg
@@ -346,8 +346,8 @@ Sol:
                 Carme:
                     kind: "moon"
                     name: "Carme"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.13 Zg
+                    radius: 23 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -358,8 +358,8 @@ Sol:
                 Pasiphae:
                     kind: "moon"
                     name: "Pasiphae"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.3 kg
+                    radius: 30 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -370,8 +370,8 @@ Sol:
                 Sinope:
                     kind: "moon"
                     name: "Sinope"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.076 Zg
+                    radius: 19 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -401,8 +401,8 @@ Sol:
                 Atlas:
                     kind: "moon"
                     name: "Atlas"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.0066 Zg
+                    radius: 15.3 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -434,19 +434,19 @@ Sol:
                 Janus:
                     kind: "moon"
                     name: "Janus"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 1.912 Zg
+                    radius: 89.4 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
                     rendering:
-                        model: "sphere"
+                        model: "sphere" # TODO: irregular
                     
                 Epimetheus:
                     kind: "moon"
                     name: "Epimetheus"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.5304 Zg
+                    radius: 56.7 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -456,8 +456,8 @@ Sol:
                 Mimas:
                     kind: "moon"
                     name: "Mimas"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.03749 Yg
+                    radius: 198.3 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -467,8 +467,8 @@ Sol:
                 Enceladus:
                     kind: "moon"
                     name: "Enceladus"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.108 Yg
+                    radius: 252.1 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -478,8 +478,8 @@ Sol:
                 Tethys:
                     kind: "moon"
                     name: "Tethys"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.6173 Yg
+                    radius: 533 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -511,13 +511,13 @@ Sol:
                 Dione:
                     kind: "moon"
                     name: "Dione"
-                    radius: 999 m
+                    radius: 561.6 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
                     rendering:
                         model: "sphere"
-                    mass: 999 kg
+                    mass: 1.096 Yg
                 S6:
                     kind: "moon"
                     name: "S6"
@@ -530,20 +530,20 @@ Sol:
                 Rhea:
                     kind: "moon"
                     name: "Rhea"
-                    radius: 999 m
+                    radius: 764.4 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
                     rendering:
                         model: "sphere"
-                    mass: 999 kg
+                    mass: 2.3166 Yg
                 Titan:
                     kind: "moon"
                     name: "Titan"
-                    mass: 999 kg
+                    mass: 134.5 Yg
                     pressure: 150 kPa
                     surface-temp: 95 K
-                    radius: 999 m
+                    radius: 2575 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -553,19 +553,19 @@ Sol:
                 Hyperion:
                     kind: "moon"
                     name: "Hyperion"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.00558 Yg
+                    radius: 135.0 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
                     rendering:
-                        model: "sphere"
+                        model: "sphere" # TODO: irregular
                     
                 Iapetus:
                     kind: "moon"
                     name: "Iapetus"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 1.9739 Yg
+                    radius: 736 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -575,8 +575,8 @@ Sol:
                 Phoebe:
                     kind: "moon"
                     name: "Phoebe"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.00829 Yg
+                    radius: 106.6 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -605,8 +605,8 @@ Sol:
                 Miranda:
                     kind: "moon"
                     name: "Miranda"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.0659 Yg
+                    radius: 235.8 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -616,8 +616,8 @@ Sol:
                 Ariel:
                     kind: "moon"
                     name: "Ariel"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 1.35 Yg
+                    radius: 578.9 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -627,8 +627,8 @@ Sol:
                 Umbriel:
                     kind: "moon"
                     name: "Umbriel"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 1.2 Yg
+                    radius: 584.7 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -638,8 +638,8 @@ Sol:
                 Titania:
                     kind: "moon"
                     name: "Titania"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 3.526 Yg
+                    radius: 788.9 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -649,8 +649,8 @@ Sol:
                 Oberon:
                     kind: "moon"
                     name: "Oberon"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 3.014 Yg
+                    radius: 761.4 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -679,8 +679,8 @@ Sol:
                 Triton:
                     kind: "moon"
                     name: "Triton"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 21.5 Yg
+                    radius: 1353.4 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
@@ -690,14 +690,14 @@ Sol:
                 Nereid:
                     kind: "moon"
                     name: "Nereid"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 0.031 Yg
+                    radius: 170 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min
                         axial-inclination: 999 deg
                     rendering:
-                        model: "sphere"
+                        model: "sphere" # Note, should be irregular
                     
         # For pluto and Charon, their system is really noticably rotating around the
         # barycentre, but we leave this as is for now until anyone complain.
@@ -724,8 +724,8 @@ Sol:
                 Charon:
                     kind: "moon"
                     name: "Charon"
-                    mass: 999 kg
-                    radius: 999 m
+                    mass: 1.52 Yg
+                    radius: 606 km
                     orbit:
                         initial: 0 deg
                         axial-period: 99 h 99 min

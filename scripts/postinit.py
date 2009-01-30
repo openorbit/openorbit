@@ -77,6 +77,10 @@ def parseMass(str):
 
     if tokens[1] == "kg":
         return float(tokens[0])
+    elif tokens[1] == "Zg":
+        return float(tokens[0]) * (10.0**21.0 / 10.0**3.0)
+    elif tokens[1] == "Yg":
+        return float(tokens[0]) * (10.0**24.0 / 10.0**3.0)
     else:
         raise UnitParseError("Unknown unit in mass context: " + tokens[1])
 
