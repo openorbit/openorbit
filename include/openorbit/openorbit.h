@@ -39,6 +39,8 @@
 #ifndef OPENORBIT_H__
 #define OPENORBIT_H__
 
+#include <stdlib.h>
+
 typedef void OOobject;
 
 typedef struct {
