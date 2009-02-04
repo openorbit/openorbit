@@ -2,6 +2,8 @@
 #define OBJECT_MANAGER2_H_VT1NTC32
 #include <openorbit/openorbit.h>
 
+#include <string.h>
+
 #define OM_SIZE_MASK 0x3f
 #define OM_FP   0x00000040
 #define OM_SIGN 0x00000080
@@ -30,6 +32,29 @@ omMakeKey(const char *key)
   }
   
   return u.v;
+}
+
+static inline int32_t
+omKeyCmp(OMkey a, OMkey b)
+{
+  // This is a very general vector comparison, it is valid for checking
+  // whether two vectors are ordered or not in big endian order.
+  // On the other hand, ordering in this case will only be a permutation of
+  // normal order, so it is working, but you cannot easily see the sorting by
+  // looking on the keys
+  union {
+    OMkey v;
+    int32_t a[2];
+  } u;
+  
+  u.v = a - b;
+
+  if (u.a[0] != 0) return u.a[0];
+  if (u.a[1] != 0) return u.a[1];
+  if (u.a[2] != 0) return u.a[2];
+  if (u.a[3] != 0) return u.a[3];
+  
+  return 0; // Vectors are equal
 }
 
 typedef enum {
