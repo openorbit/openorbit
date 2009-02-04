@@ -1,6 +1,8 @@
 HACKING OPEN ORBIT
+==================
 
-0. ABSTRACT
+ABSTRACT
+--------
 This document describes the architecture and the coding conventions used in
 Open Orbit. Submitted patches must confirm to the coding conventions in order
 to be accepted. Note that these conventions are not yet finished, and under
@@ -8,14 +10,16 @@ development. This means that some code might not be consequent with these guide
 lines, if you find such an item, please notify the authors and the code will
 hopefully be re-factored.
 
-1. ARCHITECTURE
+ARCHITECTURE
+------------
 
 The source is in the src directory, public includes are in the include
 directory.
 
-Libraries part of openorbit place public includes in include/"libname".
+Libraries part of openorbit place public includes in include/libname.
 
-2. CODE STYLE
+CODE STYLE
+----------
 Open Orbit is written in C and tries to confirm to the C99 standard.
 GNU-extensions are only allowed when they are not strictly needed for the code
 to work (e.g. attributes).
@@ -25,71 +29,89 @@ macros should be in ALL_CAPS. Global variables shall have a prefix in caps
 identifying the module where the variable is defined and then named as a normal
 variable, e.g. FOO_bar. All defined types ends with _t.
 
-2.1 Lines
+Lines
+*****
 The line length may not be more than 80 characters for code and documentation.
 
-2.2 Functions
+Functions
+*********
 Functions are declared in the headers on one line if possible. When they appear
 in the C-files, the return type is written on a separate line and the open
 brace as well. The pointer splat is considered part of the return type. Note
 that normal pointers have the splat adjacent to the variable name due to
 semantical issues with C.
 
-int*
-foobar(int foo, int bar)
-{
-    int *pointer;
-    ...
-}
+::
+
+    int*
+    foobar(int foo, int bar)
+    {
+        int *pointer;
+        ...
+    }
+
 
 
 Calling a function will be done without white space between the name and the
 parantheses. Any gnu-style coding will be punished by cutting of the fingers.
 
-RIGHT: foobar(1, 1);
-WRONG: foobar (1, 1);
+RIGHT: ``foobar(1, 1);``
+WRONG: ``foobar (1, 1);``
 
-2.3 Control Structures
+Control Structures
+******************
 Control structures such as while, if and for shall have a space between the
 keyword and the first parentheses. The first curly brace shall be on the same
 line.
 
-while ( FOO ) {
+::
 
-}
+    while ( FOO ) {
+    
+    }
 
-2.4 Object Manager
+
+Object Manager
+**************
 In order to facilitate future automation of interface generation, you should
-finish any interface name, and only interface names with iface:
+finish any interface name, and only interface names with iface::
 
-typedef struct {
-    ...
-} foo_bar_iface;
+    typedef struct {
+        ...
+    } foo_bar_iface;
 
-2.5 Macros
+Macros
+******
 All preprocessor macro names are in ALL_CAPS. When writing a macro consisting of
 several lines, add a do {} while (0) block around the lines. Enclose all
 parameters in parentheses as they may be statements.
 
-Example:
-#define MY_MACRO(a, b, c)   \
-    do {                    \
-		foo x = (a) * (b);	\
-    } while (0)
+Example::
 
-2.6 Constants
+    #define MY_MACRO(a, b, c)   \
+        do {                    \
+		    foo x = (a) * (b);	\
+        } while (0)
+
+
+Constants
+*********
 C constants are preprocessor macros and should be in all caps.
 
-E.g.
-#define PI 3.14
+E.g::
+    #define PI 3.14
 
-2.7 Enums
-typedef enum {
-    FOO_xyz,
-    FOO_bar
-} foo_t;
+Enums
+*****
+::
 
-2.8 Global Variables
+    typedef enum {
+        FOO_xyz,
+        FOO_bar
+    } foo_t;
+
+Global Variables
+****************
 Exported global variables must be defined with a 'g' and a package prefix. For
 example, if there is a package or library named foo, that exports a global named
-bar; the name of the symbol would be "gFOO_bar".
+bar; the name of the symbol would be ``gFOO_bar``.
