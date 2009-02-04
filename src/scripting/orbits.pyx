@@ -36,23 +36,18 @@ import ode
 cimport ode
 
 cdef class OrbitSys:
-    def __cinit__(self, char *name, float radius, float w0):
+    def __cinit__(self, char *name, float m, float semiMaj, float semiMin):
         #texture.load(textureName, textureName)
-        self.osys = ooOrbitNewSys(name, radius, w0)
+        self.osys = ooOrbitNewSys(name, m, semiMaj, semiMin)
     def __dealloc__(self):
         # C function call to delete obj_sys object.
         pass
-    def addObj(self, name, rad, w0, m):
+    def addObj(self, name, m, x, y, z, vx, vy, vz, qx,qy,qz,qw,vqx,vqy,vqz,vqw):
         cdef OOorbobj *obj
-        obj = ooOrbitAddObj(<OOorbsys*>self.osys, name, rad, w0, m)
+        obj = ooOrbitNewObj(<OOorbsys*>self.osys, name, m, x, y, z, vx, vy, vz, qx,qy,qz,qw,vqx,vqy,vqz,vqw)
         if obj == NULL:
             raise TypeError("null returned")
     
     def addChild(self, OrbitSys child):
         ooOrbitAddChildSys(self.osys, child.osys)
-
-    def getBody(self):
-        cdef ode.OdeBody body
-        body.body = self.osys.id
-        return body
     

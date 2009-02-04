@@ -175,7 +175,10 @@ def parseTime(str):
     else:
         raise UnitParseError("Token count wrong in %s" % (str))
 
-    
+
+def SemiMin(semiMaj, ecc):
+  return math.sqrt(1.0 - ecc**2.0) * semiMaj
+  
 def addSgObj(scene, renderOpts):
   if renderOpts["model"] == "sphere":
     pass
@@ -193,10 +196,10 @@ def addStar(scene, parent, name, body):
     except KeyError, err:
         print "error: missing key in star %s (%s)" % (name, err.args)
         sys.exit(1)
-    star = orbits.OrbitSys(name, radius, 0.0)
+    star = orbits.OrbitSys(name, mass, 0.0, 0.0)
     if parent:
         parent.addChild(star)
-    star.addObj(name, radius, 0.0, mass)
+    #star.addObj(name, mradius, 0.0, mass)
 
     if body.has_key("satellites"):
         for key in body["satellites"].keys():
@@ -218,20 +221,24 @@ def addPlanet(scene, parent, name, body):
         radius = parseDistance(body["radius"])
         axialPeriod = parseTime(orbit["axial-period"])
         rendOpts = body["rendering"]
+        semiMaj = parseDistance(orbit["semi-major-axis"])
+        ecc = orbit["eccentricity"]
+        semiMin = SemiMin(semiMaj, ecc)
     except KeyError, err:
         print "error: missing key in planet %s (%s)" % (name, err.args)
-        sys.exit(1)
-
-    planet = orbits.OrbitSys(name, radius, 0.0)
+        print "       since you missed this key, the planet will not be added"
+        return
+        
+    planet = orbits.OrbitSys(name, mass, semiMaj, semiMin)
     if parent:
         parent.addChild(planet)
-    planet.addObj(name, radius, 0.0, mass)
+    #planet.addObj(name, radius, 0.0, mass)
     
     if body.has_key("satellites"):
         for key in body["satellites"].keys():
             addBody(scene, planet, key, body["satellites"][key])
 
-    scene.connectToOdeObj(planet.getBody())
+    #scene.connectToOdeObj(planet.getBody())
     addSgObj(scene, rendOpts)
     
 def addMoon(scene, parent, name, body):
@@ -241,10 +248,17 @@ def addMoon(scene, parent, name, body):
         radius = parseDistance(body["radius"])
         axialPeriod = parseTime(orbit["axial-period"])
         rendOpts = body["rendering"]
+        semiMaj = parseDistance(orbit["semi-major-axis"])
+        ecc = orbit["eccentricity"]
+        semiMin = SemiMin(semiMaj, ecc)
     except KeyError, err:
         print "error: missing key in moon %s (%s)" % (name, err.args)
-        sys.exit(1)
-    parent.addObj(name, radius, 0.0, 0.0)
+        print "       the moon will not be added without these parameters being set"
+        return
+    moon = orbits.OrbitSys(name, mass, semiMaj, semiMin)
+    if parent:
+        parent.addChild(moon)
+    #parent.addObj(name, radius, 0.0, 0.0)
     addSgObj(scene, rendOpts)
     
 def addBody(scene, parent, name, body):

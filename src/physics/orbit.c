@@ -38,63 +38,49 @@
 
 #include <vmath/vmath.h>
 
+#include "geo/geo.h"
 #include "log.h"
 
-
-
 OOorbsys*
-ooOrbitNewSys(const char *name, float radius, float w0)
+ooOrbitNewSys(const char *name, float m, float semiMaj, float semiMin)
 {
-    OOorbsys *sys = malloc(sizeof(OOorbsys));
-    if (sys == NULL) ooLogFatal("failed malloc when adding %s system\n", name);
-    
-    
-    sys->world = dWorldCreate();
-    sys->name = strdup(name);
-    if (sys->name == NULL) ooLogFatal("failed malloc when adding system\n");
-    ooObjVecInit(&sys->children);
-    
-    sys->scale.dist = 1.0f;
-    sys->scale.distInv = 1.0f;
-    sys->scale.mass = 1.0f;
-    sys->scale.massInv = 1.0f;
-    
-    sys->parent = NULL;
-    sys->obj = NULL;
-    sys->id = 0;
-    
-    sys->k.G = 6.67428e-11;
-    
-    return sys;
+  OOorbsys *sys = malloc(sizeof(OOorbsys));
+  sys->world = dWorldCreate();
+  sys->name = strdup(name);
+  sys->orbit = ooGeoEllipseAreaSeg(300, semiMaj, semiMin);
+  ooObjVecInit(&sys->sats);
+  ooObjVecInit(&sys->objs);
+
+  sys->parent = NULL;
+
+  sys->scale.dist = 1.0f;
+  sys->scale.distInv = 1.0f;
+  sys->scale.mass = 1.0f;
+  sys->scale.massInv = 1.0f;
+
+  sys->phys.k.G = 6.67428e-11;
+  sys->phys.param.m = m;
+
+  return sys;
 }
 
 OOorbobj*
-ooOrbitAddObj(OOorbsys *sys, const char *name, float radius, float w0, float m)
+ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
+              float x, float y, float z,
+              float vx, float vy, float vz,
+              float qx, float qy, float qz, float qw,
+              float rqx, float rqy, float rqz, float rqw)
 {
-    assert(sys != NULL);
-    OOorbobj *obj = malloc(sizeof(OOorbobj));
-    if (obj == NULL) {
-        free(obj);
-        return NULL;
-    }
-    
-    obj->name = strdup(name);
-    obj->id = dBodyCreate(sys->world);
+  assert(sys != NULL);
+  assert(m >= 0.0);
+  OOorbobj *obj = malloc(sizeof(OOorbobj));
+  obj->name = strdup(name);
+  obj->id = dBodyCreate(sys->world);
+  obj->m = m;
 
-    // Insert as first object
-    obj->next = sys->obj;
-    sys->obj = obj;
-        
-    // Add mass to ancestral systems
-    obj->m = m;
-    OOorbsys *sp = sys;
-    while (sp) {
-        sp->m += m;
-        m *= sp->scale.massInv;
-        sp = sp->parent;
-    }
-    
-    return obj;
+  ooObjVecPush(&sys->objs, obj);
+  
+  return obj;
 }
 
 
@@ -104,8 +90,7 @@ ooOrbitAddChildSys(OOorbsys * restrict parent, OOorbsys * restrict child)
   assert(parent != NULL);
   assert(child != NULL);
   
-  child->id = dBodyCreate(parent->world);
-  ooObjVecPush(&parent->children, child);
+  ooObjVecPush(&parent->sats, child);
 }
 
 void
@@ -123,83 +108,44 @@ ooOrbitSetScale(OOorbsys *sys, float ms, float ds)
 void
 ooOrbitClear(OOorbsys *sys)
 {
-    if (sys == NULL) return;
-    
-    if (sys->parent != NULL) {
-        dBodySetForce(sys->id, 0.0f, 0.0f, 0.0f);
-        dBodySetTorque(sys->id, 0.0f, 0.0f, 0.0f);
-    }
-    OOorbobj *obj = sys->obj;
-    
-    while (obj) {
-        dBodySetForce(obj->id, 0.0f, 0.0f, 0.0f);
-        dBodySetTorque(obj->id, 0.0f, 0.0f, 0.0f);
-
-        obj = obj->next;
-    }
-    
-    for (size_t i = 0; i < sys->children.length ; i ++)
-      ooOrbitClear(sys->children.elems[i]); // children
-    
-    //ooOrbitClear(sys->next); // siblings
+  for (size_t i ; i < sys->objs.length ; i ++) {
+    dBodySetForce(((OOorbobj*)sys->objs.elems[i])->id, 0.0f, 0.0f, 0.0f);
+    dBodySetTorque(((OOorbobj*)sys->objs.elems[i])->id, 0.0f, 0.0f, 0.0f);
+  }
+  
+  for (size_t i; i < sys->sats.length ; i ++) {
+    ooOrbitClear(sys->sats.elems[i]);
+  }
 }
 
-#define P_G 6.67428e-11 
+
+
 void
-ooOrbitStep(OOorbsys *sys, float stepsize)
+ooOrbitStep(OOorbsys *sys, float stepSize)
 {
-    if (sys == NULL) return;
-    
-    // Solves mutual force equations for all objects in the system, and then solves them
-    // for each subsystem
-    OOorbobj *onode0 = sys->obj;
-    while (onode0) {
-        const dReal *ode_o0p = dBodyGetPosition (onode0->id);
-        vector_t o0p = v_set(ode_o0p[0], ode_o0p[1], ode_o0p[2], 0.0f);
-        OOorbobj *onode1 = onode0->next;
-        while (onode1) {
-            const dReal *ode_o1p = dBodyGetPosition (onode1->id);
-            vector_t o1p = v_set(ode_o1p[0], ode_o1p[1], ode_o1p[2], 0.0f);            
-            vector_t dist = v_sub(o1p, o0p);
-
-            scalar_t r12 = v_abs(dist);
-            r12 = r12 * r12;
-            vector_t f12 = v_s_mul(v_normalise(dist),
-                                  -sys->k.G*onode0->m * onode1->m / r12);
-            vector_t f21 = v_neg(f12);
-            
-            dBodyAddForce(onode0->id, f12.x, f12.y, f12.z);
-            dBodyAddForce(onode1->id, f21.x, f21.y, f21.z);
-
-            onode1 = onode1->next;
-        }
-        
-        // all system children and objects
-        for (size_t i = 0 ; i < sys->children.length ; i ++) {
-            OOorbsys *snode = sys->children.elems[i];
-            const dReal *ode_s1p = dBodyGetPosition (snode->id);
-            vector_t s1p = v_set(ode_s1p[0], ode_s1p[1], ode_s1p[2], 0.0f);            
-            vector_t dist = v_sub(s1p, o0p);
-
-            scalar_t r12 = v_abs(dist);
-            r12 = r12 * r12;
-            vector_t f12 = v_s_mul(v_normalise(dist),
-                                   -sys->k.G*onode0->m * snode->m / r12);
-            vector_t f21 = v_neg(f12);
-            
-            dBodyAddForce(onode0->id, f21.x, f21.y, f21.z);
-            dBodyAddForce(snode->id, f12.x, f12.y, f12.z);
-        }
-      
-        onode0 = onode0->next;
+  // First compute local gravity for each object
+  for (size_t i ; i < sys->objs.length ; i ++) {
+    // Since objects can migrate to other systems...
+    if (sys->objs.elems[i] != NULL) {
+      OOorbobj *obj = sys->objs.elems[i];
+      //sys->phys.param.m
+      const dReal *objPos_ = dBodyGetPosition(obj->id);
+      vector_t objPos = v_set(objPos_[0], objPos_[1], objPos_[2], 0.0f);            
+      vector_t dist = objPos; // Since system origin is 0.0 
+      scalar_t r12 = v_abs(dist);
+      r12 = r12 * r12;
+      vector_t f12 = v_s_mul(v_normalise(v_neg(dist)), //negate, force should point to center object
+                            -sys->phys.k.G * sys->phys.param.m * obj->m / r12);
+      dBodyAddForce(obj->id, f12.x, f12.y, f12.z);
+    } else {
+      // TODO: Try to compress vector
     }
-    
-    dWorldStep(sys->world, stepsize);
-    
-    // handle children
-    for (size_t i = 0 ; i < sys->children.length ; i ++) {
-        ooOrbitStep(sys->children.elems[i], stepsize);
-    }
+  }
+  
+  dWorldStep(sys->world, stepSize);
+  for (size_t i ; i < sys->sats.length ; i ++) {
+    ooOrbitStep(sys->sats.elems[i], stepSize);
+  }
 }
 
 void
@@ -209,6 +155,6 @@ ooOrbitSetConstant(OOorbsys *sys, const char *key, float k)
     assert(key != NULL && "key is null");
     
     if (!strcmp(key, "G")) {
-        sys->k.G = k;
+        sys->phys.k.G = k;
     }
 }

@@ -41,6 +41,8 @@
 #include <openorbit/openorbit.h>
 #include <vmath/vmath.h>
 
+#include "geo/geo.h"
+
 static inline v4f_t
 ode2v4(const dReal *vec)
 {
@@ -54,16 +56,13 @@ ode2v3(const dReal *vec)
 }
 
 
-typedef struct __OOorbobj {
+typedef struct OOorbobj {
     char *name;
     dBodyID id;
     float m;
-    struct __OOorbobj *next;
 } OOorbobj;
 
-
-typedef struct _OOorbsys {
-    dBodyID id; // in parent system this system has an object id
+typedef struct OOorbsys {
     dWorldID world;
     char *name;
     
@@ -73,22 +72,34 @@ typedef struct _OOorbsys {
       float mass;
       float massInv;      
     } scale;
-
+    
     struct {
+      struct {
+        float m;
+      } param;
+      struct {
         float G; //!< Gravitational constant (6.67428e-11)
-    } k;
+      } k;
+    } phys;
+        
+    struct OOorbot *parent; // parent
     
-    float m; // sum of subsystem masses
+    OOellipse *orbit;
     
-    OOorbobj *obj;
-    
-    struct _OOorbsys *parent; // parent
-    
-    OOobjvector children;
+    OOobjvector sats;
+    OOobjvector objs;
 } OOorbsys;
 
-OOorbsys* ooOrbitNewSys(const char *name, float radius, float w0);
-OOorbobj* ooOrbitAddObj(OOorbsys *sys, const char *name, float radius, float w0, float m);
+
+OOorbsys* ooOrbitNewSys(const char *name, float m, float semiMaj, float semiMin);
+OOorbobj*
+ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
+              float x, float y, float z,
+              float vx, float vy, float vz,
+              float qx, float qy, float qz, float qw,
+              float rqx, float rqy, float rqz, float rqw);
+
+
 void ooOrbitAddChildSys(OOorbsys * restrict sys, OOorbsys * restrict child);
 
 void ooOrbitSetScale(OOorbsys *sys, float ms, float ds);
@@ -96,5 +107,6 @@ void ooOrbitSetConstant(OOorbsys *sys, const char *key, float k);
 
 void ooOrbitStep(OOorbsys *sys, float stepsize);
 void ooOrbitClear(OOorbsys *sys);
+
 
 #endif /* ! _ORBIT_H_ */
