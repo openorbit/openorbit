@@ -308,6 +308,7 @@ ooObjVecPush(OOobjvector *vec, OOobject *obj)
                                    vec->asize * sizeof(OOobject*) * 2);
         if (newVec == NULL) ooLogFatal("realloc of vector failed");
         vec->asize *= 2;
+        vec->elems = newVec;
     }
     vec->elems[vec->length ++] = obj;
 }

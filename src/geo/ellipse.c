@@ -53,6 +53,7 @@ ooVecArrayPushV(OOvecarray *vec, v4f_t obj)
                                 vec->asize * sizeof(v4f_t) * 2);
         if (newVec == NULL) ooLogFatal("realloc of vector failed");
         vec->asize *= 2;
+        vec->elems = newVec;
     }
     vec->elems[vec->length ++] = obj;
 }
@@ -66,6 +67,7 @@ ooVecArrayPushC(OOvecarray *vec, float x, float y, float z, float w)
                             vec->asize * sizeof(v4f_t) * 2);
     if (newVec == NULL) ooLogFatal("realloc of vector failed");
     vec->asize *= 2;
+    vec->elems = newVec;
   }
   vec->elems[vec->length ++] = obj;
 }
