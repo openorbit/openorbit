@@ -34,16 +34,17 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/time.h>
 
 #include "sim.h"
 #include "physics/dynamics.h"
-
+#include "physics/orbit.h"
 #include "rendering/planet.h"
 
 #include "log.h"
 // epoch = ???
 
-SIMstate gSIM_state = {0, 0.05, NULL, NULL, NULL};
+SIMstate gSIM_state = {0.0, 0, 0.05, NULL, NULL};
 
 #define OO_EVENT_QUEUE_INIT_LEN 100
 OOeventqueue*
@@ -104,14 +105,6 @@ ooSimSetOrbSys(OOorbsys *osys)
     gSIM_state.orbSys = osys;
 }
 
-void
-ooSimSetCam(OOcam *cam)
-{
-    gSIM_state.cam = cam;
-}
-
-#include "physics/orbit.h"
-#include <sys/time.h>
 void
 ooSimStep(float dt)
 {

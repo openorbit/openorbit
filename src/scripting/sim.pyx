@@ -9,7 +9,6 @@ cdef extern from "sim.h":
     
     ctypedef struct SIMstate:
         orbits.OOorbsys *orbSys
-        sg.OOcam *cam
         sg.OOscenegraph *sg
 
 def setSg(sg.Scenegraph sg):
@@ -17,6 +16,3 @@ def setSg(sg.Scenegraph sg):
     
 def setOrbSys(orbits.OrbitSys sys):
     ooSimSetOrbSys(sys.osys)
-
-def setCam(sg.Cam cam):
-    ooSimSetCam(cam.cam)

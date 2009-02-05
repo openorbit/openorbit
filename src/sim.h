@@ -64,18 +64,19 @@ OOeventqueue* ooSimNewEventQueue(void);
 int ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *data);
 int ooSimHandleNextEvent(OOeventqueue *q);
     
-typedef struct {
-    uint64_t timeStamp;
-    float stepSize;
-    OOorbsys *orbSys;
-    OOcam *cam;
-    OOscenegraph *sg;
+typedef struct {  
+  double currentTime; //!< Current time in earth days relative to epoch
+  uint64_t timeStamp; //!< Time stamp (ticking up one every step)
+  float stepSize;     //!< Step size for simulation in seconds
+  
+  OOorbsys *orbSys;   //!< Root orbit system, this will be the sun initially
+  //OOcam *cam;         //!< Current camera
+  OOscenegraph *sg;   //!< Scenegraph of the world
 } SIMstate;
 
 void ooSimSetSg(OOscenegraph *sg);
 
 void ooSimSetOrbSys(OOorbsys *osys);
-void ooSimSetCam(OOcam *cam);
 
 void ooSimStep(float dt);
 
