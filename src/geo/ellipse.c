@@ -210,3 +210,26 @@ ooGeoEllipseEcc(OOellipse *e)
   return sqrt(1.0-(e->semiMinor/e->semiMajor)*(e->semiMinor/e->semiMajor));
 }
 
+v4f_t
+ooGeoEllipseSegPoint(OOellipse *e, double t)
+{
+  double pos = fmod(t, (double)e->vec.length);
+  size_t i = (size_t) pos;
+
+  v4f_t a = e->vec.elems[(i + 1) % e->vec.length];  
+  v4f_t b = e->vec.elems[i % e->vec.length];
+  
+  double frac = pos - floor(pos);
+  
+  // TODO: Vectors should not use unions anymore
+  vector_t av, bv;
+  av.v = a;
+  bv.v = b;
+  
+  // Lineraly interpolate between point b and a
+  vector_t abdiff = v_sub(av, bv);
+  vector_t fv = v_s_mul(abdiff, (float)frac);
+  vector_t res = v_add(bv, fv);
+  
+  return res.v;
+}

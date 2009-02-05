@@ -74,7 +74,7 @@ double ooGeoEllipseArea(OOellipse *e);
 double ooGeoEllipseTrueAnomality(OOellipse *e, double fi);
 double ooGeoEllipseSegmentArea(OOellipse *e, double fi0, double fi1);
 double ooGeoEllipseEcc(OOellipse *e);
-
+v4f_t ooGeoEllipseSegPoint(OOellipse *e, double t);
 
 #endif /* end of include guard: ELLIPSE_H_1304815C */
 
