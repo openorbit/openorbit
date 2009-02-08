@@ -76,6 +76,7 @@ typedef struct OOorbsys {
     struct {
       struct {
         float m;
+        float period;
       } param;
       struct {
         float G; //!< Gravitational constant (6.67428e-11)
