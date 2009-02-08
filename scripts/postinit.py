@@ -211,6 +211,7 @@ def addStar(scene, parent, name, body):
     sim.setOrbSys(star)
     
     #scene.connectToOdeObj(star.getBody())
+    scene.connectToOrbSys(star)
     
     addSgObj(scene, rendOpts)
     
@@ -238,6 +239,7 @@ def addPlanet(scene, parent, name, body):
         for key in body["satellites"].keys():
             addBody(scene, planet, key, body["satellites"][key])
 
+    scene.connectToOrbSys(planet)
     #scene.connectToOdeObj(planet.getBody())
     addSgObj(scene, rendOpts)
     
@@ -259,6 +261,8 @@ def addMoon(scene, parent, name, body):
     if parent:
         parent.addChild(moon)
     #parent.addObj(name, radius, 0.0, 0.0)
+    #scene.connectToOrbSys(moon)
+
     addSgObj(scene, rendOpts)
     
 def addBody(scene, parent, name, body):
