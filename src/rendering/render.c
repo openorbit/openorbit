@@ -51,7 +51,6 @@
 #include "texture.h"
 #include "planet.h"
 
-static void draw_gl(void);
 static void init_gl(void);
 static void print_attributes(void);
 static void init_attributes(void);
@@ -76,29 +75,24 @@ init_renderer(void) {
     return true;
 }
 
-void
-render_scene(void) {
-    draw_gl();
-    SDL_GL_SwapBuffers();
-}
-
-
 static void
 init_gl(void)
 {
     int width, height;
+    float fovy, aspect;
     
     glMatrixMode(GL_PROJECTION);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glLoadIdentity();
-	gluPerspective(/*fovy*/45.0, /*aspect*/1.33 , /*near*/0.001, /*far*/100.0);
+    
+    if (ooConfGetFloat("video.gl.fovy", &fovy)) fovy = 45.0f;
+    if (ooConfGetFloat("video.gl.aspect", &aspect)) aspect = 1.33f;
+	gluPerspective(fovy, aspect, /*near*/0.001, /*far*/100.0);
     
     if (ooConfGetInt("video.width", &width)) width = 640;
     if (ooConfGetInt("video.height", &height)) height = 480;
     
     glViewport(0, 0, width, height);
-    
-//    ugly_load_and_init_of_test_texture();
 }
 
 
@@ -193,44 +187,3 @@ void enter_fullscreen()
     //                                        0, SDL_OPENGL|SDL_FULLSCREEN);
 }
 
-
-static void
-draw_gl(void)
-{
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    // first, lets draw the nightsky, z-buffer disabled
-    
-    glLoadIdentity();
-    
-    // the drawing is not very well structured at the moment
-    cam_move_global_camera();
-
-    glPushMatrix();
-
-    glEnable(GL_DEPTH_TEST);
-    planet_draw_all();
-    glPopMatrix();
-    
-    // axis, ugly, but this is a temporary hack
-    glBegin(GL_LINES);
-    {
-        // x
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(1.0f, 0.0f, 0.0f);
-        
-        // y
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 1.0f, 0.0f);
-        
-        // z
-        glColor3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 1.0f);        
-    }
-    glEnd();
-}
