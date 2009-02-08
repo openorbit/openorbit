@@ -39,44 +39,30 @@
 
 #include <openorbit/openorbit.h>
 #include "texture.h"
+#include "physics/orbit.h"
+#include "sim/simtime.h"
 
+  typedef struct OOdrawable OOdrawable;
+  typedef struct OOscene_ OOscene; 
+  typedef struct OOoverlay OOoverlay;
+  typedef struct OOscenegraph OOscenegraph;
+
+#include "camera.h"
+  
 //typedef void OOobject;
 typedef void (*OOdrawfunc)(OOobject*);
 
 
-typedef enum {
-    OOCam_Free,
-    OOCam_Fixed,
-    OOCam_Orbit
-} OOcamtype;
-
-typedef struct {
-    vector_t p;
-    quaternion_t q;
-} OOfreecam;
-
-typedef struct {
-    dBodyID body;
-    
-    vector_t r;
-    quaternion_t q;   
-} OOfixedcam;
-
-typedef struct {
-    dBodyID body;
-    
-    vector_t r;
-} OOorbitcam;
-
-
-typedef struct {
+struct OOdrawable {
+  vector_t p;
+  quaternion_t q;
+  float s;
+  
   OOobject *obj;
   OOdrawfunc draw;
-} OOdrawable;
+};
 
-OOdrawable* ooSgNewDrawable(OOobject *obj, OOdrawfunc df);
-
-typedef struct OOscene_ {
+struct OOscene_ {
     struct OOscene_ *parent;
     char *name;
 
@@ -90,31 +76,26 @@ typedef struct OOscene_ {
     
     OOobjvector scenes;
     OOobjvector objs;
-} OOscene;
+};
 
-typedef struct {
-    OOcamtype kind;
-    OOscene *scene;
-    OOobject *camData;
-} OOcam;
-
-
-typedef struct {
+struct OOoverlay {
   OOtexture *tex;
   float x, y;
   float w, h;
-} OOoverlay;
+};
 
-void ooSgDrawOverlay(OOoverlay *overlay);
-
-typedef struct {
+struct OOscenegraph {
   OOscene *root;
   OOcam *currentCam;
   OOobjvector cams;
 
   OOdrawable *sky;
   OOobjvector overlays;
-} OOscenegraph;
+};
+
+OOdrawable* ooSgNewDrawable(OOobject *obj, OOdrawfunc df);
+
+void ooSgDrawOverlay(OOoverlay *overlay);
 
 OOscenegraph* ooSgNewSceneGraph();
 void ooSgPaint(OOscenegraph *sg);
@@ -158,19 +139,8 @@ void ooSgSceneAddObj(OOscene *sc, OOobject *object);
 // Makes a scene synchronise with an ODE object
 void ooSgSceneAttachOdeObj(OOscene *sc, dBodyID body);
 
-OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
-                      float x, float y, float z, 
-                      float rx, float ry, float rz);
-                      
-OOcam* ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
-                       float dx, float dy, float dz, 
-                       float rx, float ry, float rz);
-
-OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
-                       float dx, float dy, float dz);
-
-void ooSgCamMove(OOcam *cam);
-
+// Makes a scene synchronise with an orbital system
+void ooSgSceneAttachOrbSys(OOscene *sc, OOorbsys *sys);
 
 typedef struct {
     matrix_t t;
@@ -206,6 +176,8 @@ typedef struct {
     GLUquadricObj *quadratic;
     GLfloat radius;
 } OOsphere;
+
+OOdrawable* ooSgNewSphere(float size);
 
 /* Allocators */
 //OOnode* ooSgNewMesh(OOtexture *tex);

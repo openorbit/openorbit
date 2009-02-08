@@ -39,72 +39,60 @@ extern "C" {
 
 #include <stdbool.h>
 #include <vmath/vmath.h>
+#include <ode/ode.h>
 
-typedef enum {
-    CAM_FREE,
-    CAM_ORBITING,
-    CAM_CHASE
-} camera_type_t;
+  typedef enum OOcamtype OOcamtype;
+  typedef struct OOfreecam OOfreecam;
+  typedef struct OOfixedcam OOfixedcam;
+  typedef struct OOorbitcam OOorbitcam;
+  typedef struct OOcam OOcam;
+  
+#include "scenegraph.h"
 
-typedef struct {
-    vector_t p;   // has its own position
-    quaternion_t rq;
-} free_cam_t;
+  enum OOcamtype {
+      OOCam_Free,
+      OOCam_Fixed,
+      OOCam_Orbit
+  };
 
+  struct OOfreecam {
+      vector_t p;
+      quaternion_t q;
+  };
 
-typedef struct {
-    camera_type_t type;
-    union {
-        struct {
-            vector_t p;   // has its own position
-            quaternion_t rq;
-        } free_cam;
-        
-        struct {
-            vector_t *p;   // position of center object
-            scalar_t d;      // distance between object and camera
-            angle_t ra;
-            angle_t dec;
-        } orbiting_cam;
-        
-        struct {
-            vector_t *p;  // pos of chased object
-            vector_t d;   // relative position to object
-        } chase_cam;
-    };
-} camera_t;
+  struct OOfixedcam {
+      dBodyID body;
 
-bool init_cam(void);
-    
-void cam_move_global_camera(void);
+      vector_t r;
+      quaternion_t q;   
+  };
 
-void cam_rotate(quaternion_t q);
+  struct OOorbitcam {
+      dBodyID body;
 
-/*! cam_set_free
-    \param p
-    \param q
- */
-void cam_set_free(vector_t p, quaternion_t q);
+      vector_t r;
+  };
 
-/*! cam_set_polar
-    \param tgt
-    \param len
-    \param ra
-    \param dec
- */
-void cam_set_polar(vector_t tgt, scalar_t len, scalar_t ra, scalar_t dec);
+  struct OOcam {
+      OOcamtype kind;
+      OOscene *scene;
+      OOobject *camData;
+  };
 
-/* Camera handling functions,  */
-void cam_move_forward(camera_t *cam, scalar_t distance);
-void cam_move_back(camera_t *cam, scalar_t distance);
-void cam_move_left(camera_t *cam, scalar_t distance);
-void cam_move_right(camera_t *cam, scalar_t distance);
-void cam_move_up(camera_t *cam, scalar_t distance);
-void cam_move_down(camera_t *cam, scalar_t distance);
-void cam_rotate_alpha(camera_t *cam, angle_t ang);
-void cam_rotate_beta(camera_t *cam, angle_t ang);
-void cam_rotate_gamma(camera_t *cam, angle_t ang);
+  void ooSgCamInit(void);
 
+  OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
+                        float x, float y, float z, 
+                        float rx, float ry, float rz);
+
+  OOcam* ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
+                         float dx, float dy, float dz, 
+                         float rx, float ry, float rz);
+
+  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
+                         float dx, float dy, float dz);
+
+  void ooSgCamMove(OOcam *cam);
 
 #ifdef __cplusplus
 }

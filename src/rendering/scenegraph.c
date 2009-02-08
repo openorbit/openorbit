@@ -39,11 +39,16 @@
 #include "sky.h"
 #include "log.h"
 #include <vmath/vmath.h>
+#include "geo/geo.h"
+#include "physics/orbit.h"
 
 OOdrawable*
 ooSgNewDrawable(OOobject *obj, OOdrawfunc df)
 {
   OOdrawable *drawable = malloc(sizeof(OOdrawable));
+  drawable->p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
+  drawable->q = q_rot(1.0f, 0.0f, 0.0f, 0.0f);
+  drawable->s = 1.0;
   drawable->draw = df;
   drawable->obj = obj;
   return drawable;
@@ -102,6 +107,30 @@ updateOde(OOscene *sc)
   
   sc->t = v_set(p[0], p[1], p[2], 1.0f);
   sc->q = v_set(r[1], r[2], r[3], r[0]);
+}
+
+
+void
+updateEllipse(OOscene *sc)
+{
+  OOorbsys *os = sc->data;
+  
+  float ts = ooTimeGetJD();
+  
+  v4f_t p = ooGeoEllipseSegPoint(os->orbit,
+                                 ts / os->phys.param.period * os->orbit->vec.length);
+  
+  sc->t.v = p;
+}
+
+void
+ooSgSceneAttachOrbSys(OOscene *sc, OOorbsys *sys)
+{
+  assert(sc != NULL);
+  assert(sys != NULL);
+  
+  sc->data = sys;
+  sc->preStepUpdate = (OOdrawfunc)updateEllipse;
 }
 
 void
@@ -182,6 +211,11 @@ ooSgSceneDraw(OOscene *sc)
     for (size_t i = 0 ; i < sc->objs.length ; i ++) {
       OOdrawable *obj = sc->objs.elems[i];
       glPushMatrix();
+      glTranslatef(obj->p.x, obj->p.y, obj->p.z);
+      matrix_t m;
+      q_m_convert(&m, obj->q);
+      glMultMatrixf((GLfloat*)&m);
+      glScalef(obj->s, obj->s, obj->s);
       obj->draw(obj->obj);
       glPopMatrix();
     }
@@ -339,92 +373,6 @@ ooObjVecSet(OOobjvector *vec, size_t i, OOobject *obj)
 }
 
 
-OOcam*
-ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
-               float x, float y, float z, float rx, float ry, float rz)
-{
-  assert(sg != NULL);
-  OOcam *cam = malloc(sizeof(OOcam));
-  cam->camData = malloc(sizeof(OOfreecam));
-  cam->kind = OOCam_Free;
-  
-  cam->scene = sc;
-  ((OOfreecam*)cam->camData)->p = v_set(x,y,z,1.0f);
-  ((OOfreecam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
-  
-  ooObjVecPush(&sg->cams, cam);
-  return cam;
-}
-
-OOcam*
-ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
-                float dx, float dy, float dz, float rx, float ry, float rz)
-{
-    OOcam *cam = malloc(sizeof(OOcam));
-    cam->camData = malloc(sizeof(OOfixedcam));
-    cam->kind = OOCam_Fixed;
-
-    cam->scene = sc;
-    ((OOfixedcam*)cam->camData)->body = body;
-    ((OOfixedcam*)cam->camData)->r = v_set(dx,dy,dz,1.0f);
-    ((OOfixedcam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
-
-    ooObjVecPush(&sg->cams, cam);
-    return cam;
-}
-
-OOcam*
-ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body, float dx, float dy, float dz)
-{
-    OOcam *cam = malloc(sizeof(OOcam));
-    cam->camData = malloc(sizeof(OOorbitcam));
-    cam->kind = OOCam_Orbit;
-
-    cam->scene = sc;
-    ((OOorbitcam*)cam->camData)->body = body;
-    ((OOorbitcam*)cam->camData)->r = v_set(dx,dy,dz,1.0f);
-
-    ooObjVecPush(&sg->cams, cam);
-    return cam;
-}
-
-void
-ooSgCamMove(OOcam *cam)
-{
-    assert(cam != NULL && "cam not set");
-    glPushMatrix();
-    
-    switch (cam->kind) {
-    case OOCam_Orbit:
-        {
-            const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
-            const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
-            gluLookAt(  ((OOorbitcam*)cam->camData)->r.x + pos[0],
-         	            ((OOorbitcam*)cam->camData)->r.y + pos[1],
-         	            ((OOorbitcam*)cam->camData)->r.x + pos[2],
-         	            pos[0], pos[1], pos[2], // center
-                        0.0, 1.0, 0.0); // up
-        }
-        break;
-    case OOCam_Fixed:
-        {
-            const dReal *pos = dBodyGetPosition(((OOfixedcam*)cam->camData)->body);
-            const dReal *rot = dBodyGetRotation(((OOfixedcam*)cam->camData)->body);
-            glTranslatef(((OOfixedcam*)cam->camData)->r.x + pos[0],
-                         ((OOfixedcam*)cam->camData)->r.y + pos[1],
-                         ((OOfixedcam*)cam->camData)->r.z + pos[2]);
-            
-        }
-        break;
-    case OOCam_Free:
-        glTranslatef(((OOfreecam*)cam->camData)->p.x,
-                     ((OOfreecam*)cam->camData)->p.y,
-                     ((OOfreecam*)cam->camData)->p.z);
-        break;
-    default:
-        assert(0 && "illegal case statement");
-    }
-}
 
 void
 ooSgCamPopMove(OOcam *cam)
@@ -440,70 +388,24 @@ ooSgDrawFuncGnd(OOobject*obj)
     
 }
 
+void
+ooSgDrawSphere(OOsphere *sp)
+{
+    glBindTexture(GL_TEXTURE_2D, sp->texId);    
+    gluSphere(sp->quadratic, sp->radius, 64, 64);
+    
+    glPopMatrix();
+}
+
+OOdrawable*
+ooSgNewSphere(float size)
+{
+  
+}
+
+
 #if 0
-OOnode*
-ooSgNewNode(OOobject *obj, OOdrawfunc df, OOdrawfunc postDf)
-{
-    OOnode *node = malloc(sizeof(OOnode));
-    if (node != NULL) {
-        node->obj = obj;
-        node->draw = (df == NULL) ? ooSgDrawFuncGnd : df;
-        node->postDraw = (postDf == NULL) ? ooSgDrawFuncGnd : postDf;
-        node->next = NULL;
-        node->children = NULL;
-    }
-    return node;
-}
 
-void
-ooSgAddChild(OOnode *parent, OOnode *child)
-{
-    if (parent->children == NULL) {
-        parent->children = child;
-    } else {
-        OOnode *node = parent->children;
-        while (node->next) {
-            node = node->next;
-        }
-        node->next = child;
-    }    
-}
-
-static void
-ooSgDraw2(OOnode *node, OOcam *cam)
-{
-    assert(node != NULL && "node null");
-    assert(cam != NULL && "cam null");
-    
-    while (node) {
-        // Check if camera transforms should be done
-//        if (node == cam->attachedScene) {
-//            ooSgCamMove(cam);
-//        }
-        
-        node->draw(node->obj);
-        if (node->children) ooSgDraw2(node->children, cam);
-        node->postDraw(node->obj);
-
-//        if (node == cam->attachedNode) {
-//            ooSgCamPopMove(cam);
-//        }
-
-        node = node->next;
-    }
-}
-
-void
-ooSgDraw(OOnode *node, OOcam *cam)
-{
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-	
-    ooSgDraw2(node, cam);
-}
 
 void
 ooSgDrawMesh(OOmesh *mesh)

@@ -1,5 +1,6 @@
 cimport texture
 cimport ode
+cimport orbits
 
 cdef extern from "rendering/scenegraph.h":
    ctypedef void OOobject
@@ -25,6 +26,7 @@ cdef extern from "rendering/scenegraph.h":
       OOdrawfunc draw
 
    void ooSgSceneAttachOdeObj(OOscene *sc, ode.dBodyID body)
+   void ooSgSceneAttachOrbSys(OOscene *sc, orbits.OOorbsys *sys)
 
    void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj)
    void ooSgSetCam(OOscenegraph *sg, OOcam *cam)

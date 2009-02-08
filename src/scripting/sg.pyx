@@ -1,5 +1,5 @@
 cimport sg, texture
-cimport ode
+cimport ode, orbits
 
 cdef extern from "rendering/sky.h":
    ctypedef struct OOstars
@@ -21,11 +21,13 @@ cdef class Scene:
     
     def connectToOdeObj(self, ode.OdeBody body):
         ooSgSceneAttachOdeObj(self.sc, body.body);
-
     
+    def connectToOrbSys(self, orbits.OrbitSys sys):
+        ooSgSceneAttachOrbSys(self.sc, sys.osys)
+     
     def addChild(self, Scene sc):
         ooSgSceneAddChild(self.sc, sc.sc)
-        
+    
     def addObject(self):
         pass
     def setTranslation(self, float x, float y, float z):

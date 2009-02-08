@@ -40,443 +40,187 @@
 #include "camera.h"
 
 /* Camera actions, registered as action handlers */
-void cam_move_forward_button_action(bool up, void *data);
-void cam_move_back_button_action(bool up, void *data);
-void cam_move_left_button_action(bool up, void *data);
-void cam_move_right_button_action(bool up, void *data);
-void cam_move_up_button_action(bool up, void *data);
-void cam_move_down_button_action(bool up, void *data);
-void cam_roll_left_button_action(bool up, void *data);
-void cam_roll_right_button_action(bool up, void *data);
-void cam_yaw_left_button_action(bool up, void *data);
-void cam_yaw_right_button_action(bool up, void *data);
-void cam_pitch_down_button_action(bool up, void *data);
-void cam_pitch_up_button_action(bool up, void *data);
-
-// TODO: Remove global camera
-camera_t *gCam = NULL;
-static scalar_t gDist = 0.1f;
-static angle_t gRot = 0.1f;
 
 
-bool
-init_cam(void)
+void ooSgCamFwd(bool up, void *data);
+void ooSgCamBack(bool up, void *data);
+void ooSgCamLeft(bool up, void *data);
+void ooSgCamRight(bool up, void *data);
+void ooSgCamUp(bool up, void *data);
+void ooSgCamDown(bool up, void *data);
+void ooSgCamRollLeft(bool up, void *data);
+void ooSgCamRollRight(bool up, void *data);
+void ooSgCamYawLeft(bool up, void *data);
+void ooSgCamYawRight(bool up, void *data);
+void ooSgCamPitchDown(bool up, void *data);
+void ooSgCamPitchUp(bool up, void *data);
+
+
+
+void
+ooSgCamInit(void)
 {
-    gCam = calloc(1, sizeof(camera_t));// TODO: Remove global camera
-    gCam->type = CAM_FREE;
-    gCam->free_cam.p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
-    gCam->free_cam.rq = q_rot(0.0f,0.0f,1.0f,0.0f);
-    
     // Register camera actions
-    ooIoRegCKeyHandler("cam-fwd", cam_move_forward_button_action);        
-    ooIoRegCKeyHandler("cam-back", cam_move_back_button_action);
-    ooIoRegCKeyHandler("cam-left", cam_move_left_button_action);
-    ooIoRegCKeyHandler("cam-right", cam_move_right_button_action);
-    ooIoRegCKeyHandler("cam-up", cam_move_up_button_action);
-    ooIoRegCKeyHandler("cam-down", cam_move_down_button_action);
-    ooIoRegCKeyHandler("cam-pitch-up", cam_pitch_up_button_action);
-    ooIoRegCKeyHandler("cam-pitch-down", cam_pitch_down_button_action);
-    ooIoRegCKeyHandler("cam-yaw-left", cam_yaw_left_button_action);
-    ooIoRegCKeyHandler("cam-yaw-right", cam_yaw_right_button_action);
-    ooIoRegCKeyHandler("cam-roll-left", cam_roll_left_button_action);
-    ooIoRegCKeyHandler("cam-roll-right", cam_roll_right_button_action);
-
-
-    return true;
+    ooIoRegCKeyHandler("cam-fwd", ooSgCamFwd);        
+    ooIoRegCKeyHandler("cam-back", ooSgCamBack);
+    ooIoRegCKeyHandler("cam-left", ooSgCamLeft);
+    ooIoRegCKeyHandler("cam-right", ooSgCamRight);
+    ooIoRegCKeyHandler("cam-up", ooSgCamUp);
+    ooIoRegCKeyHandler("cam-down", ooSgCamDown);
+    ooIoRegCKeyHandler("cam-roll-left", ooSgCamRollLeft);
+    ooIoRegCKeyHandler("cam-roll-right", ooSgCamRollRight);
+    ooIoRegCKeyHandler("cam-yaw-left", ooSgCamYawLeft);
+    ooIoRegCKeyHandler("cam-yaw-right", ooSgCamYawRight);
+    ooIoRegCKeyHandler("cam-pitch-down", ooSgCamPitchDown);
+    ooIoRegCKeyHandler("cam-pitch-up", ooSgCamPitchUp);
 }
+    
 
-void
-cam_rotate(quaternion_t q)
+
+OOcam*
+ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
+               float x, float y, float z, float rx, float ry, float rz)
 {
-    matrix_t m;
-    vector_t up, rup, dir, rdir;
-    up = v_set(0.0f, 1.0f, 0.0f, 0.0f);
-    dir = v_set(0.0f, 0.0f, -1.0f, 0.0f);
-    
-    q_m_convert(&m, q);
-    rup = m_v_mul(&m, up);
-    rdir = m_v_mul(&m, dir);
-    
-    gluLookAt(0.0, 0.0, 0.0, rdir.x, rdir.y, rdir.z,
-              rup.x, rup.y, rup.z);
+  assert(sg != NULL);
+  OOcam *cam = malloc(sizeof(OOcam));
+  cam->camData = malloc(sizeof(OOfreecam));
+  cam->kind = OOCam_Free;
+  
+  cam->scene = sc;
+  ((OOfreecam*)cam->camData)->p = v_set(x,y,z,1.0f);
+  ((OOfreecam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
+  
+  ooObjVecPush(&sg->cams, cam);
+  return cam;
 }
 
-void
-cam_set_free(vector_t p, quaternion_t q)
+OOcam*
+ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
+                float dx, float dy, float dz, float rx, float ry, float rz)
 {
-    matrix_t m;
-    vector_t up, rup, dir, rdir;
-    up = v_set(0.0f, 1.0f, 0.0f, 0.0f);
-    dir = v_set(0.0f, 0.0f, -1.0f, 0.0f);
-    
-    q_m_convert(&m, q);
-    rup = m_v_mul(&m, up);
-    rdir = m_v_mul(&m, dir);
+    OOcam *cam = malloc(sizeof(OOcam));
+    cam->camData = malloc(sizeof(OOfixedcam));
+    cam->kind = OOCam_Fixed;
 
-    gluLookAt(p.x, p.y, p.z,
-              p.x + rdir.x, p.y + rdir.y, p.z + rdir.z,
-              rup.x, rup.y, rup.z);
+    cam->scene = sc;
+    ((OOfixedcam*)cam->camData)->body = body;
+    ((OOfixedcam*)cam->camData)->r = v_set(dx,dy,dz,1.0f);
+    ((OOfixedcam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
+
+    ooObjVecPush(&sg->cams, cam);
+    return cam;
 }
 
-void
-cam_set_polar(vector_t tgt, scalar_t len, scalar_t ra, scalar_t dec)
+OOcam*
+ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body, float dx, float dy, float dz)
 {
-    matrix_t m;
-    vector_t cam_pos, rot_cam_pos, up, rot_up, right, rot_right;
-    quaternion_t q0, q1, qr;
-    
-    cam_pos = v_set(0.0f, 0.0f, 1.0f, 0.0f);
-    up = v_set(0.0f, 1.0f, 0.0f, 0.0f);
-    right = v_set(1.0f, 0.0f, 0.0f, 1.0f);
+    OOcam *cam = malloc(sizeof(OOcam));
+    cam->camData = malloc(sizeof(OOorbitcam));
+    cam->kind = OOCam_Orbit;
 
-    q0 = q_rot(0.0f, 1.0f, 0.0f, ra);
-    q_m_convert(&m, q0);
-    rot_right = m_v_mul(&m, right);
-    q1 = q_rotv(rot_right, dec);
-    
-    qr = q_mul(q0, q1);
-    q_m_convert(&m, qr);
-    
-    rot_cam_pos = m_v_mul(&m, cam_pos);
-    rot_up = m_v_mul(&m, up);
-    
-    rot_cam_pos = v_s_mul(rot_cam_pos, len);
-    
-    gluLookAt(tgt.x, tgt.y, tgt.z,
-              tgt.x + rot_cam_pos.x,
-              tgt.y + rot_cam_pos.y,
-              tgt.z + rot_cam_pos.z,
-              rot_up.x, rot_up.y, rot_up.z);
+    cam->scene = sc;
+    ((OOorbitcam*)cam->camData)->body = body;
+    ((OOorbitcam*)cam->camData)->r = v_set(dx,dy,dz,1.0f);
+
+    ooObjVecPush(&sg->cams, cam);
+    return cam;
 }
 
-
 void
-cam_set_view(camera_t *cam)
-{    
-    switch (cam->type) {
-        case CAM_FREE:
-            cam_set_free(cam->free_cam.p, cam->free_cam.rq);
-            break;
-        case CAM_CHASE:
-            break;
-        case CAM_ORBITING:
-            break;
-        default:
-            break;
-    }
-}
-void
-cam_move_global_camera(void)
+ooSgCamMove(OOcam *cam)
 {
-    cam_set_view(gCam);
+    assert(cam != NULL && "cam not set");
+    glPushMatrix();
     
-    ooLogInfo("%vf\n", gCam->free_cam.rq);
-}
-
-/* Camera handling functions,  */
-void
-cam_move_forward(camera_t *cam, scalar_t distance)
-{
-    vector_t v, vb;
-    matrix_t rm;
-    vb = v_set(0.0, 0.0, 1.0, 0.0);
-    
-    switch (cam->type) {
-    case CAM_FREE:
-        q_m_convert(&rm, cam->free_cam.rq);
-        v = m_v_mul(&rm, vb);
-        
-        vb = v_s_mul(v, distance);
-        cam->free_cam.p = v_sub(cam->free_cam.p, vb);
+    switch (cam->kind) {
+    case OOCam_Orbit:
+        {
+            const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
+            const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
+            gluLookAt(  ((OOorbitcam*)cam->camData)->r.x + pos[0],
+         	            ((OOorbitcam*)cam->camData)->r.y + pos[1],
+         	            ((OOorbitcam*)cam->camData)->r.x + pos[2],
+         	            pos[0], pos[1], pos[2], // center
+                        0.0, 1.0, 0.0); // up
+        }
         break;
-    case CAM_CHASE:
+    case OOCam_Fixed:
+        {
+            const dReal *pos = dBodyGetPosition(((OOfixedcam*)cam->camData)->body);
+            const dReal *rot = dBodyGetRotation(((OOfixedcam*)cam->camData)->body);
+            glTranslatef(((OOfixedcam*)cam->camData)->r.x + pos[0],
+                         ((OOfixedcam*)cam->camData)->r.y + pos[1],
+                         ((OOfixedcam*)cam->camData)->r.z + pos[2]);
+            
+        }
         break;
-    case CAM_ORBITING:
+    case OOCam_Free:
+        glTranslatef(((OOfreecam*)cam->camData)->p.x,
+                     ((OOfreecam*)cam->camData)->p.y,
+                     ((OOfreecam*)cam->camData)->p.z);
         break;
     default:
-        break;
+        assert(0 && "illegal case statement");
     }
 }
 
-void
-cam_move_back(camera_t *cam, scalar_t distance)
-{
-    vector_t v, vb;
-    matrix_t rm;
-    vb = v_set(0.0, 0.0, 1.0, 0.0);
-    
-    switch (cam->type) {
-    case CAM_FREE:
-        q_m_convert(&rm, cam->free_cam.rq);
-        v = m_v_mul(&rm, vb);
-        
-        vb = v_s_mul(v, distance);
-        cam->free_cam.p = v_add(cam->free_cam.p, vb);
-        break;
-    case CAM_CHASE:
-        break;
-    case CAM_ORBITING:
-        break;
-    default:
-        break;
-    }
-}
 
-void
-cam_move_left(camera_t *cam, scalar_t distance)
-{
-    vector_t v, vr;
-    matrix_t rm;
-    vr = v_set(1.0, 0.0, 0.0, 0.0);
 
-    switch (cam->type) {
-    case CAM_FREE:
-        q_m_convert(&rm, cam->free_cam.rq);
-        v = m_v_mul(&rm, vr);
-        
-        vr = v_s_mul(v, distance);
-        cam->free_cam.p = v_sub(cam->free_cam.p, vr);
-        break;
-    case CAM_CHASE:
-        break;
-    case CAM_ORBITING:
-        break;
-    default:
-        break;
-    }
-}
-
-void
-cam_move_right(camera_t *cam, scalar_t distance)
-{
-    vector_t v, vr;
-    matrix_t rm;
-    vr = v_set(1.0, 0.0, 0.0, 0.0);
-    
-    switch (cam->type) {
-    case CAM_FREE:
-        q_m_convert(&rm, cam->free_cam.rq);
-        v = m_v_mul(&rm, vr);
-        
-        vr = v_s_mul(v, distance);
-        cam->free_cam.p = v_add(cam->free_cam.p, vr);
-        break;
-    case CAM_CHASE:
-        break;
-    case CAM_ORBITING:
-        break;
-    default:
-        break;
-    }
-}
-
-void
-cam_move_up(camera_t *cam, scalar_t distance)
-{
-    vector_t v, vup;
-    matrix_t rm;
-    vup = v_set(0.0, 1.0, 0.0, 0.0);
-
-    switch (cam->type) {
-        case CAM_FREE:
-            q_m_convert(&rm, cam->free_cam.rq);
-            v = m_v_mul(&rm, vup);
-            vup = v_s_mul(v, distance);
-            cam->free_cam.p = v_add(cam->free_cam.p, vup);
-            break;
-        case CAM_CHASE:
-            break;
-        case CAM_ORBITING:
-            break;
-        default:
-            break;
-    }
-}
-
-void
-cam_move_down(camera_t *cam, scalar_t distance)
-{
-    vector_t v, vup;
-    matrix_t rm;
-    vup = v_set(0.0, 1.0, 0.0, 0.0);
-    switch (cam->type) {
-        case CAM_FREE:
-            q_m_convert(&rm, cam->free_cam.rq);
-            v = m_v_mul(&rm, vup);
-            
-            vup = v_s_mul(v, distance);
-            cam->free_cam.p = v_sub(cam->free_cam.p, vup);
-            break;
-        case CAM_CHASE:
-            break;
-        case CAM_ORBITING:
-            break;
-        default:
-            break;
-    }    
-}
-
-// pitch
-void
-cam_rotate_alpha(camera_t *cam, angle_t ang)
-{
-    quaternion_t rot, rq;
-    matrix_t mrot;
-    vector_t side, rotside;
-    
-    side = v_set(1.0f, 0.0f, 0.0f, 1.0f);
-    
-    
-    switch (cam->type) {
-        case CAM_FREE:
-            q_m_convert(&mrot, cam->free_cam.rq);
-            rotside = m_v_mul(&mrot, side);
-
-            rot = q_rotv(rotside, ang);
-            rq = cam->free_cam.rq;
-            
-            cam->free_cam.rq = q_mul(rq, rot);
-            cam->free_cam.rq = q_normalise(cam->free_cam.rq);
-            
-            break;
-        case CAM_CHASE:
-            break;
-        case CAM_ORBITING:
-            break;
-        default:
-            break;
-    }    
-}
-
-// yaw
-void
-cam_rotate_beta(camera_t *cam, angle_t ang)
-{
-    quaternion_t rot, rq;
-    matrix_t mrot;
-    vector_t up, rotup;
-    
-    up = v_set(0.0f, 1.0f, 0.0f, 1.0f);
-    
-    switch (cam->type) {
-        case CAM_FREE:            
-            q_m_convert(&mrot, cam->free_cam.rq);
-            rotup = m_v_mul(&mrot, up);
-
-            rot = q_rotv(rotup, ang);
-            rq  = cam->free_cam.rq;
-        
-            cam->free_cam.rq = q_mul(rq, rot);
-            cam->free_cam.rq = q_normalise(cam->free_cam.rq);
-            
-            break;
-        case CAM_CHASE:
-            break;
-        case CAM_ORBITING:
-            break;
-        default:
-            break;
-    }
-    
-}
-
-// roll
-void
-cam_rotate_gamma(camera_t *cam, angle_t ang)
-{
-    quaternion_t rot, rq;
-    vector_t fwd, rotfwd;
-    matrix_t mrot;
-    
-    fwd = v_set(0.0f, 0.0f, -1.0f, 1.0f);
-
-    switch (cam->type) {
-        case CAM_FREE:
-            q_m_convert(&mrot, cam->free_cam.rq);
-            rotfwd = m_v_mul(&mrot, fwd);
-
-            rot = q_rotv(rotfwd, ang);
-            rq = cam->free_cam.rq;
-        
-            cam->free_cam.rq = q_mul(rq, rot);
-            cam->free_cam.rq = q_normalise(cam->free_cam.rq);
-            
-            break;
-        case CAM_CHASE:
-            break;
-        case CAM_ORBITING:
-            break;
-        default:
-            break;
-    }        
-}
 
 #include "sim.h"
 extern SIMstate gSIM_state;
 /* Camera actions, registered as action handlers */
 void
-cam_move_forward_button_action(bool up, void *data)
+ooSgCamFwd(bool up, void *data)
 {
-    cam_move_forward(gCam, gDist);
 }
 
 void
-cam_move_back_button_action(bool up, void *data)
+ooSgCamBack(bool up, void *data)
 {
-    cam_move_back(gCam, gDist);    
 }
 void
-cam_move_left_button_action(bool up, void *data)
+ooSgCamLeft(bool up, void *data)
 {
-    cam_move_left(gCam, gDist);
 }
 void
-cam_move_right_button_action(bool up, void *data)
+ooSgCamRight(bool up, void *data)
 {
-    cam_move_right(gCam, gDist);
 }
 void
-cam_move_up_button_action(bool up, void *data)
+ooSgCamUp(bool up, void *data)
 {
-    cam_move_up(gCam, gDist);
 }
 void
-cam_move_down_button_action(bool up, void *data)
+ooSgCamDown(bool up, void *data)
 {
-    cam_move_down(gCam, gDist);
 }
 void
-cam_roll_left_button_action(bool up, void *data)
+ooSgCamRollLeft(bool up, void *data)
 {
-    cam_rotate_gamma(gCam, -gRot);
 }
 void
-cam_roll_right_button_action(bool up, void *data)
+ooSgCamRollRight(bool up, void *data)
 {
-    cam_rotate_gamma(gCam, gRot);    
 }
 
 void
-cam_yaw_left_button_action(bool up, void *data)
+ooSgCamYawLeft(bool up, void *data)
 {
-    cam_rotate_beta(gCam, gRot);
 }
 
 void
-cam_yaw_right_button_action(bool up, void *data)
+ooSgCamYawRight(bool up, void *data)
 {
-    cam_rotate_beta(gCam, -gRot);
 }
 
 void
-cam_pitch_down_button_action(bool up, void *data)
+ooSgCamPitchDown(bool up, void *data)
 {
-    cam_rotate_alpha(gCam, -gRot);
 }
 
 
 void
-cam_pitch_up_button_action(bool up, void *data)
+ooSgCamPitchUp(bool up, void *data)
 {
-    cam_rotate_alpha(gCam, gRot);
 }

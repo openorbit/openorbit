@@ -186,7 +186,7 @@ main(int argc, char*argv[])
     // Setup IO-tables
     ooIoInitSdlStringMap();
     
-    init_cam();
+    //init_cam();
 
     ooPluginInit();
     
