@@ -24,10 +24,11 @@ add_subdirectory(parsers)
 aux_source_directory(rendering rendering_src)
 aux_source_directory(vessel vessel_src)
 aux_source_directory(geo geo_src)
+aux_source_directory(sim sim_src)
 
 set(openorbit_SRC
 	main.c sim.c error.c settings.c io-manager.c plugin-handler.c log.c
-	${rendering_src} ${vessel_src} ${geo_src})
+	${rendering_src} ${vessel_src} ${geo_src} ${sim_src})
 
 set(openorbit_FILES
 	sim.h error.h io-manager.h settings.h plugin-handler.h

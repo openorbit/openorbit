@@ -109,17 +109,13 @@ void
 ooSimStep(float dt)
 {
     gSIM_state.timeStamp ++;
-    // temporary to have something to look at...
-    //for (int i = 0 ; i < MAX_PLANETS ; i ++) {
-    //    planet_rot_orig(&gPlanets[i], dt*0.1);
-    //    planet_rot_ax(&gPlanets[i], dt*0.5);
-    //}
+    
+    gSIM_state.currentTime = (float)gSIM_state.timeStamp * dt / (24.0 * 3600.0);
     
     struct timeval start;
     struct timeval end;
     gettimeofday(&start, NULL);
     
-//    extern OOorbsys *gOrb_root_system;
     ooOrbitClear(gSIM_state.orbSys);
     ooOrbitStep(gSIM_state.orbSys, dt);
     
@@ -127,8 +123,7 @@ ooSimStep(float dt)
     
     ooLogInfo("simstep time: %lu", ((end.tv_sec*1000000 + end.tv_usec) -
                                     (start.tv_sec*1000000 + start.tv_usec)));
-    // compute physics step
-//    ph_step(gSIM_state.world, dt);
+
     
     // do system simulation
     // sys_step(gSIM_state->systems, dt);
