@@ -141,8 +141,10 @@ OOellipse* ooGeoEllipseAreaSeg(size_t segs, float semiMajor, float semiMinor)
     }
     //segArea = segmentArea(prevAngle, newAngle, semimajor, ecc);
 
+    // Insert vec in array, note that center is in foci
     ooVecArrayPushC(&e->vec,
-                    semiMajor * cos(newAngle), semiMinor * sin(newAngle),
+                    semiMajor * cos(newAngle) - e->ecc * semiMajor,
+                    semiMinor * sin(newAngle),
                     0.0f, 0.0f);
 
 
