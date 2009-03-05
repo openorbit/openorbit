@@ -42,3 +42,16 @@ ooTimeGetJD(void)
   
   return gSIM_state.currentTime;
 }
+
+
+time_t
+ooTimeGetEpoch(void)
+{
+  
+}
+
+void
+ooTimeSetEpoch(time_t epoch)
+{
+  
+}

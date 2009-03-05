@@ -35,5 +35,8 @@
 
 float ooTimeGetJD(void);
 
+time_t ooTimeGetEpoch(void);
+void ooTimeSetEpoch(time_t epoch);
+
 #endif /* end of include guard: SIMTIME_H_STPF70AM */
  
