@@ -187,6 +187,7 @@ PythonWrapperContext::genEnums()
   }
 }
 
+void
 PythonWrapperContext::genInit()
 {
   // TODO: Fix module name, we might whant several headers in the same module, what should
