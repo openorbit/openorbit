@@ -92,6 +92,8 @@ if (HAVE_ALTIVEC)
 endif (HAVE_ALTIVEC)
 
 
+# Build tools first
+add_subdirectory(tools)
 
 include_directories(include)
 add_subdirectory(rsrc)
