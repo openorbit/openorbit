@@ -9,7 +9,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 foreach (file ${pyrex_files})
 	list(APPEND pyrex_c_files ${CMAKE_CURRENT_BINARY_DIR}/${file}.c)
 	list(APPEND pyrex_pyx_files ${file}.pyx)
-    use_pyrex(${file})
+  use_pyrex(${file})
 endforeach(file)
 
 add_cmake_list()
