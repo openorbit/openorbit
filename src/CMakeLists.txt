@@ -99,9 +99,6 @@ target_link_libraries(openorbit
                       ${ODE_LIB}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${GLUT_LIBRARIES})
 
-
-
-
 install(TARGETS openorbit
         RUNTIME DESTINATION bin
         RESOURCE DESTINATION share/openorbit/
