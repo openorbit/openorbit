@@ -94,6 +94,7 @@ endif (HAVE_ALTIVEC)
 
 # Build tools first
 add_subdirectory(tools)
+include(cmake/Autowrap.cmake)
 
 include_directories(include)
 add_subdirectory(rsrc)
