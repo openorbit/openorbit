@@ -83,16 +83,16 @@ main(int argc, char **argv)
     std::cerr << "error: no input files specified\n";
     exit(EX_USAGE);
   }
-  
-  PrepCtxt prepCtxt;
-  // Add header search directories
-  clang::InitHeaderSearch init(prepCtxt.headers);
-  init.AddDefaultSystemIncludePaths(prepCtxt.opts);
-  init.Realize();
   // TODO: Support multiple files
   for (llvm::cl::list<std::string>::iterator i = inputFilenames.begin();
        i != inputFilenames.end() ; i ++)
-  {
+  {    
+    PrepCtxt prepCtxt;
+    // Add header search directories
+    clang::InitHeaderSearch init(prepCtxt.headers);
+    init.AddDefaultSystemIncludePaths(prepCtxt.opts);
+    init.Realize();
+    
     const clang::FileEntry* file = prepCtxt.fm.getFile(*i);
     clang::ASTConsumer *consumer = new PythonConsumer(*i, modName);
 
@@ -103,6 +103,8 @@ main(int argc, char **argv)
     prepCtxt.sm.createMainFileID(file, clang::SourceLocation());
     
     ParseAST(prepCtxt.prep, consumer);  // calls pp.EnterMainSourceFile() for us
+    
+    delete consumer;
   }
   
   return 0;

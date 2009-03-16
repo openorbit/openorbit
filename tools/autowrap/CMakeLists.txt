@@ -35,3 +35,18 @@ include_directories(${LLVM_INC} ${CLANG_INC})
 set(AUTOWRAP_SRC autowrap.cc scriptlang.cc)
 add_executable(autowrap ${AUTOWRAP_SRC})
 target_link_libraries(autowrap ${LLVM_LIBS} ${CLANG_LIBS})
+
+install(TARGETS autowrap
+        RUNTIME DESTINATION bin)
+
+
+
+MACRO(AUTOWRAP file)
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/aw_${file}
+                     COMMAND autowrap
+                             ${CMAKE_CURRENT_SOURCE_DIR}/${file}
+                             -o ${CMAKE_CURRENT_BINARY_DIR}/aw_${file}
+                     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${file}
+                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	)
+ENDMACRO(AUTOWRAP file)

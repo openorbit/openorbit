@@ -1,8 +1,11 @@
 #include <iostream>
+#include <set>
 
 #include <clang/Basic/SourceManager.h>
 #include <clang/AST/AstConsumer.h>
 #include <clang/AST/TranslationUnit.h>
+#include <clang/AST/Decl.h>
+#include <clang/AST/Type.h>
 
 #include "scriptlang.hh"
 using namespace llvm;
@@ -210,6 +213,7 @@ PythonConsumer::HandleTranslationUnit(TranslationUnit& TU) {
   PythonWrapperContext wrapCtxt(fileName, moduleName);
   wrapCtxt.genHeader();
   
+  std::set<RecordType*> recSet;
   for (TranslationUnit::iterator i = TU.begin(); i != TU.end(); i ++) {
     if (strcmp(sm.getBufferName(i->getLocation()), fileName.c_str())) {
       continue; // skip any treatment of other files, we only wrap the given file
@@ -217,23 +221,68 @@ PythonConsumer::HandleTranslationUnit(TranslationUnit& TU) {
     
     if (RecordDecl *rec = dyn_cast<RecordDecl>(*i)) {
       
-      GenWrappedPtrType(rec->getNameAsString());
-      GenWrappedStructType(rec->getNameAsString());
+      //GenWrappedPtrType(rec->getNameAsString());
+      //GenWrappedStructType(rec->getNameAsString());
       
-      for (RecordDecl::field_iterator i = rec->field_begin(); i != rec->field_end() ; i ++) {
-        GenGetSetPair(rec->getNameAsString(), i->getNameAsString());
-      }
+      //for (RecordDecl::field_iterator i = rec->field_begin(); i != rec->field_end() ; i ++) {
+      //  GenGetSetPair(rec->getNameAsString(), i->getNameAsString());
+      //}
       
-      GenGetSetterArray(rec->getNameAsString(), rec->field_begin(), rec->field_end());
+      //GenGetSetterArray(rec->getNameAsString(), rec->field_begin(), rec->field_end());
       
       //GenPyTypeObj(std::string("openorbit"), rec->getNameAsString());
-
+      RecordType *typ = cast<RecordType>(TU.getContext().getTypeDeclType(rec).getTypePtr());
+      recSet.insert(typ);
     } else if (TypedefDecl *tdef = dyn_cast<TypedefDecl>(*i)) {
       std::cout << "typedef found " << tdef->getNameAsString() << "\n";
     } else if (FunctionDecl *func = dyn_cast<FunctionDecl>(*i)) {
+      bool firstParamWasRecordPtr = false;
       // If the function has the first parameter being a pointer to a wrapped type
       // structure, then this function will be inserted into that types class
       std::cout << "func found " << func->getNameAsString() << "\n";
+      // We have at least one param, check the type (i.e. whether it is a pointer to a
+      // known wrapped type, if so, we will add this to the list of known member functions
+      // of the wrapper class), at the moment this is automatic
+      if (func->getNumParams() >= 1) {
+        ParmVarDecl *param = func->getParamDecl(0);
+        std::cout << "\tfirst param " << param->getOriginalType().getAsString() << "\n";
+      
+        if (param->getOriginalType()->isPointerType()) {
+          QualType qualRecTyp = cast<PointerType>(param->getOriginalType())->getPointeeType();
+          
+          if (qualRecTyp->isRecordType()) {
+            firstParamWasRecordPtr = true;
+
+
+            RecordType *recTyp = cast<RecordType>(qualRecTyp.getTypePtr());
+            // This is a record pointer passed as first parameter, we will now
+            // add this as a member function of the python class representing
+            if (recSet.find(recTyp) != recSet.end()) {
+              std::cout << "whohooo...\n";
+            }
+          }
+//          if (recSet.find(recTyp) != recSet.end()) {
+//            std::cout << "\tdefined in this module as struct\n";
+//          }
+        }
+      }
+      
+      if (! firstParamWasRecordPtr) {
+        QualType resultTyp = func->getResultType();
+        if (resultTyp->isPointerType()) {
+          QualType qualRecResTyp = cast<PointerType>(resultTyp)->getPointeeType();
+          if (qualRecResTyp->isRecordType()) {
+            // The result of the function is a pointer to a record we will allow 
+            std::cout << "\tthe result is a record pointer\n";
+          }
+        }
+      }
+    } else if (EnumDecl *endef = dyn_cast<EnumDecl>(*i)) {
+      std::cout << "enum decl\n";    
+      for (EnumDecl::enumerator_iterator i = endef->enumerator_begin();
+           i != endef->enumerator_end(); i ++) {
+          std::cout << "enum " << i->getNameAsString() << " " << i->getInitVal().toString(10) << "\n";
+      }
     } else {
       std::cout << "some other decl\n";
     }
