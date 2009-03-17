@@ -148,12 +148,12 @@ ooConfSetFloat(const char *key, float val)
             free(confval->u.str);
         }
         confval->kind = CONF_float;
-        confval->u.i = val;
+        confval->u.f = val;
     } else {
         confval = malloc(sizeof(conf_val_t));
         if (confval) {
             confval->kind = CONF_float;
-            confval->u.i = val;
+            confval->u.f = val;
             hashtable_insert(g_config, key, confval);
         } else {
             return -1;
