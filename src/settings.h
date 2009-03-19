@@ -36,7 +36,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 #include <stdbool.h>
 
 /*! The settings structure stores global information on the game such as video
@@ -50,7 +50,7 @@ extern "C" {
  * 
  *  NOTE: In the Python API, this system is called config.
  */
-    
+
 void ooConfInit(void);
 
 int ooConfSetBool(const char *key, bool val);
@@ -69,10 +69,9 @@ int ooConfGetFloat(const char *key, float *val);
 int ooConfSetStr(const char *key, char *val);
 char* ooConfGetStr(const char *key);
 
-    
-    
+
 #ifdef __cplusplus
 }
 #endif
-    
+
 #endif /* ! __SETTINGS_H__ */
