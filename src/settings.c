@@ -69,6 +69,25 @@ ooConfInit(void)
     assert(g_config != NULL);
 }
 
+// Entry point for reading options from file, at the moment this is handled by
+// reading an .ini file in the startup script, I would prefer in the long run that
+// this was moved into a simple file parser reading some c-like configuration
+// files.
+// E.g.:
+// enum loglev {trace = 0, info = 1, warn = 2, err = 3, fatal = 4};
+// config default {
+//    log.level = trace;
+//    log.file = "stderr";
+//    video.fullscreen = true;
+//    video.gl.fovy = 45.0;
+// }
+void
+ooConfParse(const char *file)
+{
+  // TODO: Hook this up with yacc (yyparse, but we want multiple parsers
+  // embedded, so yyprefix must be changed)
+}
+
 int
 ooConfSetInt(const char *key, int val)
 {

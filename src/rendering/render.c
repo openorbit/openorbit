@@ -87,7 +87,8 @@ init_gl(void)
     
     if (ooConfGetFloat("video.gl.fovy", &fovy)) fovy = 45.0f;
     if (ooConfGetFloat("video.gl.aspect", &aspect)) aspect = 1.33f;
-	gluPerspective(fovy, aspect, /*near*/0.001, /*far*/100.0);
+    
+    gluPerspective(fovy, aspect, /*near*/0.001, /*far*/100.0);
     
     if (ooConfGetInt("video.width", &width)) width = 640;
     if (ooConfGetInt("video.height", &height)) height = 480;
