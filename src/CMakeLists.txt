@@ -1,6 +1,7 @@
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${ODE_INC})
+include_directories(${SDLTTF_INCLUDE_DIR})
 
 # Set proper shared lib extension
 set(so_ext "\".so\"")
@@ -20,6 +21,7 @@ add_subdirectory(vmath)
 add_subdirectory(physics)
 add_subdirectory(scripting)
 add_subdirectory(parsers)
+add_subdirectory(plugins)
 
 aux_source_directory(rendering rendering_src)
 aux_source_directory(vessel vessel_src)
@@ -75,9 +77,12 @@ set_source_files_properties(${ORBIT_SCRIPTS}
                             MACOSX_PACKAGE_LOCATION Resources/script/)
 
 set_source_files_properties(${ORBIT_DEP_YAML}
-							PROPERTIES
-							MACOSX_PACKAGE_LOCATION Resources/python/yaml)
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/python/yaml)
 
+set_source_files_properties(${ORBIT_PLUGINS}
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/plugins/)
 
 
 
@@ -87,7 +92,8 @@ add_executable(openorbit MACOSX_BUNDLE
                ${ORBIT_RES_TEX}
                ${ORBIT_RES_DATA}
                ${ORBIT_SCRIPTS}
-			   ${ORBIT_DEP_YAML})
+               ${ORBIT_DEP_YAML}
+			         ${ORBIT_PLUGINS})
 
 set_target_properties(openorbit
                       PROPERTIES
@@ -97,7 +103,7 @@ set_target_properties(openorbit
 target_link_libraries(openorbit
                       math scripting parsers dl gencds ph
                       ${ODE_LIB}
-                      ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${GLUT_LIBRARIES})
+                      ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${SDLTTF_LIBRARY} ${GLUT_LIBRARIES})
 
 install(TARGETS openorbit
         RUNTIME DESTINATION bin

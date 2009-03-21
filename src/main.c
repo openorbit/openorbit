@@ -53,7 +53,9 @@
 #include <stdint.h>
 #include <math.h>
 #include <assert.h>
+#include <glob.h>
 
+#include "res-manager.h"
 #include "log.h"
 #include "error.h"
 #include "settings.h"
@@ -66,7 +68,7 @@
 #include "scripting/scripting.h"
 
 #include "SDL.h"
-
+#include "SDL_ttf.h"
 
 //extern settings_t SETTINGS;
 /* Simulator SDL events */
@@ -189,7 +191,9 @@ main(int argc, char*argv[])
     //init_cam();
 
     ooPluginInit();
-    
+    ooPluginLoadAll();
+    ooPluginPrintAll();
+        
     // Load and run initialisation script
     ooScriptingInit();
     
@@ -202,6 +206,10 @@ main(int argc, char*argv[])
     // Init SDL video subsystem
     if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {
       ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
+    }
+    
+    if (TTF_Init() == -1) {
+      ooLogFatal("Couldn't initialize SDL_ttf: %s", TTF_GetError());
     }
     
     // Init GL state
