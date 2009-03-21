@@ -40,31 +40,7 @@ extern "C" {
 
 #include <stdbool.h>
 
-#include <gencds/object-manager.h>
-
-// All OSes do not support resolving backlinks, so we export an interface with
-// pointers to all the functions in the API
-typedef struct {
-    char *name; //!< Proper name of the plugin (e.g. "Space Shuttle")
-    unsigned rev; //!< Revision number, greater is later
-    char *key; //!< Hashkey (e.g. "SPACE_SHTL")
-    char *description; //!< Long string describing the plugin, e.g. "All shuttle components"
-    void *dynlib_handle; //!< Admin data, filled in automatically, do not touch
-} OOplugin;
-
-// Note tat in order to maintain backward compatibility, this structure may
-// not change, thus, it is versioned for future extensions.
-typedef struct {
-  om_ctxt_t *objectManager;
-} OOplugincontext_v1;
-
-typedef enum {
-  OO_Plugin_Ver_1_00 = 0
-} OOpluginversion; // Exported by each plugin in the ooplugversion symbol
-
-typedef OOplugin* (*init_f)(OOplugincontext_v1 *);
-#define PLUGIN_INIT_SYMBOL "ooplugininit"
-
+#include <openorbit/plugin.h>
 
 void ooPluginInit(void);
 
@@ -90,12 +66,15 @@ void ooPluginInit(void);
     \return A zero terminated c-string containing the identifier of the plugin.
 */
 
-bool ooPluginLoadAll(void);
+void ooPluginLoadAll(void);
 char *ooPluginLoad(char *filename);
 void ooPluginUnload(char *key);
 
 void ooPluginRegisterInterface(char *interface_key, void *interface);
 void ooPluginRemoveInterface(char *interface_key);
+
+void ooPluginPrintAll(void);
+
 
 #ifdef __cplusplus
 }

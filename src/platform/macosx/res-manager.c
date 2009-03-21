@@ -38,10 +38,27 @@
 #include <fcntl.h>
 #include <string.h>
 #include <limits.h>
-
+#include <glob.h>
 // Open Orbit headers
 #include "res-manager.h"
 #include "log.h"
+
+#ifndef INSTALL_PREFIX
+#define INSTALL_PREFIX "/usr/local"
+#endif /* ! INSTALL_PREFIX */
+
+    //#ifdef _UNIX_
+        static char *paths[] = {
+            "~/.openorbit/plugins/",
+            INSTALL_PREFIX "/share/openorbit/plugins"
+    #ifdef __APPLE__
+            ,
+            "~/Library/Application Support/Open Orbit/Plugins",
+            "/Library/Application Support/Open Orbit/Plugins",
+            "/Network/Library/Application Support/Open Orbit/Plugins"
+    #endif /* __APPLE__ */
+        };
+    //#endif /* _UNIX_ */
 
 const char*
 ooResGetBasePath(void)
@@ -77,6 +94,22 @@ ooResGetPath(const char *fileName)
     
     return path; // Note, asprintf sets this to NULL if it fails
 }
+
+glob_t
+ooResGetFilePaths(const char *pattern)
+{
+  const char *base = ooResGetBasePath();
+  
+  char *fullPattern;
+  asprintf(&fullPattern, "%s/%s\0", base, pattern);
+  ooLogInfo("search for %s", fullPattern);
+  glob_t globs;
+  glob(fullPattern, 0, NULL, &globs);
+
+  free(fullPattern);
+  return globs;
+}
+
 
 FILE*
 ooResGetFile(const char *fileName)

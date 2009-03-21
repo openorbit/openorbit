@@ -48,10 +48,12 @@
 #ifndef _RES_MANAGER_H_
 #define _RES_MANAGER_H_
 #include <stdio.h>
+#include <glob.h>
 
 char* ooResGetPath(const char *fileName);
 FILE* ooResGetFile(const char *fileName);
 int ooResGetFd(const char *fileName);
+glob_t ooResGetFilePaths(const char *pattern);
 
 char* ooPluginGetPath(const char *fileName);
 FILE* ooPluginGetFile(const char *fileName);

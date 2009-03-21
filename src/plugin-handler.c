@@ -38,19 +38,19 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <assert.h>
+#include <glob.h>
+
 
 #include <gencds/hashtable.h>
 
+#include "res-manager.h"
 #include "plugin-handler.h"
 #include "log.h"
 
 #ifndef SO_EXT
 #define SO_EXT ".so"
 #endif /* ! SO_EXT */
-
-#ifndef INSTALL_PREFIX
-#define INSTALL_PREFIX "/usr/local"
-#endif /* ! INSTALL_PREFIX */
 
 static hashtable_t *gPLUGIN_interface_dict = NULL;
 static hashtable_t *gPLUGIN_dict = NULL;
@@ -68,42 +68,17 @@ ooPluginInit(void)
 }
 
 /* read in all dynlibs in the plug-in directories */
-bool
+void
 ooPluginLoadAll(void)
 {
+  glob_t glob = ooResGetFilePaths("plugins/*" SO_EXT);
 
-//#ifdef _UNIX_
-    char *paths[] = {
-        "~/.openorbit/plugins/",
-        INSTALL_PREFIX "/share/openorbit/plugins"
-#ifdef __APPLE__
-        ,
-        "~/Library/Application Support/Open Orbit/Plugins",
-        "/Library/Application Support/Open Orbit/Plugins",
-        "/Network/Library/Application Support/Open Orbit/Plugins"
-#endif /* __APPLE__ */
-    };
-//#endif /* _UNIX_ */
-    
-    for (int i = 0 ; i < sizeof(paths) ; i ++) {
-        char *path = paths[i];
-        DIR *dirp = opendir(path);
-        struct dirent *dp;
-        if (dirp != NULL) {
-            while ((dp = readdir(dirp)) != NULL) {
-                // Only load files with the proper extension
-                if (!strncmp(dp->d_name + dp->d_namlen - strlen(SO_EXT),
-                             SO_EXT, strlen(SO_EXT))) {
-                    // Make an absolute path
-                    char *file_name;
-                    asprintf(&file_name, "%s/%s", path, dp->d_name);
-                    ooPluginLoad(file_name);
-                    free(file_name);
-                }
-            }
-            closedir(dirp);
-        }
-    }
+  ooLogInfo("%u plugins found with extension " SO_EXT, glob.gl_pathc);
+  for (int i = 0 ; i < glob.gl_pathc ; i ++) {
+    ooPluginLoad(glob.gl_pathv[i]);
+  }
+
+  globfree(&glob);
 }
 
 
@@ -133,13 +108,15 @@ ooPluginLoadSO(char *filename)
       plugin->dynlib_handle = plugin_handle; // this is a runtime param not set by the plugin itself
       /* insert plugin in our plugin registry */
       hashtable_insert(gPLUGIN_dict, plugin->key, plugin);
-    
+      ooLogInfo("plugin %s loaded", plugin->key);
       return plugin->key;
     } else {
       if (!vers) ooLogError("plugin %s does not specify oopluginversion", filename);
       else ooLogError("plugin %s incompatible (plugin v = %d, supported = %d)",
                       filename, *vers, OO_Plugin_Ver_1_00);
     }
+    
+    return NULL;
 }
 
 // Check what kind of plugin is available in the search path and load it
@@ -173,7 +150,21 @@ unload_plugin(char *key)
 {
     OOplugin *plugin = hashtable_remove(gPLUGIN_dict, key);
     
-    if (! plugin) return;
+    OOpluginversion *vers = dlsym(plugin->dynlib_handle, "oopluginversion");
+    
+    if (! vers) ooLogFatal("pluginversion not found when unloading");
+    switch (*vers) {
+    case OO_Plugin_Ver_1_00:
+      {
+        void (*finalise_func)(void*) = dlsym(plugin->dynlib_handle,
+                                             PLUGIN_FINALISE_SYMBOL);
+        if (finalise_func == NULL) ooLogFatal("no finalisation function in plugin");
+        finalise_func(NULL);// TODO: Pass in proper context
+      }
+    default:
+      assert(0 && "invalid case");
+    }
+
     
     dlclose(plugin->dynlib_handle);
 }
@@ -189,4 +180,26 @@ void
 remove_plugin_interface(char *interface_key)
 {
     hashtable_remove(gPLUGIN_interface_dict, interface_key);
+}
+
+void
+ooPluginPrintAll()
+{
+  // Prints info on all loaded plugins
+  list_entry_t *entry = hashtable_first(gPLUGIN_dict);
+
+  printf("=============== PLUGIN LIST ==============\n");
+  printf("|KEY     |NAME            |REV|STATUS|VER|\n");
+  printf("|--------|----------------|---|------|---|\n");
+  
+  while (entry) {
+    OOplugin *plugin = (OOplugin*) hashtable_entry_data(entry);
+    printf("|%-8s|%-16s|%3u|LOADED|%3d|\n",
+           plugin->key, plugin->name, plugin->rev, plugin->vers);    
+    
+    entry = list_entry_next(entry);
+  }
+
+  printf("==========================================\n");
+
 }

@@ -40,6 +40,7 @@
 #define OPENORBIT_H__
 
 #include <stdlib.h>
+#include <openorbit/plugin.h>
 
 typedef void OOobject;
 
@@ -57,7 +58,7 @@ OOobject* ooObjVecPop(OOobjvector *vec);
  * Reads out the i:th element in vec
  *
  * The function should not be used in normal cases as it introduce a high
- * overhead, however it should be used from scripts as it ensurese that the
+ * overhead, however it should be used from scripts as it ensure that the
  * index is within bounds.
  */
 OOobject* ooObjVecGet(OOobjvector *vec, size_t i);

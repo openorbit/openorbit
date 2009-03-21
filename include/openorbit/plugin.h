@@ -12,11 +12,11 @@
     The Original Code is the Open Orbit space flight simulator.
 
     The Initial Developer of the Original Code is Mattias Holm. Portions
-    created by the Initial Developer are Copyright (C) 2006 the
+    created by the Initial Developer are Copyright (C) 2009 the
     Initial Developer. All Rights Reserved.
 
     Contributor(s):
-        Mattias Holm <mattias.holm(at)contra.nu>.
+        Mattias Holm <mattias.holm(at)openorbit.org>.
 
     Alternatively, the contents of this file may be used under the terms of
     either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -29,42 +29,39 @@
     required by the GPL or the LGPL.  If you do not delete the provisions
     above, a recipient may use your version of this file under either the MPL,
     the GPL or the LGPL."
-*/
+ */
  
- 
-#ifndef CONTROL_IF_H__
-#define CONTROL_IF_H__
+#ifndef PLUGIN_H_ZLG8MCO9
+#define PLUGIN_H_ZLG8MCO9
 
-#include <stdbool.h>
+#include <gencds/object-manager.h>
 
+// Note tat in order to maintain backward compatibility, this structure may
+// not change, thus, it is versioned for future extensions.
 typedef struct {
-    void (*aft_thrusters)(OOobject *self, bool on);
-    void (*fwd_thrusters)(OOobject *self, bool on);
-    void (*left_thrusters)(OOobject *self, bool on);
-    void (*right_thrusters)(OOobject *self, bool on);
-    void (*top_thrusters)(OOobject *self, bool on);
-    void (*bottom_thrusters)(OOobject *self, bool on);
-} thr_iface;
+  om_ctxt_t *objectManager;
+} OOplugincontext_v1;
 
-#define THR_IF_KEY "pub.control.thr"
+typedef enum {
+  OO_Plugin_Ver_1_00 = 0
+} OOpluginversion; // Exported by each plugin in the ooplugversion symbol
 
-
+// All OSes do not support resolving backlinks, so we export an interface with
+// pointers to all the functions in the API
 typedef struct {
-    void (*alpha_rcs)(OOobject *self, bool on);
-    void (*beta_rcs)(OOobject *self, bool on);
-    void (*gamma_rcs)(OOobject *self, bool on);
-} rcs_iface;
+    char *name; //!< Proper name of the plugin (e.g. "Space Shuttle")
+    unsigned rev; //!< Revision number, greater is later
+    char *key; //!< Hashkey (e.g. "SPACE_SHTL")
+    char *description; //!< Long string describing the plugin, e.g. "All shuttle components"
+    void *dynlib_handle; //!< Admin data, filled in automatically, do not touch
+    OOpluginversion vers;
+} OOplugin;
 
-#define RCS_IF_KEY "pub.control.rcs"
+typedef OOplugin* (*init_f)(OOplugincontext_v1 *);
 
-
-typedef struct {
-    void (*alpha_mt)(OOobject *self, bool on);
-    void (*beta_mt)(OOobject *self, bool on);
-    void (*gamma_mt)(OOobject *self, bool on);
-} mt_iface;
-
-#define MT_IF_KEY "pub.control.mt"
+#define PLUGIN_INIT_SYMBOL "ooplugininit"
+#define PLUGIN_FINALISE_SYMBOL "oopluginfinalise"
 
 
-#endif /* ! CONTROL_IF_H__ */
+
+#endif /* end of include guard: PLUGIN_H_ZLG8MCO9 */
