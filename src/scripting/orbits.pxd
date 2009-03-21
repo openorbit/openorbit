@@ -17,7 +17,7 @@ cdef extern from "physics/orbit.h":
         char *name
         ode.dBodyID id
       
-    OOorbsys* ooOrbitNewSys(char *name, float m, float semiMaj, float semiMin)
+    OOorbsys* ooOrbitNewSys(char *name, float m, float period, float semiMaj, float semiMin)
 
     OOorbobj* ooOrbitNewObj(OOorbsys *sys, char *name, float m,
                            float x, float y, float z,

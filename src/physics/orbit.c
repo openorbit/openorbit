@@ -37,12 +37,14 @@
 
 
 #include <vmath/vmath.h>
-
+#include "sim/simtime.h"
 #include "geo/geo.h"
 #include "log.h"
 
 OOorbsys*
-ooOrbitNewSys(const char *name, float m, float semiMaj, float semiMin)
+ooOrbitNewSys(const char *name,
+              float m, float period,
+              float semiMaj, float semiMin)
 {
   OOorbsys *sys = malloc(sizeof(OOorbsys));
   sys->world = dWorldCreate();
@@ -60,7 +62,7 @@ ooOrbitNewSys(const char *name, float m, float semiMaj, float semiMin)
 
   sys->phys.k.G = 6.67428e-11;
   sys->phys.param.m = m;
-
+  sys->phys.param.period = period;
   return sys;
 }
 
@@ -142,7 +144,17 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
     }
   }
   
+  // Do ODE step
   dWorldStep(sys->world, stepSize);
+  
+  // Update current position
+  sys->phys.param.pos = ooGeoEllipseSegPoint(sys->orbit,
+                                   (ooTimeGetJD()/sys->phys.param.period)*
+                                   (float)sys->orbit->vec.length);
+  
+  ooLogInfo("%f: %s: %f: %vf", ooTimeGetJD(), sys->name, sys->phys.param.period, sys->phys.param.pos);
+  
+  // Recurse and do the same for each subsystem
   for (size_t i ; i < sys->sats.length ; i ++) {
     ooOrbitStep(sys->sats.elems[i], stepSize);
   }

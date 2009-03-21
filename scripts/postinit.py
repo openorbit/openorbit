@@ -196,7 +196,7 @@ def addStar(scene, parent, name, body):
     except KeyError, err:
         print "error: missing key in star %s (%s)" % (name, err.args)
         sys.exit(1)
-    star = orbits.OrbitSys(name, mass, 0.0, 0.0)
+    star = orbits.OrbitSys(name, mass, 0.0, 0.0, 0.0)
     if parent:
         parent.addChild(star)
     #star.addObj(name, mradius, 0.0, mass)
@@ -221,6 +221,7 @@ def addPlanet(scene, parent, name, body):
         mass = parseMass(body["mass"])
         radius = parseDistance(body["radius"])
         axialPeriod = parseTime(orbit["axial-period"])
+        period = parseTime(orbit["period"])/(3600.0 * 24.0)
         rendOpts = body["rendering"]
         semiMaj = parseDistance(orbit["semi-major-axis"])
         ecc = orbit["eccentricity"]
@@ -230,7 +231,7 @@ def addPlanet(scene, parent, name, body):
         print "       since you missed this key, the planet will not be added"
         return
         
-    planet = orbits.OrbitSys(name, mass, semiMaj, semiMin)
+    planet = orbits.OrbitSys(name, mass, period, semiMaj, semiMin)
     if parent:
         parent.addChild(planet)
     #planet.addObj(name, radius, 0.0, mass)
@@ -257,7 +258,7 @@ def addMoon(scene, parent, name, body):
         print "error: missing key in moon %s (%s)" % (name, err.args)
         print "       the moon will not be added without these parameters being set"
         return
-    moon = orbits.OrbitSys(name, mass, semiMaj, semiMin)
+    moon = orbits.OrbitSys(name, mass, 0.0, semiMaj, semiMin)
     if parent:
         parent.addChild(moon)
     #parent.addObj(name, radius, 0.0, 0.0)

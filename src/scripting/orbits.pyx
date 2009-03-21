@@ -36,9 +36,9 @@ import ode
 cimport ode
 
 cdef class OrbitSys:
-    def __cinit__(self, char *name, float m, float semiMaj, float semiMin):
+    def __cinit__(self, char *name, float m, float period, float semiMaj, float semiMin):
         #texture.load(textureName, textureName)
-        self.osys = ooOrbitNewSys(name, m, semiMaj, semiMin)
+        self.osys = ooOrbitNewSys(name, m, period, semiMaj, semiMin)
     def __dealloc__(self):
         # C function call to delete obj_sys object.
         pass

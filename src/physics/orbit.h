@@ -77,13 +77,15 @@ typedef struct OOorbsys {
       struct {
         float m;
         float period;
+        v4f_t pos;
+        v4f_t rot;
       } param;
       struct {
         float G; //!< Gravitational constant (6.67428e-11)
       } k;
     } phys;
         
-    struct OOorbot *parent; // parent
+    struct OOorbsys *parent; // parent
     
     OOellipse *orbit;
     
@@ -92,7 +94,9 @@ typedef struct OOorbsys {
 } OOorbsys;
 
 
-OOorbsys* ooOrbitNewSys(const char *name, float m, float semiMaj, float semiMin);
+OOorbsys* ooOrbitNewSys(const char *name,
+                        float m, float period,
+                        float semiMaj, float semiMin);
 OOorbobj*
 ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
               float x, float y, float z,
