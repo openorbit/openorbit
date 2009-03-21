@@ -63,3 +63,10 @@ def toggleFullscreen():
 def setScreenDepth(short d):
     ooConfSetInt("video.depth", d)
 
+def setGLFovy(float f):
+    ooConfSetFloat("video.gl.fovy", f)
+    
+def setGLAspect(float f):
+    ooConfSetFloat("video.gl.aspect", f)
+
+    

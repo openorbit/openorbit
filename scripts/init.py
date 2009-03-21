@@ -93,6 +93,8 @@ if not prefs.has_section("VIDEO"):
     prefs.set("VIDEO", "height", 600)
     prefs.set("VIDEO", "fullscreen", False)
     prefs.set("VIDEO", "depth", 32)
+    prefs.set("VIDEO", "fovy", 45.0)
+    prefs.set("VIDEO", "aspect", 1.33)
     
 if not prefs.has_section("AUDIO"):
     prefs.add_section("AUDIO")
@@ -115,8 +117,22 @@ if not prefs.has_section("KEYBOARD"):
 if not prefs.has_section("MOUSE"):
     prefs.add_section("MOUSE")
 
-# Write all defaults to disk (maybe we should not write anything if there have
-# been no modifications?)
+if not prefs.has_section("SYS"):
+    prefs.add_section("SYS")
+    prefs.set("SYS", "log-level", "info")
+    
+
+
+
+# Write all defaults to disk (maybe we should not write anything if there
+# have been no modifications?)
+# One thing that is todo here, is that the current usage of the options is
+# rather messy. We want to read in any kind of option and insert it
+# independent of type and name. We do not want to add config.setXXXYYY for
+# every option needed, but for now, this is quite OK.
+
+# I guess that the best is to (in the long run), write the options parser
+# in yacc/flex/C and have it tightly connected with the internals.
 fp = open(os.path.join(prefsSearchPaths[1], "openorbit.conf"), "w")
 prefs.write(fp)
 fp.close()
@@ -129,8 +145,10 @@ try:
     videoHeight = prefs.getint("VIDEO", "height")
     videoFullscreen = prefs.getboolean("VIDEO", "fullscreen")
     videoDepth = prefs.getint("VIDEO", "depth")
+    videoGlFovy = prefs.getfloat("VIDEO", "gl.fovy")
+    videoGlAspect = prefs.getfloat("VIDEO", "gl.aspect")
 except ConfigParser.NoOptionError:
-    print "Options width, height or fullscreen missing in section VIDEO"
+    print "Options missing parameter in section VIDEO"
     sys.exit(1)
 except ConfigParser.NoSectionError:
     print "VIDEO section missing"
@@ -139,6 +157,8 @@ except ConfigParser.NoSectionError:
 config.setScreenSize(videoWidth, videoHeight)
 config.setFullscreen(videoFullscreen)
 config.setScreenDepth(videoDepth)
+config.setGLAspect(videoGlAspect)
+config.setGLFovy(videoGlFovy)
 
 camControlActionKeys = ["cam-fwd", "cam-back", "cam-left", "cam-right",
                         "cam-up", "cam-down", "cam-pitch-up", "cam-pitch-down",
