@@ -48,11 +48,41 @@
 #include <openorbit/openorbit.h>
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 //#include "log.h"
 
 #include <gencds/object-manager2.h>
+
+
+OMcontext*
+omCtxtNew(void)
+{
+  OMcontext *ctxt = malloc(sizeof(OMcontext));
+  ctxt->classes = hashtable_new_with_str_keys(1024);
+  ctxt->objects = omTreeNew();
+  return ctxt;
+}
+
+OMtree*
+omTreeNew(void)
+{
+  OMtree *tree = malloc(sizeof(OMtree));
+  tree->root = NULL;
+}
+
+OMobjdesc*
+omObjDescNew(const char *name, OMclass *cls, OOobject *obj)
+{
+  OMobjdesc *objDesc = malloc(sizeof(OMobjdesc));
+  objDesc->name = strdup(name);
+  objDesc->cls = cls;
+  objDesc->obj = obj;
+  
+  return objDesc;
+}
+
 static void
-omDumpNode(OMtreenode *node, unsigned id)
+omDumpNode(FILE *file, OMtreenode *node, unsigned id)
 {
 //    struct OMtreenode *parent;
 //    struct OMtreenode *left;
@@ -61,40 +91,45 @@ omDumpNode(OMtreenode *node, unsigned id)
 //    int8_t balanceFactor;
 
 
-  printf("\tnode%d [label=\"{<parent> parent|%p|{<left> left|<right> right}}\"];\n", id, (void*)node->objDesc);
+  fprintf(file, "\tnode%d [label=\"{<parent> parent|%p:%d|{<left> left|<right> right}}\"];\n", id, (void*)node->key, node->balance);
   
   if (node->left) {
-    printf("\tnode%d:left->node%d:parent;\n", id, id << 1);
-    omDumpNode(node->left, id << 1); 
+    fprintf(file, "\tnode%d:left->node%d:parent;\n", id, id << 1);
+    omDumpNode(file, node->left, id << 1); 
   }
 
   if (node->right) {
-    printf("\tnode%d:right->node%d:parent;\n", id, id << 1 | 1);
-    omDumpNode(node->right, id << 1 | 1);
+    fprintf(file, "\tnode%d:right->node%d:parent;\n", id, id << 1 | 1);
+    omDumpNode(file, node->right, id << 1 | 1);
   }
 }
 
 // dump graphwis dot rep of tree
 void
-omDbgDumpTree(OMtreenode *root)
+omDbgDumpTree(FILE *file, OMtree *tree)
 {
-  printf("digraph T {\n");
-  printf("\tnode [shape=record];\n");
+  assert(tree != NULL);
+  assert(tree->root != NULL);
+  
+  OMtreenode *root = tree->root;
+
+  fprintf(file, "digraph T {\n");
+  fprintf(file, "\tnode [shape=record];\n");
   
   unsigned node = 1;
-  printf("\tnode%d [label=\"{<parent> parent|%p|{<left> left|<right> right}}\"];\n", node, (void*)root->objDesc);
+  fprintf(file, "\tnode%d [label=\"{<parent> parent|%p:%d|{<left> left|<right> right}}\"];\n", node, (void*)root->key, root->balance);
   
   if (root->left) {
-    printf("\tnode%d:left->node%d:parent;\n", node, node << 1);
-    omDumpNode(root->left, node << 1);
+    fprintf(file, "\tnode%d:left->node%d:parent;\n", node, node << 1);
+    omDumpNode(file, root->left, node << 1);
   }
 
   if (root->right) {
-    printf("\tnode%d:right->node%d:parent;\n", node, node << 1 | 1);
-    omDumpNode(root->right, node << 1 | 1);
+    fprintf(file, "\tnode%d:right->node%d:parent;\n", node, node << 1 | 1);
+    omDumpNode(file, root->right, node << 1 | 1);
   }
   
-  printf("}\n");
+  fprintf(file, "}\n");
 }
 
 
@@ -127,23 +162,22 @@ omGetIface(OMclass *cls, const char *name)
 
 
 void
-omAddProp(OMclass **cls, const char *name, OMpropkind typ, size_t offset)
+omAddProp(OMclass *cls, const char *name, OMpropkind typ, size_t offset)
 {
-  if ((*cls)->propCountAlloc <= (*cls)->propCount) {
-    cls = realloc(cls, sizeof(OMclass) +
-                       sizeof(OMproperty)*((*cls)->propCountAlloc * 2));
+  if (cls->propAlloc <= cls->propCount) {
+    cls->props = realloc(cls->props, sizeof(OMproperty)*(cls->propAlloc * 2));
     //ooLogFatalIfNull(cls, "Failed to realloc class object");
   
-    (*cls)->propCountAlloc *= 2;
+    cls->propAlloc *= 2;
   }
   
-  (*cls)->props[(*cls)->propCount].name = strdup(name);
-  (*cls)->props[(*cls)->propCount].type = typ;
-  (*cls)->props[(*cls)->propCount].offset = offset;
+  cls->props[cls->propCount].name = strdup(name);
+  cls->props[cls->propCount].type = typ;
+  cls->props[cls->propCount].offset = offset;
 
-  (*cls)->propCount ++;
+  cls->propCount ++;
 }
-
+#if 0
 void
 omTreeRotateLeft(OMtreenode *root)
 {
@@ -187,35 +221,66 @@ omTreeRebalance(OMtreenode *node) {
   }
 }
 
-void
-omTreeInsert(OMtreenode *root, OMobjdesc *desc)
+static void
+omTreeInsert_(OMtreenode * restrict tree, OMtreenode * restrict node)
 {
+  if (node->key < tree->key) {  
+    if (tree->left == NULL) {
+      tree->left = node; 
+    } else {
+      omTreeInsert_(tree->left, node);
+    }
+  } else {
+    if (tree->right == NULL) {
+      tree->right = node; 
+    } else {
+      omTreeInsert_(tree->right, node);
+    }
+  }
+}
+
+void
+omTreeInsert(OMtree *tree, uintptr_t key, void *data)
+{
+  assert(tree != NULL);
+  assert(data != NULL);
+  
+  OMtreenode *root = tree->root;
+  
   OMtreenode *node = malloc(sizeof(OMtreenode));
-  node->balanceFactor = 0;
-  node->objDesc = desc;
+
+  node->data = data;
+  node->key = key;
   node->left = NULL;
   node->right = NULL;
-  node->balanceFactor = 0;
+  node->parent = NULL;
+  node->balance = 0;
+  
+  if (tree->root == NULL) {
+    tree->root = node;
+    return;
+  }
   
   OMtreenode *next;
   
   while (root) {
-    if (root->objDesc->obj < desc->obj) {
+    if (root->key < key) {
       next = root->right;
       if (! next) {
         root->right = node;
         node->parent = root;
-        root->balanceFactor ++;
-        root->parent->balanceFactor ++;
+        root->balance ++;
+        
+        if (root->parent) root->parent->balance ++;
         break;
       }
-    } else if (root->objDesc->obj > desc->obj) {
+    } else if (root->key > key) {
       next = root->left;
       if (! next) {
         root->left = node;
         node->parent = root;
-        root->balanceFactor --;
-        root->parent->balanceFactor --;
+        root->balance --;
+        if (root->parent) root->parent->balance --;
         break;
       }
     } else {
@@ -226,20 +291,19 @@ omTreeInsert(OMtreenode *root, OMobjdesc *desc)
     root = next;
   }
   
-  
   omTreeRebalance(root);  
 }
-
+#endif
 OMobjdesc*
 omTreeLookup(const OMtreenode *root, OOobject *obj)
 {  
   while (root) {
-    if (root->objDesc->obj < obj) {
+    if (root->key < (uintptr_t)obj) {
       root = root->left;
-    } else if (root->objDesc->obj > obj) {
+    } else if (root->key > (uintptr_t)obj) {
       root = root->right;
     } else {
-      return root->objDesc;
+      return root->data;
     }
   }
 }
@@ -258,8 +322,8 @@ omGetClassObject(const char *cls)
   return NULL;
 }
 
-OOobject*
-omNewObject(const char *clsName)
+void*
+omNewObject(OMcontext *ctxt, const char *clsName)
 {
   OMclass *cls = omGetClassObject(clsName);
   
@@ -267,17 +331,217 @@ omNewObject(const char *clsName)
 }
 
 OMclass*
-omNewClass(const char *clsName, size_t objLen)
+omNewClass(OMcontext *ctxt, const char *clsName, size_t objLen)
 {
-  OMclass *cls = malloc(sizeof(OMclass) + sizeof(OMproperty)*4);
+  OMclass *cls = malloc(sizeof(OMclass));
   cls->name = strdup(clsName);
   cls->objSize = objLen;
 
   cls->ifaceAlloc = 4;
   cls->ifaceCount = 0;
   cls->ifaces = calloc(4, sizeof(OMinterface));
-  cls->propCountAlloc = 4;
+  cls->propAlloc = 4;
   cls->propCount = 0;
+  cls->props = calloc(4, sizeof(OMproperty));
+
+  hashtable_insert(ctxt->classes, clsName, cls);
   
   return cls;
+}
+
+OMtreenode*
+omAVLLeftSingle(OMtreenode * restrict root)
+{
+  OMtreenode *newRoot = root->right;
+  root->right = newRoot->left;
+  newRoot->left = root;
+  
+  return newRoot;
+}
+
+OMtreenode*
+omAVLRightSingle(OMtreenode * restrict root)
+{
+  OMtreenode *newRoot = root->left;
+  root->left = newRoot->right;
+  newRoot->right = root;
+  
+  return newRoot;
+}
+
+OMtreenode*
+omAVLLeftDouble(OMtreenode * restrict root)
+{
+  OMtreenode *newRoot = root->right->left;
+  
+  root->right->left = newRoot->right;
+  newRoot->right = root->right;
+  root->right = newRoot;
+  
+  newRoot = root->right;
+  root->right = newRoot->left;
+  newRoot->left = root;
+  
+  return newRoot;
+}
+
+OMtreenode*
+omAVLRightDouble(OMtreenode * restrict root)
+{
+  OMtreenode *newRoot = root->left->right;
+  
+  root->left->right = newRoot->left;
+  newRoot->left = root->left;
+  root->left = newRoot;
+  
+  newRoot = root->left;
+  root->left = newRoot->right;
+  newRoot->right = root;
+  
+  return newRoot;
+}
+
+
+//OMtreenode*
+//omAVLInsert(OMtreenode * restrict tree, OMtreenode * restrict node)
+//{
+//  if (tree == NULL) {
+//    return node;
+//  } else if (node->key < tree->key) {
+//    tree->left = omAVLInsert(tree->left, node);
+//  } else {
+//    tree->right = omAVLInsert(tree->right, node);
+//  }
+//  
+//  return tree;
+//}
+
+void
+omAVLUpdateBalanceLeft(OMtreenode *root, int8_t bal)
+{
+  OMtreenode *n = root->left;
+  OMtreenode *nn = n->right;
+  
+  if (nn->balance == 0) {
+    root->balance = 0;
+    n->balance = 0; 
+  } else if (nn->balance == bal) {
+    root->balance = -bal;
+    n->balance = 0;
+  } else {
+    root->balance = 0;
+    n->balance = bal;
+  }
+  
+  nn->balance = 0;
+}
+
+void
+omAVLUpdateBalanceRight(OMtreenode *root, int8_t bal)
+{
+  OMtreenode *n = root->right;
+  OMtreenode *nn = n->left;
+  
+  if (nn->balance == 0) {
+    root->balance = 0;
+    n->balance = 0; 
+  } else if (nn->balance == bal) {
+    root->balance = -bal;
+    n->balance = 0;
+  } else {
+    root->balance = 0;
+    n->balance = bal;
+  }
+  
+  nn->balance = 0;
+}
+
+OMtreenode*
+omAVLInsertBalanceLeft(OMtreenode *root)
+{
+  OMtreenode *n = root->left;
+  if (n->balance == -1) {
+    root->balance = 0;
+    n->balance = 0;
+    root = omAVLRightSingle(root);
+  } else {
+    omAVLUpdateBalanceLeft(root, -1);
+    root = omAVLRightDouble(root);
+  }
+  return root;
+}
+
+
+
+OMtreenode*
+omAVLInsertBalanceRight(OMtreenode *root)
+{
+  OMtreenode *n = root->right;
+  if (n->balance == 1) {
+    root->balance = 0;
+    n->balance = 0;
+    root = omAVLLeftSingle(root);
+  } else {
+    omAVLUpdateBalanceRight(root, 1);
+    root = omAVLLeftDouble(root);
+  }
+  return root;
+}
+
+OMtreenode*
+omAVLInsert_(OMtreenode *root, OMtreenode *node, bool *done)
+{
+  if (root == NULL) {
+    root = node;
+  } else if (node->key < root->key) {
+    root->left = omAVLInsert_(root->left, node, done);
+    
+    if (!*done) {
+      root->balance --;
+      
+      if (root->balance == 0) {
+        *done = true;
+      } else if ((root->balance < -1) || (root->balance > 1)) {
+        root = omAVLInsertBalanceLeft(root);
+        *done = true;
+      }
+    }
+  } else {
+    root->right = omAVLInsert_(root->right, node, done);
+    
+    if (!*done) {
+      root->balance ++;
+      
+      if (root->balance == 0) {
+        *done = true;
+      } else if ((root->balance < -1) || (root->balance > 1)) {
+        root = omAVLInsertBalanceRight(root);
+        *done = true;
+      }
+    }
+  }
+  
+  return root;
+}
+
+void
+omAVLInsert(OMtree *tree, OMtreenode *node)
+{
+  bool done = false;
+  tree->root = omAVLInsert_(tree->root, node, &done);
+}
+void
+omTreeInsert2(OMtree *tree, uintptr_t key, void *data)
+{
+  OMtreenode *node = malloc(sizeof(OMtreenode));
+
+  node->data = data;
+  node->key = key;
+  node->left = NULL;
+  node->right = NULL;
+  //node->parent = NULL;
+  node->balance = 0;
+  
+  
+  omAVLInsert(tree, node);
 }

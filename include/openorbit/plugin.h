@@ -34,12 +34,12 @@
 #ifndef PLUGIN_H_ZLG8MCO9
 #define PLUGIN_H_ZLG8MCO9
 
-#include <gencds/object-manager.h>
+#include <gencds/object-manager2.h>
 
 // Note tat in order to maintain backward compatibility, this structure may
 // not change, thus, it is versioned for future extensions.
 typedef struct {
-  om_ctxt_t *objectManager;
+  OMcontext *objectManager;
 } OOplugincontext_v1;
 
 typedef enum {

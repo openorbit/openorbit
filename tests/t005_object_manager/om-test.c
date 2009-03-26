@@ -38,7 +38,7 @@
 #include <check.h>
 
 #include <gencds/object-manager.h>
-#include <gencds/object-manager2.h>
+//#include <gencds/object-manager2.h>
 typedef struct {
     int a;
     int b;

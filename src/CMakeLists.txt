@@ -16,13 +16,14 @@ if (APPLE)
     include_directories(platform/macosx/)
 endif (APPLE)
 
-add_subdirectory(libgencds)
+#add_subdirectory(libgencds)
 add_subdirectory(vmath)
 add_subdirectory(physics)
 add_subdirectory(scripting)
 add_subdirectory(parsers)
 add_subdirectory(plugins)
 
+aux_source_directory(libgencds gencds_src)
 aux_source_directory(rendering rendering_src)
 aux_source_directory(vessel vessel_src)
 aux_source_directory(geo geo_src)
@@ -30,7 +31,7 @@ aux_source_directory(sim sim_src)
 
 set(openorbit_SRC
 	main.c sim.c error.c settings.c io-manager.c plugin-handler.c log.c
-	${rendering_src} ${vessel_src} ${geo_src} ${sim_src})
+	${rendering_src} ${vessel_src} ${geo_src} ${sim_src} ${gencds_src})
 
 set(openorbit_FILES
 	sim.h error.h io-manager.h settings.h plugin-handler.h
@@ -82,8 +83,8 @@ set_source_files_properties(${ORBIT_DEP_YAML}
 
 set_source_files_properties(${ORBIT_PLUGINS}
                             PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/plugins/)
-
+                            GENERATED true
+                            MACOSX_PACKAGE_LOCATION Resources/plugins)
 
 
 add_executable(openorbit MACOSX_BUNDLE
@@ -93,19 +94,22 @@ add_executable(openorbit MACOSX_BUNDLE
                ${ORBIT_RES_DATA}
                ${ORBIT_SCRIPTS}
                ${ORBIT_DEP_YAML}
-			         ${ORBIT_PLUGINS})
-
+               ${ORBIT_PLUGINS}
+			         )
+add_dependencies(openorbit ${ORBIT_PLUGIN_TARGETS})
 set_target_properties(openorbit
                       PROPERTIES
                       RELEASE_OUTPUT_NAME "${open_orbit_name}"
                       DEBUG_OUTPUT_NAME "${open_orbit_debug_name}")
 
 target_link_libraries(openorbit
-                      math scripting parsers dl gencds ph
+                      math scripting parsers dl ph
                       ${ODE_LIB}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${SDLTTF_LIBRARY} ${GLUT_LIBRARIES})
+#target_link_libraries(openorbit ${ORBIT_PLUGINS})
 
 install(TARGETS openorbit
         RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
         RESOURCE DESTINATION share/openorbit/
         BUNDLE DESTINATION Applications )

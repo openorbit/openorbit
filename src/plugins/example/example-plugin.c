@@ -18,9 +18,10 @@ typedef struct OOexamplesc {
 
 
 void
-register_example_class(om_ctxt_t *ctxt)
+register_example_class(OMcontext *ctxt)
 {
-    return;
+  OMclass *cls = omNewClass(ctxt, "examplesc", sizeof(OOexamplesc));
+  
 }
 
 OOplugin*

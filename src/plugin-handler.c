@@ -43,6 +43,7 @@
 
 
 #include <gencds/hashtable.h>
+#include <gencds/object-manager2.h>
 
 #include "res-manager.h"
 #include "plugin-handler.h"
@@ -55,6 +56,8 @@
 static hashtable_t *gPLUGIN_interface_dict = NULL;
 static hashtable_t *gPLUGIN_dict = NULL;
 
+OOplugincontext_v1 ctxt = { NULL };
+
 void
 ooPluginInit(void)
 {
@@ -65,13 +68,15 @@ ooPluginInit(void)
         hashtable_delete(gPLUGIN_interface_dict);
         ooLogFatal("plugin: plugin dictionary not created");
     }
+    
+    ctxt.objectManager = omCtxtNew();
 }
 
 /* read in all dynlibs in the plug-in directories */
 void
 ooPluginLoadAll(void)
 {
-  glob_t glob = ooResGetFilePaths("plugins/*" SO_EXT);
+  glob_t glob = ooResGetFilePaths("plugins/*.so");
 
   ooLogInfo("%u plugins found with extension " SO_EXT, glob.gl_pathc);
   for (int i = 0 ; i < glob.gl_pathc ; i ++) {
@@ -88,7 +93,8 @@ ooPluginLoadSO(char *filename)
     void *plugin_handle = dlopen(filename, RTLD_NOW|RTLD_LOCAL);
     
     if (! plugin_handle) {
-        return NULL;
+      ooLogError("plugin load failed: %s", dlerror());
+      return NULL;
     }
     
     OOpluginversion *vers = dlsym(plugin_handle, "oopluginversion");
@@ -103,7 +109,6 @@ ooPluginLoadSO(char *filename)
     }
     
     if (vers && *vers == OO_Plugin_Ver_1_00) {
-      OOplugincontext_v1 ctxt = { NULL };
       OOplugin *plugin = init_func(&ctxt);
       plugin->dynlib_handle = plugin_handle; // this is a runtime param not set by the plugin itself
       /* insert plugin in our plugin registry */

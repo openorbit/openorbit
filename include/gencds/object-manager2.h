@@ -1,8 +1,11 @@
 #ifndef OBJECT_MANAGER2_H_VT1NTC32
 #define OBJECT_MANAGER2_H_VT1NTC32
-#include <openorbit/openorbit.h>
 
+#include <gencds/hashtable.h>
+
+#include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #define OM_SIZE_MASK 0x3f
 #define OM_FP   0x00000040
@@ -26,9 +29,8 @@ omMakeKey(const char *key)
   memset(&u.v, 0, sizeof(v16c_t));
   
   for (size_t i = 0; i < sizeof(v16c_t) ; i ++) {
-    u.a[i] = *key;
-    key ++;
-    if (*key == '\0') break;
+    if (key[i] == '\0') break;
+    u.a[i] = key[i];
   }
   
   return u.v;
@@ -57,7 +59,7 @@ omKeyCmp(OMkey a, OMkey b)
   return 0; // Vectors are equal
 }
 
-typedef enum {
+typedef enum OMpropkind {
   OM_Byte = sizeof(uint8_t),
   OM_UChar = sizeof(unsigned char),
   OM_Char = sizeof(char) | OM_SIGN,
@@ -82,7 +84,7 @@ typedef enum {
   OM_Double = sizeof(double) | OM_FP,
   OM_Long_Double = sizeof(long double) | OM_FP,  
   
-  OM_Object = sizeof(OOobject*),
+  OM_Object = sizeof(void*) | OM_PTR,
   
   /* Vector types */
   OM_Float_Vec = OM_VEC|OM_FP|(sizeof(float)*4),
@@ -94,18 +96,18 @@ typedef enum {
   OM_Byte_Vec =  OM_VEC|sizeof(uint8_t)*16
 } OMpropkind;
 
-typedef struct {
+typedef struct OMproperty {
   char *name;
   OMpropkind type;
   size_t offset;
 } OMproperty;
 
-typedef struct {
+typedef struct OMinterface {
   char *name;
   void *ifacePtr;
 } OMinterface;
 
-typedef struct {
+typedef struct OMclass {
   char *name;
   size_t objSize;
   
@@ -113,35 +115,57 @@ typedef struct {
   size_t ifaceCount;
   OMinterface *ifaces;
   
-  size_t propCountAlloc;
+  size_t propAlloc;
   size_t propCount;
-  OMproperty props[];
+  OMproperty *props;
 } OMclass;
 
-typedef struct {
+typedef struct OMobjdesc {
   char *name;
   OMclass *cls;
-  OOobject *obj;
+  void *obj;
 } OMobjdesc;
 
 typedef struct OMtreenode {
-  struct OMtreenode *parent;
+//  struct OMtreenode *parent;
   struct OMtreenode *left;
   struct OMtreenode *right;
-  OMobjdesc *objDesc;
-  int8_t balanceFactor;
+  uintptr_t key; // Can be any integer, also a pointer
+  void *data;
+  int8_t balance;
 } OMtreenode;
 
+typedef struct OMtree {
+  OMtreenode *root;
+} OMtree;
+
+typedef struct OMcontext {
+  hashtable_t *classes;
+  OMtree *objects;
+} OMcontext;
+
+OMcontext* omCtxtNew(void);
+
+OMtree* omTreeNew(void);
+OMobjdesc* omObjDescNew(const char *name, OMclass *cls, void *obj);
 
 void omAddIface(OMclass *cls, const char *name, void *iface);
 void* omGetIface(OMclass *cls, const char *name);
-void omAddProp(OMclass **cls, const char *name, OMpropkind typ, size_t offset);
+void omAddProp(OMclass *cls, const char *name, OMpropkind typ, size_t offset);
 void omTreeRotateLeft(OMtreenode *root);
 void omTreeRotateRight(OMtreenode *root);
 void omTreeRebalance(OMtreenode *node);
-void omTreeInsert(OMtreenode *root, OMobjdesc *desc);
-OMobjdesc* omTreeLookup(const OMtreenode *root, OOobject *obj);
-void* omObjGetIface(OOobject *obj, const char *iface);
-OOobject* omNewObject(const char *cls);
+void omTreeInsert(OMtree *tree, uintptr_t key, void *data);
+OMobjdesc* omTreeLookup(const OMtreenode *root, void *obj);
+
+void omDbgDumpTree(FILE *file, OMtree *root);
+
+
+void* omObjGetIface(void *obj, const char *iface);
+void* omNewObject(OMcontext *ctxt, const char *cls);
+OMclass* omNewClass(OMcontext *ctxt, const char *clsName, size_t objSize);
+
+void omAVLInsert(OMtree *tree, OMtreenode *node);
+void omTreeInsert2(OMtree *tree, uintptr_t key, void *data);
 
 #endif /* end of include guard: OBJECT_MANAGER2_H_VT1NTC32 */
