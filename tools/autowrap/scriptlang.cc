@@ -109,7 +109,21 @@ GenGetSetterArray(const std::string &baseType, RecordDecl::field_iterator start,
 
   
 void WrappedRecordInfo::genPythonFuncWrappers()
-{}
+{
+  std::cout << "static PyObject*\n";
+  std::cout << "module_func_wrap(" << "PyObject *self, PyObject *args)\n";
+  std::cout << "{\n";
+  std::cout << "    FOO_t *foo = (FOO_t*)" <<"self;\n";
+  std::cout << "    if (!PyArg_ParseTuple(args, \"" << "\", " << ")) {return NULL;}\n";
+  
+  std::cout << "    BAR res = func(foo, ...);\n";
+  
+  std::cout << "    return Py_BuildValue(" << "," << ")\n";
+  std::cout << "    Py_RETURN_NONE;\n";
+  
+  std::cout << "}\n\n";
+  
+}
 void WrappedRecordInfo::genPythonTypeStruct()
 {}
 void WrappedRecordInfo::genPythonTypeObject()
@@ -195,10 +209,11 @@ PythonWrapperContext::genInit()
 {
   // TODO: Fix module name, we might whant several headers in the same module, what should
   //       we do in order avoid clashes?
-  std::cout << "void\n"
+  std::cout << "PyMODINIT_FUNC\n"
                "init" << moduleName << "(void)\n"
                "{\n";
-               
+  std::cout << "    PyObject *m;\n"
+            << "    m = Py_InitModule(\"" << moduleName << "\", " << ");\n";
   std::cout << "}\n\n";
 }
 
