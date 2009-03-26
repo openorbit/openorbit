@@ -25,6 +25,9 @@ find_package(GLUT REQUIRED)
 find_library(ODE_LIB ode)
 find_path(ODE_INC "ode/ode.h")
 
+# TODO: Download missing packages, i.e. sdl, ode et.al.
+# file(DOWNLOAD url file [TIMEOUT timeout] [STATUS status] [LOG log])
+
 if (NOT ODE_LIB)
     message(FATAL_ERROR "Could not find libode")
 endif (NOT ODE_LIB)
