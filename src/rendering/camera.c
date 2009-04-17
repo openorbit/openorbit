@@ -38,7 +38,7 @@
 #include "log.h"
 #include "io-manager.h"
 #include "camera.h"
-
+#include "settings.h"
 /* Camera actions, registered as action handlers */
 
 
@@ -56,25 +56,39 @@ void ooSgCamPitchDown(bool up, void *data);
 void ooSgCamPitchUp(bool up, void *data);
 
 
+struct str_action_triplet {
+  const char *confKey;
+  const char *ioKey;
+  OObuttonhandlerfunc action;
+};
 
 void
 ooSgCamInit(void)
 {
-    // Register camera actions
-    ooIoRegCKeyHandler("cam-fwd", ooSgCamFwd);        
-    ooIoRegCKeyHandler("cam-back", ooSgCamBack);
-    ooIoRegCKeyHandler("cam-left", ooSgCamLeft);
-    ooIoRegCKeyHandler("cam-right", ooSgCamRight);
-    ooIoRegCKeyHandler("cam-up", ooSgCamUp);
-    ooIoRegCKeyHandler("cam-down", ooSgCamDown);
-    ooIoRegCKeyHandler("cam-roll-left", ooSgCamRollLeft);
-    ooIoRegCKeyHandler("cam-roll-right", ooSgCamRollRight);
-    ooIoRegCKeyHandler("cam-yaw-left", ooSgCamYawLeft);
-    ooIoRegCKeyHandler("cam-yaw-right", ooSgCamYawRight);
-    ooIoRegCKeyHandler("cam-pitch-down", ooSgCamPitchDown);
-    ooIoRegCKeyHandler("cam-pitch-up", ooSgCamPitchUp);
+  const char *key;
+  static const struct str_action_triplet keyBindings[] = {
+    {"openorbit/controls/keyboard/cam-fwd", "cam-fwd", ooSgCamFwd},
+    {"openorbit/controls/keyboard/cam-back", "cam-back", ooSgCamBack},
+    {"openorbit/controls/keyboard/cam-left", "cam-left", ooSgCamLeft},
+    {"openorbit/controls/keyboard/cam-right", "cam-right", ooSgCamRight},
+    {"openorbit/controls/keyboard/cam-up", "cam-up", ooSgCamUp},
+    {"openorbit/controls/keyboard/cam-down", "cam-down", ooSgCamDown},
+    {"openorbit/controls/keyboard/cam-roll-left", "cam-roll-left", ooSgCamRollLeft},
+    {"openorbit/controls/keyboard/cam-roll-right", "cam-roll-right", ooSgCamRollRight},
+    {"openorbit/controls/keyboard/cam-yaw-left", "cam-yaw-left", ooSgCamYawLeft},
+    {"openorbit/controls/keyboard/cam-yaw-right", "cam-yaw-right", ooSgCamYawRight},
+    {"openorbit/controls/keyboard/cam-pitch-down", "cam-pitch-down", ooSgCamPitchDown},
+    {"openorbit/controls/keyboard/cam-pitch-up", "cam-pitch-up", ooSgCamPitchUp}
+  };
+  
+  // Register camera actions
+  for (int i = 0 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
+    ooIoRegCKeyHandler(keyBindings[i].ioKey, keyBindings[i].action);        
+    ooConfGetStrDef(keyBindings[i].confKey, &key, NULL);
+    if (key) ooIoBindKeyHandler(key, keyBindings[i].ioKey, 0, 0);
+  }
 }
-    
+
 
 
 OOcam*

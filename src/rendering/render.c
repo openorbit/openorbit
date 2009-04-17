@@ -85,13 +85,13 @@ init_gl(void)
 	  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glLoadIdentity();
     
-    if (ooConfGetFloat("video.gl.fovy", &fovy)) fovy = 45.0f;
-    if (ooConfGetFloat("video.gl.aspect", &aspect)) aspect = 1.33f;
-    
+    ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
+    ooConfGetFloatDef("openorbit/video/gl/aspect", &aspect, 1.33f);
+        
     gluPerspective(fovy, aspect, /*near*/0.001, /*far*/100.0);
     
-    if (ooConfGetInt("video.width", &width)) width = 640;
-    if (ooConfGetInt("video.height", &height)) height = 480;
+    ooConfGetIntDef("openorbit/video/width", &width, 640);
+    ooConfGetIntDef("openorbit/video/height", &width, 480);
     
     glViewport(0, 0, width, height);
 }
@@ -155,9 +155,9 @@ create_surface(void)
     bool fullscreen;
     int width, height;
     
-    if (ooConfGetBool("video.fullscreen", &fullscreen)) fullscreen = true;
-    if (ooConfGetInt("video.width", &width)) width = 640;
-    if (ooConfGetInt("video.height", &height)) height = 480;
+    ooConfGetBoolDef("openorbit/video/fullscreen", &fullscreen, false);
+    ooConfGetIntDef("openorbit/video/width", &width, 640);
+    ooConfGetIntDef("openorbit/video/height", &height, 480);
 
     if (fullscreen) flags |= SDL_FULLSCREEN;
     // Create window
