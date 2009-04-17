@@ -50,6 +50,8 @@
 #include <stdio.h>
 #include <glob.h>
 
+const char* ooResGetConfPath();
+
 char* ooResGetPath(const char *fileName);
 FILE* ooResGetFile(const char *fileName);
 int ooResGetFd(const char *fileName);

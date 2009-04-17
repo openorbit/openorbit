@@ -52,6 +52,7 @@ extern "C" {
  */
 
 void ooConfInit(void);
+void ooConfLoad(const char *name);
 
 int ooConfSetBool(const char *key, bool val);
 int ooConfGetBool(const char *key, bool *val);    
@@ -69,6 +70,12 @@ int ooConfGetFloat(const char *key, float *val);
 int ooConfSetStr(const char *key, char *val);
 char* ooConfGetStr(const char *key);
 
+
+int ooConfGetBoolDef(const char *key, bool *val, bool defVal);
+int ooConfGetBoolAsIntDef(const char *key, int *val, int defVal);
+int ooConfGetIntDef(const char *key, int *val, int defVal);
+int ooConfGetFloatDef(const char *key, float *val, float defVal);
+int ooConfGetStrDef(const char *key, const char **val, const char *defVal);
 
 #ifdef __cplusplus
 }

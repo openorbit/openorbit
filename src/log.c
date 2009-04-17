@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdarg.h>
 #include <sysexits.h>
 
@@ -41,6 +42,18 @@
 static FILE *sLogFile;
 static OOloglev sLogLev;
 static char* sLogNames[] = {"trace", "info", "warning", "error", "fatal"};
+
+OOloglev ooLogGetLevFromStr(const char *str)
+{
+  for (int i = 0 ; i < sizeof(sLogNames)/sizeof(char*) ; ++ i) {
+    if (!strcmp(sLogNames[i], str)) {
+      return (OOloglev)i;
+    }
+  }
+  
+  ooLogError("loglev from string \"%s\" not recognised", str);
+  return OOLog_Info;
+}
 
 static void
 ooLogWriteV(OOloglev lev, const char *msg, va_list vaList)

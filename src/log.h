@@ -56,7 +56,7 @@ typedef enum {
 
 void ooLogInit(FILE *logPath);
 void ooLogSetLevel(OOloglev lev);
-
+OOloglev ooLogGetLevFromStr(const char *str);
 void ooLogTrace(const char *msg, ...);
 void ooLogInfo(const char *msg, ...);
 void ooLogWarn(const char *msg, ...);

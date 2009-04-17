@@ -67,6 +67,7 @@
 #include "rendering/sky.h"
 #include "scripting/scripting.h"
 
+#include <ode/ode.h>
 #include "SDL.h"
 #include "SDL_ttf.h"
 
@@ -181,15 +182,20 @@ main_loop(void)
 
 int
 main(int argc, char*argv[])
-{   
-    ooConfInit();
-    
+{
     ooLogInit(stderr);
+
+    ooConfInit();
+    ooConfLoad(ooResGetConfPath());
+    
+    // Set log level, need to do that here
+    const char *levStr = NULL;
+    ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
+    ooLogSetLevel(ooLogGetLevFromStr(levStr));
+    
     // Setup IO-tables
     ooIoInitSdlStringMap();
     
-    //init_cam();
-
     ooPluginInit();
     ooPluginLoadAll();
     ooPluginPrintAll();
@@ -201,7 +207,8 @@ main(int argc, char*argv[])
       ooLogFatal("script/init.py missing");
     }
     
-    // Initialise SDL, GL and AL
+    // Initialise ODE, SDL, GL and AL
+    dInitODE();
     
     // Init SDL video subsystem
     if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {

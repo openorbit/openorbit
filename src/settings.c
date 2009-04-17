@@ -40,6 +40,7 @@
 #include <float.h>
 #include <gencds/hashtable.h>
 #include <assert.h>
+#include <libconfig.h>
 
 #include "log.h"
 
@@ -62,13 +63,24 @@ typedef struct {
 
 
 hashtable_t *g_config;
+config_t conf;
 void
 ooConfInit(void)
 {
     g_config = hashtable_new_with_str_keys(512);
     assert(g_config != NULL);
+    
+    config_init(&conf);
 }
 
+void
+ooConfLoad(const char *name)
+{
+  if (! config_read_file(&conf, name)) {
+    ooLogError("%s:%d %s", name, config_error_line(&conf),
+               config_error_text(&conf));
+  }
+}
 // Entry point for reading options from file, at the moment this is handled by
 // reading an .ini file in the startup script, I would prefer in the long run that
 // this was moved into a simple file parser reading some c-like configuration
@@ -273,3 +285,73 @@ ooConfGetStr(const char *key)
     return NULL;    
 }
 
+
+int
+ooConfGetBoolDef(const char *key, bool *val, bool defVal)
+{
+  int configVal;
+  
+  if (config_lookup_bool(&conf, key, &configVal)) {
+    *val = (bool) configVal;
+  } else {
+    *val = defVal;
+  }
+  
+  return 0;
+}
+
+int
+ooConfGetBoolAsIntDef(const char *key, int *val, int defVal)
+{
+  int configVal;
+  
+  if (config_lookup_bool(&conf, key, &configVal)) {
+    *val = configVal;
+  } else {
+    *val = defVal;
+  }
+  
+  return 0;  
+}
+
+int
+ooConfGetIntDef(const char *key, int *val, int defVal)
+{
+  long configVal;
+  
+  if (config_lookup_int(&conf, key, &configVal)) {
+    *val = configVal;
+  } else {
+    *val = defVal;
+  }
+  
+  return 0;
+}
+
+int
+ooConfGetFloatDef(const char *key, float *val, float defVal)
+{
+  double configVal;
+  
+  if (config_lookup_float(&conf, key, &configVal)) {
+    *val = configVal;
+  } else {
+    *val = defVal;
+  }
+  
+  return 0;
+}
+
+int
+ooConfGetStrDef(const char *key, const char **val, const char *defVal)
+{
+  const char *configVal;
+  
+  if (config_lookup_string(&conf, key, &configVal)) {
+    *val = configVal;
+  } else {
+    *val = defVal;
+  }
+
+  return 0;
+}

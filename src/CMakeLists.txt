@@ -2,7 +2,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${ODE_INC})
 include_directories(${SDLTTF_INCLUDE_DIR})
-
+include_directories(${CONFIG_INC})
 # Set proper shared lib extension
 set(so_ext "\".so\"")
 if (APPLE)
@@ -104,7 +104,7 @@ set_target_properties(openorbit
 
 target_link_libraries(openorbit
                       math scripting parsers dl ph
-                      ${ODE_LIB}
+                      ${ODE_LIB} ${CONFIG_LIB}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${SDLTTF_LIBRARY} ${GLUT_LIBRARIES})
 #target_link_libraries(openorbit ${ORBIT_PLUGINS})
 

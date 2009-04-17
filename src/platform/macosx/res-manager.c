@@ -61,6 +61,21 @@
     //#endif /* _UNIX_ */
 
 const char*
+ooResGetConfPath()
+{
+  char *homeDir = getenv("HOME");
+  ooLogFatalIfNull(homeDir, "$HOME not set");
+  
+  char *confPath = NULL;
+  
+  if (confPath == NULL) {
+    asprintf(&confPath, "%s/%s", homeDir, "Library/Preferences/org.openorbit.conf");
+  }
+  
+  return confPath;
+}
+
+const char*
 ooResGetBasePath(void)
 {
     static UInt8 base[PATH_MAX+1] = {0};
