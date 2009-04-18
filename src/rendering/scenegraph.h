@@ -39,7 +39,7 @@
 
 #include <openorbit/openorbit.h>
 #include "texture.h"
-#include "physics/orbit.h"
+//#include "physics/orbit.h"
 #include "sim/simtime.h"
 
   typedef struct OOdrawable OOdrawable;
@@ -95,6 +95,10 @@ struct OOscenegraph {
 
 OOdrawable* ooSgNewDrawable(OOobject *obj, OOdrawfunc df);
 
+void ooSgSetScenePos(OOscene *sc, float x, float y, float z);
+void ooSgSetSceneQuat(OOscene *sc, float x, float y, float z, float w);
+void ooSgSetSceneScale(OOscene *sc, float scale);
+
 void ooSgDrawOverlay(OOoverlay *overlay);
 
 OOscenegraph* ooSgNewSceneGraph();
@@ -137,10 +141,10 @@ void ooSgSceneAddObj(OOscene *sc, OOobject *object);
 //void ooSgDraw(OOnode *node, OOcam *cam);
 
 // Makes a scene synchronise with an ODE object
-void ooSgSceneAttachOdeObj(OOscene *sc, dBodyID body);
+//void ooSgSceneAttachOdeObj(OOscene *sc, dBodyID body);
 
 // Makes a scene synchronise with an orbital system
-void ooSgSceneAttachOrbSys(OOscene *sc, OOorbsys *sys);
+//void ooSgSceneAttachOrbSys(OOscene *sc, OOorbsys *sys);
 
 typedef struct {
     matrix_t t;

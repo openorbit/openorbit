@@ -42,6 +42,55 @@
 #include "geo/geo.h"
 #include "physics/orbit.h"
 
+/*!
+    Updates a drawable object with ode-data. This conforms to the 
+*/
+
+void
+ooSgSetScenePos(OOscene *sc, float x, float y, float z)
+{
+  assert(sc != NULL);
+  
+  sc->t.x = x;
+  sc->t.y = y;
+  sc->t.z = z;
+  sc->t.w = 0.0;
+}
+
+void
+ooSgSetSceneQuat(OOscene *sc, float x, float y, float z, float w)
+{
+  assert(sc != NULL);
+  
+  sc->q.x = x;
+  sc->q.y = y;
+  sc->q.z = z;
+  sc->q.w = w;
+}
+
+void
+ooSgSetSceneScale(OOscene *sc, float scale)
+{
+  assert(sc != NULL);
+  sc->s = scale;
+  sc->si = 1.0f/scale;
+}
+
+
+void
+ooSgUpdateObject(dBodyID body)
+{
+  OOdrawable *obj = dBodyGetData(body);
+  const dReal *pos = dBodyGetPosition(body);
+  //const dReal *rot = dBodyGetRotation(body);
+  const dReal *quat = dBodyGetQuaternion(body);
+  //const dReal *linVel = dBodyGetLinearVel(body);
+  //const dReal *angVel = dBodyGetAngularVel(body);
+  
+  obj->p = v_set(pos[0], pos[1], pos[2], 0.0);
+  obj->q = v_set(quat[1], quat[2], quat[3], quat[0]);
+}
+
 OOdrawable*
 ooSgNewDrawable(OOobject *obj, OOdrawfunc df)
 {
@@ -332,6 +381,36 @@ ooObjVecInit(OOobjvector *vec)
     vec->asize = 16;
     vec->length = 0;
     vec->elems = calloc(vec->asize, sizeof(OOobject*));
+}
+
+void
+ooObjVecCompress(OOobjvector *vec)
+{
+  // Remove last NULL pointers
+  for (size_t i = vec->length; i > 0; i --) {
+    if (vec->elems[i-1] != NULL) {
+      vec->length = i;
+      break;
+    }
+  }
+  
+  // Move pointers at end of vector to first free entries
+  for (size_t i = 0; i < vec->length ; i ++) {
+    if (vec->elems[i] == NULL) {
+      vec->elems[i] = vec->elems[vec->length-1];
+      vec->length --;
+    }
+
+    // Remove any unused space at the end of the vector
+    for (size_t j = vec->length; j > 0; j --) {
+      if (vec->elems[j-1] != NULL) {
+        vec->length = j;
+        break;
+      }
+    }
+
+  }
+  
 }
 
 void

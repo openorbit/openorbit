@@ -51,6 +51,7 @@ typedef struct {
 } OOobjvector;
 
 void ooObjVecInit(OOobjvector *vec);
+void ooObjVecCompress(OOobjvector *vec);
 void ooObjVecPush(OOobjvector *vec, OOobject *obj);
 OOobject* ooObjVecPop(OOobjvector *vec);
 

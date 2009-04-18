@@ -42,6 +42,7 @@
 #include <vmath/vmath.h>
 
 #include "geo/geo.h"
+#include "rendering/scenegraph.h"
 
 static inline v4f_t
 ode2v4(const dReal *vec)
@@ -60,6 +61,8 @@ typedef struct OOorbobj {
     char *name;
     dBodyID id;
     float m;
+//    OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
+                          //!< object.
 } OOorbobj;
 
 typedef struct OOorbsys {
@@ -86,11 +89,12 @@ typedef struct OOorbsys {
     } phys;
         
     struct OOorbsys *parent; // parent
+    OOscene *scene; //!< Link to scene graph scene corresponding to this system
     
     OOellipse *orbit;
     
-    OOobjvector sats;
-    OOobjvector objs;
+    OOobjvector sats; //!< Natural satellites, i.e. other orbital systems
+    OOobjvector objs; //!< Synthetic satellites, i.e. stuff that is handled by ODE
 } OOorbsys;
 
 
@@ -109,6 +113,7 @@ void ooOrbitAddChildSys(OOorbsys * restrict sys, OOorbsys * restrict child);
 
 void ooOrbitSetScale(OOorbsys *sys, float ms, float ds);
 void ooOrbitSetConstant(OOorbsys *sys, const char *key, float k);
+void ooOrbitSetScene(OOorbsys *sys, OOscene *scene);
 
 void ooOrbitStep(OOorbsys *sys, float stepsize);
 void ooOrbitClear(OOorbsys *sys);

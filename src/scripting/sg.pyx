@@ -19,11 +19,11 @@ cdef class Scene:
     def setParent(self, Scene parent):
         ooSgSceneAddChild(parent.sc, self.sc)
     
-    def connectToOdeObj(self, ode.OdeBody body):
-        ooSgSceneAttachOdeObj(self.sc, body.body);
+#    def connectToOdeObj(self, ode.OdeBody body):
+#        ooSgSceneAttachOdeObj(self.sc, body.body);
     
-    def connectToOrbSys(self, orbits.OrbitSys sys):
-        ooSgSceneAttachOrbSys(self.sc, sys.osys)
+#    def connectToOrbSys(self, orbits.OrbitSys sys):
+#        ooSgSceneAttachOrbSys(self.sc, sys.osys)
      
     def addChild(self, Scene sc):
         ooSgSceneAddChild(self.sc, sc.sc)

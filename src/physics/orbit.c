@@ -41,6 +41,16 @@
 #include "geo/geo.h"
 #include "log.h"
 
+/*
+    NOTE: G is defined as 6.67428 e-11 (m^3)/kg/(s^2), let's call that G_m. In AU,
+      this would then be G_au = G_m / (au^3)
+      
+      This means that G_au = 1.99316734 e-44 au^3/kg/s^2
+      or: G_au = 1.99316734 e-44 au^3/kg/s^2
+
+      1 au = 149 597 870 000 m
+*/
+
 OOorbsys*
 ooOrbitNewSys(const char *name,
               float m, float period,
@@ -63,6 +73,9 @@ ooOrbitNewSys(const char *name,
   sys->phys.k.G = 6.67428e-11;
   sys->phys.param.m = m;
   sys->phys.param.period = period;
+  
+  sys->scene = 0;
+  
   return sys;
 }
 
@@ -106,6 +119,15 @@ ooOrbitSetScale(OOorbsys *sys, float ms, float ds)
   sys->scale.distInv = 1.0f/ds;
 }
 
+void
+ooOrbitSetScene(OOorbsys *sys, OOscene *scene)
+{
+  assert(sys != NULL);
+  assert(scene != NULL);
+  
+  sys->scene = scene;
+}
+
 
 void
 ooOrbitClear(OOorbsys *sys)
@@ -125,6 +147,7 @@ ooOrbitClear(OOorbsys *sys)
 void
 ooOrbitStep(OOorbsys *sys, float stepSize)
 {
+  bool needsCompacting = false;
   // First compute local gravity for each object
   for (size_t i ; i < sys->objs.length ; i ++) {
     // Since objects can migrate to other systems...
@@ -140,7 +163,7 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
                             -sys->phys.k.G * sys->phys.param.m * obj->m / r12);
       dBodyAddForce(obj->id, f12.x, f12.y, f12.z);
     } else {
-      // TODO: Try to compress vector
+      needsCompacting = true;
     }
   }
   
@@ -157,6 +180,17 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
   // Recurse and do the same for each subsystem
   for (size_t i ; i < sys->sats.length ; i ++) {
     ooOrbitStep(sys->sats.elems[i], stepSize);
+  }
+  
+  if (sys->scene) {
+    vector_t v = {.v = sys->phys.param.pos};
+    ooSgSetScenePos(sys->scene, v.x, v.y, v.z);
+    //ooSgSetSceneQuat(sys->scene, float x, float y, float z, float w);
+    //ooSgSetSceneScale(sys->scene, float scale);
+  }
+  
+  if (needsCompacting) {
+    ooObjVecCompress(&sys->objs);
   }
 }
 

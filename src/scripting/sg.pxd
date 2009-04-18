@@ -25,8 +25,8 @@ cdef extern from "rendering/scenegraph.h":
       OOobject *obj
       OOdrawfunc draw
 
-   void ooSgSceneAttachOdeObj(OOscene *sc, ode.dBodyID body)
-   void ooSgSceneAttachOrbSys(OOscene *sc, orbits.OOorbsys *sys)
+#   void ooSgSceneAttachOdeObj(OOscene *sc, ode.dBodyID body)
+#   void ooSgSceneAttachOrbSys(OOscene *sc, orbits.OOorbsys *sys)
 
    void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj)
    void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
