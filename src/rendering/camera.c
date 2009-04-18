@@ -85,10 +85,18 @@ ooSgCamInit(void)
   for (int i = 0 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
     ooIoRegCKeyHandler(keyBindings[i].ioKey, keyBindings[i].action);        
     ooConfGetStrDef(keyBindings[i].confKey, &key, NULL);
-    if (key) ooIoBindKeyHandler(key, keyBindings[i].ioKey, 0, 0);
+    if (key) {
+      ooIoBindKeyHandler(key, keyBindings[i].ioKey, 0, 0);
+      ooIoBindKeyHandler(key, keyBindings[i].ioKey, 1, 0);
+    }    
   }
 }
 
+void
+ooSgCamStep(OOcam *cam)
+{
+  
+}
 
 
 OOcam*
@@ -187,6 +195,14 @@ extern SIMstate gSIM_state;
 void
 ooSgCamFwd(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData
+    if (up) {
+      //fcam->dp = v_sub(fcam->dp, );
+    } else {
+      //fcam->dp = v_add(fcam->dp, );
+    }
+  }
 }
 
 void

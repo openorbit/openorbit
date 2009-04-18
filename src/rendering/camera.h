@@ -57,7 +57,9 @@ extern "C" {
 
   struct OOfreecam {
       vector_t p;
+      vector_t dp;
       quaternion_t q;
+      quaternion_t dq;
   };
 
   struct OOfixedcam {
@@ -80,6 +82,7 @@ extern "C" {
   };
 
   void ooSgCamInit(void);
+  void ooSgCamStep(OOcam *cam);
 
   OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
                         float x, float y, float z, 
