@@ -9,15 +9,19 @@ Dependencies
 
 Required tools and libraries are the following, Open Orbit is impossible to build without 
 these (and you need the developer packages for these):
-	* Pyrex: Python / C bridge and wrappers
-	* Python: Scripting langage (embedded in Open Orbit)
+    Tools:
 	* CMake: Cross platform configuration of software builds
-	* libSDL: Library for creating windows and handling I/O
-	* libODE: Physics / Dynamics simulation library
-
+	* Pyrex: Python / C bridge and wrappers
+    Libs:
+	* Python: Scripting langage (embedded in Open Orbit), PSF LICENSE
+	* libSDL: Library for creating windows and handling I/O, LGPL
+	* libODE: Physics / Dynamics simulation library, BSD
+        * libconfig: Loading configuration files, LGPL
+        
 The following tools and libraries are optional, they add additional functionality only:
-	* libcheck: Required if regression tests are to be built. It is recommended that
-		you build these if you have checked out Open Orbit from the SCM. 
+	* libcheck: Required if regression tests are to be built. It is
+	            recommended that you build these if you have checked
+	            out Open Orbit from the SCM. 
 
 
 Configuration
@@ -32,7 +36,8 @@ level CMakeLists.txt file.
 Type make, and then make install
 
 There is also a convenience script called configure that let you do the normal
-./configure dance (except for the fact that it will not run in the src directory).
+./configure dance (except for the fact that it will not run in the src
+directory).
 
 Mac OS X
 --------
@@ -41,11 +46,19 @@ See 2.1 (UNIX like systems)
 
 Windows
 -------
-
+Not written yet, at the moment Windows is not supported, it is likely that MinGW
+(preferred) or Cygwin will be required in order to ease portability.
 
 Advanced Configuration
 **********************
 
 Configuration Switches
 ----------------------
-
+        "-Denable_test:bool=true" : Enable unit tests
+        "-Dgetdeps:bool=true" : Download dependencies when running cmake, this
+                                option will force cmake to download missing
+                                libraries into $BUILDDIR/deps/.
+Make Targets
+------------
+        make test: Build unit tests
+        make deps: Build libraries downloaded by getdeps
