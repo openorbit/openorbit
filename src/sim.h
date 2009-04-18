@@ -43,7 +43,7 @@ extern "C" {
 
 #include "physics/orbit.h"
 #include "rendering/scenegraph.h"
-
+#include "sim/spacecraft.h"
 
     
 typedef void (*OOeventhandler)(void *data);
@@ -68,7 +68,7 @@ typedef struct {
   double currentTime; //!< Current time in earth days relative to epoch
   uint64_t timeStamp; //!< Time stamp (ticking up one every step)
   float stepSize;     //!< Step size for simulation in seconds
-  
+  OOspacecraft *currentSc; //!< Current active spacecraft
   OOorbsys *orbSys;   //!< Root orbit system, this will be the sun initially
   //OOcam *cam;         //!< Current camera
   OOscenegraph *sg;   //!< Scenegraph of the world

@@ -44,7 +44,7 @@
 #include "log.h"
 // epoch = ???
 
-SIMstate gSIM_state = {0.0, 0, 0.05, NULL, NULL};
+SIMstate gSIM_state = {0.0, 0, 0.05, NULL, NULL, NULL};
 
 #define OO_EVENT_QUEUE_INIT_LEN 100
 OOeventqueue*
