@@ -154,24 +154,24 @@ except ConfigParser.NoSectionError:
     print "VIDEO section missing"
     sys.exit(1)
     
-config.setScreenSize(videoWidth, videoHeight)
-config.setFullscreen(videoFullscreen)
-config.setScreenDepth(videoDepth)
-config.setGLAspect(videoGlAspect)
-config.setGLFovy(videoGlFovy)
+#config.setScreenSize(videoWidth, videoHeight)
+#config.setFullscreen(videoFullscreen)
+#config.setScreenDepth(videoDepth)
+#config.setGLAspect(videoGlAspect)
+#config.setGLFovy(videoGlFovy)
 
-camControlActionKeys = ["cam-fwd", "cam-back", "cam-left", "cam-right",
-                        "cam-up", "cam-down", "cam-pitch-up", "cam-pitch-down",
-                        "cam-yaw-right", "cam-yaw-left", "cam-roll-left",
-                        "cam-roll-right"]
+#camControlActionKeys = ["cam-fwd", "cam-back", "cam-left", "cam-right",
+#                        "cam-up", "cam-down", "cam-pitch-up", "cam-pitch-down",
+#                        "cam-yaw-right", "cam-yaw-left", "cam-roll-left",
+#                        "cam-roll-right"]
 
-for key in camControlActionKeys:
-    try:
-        keyCode = prefs.get("KEYBOARD", key)
-        io.bindKeyDown(keyCode, 0, key)
-    except ConfigParser.NoOptionError:
-        # ignore missing bindings...
-        pass
-    except ConfigParser.NoSectionError:
-        print "fatal error, no KEYBOARD section"
-        sys.exit(1)
+#for key in camControlActionKeys:
+#    try:
+#        keyCode = prefs.get("KEYBOARD", key)
+#        io.bindKeyDown(keyCode, 0, key)
+#    except ConfigParser.NoOptionError:
+#        # ignore missing bindings...
+#        pass
+#    except ConfigParser.NoSectionError:
+#       print "fatal error, no KEYBOARD section"
+#        sys.exit(1)
