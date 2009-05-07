@@ -48,7 +48,7 @@ class PythonWrapperContext {
   std::string moduleName; //!< The parsed header
 
 
-  std::vector<WrappedTypeInfo*> types;
+  std::map<clang::Type*, WrappedTypeInfo*> types;
   std::vector<clang::FunctionDecl*> methods;
   std::vector<clang::EnumDecl*> enums;
 public:
