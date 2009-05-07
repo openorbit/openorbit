@@ -312,8 +312,9 @@ void
 ooSgPaint(OOscenegraph *sg)
 {
     assert(sg != NULL);
+    ooLogTrace("SgPaint");
 
-    ooSgPreUpdate(sg->root);
+    //ooSgPreUpdate(sg->root);
 
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -324,7 +325,7 @@ ooSgPaint(OOscenegraph *sg)
 
     // Compute sky rotation
     OOscene *sc = sg->currentCam->scene->parent;
-    quaternion_t q = sg->currentCam->scene->q;    
+    quaternion_t q = sg->currentCam->scene->q;
     
     while (sc) {
       q = q_mul(q, sc->q);
