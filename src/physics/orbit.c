@@ -105,6 +105,7 @@ ooOrbitAddChildSys(OOorbsys * restrict parent, OOorbsys * restrict child)
   assert(parent != NULL);
   assert(child != NULL);
   
+  ooLogInfo("adding child system %s to %s", child->name, parent->name);
   ooObjVecPush(&parent->sats, child);
 }
 
@@ -175,10 +176,10 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
                                    (ooTimeGetJD()/sys->phys.param.period)*
                                    (float)sys->orbit->vec.length);
   
-  ooLogInfo("%f: %s: %f: %vf", ooTimeGetJD(), sys->name, sys->phys.param.period, sys->phys.param.pos);
+  ooLogTrace("%f: %s: %f: %vf", ooTimeGetJD(), sys->name, sys->phys.param.period, sys->phys.param.pos);
   
   // Recurse and do the same for each subsystem
-  for (size_t i ; i < sys->sats.length ; i ++) {
+  for (size_t i = 0; i < sys->sats.length ; i ++) {
     ooOrbitStep(sys->sats.elems[i], stepSize);
   }
   
