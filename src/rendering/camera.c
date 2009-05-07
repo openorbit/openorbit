@@ -180,6 +180,7 @@ ooSgCamMove(OOcam *cam)
         glTranslatef(((OOfreecam*)cam->camData)->p.x,
                      ((OOfreecam*)cam->camData)->p.y,
                      ((OOfreecam*)cam->camData)->p.z);
+        glRotatef(0.0, 1.0, 0.0, 0.0);
         break;
     default:
         assert(0 && "illegal case statement");
@@ -196,7 +197,7 @@ void
 ooSgCamFwd(bool up, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
-    OOfreecam *fcam = gSIM_state.sg->currentCam->camData
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
     if (up) {
       //fcam->dp = v_sub(fcam->dp, );
     } else {
