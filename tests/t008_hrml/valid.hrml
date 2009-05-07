@@ -1,0 +1,13 @@
+document () {
+  header () {
+    title: "My Document";
+  }
+  body () {
+    paragraph (id: foo): {
+      : "My Paragraph"; # Anonymous entry
+      str: "Hello world"; # Named string
+      integer: 1234; # integer
+      float: 123.0; # real value
+      unit: 123.0 mW; # value with physical unit 
+  }
+}
