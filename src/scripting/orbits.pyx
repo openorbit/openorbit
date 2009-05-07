@@ -34,6 +34,8 @@ import res
 
 import ode
 cimport ode
+cimport sg
+cimport orbits
 
 cdef class OrbitSys:
     def __cinit__(self, char *name, float m, float period, float semiMaj, float semiMin):
@@ -47,7 +49,8 @@ cdef class OrbitSys:
         obj = ooOrbitNewObj(<OOorbsys*>self.osys, name, m, x, y, z, vx, vy, vz, qx,qy,qz,qw,vqx,vqy,vqz,vqw)
         if obj == NULL:
             raise TypeError("null returned")
-    
+    def setScene(self, sg.Scene sc):
+      ooOrbitSetScene(self.osys, <OOscene*>sc.sc)
     def addChild(self, OrbitSys child):
         ooOrbitAddChildSys(self.osys, child.osys)
     

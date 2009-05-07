@@ -6,7 +6,9 @@ cdef extern from "rendering/sky.h":
    void ooSkyAddStar(OOstars *obj, double ra, double dec, double mag, double bv)
    OOstars* ooSkyInitStars(int starCount)
    OOstars *ooSkyRandomStars()
-   OOdrawable *ooSkyNewDrawable()
+   OOdrawable *ooSkyNewDrawable(char *file)
+   OOstars* ooSkyLoadStars(char *file)
+   
    
 cdef class Scene:
     def __cinit__(self):
@@ -64,10 +66,10 @@ cdef class Scenegraph:
         pass
 
 cdef class SkyDrawable:
-    def __cinit__(self):
-        self.sky = ooSkyNewDrawable()
-    def addStar(self, ra, dec, mag, bv):
-        ooSkyAddStar(<OOstars*>self.sky.obj, ra, dec, mag, bv)
+    def __cinit__(self, char *file):
+        self.sky = ooSkyNewDrawable(file)
+    #def addStar(self, ra, dec, mag, bv):
+    #    ooSkyAddStar(<OOstars*>self.sky.obj, ra, dec, mag, bv)
 
 
 cdef class Cam:

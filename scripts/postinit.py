@@ -46,15 +46,15 @@ from os import environ
 print "Running post init script..."
 
 def loadStars():
-    f = open(res.getPath("data/stars.csv"))
-    skyDrawable = sg.SkyDrawable()
-    for line in f:
-        vmag, ra, dec, btmag, vtmag, b_v, v_i = tuple(line.split(","))
-        skyDrawable.addStar(math.radians(float(ra)), math.radians(float(dec)),
-                            float(vmag), float(b_v))
+  #  f = open(res.getPath("data/stars.csv"))
+    skyDrawable = sg.SkyDrawable("data/stars.csv")
+  #  for line in f:
+  #      vmag, ra, dec, btmag, vtmag, b_v, v_i = tuple(line.split(","))
+  #      skyDrawable.addStar(math.radians(float(ra)), math.radians(float(dec)),
+  #                          float(vmag), float(b_v))
     
     
-    f.close()
+  #  f.close()
     return skyDrawable
     
 class UnitParseError(Exception):
@@ -178,14 +178,14 @@ def parseTime(str):
 
 def SemiMin(semiMaj, ecc):
   return math.sqrt(1.0 - ecc**2.0) * semiMaj
-  
+
 def addSgObj(scene, renderOpts):
   if renderOpts["model"] == "sphere":
     pass
   elif renderOpts["model"] == "mesh":
     pass
   #texture.load(renderOpts["texture"], renderOpts["texture"])
-  
+
 def addStar(scene, parent, name, body):
     try:
         orbit = body["orbit"]
@@ -200,21 +200,21 @@ def addStar(scene, parent, name, body):
     if parent:
         parent.addChild(star)
     #star.addObj(name, mradius, 0.0, mass)
-
+    
     if body.has_key("satellites"):
         for key in body["satellites"].keys():
             newScene = sg.Scene().init(key)
             scene.addChild(newScene)
             addBody(newScene, star, key, body["satellites"][key])
-
+    
     # not pretty, but works for now (i.e. will bomb with more than one star)
     sim.setOrbSys(star)
-    
+    star.setScene(scene)
     #scene.connectToOdeObj(star.getBody())
-    scene.connectToOrbSys(star)
+    #scene.connectToOrbSys(star)
     
     addSgObj(scene, rendOpts)
-    
+
 def addPlanet(scene, parent, name, body):
     try:
         orbit = body["orbit"]
@@ -230,7 +230,7 @@ def addPlanet(scene, parent, name, body):
         print "error: missing key in planet %s (%s)" % (name, err.args)
         print "       since you missed this key, the planet will not be added"
         return
-        
+    
     planet = orbits.OrbitSys(name, mass, period, semiMaj, semiMin)
     if parent:
         parent.addChild(planet)
@@ -239,8 +239,10 @@ def addPlanet(scene, parent, name, body):
     if body.has_key("satellites"):
         for key in body["satellites"].keys():
             addBody(scene, planet, key, body["satellites"][key])
-
-    scene.connectToOrbSys(planet)
+    
+    planet.setScene(scene)
+    
+    #scene.connectToOrbSys(planet)
     #scene.connectToOdeObj(planet.getBody())
     addSgObj(scene, rendOpts)
     
@@ -263,6 +265,7 @@ def addMoon(scene, parent, name, body):
         parent.addChild(moon)
     #parent.addObj(name, radius, 0.0, 0.0)
     #scene.connectToOrbSys(moon)
+    moon.setScene(scene)
 
     addSgObj(scene, rendOpts)
     
