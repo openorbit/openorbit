@@ -38,10 +38,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <assert.h>
 
 typedef enum HRMLtokenkind{
   HrmlTokenInvalid = 0,
   HrmlTokenSym,
+  HrmlTokenStr,
   HrmlTokenInt,
   HrmlTokenFloat,
   HrmlTokenDate,
@@ -53,6 +55,7 @@ typedef struct HRMLtoken {
   HRMLtokenkind kind;
   union {
     char *sym;
+    char *str;
     uint64_t integer;
     double real;
     char ch;
@@ -127,14 +130,26 @@ hrmlLex(FILE *f)
   while (isblank(c = fgetc(f))) ; // Skip WS
   if (feof(f)) return errTok; // End of file
   if (ferror(f)) {fprintf(stderr, "lexerror\n");return errTok;} // End of file
-  
+
+  // Skip comments
+  if (c == '#') {
+    while ((c = fgetc(f)) != '\n') {
+      if (feof(f)) return errTok; // End of file
+      if (ferror(f)) {fprintf(stderr, "lexerror\n");return errTok;} // End of file    
+    }
+  }
+
+  if (c == '\n') {
+    // Keep line counter up to date
+  }
+
   // Special hex or bin numbers
   if (c == '0') {
     int c2 = fgetc(f);
     if (c2 == 'x') {
       // Hexnumber
-      while (isxdigit(c = fgetc(f))) {
-        gw_push(&s, c);
+      while (isxdigit(c = fgetc(f)) || c == '_') {
+        if (c != '_') gw_push(&s, c);
       }
       if (gw_len(&s)) {
         HRMLtoken tok;
@@ -146,8 +161,8 @@ hrmlLex(FILE *f)
       return errTok;
     } else if (c2 == 'b') {
       // Binary number
-      while (isbindigit(c = fgetc(f))) {
-        gw_push(&s, c);
+      while (isbindigit(c = fgetc(f)) || c == '_') {
+        if (c != '_') gw_push(&s, c);
       }
       if (gw_len(&s)) {
         HRMLtoken tok;
@@ -163,15 +178,16 @@ hrmlLex(FILE *f)
   }
   
   if (isdigit(c)) {
+    // Integers or floads
     gw_push(&s, c);
-    while (isdigit(c = fgetc(f))) {
-      gw_push(&s, c);
+    while (isdigit(c = fgetc(f)) || c == '_') {
+      if (c != '_') gw_push(&s, c);
     }
     if (c == '.') {
       // Float
       gw_push(&s, c);
-      while (isdigit(c = fgetc(f))) {
-        gw_push(&s, c);
+      while (isdigit(c = fgetc(f)) || c == '_') {
+        if (c != '_') gw_push(&s, c);
       }
       HRMLtoken tok;
       tok.kind = HrmlTokenFloat;
@@ -189,6 +205,7 @@ hrmlLex(FILE *f)
     }
     return errTok;
   } else if (isalpha(c)) {
+    // Symbols
     gw_push(&s, c);
     while (isalnum(c = fgetc(f))) {
       gw_push(&s, c);
@@ -199,6 +216,26 @@ hrmlLex(FILE *f)
     tok.val.sym = strdup(s.str);
     gw_destroy(&s);
     return tok;
+  } else if (c == '"') {
+    // String
+    while ((c = fgetc(f)) != '"') {
+      // TODO: check for errors in reading
+      if (c == '\\') {
+        // Escapes
+        int c2 = fgetc(f);
+        if (c2 == '"') gw_push(&s, c2);
+        else if (c2 == 't') gw_push(&s, '\t');
+        else if (c2 == 'n') gw_push(&s, '\n');
+        else if (c2 == '\\') gw_push(&s, '\\');
+        else {gw_destroy(&s); return errTok; }
+      } else {
+        // Non escaped characters
+        gw_push(&s, c);
+      }
+    }
+    HRMLtoken tok;
+    tok.kind = HrmlTokenStr;
+    tok.val.str = strdup(s.str);
   }
 
   if (isop(c)) {
@@ -213,10 +250,47 @@ hrmlLex(FILE *f)
   return errTok;
 }
 
+HRMLobject* hrmlParseArray(FILE *f)
+{
+  HRMLtoken leftBracket = hrmlLex(f);
+  
+  HRMLtoken value = hrmlLex(f);
+  HRMLtoken comma = hrmlLex(f);
+  
+  HRMLtoken rightBracket = hrmlLex(f);
+}
+
 static HRMLlist*
 hrmlParse2(FILE *f, HRMLlist *node)
 {
+  HRMLtoken tok = hrmlLex(f);
   
+  switch (tok.kind) {
+  case HrmlTokenInvalid:
+    break;
+  case HrmlTokenSym:
+    break;
+  case HrmlTokenStr:
+    break;
+  case HrmlTokenInt:
+    break;
+  case HrmlTokenFloat:
+    break;
+  case HrmlTokenDate:
+    break;
+  case HrmlTokenTime:
+    break;
+  case HrmlTokenChar:
+    switch (tok.val.ch) {
+    case '[':
+      break;
+    case '{':
+      break;
+    }
+    break;
+  default:
+    assert(0 && "invalid case");
+  }
 }
 
 HRMLdocument*
@@ -224,6 +298,8 @@ hrmlParse(FILE *f)
 {
   HRMLdocument *doc = malloc(sizeof(HRMLdocument));
   doc->rootNode = malloc(sizeof(HRMLlist));
+  
+  return NULL;
 }
 
 bool
