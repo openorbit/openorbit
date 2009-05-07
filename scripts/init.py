@@ -140,19 +140,19 @@ fp.close()
 prefs = ConfigParser.ConfigParser(defaultValues)
 prefs.read([path + "openorbit.conf" for path in prefsSearchPaths])
 
-try:
-    videoWidth = prefs.getint("VIDEO", "width")
-    videoHeight = prefs.getint("VIDEO", "height")
-    videoFullscreen = prefs.getboolean("VIDEO", "fullscreen")
-    videoDepth = prefs.getint("VIDEO", "depth")
-    videoGlFovy = prefs.getfloat("VIDEO", "gl.fovy")
-    videoGlAspect = prefs.getfloat("VIDEO", "gl.aspect")
-except ConfigParser.NoOptionError:
-    print "Options missing parameter in section VIDEO"
-    sys.exit(1)
-except ConfigParser.NoSectionError:
-    print "VIDEO section missing"
-    sys.exit(1)
+#try:
+#    videoWidth = prefs.getint("VIDEO", "width")
+#    videoHeight = prefs.getint("VIDEO", "height")
+#    videoFullscreen = prefs.getboolean("VIDEO", "fullscreen")
+#    videoDepth = prefs.getint("VIDEO", "depth")
+#    videoGlFovy = prefs.getfloat("VIDEO", "gl.fovy")
+#    videoGlAspect = prefs.getfloat("VIDEO", "gl.aspect")
+#except ConfigParser.NoOptionError:
+#    print "Options missing parameter in section VIDEO"
+#    sys.exit(1)
+#except ConfigParser.NoSectionError:
+#    print "VIDEO section missing"
+#    sys.exit(1)
     
 #config.setScreenSize(videoWidth, videoHeight)
 #config.setFullscreen(videoFullscreen)
