@@ -73,8 +73,9 @@ OOstars *ooSkyRandomStars(void);
 void ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv);
     
 void ooSkyDrawStars(OOstars *stars);
+OOstars* ooSkyLoadStars(const char *file);
 
-OOdrawable *ooSkyNewDrawable();
+OOdrawable *ooSkyNewDrawable(const char *file);
 
 
 #ifdef __cplusplus

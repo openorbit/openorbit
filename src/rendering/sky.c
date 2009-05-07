@@ -34,13 +34,13 @@
  
 #include "sky.h"
 #include "colour.h"
-
+#include "res-manager.h"
+#include "log.h"
 #include <tgmath.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <assert.h>
 #include <stdlib.h>
-
 
 vector_t
 ooEquToCart(angle_t ra, angle_t dec)
@@ -105,6 +105,20 @@ double deg2rad(double deg) {
     return deg * M_PI / 180.0;
 }
 
+OOstars* ooSkyLoadStars(const char *file)
+{
+  OOstars *stars = ooSkyInitStars(4096);
+  FILE *f = ooResGetFile(file);
+  assert(f != NULL);
+  double vmag, ra, dec, btmag, vtmag, bv, vi;
+  while (fscanf(f, "%f,%f,%f,%f,%f,%f,%f\n", &vmag, &ra, &dec, &btmag, &vtmag, &bv, &vi) == 7) {
+    ooSkyAddStar(stars, deg2rad(ra), deg2rad(dec), vmag, bv);
+  }
+
+  ooLogInfo("loaded %d stars from %s", stars->n_stars, file);
+  return stars;
+}
+
 
 OOstars*
 ooSkyRandomStars(void)
@@ -151,16 +165,17 @@ ooSkyInitStars(int star_count)
 void
 ooSkyDrawStars(OOstars *stars)
 {
+  ooLogTrace("draw %d stars", stars->n_stars);
     glPushMatrix();
     glLoadIdentity();
 
     //extern camera_t *gCam;
     //cam_rotate(gCam->free_cam.rq);
-
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glInterleavedArrays(GL_C4UB_V3F, 0, stars->data);
+    glPointSize(10.0f);
     glDrawArrays(GL_POINTS, 0, stars->n_stars);
     
     glDisable(GL_BLEND);
@@ -170,10 +185,10 @@ ooSkyDrawStars(OOstars *stars)
 
 
 OOdrawable*
-ooSkyNewDrawable()
+ooSkyNewDrawable(const char *file)
 {
   OOdrawable *sky = malloc(sizeof(OOdrawable));
-  sky->obj = ooSkyInitStars(1024);
+  sky->obj = ooSkyLoadStars(file);
   sky->draw = (OOdrawfunc)ooSkyDrawStars;
   
   return sky;
