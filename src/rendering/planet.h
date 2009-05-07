@@ -36,6 +36,15 @@
 #include "SDL_opengl.h"
 #include <vmath/vmath.h>
 
+typedef struct {
+  GLuint texid;
+  GLUquadricObj *quadratic;
+  scalar_t radius;
+  vector_t pos; // original position (this is should be in a plane)
+  scalar_t mass;
+  quaternion_t rot_orig;
+  quaternion_t rot_ax;
+} OOplanet;
 /* Most of the stuff here should be moved to the dynamics system later on */
 
 typedef struct {

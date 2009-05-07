@@ -37,7 +37,17 @@
 
 
 #include "SDL_opengl.h"
+
+void ooPlanetDraw(OOplanet *planet)
+{
+  // Switch rendering options based on distance to camera
+  // Get 
+//  if ()
+}
+
 /* This code is temporary */
+
+
 
 static int planet_count;
 planet_t gPlanets[MAX_PLANETS];
