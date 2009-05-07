@@ -121,7 +121,7 @@ ooSimStep(float dt)
     
     gettimeofday(&end, NULL);
     
-    ooLogInfo("simstep time: %lu", ((end.tv_sec*1000000 + end.tv_usec) -
+    ooLogInfo("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
                                     (start.tv_sec*1000000 + start.tv_usec)));
 
     
