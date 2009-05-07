@@ -21,6 +21,7 @@ find_package(SDL REQUIRED)
 find_package(SDL_ttf REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
+find_package(PNG REQUIRED)
 
 find_library(ODE_LIB ode)
 find_path(ODE_INC "ode/ode.h")
