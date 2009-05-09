@@ -178,7 +178,7 @@ hrmlLex(FILE *f)
   }
   
   if (isdigit(c)) {
-    // Integers or floads
+    // Integers or floats
     gw_push(&s, c);
     while (isdigit(c = fgetc(f)) || c == '_') {
       if (c != '_') gw_push(&s, c);
@@ -249,22 +249,138 @@ hrmlLex(FILE *f)
   gw_destroy(&s);
   return errTok;
 }
+#define IS_CHAR(tok, c) ((tok).kind == HrmlTokenChar && (tok).val.ch == (c))
+#define IS_SYM(tok) ((tok).kind == HrmlTokenSym)
+#define SYM(tok) ((tok).val.sym)
 
-HRMLobject* hrmlParseArray(FILE *f)
+#define IS_STR(tok) ((tok).kind == HrmlTokenStr)
+#define STR(tok) ((tok).val.str)
+#define IS_INTEGER(tok) ((tok).kind == HrmlTokenInt)
+#define IS_BOUNDED_INTEGER(tok, minVal, maxVal) ((tok).kind == HrmlTokenInt && (tok).val.integer >= (minVal) && (tok).val.integer <= (maxVal))
+#define INTEGER(tok) ((tok).val.integer)
+#define IS_REAL(tok) ((tok).kind == HrmlTokenFloat)
+#define REAL(tok) ((tok).val.real)
+#define IS_LEAP_YEAR(y) (((y) % 400 == 0) || ((y) % 100 != 0 && (y) % 4 == 0))
+
+// Checks date for validity, asserts that month is between 1 and 12 and that the
+// day is in the valid range for that month, taking leap years into account
+inline bool
+isValidDate(int64_t year, int month, int day)
 {
-  HRMLtoken leftBracket = hrmlLex(f);
-  
+  if (month == 2 && IS_LEAP_YEAR(year)) {
+    if (day <= 29) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (month == 2) {
+    if (day <= 28) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (month == 1 || month == 3 || month == 5 ||
+             month == 7 || month == 8 || month == 10 ||
+             month == 12) {
+    if (day <= 31) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (month == 4 || month == 6 || month == 9 ||
+             month == 11) {
+    if (day <= 31) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return false;
+}
+
+HRMLobject*
+hrmlParseArray(FILE *f)
+{
+  // At this point, the left bracket '[' should already be consumed
   HRMLtoken value = hrmlLex(f);
   HRMLtoken comma = hrmlLex(f);
-  
+
   HRMLtoken rightBracket = hrmlLex(f);
+}
+
+HRMLobject*
+hrmlParsePrimitiveValue(FILE *f)
+{
+  HRMLtoken firstTok = hrmlLex(f);
+  if (IS_INTEGER(firstTok)) {
+    HRMLtoken minusOrSemi = hrmlLex(f);
+
+    if (IS_CHAR(minusOrSemi, ';')) {
+      // Normal integer
+    } else if (IS_CHAR(minusOrSemi, '-')) {
+      // This should be a date object
+      HRMLtoken month = hrmlLex(f);
+      if (IS_BOUNDED_INTEGER(month, 1, 12)) {
+        HRMLtoken minus1 = hrmlLex(f);
+        if (IS_CHAR(minus1, '-')) {
+          HRMLtoken day = hrmlLex(f);
+          if (IS_BOUNDED_INTEGER(day, 1, 31)) {
+            HRMLtoken semiOrHour = hrmlLex(f);
+            if (IS_CHAR(semiOrHour, ';')) {
+              // Date ok... sort of, we still need to verify the days in the
+              // month
+              int64_t yearNum = INTEGER(firstTok);
+              int monthNum = INTEGER(month);
+              int dayNum = INTEGER(day);
+              if (isValidDate(yearNum, monthNum, dayNum)) {
+                
+              }
+            } else if (IS_BOUNDED_INTEGER(semiOrHour, 0, 23)) {
+
+            }
+          } 
+        }
+      }
+    } else {
+      // Parse error
+    }
+  } else if (IS_REAL(firstTok)) {
+    HRMLtoken unitOrSemi = hrmlLex(f);
+    if (IS_CHAR(unitOrSemi, ';')) {
+      
+    } else if (IS_SYM(unitOrSemi)) {
+      
+    }
+  }
+}
+
+
+HRMLobject*
+hrmlParseObj(FILE *f)
+{
+  HRMLtoken nameOrColon = hrmlLex(f);
+  if (nameOrColon.kind == HrmlTokenChar && nameOrColon.val.ch == ':') {
+    // Anonymous object, they are always primitive
+    HRMLtoken val = hrmlLex(f);
+  } else if (nameOrColon.kind == HrmlTokenSym){
+    HRMLtoken colonOrBrace = hrmlLex(f);
+    if (IS_CHAR(colonOrBrace, ':')) {
+      
+    } else if (IS_CHAR(colonOrBrace, '{')) {
+      // New object
+    } else {
+      // Parse errror
+    }
+  } else {
+      // Parse errror    
+  }
 }
 
 static HRMLlist*
 hrmlParse2(FILE *f, HRMLlist *node)
 {
   HRMLtoken tok = hrmlLex(f);
-  
+  HRMLobject *obj = NULL;
   switch (tok.kind) {
   case HrmlTokenInvalid:
     break;
@@ -283,8 +399,10 @@ hrmlParse2(FILE *f, HRMLlist *node)
   case HrmlTokenChar:
     switch (tok.val.ch) {
     case '[':
+      obj = hrmlParseArray(f);
       break;
     case '{':
+      obj = hrmlParseObj(f);
       break;
     }
     break;
