@@ -82,8 +82,25 @@ typedef struct HRMLlist HRMLlist;
 
 typedef struct HRMLlistentry HRMLlistentry;
 
+typedef struct HRMLvalue {
+  HRMLtype typ;
+  union {
+    uint64_t integer;
+    double real;
+    char *str;
+  } u;
+} HRMLvalue;
+
+typedef struct HRMLattrlist {
+  size_t allocLen;
+  size_t attrCount;
+  char **names;
+  HRMLvalue *values;
+} HRMLattrlist;
+
 typedef struct HRMLobject {
   HRMLtype typ;
+  HRMLattrlist *attrs;
   union {
     uint64_t integer;
     double real;
