@@ -41,16 +41,21 @@ static char *validHrmlFileName;
 START_TEST(test_valid)
 {
   FILE *f = fopen(validHrmlFileName, "r");
-  HRMLdocument *doc = hrmlParse(f);
-
-  fail_if( doc == 0, "hrmlParse returned null");
+  if (f) {
+    HRMLdocument *doc = hrmlParse(f);
+    fail_if( doc == 0, "hrmlParse returned null");
+  } else {
+    fail_if(1, "invalid file");
+  }
+  
+  
 }
 END_TEST
 
 Suite
 *test_suite(int argc, char **argv)
 {
-    if (argc != 2) {
+    if (argc != 1) {
       validHrmlFileName = argv[1];
     }
 

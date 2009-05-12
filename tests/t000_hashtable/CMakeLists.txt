@@ -1,8 +1,11 @@
 
 set(tc_TC_NAME "T000_Hashtables")
-set(tc_SRC hash-test.c)
+set(tc_SRC hash-test.c
+           ${CMAKE_SOURCE_DIR}/src/libgencds/hashtable.c
+           ${CMAKE_SOURCE_DIR}/src/libgencds/list.c
+           )
 set(tc_TGT t000_hashtest)
-set(tc_LIBS gencds)
+set(tc_LIBS)
 set(tc_INCDIRS)
 
 include_directories(${tc_INCDIRS})

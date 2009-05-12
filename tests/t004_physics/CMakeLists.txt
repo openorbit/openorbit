@@ -2,7 +2,7 @@
 set(tc_TC_NAME "T004_physics") 
 set(tc_SRC test-case.c)
 set(tc_TGT t004_physics)
-set(tc_LIBS ph math m gencds ${ODE_LIB})
+set(tc_LIBS ph math m ${ODE_LIB})
 set(tc_INCDIRS ${ODE_INC})
 
 include_directories(${tc_INCDIRS})

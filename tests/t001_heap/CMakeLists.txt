@@ -1,8 +1,9 @@
 
 set(tc_TC_NAME "T001_Heap")
-set(tc_SRC heap-test.c)
+set(tc_SRC heap-test.c
+           ${CMAKE_SOURCE_DIR}/src/libgencds/heap.c)
 set(tc_TGT t001_heaptest)
-set(tc_LIBS gencds)
+set(tc_LIBS)
 set(tc_INCDIRS)
 
 

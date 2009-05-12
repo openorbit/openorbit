@@ -1,8 +1,10 @@
 
 set(tc_TC_NAME "T006_List")
-set(tc_SRC list-test.c)
+set(tc_SRC list-test.c
+           ${CMAKE_SOURCE_DIR}/src/libgencds/list.c
+)
 set(tc_TGT t006_listtest)
-set(tc_LIBS gencds)
+set(tc_LIBS)
 set(tc_INCDIRS)
 
 include_directories(${tc_INCDIRS})
