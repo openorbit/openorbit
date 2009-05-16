@@ -11,6 +11,7 @@ document (test: foo, blah: xxy) {
       unit: 123.0 mW; # value with physical unit
       someHex: 0x1234;
       someBin: 0b0111;
+      anArray: [0,1,2,3,4,5];
     }
   }
 
