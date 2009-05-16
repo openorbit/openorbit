@@ -73,30 +73,30 @@ void m_add(matrix_t *res, matrix_t *a, matrix_t *b)
 vector_t v_s_add(vector_t a, scalar_t b);
 
 vector_t v_add(vector_t a, const vector_t b)
-    __attribute__ ((__pure__,__nonnull__));
+    __attribute__ ((__pure__));
 
 
 vector_t v_sub(vector_t a, const vector_t b)
-    __attribute__ ((__pure__,__nonnull__));
+    __attribute__ ((__pure__));
 
 
 vector_t v_s_mul(vector_t a, scalar_t s)
-    __attribute__ ((__pure__,__nonnull__));
+    __attribute__ ((__pure__));
 
 
 vector_t v_s_div(vector_t a, scalar_t s)
-    __attribute__ ((__pure__,__nonnull__));
+    __attribute__ ((__pure__));
 
 
 /* This is really a 3d x product */
     
 vector_t v_cross(vector_t a, vector_t b)
-    __attribute__ ((__pure__,__nonnull__));
+    __attribute__ ((__pure__));
     
-vector_t v_normalise(vector_t v) __attribute__ ((__pure__,__nonnull__));
+vector_t v_normalise(vector_t v) __attribute__ ((__pure__));
     
  scalar_t v_abs(const vector_t v)
-    __attribute__ ((__pure__, __nonnull__));
+    __attribute__ ((__pure__));
 
 /*! Compute determinant of 4x4 matrix M */
 scalar_t m_det(const matrix_t *M);
@@ -139,7 +139,7 @@ v_set(scalar_t v0, scalar_t v1, scalar_t v2, scalar_t v3)
  *  tolerance */
      
 bool v_eq(vector_t a, vector_t b, scalar_t tol)
-    __attribute__ ((__pure__, __nonnull__));
+    __attribute__ ((__pure__));
 
 /*! Compares two matrices for elementvise equality, with a given absolute
  *  tolerance */

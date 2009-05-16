@@ -57,11 +57,10 @@ extern "C" {
 
     
  scalar_t q_scalar(const quaternion_t q)
-    __attribute__ ((__pure__, __nonnull__));
+    __attribute__ ((__pure__));
 
 
-vector_t q_vector(const quaternion_t q)
-    __attribute__ ((__nonnull__));
+vector_t q_vector(const quaternion_t q);
 
 
 /*!
