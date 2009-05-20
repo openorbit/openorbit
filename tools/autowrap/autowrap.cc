@@ -83,11 +83,13 @@ main(int argc, char **argv)
     std::cerr << "error: no input files specified\n";
     exit(EX_USAGE);
   }
+  AutowrapPragmaHandler *ph = new AutowrapPragmaHandler("aw_pkgname");
   // TODO: Support multiple files
   for (llvm::cl::list<std::string>::iterator i = inputFilenames.begin();
        i != inputFilenames.end() ; i ++)
   {    
     PrepCtxt prepCtxt;
+    prepCtxt.prep.AddPragmaHandler("", ph);
     // Add header search directories
     clang::InitHeaderSearch init(prepCtxt.headers);
     init.AddDefaultSystemIncludePaths(prepCtxt.opts);

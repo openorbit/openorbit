@@ -88,6 +88,21 @@ public:
   
 };
 
+class AutowrapPragmaHandler : public clang::PragmaHandler {
+  std::string _pkgname;
+public:
+  virtual void 	HandlePragma (clang::Preprocessor &PP, clang::Token &FirstToken)
+  {
+    clang::Token pkgNameTok;
+    PP.Lex(pkgNameTok);
+    _pkgname = std::string(pkgNameTok.getName());
+  }
+  
+  const std::string &getPkgName() {
+    return _pgkname;
+  }
+};
+
 class PythonConsumer : public clang::ASTConsumer {
   std::string fileName; //!< Main file that we are parsing
   std::string moduleName; //!< Module name of python wrapper
