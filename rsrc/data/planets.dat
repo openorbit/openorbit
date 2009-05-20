@@ -1,0 +1,373 @@
+Source: http://nssdc.gsfc.nasa.gov/planetary/planetfact.html
+
+==== Mercury ====
+Semimajor axis (AU)                  0.38709893  
+Orbital eccentricity                 0.20563069   
+Orbital inclination (deg)            7.00487    
+Longitude of ascending node (deg)   48.33167     
+Longitude of perihelion (deg)       77.45645  
+Mean Longitude (deg)               252.25084 
+
+Right Ascension: 281.01 - 0.003T
+Declination    :  61.45 - 0.005T
+Reference Date : 12:00 UT 1 Jan 2000 (JD 2451545.0)
+T = Julian centuries from reference date 
+
+Surface pressure: ~10-15 bar (0.001 picobar)  
+Average temperature: 440 K (167 C) (590-725 K, sunward side)
+Total mass of atmosphere: <~1000 kg
+
+Atmospheric composition: 42% Oxygen (O2), 29% Sodium (Na), 
+22% Hydrogen (H2), 6% Helium (He), 0.5% Potassium (K),
+possible trace amounts of Argon (Ar), Carbon Dioxide (CO2), 
+Water (H2O), Nitrogen (N2), Xenon (Xe), Krypton (Kr), Neon (Ne)
+
+(The atmosphere of Mercury is essentially a vacuum.  
+Compositional values are not well constrained, values from "Mercury",  
+Vilas, Chapman, and Matthews, eds., University of Arizona Press, 1988)
+
+atmosphere {
+	surfacePressure = 0.001 picobar
+	averageTemp = 440 K, 590-725 K (sunward)
+	composition {
+		oxygen = 42 %
+		sodium = 29 %
+		hydrogen = 22 %
+		helium = 6 %
+		potassium = 6 %
+	}
+}
+
+
+==== Venus ====
+Semimajor axis (AU)                  0.72333199  
+Orbital eccentricity                 0.00677323   
+Orbital inclination (deg)            3.39471   
+Longitude of ascending node (deg)   76.68069  
+Longitude of perihelion (deg)      131.53298  
+Mean Longitude (deg)               181.97973
+Right Ascension: 272.76
+Declination    :  67.16
+Reference Date : 12:00 UT 1 Jan 2000 (JD 2451545.0)
+
+Surface pressure: 92 bars  
+Surface density: ~65. kg/m3
+Scale height: 15.9 km
+Total mass of atmosphere:  ~4.8 x 1020 kg
+Average temperature: 737 K (464 C)
+Diurnal temperature range: ~0 
+Wind speeds: 0.3 to 1.0 m/s (surface)
+Mean molecular weight: 43.45 g/mole
+Atmospheric composition (near surface, by volume): 
+    Major:       96.5% Carbon Dioxide (CO2), 3.5% Nitrogen (N2) 
+    Minor (ppm): Sulfur Dioxide (SO2) - 150; Argon (Ar) - 70; Water (H2O) - 20;
+                 Carbon Monoxide (CO) - 17; Helium (He) - 12; Neon (Ne) - 7
+
+				atmosphere {
+					surfacePressure = 92 bars
+					averageTemp = 737 K
+					wind = 0.3-1.0 m/s
+					height = 15.9 km // Height where pressure changes by e (2.7183)
+					composition {
+						co2 = 96.5 %
+						nitrogen = 3.5 %
+					}
+				}
+
+==== Earth ====
+Semimajor axis (AU)                  1.00000011  
+Orbital eccentricity                 0.01671022   
+Orbital inclination (deg)            0.00005  
+Longitude of ascending node (deg)  -11.26064  
+Longitude of perihelion (deg)      102.94719  
+Mean Longitude (deg)               100.46435
+Right Ascension:  0.00 - 0.641T
+Declination    : 90.00 - 0.557T
+Reference Date : 12:00 UT 1 Jan 2000 (JD 2451545.0)
+T = Julian centuries from reference date 
+
+Dipole field strength: 0.3076 gauss-Re3
+Latitude/Longitude of dipole N: 78.6 degrees N/70.1 degrees W
+Dipole offset (planet center to dipole center) distance: 0.0725 Re
+Latitude/Longitude of offset vector: 18.3 degrees N/147.8 degrees E
+
+Surface pressure: 1014 mb
+Surface density: 1.217 kg/m3
+Scale height: 8.5 km
+Total mass of atmosphere:  5.1 x 1018 kg
+Total mass of hydrosphere:  1.4 x 1021 kg
+Average temperature:  288 K (15 C)
+Diurnal temperature range: 283 K to 293 K (10 to 20 C)
+Wind speeds: 0 to 100 m/s
+Mean molecular weight: 28.97 g/mole 
+Atmospheric composition (by volume, dry air): 
+    Major      : 78.084% Nitrogen (N2), 20.946% Oxygen (O2), 
+    Minor (ppm): Argon (Ar) - 9340; Carbon Dioxide (CO2) - 380
+                 Neon (Ne) - 18.18; Helium (He) - 5.24; CH4 - 1.7
+                 Krypton (Kr) - 1.14; Hydrogen (H2) - 0.55 
+    Water is highly variable, typically makes up about 1%
+
+	atmosphere {
+		surfacePressure = 1014 mb
+		averageTemp = 288 K, (diurnal) 283 K to 293 K
+		wind = 0 - 100 m/s
+		height = 8.5 km
+		composition {
+			nitrogen = 78.084 %
+			oxygen = 20.946 %
+			water = 1.0 % (variable)
+		}
+	}
+
+
+==== Mars ====
+Semimajor axis (AU)                  1.52366231  
+Orbital eccentricity                 0.09341233   
+Orbital inclination (deg)            1.85061   
+Longitude of ascending node (deg)   49.57854  
+Longitude of perihelion (deg)      336.04084   
+Mean Longitude (deg)               355.45332
+Right Ascension: 317.681 - 0.106T
+Declination    :  52.887 - 0.061T
+Reference Date : 12:00 UT 1 Jan 2000 (JD 2451545.0)
+T = Julian centuries from reference date 
+
+Surface pressure:  6.36 mb at mean radius (variable from 4.0 to 8.7 mb depending on season)  
+                   [6.9 mb to 9 mb (Viking 1 Lander site)]
+Surface density: ~0.020 kg/m3
+Scale height:  11.1 km
+Total mass of atmosphere: ~2.5 x 1016 kg
+Average temperature:  ~210 K (-63 C)
+Diurnal temperature range: 184 K to 242 K (-89 to -31 C) (Viking 1 Lander site)
+Wind speeds:  2-7 m/s (summer), 5-10 m/s (fall), 17-30 m/s (dust storm) (Viking Lander sites)
+Mean molecular weight: 43.34 g/mole 
+Atmospheric composition (by volume): 
+    Major      : Carbon Dioxide (CO2) - 95.32% ; Nitrogen (N2) - 2.7%
+                 Argon (Ar) - 1.6%; Oxygen (O2) - 0.13%; Carbon Monoxide (CO) - 0.08% 
+    Minor (ppm): Water (H2O) - 210; Nitrogen Oxide (NO) - 100; Neon (Ne) - 2.5;
+                 Hydrogen-Deuterium-Oxygen (HDO) - 0.85; Krypton (Kr) - 0.3; 
+		 Xenon (Xe) - 0.08
+
+		atmosphere {
+			surfacePressure = 6.36 mb
+			averageTemp = 210 K
+			wind = 2-7, 5-10, 17-30 m/s
+			height = 11.1 km
+			composition {
+				co2 = 95.32 %
+				nitrogen = 2.7 %
+			}
+		}
+
+
+==== Jupiter ====
+Semimajor axis (AU)                  5.20336301  
+Orbital eccentricity                 0.04839266   
+Orbital inclination (deg)            1.30530  
+Longitude of ascending node (deg)  100.55615   
+Longitude of perihelion (deg)       14.75385   
+Mean Longitude (deg)                34.40438  
+Right Ascension: 268.05 - 0.009T
+Declination    :  64.49 + 0.003T
+Reference Date : 12:00 UT 1 Jan 2000 (JD 2451545.0)
+T = Julian centuries from reference date 
+
+Dipole field strength: 4.28 gauss-Rj3
+Dipole tilt to rotational axis: 9.6 degrees
+Longitude of tilt: 201.7 degrees
+Dipole offset (planet center to dipole center) distance: 0.131 Rj
+Latitude/Longitude of offset vector: -8.0 degrees/148.57 degrees
+
+
+Surface Pressure: >>1000 bars  
+Temperature at 1 bar: 165 K (-108 C)
+Temperature at 0.1 bar: 112 K (-161 C)
+Density at 1 bar: 0.16 kg/m3
+Wind speeds
+   Up to 150 m/s (<30 degrees latitude)
+   Up to  40 m/s (>30 degrees latitude)
+Scale height: 27 km
+Mean molecular weight: 2.22 g/mole
+Atmospheric composition (by volume, uncertainty in parentheses)
+    Major:       Molecular hydrogen (H2) - 89.8% (2.0%); Helium (He) - 10.2% (2.0%)
+    Minor (ppm): Methane (CH4) - 3000 (1000); Ammonia (NH3) - 260 (40);
+                 Hydrogen Deuteride (HD) - 28 (10); Ethane (C2H6) - 5.8 (1.5);
+                 Water (H2O) - 4 (varies with pressure)
+    Aerosols:    Ammonia ice, water ice, ammonia hydrosulfide
+
+	atmosphere {
+		surfacePressure = >>1000 bar
+		averageTemp (1 bar) = 165 K
+		averageTemp (0.1 bar) = 112 K
+		wind (< 30 deg lat) = 150 m/s
+		wind (> 30 deg lat) = 40 m/s
+		height = 27 km
+		composition {
+			hydrogen = 89.8 %
+			helium = 10.2 %
+		}
+	}
+
+==== Saturn ====
+Semimajor axis (AU)                  9.53707032  
+Orbital eccentricity                 0.05415060   
+Orbital inclination (deg)            2.48446   
+Longitude of ascending node (deg)  113.71504   
+Longitude of perihelion (deg)       92.43194   
+Mean Longitude (deg)                49.94432
+Right Ascension: 40.5954 - 0.0577T
+Declination    : 83.5380 - 0.0066T
+Reference Date : 12:00 UT 1 Jan 2000 (JD 2451545.0)
+T = Julian centuries from reference date 
+
+Dipole field strength: 0.210 gauss-Rs3
+Dipole tilt to rotational axis: < 1 degree
+Dipole offset (planet center to dipole center) distance: 0.04 to 0.05 Rs northward
+
+Surface Pressure: >>1000 bars  
+Temperature at 1 bar: 134 K (-139 C)
+Temperature at 0.1 bar: 84 K (-189 C)
+Density at 1 bar: 0.19 kg/m3
+Wind speeds
+   Up to 400 m/s (<30 degrees latitude)
+   Up to 150 m/s (>30 degrees latitude)
+Scale height: 59.5 km
+Mean molecular weight: 2.07 g/mole
+Atmospheric composition (by volume, uncertainty in parentheses)
+    Major:       Molecular hydrogen (H2) - 96.3% (2.4%); Helium (He) - 3.25% (2.4%)
+    Minor (ppm): Methane (CH4) - 4500 (2000); Ammonia (NH3) - 125 (75);
+                 Hydrogen Deuteride (HD) - 110 (58); Ethane (C2H6) - 7 (1.5)
+    Aerosols:    Ammonia ice, water ice, ammonia hydrosulfide
+
+	atmosphere {
+		surfacePressure = >>1000 bar
+		averageTemp (1 bar) = 134 K
+		averageTemp (0.1 bar) = 84 K
+		wind (< 30 deg lat) = 400 m/s
+		wind (> 30 deg lat) = 150 m/s
+		height = 59.5 km
+		composition {
+			hydrogen = 96.3 %
+			helium = 3.25 %
+		}
+	}
+
+
+==== Uranus ====
+Semimajor axis (AU)                 19.19126393  
+Orbital eccentricity                 0.04716771   
+Orbital inclination (deg)            0.76986   
+Longitude of ascending node (deg)   74.22988  
+Longitude of perihelion (deg)      170.96424  
+Mean Longitude (deg)               313.23218
+Right Ascension: 257.43
+Declination    : -15.10
+Reference Date : 12:00 UT 1 Jan 2000 (JD 2451545.0)
+
+Dipole field strength: 0.228 gauss-Ru3
+Dipole tilt to rotational axis: 58.6 degrees
+Dipole offset (planet center to dipole center) distance: 0.3 Ru along the rotation axis
+
+Surface Pressure: >>1000 bars  
+Temperature at 1 bar: 76 K (-197 C)
+Temperature at 0.1 bar: 53 K (-220 C)
+Density at 1 bar: 0.42 kg/m3
+Wind speeds: 0-200 m/s
+Scale height: 27.7 km
+Mean molecular weight: 2.64 g/mole
+Atmospheric composition (by volume, uncertainty in parentheses)
+    Major:       Molecular hydrogen (H2) - 82.5% (3.3%); Helium (He) - 15.2% (3.3%)
+                 Methane (CH4) - 2.3%
+    Minor (ppm): Hydrogen Deuteride (HD) - 148
+    Aerosols:    Ammonia ice, water ice, ammonia hydrosulfide, methane ice(?)
+
+	atmosphere {
+		surfacePressure = >>1000 bar
+		averageTemp (1 bar) = 76 K
+		averageTemp (0.1 bar) = 53 K
+		wind = 0-200 m/s
+		height = 27.7 km
+		composition {
+			hydrogen = 82.5 %
+			helium = 15.2 %
+			methane = 2.3 %
+		}
+	}
+
+==== Neptune ====
+Semimajor axis (AU)                 30.06896348  
+Orbital eccentricity                 0.00858587   
+Orbital inclination (deg)            1.76917  
+Longitude of ascending node (deg)  131.72169   
+Longitude of perihelion (deg)       44.97135  
+Mean Longitude (deg)               304.88003
+
+Right Ascension: 299.36 + 0.70 sin N
+Declination    :  43.46 - 0.51 cos N
+Reference Date : 12:00 UT 1 Jan 2000 (JD 2451545.0)
+N = 359.28 + 549.308T degrees
+T = Julian centuries from reference date 
+
+Dipole field strength: 0.142 gauss-Rn3
+Dipole tilt to rotational axis: 46.9 degrees
+Longitude of tilt: 288 degrees (IAU convention)
+Dipole offset (planet center to dipole center) distance: 0.55 Rn
+
+Surface Pressure: >>1000 bars  
+Temperature at 1 bar: 72 K (-201 C)
+Temperature at 0.1 bar: 55 K (-218 C)
+Density at 1 bar: 0.45 kg/m3
+Wind speeds: 0-200 m/s
+Scale height: 19.1 - 20.3 km
+Mean molecular weight: 2.53 - 2.69 g/mole
+Atmospheric composition (by volume, uncertainty in parentheses)
+    Major:       Molecular hydrogen (H2) - 80.0% (3.2%); Helium (He) - 19.0% (3.2%);
+                 Methane (CH4) 1.5% (0.5%)
+    Minor (ppm): Hydrogen Deuteride (HD) - 192; Ethane (C2H6) - 1.5
+    Aerosols:    Ammonia ice, water ice, ammonia hydrosulfide, methane ice(?)
+
+// Should be special for gas giant
+	atmosphere {
+		surfacePressure = >>1000 bar
+		averageTemp (1 bar) = 72 K
+		averageTemp (0.1 bar) = 55 K
+		wind = 0-200 m/s
+		height = 19.1-20.3 km
+		composition {
+			hydrogen = 80.0 %
+			helium = 19.0 %
+			methane = 1.5 %
+		}
+	}
+
+
+==== Pluto ====
+Semimajor axis (AU)                 39.48168677  
+Orbital eccentricity                 0.24880766  
+Orbital inclination (deg)           17.14175  
+Longitude of ascending node (deg)  110.30347  
+Longitude of perihelion (deg)      224.06676  
+Mean longitude (deg)               238.92881
+Right Ascension: 313.02
+Declination    :   9.09
+Reference Date : 12:00 UT 1 Jan 2000 (JD 2451545.0)
+
+orbitalelements {
+	semimajorAxis = 39.48168677 au
+}
+
+atmosphere {
+	surfacePressure = 3 microbar
+	averageTemp = 50 K
+	height = 60 km
+	composition {
+		methane,
+		nitrogen
+	}
+}
+
+Surface Pressure: ~3 microbar
+Average temperature: ~50 K (-223 C)
+Scale height: ~60 km
+Mean molecular weight: ~16-25 g/mole
+Atmospheric composition:  Methane (CH4), Nitrogen (N2)
