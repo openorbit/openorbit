@@ -1,4 +1,4 @@
-/* 
+/*
     The contents of this file are subject to the Mozilla Public License
     Version 1.1 (the "License"); you may not use this file except in compliance
     with the License. You may obtain a copy of the License at
@@ -40,11 +40,23 @@
 #include "sim/simtime.h"
 #include "geo/geo.h"
 #include "log.h"
+#include "parsers/hrml.h"
+OOorbsys*
+ooOrbitLoadSysFromFile(const char *fileName)
+{
+  // Read hrml file containing solar system and return an orbital system
+
+  FILE *file = ooResGetFile(fileName);
+  HRMLdocument *solarSys = hrmlParse(file);
+
+  hrmlFreeDocument(solarSys);
+}
+
 
 /*
     NOTE: G is defined as 6.67428 e-11 (m^3)/kg/(s^2), let's call that G_m. In AU,
       this would then be G_au = G_m / (au^3)
-      
+
       This means that G_au = 1.99316734 e-44 au^3/kg/s^2
       or: G_au = 1.99316734 e-44 au^3/kg/s^2
 
@@ -73,9 +85,9 @@ ooOrbitNewSys(const char *name,
   sys->phys.k.G = 6.67428e-11;
   sys->phys.param.m = m;
   sys->phys.param.period = period;
-  
+
   sys->scene = 0;
-  
+
   return sys;
 }
 
@@ -94,17 +106,17 @@ ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
   obj->m = m;
 
   ooObjVecPush(&sys->objs, obj);
-  
+
   return obj;
 }
 
 
 void
 ooOrbitAddChildSys(OOorbsys * restrict parent, OOorbsys * restrict child)
-{   
+{
   assert(parent != NULL);
   assert(child != NULL);
-  
+
   ooLogInfo("adding child system %s to %s", child->name, parent->name);
   ooObjVecPush(&parent->sats, child);
 }
@@ -113,7 +125,7 @@ void
 ooOrbitSetScale(OOorbsys *sys, float ms, float ds)
 {
   assert(sys != NULL);
-  
+
   sys->scale.mass = ms;
   sys->scale.massInv = 1.0f/ms;
   sys->scale.dist = ds;
@@ -125,7 +137,7 @@ ooOrbitSetScene(OOorbsys *sys, OOscene *scene)
 {
   assert(sys != NULL);
   assert(scene != NULL);
-  
+
   sys->scene = scene;
 }
 
@@ -137,7 +149,7 @@ ooOrbitClear(OOorbsys *sys)
     dBodySetForce(((OOorbobj*)sys->objs.elems[i])->id, 0.0f, 0.0f, 0.0f);
     dBodySetTorque(((OOorbobj*)sys->objs.elems[i])->id, 0.0f, 0.0f, 0.0f);
   }
-  
+
   for (size_t i; i < sys->sats.length ; i ++) {
     ooOrbitClear(sys->sats.elems[i]);
   }
@@ -156,8 +168,8 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
       OOorbobj *obj = sys->objs.elems[i];
       //sys->phys.param.m
       const dReal *objPos_ = dBodyGetPosition(obj->id);
-      vector_t objPos = v_set(objPos_[0], objPos_[1], objPos_[2], 0.0f);            
-      vector_t dist = objPos; // Since system origin is 0.0 
+      vector_t objPos = v_set(objPos_[0], objPos_[1], objPos_[2], 0.0f);
+      vector_t dist = objPos; // Since system origin is 0.0
       scalar_t r12 = v_abs(dist);
       r12 = r12 * r12;
       vector_t f12 = v_s_mul(v_normalise(v_neg(dist)), //negate, force should point to center object
@@ -167,29 +179,29 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
       needsCompacting = true;
     }
   }
-  
+
   // Do ODE step
   dWorldStep(sys->world, stepSize);
-  
+
   // Update current position
   sys->phys.param.pos = ooGeoEllipseSegPoint(sys->orbit,
                                    (ooTimeGetJD()/sys->phys.param.period)*
                                    (float)sys->orbit->vec.length);
-  
+
   ooLogTrace("%f: %s: %f: %vf", ooTimeGetJD(), sys->name, sys->phys.param.period, sys->phys.param.pos);
-  
+
   // Recurse and do the same for each subsystem
   for (size_t i = 0; i < sys->sats.length ; i ++) {
     ooOrbitStep(sys->sats.elems[i], stepSize);
   }
-  
+
   if (sys->scene) {
     vector_t v = {.v = sys->phys.param.pos};
     ooSgSetScenePos(sys->scene, v.x, v.y, v.z);
     //ooSgSetSceneQuat(sys->scene, float x, float y, float z, float w);
     //ooSgSetSceneScale(sys->scene, float scale);
   }
-  
+
   if (needsCompacting) {
     ooObjVecCompress(&sys->objs);
   }
@@ -200,7 +212,7 @@ ooOrbitSetConstant(OOorbsys *sys, const char *key, float k)
 {
     assert(sys != NULL && "sys is null");
     assert(key != NULL && "key is null");
-    
+
     if (!strcmp(key, "G")) {
         sys->phys.k.G = k;
     }

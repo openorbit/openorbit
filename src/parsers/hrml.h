@@ -1,4 +1,4 @@
-/* 
+/*
     The contents of this file are subject to the Mozilla Public License
     Version 1.1 (the "License"); you may not use this file except in compliance
     with the License. You may obtain a copy of the License at
@@ -30,10 +30,10 @@
     above, a recipient may use your version of this file under either the MPL,
     the GPL or the LGPL."
  */
- 
+
 /*!
   Human Readable Markup Language Parser
-  
+
   The human reaable markup language is usable when you don't want xml because
   it is not hand editable. This include the times when you have revision control
   on the data and you need to edit the data in programs such as Emacs and Vi.
@@ -45,7 +45,7 @@
       subkey (properties): value;
     }
   }
-  
+
   A html document might be represented as (note that nodes may be unnamed):
     html () {
       head () {
@@ -55,14 +55,14 @@
         p (id: foo): {
           : "My Paragraph";
           i: "Italic";
-          : "more text"; 
+          : "more text";
       }
     }
   The data is typed, and may consit of the following types: integers, reals,
   dates, strings, values with SI units and enums (defined in schemas).
-  
+
   The properties include the reserved "uid" property that contains a unique id
-  for the object, this allows the tree-like layout of the system to form a graph 
+  for the object, this allows the tree-like layout of the system to form a graph
 */
 #ifndef HRML_H_SJH7PZB3
 #define HRML_H_SJH7PZB3
@@ -99,6 +99,7 @@ typedef struct HRMLattrlist {
 } HRMLattrlist;
 
 typedef struct HRMLobject {
+  char *name;
   HRMLtype typ;
   HRMLattrlist *attrs;
   union {
@@ -111,7 +112,7 @@ typedef struct HRMLobject {
 
 struct HRMLlistentry {
   HRMLlistentry *previous;
-  HRMLlistentry *next; 
+  HRMLlistentry *next;
   HRMLobject *data;
 };
 
@@ -125,18 +126,18 @@ typedef struct HRMLdocument {
 } HRMLdocument;
 
 typedef struct HRMLschema {
-  
+
 } HRMLschema;
 
 typedef HRMLlistentry HRMLiterator;
-  
 HRMLdocument* hrmlParse(FILE *f);
 bool hrmlValidate(HRMLdocument *doc, HRMLschema *sc);
 HRMLiterator *hrmlRootIterator(HRMLdocument *doc);
 HRMLiterator *hrmlIteratorNext(HRMLiterator *it);
 HRMLtype hrmlIteratorType(HRMLiterator *it);
 HRMLobject* hrmlIteratorValue(HRMLiterator *it);
-
+void hrmlFreeDocument(HRMLdocument *doc);
+HRMLobject* hrmlGetObject(HRMLdocument *doc, const char *docPath);
 
 #endif /* end of include guard: HRML_H_SJH7PZB3 */
 
