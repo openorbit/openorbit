@@ -1,0 +1,123 @@
+openorbit {
+  star (name: Sol) {
+    physical {
+      mass: 1.991e30 kg;
+      radius: 6.96e8 m;
+    }
+    rendering {
+       model: "sphere"; # Special keys are sphere, otherwise it is interpreted as a file name
+       texture: "tex/sol.tga";
+    }
+    satellites {
+      planet (name: Mercury) {
+        physical {
+	  mass: 3.18e23 kg;
+          radius: 2.43e6 m;
+	}
+	orbit {
+	  semimajor-axis: 0.38709893 au;  
+      	  eccentricity: 0.20563069;   
+	  inclination: 7.00487 deg;
+	  longitude-ascending-node: 48.33167 deg;     
+	  longitude-perihelion: 77.45645 deg;
+	  mean-longitude: 252.25084 deg;
+	  right-ascension: 281.01 deg; # - 0.003T
+	  declination:  61.45 deg; # - 0.005T
+	  reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
+	}
+	atmosphere {
+	  surface-pressure: 0.001 pbar;
+	  temp: 440 K; # TODO: Should include sunward temperature
+	  composition {
+	    oxygen: 42 %;
+	    sodium: 29 %;
+	    hydrogen: 22 %;
+	    helium: 6 %;
+	    potassium: 6 %;
+	  }
+	}
+        rendering {
+          model: "sphere";
+          texture: "tex/mercury.tga";
+	}
+      }
+      planet (name: Venus) {
+        physical {
+          mass: 4.88e24 kg;
+          radius: 6.06e6 m;
+	}
+        orbit {
+	  semimajor-axis: 0.72333199  au;
+	  eccentricity: 0.00677323;
+	  inclination: 3.39471 deg;
+	  longitude-ascending-node: 76.68069 deg;
+	  longitude-perihelion: 131.53298 deg;
+	  mean-longitude: 181.97973 deg;
+	  right-ascension: 272.76 deg;
+	  declination: 67.16 deg;
+	  reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
+	}
+	atmosphere {
+          surface-pressure: 92 bar;
+	  temp: 737 K;
+	  wind: 0.3-1.0 m/s;
+	  height: 15.9 km; # Height where pressure changes by e (2.7183)
+	  composition {
+	    co2: 96.5 %;
+	    nitrogen: 3.5 %;
+	  }
+	}
+	rendering {
+          model: "sphere";
+          texture: "tex/venus.tga";
+	}
+      }
+      planet (name: Earth) {
+        physical {
+	  mass: 5.98e24 kg;
+          radius: 6.37e6 m;
+	}
+      	orbit {
+	  semimajor-axis: 1.00000011 au;  
+	  eccentricity: 0.01671022; 
+	  inclination: 0.00005 deg;
+	  longitude-ascending-node: -11.26064 deg;
+	  longitude-perihelion: 102.94719 deg;  
+	  mean-longitude: 100.46435 deg;
+	  right-ascension:  0.00 deg; #- 0.641T
+	  declination    : 90.00 deg; #- 0.557T
+	  reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
+	}
+	atmosphere {
+	  surface-pressure: 1014 mb
+	  temp: 288 K; #, (diurnal) 283 K to 293 K
+	  wind: 0 - 100 m/s;
+	  height: 8.5 km;
+	  composition {
+	    nitrogen: 78.084 %;
+	    oxygen: 20.946 %; 
+	    water: 1.0 %; # (variable)
+	  }
+	}
+	rendering {
+          model: "sphere";
+          texture: "tex/earth.tga";
+	}
+	satellites {
+	  moon (name: Luna) {
+	    physical {
+              mass: 7.36e22 kg;
+              radius: 1.74e6 m;
+	    }
+	    orbit {
+	    }
+	    rendering {
+              model: "sphere";
+              texture: "tex/luna.tga";
+	    }
+	  }
+	}
+      }
+    }
+  }
+}
