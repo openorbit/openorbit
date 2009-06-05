@@ -41,16 +41,7 @@
 #include "geo/geo.h"
 #include "log.h"
 #include "parsers/hrml.h"
-OOorbsys*
-ooOrbitLoadSysFromFile(const char *fileName)
-{
-  // Read hrml file containing solar system and return an orbital system
-
-  FILE *file = ooResGetFile(fileName);
-  HRMLdocument *solarSys = hrmlParse(file);
-
-  hrmlFreeDocument(solarSys);
-}
+#include "res-manager.h"
 
 
 /*
@@ -216,4 +207,140 @@ ooOrbitSetConstant(OOorbsys *sys, const char *key, float k)
     if (!strcmp(key, "G")) {
         sys->phys.k.G = k;
     }
+}
+
+void
+ooOrbitLoad2(HRMLobject *obj)
+{
+  // TODO: Free strings as well
+  assert(obj != NULL);
+
+  switch (obj->typ) {
+  case HRMLNode:
+    if (!strcmp(obj->name, "star")) {
+      HRMLlistentry *child = obj->u.node->head;
+      while (child) {
+        child = child->next;
+      }
+    } else if (!strcmp(obj->name, "planet")) {
+      HRMLlistentry *child = obj->u.node->head;
+      while (child) {
+        child = child->next;
+      } 
+    } else if (!strcmp(obj->name, "moon")) {
+      HRMLlistentry *child = obj->u.node->head;
+      while (child) {
+        child = child->next;
+      }  
+    } else if (!strcmp(obj->name, "comet")) {
+      HRMLlistentry *child = obj->u.node->head;
+      while (child) {
+        child = child->next;
+      }
+    }
+    break;
+  case HRMLInt:
+  case HRMLFloat:
+  case HRMLStr:
+  case HRMLDate:
+  default:
+    assert(0 && "invalid case");
+  }
+}
+
+void
+ooOrbitLoadComet(HRMLobject *obj)
+{
+  assert(obj);
+  assert(obj->typ == HRMLNode);
+
+}
+
+void
+ooOrbitLoadMoon(HRMLobject *obj)
+{
+  assert(obj);
+  assert(obj->typ == HRMLNode);
+
+}
+
+
+void
+ooOrbitLoadPlanet(HRMLobject *obj)
+{
+  assert(obj);
+  assert(obj->typ == HRMLNode);
+
+}
+
+void
+ooOrbitLoadSatellites(HRMLobject *obj)
+{
+  assert(obj);
+  assert(obj->typ == HRMLNode);
+
+  HRMLlistentry *child = obj->u.node->head;
+  while (child) {
+    if (!strcmp(child->data->name, "planet")) {
+      ooOrbitLoadPlanet(child->data);
+    } else if (!strcmp(child->data->name, "moon")) {
+      ooOrbitLoadMoon(child->data);
+    } else if (!strcmp(child->data->name, "comet")) {
+
+    }
+
+    child = child->next;
+  }
+
+}
+
+
+void
+ooOrbitLoadStar(HRMLobject *obj)
+{
+  assert(obj);
+  assert(obj->typ == HRMLNode);
+  
+  HRMLlistentry *child = obj->u.node->head;
+  while (child) {
+    if (!strcmp(child->data->name, "satellites")) {
+      ooOrbitLoadSatellites(child->data);
+    } else if (!strcmp(child->data->name, "physical")) {
+      HRMLobject *phys = child->data;
+      assert(phys->typ == HRMLNode);
+      HRMLlistentry *physChild = phys->u.node->head;
+      
+      while (physChild) {
+        HRMLobject *physObj = physChild->data;
+
+        if (!strcmp(physObj->name, "")) {
+          
+        } else if (!strcmp(physObj->name, "")) {
+          
+        }
+
+        physChild = physChild->next;
+      }
+
+    }
+    child = child->next;
+  }
+  
+}
+
+OOorbsys*
+ooOrbitLoad(const char *fileName)
+{
+  FILE *file = ooResGetFile(fileName);
+  HRMLdocument *solarSys = hrmlParse(file);
+  //HRMLschema *schema = hrmlLoadSchema(ooResGetFile("solarsystem.hrmlschema"));
+  //hrmlValidate(solarSys, schema);
+  if (solarSys == NULL) {
+    // Parser is responsible for pestering the users with errors for now.
+    return NULL;
+  }
+
+  // Go through the document and handle each entry in the document
+
+  hrmlFreeDocument(solarSys);
 }

@@ -822,12 +822,31 @@ HRMLobject* hrmlIteratorValue(HRMLiterator *it)
   return it->data;
 }
 
+void
+hrmlFreeObj(HRMLobject *obj)
+{
+  // TODO: Free strings as well
+  assert(obj != NULL);
+
+  if (obj->typ == HRMLNode) {
+    HRMLlistentry *child = obj->u.node->head;
+    while (child) {
+      hrmlFreeObj(child->data);
+      child = child->next;
+    }
+    free(obj->u.node);
+  }
+  
+  free(obj);
+}
 
 void
 hrmlFreeDocument(HRMLdocument *doc)
 {
-
+  hrmlFreeObj(doc->rootNode);
 }
+
+
 
 HRMLobject*
 hrmlGetObject(HRMLdocument *doc, const char *docPath)

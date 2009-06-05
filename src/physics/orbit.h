@@ -118,5 +118,13 @@ void ooOrbitSetScene(OOorbsys *sys, OOscene *scene);
 void ooOrbitStep(OOorbsys *sys, float stepsize);
 void ooOrbitClear(OOorbsys *sys);
 
+/*!
+   Loads an hrml description of a solar system and builds a solar system graph
+   it also connects the physics system to the graphics system.
+   
+   This function does not belong in the physics system, but will be here for
+   now beeing.
+ */
+OOorbsys* ooOrbitLoad(const char *file);
 
 #endif /* ! _ORBIT_H_ */
