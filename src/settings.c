@@ -40,8 +40,11 @@
 #include <float.h>
 #include <gencds/hashtable.h>
 #include <assert.h>
+
+// TODO: Remove libconfig req
 #include <libconfig.h>
 
+#include "parsers/hrml.h"
 #include "log.h"
 
 typedef enum {
@@ -69,7 +72,7 @@ ooConfInit(void)
 {
     g_config = hashtable_new_with_str_keys(512);
     assert(g_config != NULL);
-    
+
     config_init(&conf);
 }
 
@@ -80,7 +83,20 @@ ooConfLoad(const char *name)
     ooLogError("%s:%d %s", name, config_error_line(&conf),
                config_error_text(&conf));
   }
+
+  char hrmlFileName[strlen(name) + 5 + 1];
+  strcpy(hrmlFileName, name);
+  strncat(hrmlFileName, ".hrml", 5);
+  FILE *f = fopen(hrmlFileName, "r");
+  if (!f) {
+    ooLogWarn("could not find file '%s'\n", hrmlFileName);
+  } else {
+    HRMLdocument *doc = hrmlParse(f);
+
+    hrmlFreeDocument(doc);
+  }
 }
+
 // Entry point for reading options from file, at the moment this is handled by
 // reading an .ini file in the startup script, I would prefer in the long run that
 // this was moved into a simple file parser reading some c-like configuration
@@ -126,7 +142,7 @@ int
 ooConfSetBool(const char *key, bool val)
 {
     conf_val_t *confval;
-    
+
     if (confval = hashtable_lookup(g_config, key)) {
         if (confval->kind == CONF_str) {
             free(confval->u.str);
@@ -211,12 +227,12 @@ ooConfSetStr(const char *key, char *val)
             hashtable_insert(g_config, key, confval);
         }
     }
-    
+
     if (! confval || ! confval->u.str) {
         return -1;
     }
-    
-    return 0;    
+
+    return 0;
 }
 
 int
@@ -227,7 +243,7 @@ ooConfGetInt(const char *key, int *val)
         *val = confval->u.i;
         return 0;
     }
-    
+
     ooLogWarn("settings:no integer %s exists", key);
     return -1;
 }
@@ -240,7 +256,7 @@ ooConfGetBool(const char *key, bool *val)
         *val = confval->u.b;
         return 0;
     }
-    
+
     ooLogWarn("settings:no boolean %s exists", key);
     return -1;
 }
@@ -253,7 +269,7 @@ ooConfGetBoolAsInt(const char *key, int *val)
         *val = (int)confval->u.b;
         return 0;
     }
-    
+
     ooLogWarn("settings:no boolean %s exists", key);    
     return -1;
 }
@@ -268,7 +284,7 @@ ooConfGetFloat(const char *key, float *val)
         *val = confval->u.f;
         return 0;
     }
-    
+
     ooLogWarn("settings:no real %s exists", key);
     return -1;
 }
@@ -280,7 +296,7 @@ ooConfGetStr(const char *key)
     if (confval && (confval->kind == CONF_str)) {
         return confval->u.str;
     }
-    
+
     ooLogWarn("settings:no string %s exists", key);
     return NULL;    
 }
@@ -290,13 +306,13 @@ int
 ooConfGetBoolDef(const char *key, bool *val, bool defVal)
 {
   int configVal;
-  
+
   if (config_lookup_bool(&conf, key, &configVal)) {
     *val = (bool) configVal;
   } else {
     *val = defVal;
   }
-  
+
   return 0;
 }
 
@@ -304,27 +320,27 @@ int
 ooConfGetBoolAsIntDef(const char *key, int *val, int defVal)
 {
   int configVal;
-  
+
   if (config_lookup_bool(&conf, key, &configVal)) {
     *val = configVal;
   } else {
     *val = defVal;
   }
-  
-  return 0;  
+
+  return 0;
 }
 
 int
 ooConfGetIntDef(const char *key, int *val, int defVal)
 {
   long configVal;
-  
+
   if (config_lookup_int(&conf, key, &configVal)) {
     *val = configVal;
   } else {
     *val = defVal;
   }
-  
+
   return 0;
 }
 
@@ -332,13 +348,13 @@ int
 ooConfGetFloatDef(const char *key, float *val, float defVal)
 {
   double configVal;
-  
+
   if (config_lookup_float(&conf, key, &configVal)) {
     *val = configVal;
   } else {
     *val = defVal;
   }
-  
+
   return 0;
 }
 
@@ -346,7 +362,7 @@ int
 ooConfGetStrDef(const char *key, const char **val, const char *defVal)
 {
   const char *configVal;
-  
+
   if (config_lookup_string(&conf, key, &configVal)) {
     *val = configVal;
   } else {
