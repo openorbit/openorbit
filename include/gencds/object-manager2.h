@@ -132,7 +132,7 @@ typedef struct OMtreenode {
   struct OMtreenode *right;
   uintptr_t key; // Can be any integer, also a pointer
   void *data;
-  int8_t balance;
+  int8_t balance; // Constrained to +/-1
 } OMtreenode;
 
 typedef struct OMtree {
