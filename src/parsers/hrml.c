@@ -42,6 +42,131 @@
 #include <assert.h>
 #include <setjmp.h>
 
+// Used to build up parsing tables for the si-unit parser
+static const char * gPrefixTable[HRML_siprefix_size] = {
+    [HRML_yocto] = "y",
+    [HRML_zepto] = "z",
+    [HRML_atto] = "a",
+    [HRML_femto] = "f",
+    [HRML_pico] = "p",
+    [HRML_nano] = "n",
+    [HRML_micro] = "u",
+    [HRML_milli] = "m",
+    [HRML_centi] = "c",
+    [HRML_deci] = "d",
+    [HRML_none] = "",
+    [HRML_deca] = "da",
+    [HRML_hecto] = "h",
+    [HRML_kilo] = "k",
+    [HRML_mega] = "M",
+    [HRML_giga] = "G",
+    [HRML_tera] = "T",
+    [HRML_peta] = "P",
+    [HRML_exa] = "E",
+    [HRML_zetta] = "Z",
+    [HRML_yotta] = "Y"
+};
+
+// Used to build up parsing tables for the si-unit parser
+static const char * gUnitTable[HRML_siunit_size] = {
+  [HRML_metre] = "m",
+  [HRML_gram] = "g",
+  [HRML_second] = "s",
+  [HRML_ampere] = "A",
+  [HRML_kelvin] = "K",
+  [HRML_mole] = "mol",
+  [HRML_candela] = "cd",
+
+  [HRML_hertz] = "Hz",
+  [HRML_radian] = "rad",
+  [HRML_steradian] = "sr",
+  [HRML_newton] = "N",
+  [HRML_pascal] = "Pa",
+  [HRML_joule] = "J",
+  [HRML_watt] = "W",
+  [HRML_coulomb] = "C",
+  [HRML_volt] = "V",
+  [HRML_farad] = "F",
+  [HRML_ohm] = "Ohm",
+  [HRML_siemens] = "S",
+  [HRML_weber] = "Wb",
+  [HRML_tesla] = "T",
+  [HRML_henry] = "H",
+  [HRML_celsius] = "deg C",
+  [HRML_lumen] = "lm",
+  [HRML_lux] = "lx",
+  [HRML_becquerel] = "Bq",
+  [HRML_gray] = "Gy",
+  [HRML_sievert] = "Sv",
+  [HRML_katal] = "kat",
+
+  [HRML_minute] = "min",
+  [HRML_hour] = "h",
+  [HRML_day] = "d",
+  [HRML_arcdeg] = "deg arc",
+  [HRML_arcminute] = "'",
+  [HRML_arcsec] = "''",
+  [HRML_hectare] = "ha",
+  [HRML_litre] = "L",
+  [HRML_tonne] = "t",
+  [HRML_electronvolt] = "eV",
+  [HRML_atomic_mass_unit] = "u",
+  [HRML_astronomical_unit] = "AU",
+  [HRML_parsec] = "pc",
+  [HRML_lightyear] = "ly",
+  [HRML_bar] = "bar"
+};
+
+/* Parsing the si units is a bit tricky as it in principle requires that
+  we parse the unit first and then the prefix due to ambiguities with the
+  derived units. E.g. dd is in principle deci-day, though this is in princple
+  not allowed, we have to treat this case if we want a general parser.
+
+  We build up parse tables that start from the back of the strings and then
+  fork of in sparse trees to resolve the units
+*/
+
+typedef struct parse_tree_t {
+  char ch;
+  HRMLsitype sitype; // If this is the final entry for this, otherwise invalid
+  size_t childCount;
+  struct parse_tree_t **children;
+} parse_tree_t;
+
+parse_tree_t *si_unit_trees[28];
+
+static void
+build_si_unit_parse_tables(void)
+{
+  memset(si_unit_trees, 0, sizeof(si_unit_trees));
+  for (size_t i = 0 ; i < HRML_siunit_size ; i ++ ) {
+    size_t slen = strlen(gUnitTable[i]);
+    const char *endc = gUnitTable[i] + slen - 1;
+
+    // Create new root if neccissary
+    if (si_unit_trees[*endc] == NULL) {
+      si_unit_trees[*endc] = malloc(sizeof(parse_tree_t));
+      si_unit_trees[*endc]->ch = *endc;
+      si_unit_trees[*endc]->sitype = HRML_siunit_invalid;
+      si_unit_trees[*endc]->childCount = 0;
+      si_unit_trees[*endc]->children = NULL;
+    }
+
+    // Go down in the tree, adding additional nodes if neccissary
+    parse_tree_t *final_entry = si_unit_trees[*endc];
+    do {
+      endc --;
+    } while (endc >= gUnitTable[i]);
+    final_entry->sitype = i;
+  }
+}
+
+static void
+parse_si_unit(const char *unit)
+{
+
+}
+
 typedef enum HRMLtokenkind{
   HrmlTokenInvalid = 0,
   HrmlTokenSym,
@@ -51,6 +176,7 @@ typedef enum HRMLtokenkind{
   HrmlTokenDate,
   HrmlTokenTime,
   HrmlTokenChar,
+  HrmlTokenBool
 } HRMLtokenkind;
 
 static int gLineCount = 1;
@@ -59,7 +185,15 @@ static bool gParseErrors = false;
 
 static char *gTokenKinds[] =
 {
-  "invalid", "sym", "str", "int", "real", "date", "time", "char"
+  [HrmlTokenInvalid] = "invalid",
+  [HrmlTokenSym] = "sym",
+  [HrmlTokenStr] = "str",
+  [HrmlTokenInt] = "int",
+  [HrmlTokenFloat] = "real",
+  [HrmlTokenDate] = "date",
+  [HrmlTokenTime] = "time",
+  [HrmlTokenChar] = "char",
+  [HrmlTokenBool] = "bool"
 };
 
 static inline void
@@ -87,6 +221,7 @@ typedef struct HRMLtoken {
     uint64_t integer;
     double real;
     char ch;
+    bool boolean;
   } val;
 } HRMLtoken;
 
@@ -193,8 +328,47 @@ makeInt(const char * restrict name, uint64_t i)
 {
   HRMLobject *obj = malloc(sizeof(HRMLobject));
   obj->name = strdup(name);
-  obj->typ = HRMLInt;
-  obj->u.integer = i;
+  obj->val.alen = 0;
+  obj->val.typ = HRMLInt;
+  obj->val.u.integer = i;
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+
+  return obj;
+}
+
+static inline HRMLobject*
+makeIntArray(const char * restrict name, uint64_t *i, size_t len)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+  obj->val.alen = len;
+  obj->val.typ = HRMLIntArray;
+  obj->val.u.intArray = calloc(len, sizeof(uint64_t));
+  memcpy(obj->val.u.intArray, i, len*sizeof(uint64_t));
+
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+
+  return obj;
+}
+
+
+static inline HRMLobject*
+makeFloatArray(const char * restrict name, double *d, size_t len)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+  obj->val.alen = len;
+  obj->val.typ = HRMLFloatArray;
+  obj->val.u.realArray = calloc(len, sizeof(double));
+  memcpy(obj->val.u.realArray, d, len*sizeof(double));
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+
   return obj;
 }
 
@@ -203,18 +377,66 @@ makeFloat(const char * restrict name, double d)
 {
   HRMLobject *obj = malloc(sizeof(HRMLobject));
   obj->name = strdup(name);
-  obj->typ = HRMLFloat;
-  obj->u.real = d;
+  obj->val.alen = 0;
+  obj->val.typ = HRMLFloat;
+  obj->val.u.real = d;
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+
   return obj;
 }
+
 
 static inline HRMLobject*
 makeStr(const char * restrict name, const char * restrict s)
 {
   HRMLobject *obj = malloc(sizeof(HRMLobject));
   obj->name = strdup(name);
-  obj->typ = HRMLStr;
-  obj->u.str = strdup(s);
+
+  obj->val.alen = 0;
+  obj->val.typ = HRMLStr;
+  obj->val.u.str = strdup(s);
+
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+
+  return obj;
+}
+
+static inline HRMLobject*
+makeBool(const char * restrict name, bool b)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+
+  obj->val.alen = 0;
+  obj->val.typ = HRMLBool;
+  obj->val.u.boolean = b;
+
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+
+  return obj;
+}
+
+static inline HRMLobject*
+makeBoolArray(const char * restrict name, bool *b, size_t len)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+
+  obj->val.alen = len;
+  obj->val.typ = HRMLBool;
+  obj->val.u.boolArray = calloc(len, sizeof(bool));
+  memcpy(obj->val.u.boolArray, b, len*sizeof(bool));
+
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+
   return obj;
 }
 
@@ -222,13 +444,13 @@ static inline HRMLobject*
 makeNode(const char * restrict name)
 {
   HRMLobject *obj = malloc(sizeof(HRMLobject));
-  obj->name = strdup(name);
-  obj->typ = HRMLNode;
-  obj->u.node = malloc(sizeof(HRMLlist));
-  obj->u.node->head = NULL;
-  obj->u.node->tail = NULL;
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
 
-//  printf("made node %p for %s\n", obj, name);
+  obj->val.alen = 0;  
+  obj->name = strdup(name);
+  obj->val.typ = HRMLNode;
 
   return obj;
 }
@@ -236,20 +458,14 @@ makeNode(const char * restrict name)
 static inline void
 pushNode(HRMLobject *parent, HRMLobject *child)
 {
-//  printf("push node %s on %s\n", child->name, parent->name);
+  // TODO: This inserts in the wrong order, we should fix this by adding a tail node
+  child->next = parent->children;
+  child->previous = NULL;
 
-  HRMLlistentry *entry = malloc(sizeof(HRMLlistentry));
-  entry->data = child;
-  entry->previous = parent->u.node->tail;
-  entry->next = NULL;
-
-  if (parent->u.node->head == NULL) {
-    parent->u.node->head = entry;
-    parent->u.node->tail = entry;
-  } else {
-    parent->u.node->tail->next = entry;
-    parent->u.node->tail = entry;
+  if (parent->children != NULL) {
+    parent->children->previous = child;
   }
+  parent->children = child;
 }
 
 HRMLtoken
@@ -350,19 +566,33 @@ hrmlLex(FILE *f)
 
       return tok;
     }
-  printf("********\n");
+  
+    printf("********\n");
     return errTok;
   } else if (isalpha(c)) {
     // Symbols
     gw_push(&s, c);
-    while (isalnum(c = fgetc(f))) {
+    while (isalnum(c = fgetc(f)) || c == '-') {
       gw_push(&s, c);
     }
     ungetc(c, f);
 
+    if (!strcmp(s.str, "true")) {
+      HRMLtoken tok;
+      tok.kind = HrmlTokenBool;
+      tok.val.boolean = true;
+      gw_destroy(&s);
+      return tok;
+    } else if (!strcmp(s.str, "false")) {
+      HRMLtoken tok;
+      tok.kind = HrmlTokenBool;
+      tok.val.boolean = false;
+      gw_destroy(&s);
+      return tok;
+    }
     HRMLtoken tok;
     tok.kind = HrmlTokenSym;
-    tok.val.sym = strdup(s.str);//TODO: fix leak
+    tok.val.sym = strdup(s.str);//TODO: fix leak, should move to Mmap based files
     gw_destroy(&s);
     return tok;
   } else if (c == '"') {
@@ -415,6 +645,9 @@ hrmlLex(FILE *f)
 #define REAL(tok) ((tok).val.real)
 #define IS_LEAP_YEAR(y) (((y) % 400 == 0) || ((y) % 100 != 0 && (y) % 4 == 0))
 #define IS_VALUE(tok) (IS_STR(tok) || IS_INTEGER(tok) || IS_REAL(tok) || IS_SYM(tok))
+
+#define IS_BOOLEAN(tok) ((tok).kind == HrmlTokenBool)
+#define BOOLEAN(tok) ((tok).val.boolean)
 
 // Checks date for validity, asserts that month is between 1 and 12 and that the
 // day is in the valid range for that month, taking leap years into account
@@ -505,6 +738,7 @@ hrmlPrintTok(HRMLtoken tok)
 HRMLobject*
 hrmlParseArray(FILE *f)
 {
+  size_t alen;
   // At this point, the left bracket '[' should already be consumed
   HRMLtoken value = hrmlLex(f);
   HRMLtoken comma = hrmlLex(f);
@@ -572,6 +806,15 @@ hrmlParsePrimitiveValue(FILE *f, const char *sym)
     if (IS_CHAR(semi, ';')) {
       return makeStr(sym, STR(firstTok));
     }
+  } else if (IS_BOOLEAN(firstTok)) {
+    HRMLtoken semi = hrmlLex(f);
+    if (IS_CHAR(semi, ';')) {
+      return makeBool(sym, BOOLEAN(firstTok));
+    }
+  } else if (IS_CHAR(firstTok, '[')) {
+    // Parse primitive value array (only bools, reals and integers)
+  } else {
+    ParseError("unknown token detected\n");
   }
 
 
@@ -644,8 +887,7 @@ hrmlParseAttrs(FILE *f)
   return NULL;
 }
 
-HRMLobject*
-  hrmlParseObj(FILE *f, const char *sym);
+HRMLobject* hrmlParseObj(FILE *f, const char *sym);
 
 HRMLobject*
 hrmlParseObjList(FILE *f, const char *sym)
@@ -717,12 +959,12 @@ hrmlPrintObj(HRMLobject *obj, int indent)
 {
   assert(obj != NULL);
 
-  if (obj->typ == HRMLNode) {
+  if (obj->val.typ == HRMLNode) {
     indentstdout(indent);
     printf("%s () {\n", obj->name);
-    HRMLlistentry *child = obj->u.node->head;
+    HRMLobject *child = obj->children;
     while (child) {
-      hrmlPrintObj(child->data, indent + 1);
+      hrmlPrintObj(child, indent + 1);
       child = child->next;
     }
 
@@ -783,58 +1025,18 @@ hrmlValidate(HRMLdocument *doc, HRMLschema *sc)
 
 }
 
-HRMLiterator *
-hrmlRootIterator(HRMLdocument *doc)
-{
-  HRMLiterator *it = malloc(sizeof(HRMLiterator));
-
-  return it;
-}
-
-
-HRMLiterator *
-hrmlIteratorNext(HRMLiterator *it)
-{
-  if (it->next) {
-    return it->next;
-  }
-
-  return NULL;
-}
-
-HRMLiterator *
-hrmlIteratorPrev(HRMLiterator *it)
-{
-  if (it->previous) {
-    return it->previous;
-  }
-
-  return NULL;
-}
-
-
-HRMLtype hrmlIteratorType(HRMLiterator *it)
-{
-  return it->data->typ;
-}
-HRMLobject* hrmlIteratorValue(HRMLiterator *it)
-{
-  return it->data;
-}
-
 void
 hrmlFreeObj(HRMLobject *obj)
 {
   // TODO: Free strings as well
   assert(obj != NULL);
 
-  if (obj->typ == HRMLNode) {
-    HRMLlistentry *child = obj->u.node->head;
+  if (obj->val.typ == HRMLNode) {
+    HRMLobject *child = obj->children;
     while (child) {
-      hrmlFreeObj(child->data);
+      hrmlFreeObj(child);
       child = child->next;
     }
-    free(obj->u.node);
   }
   
   free(obj);
@@ -844,14 +1046,34 @@ void
 hrmlFreeDocument(HRMLdocument *doc)
 {
   hrmlFreeObj(doc->rootNode);
+  free(doc);
 }
-
 
 
 HRMLobject*
 hrmlGetObject(HRMLdocument *doc, const char *docPath)
 {
+  char str[strlen(docPath)+1];
+  strcpy(str, docPath); // TODO: We do not trust the user, should probably
+                        // check alloca result
 
+  HRMLobject *obj = hrmlGetRoot(doc);
+  char *strp = str;
+  char *strTok = strsep(&strp, "/");
+  while (obj) {
+    if (!strcmp(obj->name, strTok)) {
+      if (strp == NULL) {
+        // At the end of the doc path
+        return obj;
+      }
+
+      // If this is not the lowest level, go one level down
+      strTok = strsep(&strp, "/");
+      obj = obj->children;
+    } else {
+      obj = obj->next;
+    }
+  }
   return NULL;
 }
 

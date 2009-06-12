@@ -58,6 +58,7 @@
           : "more text";
       }
     }
+  Note that the anonymous entry syntax : ""; is subject to change.
   The data is typed, and may consit of the following types: integers, reals,
   dates, strings, values with SI units and enums (defined in schemas).
 
@@ -69,6 +70,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+#include <assert.h>
 
 typedef enum HRMLtype {
   HRMLInt,
@@ -76,18 +79,114 @@ typedef enum HRMLtype {
   HRMLStr,
   HRMLNode,
   HRMLDate,
+  HRMLBool,
+  HRMLIntArray,
+  HRMLFloatArray,
+  HRMLBoolArray,
+  HRMLNull
 } HRMLtype;
 
-typedef struct HRMLlist HRMLlist;
+typedef enum HRMLsiprefix {
+  HRML_yocto = 0,
+  HRML_zepto,
+  HRML_atto,
+  HRML_femto,
+  HRML_pico,
+  HRML_nano,
+  HRML_micro,
+  HRML_milli,
+  HRML_centi,
+  HRML_deci,
+  HRML_none,
+  HRML_deca,
+  HRML_hecto,
+  HRML_kilo,
+  HRML_mega,
+  HRML_giga,
+  HRML_tera,
+  HRML_peta,
+  HRML_exa,
+  HRML_zetta,
+  HRML_yotta,
+  HRML_siprefix_size
+} HRMLsiprefix;
 
-typedef struct HRMLlistentry HRMLlistentry;
+typedef enum HRMLsitype {
+  /* First the base units */
+  HRML_metre = 0,
+  HRML_gram, /* Note that since the base is actually kg, you have to use the prefix to set the proper unit */
+  HRML_second,
+  HRML_ampere,
+  HRML_kelvin,
+  HRML_mole,
+  HRML_candela,
+
+  /* Derived units */
+  HRML_hertz,
+  HRML_radian,
+  HRML_steradian,
+  HRML_newton,
+  HRML_pascal,
+  HRML_joule,
+  HRML_watt,
+  HRML_coulomb,
+  HRML_volt,
+  HRML_farad,
+  HRML_ohm,
+  HRML_siemens,
+  HRML_weber,
+  HRML_tesla,
+  HRML_henry,
+  HRML_celsius,
+  HRML_lumen,
+  HRML_lux,
+  HRML_becquerel,
+  HRML_gray,
+  HRML_sievert,
+  HRML_katal,
+
+  /* Other units */
+  HRML_minute,
+  HRML_hour,
+  HRML_day,
+  HRML_arcdeg,
+  HRML_arcminute,
+  HRML_arcsec,
+  HRML_hectare,
+  HRML_litre,
+  HRML_tonne,
+
+  HRML_electronvolt,
+  HRML_atomic_mass_unit,
+  HRML_astronomical_unit,
+
+  HRML_parsec,
+  HRML_lightyear,
+
+  HRML_bar,
+  HRML_siunit_size,
+  HRML_siunit_invalid
+} HRMLsitype;
 
 typedef struct HRMLvalue {
   HRMLtype typ;
+  size_t alen; // Array length if applicable
   union {
     uint64_t integer;
+    uint64_t *intArray;
+
     double real;
+    double *realArray;
+
     char *str;
+    bool boolean;
+    bool *boolArray;
+
+    struct {
+      double val;
+      HRMLsiprefix siPrefix;
+      HRMLsitype siType;
+    } typedVal;
   } u;
 } HRMLvalue;
 
@@ -100,42 +199,82 @@ typedef struct HRMLattrlist {
 
 typedef struct HRMLobject {
   char *name;
-  HRMLtype typ;
   HRMLattrlist *attrs;
-  union {
-    uint64_t integer;
-    double real;
-    char *str;
-    HRMLlist *node;
-  } u;
+  HRMLvalue val;
+  struct HRMLobject *previous;
+  struct HRMLobject *next;
+  struct HRMLobject *children;
 } HRMLobject;
 
-struct HRMLlistentry {
-  HRMLlistentry *previous;
-  HRMLlistentry *next;
-  HRMLobject *data;
-};
+static inline HRMLvalue
+hrmlGetAttrForName(HRMLobject *obj, const char *attrName)
+{
+  for (size_t i = 0 ; i < obj->attrs->attrCount; i ++) {
+    if (!strcmp(attrName, obj->attrs->names[i])) {
+      return obj->attrs->values[i];
+    }
+  }
 
-struct HRMLlist {
-  HRMLlistentry *head;
-  HRMLlistentry *tail;
-};
+  HRMLvalue nullVal = {.typ = HRMLNull, .u.integer = 0};
+  return nullVal;
+}
+
+static inline uint64_t
+hrmlGetInt(HRMLobject *obj)
+{
+  assert(obj->val.typ == HRMLInt);
+  return obj->val.u.integer;
+}
+
+static inline double
+hrmlGetReal(HRMLobject *obj)
+{
+  assert(obj->val.typ == HRMLFloat);
+  return obj->val.u.real;
+}
+
+static inline const char*
+hrmlGetStr(HRMLobject *obj)
+{
+  assert(obj->val.typ == HRMLStr);
+  return obj->val.u.str;
+}
+
+static inline HRMLobject*
+hrmlGetNode(HRMLobject *obj)
+{
+  assert(obj->val.typ == HRMLNode);
+  return obj->children;
+}
 
 typedef struct HRMLdocument {
   HRMLobject *rootNode;
 } HRMLdocument;
 
+static inline HRMLobject*
+hrmlGetNodeHead(HRMLobject *node) {
+  assert(node->val.typ == HRMLNode);
+  return node->children;
+}
+
+static inline HRMLobject*
+hrmlGetNodeTail(HRMLobject *node) {
+  assert(node->val.typ == HRMLNode);
+  return node->children;
+}
+
+
+static inline HRMLobject*
+hrmlGetRoot(HRMLdocument *doc){
+  return doc->rootNode;
+}
+
 typedef struct HRMLschema {
 
 } HRMLschema;
 
-typedef HRMLlistentry HRMLiterator;
 HRMLdocument* hrmlParse(FILE *f);
 bool hrmlValidate(HRMLdocument *doc, HRMLschema *sc);
-HRMLiterator *hrmlRootIterator(HRMLdocument *doc);
-HRMLiterator *hrmlIteratorNext(HRMLiterator *it);
-HRMLtype hrmlIteratorType(HRMLiterator *it);
-HRMLobject* hrmlIteratorValue(HRMLiterator *it);
 void hrmlFreeDocument(HRMLdocument *doc);
 HRMLobject* hrmlGetObject(HRMLdocument *doc, const char *docPath);
 

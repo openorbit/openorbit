@@ -44,13 +44,31 @@ START_TEST(test_valid)
   if (f) {
     HRMLdocument *doc = hrmlParse(f);
     fail_if( doc == 0, "hrmlParse returned null");
+    hrmlFreeDocument(doc);
   } else {
     fail_if(1, "invalid file");
   }
   
-  
 }
 END_TEST
+
+START_TEST(test_path)
+{
+  FILE *f = fopen(validHrmlFileName, "r");
+  HRMLdocument *doc = hrmlParse(f);
+
+  HRMLobject *obj = hrmlGetObject(doc, "document/header/title");
+  fail_if(obj == NULL);
+  fail_unless(obj->val.typ == HRMLStr);
+  fail_if(strcmp(obj->val.u.str, "My Document"));
+
+  HRMLobject *obj2 = hrmlGetObject(doc, "document/header/blaht");
+  fail_unless(obj2 == NULL);
+
+  hrmlFreeDocument(doc);
+}
+END_TEST
+
 
 Suite
 *test_suite(int argc, char **argv)
@@ -65,6 +83,7 @@ Suite
     TCase *tc_core = tcase_create("Core");
 
     tcase_add_test(tc_core, test_valid);
+    tcase_add_test(tc_core, test_path);
     
     suite_add_tcase(s, tc_core);
     
