@@ -43,7 +43,7 @@
 #include "sim/simtime.h"
 
   typedef struct OOdrawable OOdrawable;
-  typedef struct OOscene_ OOscene; 
+  typedef struct OOscene OOscene;
   typedef struct OOoverlay OOoverlay;
   typedef struct OOscenegraph OOscenegraph;
 
@@ -62,8 +62,8 @@ struct OOdrawable {
   OOdrawfunc draw;
 };
 
-struct OOscene_ {
-    struct OOscene_ *parent;
+struct OOscene {
+    struct OOscene *parent;
     char *name;
 
     OOobject *data;
