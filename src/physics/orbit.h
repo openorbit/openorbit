@@ -98,7 +98,7 @@ typedef struct OOorbsys {
 } OOorbsys;
 
 
-OOorbsys* ooOrbitNewSys(const char *name,
+OOorbsys* ooOrbitNewSys(const char *name, OOscene *scene,
                         float m, float period,
                         float semiMaj, float semiMin);
 OOorbobj*
