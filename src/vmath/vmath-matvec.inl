@@ -8,7 +8,8 @@ might be more architectural specialised files further down from here
 static inline vector_t
 v_neg(vector_t v)
 {
-    return (vector_t)-v.v;
+  vector_t nv = {.v = -v.v};
+    return nv;
 }
 #endif /* VM_V4_NEG */
 
