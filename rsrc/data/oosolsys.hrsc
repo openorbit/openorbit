@@ -1,0 +1,38 @@
+# Schema file for open orbit
+openorbit (count: "1") {
+  star (count: "1+") {
+    physical (count: "1") {
+      radius (count: "1"): "real";
+      mass (count: "1"): "real";
+    }
+    satellites (count: "1") {
+      planet (count: "*") {
+        orbit (count: "1") {
+          semimajor-axis (count: "1"): "real";
+          eccentricity (count: "1"): "real";
+          inclination (count: "1"): "real";
+          longitude-ascending-node (count: "1"): "real";
+          longitude-perihelion (count: "1"): "real";
+          mean-longitude (count: "1"): "real";
+          right-ascension (count: "1"): "real";
+          declination (count: "1"): "real";
+          reference-date (count: "1"): "real";
+        }
+        physical (count: "1") {
+          radius (count: "1"): "real";
+          mass (count: "1"): "real";
+        }
+        satellites (count: "1") {
+          moon (count: "*") {
+            orbit (count: "1") {
+            }
+            physical (count: "1") {
+              radius (count: "1"): "real";
+              mass (count: "1"): "real";
+            }
+          }
+        }
+      }
+    }
+  }
+}
