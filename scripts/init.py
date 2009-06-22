@@ -43,85 +43,85 @@
 
 print "Running init script..."
 
-import io       # I/O module, allowing the binding of key handlers
-import config   # config, allows one to set config values
-import res
+#import io       # I/O module, allowing the binding of key handlers
+#import config   # config, allows one to set config values
+#import res
 
 import math
-import ConfigParser
+#import ConfigParser
 import sys
 import os
 from os import environ
 
 home = environ["HOME"]
-prefsSearchPaths = [home + "/Library/Preferences/", home + "/.openorbit/"]
-resSearchPaths = [home + "/Library/Application Support/Open Orbit/", home + "/.openorbit/"]
+#prefsSearchPaths = [home + "/Library/Preferences/", home + "/.openorbit/"]
+#resSearchPaths = [home + "/Library/Application Support/Open Orbit/", home + "/.openorbit/"]
 # Find path that contains the openorbit.conf file, this path is our default dir
 # for preferences, we should create the directory if it does not exist
-for path in prefsSearchPaths:
-    prefsPath = None
-    if os.path.isfile(os.path.join(path, "openorbit.conf")):
-        prefsPath = path
-        break
+#for path in prefsSearchPaths:
+#    prefsPath = None
+#    if os.path.isfile(os.path.join(path, "openorbit.conf")):
+#        prefsPath = path
+#        break
 
-if prefsPath == None:
+#if prefsPath == None:
     # not found
-    pass
+#    pass
 
 # Find path with open orbit resources
-for path in resSearchPaths:
-    resPath = None
-    if os.path.isfile(os.path.join(path, "")):
-        resPath = path
-        break
+#for path in resSearchPaths:
+#    resPath = None
+#    if os.path.isfile(os.path.join(path, "")):
+#        resPath = path
+#        break
 
-if resPath == None:
+#if resPath == None:
     # not found
-    pass
+#    pass
 
     
 # A few default values for the config parser
-defaultValues = {'HOME' : home, 'RES': resPath}
+#defaultValues = {'HOME' : home, 'RES': resPath}
 
-prefs = ConfigParser.ConfigParser(defaultValues)
-prefs.read([path + "openorbit.conf" for path in prefsSearchPaths])
+#prefs = ConfigParser.ConfigParser(defaultValues)
+#prefs.read([path + "openorbit.conf" for path in prefsSearchPaths])
 
 # Populate the default preferences
-if not prefs.has_section("VIDEO"):
-    prefs.add_section("VIDEO")
-    prefs.set("VIDEO", "width", 800)
-    prefs.set("VIDEO", "height", 600)
-    prefs.set("VIDEO", "fullscreen", False)
-    prefs.set("VIDEO", "depth", 32)
-    prefs.set("VIDEO", "fovy", 45.0)
-    prefs.set("VIDEO", "aspect", 1.33)
-    
-if not prefs.has_section("AUDIO"):
-    prefs.add_section("AUDIO")
-    
-if not prefs.has_section("KEYBOARD"):
-    prefs.add_section("KEYBOARD")
-    prefs.set("KEYBOARD", "cam-fwd",        "e")
-    prefs.set("KEYBOARD", "cam-back",       "d")
-    prefs.set("KEYBOARD", "cam-left",       "s")
-    prefs.set("KEYBOARD", "cam-right",      "f")
-    prefs.set("KEYBOARD", "cam-up",         "a")
-    prefs.set("KEYBOARD", "cam-down",       "z")
-    prefs.set("KEYBOARD", "cam-pitch-up",   "g")
-    prefs.set("KEYBOARD", "cam-pitch-down", "t")
-    prefs.set("KEYBOARD", "cam-yaw-right",  "v")
-    prefs.set("KEYBOARD", "cam-yaw-left",   "x")
-    prefs.set("KEYBOARD", "cam-roll-left",  "w")
-    prefs.set("KEYBOARD", "cam-roll-right", "r")
-    
-if not prefs.has_section("MOUSE"):
-    prefs.add_section("MOUSE")
-
-if not prefs.has_section("SYS"):
-    prefs.add_section("SYS")
-    prefs.set("SYS", "log-level", "info")
-    
-
+#if not prefs.has_section("VIDEO"):
+#    prefs.add_section("VIDEO")
+#    prefs.set("VIDEO", "width", 800)
+#    prefs.set("VIDEO", "height", 600)
+#    prefs.set("VIDEO", "fullscreen", False)
+#    prefs.set("VIDEO", "depth", 32)
+#    prefs.set("VIDEO", "fovy", 45.0)
+#    prefs.set("VIDEO", "aspect", 1.33)
+#    
+#if not prefs.has_section("AUDIO"):
+#    prefs.add_section("AUDIO")
+#    
+#if not prefs.has_section("KEYBOARD"):
+#    prefs.add_section("KEYBOARD")
+#    prefs.set("KEYBOARD", "cam-fwd",        "e")
+#    prefs.set("KEYBOARD", "cam-back",       "d")
+#    prefs.set("KEYBOARD", "cam-left",       "s")
+#    prefs.set("KEYBOARD", "cam-right",      "f")
+#    prefs.set("KEYBOARD", "cam-up",         "a")
+#    prefs.set("KEYBOARD", "cam-down",       "z")
+#    prefs.set("KEYBOARD", "cam-pitch-up",   "g")
+#    prefs.set("KEYBOARD", "cam-pitch-down", "t")
+#    prefs.set("KEYBOARD", "cam-yaw-right",  "v")
+#    prefs.set("KEYBOARD", "cam-yaw-left",   "x")
+#    prefs.set("KEYBOARD", "cam-roll-left",  "w")
+#    prefs.set("KEYBOARD", "cam-roll-right", "r")
+#    
+#if not prefs.has_section("MOUSE"):
+#    prefs.add_section("MOUSE")
+#
+#if not prefs.has_section("SYS"):
+#    prefs.add_section("SYS")
+#    prefs.set("SYS", "log-level", "info")
+#    
+#
 
 
 # Write all defaults to disk (maybe we should not write anything if there
@@ -133,12 +133,12 @@ if not prefs.has_section("SYS"):
 
 # I guess that the best is to (in the long run), write the options parser
 # in yacc/flex/C and have it tightly connected with the internals.
-fp = open(os.path.join(prefsSearchPaths[1], "openorbit.conf"), "w")
-prefs.write(fp)
-fp.close()
+#fp = open(os.path.join(prefsSearchPaths[1], "openorbit.conf"), "w")
+#prefs.write(fp)
+#fp.close()
 
-prefs = ConfigParser.ConfigParser(defaultValues)
-prefs.read([path + "openorbit.conf" for path in prefsSearchPaths])
+#prefs = ConfigParser.ConfigParser(defaultValues)
+#prefs.read([path + "openorbit.conf" for path in prefsSearchPaths])
 
 #try:
 #    videoWidth = prefs.getint("VIDEO", "width")
