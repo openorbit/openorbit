@@ -105,7 +105,7 @@ ooResGetPath(const char *fileName)
     assert(fileName != NULL && "File name cannot be null");
         
     char *path;
-    asprintf(&path, "%s/%s\0", ooResGetBasePath(), fileName);
+    asprintf(&path, "%s/%s", ooResGetBasePath(), fileName);
     
     return path; // Note, asprintf sets this to NULL if it fails
 }
@@ -116,7 +116,7 @@ ooResGetFilePaths(const char *pattern)
   const char *base = ooResGetBasePath();
   
   char *fullPattern;
-  asprintf(&fullPattern, "%s/%s\0", base, pattern);
+  asprintf(&fullPattern, "%s/%s", base, pattern);
   ooLogInfo("search for %s", fullPattern);
   glob_t globs;
   glob(fullPattern, 0, NULL, &globs);
