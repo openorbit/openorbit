@@ -969,7 +969,7 @@ hrmlPrintObj(HRMLobject *obj, int indent)
     }
 
     indentstdout(indent);
-    printf("}\n", obj->name);
+    printf("}\n");
 
   } else {
     indentstdout(indent);
