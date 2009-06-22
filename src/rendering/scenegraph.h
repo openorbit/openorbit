@@ -136,15 +136,6 @@ OOscene* ooSgSceneGetRoot(OOscene *sc);
 void ooSgSceneAddChild(OOscene *parent, OOscene *child);
 void ooSgSceneAddObj(OOscene *sc, OOobject *object);
 
-//OOnode* ooSgNewNode(OOobject *obj, OOdrawfunc df, OOdrawfunc postDf);
-//void ooSgAddChild(OOnode *parent, OOnode *child);
-//void ooSgDraw(OOnode *node, OOcam *cam);
-
-// Makes a scene synchronise with an ODE object
-//void ooSgSceneAttachOdeObj(OOscene *sc, dBodyID body);
-
-// Makes a scene synchronise with an orbital system
-//void ooSgSceneAttachOrbSys(OOscene *sc, OOorbsys *sys);
 
 typedef struct {
     matrix_t t;
@@ -181,7 +172,7 @@ typedef struct {
     GLfloat radius;
 } OOsphere;
 
-OOdrawable* ooSgNewSphere(float size);
+OOdrawable* ooSgNewSphere(float radius, const char *tex);
 
 /* Allocators */
 //OOnode* ooSgNewMesh(OOtexture *tex);

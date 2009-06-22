@@ -478,9 +478,17 @@ ooSgDrawSphere(OOsphere *sp)
 }
 
 OOdrawable*
-ooSgNewSphere(float size)
+ooSgNewSphere(float radius, const char *tex)
 {
+  OOsphere *sp = malloc(sizeof(OOsphere));
+  sp->radius = radius;
+  ooTexLoad(tex, tex);
+  sp->texId = ooTexNum(tex);
+  sp->quadratic = gluNewQuadric();
+  gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
+  gluQuadricTexture(sp->quadratic, GL_TRUE);
   
+  return ooSgNewDrawable(sp, (OOdrawfunc) ooSgDrawSphere);
 }
 
 
