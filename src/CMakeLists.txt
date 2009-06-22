@@ -75,6 +75,10 @@ set_source_files_properties(${ORBIT_RES_DATA}
                             PROPERTIES
                             MACOSX_PACKAGE_LOCATION Resources/data/)
 
+set_source_files_properties(${ORBIT_RES_FONT}
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/font/)
+
 set_source_files_properties(${ORBIT_SCRIPTS}
                             PROPERTIES
                             MACOSX_PACKAGE_LOCATION Resources/script/)
@@ -94,6 +98,7 @@ add_executable(openorbit MACOSX_BUNDLE
                ${openorbit_FILES}
                ${ORBIT_RES_TEX}
                ${ORBIT_RES_DATA}
+               ${ORBIT_RES_FONT}
                ${ORBIT_SCRIPTS}
                ${ORBIT_DEP_YAML}
                ${ORBIT_PLUGINS}

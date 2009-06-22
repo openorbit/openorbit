@@ -11,8 +11,16 @@ set_source_files_properties(${ORBIT_RES_TEX}
 
 
 # Data
-file(GLOB ORBIT_RES_DATA_LOCAL "data/*.csv" "data/*.yaml")
+file(GLOB ORBIT_RES_DATA_LOCAL "data/*.csv" "data/*.yaml" "data/*.hrml" "data/*.hrsc")
 set(ORBIT_RES_DATA ${ORBIT_RES_DATA_LOCAL} PARENT_SCOPE)
 set_source_files_properties(${ORBIT_RES_DATA}
                             PROPERTIES
                             MACOSX_PACKAGE_LOCATION Resources/data)
+
+# Fonts
+file(GLOB ORBIT_RES_FONT_LOCAL "font/*.ttf")
+set(ORBIT_RES_FONT ${ORBIT_RES_FONT_LOCAL} PARENT_SCOPE)
+set_source_files_properties(${ORBIT_RES_FONT}
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/font)
+
