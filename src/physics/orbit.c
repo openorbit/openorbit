@@ -376,7 +376,7 @@ ooOrbitLoadStar(HRMLobject *obj)
 }
 
 OOorbsys*
-ooOrbitLoad(const char *fileName)
+ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 {
   FILE *file = ooResGetFile(fileName);
   HRMLdocument *solarSys = hrmlParse(file);

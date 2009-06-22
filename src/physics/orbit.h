@@ -73,7 +73,7 @@ typedef struct OOorbsys {
       float dist;
       float distInv;
       float mass;
-      float massInv;      
+      float massInv;
     } scale;
     
     struct {
@@ -125,6 +125,6 @@ void ooOrbitClear(OOorbsys *sys);
    This function does not belong in the physics system, but will be here for
    now beeing.
  */
-OOorbsys* ooOrbitLoad(const char *file);
+OOorbsys* ooOrbitLoad(OOscenegraph *sg, const char *file);
 
 #endif /* ! _ORBIT_H_ */
