@@ -4,6 +4,7 @@ option(USE_CLANG "Use clang as compiler" off)
 option(ANALYSIS "Run clang static analyser on the source" off)
 if (USE_CLANG OR ANALYSIS)
   set(CMAKE_C_COMPILER_INIT "clang")
+  set(CMAKE_CXX_COMPILER_INIT "clang")
 endif(USE_CLANG OR ANALYSIS)
 
 
