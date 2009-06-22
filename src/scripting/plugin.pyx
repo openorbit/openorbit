@@ -42,4 +42,3 @@ def Load(name):
     
 def Unload(key):
     ooPluginUnload(key)
-    

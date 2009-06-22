@@ -29,12 +29,14 @@
 #   above, a recipient may use your version of this file under either the MPL,
 #   the GPL or the LGPL."
 
-import io       # I/O module, allowing the binding of key handlers
-import config   # config, allows one to set config values
-import orbits
-import res, sg, sim, texture
+#import io       # I/O module, allowing the binding of key handlers
+#import config   # config, allows one to set config values
+#import orbits
+#import res, sg, sim, texture
 
-import yaml
+#import yaml
+
+import ooscript
 
 import math
 import ConfigParser
@@ -47,7 +49,7 @@ print "Running post init script..."
 
 def loadStars():
   #  f = open(res.getPath("data/stars.csv"))
-    skyDrawable = sg.SkyDrawable("data/stars.csv")
+    skyDrawable = ooscript.SkyDrawable("data/stars.csv")
   #  for line in f:
   #      vmag, ra, dec, btmag, vtmag, b_v, v_i = tuple(line.split(","))
   #      skyDrawable.addStar(math.radians(float(ra)), math.radians(float(dec)),
@@ -311,13 +313,14 @@ def _test():
 #else:
 stars = loadStars()
 
-sgr = sg.Scenegraph().new()
+sgr = ooscript.Scenegraph().new()
 sgr.setBackground(stars)
-cam = sg.FreeCam()
+cam = ooscript.FreeCam()
 cam.setParams(sgr, sgr.getRoot(), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 sgr.setCam(cam)
 
-sim.setSg(sgr)
+ooscript.setSg(sgr)
+osys = ooscript.OrbitSys().new(sgr, "data/solsystem.hrml")
+ooscript.setOrbSys(osys)
 
-
-loadSolYaml(sgr)
+#loadSolYaml(sgr)

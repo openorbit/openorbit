@@ -38,19 +38,12 @@ cimport sg
 cimport orbits
 
 cdef class OrbitSys:
-    def __cinit__(self, char *name, float m, float period, float semiMaj, float semiMin):
-        #texture.load(textureName, textureName)
-        self.osys = ooOrbitNewSys(name, m, period, semiMaj, semiMin)
+    def __init__(self):
+        self.osys = <OOorbsys*>0
     def __dealloc__(self):
         # C function call to delete obj_sys object.
         pass
-    def addObj(self, name, m, x, y, z, vx, vy, vz, qx,qy,qz,qw,vqx,vqy,vqz,vqw):
-        cdef OOorbobj *obj
-        obj = ooOrbitNewObj(<OOorbsys*>self.osys, name, m, x, y, z, vx, vy, vz, qx,qy,qz,qw,vqx,vqy,vqz,vqw)
-        if obj == NULL:
-            raise TypeError("null returned")
-    def setScene(self, sg.Scene sc):
-      ooOrbitSetScene(self.osys, <OOscene*>sc.sc)
-    def addChild(self, OrbitSys child):
-        ooOrbitAddChildSys(self.osys, child.osys)
-    
+    def new(self, scg, char *fileName):
+      scenegraph = scg.getSg()
+      self.osys = ooOrbitLoad(<OOscenegraph*>scenegraph, fileName)
+      return self

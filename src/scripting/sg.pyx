@@ -39,6 +39,12 @@ cdef class Scene:
     def setScale(self, float x):
         pass
 
+cdef class Scene:
+    cdef OOscene *sc
+
+cdef class Cam:
+    cdef OOcam *cam
+
 cdef class Scenegraph:
     def __cinit__(self):
         self.sg = <OOscenegraph*>0
@@ -47,6 +53,9 @@ cdef class Scenegraph:
         self.sg = ooSgNewSceneGraph()
         return self
     
+    cdef getSg(self):
+        return self.sg
+        
     def setCam(self, Cam cam):
         ooSgSetCam(self.sg, cam.cam)
         

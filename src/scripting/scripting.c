@@ -39,14 +39,7 @@
 
 #include <Python.h>
 
-extern void initio(void);
-extern void initconfig(void);
-extern void initres(void);
-extern void initorbits(void);
-extern void inittexture(void);
-extern void initsg(void);
-extern void initsim(void);
-extern void initode(void);
+extern void initooscript(void);
 
  
 #include "scripting.h"
@@ -60,14 +53,7 @@ ooScriptingInit(void)
     
     Py_InitializeEx(0); // note that ex(0) prevents python from stealing sighandlers
 
-    initode();    
-    initio();
-    initconfig();
-    initres();
-    inittexture();
-    initorbits();
-    initsg();
-    initsim();
+    initooscript();
     // insert app-specific python path
     char *ooPyPath = ooResGetPath("python/");
     if (! ooPyPath) ooLogFatal("cannot generate python path");

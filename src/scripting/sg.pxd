@@ -5,23 +5,23 @@ cimport orbits
 cdef extern from "rendering/scenegraph.h":
    ctypedef void OOobject
    ctypedef void (*OOdrawfunc)(OOobject*)
-      
    
-   ctypedef struct OOvertex:
+   cdef struct OOvertex:
       float uv[2]
       float rgba[4]
       float norm[3]
       float vert[3]
 
-   ctypedef struct OOscene
+   cdef struct OOscene:
+      pass
 
-   ctypedef struct OOcam:
+   cdef struct OOcam:
       OOscene *scene
 
-   ctypedef struct OOscenegraph:
+   cdef struct OOscenegraph:
       OOscene *root
 
-   ctypedef struct OOdrawable:
+   cdef struct OOdrawable:
       OOobject *obj
       OOdrawfunc draw
 
