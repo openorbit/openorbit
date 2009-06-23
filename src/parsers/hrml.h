@@ -190,6 +190,13 @@ typedef struct HRMLvalue {
   } u;
 } HRMLvalue;
 
+typedef struct HRMLattr {
+  char *name;
+  HRMLvalue val;
+  struct HRMLattr *next;
+} HRMLattr;
+
+
 typedef struct HRMLattrlist {
   size_t allocLen;
   size_t attrCount;
@@ -277,6 +284,16 @@ HRMLdocument* hrmlParse(FILE *f);
 bool hrmlValidate(HRMLdocument *doc, HRMLschema *sc);
 void hrmlFreeDocument(HRMLdocument *doc);
 HRMLobject* hrmlGetObject(HRMLdocument *doc, const char *docPath);
+
+
+// Node iteration macros
+#define FOR_ALL_ATTR(attrib, node) \
+   for (HRMLattr *attrib = node->attr ; attrib != NULL; attrib = attrib->next)
+
+#define FOR_ALL_CHILDREN(obj, node) \
+   for (HRMLobject *obj = node->children ; obj != NULL; obj = obj->next)
+
+
 
 #endif /* end of include guard: HRML_H_SJH7PZB3 */
 

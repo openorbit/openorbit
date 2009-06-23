@@ -41,6 +41,536 @@
 #include <ctype.h>
 #include <assert.h>
 #include <setjmp.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <wchar.h>
+#include <wctype.h>
+#include <setjmp.h>
+
+// TODO: Ensure that line number and column number are availble for diagnostics
+
+typedef enum TokenKind {
+  tk_ident = 0,
+  tk_int,
+  tk_real,
+  tk_str,
+  tk_comment,
+  tk_colon,
+  tk_semi,
+  tk_comma,
+  tk_eq,
+  tk_lbrace,
+  tk_rbrace,
+  tk_lparen,
+  tk_rparen,
+  tk_lbrack,
+  tk_rbrack,
+  tk_eof,
+  tk_count
+} TokenKind;
+
+typedef struct Token {
+  TokenKind kind_;
+  const char *start_;
+  size_t len_;
+} Token;
+
+Token makeTok(TokenKind kind, const char *start, size_t len)
+{
+  Token tok = {kind, start, len}; 
+  return tok;
+}
+
+static jmp_buf gParseError;
+
+typedef struct LexState {
+  const char *startPtr_; // Start of file
+  const char *endPtr_; // End of file
+  const char *rdPtr_; // Current read pointer for file
+  size_t fileLen_; // Total length of file in bytes
+
+  const char *tokPtr_; // Pointer to current token
+  const char *nextTokPtr_; // Pointer to next token pointer
+  
+  Token currTok_;
+  Token nextTok_;
+  int fd;
+  int line_;
+  int col_;
+  wchar_t currCh_;
+} LexState;
+
+typedef struct ParseState {
+  LexState *lexer;
+  bool errors;
+  HRMLdocument *doc; //!< Available so that we do not lose this entry
+  HRMLobject *obj; //!< Need to know where parser inserts the entries
+} ParseState;
+
+Token createNextToken(TokenKind kind, LexState *lex) {
+  Token next = makeTok(tk_str, lex->nextTokPtr_, (size_t)(lex->rdPtr_ - lex->nextTokPtr_));
+  lex->nextTok_ = next;
+  return next;
+}
+  
+static inline size_t min(size_t a, size_t b) {
+  return (a < b) ? a : b;
+}
+
+static inline wchar_t lexGetCurrChar(LexState *lex)
+{
+  return lex->currCh_;
+}
+
+off_t getFileLen(const char *path)
+{
+  int fd = open(path, O_RDONLY);
+  if (fd == -1) {
+    return 0;
+  }
+  
+  off_t len = lseek(fd, 0, SEEK_END);
+  close(fd);
+  return len;
+}
+
+LexState*
+newLex(const char *file)
+{
+  off_t len = getFileLen(file);
+  if (len == 0) {
+    // No data or no file with that name
+    return NULL;
+  }
+  
+  LexState *lex = malloc(sizeof(LexState));
+  int fd = open(file, O_RDONLY);
+  lex->fd = fd;
+  lex->startPtr_ = mmap(NULL, (size_t)len, PROT_READ, MAP_FILE, fd, 0);
+  lex->endPtr_ = lex->startPtr_ + len;
+  lex->fileLen_ = len;
+  lex->rdPtr_ = lex->startPtr_;
+  lex->tokPtr_ = lex->startPtr_;
+  lex->nextTokPtr_ = lex->startPtr_;
+
+  lex->line_ = 1;
+  lex->col_ = 0;
+
+  return lex;
+}
+
+void
+deleteLex(LexState *lex)
+{
+  munmap((void*)lex->startPtr_, lex->fileLen_);
+  close(lex->fd);
+  memset(lex, 0, sizeof(LexState)); // invalidate all pointers, though in principle the 
+                                    // unmap does this, but if someone does another mmap,
+                                    // they may become valid again
+  free(lex);
+}
+Token lexToken(LexState *lex);
+
+// Reads next character and consumes it
+wchar_t
+lexGetChar(LexState *lex)
+{
+  wchar_t ch;
+  if (lex->fileLen_ - (lex->rdPtr_ - lex->startPtr_) <= 0) {
+    return WEOF;
+  }
+  
+  int count = mbtowc(&ch, lex->rdPtr_ , min(16, lex->fileLen_ - (lex->rdPtr_ - lex->startPtr_)));
+  if (count == -1) {
+    fprintf(stderr, "invalid file, for now lets just die\n");
+    exit(1);
+  }
+  
+  lex->rdPtr_ += count;
+  lex->col_ ++;
+  
+  if (ch == '\n') {
+    lex->line_ ++;
+    lex->col_ = 0;
+  }
+  
+  lex->currCh_ = ch;
+  
+  return ch;
+}
+
+// Reads next character without consuming it
+wchar_t
+lexPeekChar(LexState *lex)
+{
+  wchar_t ch;
+  if (lex->fileLen_ - (lex->rdPtr_ - lex->startPtr_) <= 0) {
+    return WEOF;
+  }
+  
+  int count = mbtowc(&ch, lex->rdPtr_ , min(16, lex->fileLen_ - (lex->rdPtr_ - lex->startPtr_)));
+  if (count == -1) {
+    fprintf(stderr, "invalid chars in file, for now lets just die\n");
+    exit(1);
+  }
+  
+  return ch;
+}
+
+void
+lexConsumeTok(LexState *lex)
+{
+  lex->tokPtr_ = lex->nextTokPtr_;
+  lex->currTok_ = lex->nextTok_;
+}
+
+Token
+lexPeekTok(LexState *lex)
+{
+  if (lex->tokPtr_ == lex->nextTokPtr_) {
+    lex->nextTokPtr_ = lex->rdPtr_;
+    lex->nextTok_ = lexToken(lex);
+  }
+  return lex->nextTok_;
+}
+
+Token lexGetNextTok(LexState *lex)
+{
+  Token tok = lexPeekTok(lex);
+  lexConsumeTok(lex);
+  return tok;
+}
+
+Token lexGetCurrentTok(LexState *lex)
+{
+  return lex->currTok_;
+}
+
+void
+lexConsumeWS(LexState *lex)
+{
+  while (iswspace(lexPeekChar(lex))) {
+    lexGetChar(lex);
+    lex->nextTokPtr_ = lex->rdPtr_;
+  }
+}
+
+Token lexIdent(LexState *lex)
+{
+  while (iswalnum(lexPeekChar(lex)) || lexPeekChar(lex) == '_') {
+    lexGetChar(lex);
+  }
+  return createNextToken(tk_ident, lex);
+}
+
+Token lexString(LexState *lex)
+{
+  while ((lexPeekChar(lex) != '"') && (lexPeekChar(lex) != WEOF)) {
+    wchar_t ch = lexGetChar(lex);
+    if (ch == '\\') {
+      lexGetChar(lex);
+    }
+  }
+  
+  if (lexPeekChar(lex) == '"') {
+    lexGetChar(lex); // consume last quote in string
+    return createNextToken(tk_str, lex);
+  } else {
+    return createNextToken(tk_eof, lex);
+  }
+}
+Token lexReal(LexState *lex)
+{
+  lexGetChar(lex);
+  while (iswnumber(lexPeekChar(lex)) || lexPeekChar(lex) == '_') {
+    lexGetChar(lex);
+  }
+  if (lexPeekChar(lex) == 'e') {
+    lexGetChar(lex);
+    if (lexPeekChar(lex) == '-') lexGetChar(lex);
+    if (!iswnumber(lexPeekChar(lex))) {
+      // unget
+    } else {
+      while (iswnumber(lexPeekChar(lex))) {
+        lexGetChar(lex);
+      }
+    }
+  }
+  
+  return createNextToken(tk_real, lex);
+}
+
+Token lexNum(LexState *lex)
+{
+  if ( lexGetCurrChar(lex) == '0') {
+    if ( lexPeekChar(lex) == 'x') {
+       lexGetChar(lex);
+      while (iswxdigit( lexPeekChar(lex)) ||  lexPeekChar(lex) == '_') {
+         lexGetChar(lex);
+      }
+      return createNextToken(tk_int, lex);
+    } else if ( lexPeekChar(lex) == 'b') {
+      // binary number
+       lexGetChar(lex);
+      while (( lexPeekChar(lex) == '0') || ( lexPeekChar(lex) == '1') || ( lexPeekChar(lex) == '_')) {
+         lexGetChar(lex);
+      }
+      return createNextToken(tk_int, lex);
+    } else if ( lexPeekChar(lex) == 'o') {
+      // octal
+       lexGetChar(lex);
+      while ((( lexPeekChar(lex) >= '0') && ( lexPeekChar(lex) <= '7')) || ( lexPeekChar(lex) == '_')) {
+         lexGetChar(lex);
+      }
+      return createNextToken(tk_int, lex);
+    }
+  }
+  
+  while (iswnumber(lexPeekChar(lex)) ||  lexPeekChar(lex) == '_') {
+    lexGetChar(lex);
+  }
+  
+  if (lexPeekChar(lex) == '.') {
+    return lexReal(lex);
+  }
+  
+}
+
+Token lexPunct(LexState *lex)
+{
+  switch (lexGetCurrChar(lex)) {
+  case '[':
+    return createNextToken(tk_lbrack, lex);
+  case ']':
+    return createNextToken(tk_rbrack, lex);
+  case '{':
+    return createNextToken(tk_lbrace, lex);
+  case '}':
+    return createNextToken(tk_rbrace, lex);
+  case '(':
+    return createNextToken(tk_lparen, lex);
+  case ')':
+    return createNextToken(tk_rparen, lex);
+  case ':':
+    return createNextToken(tk_colon, lex);
+  case ';':
+    return createNextToken(tk_semi, lex);
+  case ',':
+    return createNextToken(tk_comma, lex);
+  default:
+    // Error
+    ;
+  }
+  
+  return createNextToken(tk_eof, lex);
+}
+
+void lexComment(LexState *lex)
+{
+  if (lexPeekChar(lex) == '*') {
+    int nestLevel = 1;
+    
+    while ((lexPeekChar(lex) != WEOF)) {
+      wchar_t ch = lexGetChar(lex);
+      if (ch == '/') {
+        if (lexPeekChar(lex) == '*') {
+          lexGetChar(lex);
+          nestLevel ++;
+        }
+      }
+      if (ch == '*') {
+        if (lexPeekChar(lex) == '/') {
+          lexGetChar(lex);
+          nestLevel --;
+          if (nestLevel == 0) return; // createNextToken(tk_comment);
+        }
+      }
+    }
+  } else if (lexPeekChar(lex) == '/') {
+    while ((lexPeekChar(lex) != '\n') && (lexPeekChar(lex) != WEOF)) lexGetChar(lex);
+    
+    return ;//createNextToken(tk_comment);
+  }
+  
+  return ;//createNextToken(tk_eof);
+  
+}
+
+Token lexToken(LexState *lex)
+{
+  lexConsumeWS(lex);
+  
+  wchar_t ch = lexGetChar(lex);
+  
+  if (iswalpha(ch)) {
+    return lexIdent(lex);
+  } else if (iswdigit(ch)) {
+    return lexNum(lex);
+  } else if (ch == '"') {
+    return lexString(lex);
+  } else if (iswpunct(ch)) {
+    return lexPunct(lex);
+  } else if (ch == WEOF) {
+    fprintf(stderr, "eof\n");
+    return createNextToken(tk_eof, lex);
+  } else {
+    fprintf(stderr, "unknown character '"); fputwc(ch, stderr); fprintf(stderr, "'\n");
+    assert(0 && "unknown ch in stream");
+  }
+}
+
+static void ParseErr(const char *str)
+{
+  fprintf(stderr, "error: %s\n", str);
+  longjmp(gParseError, 1);
+}
+
+static void ParseWarning(const char *str)
+{
+  fprintf(stderr, "warning: %s\n", str);  
+}
+
+// Checks if next token is of the given kind, if not, longjump to parser error handler
+static void Require(ParseState *parser, TokenKind kind)
+{
+  if (lexPeekTok(parser->lexer).kind_ == kind) {
+    lexGetNextTok(parser->lexer);
+  }
+
+  ParseErr("token 'xxx' expected");
+}
+
+// Checks if next token is of the given kind, if so consume token and return true
+static bool Optional(ParseState *parser, TokenKind kind)
+{
+  if (lexPeekTok(parser->lexer).kind_ == kind) {
+    lexGetNextTok(parser->lexer);
+    return true;
+  }
+
+  return false;
+}
+
+// Peeks for next token without consuming
+static bool Peek(ParseState *parser, TokenKind kind)
+{
+  if (lexPeekTok(parser->lexer).kind_ == kind) {
+    return true;
+  }
+
+  if (lexPeekTok(parser->lexer).kind_ == tk_eof) {
+    ParseErr("premature eof");
+  }
+  return false;
+}
+
+void 
+ParseAttributes(ParseState *parser)
+{
+  // May be an empty attribute list
+  if (!Peek(parser, tk_rparen)) {
+    do {
+      Require(parser, tk_ident);
+      Require(parser, tk_colon);
+      Require(parser, tk_ident);
+      
+    } while (Optional(parser, tk_comma));
+  }
+}
+
+void ParseVal(ParseState *parser)
+{
+  Require(parser, tk_ident);
+  Token ident = lexGetCurrentTok(parser->lexer);
+
+  if (Optional(parser, tk_lparen)) {
+    ParseAttributes(parser);
+    Require(parser, tk_rparen);
+  }
+  
+  if (Optional(parser, tk_lbrace)) {
+    // Aggregated value
+    // Parse each sub value by recursive call
+    while (!Peek(parser, tk_rbrace)) {
+        ParseVal(parser);
+    }
+    Require(parser, tk_rbrace);
+  } else if (Optional(parser, tk_colon)) {
+    // Primitive value
+    if (Optional(parser, tk_str)) {
+      Token str = lexGetCurrentTok(parser->lexer);
+    } else if (Optional(parser, tk_int)) {
+      Token integer = lexGetCurrentTok(parser->lexer);
+    } else if (Optional(parser, tk_real)) {
+      Token real = lexGetCurrentTok(parser->lexer);
+    } else if (Optional(parser, tk_lbrack)) {
+      while (!Peek(parser, tk_rbrack)) {
+        // Ensure that types are identical for all subvalues
+      }
+      Require(parser, tk_rbrack);
+    }
+    Require(parser, tk_semi);
+  } else {
+    ParseErr("object missing data");
+  }
+}
+
+void Parse2(ParseState *parser)
+{
+  ParseVal(parser);
+}
+
+// New parser function
+void Parse(ParseState *parser)
+{
+  int res = 0;
+  if (res = setjmp(gParseError)) {
+    parser->errors = true;
+    // Longjumped here, error code is in res
+  } else {
+    Parse2(parser);
+  }
+}
+
+ParseState *newParser(const char *path)
+{
+  assert(path != NULL);
+  
+  ParseState *parser = malloc(sizeof(ParseState));
+  parser->lexer = newLex(path);
+  parser->errors = false;
+  parser->doc = NULL;
+  parser->obj = NULL;
+  return parser;
+}
+
+
+void deleteParser(ParseState *parser)
+{  
+  deleteLex(parser->lexer);
+  free(parser);
+}
+
+
+HRMLdocument *hrmlParseNew(const char *path)
+{
+  assert(path != NULL);
+  ParseState *parser = newParser(path);
+  parser->doc = malloc(sizeof(HRMLdocument));
+  parser->doc->rootNode = NULL;
+  
+  Parse(parser);
+  
+  HRMLdocument *doc = parser->doc;
+  if (parser->errors) { // Incase of parsing errors, return NULL
+    hrmlFreeDocument(doc);
+    doc = NULL;
+  }
+  deleteParser(parser);
+
+  return doc;
+}
 
 // Used to build up parsing tables for the si-unit parser
 static const char * gPrefixTable[HRML_siprefix_size] = {
