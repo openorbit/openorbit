@@ -69,6 +69,14 @@ START_TEST(test_path)
 }
 END_TEST
 
+START_TEST(test_valid_doc2)
+{
+  HRMLdocument *doc = hrmlParseNew(validHrmlFileName);
+
+  fail_if(doc == NULL);
+  hrmlFreeDocument(doc);
+}
+END_TEST
 
 Suite
 *test_suite(int argc, char **argv)
@@ -78,15 +86,16 @@ Suite
     }
 
     Suite *s = suite_create ("HRML Test");
-    
+
     /* Core test case */
     TCase *tc_core = tcase_create("Core");
 
     tcase_add_test(tc_core, test_valid);
     tcase_add_test(tc_core, test_path);
-    
+    tcase_add_test(tc_core, test_valid_doc2);
+
     suite_add_tcase(s, tc_core);
-    
+
     return s;
 }
 

@@ -285,6 +285,8 @@ bool hrmlValidate(HRMLdocument *doc, HRMLschema *sc);
 void hrmlFreeDocument(HRMLdocument *doc);
 HRMLobject* hrmlGetObject(HRMLdocument *doc, const char *docPath);
 
+HRMLdocument *hrmlParseNew(const char *path);
+
 
 // Node iteration macros
 #define FOR_ALL_ATTR(attrib, node) \

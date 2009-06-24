@@ -47,6 +47,7 @@
 #include <wchar.h>
 #include <wctype.h>
 #include <setjmp.h>
+#include <execinfo.h>
 
 // TODO: Ensure that line number and column number are availble for diagnostics
 
@@ -70,11 +71,64 @@ typedef enum TokenKind {
   tk_count
 } TokenKind;
 
+char * toks [] = {
+  [tk_ident] = "ident",
+  [tk_int] = "int",
+  [tk_real] = "real",
+  [tk_str] = "str",
+  [tk_comment] = "comment",
+  [tk_colon] = "colon",
+  [tk_semi] = "semi",
+  [tk_comma] = "comma",
+  [tk_eq] = "eq",
+  [tk_lbrace] = "lbrace",
+  [tk_rbrace] = "rbrace",
+  [tk_lparen] = "lparen",
+  [tk_rparen] = "rparen",
+  [tk_lbrack] = "lbrack",
+  [tk_rbrack] = "rbrack",
+  [tk_eof] = "eof",
+  [tk_count] = "count"
+};
+
 typedef struct Token {
   TokenKind kind_;
   const char *start_;
   size_t len_;
 } Token;
+
+uint64_t getInteger(Token tok)
+{
+  assert(tok.kind_ == tk_int);
+}
+
+double getReal(Token tok)
+{
+  assert(tok.kind_ == tk_real);
+  
+}
+
+char* getString(Token tok)
+{
+  assert((tok.kind_ == tk_ident) || (tok.kind_ == tk_str));
+  
+  char *str = calloc(tok.len_ + 1, sizeof(char));
+  if (!str) return NULL;
+  
+  memcpy(str, tok.start_, tok.len_);
+  return str;
+}
+
+void printToken(Token tok)
+{
+  char str[tok.len_ + 1];
+  
+  memcpy(str, tok.start_, tok.len_);
+  str[tok.len_] = '\0';
+  
+  fprintf(stderr, "'%s'", str);
+}
+
 
 Token makeTok(TokenKind kind, const char *start, size_t len)
 {
@@ -109,7 +163,8 @@ typedef struct ParseState {
 } ParseState;
 
 Token createNextToken(TokenKind kind, LexState *lex) {
-  Token next = makeTok(tk_str, lex->nextTokPtr_, (size_t)(lex->rdPtr_ - lex->nextTokPtr_));
+  Token next = makeTok(kind, lex->nextTokPtr_,
+                       (size_t)(lex->rdPtr_ - lex->nextTokPtr_));
   lex->nextTok_ = next;
   return next;
 }
@@ -132,6 +187,9 @@ off_t getFileLen(const char *path)
   
   off_t len = lseek(fd, 0, SEEK_END);
   close(fd);
+  
+  fprintf(stderr, "file %s: %u B\n", path, len);
+  
   return len;
 }
 
@@ -146,13 +204,22 @@ newLex(const char *file)
   
   LexState *lex = malloc(sizeof(LexState));
   int fd = open(file, O_RDONLY);
+  if (fd == -1) {
+    perror(NULL);
+    assert(0 && "file not opened");
+  }
   lex->fd = fd;
-  lex->startPtr_ = mmap(NULL, (size_t)len, PROT_READ, MAP_FILE, fd, 0);
+  lex->startPtr_ = mmap(NULL, (size_t)len, PROT_READ, MAP_FILE|MAP_PRIVATE, fd, 0);
+  if (lex->startPtr_ == (char*)-1) {
+    perror(NULL);
+    assert(lex->startPtr_ != (char*)-1);
+  }
+
   lex->endPtr_ = lex->startPtr_ + len;
   lex->fileLen_ = len;
   lex->rdPtr_ = lex->startPtr_;
-  lex->tokPtr_ = lex->startPtr_;
-  lex->nextTokPtr_ = lex->startPtr_;
+  lex->tokPtr_ = NULL;
+  lex->nextTokPtr_ = NULL;
 
   lex->line_ = 1;
   lex->col_ = 0;
@@ -229,8 +296,11 @@ Token
 lexPeekTok(LexState *lex)
 {
   if (lex->tokPtr_ == lex->nextTokPtr_) {
-    lex->nextTokPtr_ = lex->rdPtr_;
-    lex->nextTok_ = lexToken(lex);
+    do {
+      lex->nextTokPtr_ = lex->rdPtr_;
+      lex->nextTok_ = lexToken(lex);
+    } while (lex->nextTok_.kind_ == tk_comment); // Ignore comments
+    
   }
   return lex->nextTok_;
 }
@@ -261,6 +331,9 @@ Token lexIdent(LexState *lex)
   while (iswalnum(lexPeekChar(lex)) || lexPeekChar(lex) == '_') {
     lexGetChar(lex);
   }
+  
+  fprintf(stderr, "returning identifier\n");
+  
   return createNextToken(tk_ident, lex);
 }
 
@@ -337,6 +410,38 @@ Token lexNum(LexState *lex)
   
 }
 
+Token lexComment(LexState *lex)
+{
+  if (lexPeekChar(lex) == '*') {
+    int nestLevel = 1;
+    
+    while ((lexPeekChar(lex) != WEOF)) {
+      wchar_t ch = lexGetChar(lex);
+      if (ch == '/') {
+        if (lexPeekChar(lex) == '*') {
+          lexGetChar(lex);
+          nestLevel ++;
+        }
+      }
+      if (ch == '*') {
+        if (lexPeekChar(lex) == '/') {
+          lexGetChar(lex);
+          nestLevel --;
+          if (nestLevel == 0) return createNextToken(tk_comment, lex);
+        }
+      }
+    }
+  } else if (lexPeekChar(lex) == '/') {
+    while ((lexPeekChar(lex) != '\n') && (lexPeekChar(lex) != WEOF)) lexGetChar(lex);
+    return createNextToken(tk_comment, lex);
+  } else if (lexGetCurrChar(lex) == '#') {
+    while ((lexPeekChar(lex) != '\n') && (lexPeekChar(lex) != WEOF)) lexGetChar(lex);
+    return createNextToken(tk_comment, lex);
+  }
+  
+  return createNextToken(tk_eof, lex);
+}
+
 Token lexPunct(LexState *lex)
 {
   switch (lexGetCurrChar(lex)) {
@@ -358,6 +463,10 @@ Token lexPunct(LexState *lex)
     return createNextToken(tk_semi, lex);
   case ',':
     return createNextToken(tk_comma, lex);
+  case '/':
+  case '#':
+    // Comments
+    return lexComment(lex);
   default:
     // Error
     ;
@@ -366,43 +475,13 @@ Token lexPunct(LexState *lex)
   return createNextToken(tk_eof, lex);
 }
 
-void lexComment(LexState *lex)
-{
-  if (lexPeekChar(lex) == '*') {
-    int nestLevel = 1;
-    
-    while ((lexPeekChar(lex) != WEOF)) {
-      wchar_t ch = lexGetChar(lex);
-      if (ch == '/') {
-        if (lexPeekChar(lex) == '*') {
-          lexGetChar(lex);
-          nestLevel ++;
-        }
-      }
-      if (ch == '*') {
-        if (lexPeekChar(lex) == '/') {
-          lexGetChar(lex);
-          nestLevel --;
-          if (nestLevel == 0) return; // createNextToken(tk_comment);
-        }
-      }
-    }
-  } else if (lexPeekChar(lex) == '/') {
-    while ((lexPeekChar(lex) != '\n') && (lexPeekChar(lex) != WEOF)) lexGetChar(lex);
-    
-    return ;//createNextToken(tk_comment);
-  }
-  
-  return ;//createNextToken(tk_eof);
-  
-}
 
 Token lexToken(LexState *lex)
-{
+{  
   lexConsumeWS(lex);
   
   wchar_t ch = lexGetChar(lex);
-  
+
   if (iswalpha(ch)) {
     return lexIdent(lex);
   } else if (iswdigit(ch)) {
@@ -434,10 +513,32 @@ static void ParseWarning(const char *str)
 // Checks if next token is of the given kind, if not, longjump to parser error handler
 static void Require(ParseState *parser, TokenKind kind)
 {
+  
+  
   if (lexPeekTok(parser->lexer).kind_ == kind) {
+    fprintf(stderr,
+            "Require(%s) == %s: ",
+            toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+    printToken(lexPeekTok(parser->lexer));
+    fprintf(stderr, "\n");
+
     lexGetNextTok(parser->lexer);
+    return;
   }
 
+  fprintf(stderr,
+          "Require(%s) != %s: ",
+          toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+  printToken(lexPeekTok(parser->lexer));
+  fprintf(stderr, "\n");
+  
+  void *callstack[128];
+  int frames = backtrace(callstack, 128);
+  char **strs = backtrace_symbols(callstack, frames);
+  for (int i = 0 ; i < frames; ++ i) {
+    fprintf(stderr, "%s\n", strs[i]);
+  }
+  
   ParseErr("token 'xxx' expected");
 }
 
@@ -445,9 +546,22 @@ static void Require(ParseState *parser, TokenKind kind)
 static bool Optional(ParseState *parser, TokenKind kind)
 {
   if (lexPeekTok(parser->lexer).kind_ == kind) {
+    fprintf(stderr,
+            "Optional(%s) == %s: ",
+            toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+    printToken(lexPeekTok(parser->lexer));
+    fprintf(stderr, "\n");
+    
     lexGetNextTok(parser->lexer);
     return true;
   }
+
+
+  fprintf(stderr,
+          "Optional(%s) != %s: ",
+          toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+  printToken(lexPeekTok(parser->lexer));
+  fprintf(stderr, "\n");
 
   return false;
 }
@@ -455,6 +569,13 @@ static bool Optional(ParseState *parser, TokenKind kind)
 // Peeks for next token without consuming
 static bool Peek(ParseState *parser, TokenKind kind)
 {
+  fprintf(stderr,
+          "Peek(%s) ?? %s: ",
+          toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+  printToken(lexPeekTok(parser->lexer));
+  fprintf(stderr, "\n");
+  
+  
   if (lexPeekTok(parser->lexer).kind_ == kind) {
     return true;
   }
@@ -482,6 +603,7 @@ ParseAttributes(ParseState *parser)
 void ParseVal(ParseState *parser)
 {
   Require(parser, tk_ident);
+  
   Token ident = lexGetCurrentTok(parser->lexer);
 
   if (Optional(parser, tk_lparen)) {
@@ -498,18 +620,29 @@ void ParseVal(ParseState *parser)
     Require(parser, tk_rbrace);
   } else if (Optional(parser, tk_colon)) {
     // Primitive value
+    fprintf(stderr, "colon found\n");
     if (Optional(parser, tk_str)) {
+      fprintf(stderr, "string??\n");
       Token str = lexGetCurrentTok(parser->lexer);
     } else if (Optional(parser, tk_int)) {
+      fprintf(stderr, "int??\n");
       Token integer = lexGetCurrentTok(parser->lexer);
     } else if (Optional(parser, tk_real)) {
+      fprintf(stderr, "real??\n");
       Token real = lexGetCurrentTok(parser->lexer);
+      if (Optional(parser, tk_ident)) {
+        // Got unit
+      }
     } else if (Optional(parser, tk_lbrack)) {
+      fprintf(stderr, "bracket??\n");
+      
       while (!Peek(parser, tk_rbrack)) {
         // Ensure that types are identical for all subvalues
       }
       Require(parser, tk_rbrack);
     }
+    fprintf(stderr, "endof val??\n");
+    
     Require(parser, tk_semi);
   } else {
     ParseErr("object missing data");
