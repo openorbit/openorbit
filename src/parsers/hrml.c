@@ -48,6 +48,150 @@
 #include <wctype.h>
 #include <setjmp.h>
 #include <execinfo.h>
+#include <inttypes.h>
+
+
+
+static inline HRMLobject*
+makeInt(const char * restrict name, uint64_t i)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+  obj->val.alen = 0;
+  obj->val.typ = HRMLInt;
+  obj->val.u.integer = i;
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+  obj->parent = NULL;
+
+  return obj;
+}
+
+static inline HRMLobject*
+makeIntArray(const char * restrict name, uint64_t *i, size_t len)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+  obj->val.alen = len;
+  obj->val.typ = HRMLIntArray;
+  obj->val.u.intArray = calloc(len, sizeof(uint64_t));
+  memcpy(obj->val.u.intArray, i, len*sizeof(uint64_t));
+
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+  obj->parent = NULL;
+
+  return obj;
+}
+
+
+static inline HRMLobject*
+makeFloatArray(const char * restrict name, double *d, size_t len)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+  obj->val.alen = len;
+  obj->val.typ = HRMLFloatArray;
+  obj->val.u.realArray = calloc(len, sizeof(double));
+  memcpy(obj->val.u.realArray, d, len*sizeof(double));
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+  obj->parent = NULL;
+
+  return obj;
+}
+
+static inline HRMLobject*
+makeFloat(const char * restrict name, double d)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+  obj->val.alen = 0;
+  obj->val.typ = HRMLFloat;
+  obj->val.u.real = d;
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+  obj->parent = NULL;
+
+  return obj;
+}
+
+
+static inline HRMLobject*
+makeStr(const char * restrict name, const char * restrict s)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+
+  obj->val.alen = 0;
+  obj->val.typ = HRMLStr;
+  obj->val.u.str = strdup(s);
+
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+  obj->parent = NULL;
+
+  return obj;
+}
+
+static inline HRMLobject*
+makeBool(const char * restrict name, bool b)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+
+  obj->val.alen = 0;
+  obj->val.typ = HRMLBool;
+  obj->val.u.boolean = b;
+
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+  obj->parent = NULL;
+
+  return obj;
+}
+
+static inline HRMLobject*
+makeBoolArray(const char * restrict name, bool *b, size_t len)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->name = strdup(name);
+
+  obj->val.alen = len;
+  obj->val.typ = HRMLBool;
+  obj->val.u.boolArray = calloc(len, sizeof(bool));
+  memcpy(obj->val.u.boolArray, b, len*sizeof(bool));
+
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+  obj->parent = NULL;
+
+  return obj;
+}
+
+static inline HRMLobject*
+makeNode(const char * restrict name)
+{
+  HRMLobject *obj = malloc(sizeof(HRMLobject));
+  obj->children = NULL;
+  obj->previous = NULL;
+  obj->next = NULL;
+  obj->parent = NULL;
+
+  obj->val.alen = 0;  
+  obj->name = strdup(name);
+  obj->val.typ = HRMLNode;
+
+  return obj;
+}
+
 
 // TODO: Ensure that line number and column number are availble for diagnostics
 
@@ -97,15 +241,78 @@ typedef struct Token {
   size_t len_;
 } Token;
 
-uint64_t getInteger(Token tok)
+int64_t getInteger(Token tok)
 {
   assert(tok.kind_ == tk_int);
+  char str[tok.len_ + 1];
+  memset(str, 0, tok.len_ + 1);
+  // TODO: Fix support for negative values
+  if (tok.start_[0] == '-') {
+    
+  }
+  
+  if (tok.len_ > 2) {
+    if (tok.start_[0] == '0' && tok.start_[1] == 'b') {
+      // Binary
+      for (int i = 2, j = 0; i < tok.len_; ++ i) {
+        // Copy string to temporary buffer, skipping any '_' that cannot be handled
+        // by strtol
+        if (tok.start_[i] != '_') {
+          str[j] = tok.start_[i];
+          ++ j;
+        }
+      }
+      intmax_t val = strtoimax(str, NULL, 2);
+      return val;
+    } else if (tok.start_[0] == '0' && tok.start_[1] == 'o') {
+      // Octal
+      for (int i = 2, j = 0; i < tok.len_; ++ i) {
+        // Copy string to temporary buffer, skipping any '_' that cannot be handled
+        // by strtol
+        if (tok.start_[i] != '_') {
+          str[j] = tok.start_[i];
+          ++ j;
+        }
+      }
+      intmax_t val = strtoimax(str, NULL, 8);
+      return val;
+    } else if (tok.start_[0] == '0' && tok.start_[1] == 'x') {
+      // Hex
+      for (int i = 2, j = 0; i < tok.len_; ++ i) {
+        // Copy string to temporary buffer, skipping any '_' that cannot be handled
+        // by strtol
+        if (tok.start_[i] != '_') {
+          str[j] = tok.start_[i];
+          ++ j;
+        }
+      }
+      intmax_t val = strtoimax(str, NULL, 16);
+      return val;
+    }
+  }
+  
+  // Normal base 10 value
+  for (int i = 0, j = 0; i < tok.len_; ++ i) {
+    // Copy string to temporary buffer, skipping any '_' that cannot be handled
+    // by strtol
+    if (tok.start_[i] != '_') {
+      str[j] = tok.start_[i];
+      ++ j;
+    }
+  }
+  
+  intmax_t val = strtoimax(str, NULL, 10);
+  return val;
 }
 
 double getReal(Token tok)
 {
   assert(tok.kind_ == tk_real);
-  
+  char str[tok.len_ + 1];
+  memcpy(str, tok.start_, tok.len_);
+  str[tok.len_] = '\0';
+  double val = strtod(str, NULL);
+  return val;
 }
 
 char* getString(Token tok)
@@ -499,6 +706,102 @@ Token lexToken(LexState *lex)
   }
 }
 
+
+//typedef struct ParseState {
+//  LexState *lexer;
+//  bool errors;
+//  HRMLdocument *doc; //!< Available so that we do not lose this entry
+//  HRMLobject *obj; //!< Need to know where parser inserts the entries
+//} ParseState;
+
+
+void
+InsertNewNode(ParseState *parser)
+{
+  if (parser->obj == NULL) {
+    parser->doc->rootNode = malloc(sizeof(HRMLobject));
+    parser->obj = parser->doc->rootNode;
+    parser->obj->parent = NULL;
+    parser->obj->next = NULL;
+    parser->obj->previous = NULL;
+  } else {
+    HRMLobject *parent = parser->obj;
+    HRMLobject *newObj = malloc(sizeof(HRMLobject));    
+  }
+}
+
+void
+GotoParentNode(ParseState *parser)
+{
+  parser->obj = parser->obj->parent;
+}
+
+
+void
+InsertAttribute(ParseState *parser, const char *name, Token tok)
+{
+  HRMLattr *attr = malloc(sizeof(HRMLattr));
+  attr->name = strdup(name);
+
+  if (tok.kind_ == tk_int) {
+    attr->val.alen = 0;
+    attr->val.typ = HRMLInt;
+    attr->val.u.integer = getInteger(tok);
+  } else if (tok.kind_ == tk_int) {
+    attr->val.alen = 0;
+    attr->val.typ = HRMLFloat;
+    attr->val.u.real = getReal(tok);
+  } else if (tok.kind_ == tk_str) {
+    attr->val.alen = 0;
+    attr->val.typ = HRMLStr;
+    attr->val.u.str = getString(tok);
+  } else if (tok.kind_ == tk_ident) {
+    attr->val.alen = 0;
+    attr->val.typ = HRMLStr;
+    attr->val.u.str = getString(tok);
+  }
+  
+  attr->next = parser->obj->attr;
+  parser->obj->attr = attr;
+}
+
+void
+InsertValueInNode(ParseState *parser, HRMLvalue val)
+{
+  
+}
+
+void
+InsertIntInNode(ParseState *parser, const char *name, int64_t val)
+{
+  HRMLobject *obj = makeInt(name, val);
+  obj->parent = parser->obj->parent;
+  parser->obj->next = obj;
+  obj->previous = parser->obj;
+  parser->obj = obj;
+}
+
+void
+InsertRealInNode(ParseState *parser, const char *name, double val)
+{
+  HRMLobject *obj = makeFloat(name, val);
+  obj->parent = parser->obj->parent;
+  parser->obj->next = obj;
+  obj->previous = parser->obj;
+  parser->obj = obj;
+}
+
+void
+InsertStrInNode(ParseState *parser, const char *name, const char *val)
+{
+  HRMLobject *obj = makeStr(name, val);
+  obj->parent = parser->obj->parent;
+  parser->obj->next = obj;
+  obj->previous = parser->obj;
+  parser->obj = obj;
+}
+
+
 static void ParseErr(const char *str)
 {
   fprintf(stderr, "error: %s\n", str);
@@ -620,28 +923,24 @@ void ParseVal(ParseState *parser)
     Require(parser, tk_rbrace);
   } else if (Optional(parser, tk_colon)) {
     // Primitive value
-    fprintf(stderr, "colon found\n");
     if (Optional(parser, tk_str)) {
-      fprintf(stderr, "string??\n");
       Token str = lexGetCurrentTok(parser->lexer);
     } else if (Optional(parser, tk_int)) {
-      fprintf(stderr, "int??\n");
       Token integer = lexGetCurrentTok(parser->lexer);
+      int64_t i = getInteger(integer);
     } else if (Optional(parser, tk_real)) {
-      fprintf(stderr, "real??\n");
       Token real = lexGetCurrentTok(parser->lexer);
       if (Optional(parser, tk_ident)) {
         // Got unit
       }
+      double r = getReal(real);
     } else if (Optional(parser, tk_lbrack)) {
-      fprintf(stderr, "bracket??\n");
       
       while (!Peek(parser, tk_rbrack)) {
         // Ensure that types are identical for all subvalues
       }
       Require(parser, tk_rbrack);
     }
-    fprintf(stderr, "endof val??\n");
     
     Require(parser, tk_semi);
   } else {
@@ -985,138 +1284,6 @@ hrmlLexUnGet(HRMLlexer *lex, int ch)
   }
 }
 
-
-static inline HRMLobject*
-makeInt(const char * restrict name, uint64_t i)
-{
-  HRMLobject *obj = malloc(sizeof(HRMLobject));
-  obj->name = strdup(name);
-  obj->val.alen = 0;
-  obj->val.typ = HRMLInt;
-  obj->val.u.integer = i;
-  obj->children = NULL;
-  obj->previous = NULL;
-  obj->next = NULL;
-
-  return obj;
-}
-
-static inline HRMLobject*
-makeIntArray(const char * restrict name, uint64_t *i, size_t len)
-{
-  HRMLobject *obj = malloc(sizeof(HRMLobject));
-  obj->name = strdup(name);
-  obj->val.alen = len;
-  obj->val.typ = HRMLIntArray;
-  obj->val.u.intArray = calloc(len, sizeof(uint64_t));
-  memcpy(obj->val.u.intArray, i, len*sizeof(uint64_t));
-
-  obj->children = NULL;
-  obj->previous = NULL;
-  obj->next = NULL;
-
-  return obj;
-}
-
-
-static inline HRMLobject*
-makeFloatArray(const char * restrict name, double *d, size_t len)
-{
-  HRMLobject *obj = malloc(sizeof(HRMLobject));
-  obj->name = strdup(name);
-  obj->val.alen = len;
-  obj->val.typ = HRMLFloatArray;
-  obj->val.u.realArray = calloc(len, sizeof(double));
-  memcpy(obj->val.u.realArray, d, len*sizeof(double));
-  obj->children = NULL;
-  obj->previous = NULL;
-  obj->next = NULL;
-
-  return obj;
-}
-
-static inline HRMLobject*
-makeFloat(const char * restrict name, double d)
-{
-  HRMLobject *obj = malloc(sizeof(HRMLobject));
-  obj->name = strdup(name);
-  obj->val.alen = 0;
-  obj->val.typ = HRMLFloat;
-  obj->val.u.real = d;
-  obj->children = NULL;
-  obj->previous = NULL;
-  obj->next = NULL;
-
-  return obj;
-}
-
-
-static inline HRMLobject*
-makeStr(const char * restrict name, const char * restrict s)
-{
-  HRMLobject *obj = malloc(sizeof(HRMLobject));
-  obj->name = strdup(name);
-
-  obj->val.alen = 0;
-  obj->val.typ = HRMLStr;
-  obj->val.u.str = strdup(s);
-
-  obj->children = NULL;
-  obj->previous = NULL;
-  obj->next = NULL;
-
-  return obj;
-}
-
-static inline HRMLobject*
-makeBool(const char * restrict name, bool b)
-{
-  HRMLobject *obj = malloc(sizeof(HRMLobject));
-  obj->name = strdup(name);
-
-  obj->val.alen = 0;
-  obj->val.typ = HRMLBool;
-  obj->val.u.boolean = b;
-
-  obj->children = NULL;
-  obj->previous = NULL;
-  obj->next = NULL;
-
-  return obj;
-}
-
-static inline HRMLobject*
-makeBoolArray(const char * restrict name, bool *b, size_t len)
-{
-  HRMLobject *obj = malloc(sizeof(HRMLobject));
-  obj->name = strdup(name);
-
-  obj->val.alen = len;
-  obj->val.typ = HRMLBool;
-  obj->val.u.boolArray = calloc(len, sizeof(bool));
-  memcpy(obj->val.u.boolArray, b, len*sizeof(bool));
-
-  obj->children = NULL;
-  obj->previous = NULL;
-  obj->next = NULL;
-
-  return obj;
-}
-
-static inline HRMLobject*
-makeNode(const char * restrict name)
-{
-  HRMLobject *obj = malloc(sizeof(HRMLobject));
-  obj->children = NULL;
-  obj->previous = NULL;
-  obj->next = NULL;
-
-  obj->val.alen = 0;  
-  obj->name = strdup(name);
-  obj->val.typ = HRMLNode;
-
-  return obj;
-}
 
 static inline void
 pushNode(HRMLobject *parent, HRMLobject *child)

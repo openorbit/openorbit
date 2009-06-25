@@ -206,11 +206,14 @@ typedef struct HRMLattrlist {
 
 typedef struct HRMLobject {
   char *name;
+  HRMLattr *attr;
+  
   HRMLattrlist *attrs;
   HRMLvalue val;
   struct HRMLobject *previous;
   struct HRMLobject *next;
   struct HRMLobject *children;
+  struct HRMLobject *parent;
 } HRMLobject;
 
 static inline HRMLvalue
