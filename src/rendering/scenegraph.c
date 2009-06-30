@@ -205,7 +205,7 @@ ooSgSceneAddObj(OOscene *sc, OOobject *object)
   assert(sc != NULL);
   assert(object != NULL);
   
-    ooObjVecPush(&sc->objs, object);
+  ooObjVecPush(&sc->objs, object);
 }
 
 OOscene*
