@@ -241,12 +241,11 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
 
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
-
   double mass, radius;
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong, rightAsc,
          declin;
-
- for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
+  const char *tex = NULL;
+  for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
     if (!strcmp(child->name, "physical")) {
       for (HRMLobject *phys = child->children; phys != NULL; phys = phys->next) {
         if (!strcmp(phys->name, "mass")) {
@@ -284,14 +283,16 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
         if (!strcmp(rend->name, "model")) {
 
         } else if (!strcmp(rend->name, "texture")) {
-
+          tex = hrmlGetStr(rend);
         }
       }
     }
   }
   
   OOscene *sc = ooSgNewScene(parentScene, planetName.u.str/*(planetName)*/);
-  
+  // Create scene object for planet
+  OOdrawable *drawable = ooSgNewSphere(radius, tex);
+  ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   return ooOrbitNewSys(planetName.u.str, sc,
                        mass, 0.0,//float period,
                        semiMajor, ecc*semiMajor);

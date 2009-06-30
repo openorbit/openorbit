@@ -61,7 +61,7 @@ typedef struct OOorbobj {
     char *name;
     dBodyID id;
     float m;
-//    OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
+    OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
                           //!< object.
 } OOorbobj;
 
@@ -90,9 +90,9 @@ typedef struct OOorbsys {
         
     struct OOorbsys *parent; // parent
     OOscene *scene; //!< Link to scene graph scene corresponding to this system
-    
+
     OOellipse *orbit;
-    
+
     OOobjvector sats; //!< Natural satellites, i.e. other orbital systems
     OOobjvector objs; //!< Synthetic satellites, i.e. stuff that is handled by ODE
 } OOorbsys;
