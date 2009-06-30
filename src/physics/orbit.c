@@ -216,11 +216,9 @@ ooOrbitLoadComet(HRMLobject *obj)
   assert(obj);
   assert(obj->val.typ == HRMLNode);
 
-  HRMLobject *child = obj->children;
-  while (child) {
-    child = child->next;
-  }
+  for (HRMLobject *child = obj->children; child != NULL; child = child->next) {
 
+  }
 }
 
 void
@@ -229,9 +227,8 @@ ooOrbitLoadMoon(HRMLobject *obj)
   assert(obj);
   assert(obj->val.typ == HRMLNode);
 
-  HRMLobject *child = obj->children;
-  while (child) {
-    child = child->next;
+  for (HRMLobject *child = obj->children; child != NULL; child = child->next) {
+
   }
 }
 
@@ -244,28 +241,22 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
 
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
-  HRMLobject *child = obj->children;
 
   double mass, radius;
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong, rightAsc,
          declin;
 
-  while (child) {
+ for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
     if (!strcmp(child->name, "physical")) {
-      HRMLobject *phys = child->children;
-      while (phys) {
+      for (HRMLobject *phys = child->children; phys != NULL; phys = phys->next) {
         if (!strcmp(phys->name, "mass")) {
           mass = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "radius")) {
           radius = hrmlGetReal(phys);
         }
-
-        phys = phys->next;
       }
-
     } else if (!strcmp(child->name, "orbit")) {
-      HRMLobject *orbit = child->children;
-      while (orbit) {
+      for (HRMLobject *orbit = child->children; orbit != NULL; orbit = orbit->next) {
         if (!strcmp(orbit->name, "semimajor-axis")) {
           semiMajor = hrmlGetReal(orbit);
         } else if (!strcmp(orbit->name, "eccentricity")) {
@@ -285,28 +276,21 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
         } else if (!strcmp(orbit->name, "reference-date")) {
 
         }
-        orbit = orbit->next;
       }
     } else if (!strcmp(child->name, "atmosphere")) {
 
     } else if (!strcmp(child->name, "rendering")) {
-      HRMLobject *rend = child->children;
-      while (rend) {
+      for (HRMLobject *rend = child->children; rend != NULL; rend = rend->next) {
         if (!strcmp(rend->name, "model")) {
 
         } else if (!strcmp(rend->name, "texture")) {
 
         }
-
-        rend = rend->next;
       }
-
     }
-
-    child = child->next;
   }
   
-  OOscene *sc = ooSgNewScene(parentScene, ""/*(planetName)*/);
+  OOscene *sc = ooSgNewScene(parentScene, planetName.u.str/*(planetName)*/);
   
   return ooOrbitNewSys(planetName.u.str, sc,
                        mass, 0.0,//float period,
@@ -320,8 +304,7 @@ ooOrbitLoadSatellites(HRMLobject *obj, OOscene *parentScene)
   assert(obj);
   assert(obj->val.typ == HRMLNode);
 
-  HRMLobject *child = obj->children;
-  while (child) {
+  for (HRMLobject *child = obj->children; child != NULL; child = child->next) {
     if (!strcmp(child->name, "planet")) {
       ooOrbitLoadPlanet(child, parentScene);
     } else if (!strcmp(child->name, "moon")) {
@@ -329,10 +312,7 @@ ooOrbitLoadSatellites(HRMLobject *obj, OOscene *parentScene)
     } else if (!strcmp(child->name, "comet")) {
 
     }
-
-    child = child->next;
   }
-
 }
 
 
@@ -342,31 +322,24 @@ ooOrbitLoadStar(HRMLobject *obj)
   assert(obj);
   assert(obj->val.typ == HRMLNode);
   HRMLvalue starName = hrmlGetAttrForName(obj, "name");
-  double mass;
+  double mass, radius;
 
-  HRMLobject *child = obj->children;
-
-  OOscene *sc = ooSgNewScene(NULL, ""/*(starName)*/);
+  OOscene *sc = ooSgNewScene(NULL, starName.u.str);
 
 
-  while (child) {
+  for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
     if (!strcmp(child->name, "satellites")) {
       ooOrbitLoadSatellites(child, sc);
     } else if (!strcmp(child->name, "physical")) {
-      HRMLobject *phys = child->children;
-      while (phys) {
+      for (HRMLobject *phys = child->children; phys != NULL; phys = phys->next) {
         if (!strcmp(phys->name, "mass")) {
           mass = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "radius")) {
-
+          radius = hrmlGetReal(phys);
         }
-
-        phys = phys->next;
       }
     } else if (!strcmp(child->name, "rendering")) {
     }
-    
-    child = child->next;
   }
   
 
@@ -390,16 +363,13 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 
   OOorbsys *sys = NULL;
   // Go through the document and handle each entry in the document
-  HRMLobject *node = hrmlGetRoot(solarSys);
-  while (node) {
+  
+  for (HRMLobject *node = hrmlGetRoot(solarSys); node != NULL; node = node->next) {
     if (!strcmp(node->name, "openorbit")) {
-      HRMLobject *star = node->children;
-      while (star) {
+      for (HRMLobject *star = node->children; star != NULL; star = star->next) {
         sys = ooOrbitLoadStar(star); //BUG: If more than one star is specified
-        star = star->next;
       }
     }
-    node = node->next;
   }
 
   hrmlFreeDocument(solarSys);
