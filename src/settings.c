@@ -87,14 +87,8 @@ ooConfLoad(const char *name)
   char hrmlFileName[strlen(name) + 5 + 1];
   strcpy(hrmlFileName, name);
   strncat(hrmlFileName, ".hrml", 5);
-  FILE *f = fopen(hrmlFileName, "r");
-  if (!f) {
-    ooLogWarn("could not find file '%s'\n", hrmlFileName);
-  } else {
-    HRMLdocument *doc = hrmlParse(f);
-
-    hrmlFreeDocument(doc);
-  }
+  HRMLdocument *doc = hrmlParse(hrmlFileName);
+  hrmlFreeDocument(doc);
 }
 
 // Entry point for reading options from file, at the moment this is handled by
