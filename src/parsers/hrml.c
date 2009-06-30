@@ -457,7 +457,7 @@ off_t getFileLen(const char *path)
   off_t len = lseek(fd, 0, SEEK_END);
   close(fd);
   
-  fprintf(stderr, "file %s: %u B\n", path, len);
+//  fprintf(stderr, "file %s: %u B\n", path, len);
   
   return len;
 }
@@ -597,7 +597,7 @@ lexConsumeWS(LexState *lex)
 
 Token lexIdent(LexState *lex)
 {
-  while (iswalnum(lexPeekChar(lex)) || lexPeekChar(lex) == '_') {
+  while (iswalnum(lexPeekChar(lex)) || lexPeekChar(lex) == '_' || lexPeekChar(lex) == '-') {
     lexGetChar(lex);
   }
 
@@ -765,7 +765,7 @@ Token lexToken(LexState *lex)
 
   if (iswalpha(ch)) {
     return lexIdent(lex);
-  } else if (iswdigit(ch)) {
+  } else if (iswdigit(ch) || ch == '-') {
     return lexNum(lex);
   } else if (ch == '"') {
     return lexString(lex);
@@ -805,6 +805,7 @@ InsertNewNode(ParseState *parser, const char *name)
     parser->obj->previous = NULL;
     parser->obj->children = NULL;
     parser->obj->attr = NULL;
+    parser->obj->val.typ = HRMLNode;
   } else {
     HRMLobject *parent = parser->obj;
     HRMLobject *newObj = malloc(sizeof(HRMLobject));
@@ -815,6 +816,7 @@ InsertNewNode(ParseState *parser, const char *name)
     newObj->previous = NULL;
     newObj->attr = NULL;
     newObj->children = NULL;
+    newObj->val.typ = HRMLNode;
     
     if (parent->children) {
       parent->children->previous = newObj;
@@ -892,28 +894,28 @@ static void Require(ParseState *parser, TokenKind kind)
   
   
   if (lexPeekTok(parser->lexer).kind_ == kind) {
-    fprintf(stderr,
-            "Require(%s) == %s: ",
-            toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
-    printToken(lexPeekTok(parser->lexer));
-    fprintf(stderr, "\n");
+//    fprintf(stderr,
+//            "Require(%s) == %s: ",
+//            toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+//    printToken(lexPeekTok(parser->lexer));
+//    fprintf(stderr, "\n");
 
     lexGetNextTok(parser->lexer);
     return;
   }
 
-  fprintf(stderr,
-          "Require(%s) != %s: ",
-          toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
-  printToken(lexPeekTok(parser->lexer));
-  fprintf(stderr, "\n");
+//  fprintf(stderr,
+//          "Require(%s) != %s: ",
+//          toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+//  printToken(lexPeekTok(parser->lexer));
+//  fprintf(stderr, "\n");
   
-  void *callstack[128];
-  int frames = backtrace(callstack, 128);
-  char **strs = backtrace_symbols(callstack, frames);
-  for (int i = 0 ; i < frames; ++ i) {
-    fprintf(stderr, "%s\n", strs[i]);
-  }
+//  void *callstack[128];
+//  int frames = backtrace(callstack, 128);
+//  char **strs = backtrace_symbols(callstack, frames);
+//  for (int i = 0 ; i < frames; ++ i) {
+//    fprintf(stderr, "%s\n", strs[i]);
+//  }
   
   ParseErr("token '%s' expected", toks[kind]);
 }
@@ -922,22 +924,22 @@ static void Require(ParseState *parser, TokenKind kind)
 static bool Optional(ParseState *parser, TokenKind kind)
 {
   if (lexPeekTok(parser->lexer).kind_ == kind) {
-    fprintf(stderr,
-            "Optional(%s) == %s: ",
-            toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
-    printToken(lexPeekTok(parser->lexer));
-    fprintf(stderr, "\n");
+    //fprintf(stderr,
+    //        "Optional(%s) == %s: ",
+    //        toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+    //printToken(lexPeekTok(parser->lexer));
+    //fprintf(stderr, "\n");
     
     lexGetNextTok(parser->lexer);
     return true;
   }
 
 
-  fprintf(stderr,
-          "Optional(%s) != %s: ",
-          toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
-  printToken(lexPeekTok(parser->lexer));
-  fprintf(stderr, "\n");
+  //fprintf(stderr,
+  //        "Optional(%s) != %s: ",
+  //        toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+  //printToken(lexPeekTok(parser->lexer));
+  //fprintf(stderr, "\n");
 
   return false;
 }
@@ -945,11 +947,11 @@ static bool Optional(ParseState *parser, TokenKind kind)
 // Peeks for next token without consuming
 static bool Peek(ParseState *parser, TokenKind kind)
 {
-  fprintf(stderr,
-          "Peek(%s) ?? %s: ",
-          toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
-  printToken(lexPeekTok(parser->lexer));
-  fprintf(stderr, "\n");
+  //fprintf(stderr,
+  //        "Peek(%s) ?? %s: ",
+  //        toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
+  //printToken(lexPeekTok(parser->lexer));
+  //fprintf(stderr, "\n");
 
 
   if (lexPeekTok(parser->lexer).kind_ == kind) {
@@ -1020,6 +1022,10 @@ void ParseVal(ParseState *parser)
       }
       HRMLvalue val = makeVal(real);
       InsertValueInNode(parser, val);
+    } else if (Optional(parser, tk_true) || Optional(parser, tk_false)) {
+      Token tok = lexGetCurrentTok(parser->lexer);
+      HRMLvalue val = makeVal(tok);
+      InsertValueInNode(parser, val);
     } else if (Optional(parser, tk_lbrack)) {
 
       while (!Peek(parser, tk_rbrack)) {
@@ -1027,12 +1033,12 @@ void ParseVal(ParseState *parser)
       }
       Require(parser, tk_rbrack);
     }
-    
+
     Require(parser, tk_semi);
   } else {
     ParseErr("object missing data");
   }
-  
+
   GotoParentNode(parser);
 }
 
@@ -1067,7 +1073,7 @@ ParseState *newParser(const char *path)
 
 
 void deleteParser(ParseState *parser)
-{  
+{
   deleteLex(parser->lexer);
   free(parser);
 }
@@ -1078,9 +1084,9 @@ HRMLdocument *hrmlParse(const char *path)
   ParseState *parser = newParser(path);
   parser->doc = malloc(sizeof(HRMLdocument));
   parser->doc->rootNode = NULL;
-  
+
   Parse(parser);
-  
+
   HRMLdocument *doc = parser->doc;
   if (parser->errors) { // Incase of parsing errors, return NULL
     fprintf(stderr, "parse errors, freeing doc\n");
@@ -1382,10 +1388,10 @@ hrmlFreeObj(HRMLobject *obj)
   HRMLattr *attr = obj->attr;
   while (attr) {
     HRMLattr *nextAttr = attr->next;
-    
+
     free(attr->name);
     free(attr);
-    
+
     attr = nextAttr;
   }
 
@@ -1397,7 +1403,7 @@ hrmlFreeObj(HRMLobject *obj)
       child = nextChild;
     }
   }
-  
+
   free(obj);
 }
 
@@ -1488,7 +1494,7 @@ writeNode(HRMLobject *obj, FILE *fp, int lev)
     fprintf(fp, ")");
   }
 
-  
+
   if (obj->children) {
     fprintf(fp, " {\n");
     for (HRMLobject *child = obj->children; child != NULL; child = child->next) {
