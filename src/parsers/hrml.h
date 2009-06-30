@@ -196,19 +196,11 @@ typedef struct HRMLattr {
   struct HRMLattr *next;
 } HRMLattr;
 
-
-typedef struct HRMLattrlist {
-  size_t allocLen;
-  size_t attrCount;
-  char **names;
-  HRMLvalue *values;
-} HRMLattrlist;
-
+// Invariant val = node && childrend is not null, val is other value, children is null
 typedef struct HRMLobject {
   char *name;
   HRMLattr *attr;
   
-  HRMLattrlist *attrs;
   HRMLvalue val;
   struct HRMLobject *previous;
   struct HRMLobject *next;
@@ -219,9 +211,9 @@ typedef struct HRMLobject {
 static inline HRMLvalue
 hrmlGetAttrForName(HRMLobject *obj, const char *attrName)
 {
-  for (size_t i = 0 ; i < obj->attrs->attrCount; i ++) {
-    if (!strcmp(attrName, obj->attrs->names[i])) {
-      return obj->attrs->values[i];
+  for (HRMLattr *attr = obj->attr ; attr != NULL; attr = attr->next) {
+    if (!strcmp(attrName, attr->name)) {
+      return attr->val;
     }
   }
 
@@ -261,18 +253,6 @@ typedef struct HRMLdocument {
   HRMLobject *rootNode;
 } HRMLdocument;
 
-static inline HRMLobject*
-hrmlGetNodeHead(HRMLobject *node) {
-  assert(node->val.typ == HRMLNode);
-  return node->children;
-}
-
-static inline HRMLobject*
-hrmlGetNodeTail(HRMLobject *node) {
-  assert(node->val.typ == HRMLNode);
-  return node->children;
-}
-
 
 static inline HRMLobject*
 hrmlGetRoot(HRMLdocument *doc){
@@ -283,13 +263,10 @@ typedef struct HRMLschema {
 
 } HRMLschema;
 
-HRMLdocument* hrmlParse(FILE *f);
+HRMLdocument* hrmlParse(const char *path);
 bool hrmlValidate(HRMLdocument *doc, HRMLschema *sc);
 void hrmlFreeDocument(HRMLdocument *doc);
 HRMLobject* hrmlGetObject(HRMLdocument *doc, const char *docPath);
-
-HRMLdocument *hrmlParseNew(const char *path);
-
 
 // Node iteration macros
 #define FOR_ALL_ATTR(attrib, node) \
@@ -299,6 +276,7 @@ HRMLdocument *hrmlParseNew(const char *path);
    for (HRMLobject *obj = node->children ; obj != NULL; obj = obj->next)
 
 
+void hrmlWriteDocument(HRMLdocument *doc, FILE *file);
 
 #endif /* end of include guard: HRML_H_SJH7PZB3 */
 

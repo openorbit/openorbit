@@ -197,6 +197,8 @@ makeNode(const char * restrict name)
 
 typedef enum TokenKind {
   tk_ident = 0,
+  tk_true,
+  tk_false,
   tk_int,
   tk_real,
   tk_str,
@@ -217,6 +219,8 @@ typedef enum TokenKind {
 
 char * toks [] = {
   [tk_ident] = "ident",
+  [tk_true] = "true",
+  [tk_false] = "false",
   [tk_int] = "int",
   [tk_real] = "real",
   [tk_str] = "str",
@@ -322,7 +326,12 @@ char* getString(Token tok)
   char *str = calloc(tok.len_ + 1, sizeof(char));
   if (!str) return NULL;
   
-  memcpy(str, tok.start_, tok.len_);
+  // If this is a quoted string, strip the quotes
+  if (*tok.start_ == '"') {
+    memcpy(str, tok.start_ + 1, tok.len_ - 2);
+  } else {
+    memcpy(str, tok.start_, tok.len_);
+  }
   return str;
 }
 
@@ -341,6 +350,58 @@ Token makeTok(TokenKind kind, const char *start, size_t len)
 {
   Token tok = {kind, start, len}; 
   return tok;
+}
+
+HRMLvalue makeVal(Token tok)
+{
+  HRMLvalue val;
+  
+  switch (tok.kind_) {
+  case tk_ident:
+  case tk_str:
+    val.typ = HRMLStr;
+    val.u.str = getString(tok);
+    break;
+  case tk_int:
+    val.typ = HRMLInt;
+    val.u.integer = getInteger(tok);
+    break;
+  case tk_real:
+    val.typ = HRMLFloat;
+    val.u.real = getReal(tok);
+    break;
+  //    HRMLDate,
+//      HRMLBool,
+//      HRMLIntArray,
+//      HRMLFloatArray,
+//      HRMLBoolArray,
+//      HRMLNull
+  case tk_true:
+    val.typ = HRMLBool;
+    val.u.boolean = true;
+    break;
+  case tk_false:
+    val.typ = HRMLBool;
+    val.u.boolean = false;
+    break;
+  case tk_comment:
+  case tk_colon:
+  case tk_semi:
+  case tk_comma:
+  case tk_eq:
+  case tk_lbrace:
+  case tk_rbrace:
+  case tk_lparen:
+  case tk_rparen:
+  case tk_lbrack:
+  case tk_rbrack:
+  case tk_eof:
+  case tk_count:
+  default:
+    assert(0 && "invalid token, cannot make value");
+  }
+  
+  return val;
 }
 
 static jmp_buf gParseError;
@@ -373,6 +434,7 @@ Token createNextToken(TokenKind kind, LexState *lex) {
   Token next = makeTok(kind, lex->nextTokPtr_,
                        (size_t)(lex->rdPtr_ - lex->nextTokPtr_));
   lex->nextTok_ = next;
+  
   return next;
 }
   
@@ -482,7 +544,7 @@ lexPeekChar(LexState *lex)
   if (lex->fileLen_ - (lex->rdPtr_ - lex->startPtr_) <= 0) {
     return WEOF;
   }
-  
+
   int count = mbtowc(&ch, lex->rdPtr_ , min(16, lex->fileLen_ - (lex->rdPtr_ - lex->startPtr_)));
   if (count == -1) {
     fprintf(stderr, "invalid chars in file, for now lets just die\n");
@@ -538,9 +600,15 @@ Token lexIdent(LexState *lex)
   while (iswalnum(lexPeekChar(lex)) || lexPeekChar(lex) == '_') {
     lexGetChar(lex);
   }
-  
-  fprintf(stderr, "returning identifier\n");
-  
+
+  if ((lex->rdPtr_ - lex->nextTokPtr_ == 4)
+      && !memcmp(lex->nextTokPtr_, "true", 4)) {
+    return createNextToken(tk_true, lex);
+  } else if ((lex->rdPtr_ - lex->nextTokPtr_ == 5)
+             && !memcmp(lex->nextTokPtr_, "false", 5)) {
+    return createNextToken(tk_false, lex);
+  }
+
   return createNextToken(tk_ident, lex);
 }
 
@@ -552,13 +620,15 @@ Token lexString(LexState *lex)
       lexGetChar(lex);
     }
   }
-  
+
   if (lexPeekChar(lex) == '"') {
     lexGetChar(lex); // consume last quote in string
     return createNextToken(tk_str, lex);
   } else {
     return createNextToken(tk_eof, lex);
   }
+  
+  assert(0 && "invalid string");
 }
 Token lexReal(LexState *lex)
 {
@@ -577,7 +647,7 @@ Token lexReal(LexState *lex)
       }
     }
   }
-  
+
   return createNextToken(tk_real, lex);
 }
 
@@ -606,22 +676,26 @@ Token lexNum(LexState *lex)
       return createNextToken(tk_int, lex);
     }
   }
-  
+
   while (iswnumber(lexPeekChar(lex)) ||  lexPeekChar(lex) == '_') {
     lexGetChar(lex);
   }
-  
+
   if (lexPeekChar(lex) == '.') {
     return lexReal(lex);
   }
   
+  return createNextToken(tk_int, lex); // Otherwise this is an integer
+  
+
+  assert(0 && "invalid number");
 }
 
 Token lexComment(LexState *lex)
 {
   if (lexPeekChar(lex) == '*') {
     int nestLevel = 1;
-    
+
     while ((lexPeekChar(lex) != WEOF)) {
       wchar_t ch = lexGetChar(lex);
       if (ch == '/') {
@@ -645,7 +719,7 @@ Token lexComment(LexState *lex)
     while ((lexPeekChar(lex) != '\n') && (lexPeekChar(lex) != WEOF)) lexGetChar(lex);
     return createNextToken(tk_comment, lex);
   }
-  
+
   return createNextToken(tk_eof, lex);
 }
 
@@ -678,7 +752,7 @@ Token lexPunct(LexState *lex)
     // Error
     ;
   }
-  
+
   return createNextToken(tk_eof, lex);
 }
 
@@ -686,7 +760,7 @@ Token lexPunct(LexState *lex)
 Token lexToken(LexState *lex)
 {  
   lexConsumeWS(lex);
-  
+
   wchar_t ch = lexGetChar(lex);
 
   if (iswalpha(ch)) {
@@ -716,17 +790,37 @@ Token lexToken(LexState *lex)
 
 
 void
-InsertNewNode(ParseState *parser)
+InsertNewNode(ParseState *parser, const char *name)
 {
+  HRMLvalue val;  
+  
+  
   if (parser->obj == NULL) {
+    
     parser->doc->rootNode = malloc(sizeof(HRMLobject));
     parser->obj = parser->doc->rootNode;
+    parser->obj->name = strdup(name);
     parser->obj->parent = NULL;
     parser->obj->next = NULL;
     parser->obj->previous = NULL;
+    parser->obj->children = NULL;
+    parser->obj->attr = NULL;
   } else {
     HRMLobject *parent = parser->obj;
-    HRMLobject *newObj = malloc(sizeof(HRMLobject));    
+    HRMLobject *newObj = malloc(sizeof(HRMLobject));
+    
+    newObj->name = strdup(name);
+    newObj->parent = parent;
+    newObj->next = parent->children;    
+    newObj->previous = NULL;
+    newObj->attr = NULL;
+    newObj->children = NULL;
+    
+    if (parent->children) {
+      parent->children->previous = newObj;
+    }
+    parent->children = newObj;
+    parser->obj = newObj;
   }
 }
 
@@ -760,7 +854,7 @@ InsertAttribute(ParseState *parser, const char *name, Token tok)
     attr->val.typ = HRMLStr;
     attr->val.u.str = getString(tok);
   }
-  
+
   attr->next = parser->obj->attr;
   parser->obj->attr = attr;
 }
@@ -768,43 +862,22 @@ InsertAttribute(ParseState *parser, const char *name, Token tok)
 void
 InsertValueInNode(ParseState *parser, HRMLvalue val)
 {
+  parser->obj->val = val;
+}
+
+
+static void ParseErr(const char *str, ...)
+{
+  char msg[strlen(str)+sizeof("error: ")+2];
+  strncpy(msg, "error: ", 8);
+  strncat(msg, str, strlen(str));
+  strncat(msg, "\n", 1);
+  va_list args;
+  va_start(args, str);
+
+  vfprintf(stderr, msg, args);
+  va_end(args);
   
-}
-
-void
-InsertIntInNode(ParseState *parser, const char *name, int64_t val)
-{
-  HRMLobject *obj = makeInt(name, val);
-  obj->parent = parser->obj->parent;
-  parser->obj->next = obj;
-  obj->previous = parser->obj;
-  parser->obj = obj;
-}
-
-void
-InsertRealInNode(ParseState *parser, const char *name, double val)
-{
-  HRMLobject *obj = makeFloat(name, val);
-  obj->parent = parser->obj->parent;
-  parser->obj->next = obj;
-  obj->previous = parser->obj;
-  parser->obj = obj;
-}
-
-void
-InsertStrInNode(ParseState *parser, const char *name, const char *val)
-{
-  HRMLobject *obj = makeStr(name, val);
-  obj->parent = parser->obj->parent;
-  parser->obj->next = obj;
-  obj->previous = parser->obj;
-  parser->obj = obj;
-}
-
-
-static void ParseErr(const char *str)
-{
-  fprintf(stderr, "error: %s\n", str);
   longjmp(gParseError, 1);
 }
 
@@ -842,7 +915,7 @@ static void Require(ParseState *parser, TokenKind kind)
     fprintf(stderr, "%s\n", strs[i]);
   }
   
-  ParseErr("token 'xxx' expected");
+  ParseErr("token '%s' expected", toks[kind]);
 }
 
 // Checks if next token is of the given kind, if so consume token and return true
@@ -877,8 +950,8 @@ static bool Peek(ParseState *parser, TokenKind kind)
           toks[kind], toks[lexPeekTok(parser->lexer).kind_]);
   printToken(lexPeekTok(parser->lexer));
   fprintf(stderr, "\n");
-  
-  
+
+
   if (lexPeekTok(parser->lexer).kind_ == kind) {
     return true;
   }
@@ -896,9 +969,15 @@ ParseAttributes(ParseState *parser)
   if (!Peek(parser, tk_rparen)) {
     do {
       Require(parser, tk_ident);
+      Token nameTok = lexGetCurrentTok(parser->lexer);
+
       Require(parser, tk_colon);
       Require(parser, tk_ident);
-      
+      Token valueTok = lexGetCurrentTok(parser->lexer);
+
+      char *name = getString(nameTok);
+      InsertAttribute(parser, name, valueTok);
+      free(name);
     } while (Optional(parser, tk_comma));
   }
 }
@@ -906,36 +985,43 @@ ParseAttributes(ParseState *parser)
 void ParseVal(ParseState *parser)
 {
   Require(parser, tk_ident);
-  
+
   Token ident = lexGetCurrentTok(parser->lexer);
+  char *valName = getString(ident);
+  InsertNewNode(parser, valName);
+  free(valName);
 
   if (Optional(parser, tk_lparen)) {
     ParseAttributes(parser);
     Require(parser, tk_rparen);
   }
-  
+
   if (Optional(parser, tk_lbrace)) {
     // Aggregated value
     // Parse each sub value by recursive call
     while (!Peek(parser, tk_rbrace)) {
-        ParseVal(parser);
+      ParseVal(parser);
     }
     Require(parser, tk_rbrace);
   } else if (Optional(parser, tk_colon)) {
-    // Primitive value
+    // Primitive value    
     if (Optional(parser, tk_str)) {
       Token str = lexGetCurrentTok(parser->lexer);
+      HRMLvalue val = makeVal(str);
+      InsertValueInNode(parser, val);      
     } else if (Optional(parser, tk_int)) {
       Token integer = lexGetCurrentTok(parser->lexer);
-      int64_t i = getInteger(integer);
+      HRMLvalue val = makeVal(integer);
+      InsertValueInNode(parser, val);
     } else if (Optional(parser, tk_real)) {
       Token real = lexGetCurrentTok(parser->lexer);
       if (Optional(parser, tk_ident)) {
         // Got unit
       }
-      double r = getReal(real);
+      HRMLvalue val = makeVal(real);
+      InsertValueInNode(parser, val);
     } else if (Optional(parser, tk_lbrack)) {
-      
+
       while (!Peek(parser, tk_rbrack)) {
         // Ensure that types are identical for all subvalues
       }
@@ -946,6 +1032,8 @@ void ParseVal(ParseState *parser)
   } else {
     ParseErr("object missing data");
   }
+  
+  GotoParentNode(parser);
 }
 
 void Parse2(ParseState *parser)
@@ -984,8 +1072,7 @@ void deleteParser(ParseState *parser)
   free(parser);
 }
 
-
-HRMLdocument *hrmlParseNew(const char *path)
+HRMLdocument *hrmlParse(const char *path)
 {
   assert(path != NULL);
   ParseState *parser = newParser(path);
@@ -996,6 +1083,7 @@ HRMLdocument *hrmlParseNew(const char *path)
   
   HRMLdocument *doc = parser->doc;
   if (parser->errors) { // Incase of parsing errors, return NULL
+    fprintf(stderr, "parse errors, freeing doc\n");
     hrmlFreeDocument(doc);
     doc = NULL;
   }
@@ -1129,103 +1217,6 @@ parse_si_unit(const char *unit)
 
 }
 
-typedef enum HRMLtokenkind{
-  HrmlTokenInvalid = 0,
-  HrmlTokenSym,
-  HrmlTokenStr,
-  HrmlTokenInt,
-  HrmlTokenFloat,
-  HrmlTokenDate,
-  HrmlTokenTime,
-  HrmlTokenChar,
-  HrmlTokenBool
-} HRMLtokenkind;
-
-static int gLineCount = 1;
-static const char *gFileName = NULL;
-static bool gParseErrors = false;
-
-static char *gTokenKinds[] =
-{
-  [HrmlTokenInvalid] = "invalid",
-  [HrmlTokenSym] = "sym",
-  [HrmlTokenStr] = "str",
-  [HrmlTokenInt] = "int",
-  [HrmlTokenFloat] = "real",
-  [HrmlTokenDate] = "date",
-  [HrmlTokenTime] = "time",
-  [HrmlTokenChar] = "char",
-  [HrmlTokenBool] = "bool"
-};
-
-static inline void
-ParseError(const char *fmt, ...)
-{
-  va_list args;
-  va_start(args, fmt);
-
-  fprintf(stderr, "%d:%s:parse error ", gLineCount, gFileName);
-  vfprintf(stderr, fmt, args);
-  fputc('\n', stderr);
-
-  va_end(args);
-
-  gParseErrors = true;
-}
-
-
-
-typedef struct HRMLtoken {
-  HRMLtokenkind kind;
-  union {
-    char *sym;
-    char *str;
-    uint64_t integer;
-    double real;
-    char ch;
-    bool boolean;
-  } val;
-} HRMLtoken;
-
-struct growable_string {
-  size_t curr_len;
-  size_t a_len;
-  char *str;
-};
-
-static void gw_init(struct growable_string *s)
-{
-  s->str = malloc(16);
-  s->str[0] = '\0';
-  s->a_len = 16;
-  s->curr_len = 0;
-}
-
-static void gw_push(struct growable_string *s, char c)
-{
-  if (s->curr_len + 1 >= s->a_len) { // Add one accounts for '\0'
-    s->str = realloc(s->str, s->a_len * 2);
-    s->a_len *= 2;
-  }
-
-  s->str[s->curr_len] = c;
-  s->str[s->curr_len+1] = '\0';
-  s->curr_len ++;
-}
-
-static void gw_clear(struct growable_string *s)
-{
-  s->curr_len = 0;
-  s->str[0] = '\0';
-}
-
-static void gw_destroy(struct growable_string *s)
-{
-  s->curr_len = 0;
-  free(s->str);
-}
-
-static size_t gw_len(struct growable_string *s) {return s->curr_len;}
 
 static int
 isbindigit(int c)
@@ -1250,237 +1241,11 @@ isop(int c)
 
   return 0;
 }
-typedef struct {
-  FILE *f;
-  size_t lineNo;
-  size_t colNo;
-} HRMLlexer;
 
-int
-hrmlLexGet(HRMLlexer *lex)
-{
-  int ch = fgetc(lex->f);
-  if (ch == '\n') {
-    lex->lineNo ++;
-    lex->colNo = 0;
-  } else if (ch == '\r') {
-    ch = fgetc(lex->f);
-  } else {
-    lex->colNo ++;
-  }
-  return ch;
-}
-
-void
-hrmlLexUnGet(HRMLlexer *lex, int ch)
-{
-  ungetc(ch, lex->f);
-  if (ch == '\n') {
-    lex->lineNo --;
-    lex->colNo = 0; // TODO: this is obviously incorrect, but I think it is ok
-                    // for now
-  } else {
-    lex->colNo --;
-  }
-}
-
-
-static inline void
-pushNode(HRMLobject *parent, HRMLobject *child)
-{
-  // TODO: This inserts in the wrong order, we should fix this by adding a tail node
-  child->next = parent->children;
-  child->previous = NULL;
-
-  if (parent->children != NULL) {
-    parent->children->previous = child;
-  }
-  parent->children = child;
-}
-
-HRMLtoken
-hrmlLex(FILE *f)
-{
-  HRMLtoken errTok = {HrmlTokenInvalid, .val.integer = 0};
-  int c;
-  struct growable_string s;
-  gw_init(&s);
-
-  while (isblank(c = fgetc(f)) || c == '\n' || c == '#') {
-    // Skip WS
-    if (c == '\n') {
-      // Update linecounter
-      gLineCount ++;
-    } else if (c == '#') {
-      // Skip comments
-      while ((c = fgetc(f)) != '\n') {
-        if (feof(f)) return errTok; // End of file
-        if (ferror(f)) {fprintf(stderr, "lexerror\n");return errTok;} // End of file
-      } // note update line counter
-    }
-
-  }
-  if (feof(f)) {
-    printf("********\n");
-
-    return errTok; // End of file
-  }
-  if (ferror(f)) {fprintf(stderr, "lexerror\n");return errTok;} // End of file
-
-  // Special hex or bin numbers
-  if (c == '0') {
-    int c2 = fgetc(f);
-    if (c2 == 'x') {
-      // Hexnumber
-      while (isxdigit(c = fgetc(f)) || c == '_') {
-        if (c != '_') gw_push(&s, c);
-      }
-      ungetc(c, f);
-      if (gw_len(&s)) {
-        HRMLtoken tok;
-        tok.kind = HrmlTokenInt;
-        tok.val.integer = strtoull(s.str, NULL, 16);
-        gw_destroy(&s);
-        return tok;
-      }
-  printf("********\n");
-      return errTok;
-    } else if (c2 == 'b') {
-      // Binary number
-      while (isbindigit(c = fgetc(f)) || c == '_') {
-        if (c != '_') gw_push(&s, c);
-      }
-      ungetc(c, f);
-      if (gw_len(&s)) {
-        HRMLtoken tok;
-        tok.kind = HrmlTokenInt;
-        tok.val.integer = strtoull(s.str, NULL, 2);
-        gw_destroy(&s);
-        return tok;
-      }
-  printf("********\n");
-
-      return errTok;
-    } else {
-      ungetc(c2, f);
-    }
-  }
-
-  if (isdigit(c)) {
-    // Integers or floats
-    gw_push(&s, c);
-    while (isdigit(c = fgetc(f)) || c == '_') {
-      if (c != '_') gw_push(&s, c);
-    }
-    if (c == '.') {
-      // Float
-      gw_push(&s, c);
-      while (isdigit(c = fgetc(f)) || c == '_') {
-        if (c != '_') gw_push(&s, c);
-      }
-      ungetc(c, f);
-
-      HRMLtoken tok;
-      tok.kind = HrmlTokenFloat;
-      tok.val.real = strtod(s.str, NULL);
-      gw_destroy(&s);
-      return tok;
-    } else {
-      // Integer
-      HRMLtoken tok;
-      ungetc(c, f);
-
-      tok.kind = HrmlTokenInt;
-      tok.val.integer = strtoull(s.str, NULL, 10);
-      gw_destroy(&s);
-
-      return tok;
-    }
-  
-    printf("********\n");
-    return errTok;
-  } else if (isalpha(c)) {
-    // Symbols
-    gw_push(&s, c);
-    while (isalnum(c = fgetc(f)) || c == '-') {
-      gw_push(&s, c);
-    }
-    ungetc(c, f);
-
-    if (!strcmp(s.str, "true")) {
-      HRMLtoken tok;
-      tok.kind = HrmlTokenBool;
-      tok.val.boolean = true;
-      gw_destroy(&s);
-      return tok;
-    } else if (!strcmp(s.str, "false")) {
-      HRMLtoken tok;
-      tok.kind = HrmlTokenBool;
-      tok.val.boolean = false;
-      gw_destroy(&s);
-      return tok;
-    }
-    HRMLtoken tok;
-    tok.kind = HrmlTokenSym;
-    tok.val.sym = strdup(s.str);//TODO: fix leak, should move to Mmap based files
-    gw_destroy(&s);
-    return tok;
-  } else if (c == '"') {
-    // String
-    while ((c = fgetc(f)) != '"') {
-      // TODO: check for errors in reading
-      if (c == '\\') {
-        // Escapes
-        int c2 = fgetc(f);
-        if (c2 == '"') gw_push(&s, c2);
-        else if (c2 == 't') gw_push(&s, '\t');
-        else if (c2 == 'n') gw_push(&s, '\n');
-        else if (c2 == '\\') gw_push(&s, '\\');
-        else {gw_destroy(&s); return errTok; }
-      } else {
-        // Non escaped characters
-        gw_push(&s, c);
-      }
-    }
-
-    HRMLtoken tok;
-    tok.kind = HrmlTokenStr;
-    tok.val.str = strdup(s.str);
-    return tok;
-  }
-
-  if (isop(c)) {
-    HRMLtoken tok;
-    tok.kind = HrmlTokenChar;
-    tok.val.ch = c;
-    gw_destroy(&s);
-    return tok;
-  }
-  // Maybe this should be static
-  gw_destroy(&s);
-  printf("********\n");
-
-  return errTok;
-}
-#define IS_CHAR(tok, c) ((tok).kind == HrmlTokenChar && (tok).val.ch == (c))
-#define IS_SYM(tok) ((tok).kind == HrmlTokenSym)
-#define SYM(tok) ((tok).val.sym)
-
-#define IS_STR(tok) ((tok).kind == HrmlTokenStr)
-#define STR(tok) ((tok).val.str)
-#define IS_INTEGER(tok) ((tok).kind == HrmlTokenInt)
-#define IS_BOUNDED_INTEGER(tok, minVal, maxVal) ((tok).kind == HrmlTokenInt && (tok).val.integer >= (minVal) && (tok).val.integer <= (maxVal))
-#define INTEGER(tok) ((tok).val.integer)
-#define IS_REAL(tok) ((tok).kind == HrmlTokenFloat)
-#define REAL(tok) ((tok).val.real)
-#define IS_LEAP_YEAR(y) (((y) % 400 == 0) || ((y) % 100 != 0 && (y) % 4 == 0))
-#define IS_VALUE(tok) (IS_STR(tok) || IS_INTEGER(tok) || IS_REAL(tok) || IS_SYM(tok))
-
-#define IS_BOOLEAN(tok) ((tok).kind == HrmlTokenBool)
-#define BOOLEAN(tok) ((tok).val.boolean)
 
 // Checks date for validity, asserts that month is between 1 and 12 and that the
 // day is in the valid range for that month, taking leap years into account
+#if 0
 static inline bool
 isValidDate(int64_t year, int month, int day)
 {
@@ -1515,66 +1280,7 @@ isValidDate(int64_t year, int month, int day)
   return false;
 }
 
-HRMLtoken
-requireSym(HRMLlexer *lex)
-{
-  HRMLtoken tok = hrmlLex(lex->f);
-  if (IS_SYM(tok)) {
-    return tok;
-  } else {
-    // longjmp(lex->jump_buffer, 1);
-  }
-}
 
-bool
-isSym(HRMLlexer *lex)
-{
-  return false;
-}
-
-
-void
-hrmlPrintTok(HRMLtoken tok)
-{
-  switch (tok.kind) {
-  case HrmlTokenInvalid:
-    break;
-  case HrmlTokenSym:
-    fprintf(stderr, "sym token %s\n", SYM(tok));
-    break;
-  case HrmlTokenStr:
-    fprintf(stderr, "str token %s\n", STR(tok));
-    break;
-  case HrmlTokenInt:
-    fprintf(stderr, "int token %llu\n", INTEGER(tok));
-    break;
-  case HrmlTokenFloat:
-    fprintf(stderr, "real token %f\n", REAL(tok));
-    break;
-  case HrmlTokenDate:
-    fprintf(stderr, "date token\n");
-    break;
-  case HrmlTokenTime:
-    fprintf(stderr, "time token\n");
-    break;
-  case HrmlTokenChar:
-    fprintf(stderr, "char token %c\n", tok.val.ch);
-    break;
-  default:
-    fprintf(stderr, "unknown token\n");
-  }
-}
-
-HRMLobject*
-hrmlParseArray(FILE *f)
-{
-  size_t alen;
-  // At this point, the left bracket '[' should already be consumed
-  HRMLtoken value = hrmlLex(f);
-  HRMLtoken comma = hrmlLex(f);
-
-  HRMLtoken rightBracket = hrmlLex(f);
-}
 
 HRMLobject*
 hrmlParsePrimitiveValue(FILE *f, const char *sym)
@@ -1650,204 +1356,16 @@ hrmlParsePrimitiveValue(FILE *f, const char *sym)
 
   return NULL;
 }
-
-HRMLattrlist*
-hrmlCreateAttrList(void)
-{
-  HRMLattrlist *alist = malloc(sizeof(HRMLattrlist));
-  alist->names = malloc(sizeof(char*)*4);
-  alist->values = malloc(sizeof(HRMLvalue*)*4);
-  alist->attrCount = 0;
-  alist->allocLen = 4;
-
-  return alist;
-}
-
-void
-hrmlPushAttr(HRMLattrlist *attrList, const char *name, HRMLvalue *value)
-{
-  // Expand attr array if needed
-  if (attrList->allocLen <= attrList->attrCount) {
-    attrList->names = realloc(attrList->names,
-                              attrList->allocLen*sizeof(char*)*2);
-    attrList->values = realloc(attrList->names,
-                               attrList->allocLen*sizeof(HRMLvalue*)*2);
-  }
-
-  attrList->names[attrList->attrCount] = strdup(name);
-  attrList->values[attrList->attrCount] = *value;
-  attrList->attrCount ++;
-}
-
-HRMLattrlist*
-hrmlParseAttrs(FILE *f)
-{
-  // Precondition, have already consumed '('
-  HRMLtoken commaOrParen;
-  do {
-    HRMLtoken tok = hrmlLex(f);
-    if (IS_CHAR(tok, ')')) {
-      // This is an empty attribute list
-      //fprintf(stderr, "empty attr list\n");
-      return NULL;
-    }
-
-    if (IS_SYM(tok)) {
-      HRMLtoken colon = hrmlLex(f);
-      if (! IS_CHAR(colon, ':')) {
-        fprintf(stderr, "attr: missing colon after %s\n", SYM(tok));
-        return NULL;
-      }
-      HRMLtoken value = hrmlLex(f);
-      if (!IS_VALUE(value)) {
-        fprintf(stderr, "attr: no value after %s\n", SYM(tok));
-        return NULL;
-      } else {
-        //fprintf(stderr, "attr: %s\n", SYM(tok));
-      }
-    }
-
-    commaOrParen = hrmlLex(f);
-    if (!(IS_CHAR(commaOrParen, ')') || IS_CHAR(commaOrParen, ','))) {
-      fprintf(stderr, "attr: list terminated by unknown sequence\n");
-      return NULL;
-    }
-  } while (IS_CHAR(commaOrParen, ','));
-
-  return NULL;
-}
-
-HRMLobject* hrmlParseObj(FILE *f, const char *sym);
-
-HRMLobject*
-hrmlParseObjList(FILE *f, const char *sym)
-{
-  HRMLobject *node = makeNode(sym);
-
-  HRMLtoken tok;
-  // '{' must be consumed
-  tok = hrmlLex(f);
-
-  do {
-    if (IS_CHAR(tok, '}')) {
-      // fprintf(stderr, "end of object list\n");
-      return node;
-    } else if (IS_SYM(tok)) {
-      //  fprintf(stderr, "parse subobj and push on list\n");
-      HRMLobject *obj = hrmlParseObj(f, SYM(tok));
-      pushNode(node, obj);
-    }
-    tok = hrmlLex(f);
-  } while (IS_SYM(tok));
+#endif
 
 
-  if (!IS_CHAR(tok, '}')) {
-    ParseError("expected '}', got %s\n", gTokenKinds[tok.kind]);
-  }
-  //fprintf(stderr, "objlist done\n");
-  return node;
-
-}
-
-HRMLobject*
-hrmlParseObj(FILE *f, const char *sym)
-{
-  HRMLtoken tok = hrmlLex(f);
-  if (IS_CHAR(tok, '(')) { // this is optional
-    //printf("parsing attributes\n");
-
-    HRMLattrlist *attrs = hrmlParseAttrs(f);
-    tok = hrmlLex(f);
-  }
-
-  if (IS_CHAR(tok, ':')) {
-    //fprintf(stderr, "parsing primitive %s\n", sym);
-    HRMLobject *obj = hrmlParsePrimitiveValue(f, sym);
-    return obj;
-  } else if (IS_CHAR(tok, '{')) {
-    //fprintf(stderr, "parsing complex %s\n", sym);
-    HRMLobject *objList = hrmlParseObjList(f, sym);
-    //fprintf(stderr, "done parsing complex %s, %p\n", sym, objList);
-    return objList;
-  }
-
-  printf("invalid object %s\n", sym);
-
-  return NULL;
-}
-
-
-static inline void indentstdout(int indentlev)
+static inline void indent(FILE *fp, int indentlev)
 {
   for (int i = 0 ; i < indentlev ; i ++) {
-    putchar('\t');
+    fputc('\t', fp);
   }
 }
 
-static void
-hrmlPrintObj(HRMLobject *obj, int indent)
-{
-  assert(obj != NULL);
-
-  if (obj->val.typ == HRMLNode) {
-    indentstdout(indent);
-    printf("%s () {\n", obj->name);
-    HRMLobject *child = obj->children;
-    while (child) {
-      hrmlPrintObj(child, indent + 1);
-      child = child->next;
-    }
-
-    indentstdout(indent);
-    printf("}\n");
-
-  } else {
-    indentstdout(indent);
-    printf("%s (): ;\n", obj->name);
-  }
-}
-
-
-
-static HRMLobject*
-hrmlParse2(FILE *f)
-{
-  HRMLtoken tok = hrmlLex(f);
-
-  HRMLobject *obj = NULL;
-  switch (tok.kind) {
-  case HrmlTokenSym:
-    obj = hrmlParseObj(f, SYM(tok));
-
-    fprintf(stderr, "done root object parsing\n");
-    break;
-
-  default:
-    return NULL;
-  }
-
-  return obj;
-}
-
-HRMLdocument*
-hrmlParse(FILE *f)
-{
-  gLineCount = 1;
-  gParseErrors = false;
-
-  HRMLdocument *doc = malloc(sizeof(HRMLdocument));
-  doc->rootNode = hrmlParse2(f);
-  if (gParseErrors) {
-    hrmlFreeDocument(doc);
-    return NULL;
-  }
-
-  fprintf(stderr, "parser done\n");
-
-  hrmlPrintObj(doc->rootNode, 0);
-
-  return doc;
-}
 
 bool
 hrmlValidate(HRMLdocument *doc, HRMLschema *sc)
@@ -1907,3 +1425,109 @@ hrmlGetObject(HRMLdocument *doc, const char *docPath)
   return NULL;
 }
 
+void
+writeNode(HRMLobject *obj, FILE *fp, int lev)
+{
+  indent(fp, lev);
+  fprintf(fp, "%s", obj->name);
+  
+  // Print out attributes
+  if (obj->attr) {
+    fprintf(fp, " (");
+    for (HRMLattr *attr = obj->attr; attr != NULL; attr = attr->next) {
+      fprintf(fp, "%s: ", attr->name);
+      switch (attr->val.typ) {
+      case HRMLInt:
+        fprintf(fp, "%"PRIi64, attr->val.u.integer);
+        break;
+      case HRMLFloat:
+        fprintf(fp, "%f", attr->val.u.real);
+        break;
+      case HRMLStr:
+        fprintf(fp, "\"%s\"", attr->val.u.str);
+        break;
+      case HRMLDate:
+        assert(0 && "date support not yet implemented");
+        break;
+      case HRMLBool:
+        if (attr->val.u.boolean) fprintf(fp, "true");
+        else fprintf(fp, "false");
+        break;
+      case HRMLIntArray:
+        fprintf(fp, "[");
+        fprintf(fp, "]");
+        assert(0 && "array support not yet implemented");
+        break;
+      case HRMLFloatArray:
+        fprintf(fp, "[");
+        fprintf(fp, "]");
+        assert(0 && "array support not yet implemented");
+        break;
+      case HRMLBoolArray:
+        fprintf(fp, "[");
+        fprintf(fp, "]");
+        assert(0 && "array support not yet implemented");
+        break;
+      default:
+        assert(0 && "invalid attribute");
+      }
+      
+      if (attr->next) fprintf(fp, ", ");
+    }
+    fprintf(fp, ")");
+  }
+
+  
+  if (obj->children) {
+    fprintf(fp, " {\n");
+    for (HRMLobject *child = obj->children; child != NULL; child = child->next) {
+      writeNode(child, fp, lev + 1);
+    }
+    indent(fp, lev);
+    fprintf(fp, "}\n");
+  } else {
+    fprintf(fp, ": ");
+    switch (obj->val.typ) {
+    case HRMLInt:
+      fprintf(fp, "%"PRIi64, obj->val.u.integer);
+      break;
+    case HRMLFloat:
+      fprintf(fp, "%f", obj->val.u.real);
+      break;
+    case HRMLStr:
+      fprintf(fp, "\"%s\"", obj->val.u.str);
+      break;
+    case HRMLDate:
+      assert(0 && "date support not yet implemented");
+      break;
+    case HRMLBool:
+      if (obj->val.u.boolean) fprintf(fp, "true");
+      else fprintf(fp, "false");
+      break;
+    case HRMLIntArray:
+      fprintf(fp, "[");
+      fprintf(fp, "]");
+      assert(0 && "array support not yet implemented");
+      break;
+    case HRMLFloatArray:
+      fprintf(fp, "[");
+      fprintf(fp, "]");
+      assert(0 && "array support not yet implemented");
+      break;
+    case HRMLBoolArray:
+      fprintf(fp, "[");
+      fprintf(fp, "]");
+      assert(0 && "array support not yet implemented");
+      break;
+    default:
+      assert(0 && "invalid attribute");
+    }
+    fprintf(fp, ";\n");
+  }
+}
+void
+hrmlWriteDocument(HRMLdocument *doc, FILE *file)
+{
+  HRMLobject *obj = doc->rootNode;  
+  writeNode(obj, file, 0);
+}
