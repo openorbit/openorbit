@@ -1379,11 +1379,22 @@ hrmlFreeObj(HRMLobject *obj)
   // TODO: Free strings as well
   assert(obj != NULL);
 
+  HRMLattr *attr = obj->attr;
+  while (attr) {
+    HRMLattr *nextAttr = attr->next;
+    
+    free(attr->name);
+    free(attr);
+    
+    attr = nextAttr;
+  }
+
   if (obj->val.typ == HRMLNode) {
     HRMLobject *child = obj->children;
     while (child) {
+      HRMLobject *nextChild = child->next;
       hrmlFreeObj(child);
-      child = child->next;
+      child = nextChild;
     }
   }
   
