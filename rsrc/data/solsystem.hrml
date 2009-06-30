@@ -23,18 +23,18 @@ openorbit {
 	  mean-longitude: 252.25084 deg;
 	  right-ascension: 281.01 deg; # - 0.003T
 	  declination:  61.45 deg; # - 0.005T
-	  reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
+	  //reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
 	}
 	atmosphere {
 	  surface-pressure: 0.001 pbar;
-	  temp: 440 K; # TODO: Should include sunward temperature
-	  composition {
-	    oxygen: 42 %;
-	    sodium: 29 %;
-	    hydrogen: 22 %;
-	    helium: 6 %;
-	    potassium: 6 %;
-	  }
+	  temp: 440.0 K; # TODO: Should include sunward temperature
+//	  composition {
+//	    oxygen: 42 %;
+//	    sodium: 29 %;
+//	    hydrogen: 22 %;
+//	    helium: 6 %;
+//	    potassium: 6 %;
+//	  }
 	}
         rendering {
           model: "sphere";
@@ -55,17 +55,17 @@ openorbit {
 	  mean-longitude: 181.97973 deg;
 	  right-ascension: 272.76 deg;
 	  declination: 67.16 deg;
-	  reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
+	  //reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
 	}
 	atmosphere {
-          surface-pressure: 92 bar;
-	  temp: 737 K;
-	  wind: 0.3-1.0 m/s;
+          surface-pressure: 92.0 bar;
+	  temp: 737.0 K;
+//	  wind: 0.3-1.0 m/s;
 	  height: 15.9 km; # Height where pressure changes by e (2.7183)
-	  composition {
-	    co2: 96.5 %;
-	    nitrogen: 3.5 %;
-	  }
+//	  composition {
+//	    co2: 96.5 %;
+//	    nitrogen: 3.5 %;
+//	  }
 	}
 	rendering {
           model: "sphere";
@@ -86,18 +86,18 @@ openorbit {
 	  mean-longitude: 100.46435 deg;
 	  right-ascension:  0.00 deg; #- 0.641T
 	  declination    : 90.00 deg; #- 0.557T
-	  reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
+	  //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
 	}
 	atmosphere {
-	  surface-pressure: 1014 mb
-	  temp: 288 K; #, (diurnal) 283 K to 293 K
-	  wind: 0 - 100 m/s;
+	  surface-pressure: 1014.0 mb;
+	  temp: 288.0 K; #, (diurnal) 283 K to 293 K
+	  //wind: 0 - 100 m/s;
 	  height: 8.5 km;
-	  composition {
-	    nitrogen: 78.084 %;
-	    oxygen: 20.946 %; 
-	    water: 1.0 %; # (variable)
-	  }
+//	  composition {
+//	    nitrogen: 78.084 %;
+//	    oxygen: 20.946 %; 
+//	    water: 1.0 %; # (variable)
+//	  }
 	}
 	rendering {
           model: "sphere";
@@ -109,8 +109,8 @@ openorbit {
               mass: 7.36e22 kg;
               radius: 1.74e6 m;
 	    }
-	    orbit {
-	    }
+//	    orbit {
+//	    }
 	    rendering {
               model: "sphere";
               texture: "tex/luna.tga";
