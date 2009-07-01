@@ -68,8 +68,8 @@ ooLogWriteV(OOloglev lev, const char *msg, va_list vaList)
 void
 ooLogInit(FILE *logFile)
 {
-    sLogFile = logFile;
-    sLogLev = OOLog_Info;
+  sLogFile = logFile;
+  sLogLev = OOLog_Info;
 }
 
 void

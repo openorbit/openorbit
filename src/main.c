@@ -111,72 +111,71 @@ fps_event(Uint32 interval, void *param)
 static void
 main_loop(void)
 {
-    extern SIMstate gSIM_state;
-    SDL_Event event;
-    const char *evName;
-    int done = 0;
-    SDL_AddTimer(SIM_STEP_PERIOD, sim_step_event, NULL);
-    SDL_AddTimer(1000, fps_event, NULL);
+  extern SIMstate gSIM_state;
+  SDL_Event event;
+  const char *evName;
+  int done = 0;
+  SDL_AddTimer(SIM_STEP_PERIOD, sim_step_event, NULL);
+  SDL_AddTimer(1000, fps_event, NULL);
         
-    while ( !done ) {
-		/* Check for events, will do the initial io-decoding */
-		while ( SDL_PollEvent (&event) ) {
-			switch (event.type) {
-            case SDL_ACTIVEEVENT:
-                break;
-            case SDL_MOUSEMOTION:
-                if (event.motion.state) {
-                }
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                break;
-            case SDL_MOUSEBUTTONUP:
-                break;
-            case SDL_KEYDOWN:
-                evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
-                ooIoDispatchKeyDown(evName, event.key.keysym.mod);
-                break;
-            case SDL_KEYUP:
-                if (event.key.keysym.sym == SDLK_q) done = 1; // for now dont remap q
-                else {
-                    evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
-                    ooIoDispatchKeyDown(evName, event.key.keysym.mod);
-                }
-                break;
-            case SDL_JOYAXISMOTION:
-            case SDL_JOYBALLMOTION:
-            case SDL_JOYHATMOTION:
-            case SDL_JOYBUTTONDOWN:
-            case SDL_JOYBUTTONUP:
-            case SDL_VIDEORESIZE:
-            case SDL_VIDEOEXPOSE:
-                break;
-            case SDL_USEREVENT:
-                switch (event.user.code) {
-                case SIM_STEP_EVENT: // this event will make a time step
-                    ooSimStep(0.05);
-                    break;
-                case SIM_DEBUG_EVENT: // display console?
-                    break;
-                default:
-                    break;
-                }
-                break;
-            case SDL_QUIT:
-                done = 1;
-                break;
-            default:
-                break;
-			}
-		}
-        
-        // draw as often as possible
-        //ooSgDraw(gSIM_state.sg, gSIM_state.cam);
-        ooSgPaint(gSIM_state.sg);
-        
-        SDL_GL_SwapBuffers();
-        frames ++;
-	}
+  while ( !done ) {
+  /* Check for events, will do the initial io-decoding */
+    while ( SDL_PollEvent (&event) ) {
+      switch (event.type) {
+      case SDL_ACTIVEEVENT:
+        break;
+      case SDL_MOUSEMOTION:
+        if (event.motion.state) {
+        }
+        break;
+      case SDL_MOUSEBUTTONDOWN:
+        break;
+      case SDL_MOUSEBUTTONUP:
+        break;
+      case SDL_KEYDOWN:
+        evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
+        ooIoDispatchKeyDown(evName, event.key.keysym.mod);
+        break;
+      case SDL_KEYUP:
+        if (event.key.keysym.sym == SDLK_q) done = 1; // for now dont remap q
+        else {
+          evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
+          ooIoDispatchKeyDown(evName, event.key.keysym.mod);
+        }
+        break;
+      case SDL_JOYAXISMOTION:
+      case SDL_JOYBALLMOTION:
+      case SDL_JOYHATMOTION:
+      case SDL_JOYBUTTONDOWN:
+      case SDL_JOYBUTTONUP:
+      case SDL_VIDEORESIZE:
+      case SDL_VIDEOEXPOSE:
+        break;
+      case SDL_USEREVENT:
+        switch (event.user.code) {
+        case SIM_STEP_EVENT: // this event will make a time step
+          ooSimStep(0.05);
+          break;
+        case SIM_DEBUG_EVENT: // display console?
+          break;
+        default:
+          break;
+        }
+        break;
+      case SDL_QUIT:
+        done = 1;
+        break;
+      default:
+        break;
+      }
+    }
+
+    // draw as often as possible
+    ooSgPaint(gSIM_state.sg);
+
+    SDL_GL_SwapBuffers();
+    frames ++;
+  }
 }
 
 
@@ -225,14 +224,14 @@ main(int argc, char*argv[])
     if (!ooScriptingRunFile("script/postinit.py")) {
       ooLogFatal("script/postinit.py missing");
     }
-    
-    
+
+
     atexit(SDL_Quit);
-    
-        
+
+
     // Draw, get events...
     main_loop();
-    
+
     ooLogInfo("Shutting down normally...");
     return 0;
 }
