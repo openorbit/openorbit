@@ -54,9 +54,49 @@
       1 au = 149 597 870 000 m
 */
 
+double
+comp_orbital_period(double semimajor, double g, double m1, double m2)
+{
+  return 2.0 * M_PI * sqrt(pow(semimajor, 3.0)/(g*(m1 + m2)));
+}
+
+double
+comp_orbital_period_for_planet(double semimajor)
+{
+  return sqrt(pow(semimajor, 3.0));
+}
+
+OOorbsys*
+ooOrbitNewRootSys(const char *name, OOscene *scene, float m, float rotPeriod)
+{
+  OOorbsys *sys = malloc(sizeof(OOorbsys));
+  sys->world = dWorldCreate();
+  sys->name = strdup(name);
+  sys->orbit = NULL;
+  ooObjVecInit(&sys->sats);
+  ooObjVecInit(&sys->objs);
+
+  sys->parent = NULL;
+
+  sys->scale.dist = 1.0f;
+  sys->scale.distInv = 1.0f;
+  sys->scale.mass = 1.0f;
+  sys->scale.massInv = 1.0f;
+
+  sys->phys.k.G = 6.67428e-11;
+  sys->phys.param.m = m;
+  sys->phys.param.rotationPeriod = rotPeriod;
+  sys->phys.param.orbitalPeriod = 0.0;
+
+  sys->scene = scene;
+
+  return sys;
+}
+
+
 OOorbsys*
 ooOrbitNewSys(const char *name, OOscene *scene,
-              float m, float period,
+              float m, float orbitPeriod, float rotPeriod,
               float semiMaj, float semiMin)
 {
   OOorbsys *sys = malloc(sizeof(OOorbsys));
@@ -75,7 +115,8 @@ ooOrbitNewSys(const char *name, OOscene *scene,
 
   sys->phys.k.G = 6.67428e-11;
   sys->phys.param.m = m;
-  sys->phys.param.period = period;
+  sys->phys.param.orbitalPeriod = orbitPeriod;
+  sys->phys.param.rotationPeriod = rotPeriod;
 
   sys->scene = scene;
 
@@ -93,9 +134,17 @@ ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
   assert(m >= 0.0);
   OOorbobj *obj = malloc(sizeof(OOorbobj));
   obj->name = strdup(name);
-  obj->id = dBodyCreate(sys->world);
   obj->m = m;
-
+  obj->id = dBodyCreate(sys->world);
+  dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
+  
+  OOdrawable *drawable = ooSgNewSphere(1.0, NULL);
+  ooSgSceneAddObj(sys->scene, drawable); // TODO: scale to radius
+  
+  dBodySetData(obj->id, drawable); // 
+  dBodySetMovedCallback(obj->id, ooSgUpdateObject);
+  
+  
   ooObjVecPush(&sys->objs, obj);
 
   return obj;
@@ -176,10 +225,11 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
 
   // Update current position
   sys->phys.param.pos = ooGeoEllipseSegPoint(sys->orbit,
-                                   (ooTimeGetJD()/sys->phys.param.period)*
+                                   (ooTimeGetJD()/sys->phys.param.orbitalPeriod)*
                                    (float)sys->orbit->vec.length);
 
-  ooLogTrace("%f: %s: %f: %vf", ooTimeGetJD(), sys->name, sys->phys.param.period, sys->phys.param.pos);
+  ooLogTrace("%f: %s: %f: %vf",
+             ooTimeGetJD(), sys->name, sys->phys.param.orbitalPeriod, sys->phys.param.pos);
 
   // Recurse and do the same for each subsystem
   for (size_t i = 0; i < sys->sats.length ; i ++) {
@@ -241,7 +291,7 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
 
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
-  double mass, radius;
+  double mass, radius, siderealPeriod;
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong, rightAsc,
          declin;
   const char *tex = NULL;
@@ -252,6 +302,8 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
           mass = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "radius")) {
           radius = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "sidereal-rotational-period")) {
+          siderealPeriod = hrmlGetReal(phys);
         }
       }
     } else if (!strcmp(child->name, "orbit")) {
@@ -293,8 +345,12 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
   // Create scene object for planet
   OOdrawable *drawable = ooSgNewSphere(radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
+  //ooSgSetObjectAngularSpeed(drawable, )
+  // Period will be in years assuming that semiMajor is in au
+  double period = comp_orbital_period_for_planet(semiMajor);
+  
   return ooOrbitNewSys(planetName.u.str, sc,
-                       mass, 0.0,//float period,
+                       mass, period, 1.0,//float period,
                        semiMajor, ecc*semiMajor);
 
 }
@@ -323,7 +379,7 @@ ooOrbitLoadStar(HRMLobject *obj)
   assert(obj);
   assert(obj->val.typ == HRMLNode);
   HRMLvalue starName = hrmlGetAttrForName(obj, "name");
-  double mass, radius;
+  double mass, radius, siderealPeriod;
 
   OOscene *sc = ooSgNewScene(NULL, starName.u.str);
 
@@ -337,16 +393,18 @@ ooOrbitLoadStar(HRMLobject *obj)
           mass = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "radius")) {
           radius = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "sidereal-rotational-period")) {
+          siderealPeriod = hrmlGetReal(phys);
         }
       }
     } else if (!strcmp(child->name, "rendering")) {
     }
   }
-  
 
-  return ooOrbitNewSys(starName.u.str, sc,
-                       mass, 0.0,//float period,
-                       0.0, 0.0);
+  OOorbsys *sys = ooOrbitNewSys(starName.u.str, sc,
+                                mass, 0.0, 0.0, //float period,
+                                0.0, 0.0);
+  return sys;
 }
 
 OOorbsys*
@@ -364,7 +422,7 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 
   OOorbsys *sys = NULL;
   // Go through the document and handle each entry in the document
-  
+
   for (HRMLobject *node = hrmlGetRoot(solarSys); node != NULL; node = node->next) {
     if (!strcmp(node->name, "openorbit")) {
       for (HRMLobject *star = node->children; star != NULL; star = star->next) {

@@ -79,7 +79,8 @@ typedef struct OOorbsys {
     struct {
       struct {
         float m;
-        float period;
+        float orbitalPeriod;
+        float rotationPeriod;
         v4f_t pos;
         v4f_t rot;
       } param;
@@ -99,7 +100,7 @@ typedef struct OOorbsys {
 
 
 OOorbsys* ooOrbitNewSys(const char *name, OOscene *scene,
-                        float m, float period,
+                        float m, float orbitPeriod, float rotPeriod,
                         float semiMaj, float semiMin);
 OOorbobj*
 ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
