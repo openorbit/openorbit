@@ -87,12 +87,12 @@ init_gl(void)
     
     ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
     ooConfGetFloatDef("openorbit/video/gl/aspect", &aspect, 1.33f);
-        
+
     gluPerspective(fovy, aspect, /*near*/0.001, /*far*/100.0);
     
     ooConfGetIntDef("openorbit/video/width", &width, 640);
-    ooConfGetIntDef("openorbit/video/height", &width, 480);
-    
+    ooConfGetIntDef("openorbit/video/height", &height, 480);
+
     glViewport(0, 0, width, height);
 }
 
