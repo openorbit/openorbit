@@ -3,6 +3,8 @@ openorbit {
     physical {
       mass: 1.991e30 kg;
       radius: 6.96e8 m;
+      sidereal-rotational-period: 25.38 days;
+      axial-tilt: 7.25 deg; // Note, obliquity is relative to ecliptic
     }
     rendering {
        model: "sphere"; # Special keys are sphere, otherwise it is interpreted as a file name
@@ -13,6 +15,8 @@ openorbit {
         physical {
 	  mass: 3.18e23 kg;
           radius: 2.43e6 m;
+          sidereal-rotational-period: 58.646 days;
+          axial-tilt: 0.0351666667 deg; // 2.11' according to wikipedia
 	}
 	orbit {
 	  semimajor-axis: 0.38709893 au;  
@@ -45,6 +49,8 @@ openorbit {
         physical {
           mass: 4.88e24 kg;
           radius: 6.06e6 m;
+          sidereal-rotational-period: 243.0185 days;
+          axial-tilt: 177.3 deg; // Reverse rotation compared to the other planets
 	}
         orbit {
 	  semimajor-axis: 0.72333199  au;
@@ -76,6 +82,8 @@ openorbit {
         physical {
 	  mass: 5.98e24 kg;
           radius: 6.37e6 m;
+          sidereal-rotational-period: 0.99726968;
+          axial-tilt: 23.439281 deg;
 	}
       	orbit {
 	  semimajor-axis: 1.00000011 au;  
@@ -108,6 +116,8 @@ openorbit {
 	    physical {
               mass: 7.36e22 kg;
               radius: 1.74e6 m;
+              sidereal-rotational-period: 27.321582 days;
+              axial-tilt: 1.5424 deg; // To ecliptic, 6.687 to orbital plane
 	    }
 //	    orbit {
 //	    }
