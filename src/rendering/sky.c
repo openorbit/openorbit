@@ -50,6 +50,7 @@ ooEquToCart(angle_t ra, angle_t dec)
     cart.x = cosdec * cos(ra);
     cart.y = cosdec * sin(ra);
     cart.z = sin(dec);
+    cart.w = 1.0;
     return cart;
 }
 
@@ -111,7 +112,8 @@ OOstars* ooSkyLoadStars(const char *file)
   FILE *f = ooResGetFile(file);
   assert(f != NULL);
   double vmag, ra, dec, btmag, vtmag, bv, vi;
-  while (fscanf(f, "%f,%f,%f,%f,%f,%f,%f\n", &vmag, &ra, &dec, &btmag, &vtmag, &bv, &vi) == 7) {
+  while (fscanf(f, "%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+                &vmag, &ra, &dec, &btmag, &vtmag, &bv, &vi) == 7) {
     ooSkyAddStar(stars, deg2rad(ra), deg2rad(dec), vmag, bv);
   }
 
@@ -123,42 +125,42 @@ OOstars* ooSkyLoadStars(const char *file)
 OOstars*
 ooSkyRandomStars(void)
 {
-    assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
-    vector_t cart;
-    float ra, dec;
-    
-    OOstars *stars = malloc(sizeof(OOstars) +  STAR_CNT*sizeof(OOstar));
-    
-    for (int i = 0; i < STAR_CNT ; i ++) {
-        ra = deg2rad(random() % 360-180);
-        dec = deg2rad(random() % 180-90);
-        cart = ooEquToCart(ra, dec);
-        stars->data[i].x = cart.x;
-        stars->data[i].y = cart.y;
-        stars->data[i].z = cart.z;
-        stars->data[i].r = 255;
-        stars->data[i].g = 255;
-        stars->data[i].b = 255;
-        stars->data[i].a = 255;
-    }
-    
-    stars->n_stars = STAR_CNT;
-    stars->a_len = STAR_CNT;
+  assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
+  vector_t cart;
+  float ra, dec;
 
-    return stars;
+  OOstars *stars = malloc(sizeof(OOstars) +  STAR_CNT*sizeof(OOstar));
+
+  for (int i = 0; i < STAR_CNT ; i ++) {
+    ra = deg2rad(random() % 360-180);
+    dec = deg2rad(random() % 180-90);
+    cart = ooEquToCart(ra, dec);
+    stars->data[i].x = cart.x;
+    stars->data[i].y = cart.y;
+    stars->data[i].z = cart.z;
+    stars->data[i].r = 255;
+    stars->data[i].g = 255;
+    stars->data[i].b = 255;
+    stars->data[i].a = 255;
+  }
+  
+  stars->n_stars = STAR_CNT;
+  stars->a_len = STAR_CNT;
+
+  return stars;
 }
 
 
 OOstars*
 ooSkyInitStars(int star_count)
 {
-    assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
+  assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
 
-    OOstars *stars = malloc(sizeof(OOstars));
-    stars->data = malloc(star_count*sizeof(OOstar));
-    stars->a_len = star_count;
-    stars->n_stars = 0;
-    return stars;
+  OOstars *stars = malloc(sizeof(OOstars));
+  stars->data = malloc(star_count*sizeof(OOstar));
+  stars->a_len = star_count;
+  stars->n_stars = 0;
+  return stars;
 }
 
 #include "camera.h"
@@ -166,21 +168,18 @@ void
 ooSkyDrawStars(OOstars *stars)
 {
   ooLogTrace("draw %d stars", stars->n_stars);
-    glPushMatrix();
-    glLoadIdentity();
 
-    //extern camera_t *gCam;
-    //cam_rotate(gCam->free_cam.rq);
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glInterleavedArrays(GL_C4UB_V3F, 0, stars->data);
-    glPointSize(10.0f);
-    glDrawArrays(GL_POINTS, 0, stars->n_stars);
-    
-    glDisable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
-    glPopMatrix();
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+  glPointSize(1.0f);
+  glInterleavedArrays(GL_C4UB_V3F, 0, stars->data);
+  glDrawArrays(GL_POINTS, 0, stars->n_stars);
+
+  glDisable(GL_BLEND);
+  glEnable(GL_DEPTH_TEST);
 }
 
 
