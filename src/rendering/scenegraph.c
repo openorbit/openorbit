@@ -43,9 +43,8 @@
 #include "physics/orbit.h"
 
 /*!
-    Updates a drawable object with ode-data. This conforms to the 
+    Updates a drawable object with ode-data.
 */
-
 void
 ooSgSetScenePos(OOscene *sc, float x, float y, float z)
 {
@@ -76,7 +75,7 @@ ooSgSetSceneScale(OOscene *sc, float scale)
   sc->si = 1.0f/scale;
 }
 
-
+// Conforms to dBodySetMovedCallback registered callbacks
 void
 ooSgUpdateObject(dBodyID body)
 {
@@ -84,20 +83,64 @@ ooSgUpdateObject(dBodyID body)
   const dReal *pos = dBodyGetPosition(body);
   //const dReal *rot = dBodyGetRotation(body);
   const dReal *quat = dBodyGetQuaternion(body);
-  //const dReal *linVel = dBodyGetLinearVel(body);
-  //const dReal *angVel = dBodyGetAngularVel(body);
+  const dReal *linVel = dBodyGetLinearVel(body);
+  const dReal *angVel = dBodyGetAngularVel(body);
   
   obj->p = v_set(pos[0], pos[1], pos[2], 0.0);
   obj->q = v_set(quat[1], quat[2], quat[3], quat[0]);
+  
+  obj->dp = v_set(linVel[0], linVel[1], linVel[2], 0.0);
+  obj->dr = v_set(angVel[0], angVel[1], angVel[2], 0.0);
+}
+
+void
+ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z)
+{
+  assert(obj != NULL);
+  obj->p = v_set(x, y, z, 0.0);
+}
+
+void
+ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w)
+{
+  assert(obj != NULL);
+  obj->q = v_set(x, y, z, w);
+}
+
+void
+ooSgSetObjectScale(OOdrawable *obj, float s)
+{
+  assert(obj != NULL);
+  obj->s = s;
+}
+
+void
+ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz)
+{
+  assert(obj != NULL);
+  obj->dp = v_set(dx, dy, dz, 0.0);
+}
+
+void
+ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz)
+{
+  assert(obj != NULL);
+  obj->dr = v_set(drx, dry, drz, 0.0);
 }
 
 OOdrawable*
 ooSgNewDrawable(OOobject *obj, OOdrawfunc df)
 {
+  assert(obj != NULL);
+  assert(df != NULL);
+  
   OOdrawable *drawable = malloc(sizeof(OOdrawable));
   drawable->p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
   drawable->q = q_rot(1.0f, 0.0f, 0.0f, 0.0f);
   drawable->s = 1.0;
+  drawable->dr = v_set(0.0f, 0.0f, 0.0f, 0.0f);
+  drawable->dp = v_set(0.0f, 0.0f, 0.0f, 0.0f);
+  
   drawable->draw = df;
   drawable->obj = obj;
   return drawable;
@@ -132,62 +175,19 @@ void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
 OOscene*
 ooSgNewScene(OOscene *parent, const char *name)
 {
-    OOscene *sc = malloc(sizeof(OOscene));
-    sc->parent = parent;
-    sc->name = strdup(name);
-    ooObjVecInit(&sc->scenes);
-    ooObjVecInit(&sc->objs);
+  assert(name != NULL);
 
-    sc->data = NULL;
-    sc->preStepUpdate = NULL;
+  OOscene *sc = malloc(sizeof(OOscene));
+  sc->parent = parent;
+  sc->name = strdup(name);
+  ooObjVecInit(&sc->scenes);
+  ooObjVecInit(&sc->objs);
 
-    if (parent) {
-      ooObjVecPush(&parent->scenes, sc);
-    }
+  if (parent) {
+    ooObjVecPush(&parent->scenes, sc);
+  }
 
-    return sc;
-}
-
-void
-updateOde(OOscene *sc)
-{
-  const dReal *p = dBodyGetPosition(sc->data); 
-  const dReal *r = dBodyGetQuaternion(sc->data);
-  
-  sc->t = v_set(p[0], p[1], p[2], 1.0f);
-  sc->q = v_set(r[1], r[2], r[3], r[0]);
-}
-
-
-void
-updateEllipse(OOscene *sc)
-{
-  OOorbsys *os = sc->data;
-  
-  float ts = ooTimeGetJD();
-  
-  v4f_t p = ooGeoEllipseSegPoint(os->orbit,
-                                 ts / os->phys.param.period * os->orbit->vec.length);
-  
-  sc->t.v = p;
-}
-
-void
-ooSgSceneAttachOrbSys(OOscene *sc, OOorbsys *sys)
-{
-  assert(sc != NULL);
-  assert(sys != NULL);
-  
-  sc->data = sys;
-  sc->preStepUpdate = (OOdrawfunc)updateEllipse;
-}
-
-void
-ooSgSceneAttachOdeObj(OOscene *sc, dBodyID body)
-{
-  assert(sc != NULL);
-  sc->data = body;
-  sc->preStepUpdate = (OOdrawfunc)updateOde;
+  return sc;
 }
 
 void
@@ -195,12 +195,12 @@ ooSgSceneAddChild(OOscene *parent, OOscene *child)
 {
   assert(parent != NULL);
   assert(child != NULL);
-    ooObjVecPush(&parent->scenes, child);
-    child->parent = parent;
+  ooObjVecPush(&parent->scenes, child);
+  child->parent = parent;
 }
 
 void
-ooSgSceneAddObj(OOscene *sc, OOobject *object)
+ooSgSceneAddObj(OOscene *sc, OOdrawable *object)
 {
   assert(sc != NULL);
   assert(object != NULL);
@@ -211,10 +211,10 @@ ooSgSceneAddObj(OOscene *sc, OOobject *object)
 OOscene*
 ooSgSceneGetRoot(OOscene *sc)
 {
-    assert(sc != NULL);
-    
-    while (sc->parent) sc = sc->parent;
-    return sc;
+  assert(sc != NULL);
+
+  while (sc->parent) sc = sc->parent;
+  return sc;
 }
 
 
@@ -255,7 +255,7 @@ ooSgSceneDraw(OOscene *sc)
     // Apply scene transforms
     glPushMatrix();
     glTranslatef(sc->t.x, sc->t.y, sc->t.z);
-    
+
     // Render objects
     for (size_t i = 0 ; i < sc->objs.length ; i ++) {
       OOdrawable *obj = sc->objs.elems[i];
@@ -268,8 +268,7 @@ ooSgSceneDraw(OOscene *sc)
       obj->draw(obj->obj);
       glPopMatrix();
     }
-    
-    
+
     // Render subscenes
     for (size_t i = 0 ; i < sc->scenes.length ; i ++) {
       OOscene *subScene = sc->scenes.elems[i];
@@ -278,24 +277,11 @@ ooSgSceneDraw(OOscene *sc)
       ooSgSceneDraw(subScene);
       glPopMatrix();
     }
-    
+
     // Pop scene transform
     glPopMatrix();
 }
 
-void
-ooSgPreUpdate(OOscene *sc)
-{
-  assert(sc != NULL);
-  
-  if (sc->preStepUpdate != NULL) {
-    sc->preStepUpdate(sc);
-  }
-  
-  for (size_t i = 0 ; i < sc->scenes.length ; i ++) {
-    ooSgPreUpdate(sc->scenes.elems[i]);
-  }
-}
 
 void
 ooSgSetSky(OOscenegraph *sg, OOdrawable *obj)
@@ -311,68 +297,66 @@ ooSgSetSky(OOscenegraph *sg, OOdrawable *obj)
 void
 ooSgPaint(OOscenegraph *sg)
 {
-    assert(sg != NULL);
-    ooLogTrace("SgPaint");
+  assert(sg != NULL);
+  ooLogTrace("SgPaint");
 
-    //ooSgPreUpdate(sg->root);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
 
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
 
 
-    // Compute sky rotation
-    OOscene *sc = sg->currentCam->scene->parent;
-    quaternion_t q = sg->currentCam->scene->q;
-    
-    while (sc) {
-      q = q_mul(q, sc->q);
-      sc = sc->parent;
-    }
-    // rotate sg->currentCam
-    matrix_t m;
-    q_m_convert(&m, q);
-    glPushMatrix();
-    glMultMatrixf((GLfloat*)&m);
-    // Draw the sky
-    sg->sky->draw(sg->sky->obj);
-    glPopMatrix();
+  // Compute sky rotation
+  OOscene *sc = sg->currentCam->scene->parent;
+  quaternion_t q = sg->currentCam->scene->q;
 
-    // Then the overlays
-    for (size_t i = 0 ; i < sg->overlays.length ; i ++) {
-      ooSgDrawOverlay(sg->overlays.elems[i]);
-    }
+  while (sc) {
+    q = q_mul(q, sc->q);
+    sc = sc->parent;
+  }
+  // rotate sg->currentCam
+  matrix_t m;
+  q_m_convert(&m, q);
+  glPushMatrix();
+  glMultMatrixf((GLfloat*)&m);
+  // Draw the sky
+  sg->sky->draw(sg->sky->obj);
+  glPopMatrix();
 
-    // Now, in order to suport grand scales, we draw the scene with the current
-    // camera (this will recursivly draw it's child scenes)
-    ooSgSceneDraw(sg->currentCam->scene);
+  // Then the overlays
+  for (size_t i = 0 ; i < sg->overlays.length ; i ++) {
+    ooLogTrace("draw overlay %d", i);
+    ooSgDrawOverlay(sg->overlays.elems[i]);
+  }
+  // Now, in order to suport grand scales, we draw the scene with the current
+  // camera (this will recursivly draw it's child scenes)
+  ooSgSceneDraw(sg->currentCam->scene);
 
-    // At this point we have not drawn the parent scene, so we start go upwards
-    // in the scenegraph now and apply the scales. Note that the SG is a tree
-    // with respect to the scenes, so we only keep track of the leaf we came
-    // from in order to prevent us from recursing back into scenes that have
-    // already been drawn
-    sc = sg->currentCam->scene->parent;
-    OOscene *prev = sg->currentCam->scene;
+  // At this point we have not drawn the parent scene, so we start go upwards
+  // in the scenegraph now and apply the scales. Note that the SG is a tree
+  // with respect to the scenes, so we only keep track of the leaf we came
+  // from in order to prevent us from recursing back into scenes that have
+  // already been drawn
+  sc = sg->currentCam->scene->parent;
+  OOscene *prev = sg->currentCam->scene;
 
-    while (sc) {
-      // Note that for each step we do here we must adjust the scales
-      // appropriatelly
-      
-      glScalef(prev->si, prev->si, prev->si);
-      
-      for (size_t i = 0; i < sc->scenes.length ; i ++) {
-        if (sc->scenes.elems[i] != prev) { // only draw non drawn scenes
-          ooSgSceneDraw(sc->scenes.elems[i]);
-        }
+  while (sc) {
+    // Note that for each step we do here we must adjust the scales
+    // appropriatelly
+
+    glScalef(prev->si, prev->si, prev->si);
+
+    for (size_t i = 0; i < sc->scenes.length ; i ++) {
+      if (sc->scenes.elems[i] != prev) { // only draw non drawn scenes
+        ooSgSceneDraw(sc->scenes.elems[i]);
       }
-      
-      // go up in the tree
-      prev = sc;
-      sc = sc->parent;
     }
+
+    // go up in the tree
+    prev = sc;
+    sc = sc->parent;
+  }
 }
 
 
@@ -394,7 +378,7 @@ ooObjVecCompress(OOobjvector *vec)
       break;
     }
   }
-  
+
   // Move pointers at end of vector to first free entries
   for (size_t i = 0; i < vec->length ; i ++) {
     if (vec->elems[i] == NULL) {
@@ -409,9 +393,7 @@ ooObjVecCompress(OOobjvector *vec)
         break;
       }
     }
-
   }
-  
 }
 
 void
@@ -452,29 +434,18 @@ ooObjVecSet(OOobjvector *vec, size_t i, OOobject *obj)
     vec->elems[i] = obj;  
 }
 
-
-
-void
-ooSgCamPopMove(OOcam *cam)
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-}
-
-
 void
 ooSgDrawFuncGnd(OOobject*obj)
 {
-    
+
 }
 
 void
 ooSgDrawSphere(OOsphere *sp)
 {
-    glBindTexture(GL_TEXTURE_2D, sp->texId);    
-    gluSphere(sp->quadratic, sp->radius, 64, 64);
-    
-    glPopMatrix();
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, sp->texId);    
+  gluSphere(sp->quadratic, sp->radius, 64, 64);
 }
 
 OOdrawable*
@@ -503,38 +474,6 @@ ooSgDrawMesh(OOmesh *mesh)
     glInterleavedArrays(GL_T2F_C4F_N3F_V3F, 0, mesh->vertices);
     glDrawArrays(GL_TRIANGLES, 0, mesh->vCount);
 }
-
-
-void
-ooSgTransform(OOtransform *t)
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-}
-
-void
-ooSgPostTransform(OOtransform *t)
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-}
-
-
-void
-ooSgOdeTransform(OOodetransform *t)
-{
-    const dReal *pos = dBodyGetPosition(t->body);
-    const dReal *rot = dBodyGetRotation(t->body);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    
-    glTranslatef(pos[0], pos[1], pos[2]);
-}
-
-
-
-
 
 OOnode*
 ooSgNewMesh(OOtexture *tex)
@@ -572,105 +511,4 @@ ooSgMeshPushVert(OOnode *node, const OOvertex *v)
 
 
 
-OOnode*
-ooSgNewTransform(float dx, float dy, float dz, float rx, float ry, float rz, float rot)
-{
-    OOtransform *transf = malloc(sizeof(OOtransform));
-    if (transf == NULL) {return NULL;}
-    OOnode *node = ooSgNewNode(transf,
-                               (OOdrawfunc)ooSgTransform,
-                               (OOdrawfunc)ooSgPostTransform);
-        
-    return node;
-}
-
-OOnode*
-ooSgNewOdeTransform(dWorldID world, dBodyID body)
-{
-    OOodetransform *transf = malloc(sizeof(OOodetransform));
-    if (transf == NULL) {return NULL;}
-    OOnode *node = ooSgNewNode(transf,
-                               (OOdrawfunc)ooSgOdeTransform,
-                               (OOdrawfunc)ooSgPostTransform);
-    
-    transf->world = world;
-    transf->body = body;
-    
-    return node;
-}
-
-OOnode*
-ooSgNewSphere(OOtexture *tex)
-{
-    OOsphere *sphere = malloc(sizeof(OOsphere));
-    if (sphere == NULL) {return NULL;}
-    
-    OOnode *node = ooSgNewNode(sphere, (OOdrawfunc)ooSgDrawSphere, NULL);
-    sphere->texId = tex->texId;
-    
-    return node;
-}
-
-void
-ooSgDrawSphere(OOsphere *sphere)
-{
-//    matrix_t m;
-//    glPushMatrix();
-    
-    glBindTexture(GL_TEXTURE_2D, sphere->texId);
-        
-//    matrix_t rot_orig;
-//    matrix_t rot_ax;
-//    q_m_convert(&rot_orig, planet->rot_orig);
-//    q_m_convert(&rot_ax, planet->rot_ax);
-    
-//    glMultMatrixf((GLfloat*)rot_orig.a);
-//    glTranslatef(planet->pos.x, planet->pos.y, planet->pos.z );
-//    glMultMatrixf((GLfloat*)rot_ax.a);
-    
-    gluSphere(sphere->quadratic, sphere->radius, 64, 64);
-    
-    glPopMatrix();
-    
-}
-
-OOnode*
-ooSgNewSky(void)
-{
-    OOstars *stars = ooSkyInitStars(8000);
-    
-    if (stars == NULL) {return NULL;}
-    
-    OOnode *node = ooSgNewNode(stars, (OOdrawfunc)ooSkyDrawStars, NULL);
-
-    return node;
-}
-
-
-void
-ooSgScale(OOscale *scale)
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    
-    glScalef(scale->s, scale->s, scale->s);
-}
-
-void
-ooSgPostScale(OOscale *scale)
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-}
-
-
-OOnode*
-ooSgNewScale(float scale)
-{
-    OOscale *scaleNode = (OOscale*) malloc(sizeof(OOscale));
-    scaleNode->s = scale;
-    
-    OOnode *node = ooSgNewNode(scaleNode, (OOdrawfunc)ooSgScale, (OOdrawfunc)ooSgPostScale);
-    return node;
-}
 #endif

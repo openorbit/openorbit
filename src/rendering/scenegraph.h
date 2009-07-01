@@ -55,27 +55,28 @@ typedef void (*OOdrawfunc)(OOobject*);
 
 struct OOdrawable {
   vector_t p;
+  vector_t dp;
+
+  vector_t dr;
+
   quaternion_t q;
   float s;
-  
+
   OOobject *obj;
   OOdrawfunc draw;
 };
 
 struct OOscene {
-    struct OOscene *parent;
-    char *name;
+  struct OOscene *parent;
+  char *name;
 
-    OOobject *data;
-    OOdrawfunc preStepUpdate;
-        
-    vector_t t;
-    quaternion_t q;
-    scalar_t s; // scale with respect to parent s
-    scalar_t si; // inverse of s
-    
-    OOobjvector scenes;
-    OOobjvector objs;
+  vector_t t;
+  quaternion_t q;
+  scalar_t s; // scale with respect to parent s
+  scalar_t si; // inverse of s
+
+  OOobjvector scenes;
+  OOobjvector objs;
 };
 
 struct OOoverlay {
@@ -94,6 +95,14 @@ struct OOscenegraph {
 };
 
 OOdrawable* ooSgNewDrawable(OOobject *obj, OOdrawfunc df);
+
+void ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w);
+void ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z);
+void ooSgSetObjectScale(OOdrawable *obj, float s);
+void ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);
+void ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz);
+void ooSgUpdateObject(dBodyID body);
+
 
 void ooSgSetScenePos(OOscene *sc, float x, float y, float z);
 void ooSgSetSceneQuat(OOscene *sc, float x, float y, float z, float w);
@@ -134,7 +143,7 @@ void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj);
 */
 OOscene* ooSgSceneGetRoot(OOscene *sc);
 void ooSgSceneAddChild(OOscene *parent, OOscene *child);
-void ooSgSceneAddObj(OOscene *sc, OOobject *object);
+void ooSgSceneAddObj(OOscene *sc, OOdrawable *object);
 
 
 typedef struct {
@@ -173,26 +182,5 @@ typedef struct {
 } OOsphere;
 
 OOdrawable* ooSgNewSphere(float radius, const char *tex);
-
-/* Allocators */
-//OOnode* ooSgNewMesh(OOtexture *tex);
-//OOnode* ooSgNewTransform(float dx, float dy, float dz,
-//                         float rx, float ry, float rz, float rot);
-//OOnode* ooSgNewOdeTransform(dWorldID world, dBodyID body);
-//OOnode* ooSgNewSphere(OOtexture *tex);
-//OOnode* ooSgNewSky(void);
-//OOnode* ooSgNewScale(float scale);
-
-//void ooSgMeshPushVert(OOnode *node, const OOvertex *v);
-
-/* Draw functions */
-//void ooSgDrawMesh(OOmesh *mesh);
-//void ooSgTransform(OOtransform *t);
-//void ooSgPostTransform(OOtransform *t);
-//void ooSgOdeTransform(OOodetransform *t);
-//void ooSgDrawSphere(OOsphere *sphere);
-
-//void ooSgScale(OOscale *scale);
-//void ooSgPostScale(OOscale *scale);
 
 #endif /* SCENEGRAPH_H_ */
