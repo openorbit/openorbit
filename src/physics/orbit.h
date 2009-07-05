@@ -109,6 +109,13 @@ ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
               float qx, float qy, float qz, float qw,
               float rqx, float rqy, float rqz, float rqw);
 
+/*!
+   Searches the system graph for a system with the given name. The name must be
+   a search path.
+
+   e.g. ooOrbitGetSys(solsys, "sol/earth/luna") would return the luna system.
+ */
+OOorbsys* ooOrbitGetSys(const OOorbsys *root,  const char *name);
 
 void ooOrbitAddChildSys(OOorbsys * restrict sys, OOorbsys * restrict child);
 
@@ -122,7 +129,7 @@ void ooOrbitClear(OOorbsys *sys);
 /*!
    Loads an hrml description of a solar system and builds a solar system graph
    it also connects the physics system to the graphics system.
-   
+
    This function does not belong in the physics system, but will be here for
    now beeing.
  */

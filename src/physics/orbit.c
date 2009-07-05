@@ -435,3 +435,39 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 
   return sys;
 }
+
+OOorbsys*
+ooOrbitGetSys(const OOorbsys *root,  const char *name)
+{
+  char str[strlen(name)+1];
+  strcpy(str, name); // TODO: We do not trust the user, should probably
+                     // check alloca result
+
+  OOorbsys *sys = (OOorbsys*)root;
+  char *strp = str;
+  char *strTok = strsep(&strp, "/");
+  int idx = 0;
+  OOobjvector *vec = NULL;
+  while (sys) {
+    if (!strcmp(sys->name, strTok)) {
+      if (strp == NULL) {
+        // At the end of the sys path
+        return sys;
+      }
+
+      // If this is not the lowest level, go one level down
+      strTok = strsep(&strp, "/");
+
+      vec = &sys->sats;
+      idx = 0;
+      if (vec->length <= 0) return NULL;
+      sys = vec->elems[idx];
+    } else {
+      if (vec == NULL) return NULL;
+      idx ++;
+      if (vec->length <= idx) return NULL;
+      sys = vec->elems[idx];
+    }
+  }
+  return NULL;
+}
