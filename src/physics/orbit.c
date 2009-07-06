@@ -52,6 +52,7 @@
       or: G_au = 1.99316734 e-44 au^3/kg/s^2
 
       1 au = 149 597 870 000 m
+
 */
 
 double
@@ -89,7 +90,7 @@ ooOrbitNewRootSys(const char *name, OOscene *scene, float m, float rotPeriod)
   sys->phys.param.orbitalPeriod = 0.0;
 
   sys->scene = scene;
-
+  sys->level = 0;
   return sys;
 }
 
@@ -119,6 +120,7 @@ ooOrbitNewSys(const char *name, OOscene *scene,
   sys->phys.param.rotationPeriod = rotPeriod;
 
   sys->scene = scene;
+  sys->level = 0;
 
   return sys;
 }
@@ -142,11 +144,28 @@ ooOrbitNewObj(OOorbsys *sys, const char *name,
 
   dBodySetData(obj->id, drawable); // 
   dBodySetMovedCallback(obj->id, ooSgUpdateObject);
-
+  obj->sys = sys;
 
   ooObjVecPush(&sys->objs, obj);
 
   return obj;
+}
+
+v4f_t ooOrbitDist(OOorbobj * restrict a, OOorbobj * restrict b)
+{
+  assert(a != NULL);
+  assert(b != NULL);
+
+  const dReal *pa = dBodyGetPosition(a->id);
+  const dReal *pb = dBodyGetPosition(b->id);
+
+  if (a->sys == b->sys) {
+    v4f_t dist = ode2v3(pa) - ode2v3(pb);
+    return dist;
+  } else {
+    assert(0 && "distances between diffrent systems not yet supported");
+    return v4f_make(0.0, 0.0, 0.0, 0.0);
+  }
 }
 
 
@@ -158,6 +177,9 @@ ooOrbitAddChildSys(OOorbsys * restrict parent, OOorbsys * restrict child)
 
   ooLogInfo("adding child system %s to %s", child->name, parent->name);
   ooObjVecPush(&parent->sats, child);
+  
+  child->parent = parent;
+  child->level = parent->level + 1;
 }
 
 void
@@ -228,7 +250,10 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
                                    (float)sys->orbit->vec.length);
 
   ooLogTrace("%f: %s: %f: %vf",
-             ooTimeGetJD(), sys->name, sys->phys.param.orbitalPeriod, sys->phys.param.pos);
+             ooTimeGetJD(),
+             sys->name,
+             sys->phys.param.orbitalPeriod,
+             sys->phys.param.pos);
 
   // Recurse and do the same for each subsystem
   for (size_t i = 0; i < sys->sats.length ; i ++) {
@@ -364,6 +389,8 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
                                    q.x, q.y, q.z, q.w,
                                    qr.x, qr.y, qr.z, qr.w);
 
+  sys->scale.dist = 149598000000.0;
+  sys->scale.distInv = 1.0/149598000000.0;
   return sys;
 }
 
@@ -424,7 +451,8 @@ ooOrbitLoadStar(HRMLobject *obj)
   }
 
   sys->phys.param.m = mass;
-
+  sys->scale.dist = 1.0;
+  sys->scale.distInv = 1.0;
   return sys;
 }
 

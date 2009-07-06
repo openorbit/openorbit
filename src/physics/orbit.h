@@ -44,6 +44,8 @@
 #include "geo/geo.h"
 #include "rendering/scenegraph.h"
 
+typedef struct OOorbsys OOorbsys;
+
 static inline v4f_t
 ode2v4(const dReal *vec)
 {
@@ -63,9 +65,11 @@ typedef struct OOorbobj {
     float m;
     OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
                           //!< object.
+
+    OOorbsys *sys;
 } OOorbobj;
 
-typedef struct OOorbsys {
+struct OOorbsys {
     dWorldID world;
     char *name;
     
@@ -75,7 +79,7 @@ typedef struct OOorbsys {
       float mass;
       float massInv;
     } scale;
-    
+
     struct {
       struct {
         float m;
@@ -88,15 +92,16 @@ typedef struct OOorbsys {
         float G; //!< Gravitational constant (6.67428e-11)
       } k;
     } phys;
-        
+
     struct OOorbsys *parent; // parent
+    unsigned level;
     OOscene *scene; //!< Link to scene graph scene corresponding to this system
 
     OOellipse *orbit;
 
     OOobjvector sats; //!< Natural satellites, i.e. other orbital systems
     OOobjvector objs; //!< Synthetic satellites, i.e. stuff that is handled by ODE
-} OOorbsys;
+};
 
 
 OOorbsys* ooOrbitNewSys(const char *name, OOscene *scene,
