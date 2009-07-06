@@ -49,7 +49,7 @@ void
 ooSgSetScenePos(OOscene *sc, float x, float y, float z)
 {
   assert(sc != NULL);
-  
+
   sc->t.x = x;
   sc->t.y = y;
   sc->t.z = z;
@@ -60,7 +60,7 @@ void
 ooSgSetSceneQuat(OOscene *sc, float x, float y, float z, float w)
 {
   assert(sc != NULL);
-  
+
   sc->q.x = x;
   sc->q.y = y;
   sc->q.z = z;
@@ -135,7 +135,7 @@ ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df)
 {
   assert(obj != NULL);
   assert(df != NULL);
-  
+
   OOdrawable *drawable = malloc(sizeof(OOdrawable));
   drawable->name = strdup(name);
   drawable->p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
@@ -143,7 +143,7 @@ ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df)
   drawable->s = 1.0;
   drawable->dr = v_set(0.0f, 0.0f, 0.0f, 0.0f);
   drawable->dp = v_set(0.0f, 0.0f, 0.0f, 0.0f);
-  
+
   drawable->draw = df;
   drawable->obj = obj;
   return drawable;
@@ -163,7 +163,7 @@ void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
 {
   assert(sg != NULL);
   assert(cam != NULL);
-  
+
   #ifdef DEBUG
   bool found = false;
   for (size_t i = 0 ; i < sg->cams.length ; i ++) {
@@ -171,7 +171,7 @@ void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
   }
   assert(found == true);
   #endif
-  
+
   sg->currentCam = cam;
 }
 
@@ -184,6 +184,12 @@ ooSgNewScene(OOscene *parent, const char *name)
   OOscene *sc = malloc(sizeof(OOscene));
   sc->parent = parent;
   sc->name = strdup(name);
+
+  sc->t = v_set(0.0, 0.0, 0.0, 0.0);
+  sc->q = q_rot(0.0, 1.0, 0.0, 0.0); // Default with 0 deg rot around y
+  sc->s = 1.0;
+  sc->si = 1.0;
+
   ooObjVecInit(&sc->scenes);
   ooObjVecInit(&sc->objs);
 
@@ -208,7 +214,7 @@ ooSgSceneAddObj(OOscene *sc, OOdrawable *object)
 {
   assert(sc != NULL);
   assert(object != NULL);
-  
+
   ooObjVecPush(&sc->objs, object);
 }
 
@@ -228,13 +234,13 @@ ooSgDrawOverlay(OOoverlay *overlay)
   glMatrixMode(GL_MODELVIEW);
   // TODO: Ensure that depth test is run, but overlay is infinitly close
   glDisable(GL_DEPTH_TEST);//|GL_LIGHTNING);
-  
+
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
-  
+
   glBindTexture(GL_TEXTURE_2D, overlay->tex->texId);
-  
+
   glBegin(GL_QUADS);
     glVertex2f(overlay->x, overlay->y);
     glVertex2f(overlay->w, overlay->y);
@@ -255,7 +261,7 @@ void
 ooSgSceneDraw(OOscene *sc)
 {
     assert(sc != NULL);
-    
+
     // Apply scene transforms
     glPushMatrix();
     glTranslatef(sc->t.x, sc->t.y, sc->t.z);
@@ -313,13 +319,22 @@ ooSgPaint(OOscenegraph *sg)
 
   // Compute sky rotation
   OOscene *sc = sg->currentCam->scene->parent;
-  quaternion_t q = sg->currentCam->scene->q;
+
+  quaternion_t q;
+  ooSgCamMove(sg->currentCam);
+  if (sg->currentCam->kind == OOCam_Free) {
+    q = ((OOfreecam*)(sg->currentCam->camData))->q;
+  } else {
+    q = q_rot(0.0, 1.0, 0.0, 0.0);
+  }
+
+  q = q_mul(q, sg->currentCam->scene->q);
 
   while (sc) {
     q = q_mul(q, sc->q);
     sc = sc->parent;
   }
-  // rotate sg->currentCam
+
   matrix_t m;
   q_m_convert(&m, q);
   glPushMatrix();
