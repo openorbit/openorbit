@@ -41,7 +41,7 @@ stars = ooscript.SkyDrawable("data/stars.csv")
 sgr = ooscript.Scenegraph().new()
 sgr.setBackground(stars)
 cam = ooscript.FreeCam()
-cam.setParams(sgr, sgr.getRoot(), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+cam.setParams(sgr, sgr.getRoot(), 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
 sgr.setCam(cam)
 
 ooscript.setSg(sgr)
