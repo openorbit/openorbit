@@ -54,6 +54,7 @@ typedef void (*OOdrawfunc)(OOobject*);
 
 
 struct OOdrawable {
+  const char *name;
   vector_t p;
   vector_t dp;
 
@@ -94,7 +95,7 @@ struct OOscenegraph {
   OOobjvector overlays;
 };
 
-OOdrawable* ooSgNewDrawable(OOobject *obj, OOdrawfunc df);
+OOdrawable* ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df);
 
 void ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w);
 void ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z);
@@ -181,6 +182,6 @@ typedef struct {
     GLfloat radius;
 } OOsphere;
 
-OOdrawable* ooSgNewSphere(float radius, const char *tex);
+OOdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
 
 #endif /* SCENEGRAPH_H_ */

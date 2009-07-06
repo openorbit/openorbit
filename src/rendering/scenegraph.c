@@ -80,6 +80,8 @@ void
 ooSgUpdateObject(dBodyID body)
 {
   OOdrawable *obj = dBodyGetData(body);
+  ooLogInfo("updating body %s", obj->name);
+
   const dReal *pos = dBodyGetPosition(body);
   //const dReal *rot = dBodyGetRotation(body);
   const dReal *quat = dBodyGetQuaternion(body);
@@ -129,12 +131,13 @@ ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz)
 }
 
 OOdrawable*
-ooSgNewDrawable(OOobject *obj, OOdrawfunc df)
+ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df)
 {
   assert(obj != NULL);
   assert(df != NULL);
   
   OOdrawable *drawable = malloc(sizeof(OOdrawable));
+  drawable->name = strdup(name);
   drawable->p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
   drawable->q = q_rot(1.0f, 0.0f, 0.0f, 0.0f);
   drawable->s = 1.0;
@@ -146,7 +149,8 @@ ooSgNewDrawable(OOobject *obj, OOdrawfunc df)
   return drawable;
 }
 
-OOscenegraph* ooSgNewSceneGraph()
+OOscenegraph*
+ooSgNewSceneGraph()
 {
   OOscenegraph *sg = malloc(sizeof(OOscenegraph));
   sg->root = ooSgNewScene(NULL, "root");
@@ -449,7 +453,7 @@ ooSgDrawSphere(OOsphere *sp)
 }
 
 OOdrawable*
-ooSgNewSphere(float radius, const char *tex)
+ooSgNewSphere(const char *name, float radius, const char *tex)
 {
   OOsphere *sp = malloc(sizeof(OOsphere));
   sp->radius = radius;
@@ -459,7 +463,7 @@ ooSgNewSphere(float radius, const char *tex)
   gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
   gluQuadricTexture(sp->quadratic, GL_TRUE);
   
-  return ooSgNewDrawable(sp, (OOdrawfunc) ooSgDrawSphere);
+  return ooSgNewDrawable(name, sp, (OOdrawfunc) ooSgDrawSphere);
 }
 
 

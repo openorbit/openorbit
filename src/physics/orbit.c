@@ -124,7 +124,9 @@ ooOrbitNewSys(const char *name, OOscene *scene,
 }
 
 OOorbobj*
-ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
+ooOrbitNewObj(OOorbsys *sys, const char *name,
+              OOdrawable *drawable,
+              float m,
               float x, float y, float z,
               float vx, float vy, float vz,
               float qx, float qy, float qz, float qw,
@@ -137,14 +139,11 @@ ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
   obj->m = m;
   obj->id = dBodyCreate(sys->world);
   dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
-  
-  OOdrawable *drawable = ooSgNewSphere(1.0, NULL);
-  ooSgSceneAddObj(sys->scene, drawable); // TODO: scale to radius
-  
+
   dBodySetData(obj->id, drawable); // 
   dBodySetMovedCallback(obj->id, ooSgUpdateObject);
-  
-  
+
+
   ooObjVecPush(&sys->objs, obj);
 
   return obj;
@@ -343,27 +342,41 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
   
   OOscene *sc = ooSgNewScene(parentScene, planetName.u.str/*(planetName)*/);
   // Create scene object for planet
-  OOdrawable *drawable = ooSgNewSphere(radius, tex);
-  ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
+  
+  
   //ooSgSetObjectAngularSpeed(drawable, )
   // Period will be in years assuming that semiMajor is in au
   double period = comp_orbital_period_for_planet(semiMajor);
   
-  return ooOrbitNewSys(planetName.u.str, sc,
-                       mass, period, 1.0,//float period,
-                       semiMajor, ecc*semiMajor);
+  OOorbsys *sys = ooOrbitNewSys(planetName.u.str, sc,
+                                mass, period, 1.0,//float period,
+                                semiMajor, ecc*semiMajor);
 
+  OOdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
+  ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
+  quaternion_t q = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(0.0));
+  quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(1.0)); // TODO: real rot
+
+  OOorbobj *orbObj = ooOrbitNewObj(sys, planetName.u.str, drawable,
+                                   mass,
+                                   0.0, 0.0, 0.0,
+                                   0.0, 0.0, 0.0,
+                                   q.x, q.y, q.z, q.w,
+                                   qr.x, qr.y, qr.z, qr.w);
+
+  return sys;
 }
 
 void
-ooOrbitLoadSatellites(HRMLobject *obj, OOscene *parentScene)
+ooOrbitLoadSatellites(HRMLobject *obj, OOorbsys *sys, OOscene *parentScene)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
 
   for (HRMLobject *child = obj->children; child != NULL; child = child->next) {
     if (!strcmp(child->name, "planet")) {
-      ooOrbitLoadPlanet(child, parentScene);
+      OOorbsys *psys = ooOrbitLoadPlanet(child, parentScene);
+      ooOrbitAddChildSys(sys, psys);
     } else if (!strcmp(child->name, "moon")) {
       ooOrbitLoadMoon(child);
     } else if (!strcmp(child->name, "comet")) {
@@ -379,14 +392,18 @@ ooOrbitLoadStar(HRMLobject *obj)
   assert(obj);
   assert(obj->val.typ == HRMLNode);
   HRMLvalue starName = hrmlGetAttrForName(obj, "name");
-  double mass, radius, siderealPeriod;
+  double mass = 0.0;
+  double radius, siderealPeriod;
 
   OOscene *sc = ooSgNewScene(NULL, starName.u.str);
 
+  OOorbsys *sys = ooOrbitNewSys(starName.u.str, sc,
+                                mass, 0.0, 0.0, //float period,
+                                0.0, 0.0);
 
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
     if (!strcmp(child->name, "satellites")) {
-      ooOrbitLoadSatellites(child, sc);
+      ooOrbitLoadSatellites(child, sys, sc);
     } else if (!strcmp(child->name, "physical")) {
       for (HRMLobject *phys = child->children; phys != NULL; phys = phys->next) {
         if (!strcmp(phys->name, "mass")) {
@@ -398,12 +415,16 @@ ooOrbitLoadStar(HRMLobject *obj)
         }
       }
     } else if (!strcmp(child->name, "rendering")) {
+      for (HRMLobject *rend = child->children; rend != NULL; rend = rend->next) {
+        if (!strcmp(rend->name, "texture")) {
+        
+        }
+      }
     }
   }
 
-  OOorbsys *sys = ooOrbitNewSys(starName.u.str, sc,
-                                mass, 0.0, 0.0, //float period,
-                                0.0, 0.0);
+  sys->phys.param.m = mass;
+
   return sys;
 }
 
@@ -433,6 +454,7 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 
   hrmlFreeDocument(solarSys);
 
+  ooLogInfo("loaded solar system");
   return sys;
 }
 

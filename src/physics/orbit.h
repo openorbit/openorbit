@@ -103,7 +103,9 @@ OOorbsys* ooOrbitNewSys(const char *name, OOscene *scene,
                         float m, float orbitPeriod, float rotPeriod,
                         float semiMaj, float semiMin);
 OOorbobj*
-ooOrbitNewObj(OOorbsys *sys, const char *name, float m,
+ooOrbitNewObj(OOorbsys *sys, const char *name,
+              OOdrawable *drawable,
+              float m,
               float x, float y, float z,
               float vx, float vy, float vz,
               float qx, float qy, float qz, float qw,
