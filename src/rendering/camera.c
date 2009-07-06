@@ -111,7 +111,10 @@ ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
   cam->scene = sc;
   ((OOfreecam*)cam->camData)->p = v_set(x,y,z,1.0f);
   ((OOfreecam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
-  
+
+  ((OOfreecam*)cam->camData)->dp = v_set(0.0,0.0,0.0,1.0f);
+  ((OOfreecam*)cam->camData)->dq = q_rot(rx,ry,rz, 0.0001f);
+
   ooObjVecPush(&sg->cams, cam);
   return cam;
 }
@@ -152,7 +155,7 @@ void
 ooSgCamMove(OOcam *cam)
 {
     assert(cam != NULL && "cam not set");
-    glPushMatrix();
+//    glPushMatrix();
     
     switch (cam->kind) {
     case OOCam_Orbit:
@@ -177,14 +180,18 @@ ooSgCamMove(OOcam *cam)
         }
         break;
     case OOCam_Free:
-        glTranslatef(((OOfreecam*)cam->camData)->p.x,
-                     ((OOfreecam*)cam->camData)->p.y,
-                     ((OOfreecam*)cam->camData)->p.z);
-        glRotatef(0.0, 1.0, 0.0, 0.0);
+//        glTranslatef(((OOfreecam*)cam->camData)->p.x,
+//                     ((OOfreecam*)cam->camData)->p.y,
+//                     ((OOfreecam*)cam->camData)->p.z);
+        ((OOfreecam*)cam->camData)->q = q_mul(((OOfreecam*)cam->camData)->q,
+                                              ((OOfreecam*)cam->camData)->dq);
+
+//        glRotatef(0.0, 1.0, 0.0, 0.0);
         break;
     default:
         assert(0 && "illegal case statement");
     }
+    
 }
 
 
