@@ -44,6 +44,7 @@ extern "C" {
 #include "physics/orbit.h"
 #include "rendering/scenegraph.h"
 #include "sim/spacecraft.h"
+#include "sim/simtime.h"
 
     
 typedef void (*OOeventhandler)(void *data);
@@ -65,14 +66,24 @@ int ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *
 int ooSimHandleNextEvent(OOeventqueue *q);
     
 typedef struct {  
-  double currentTime; //!< Current time in earth days relative to epoch
-  uint64_t timeStamp; //!< Time stamp (ticking up one every step)
+  OOsimtime *timeState;
+
   float stepSize;     //!< Step size for simulation in seconds
   OOspacecraft *currentSc; //!< Current active spacecraft
   OOorbsys *orbSys;   //!< Root orbit system, this will be the sun initially
   //OOcam *cam;         //!< Current camera
   OOscenegraph *sg;   //!< Scenegraph of the world
 } SIMstate;
+
+void ooSimInit(void);
+
+static inline OOsimtime* ooSimTimeState(void)
+{
+  extern SIMstate gSIM_state;
+  return gSIM_state.timeState;
+}
+
+
 
 void ooSimSetSg(OOscenegraph *sg);
 

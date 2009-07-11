@@ -195,6 +195,8 @@ main(int argc, char*argv[])
     // Setup IO-tables
     ooIoInitSdlStringMap();
     
+    ooSimInit();
+    
     ooPluginInit();
     ooPluginLoadAll();
     ooPluginPrintAll();

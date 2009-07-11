@@ -33,10 +33,18 @@
 #ifndef SIMTIME_H_STPF70AM
 #define SIMTIME_H_STPF70AM
 
-float ooTimeGetJD(void);
+typedef struct OOsimtime {
+  time_t epoch; // UNIX time
+  double currentTime; //!< Current time in earth days relative to epoch
+  uint64_t timeStamp; //!< Time stamp (ticking up one every step)
+} OOsimtime;
 
-time_t ooTimeGetEpoch(void);
-void ooTimeSetEpoch(time_t epoch);
+OOsimtime* ooSimTimeInit(time_t epoch);
+
+float ooTimeGetJD(OOsimtime *self);
+
+time_t ooTimeGetEpoch(OOsimtime *self);
+void ooTimeSetEpoch(OOsimtime *self, time_t epoch);
 
 #endif /* end of include guard: SIMTIME_H_STPF70AM */
  

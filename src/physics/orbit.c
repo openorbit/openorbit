@@ -37,6 +37,7 @@
 
 
 #include <vmath/vmath.h>
+#include "sim.h"
 #include "sim/simtime.h"
 #include "geo/geo.h"
 #include "log.h"
@@ -246,11 +247,11 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
 
   // Update current position
   sys->phys.param.pos = ooGeoEllipseSegPoint(sys->orbit,
-                                   (ooTimeGetJD()/sys->phys.param.orbitalPeriod)*
+                                   (ooTimeGetJD(ooSimTimeState())/sys->phys.param.orbitalPeriod)*
                                    (float)sys->orbit->vec.length);
 
   ooLogTrace("%f: %s: %f: %vf",
-             ooTimeGetJD(),
+             ooTimeGetJD(ooSimTimeState()),
              sys->name,
              sys->phys.param.orbitalPeriod,
              sys->phys.param.pos);

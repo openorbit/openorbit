@@ -35,23 +35,32 @@
 #include "sim.h"
 #include "sim/simtime.h"
 
-float
-ooTimeGetJD(void)
+OOsimtime*
+ooSimTimeInit(time_t epoch)
 {
-  extern SIMstate gSIM_state;
-  
-  return gSIM_state.currentTime;
+  OOsimtime *timeState = malloc(sizeof(OOsimtime));
+  timeState->epoch = epoch;
+  timeState->currentTime = 0.0;
+  timeState->timeStamp;
+
+  return timeState;
 }
 
 
-time_t
-ooTimeGetEpoch(void)
+float
+ooTimeGetJD(OOsimtime *self)
 {
-  
+  return self->currentTime;
+}
+
+time_t
+ooTimeGetEpoch(OOsimtime *self)
+{
+  return self->epoch;
 }
 
 void
-ooTimeSetEpoch(time_t epoch)
+ooTimeSetEpoch(OOsimtime *self, time_t epoch)
 {
-  
+  self->epoch = epoch;
 }

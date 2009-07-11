@@ -34,9 +34,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
+#include <time.h>
 #include <sys/time.h>
 
 #include "sim.h"
+
 #include "physics/dynamics.h"
 #include "physics/orbit.h"
 #include "rendering/planet.h"
@@ -44,9 +47,30 @@
 #include "log.h"
 // epoch = ???
 
-SIMstate gSIM_state = {0.0, 0, 0.05, NULL, NULL, NULL};
+SIMstate gSIM_state = {NULL, 0.05, NULL, NULL, NULL};
 
 #define OO_EVENT_QUEUE_INIT_LEN 100
+
+void
+ooSimInit(void) {
+
+  // Note that tm_wday and tm_yday are ignored by timegm
+  // Default to J2000:
+  //    January 1, 2000, 11:58:55.816 UTC
+  struct tm tm;
+  tm.tm_sec = 55;
+  tm.tm_min = 58;
+  tm.tm_hour = 11;
+  tm.tm_mday = 1;
+  tm.tm_mon = 0;
+  tm.tm_year = 100;
+  tm.tm_isdst = 0;
+  tm.tm_zone = NULL;
+  tm.tm_gmtoff = 0;
+  time_t unixJ2000Epoch = timegm(&tm);
+  gSIM_state.timeState = ooSimTimeInit(unixJ2000Epoch);
+}
+
 OOeventqueue*
 ooSimNewEventQueue(void)
 {
@@ -108,9 +132,9 @@ ooSimSetOrbSys(OOorbsys *osys)
 void
 ooSimStep(float dt)
 {
-    gSIM_state.timeStamp ++;
+    gSIM_state.timeState->timeStamp ++;
     
-    gSIM_state.currentTime = (float)gSIM_state.timeStamp * dt / (24.0 * 3600.0);
+    gSIM_state.timeState->currentTime = (float)gSIM_state.timeState->timeStamp * dt / (24.0 * 3600.0);
     
     struct timeval start;
     struct timeval end;
