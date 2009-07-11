@@ -81,32 +81,32 @@ ooSimSetSg(OOscenegraph *sg)
 void
 ooSimSetOrbSys(OOorbsys *osys)
 {
-    gSIM_state.orbSys = osys;
+  gSIM_state.orbSys = osys;
 }
 
 void
 ooSimStep(float dt)
 {
-    gSIM_state.timeState->timeStamp ++;
-    
-    gSIM_state.timeState->currentTime = (float)gSIM_state.timeState->timeStamp * dt / (24.0 * 3600.0);
-    
-    struct timeval start;
-    struct timeval end;
-    gettimeofday(&start, NULL);
-    
-    ooOrbitClear(gSIM_state.orbSys);
-    ooOrbitStep(gSIM_state.orbSys, dt);
-    
-    gettimeofday(&end, NULL);
-    
-    ooLogInfo("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
+  ooSimTimeTick(gSIM_state.timeState);
+
+  gSIM_state.timeState->currentTime = (float)gSIM_state.timeState->timeStamp * dt / (24.0 * 3600.0);
+
+  struct timeval start;
+  struct timeval end;
+  gettimeofday(&start, NULL);
+
+  ooOrbitClear(gSIM_state.orbSys);
+  ooOrbitStep(gSIM_state.orbSys, dt);
+
+  gettimeofday(&end, NULL);
+
+  ooLogInfo("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
                                     (start.tv_sec*1000000 + start.tv_usec)));
 
-    
+
     // do system simulation
     // sys_step(gSIM_state->systems, dt);
-    
+
     // check event queue
     // sim_event_check(gSIM_state->events, );
 }

@@ -41,6 +41,12 @@ typedef struct OOsimtime {
 
 OOsimtime* ooSimTimeInit(time_t epoch);
 
+static inline void
+ooSimTimeTick(OOsimtime *self)
+{
+  self->timeStamp ++;
+}
+
 float ooTimeGetJD(OOsimtime *self);
 time_t ooTimeGetTime(OOsimtime *self);
 
