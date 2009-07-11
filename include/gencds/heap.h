@@ -53,17 +53,17 @@ extern "C" {
 #endif
     
 #include <stdbool.h>
-
+#include <stdint.h>
 #define THREAD_SAFE_HEAP 1
 
 #if THREAD_SAFE_HEAP
 #include <pthread.h>
 #endif
 
-typedef unsigned int (*compute_rank_f)(void *);
+typedef uint64_t (*compute_rank_f)(void *);
 
 typedef struct {
-    unsigned int rank;
+    uint64_t rank;
     void *data;
 } heap_element_t;
 

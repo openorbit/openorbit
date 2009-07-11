@@ -42,7 +42,7 @@ typedef struct {
     unsigned int n;
 } element_type;
 
-unsigned int
+uint64_t
 f(void *p)
 {
     element_type *ep = p;
