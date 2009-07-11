@@ -34,10 +34,6 @@ find_package(PNG REQUIRED)
 find_library(ODE_LIB ode)
 find_path(ODE_INC "ode/ode.h")
 
-find_library(CONFIG_LIB config)
-find_path(CONFIG_INC "libconfig.h")
-
-
 # TODO: Download missing packages, i.e. sdl, ode et.al.
 # file(DOWNLOAD url file [TIMEOUT timeout] [STATUS status] [LOG log])
 

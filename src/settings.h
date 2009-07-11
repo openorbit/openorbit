@@ -50,26 +50,10 @@ extern "C" {
  * 
  *  NOTE: In the Python API, this system is called config.
  */
+typedef struct OOconf OOconf;
 
 void ooConfInit(void);
 void ooConfLoad(const char *name);
-
-int ooConfSetBool(const char *key, bool val);
-int ooConfGetBool(const char *key, bool *val);    
-
-/* Workaround for missing _Bool support in pyrex */
-int ooConfSetBoolAsInt(const char *key, int val);
-int ooConfGetBoolAsInt(const char *key, int *val); 
-
-int ooConfSetInt(const char *key, int val);
-int ooConfGetInt(const char *key, int *val);
-
-int ooConfSetFloat(const char *key, float val);
-int ooConfGetFloat(const char *key, float *val);
-
-int ooConfSetStr(const char *key, char *val);
-char* ooConfGetStr(const char *key);
-
 
 int ooConfGetBoolDef(const char *key, bool *val, bool defVal);
 int ooConfGetBoolAsIntDef(const char *key, int *val, int defVal);

@@ -111,7 +111,7 @@ set_target_properties(openorbit
 
 target_link_libraries(openorbit
                       math scripting parsers dl ph
-                      ${ODE_LIB} ${CONFIG_LIB} ${PNG_LIBRARIES}
+                      ${ODE_LIB} ${PNG_LIBRARIES}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${SDLTTF_LIBRARY} ${GLUT_LIBRARIES})
 #target_link_libraries(openorbit ${ORBIT_PLUGINS})
 

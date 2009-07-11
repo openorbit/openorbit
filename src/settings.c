@@ -36,273 +36,52 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <limits.h>
-#include <float.h>
-#include <gencds/hashtable.h>
 #include <assert.h>
 
 // TODO: Remove libconfig req
-#include <libconfig.h>
+//#include <libconfig.h>
 
 #include "parsers/hrml.h"
 #include "log.h"
 
-typedef enum {
-    CONF_int,
-    CONF_float,
-    CONF_str,
-    CONF_bool
-} conf_val_kind_t;
-
-typedef struct {
-    conf_val_kind_t kind;
-    union {
-        int i;
-        float f;
-        char *str;
-        bool b;
-    } u;
-} conf_val_t;
+struct OOconf
+{
+  HRMLdocument *doc;
+};
 
 
-hashtable_t *g_config;
-config_t conf;
+static OOconf gConfSingleton;
+
 void
 ooConfInit(void)
 {
-    g_config = hashtable_new_with_str_keys(512);
-    assert(g_config != NULL);
-
-    config_init(&conf);
+  gConfSingleton.doc = NULL;
 }
 
 void
 ooConfLoad(const char *name)
 {
-  if (! config_read_file(&conf, name)) {
-    ooLogError("%s:%d %s", name, config_error_line(&conf),
-               config_error_text(&conf));
+  HRMLdocument *doc = hrmlParse(name);
+  if (!doc) {
+    ooLogError("could not load config file '%s'", name);
   }
-
-  char hrmlFileName[strlen(name) + 5 + 1];
-  strcpy(hrmlFileName, name);
-  strncat(hrmlFileName, ".hrml", 5);
-  HRMLdocument *doc = hrmlParse(hrmlFileName);
-  hrmlFreeDocument(doc);
+  
+  gConfSingleton.doc = doc;
 }
 
-// Entry point for reading options from file, at the moment this is handled by
-// reading an .ini file in the startup script, I would prefer in the long run that
-// this was moved into a simple file parser reading some c-like configuration
-// files.
-// E.g.:
-// enum loglev {trace = 0, info = 1, warn = 2, err = 3, fatal = 4};
-// config default {
-//    log.level = trace;
-//    log.file = "stderr";
-//    video.fullscreen = true;
-//    video.gl.fovy = 45.0;
-// }
 void
-ooConfParse(const char *file)
+ooConfDelete()
 {
-  // TODO: Hook this up with yacc (yyparse, but we want multiple parsers
-  // embedded, so yyprefix must be changed)
-}
-
-int
-ooConfSetInt(const char *key, int val)
-{
-    conf_val_t *confval;
-    if (confval = hashtable_lookup(g_config, key)) {
-        if (confval->kind == CONF_str) {
-            free(confval->u.str);
-        }
-        confval->kind = CONF_int;
-        confval->u.i = val;
-    } else {
-        confval = malloc(sizeof(conf_val_t));
-        if (confval) {
-            confval->kind = CONF_int;
-            confval->u.i = val;
-            hashtable_insert(g_config, key, confval);
-        } else {
-            return -1;
-        }
-    }
-    return 0;
-}
-int
-ooConfSetBool(const char *key, bool val)
-{
-    conf_val_t *confval;
-
-    if (confval = hashtable_lookup(g_config, key)) {
-        if (confval->kind == CONF_str) {
-            free(confval->u.str);
-        }
-        confval->kind = CONF_bool;
-        confval->u.b = val;
-    } else {
-        confval = malloc(sizeof(conf_val_t));
-        if (confval) {
-            confval->kind = CONF_bool;
-            confval->u.b = val;
-            hashtable_insert(g_config, key, confval);
-        } else {
-            return -1;
-        }
-    }
-    return 0;
-}
-
-int
-ooConfSetBoolAsInt(const char *key, int val)
-{
-    conf_val_t *confval;
-    
-    if (confval = hashtable_lookup(g_config, key)) {
-        if (confval->kind == CONF_str) {
-            free(confval->u.str);
-        }
-        confval->kind = CONF_bool;
-        confval->u.b = val;
-    } else {
-        confval = malloc(sizeof(conf_val_t));
-        if (confval) {
-            confval->kind = CONF_bool;
-            confval->u.b = (bool)val;
-            hashtable_insert(g_config, key, confval);
-        } else {
-            return -1;
-        }
-    }
-    return 0;
-}
-
-int
-ooConfSetFloat(const char *key, float val)
-{
-    conf_val_t *confval;
-    if (confval = hashtable_lookup(g_config, key)) {
-        if (confval->kind == CONF_str) {
-            free(confval->u.str);
-        }
-        confval->kind = CONF_float;
-        confval->u.f = val;
-    } else {
-        confval = malloc(sizeof(conf_val_t));
-        if (confval) {
-            confval->kind = CONF_float;
-            confval->u.f = val;
-            hashtable_insert(g_config, key, confval);
-        } else {
-            return -1;
-        }
-    }
-    return 0;
-}
-
-int
-ooConfSetStr(const char *key, char *val)
-{
-    conf_val_t *confval;
-    if (confval = hashtable_lookup(g_config, key)) {
-        if (confval->kind == CONF_str) {
-            free(confval->u.str);
-        }
-        confval->kind = CONF_str;
-        confval->u.str = strdup(val);
-    } else {
-        confval = malloc(sizeof(conf_val_t));
-        if (confval) {
-            confval->kind = CONF_int;
-            confval->u.str = strdup(val);
-            hashtable_insert(g_config, key, confval);
-        }
-    }
-
-    if (! confval || ! confval->u.str) {
-        return -1;
-    }
-
-    return 0;
-}
-
-int
-ooConfGetInt(const char *key, int *val)
-{
-    conf_val_t *confval = hashtable_lookup(g_config, key);
-    if (confval && (confval->kind == CONF_int)) {
-        *val = confval->u.i;
-        return 0;
-    }
-
-    ooLogWarn("settings:no integer %s exists", key);
-    return -1;
-}
-
-int
-ooConfGetBool(const char *key, bool *val)
-{
-    conf_val_t *confval = hashtable_lookup(g_config, key);
-    if (confval && (confval->kind == CONF_bool)) {
-        *val = confval->u.b;
-        return 0;
-    }
-
-    ooLogWarn("settings:no boolean %s exists", key);
-    return -1;
-}
-
-int
-ooConfGetBoolAsInt(const char *key, int *val)
-{
-    conf_val_t *confval = hashtable_lookup(g_config, key);
-    if (confval && (confval->kind == CONF_bool)) {
-        *val = (int)confval->u.b;
-        return 0;
-    }
-
-    ooLogWarn("settings:no boolean %s exists", key);    
-    return -1;
-}
-
-
-
-int
-ooConfGetFloat(const char *key, float *val)
-{
-    conf_val_t *confval = hashtable_lookup(g_config, key);
-    if (confval && (confval->kind == CONF_float)) {
-        *val = confval->u.f;
-        return 0;
-    }
-
-    ooLogWarn("settings:no real %s exists", key);
-    return -1;
-}
-
-char*
-ooConfGetStr(const char *key)
-{
-    conf_val_t *confval = hashtable_lookup(g_config, key);
-    if (confval && (confval->kind == CONF_str)) {
-        return confval->u.str;
-    }
-
-    ooLogWarn("settings:no string %s exists", key);
-    return NULL;    
+  hrmlFreeDocument(gConfSingleton.doc);
 }
 
 
 int
 ooConfGetBoolDef(const char *key, bool *val, bool defVal)
 {
-  int configVal;
-
-  if (config_lookup_bool(&conf, key, &configVal)) {
-    *val = (bool) configVal;
+  HRMLobject *obj = hrmlGetObject(gConfSingleton.doc, key);
+  if (obj && obj->val.typ == HRMLBool) {
+    *val = hrmlGetBool(obj);
   } else {
     *val = defVal;
   }
@@ -313,10 +92,9 @@ ooConfGetBoolDef(const char *key, bool *val, bool defVal)
 int
 ooConfGetBoolAsIntDef(const char *key, int *val, int defVal)
 {
-  int configVal;
-
-  if (config_lookup_bool(&conf, key, &configVal)) {
-    *val = configVal;
+  HRMLobject *obj = hrmlGetObject(gConfSingleton.doc, key);
+  if (obj && obj->val.typ == HRMLBool) {
+    *val = (int) hrmlGetBool(obj);
   } else {
     *val = defVal;
   }
@@ -327,10 +105,9 @@ ooConfGetBoolAsIntDef(const char *key, int *val, int defVal)
 int
 ooConfGetIntDef(const char *key, int *val, int defVal)
 {
-  long configVal;
-
-  if (config_lookup_int(&conf, key, &configVal)) {
-    *val = configVal;
+  HRMLobject *obj = hrmlGetObject(gConfSingleton.doc, key);
+  if (obj && obj->val.typ == HRMLInt) {
+    *val = hrmlGetInt(obj);
   } else {
     *val = defVal;
   }
@@ -341,10 +118,9 @@ ooConfGetIntDef(const char *key, int *val, int defVal)
 int
 ooConfGetFloatDef(const char *key, float *val, float defVal)
 {
-  double configVal;
-
-  if (config_lookup_float(&conf, key, &configVal)) {
-    *val = configVal;
+  HRMLobject *obj = hrmlGetObject(gConfSingleton.doc, key);
+  if (obj && obj->val.typ == HRMLFloat) {
+    *val = hrmlGetReal(obj);
   } else {
     *val = defVal;
   }
@@ -355,12 +131,11 @@ ooConfGetFloatDef(const char *key, float *val, float defVal)
 int
 ooConfGetStrDef(const char *key, const char **val, const char *defVal)
 {
-  const char *configVal;
-
-  if (config_lookup_string(&conf, key, &configVal)) {
-    *val = configVal;
+  HRMLobject *obj = hrmlGetObject(gConfSingleton.doc, key);
+  if (obj && obj->val.typ == HRMLStr) {
+    *val = hrmlGetStr(obj);
   } else {
-    *val = defVal;
+    *val = defVal;    
   }
 
   return 0;
