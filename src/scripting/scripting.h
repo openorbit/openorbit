@@ -49,7 +49,6 @@ extern "C" {
 #endif 
 
 #include <stdbool.h>
-#include "error.h"
 
 #ifdef PYTHON_FWORK
 #include <Python/Python.h>

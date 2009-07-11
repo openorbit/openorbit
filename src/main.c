@@ -57,7 +57,6 @@
 
 #include "res-manager.h"
 #include "log.h"
-#include "error.h"
 #include "settings.h"
 #include "io-manager.h"
 #include "plugin-handler.h"
@@ -182,59 +181,59 @@ main_loop(void)
 int
 main(int argc, char*argv[])
 {
-    ooLogInit(stderr);
+  ooLogInit(stderr);
 
-    ooConfInit();
-    ooConfLoad(ooResGetConfPath());
-    
-    // Set log level, need to do that here
-    const char *levStr = NULL;
-    ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
-    ooLogSetLevel(ooLogGetLevFromStr(levStr));
-    
-    // Setup IO-tables
-    ooIoInitSdlStringMap();
-    
-    ooSimInit();
-    
-    ooPluginInit();
-    ooPluginLoadAll();
-    ooPluginPrintAll();
-        
-    // Load and run initialisation script
-    ooScriptingInit();
-    
-    if (!ooScriptingRunFile("script/init.py")) {
-      ooLogFatal("script/init.py missing");
-    }
-    
-    // Initialise ODE, SDL, GL and AL
-    dInitODE();
-    
-    // Init SDL video subsystem
-    if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {
-      ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
-    }
-    
-    if (TTF_Init() == -1) {
-      ooLogFatal("Couldn't initialize SDL_ttf: %s", TTF_GetError());
-    }
-    
-    // Init GL state
-    init_renderer();
+  ooConfInit();
+  ooConfLoad(ooResGetConfPath());
 
-    if (!ooScriptingRunFile("script/postinit.py")) {
-      ooLogFatal("script/postinit.py missing");
-    }
+  // Set log level, need to do that here
+  const char *levStr = NULL;
+  ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
+  ooLogSetLevel(ooLogGetLevFromStr(levStr));
 
+  // Setup IO-tables
+  ooIoInitSdlStringMap();
 
-    atexit(SDL_Quit);
+  ooSimInit();
+
+  ooPluginInit();
+  ooPluginLoadAll();
+  ooPluginPrintAll();
+
+  // Load and run initialisation script
+  ooScriptingInit();
+
+  if (!ooScriptingRunFile("script/init.py")) {
+    ooLogFatal("script/init.py missing");
+  }
+
+  // Initialise ODE, SDL, GL and AL
+  dInitODE();
+
+  // Init SDL video subsystem
+  if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {
+    ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
+  }
+
+  if (TTF_Init() == -1) {
+    ooLogFatal("Couldn't initialize SDL_ttf: %s", TTF_GetError());
+  }
+
+  // Init GL state
+  init_renderer();
+
+  if (!ooScriptingRunFile("script/postinit.py")) {
+    ooLogFatal("script/postinit.py missing");
+  }
 
 
-    // Draw, get events...
-    main_loop();
+  atexit(SDL_Quit);
 
-    ooLogInfo("Shutting down normally...");
-    return 0;
+
+  // Draw, get events...
+  main_loop();
+
+  ooLogInfo("Shutting down normally...");
+  return 0;
 }
 

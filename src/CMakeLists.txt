@@ -32,11 +32,11 @@ aux_source_directory(geo geo_src)
 aux_source_directory(sim sim_src)
 
 set(openorbit_SRC
-	main.c sim.c error.c settings.c io-manager.c plugin-handler.c log.c
+	main.c sim.c settings.c io-manager.c plugin-handler.c log.c
 	${rendering_src} ${vessel_src} ${geo_src} ${sim_src} ${gencds_src})
 
 set(openorbit_FILES
-	sim.h error.h io-manager.h settings.h plugin-handler.h
+	sim.h io-manager.h settings.h plugin-handler.h
 	CMakeLists.txt)
 
 add_cmake_list()

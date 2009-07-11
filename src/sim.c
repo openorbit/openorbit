@@ -40,7 +40,6 @@
 
 #include "sim.h"
 
-#include "physics/dynamics.h"
 #include "physics/orbit.h"
 #include "rendering/planet.h"
 

@@ -35,7 +35,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <check.h>
-#include "physics/dynamics.h"
 
 START_TEST(test_apply_force_at_pos)
 {
