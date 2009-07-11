@@ -70,50 +70,6 @@ ooSimInit(void) {
   gSIM_state.timeState = ooSimTimeInit(unixJ2000Epoch);
 }
 
-OOeventqueue*
-ooSimNewEventQueue(void)
-{
-    OOeventqueue *queue = malloc(sizeof(OOeventqueue));
-    queue->freeEvents = malloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
-    
-    for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
-        queue->freeEvents[i].next = &queue->freeEvents[i+1];
-        queue->freeEvents[i].data = NULL;
-        queue->freeEvents[i].handler = NULL;
-        queue->freeEvents[i].fireOffset = 0;
-    }
-    
-    return queue;
-}
-
-int
-ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *data)
-{
-    OOevent *e = q->first;
-    int tsCnt = e->fireOffset;
-    while (tsCnt < offset) {
-        e = e->next;
-        tsCnt += e->fireOffset;
-    }
-}
-
-int
-ooSimHandleNextEvent(OOeventqueue *q)
-{
-    if (q->first && (-- q->first->fireOffset <= 0)) {
-        OOevent *ev = q->first;
-        q->first = q->first->next;
-        ev->handler(ev->data);
-        
-        ev->next = q->freeEvents;
-        q->freeEvents = ev;
-        
-        return 0;
-    }
-    
-    if (q->first == NULL) return -1;
-    return q->first->fireOffset;
-}
 
 void
 ooSimSetSg(OOscenegraph *sg)

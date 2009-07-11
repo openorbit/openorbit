@@ -30,44 +30,61 @@
  above, a recipient may use your version of this file under either the MPL,
  the GPL or the LGPL."
  */
+
+
+#include "sim/simevent.h"
+ uint64_t EventRank(OOevent *ev)
+ {
+   return ev->fireTime;
+ }
+
+ OOeventqueue*
+ ooSimNewEventQueue(void)
+ {
+     OOeventqueue *queue = malloc(sizeof(OOeventqueue));
+     queue->freeEvents = malloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
+     queue->activeEventHeap = heap_new(8, (compute_rank_f)EventRank);
+
+     for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
+         queue->freeEvents[i].next = &queue->freeEvents[i+1];
+         queue->freeEvents[i].data = NULL;
+         queue->freeEvents[i].handler = NULL;
+         queue->freeEvents[i].fireTime = 0;
+     }
+
+     return queue;
+ }
+
+ int
+ ooSimStackEvent(OOeventqueue *q, OOeventhandler handler, void *data)
+ {
+
+ }
+
+ int
+ ooSimJDEvent(OOeventqueue *q, double jd, OOeventhandler handler, void *data)
+ {
+
+ }
+
+
+ int
+ ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *data)
+ {
+     //OOevent *e = q->first;
+     //int tsCnt = e->fireTime = offset;
+     //while (tsCnt < offset) {
+     //    e = e->next;
+     //    tsCnt += e->fireTime;
+     //}
+ }
+
+ int
+ ooSimHandleNextEvent(OOeventqueue *q)
+ {
+     OOevent *ev = heap_peek(q->activeEventHeap);
+     ev = heap_remove(q->activeEventHeap);
+
+     return ev->fireTime;
+ }
  
- 
-#include "sim.h"
-#include "sim/simtime.h"
-
-OOsimtime*
-ooSimTimeInit(time_t epoch)
-{
-  OOsimtime *timeState = malloc(sizeof(OOsimtime));
-  timeState->epoch = epoch;
-  timeState->currentTime = 0.0;
-  timeState->timeStamp;
-
-  return timeState;
-}
-
-
-float
-ooTimeGetJD(OOsimtime *self)
-{
-  return self->currentTime;
-}
-
-time_t
-ooTimeGetTime(OOsimtime *self)
-{
-  
-}
-
-
-time_t
-ooTimeGetEpoch(OOsimtime *self)
-{
-  return self->epoch;
-}
-
-void
-ooTimeSetEpoch(OOsimtime *self, time_t epoch)
-{
-  self->epoch = epoch;
-}

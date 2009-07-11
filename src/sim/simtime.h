@@ -42,6 +42,7 @@ typedef struct OOsimtime {
 OOsimtime* ooSimTimeInit(time_t epoch);
 
 float ooTimeGetJD(OOsimtime *self);
+time_t ooTimeGetTime(OOsimtime *self);
 
 time_t ooTimeGetEpoch(OOsimtime *self);
 void ooTimeSetEpoch(OOsimtime *self, time_t epoch);

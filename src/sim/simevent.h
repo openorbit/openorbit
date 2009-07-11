@@ -30,44 +30,29 @@
  above, a recipient may use your version of this file under either the MPL,
  the GPL or the LGPL."
  */
- 
- 
-#include "sim.h"
-#include "sim/simtime.h"
 
-OOsimtime*
-ooSimTimeInit(time_t epoch)
-{
-  OOsimtime *timeState = malloc(sizeof(OOsimtime));
-  timeState->epoch = epoch;
-  timeState->currentTime = 0.0;
-  timeState->timeStamp;
+#ifndef SIMEVENT_H_KHYQLKNG
+#define SIMEVENT_H_KHYQLKNG
 
-  return timeState;
-}
+#include <gencds/heap.h>
 
 
-float
-ooTimeGetJD(OOsimtime *self)
-{
-  return self->currentTime;
-}
+ typedef void (*OOeventhandler)(void *data);
 
-time_t
-ooTimeGetTime(OOsimtime *self)
-{
-  
-}
+ typedef struct _OOevent {
+     uint64_t fireTime;
+     OOeventhandler handler;
+     void *data;
+     struct _OOevent *next;
+ } OOevent;
 
+ typedef struct {
+   heap_t *activeEventHeap;
+   OOevent *freeEvents;
+ } OOeventqueue;
 
-time_t
-ooTimeGetEpoch(OOsimtime *self)
-{
-  return self->epoch;
-}
+ OOeventqueue* ooSimNewEventQueue(void);
+ int ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *data);
+ int ooSimHandleNextEvent(OOeventqueue *q);
 
-void
-ooTimeSetEpoch(OOsimtime *self, time_t epoch)
-{
-  self->epoch = epoch;
-}
+#endif /* end of include guard: SIMEVENT_H_KHYQLKNG */

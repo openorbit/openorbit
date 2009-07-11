@@ -45,25 +45,7 @@ extern "C" {
 #include "rendering/scenegraph.h"
 #include "sim/spacecraft.h"
 #include "sim/simtime.h"
-
-    
-typedef void (*OOeventhandler)(void *data);
-    
-typedef struct _OOevent {
-    signed fireOffset;
-    OOeventhandler handler;
-    void *data;
-    struct _OOevent *next;
-} OOevent;
-
-typedef struct {
-    OOevent *first;
-    OOevent *freeEvents;
-} OOeventqueue;
-
-OOeventqueue* ooSimNewEventQueue(void);
-int ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *data);
-int ooSimHandleNextEvent(OOeventqueue *q);
+#include "sim/simevent.h"
     
 typedef struct {  
   OOsimtime *timeState;
