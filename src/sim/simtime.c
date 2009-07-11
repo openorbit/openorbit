@@ -41,8 +41,9 @@ ooSimTimeInit(time_t epoch)
   OOsimtime *timeState = malloc(sizeof(OOsimtime));
   timeState->epoch = epoch;
   timeState->currentTime = 0.0;
-  timeState->timeStamp;
-
+  timeState->timeStamp = 0;
+  timeState->timeStampLength = 0.05; // 20 Hz default
+  
   return timeState;
 }
 
@@ -56,7 +57,7 @@ ooTimeGetJD(OOsimtime *self)
 time_t
 ooTimeGetTime(OOsimtime *self)
 {
-  
+  return self->epoch + (time_t)self->timeStamp * (time_t)(1.0/self->timeStampLength);
 }
 
 

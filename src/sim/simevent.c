@@ -31,8 +31,11 @@
  the GPL or the LGPL."
  */
 
-
+#include <stdlib.h>
 #include "sim/simevent.h"
+
+#define OO_EVENT_QUEUE_INIT_LEN 100
+
  uint64_t EventRank(OOevent *ev)
  {
    return ev->fireTime;

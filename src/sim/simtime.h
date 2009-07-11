@@ -37,6 +37,7 @@ typedef struct OOsimtime {
   time_t epoch; // UNIX time
   double currentTime; //!< Current time in earth days relative to epoch
   uint64_t timeStamp; //!< Time stamp (ticking up one every step)
+  double timeStampLength;
 } OOsimtime;
 
 OOsimtime* ooSimTimeInit(time_t epoch);

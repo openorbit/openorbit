@@ -48,8 +48,6 @@
 
 SIMstate gSIM_state = {NULL, 0.05, NULL, NULL, NULL};
 
-#define OO_EVENT_QUEUE_INIT_LEN 100
-
 void
 ooSimInit(void) {
 
