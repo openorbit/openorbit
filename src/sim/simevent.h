@@ -37,8 +37,16 @@
 #include <gencds/heap.h>
 
 
+/*!
+  Event handler function
+ */
  typedef void (*OOeventhandler)(void *data);
 
+/*!
+  Internal event structure. The structure is not for direct access.
+
+  \todo Move to C-file if possible
+ */
  typedef struct _OOevent {
      uint64_t fireTime;
      OOeventhandler handler;
@@ -46,6 +54,30 @@
      struct _OOevent *next;
  } OOevent;
 
+
+/*!
+  Event queue structure
+
+  An event queue works as follows: The programmer ask for either a timed event
+  which may be relative to the current simtime or absolute, it may also be at
+  time = now, meaning it will be stack posted.
+
+  There are two event queues running parallel. One is a heap of events, that all
+  have an absolute time for triggering. Thus, inserting events in this queue is
+  log(n) in time, and extracting them is also log(n) in time.
+
+  The second queue is the event stack. This stack is for use when an event is
+  posted by a function in order to get a callback from a different calling
+  context. The stack posted events are guaranteed to be dispatched before the
+  next physics simulation step. Inserting and removing these events are O(1)
+  in complexity.
+
+  In order to speed things up, we allocate a pool of event structures and place
+  these in a free event pool. Whenever an event is inserted, a structure is
+  taken from the free event pool and inserted either on the event stack or in
+  the event heap. Whenever an event is popped, the structure is moved back into
+  the free event pool.
+*/
  typedef struct {
    heap_t *activeEventHeap;
    OOevent *freeEvents;
