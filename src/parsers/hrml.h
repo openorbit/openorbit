@@ -73,6 +73,8 @@
 #include <string.h>
 #include <assert.h>
 
+
+
 typedef enum HRMLtype {
   HRMLInt,
   HRMLFloat,
@@ -227,6 +229,14 @@ hrmlGetInt(HRMLobject *obj)
   assert(obj->val.typ == HRMLInt);
   return obj->val.u.integer;
 }
+
+static inline bool
+hrmlGetBool(HRMLobject *obj)
+{
+  assert(obj->val.typ == HRMLBool);
+  return obj->val.u.boolean;
+}
+
 
 static inline double
 hrmlGetReal(HRMLobject *obj)
