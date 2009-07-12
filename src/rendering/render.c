@@ -88,7 +88,8 @@ init_gl(void)
     ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
     ooConfGetFloatDef("openorbit/video/gl/aspect", &aspect, 1.33f);
 
-    gluPerspective(fovy, aspect, /*near*/0.001, /*far*/100.0);
+    // Near clipping 1 cm away, far clipping 20 au away
+    gluPerspective(fovy, aspect, /*near*/0.01, /*far*/149598000000.0*20.0);
     
     ooConfGetIntDef("openorbit/video/width", &width, 640);
     ooConfGetIntDef("openorbit/video/height", &height, 480);
