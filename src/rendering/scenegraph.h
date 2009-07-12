@@ -143,6 +143,9 @@ void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj);
   \pre sc != NULL
 */
 OOscene* ooSgSceneGetRoot(OOscene *sc);
+void ooSgSetRoot(OOscenegraph *sg, OOscene *sc);
+
+OOscene* ooSgGetScene(OOscenegraph *sg, const char *sceneName);
 void ooSgSceneAddChild(OOscene *parent, OOscene *child);
 void ooSgSceneAddObj(OOscene *sc, OOdrawable *object);
 

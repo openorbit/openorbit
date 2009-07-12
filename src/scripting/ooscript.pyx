@@ -27,6 +27,7 @@ cdef extern from "rendering/scenegraph.h":
   OOscene* ooSgNewScene(OOscene *parent, char *name)
 
   void ooSgSceneAddChild(OOscene *parent, OOscene *child)
+  OOscene* ooSgGetScene(OOscenegraph *sg, char *sceneName)
 
 
   OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
@@ -159,7 +160,9 @@ cdef class Scenegraph:
       return sc
   
   def getScene(self, key):
-      pass
+      cdef Scene sc
+      sc.sc = ooSgGetScene(self.sg, key)
+      return sc
   
   def setBackground(self, SkyDrawable sky):
       ooSgSetSky(self.sg, sky.sky)

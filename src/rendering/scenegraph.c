@@ -50,6 +50,7 @@ ooSgSetScenePos(OOscene *sc, float x, float y, float z)
 {
   assert(sc != NULL);
 
+  ooLogInfo("setting scene %s pos to [%f, %f, %f]", sc->name, x, y, z);
   sc->t.x = x;
   sc->t.y = y;
   sc->t.z = z;
@@ -87,10 +88,10 @@ ooSgUpdateObject(dBodyID body)
   const dReal *quat = dBodyGetQuaternion(body);
   const dReal *linVel = dBodyGetLinearVel(body);
   const dReal *angVel = dBodyGetAngularVel(body);
-  
+
   obj->p = v_set(pos[0], pos[1], pos[2], 0.0);
   obj->q = v_set(quat[1], quat[2], quat[3], quat[0]);
-  
+
   obj->dp = v_set(linVel[0], linVel[1], linVel[2], 0.0);
   obj->dr = v_set(angVel[0], angVel[1], angVel[2], 0.0);
 }
@@ -227,6 +228,58 @@ ooSgSceneGetRoot(OOscene *sc)
   return sc;
 }
 
+OOscene*
+ooSgGetScene(OOscenegraph *sg, const char *sceneName)
+{
+  assert(sg != NULL);
+
+  char str[strlen(sceneName)+1];
+  strcpy(str, sceneName); // TODO: We do not trust the user, should probably
+                          // check alloca result
+
+  OOscene *scene = sg->root;
+  char *strp = str;
+  char *strTok = strsep(&strp, "/");
+  int idx = 0;
+  OOobjvector *vec = NULL;
+
+  while (scene) {
+    fprintf(stderr, "%s == %s\n", scene->name, strTok);
+    if (!strcmp(scene->name, strTok)) {
+      if (strp == NULL) {
+        // At the end of the sys path
+        return scene;
+      }
+
+      // If this is not the lowest level, go one level down
+      strTok = strsep(&strp, "/");
+
+      vec = &scene->scenes;
+      idx = 0;
+      if (vec->length <= 0) {
+        fprintf(stderr, "no subscenes found\n");
+        return NULL;
+      }
+      scene = vec->elems[idx];
+    } else {
+      if (vec == NULL) {
+        assert(0 && "not found");
+        return NULL;
+      }
+      idx ++;
+      if (vec->length <= idx) {
+        assert(0 && "index overflow");
+        return NULL;
+      }
+      scene = vec->elems[idx];
+    }
+  }
+
+  assert(0 && "dont ask for non existant things");
+  return NULL;
+}
+
+
 
 void
 ooSgDrawOverlay(OOoverlay *overlay)
@@ -261,6 +314,7 @@ void
 ooSgSceneDraw(OOscene *sc)
 {
     assert(sc != NULL);
+    ooLogInfo("drawing scene %s at %vf", sc->name, sc->t.v);
 
     // Apply scene transforms
     glPushMatrix();
@@ -269,6 +323,7 @@ ooSgSceneDraw(OOscene *sc)
     // Render objects
     for (size_t i = 0 ; i < sc->objs.length ; i ++) {
       OOdrawable *obj = sc->objs.elems[i];
+      ooLogInfo("drawing object %s", obj->name);
       glPushMatrix();
       glTranslatef(obj->p.x, obj->p.y, obj->p.z);
       matrix_t m;
@@ -368,7 +423,7 @@ ooSgPaint(OOscenegraph *sg)
 
     for (size_t i = 0; i < sc->scenes.length ; i ++) {
       if (sc->scenes.elems[i] != prev) { // only draw non drawn scenes
-        ooSgSceneDraw(sc->scenes.elems[i]);
+        //ooSgSceneDraw(sc->scenes.elems[i]);
       }
     }
 
@@ -481,6 +536,11 @@ ooSgNewSphere(const char *name, float radius, const char *tex)
   return ooSgNewDrawable(name, sp, (OOdrawfunc) ooSgDrawSphere);
 }
 
+void ooSgSetRoot(OOscenegraph *sg, OOscene *sc)
+{
+  // TODO: Delete previous scene
+  sg->root = sc;
+}
 
 #if 0
 

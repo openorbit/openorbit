@@ -477,6 +477,7 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
     if (!strcmp(node->name, "openorbit")) {
       for (HRMLobject *star = node->children; star != NULL; star = star->next) {
         sys = ooOrbitLoadStar(star); //BUG: If more than one star is specified
+        ooSgSetRoot(sg, sys->scene);
       }
     }
   }
