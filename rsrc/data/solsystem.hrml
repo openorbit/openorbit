@@ -19,10 +19,10 @@ openorbit {
           axial-tilt: 0.0351666667 deg; // 2.11' according to wikipedia
         }
         orbit {
-          semimajor-axis: 0.38709893 au;  
-          eccentricity: 0.20563069;   
+          semimajor-axis: 0.38709893 au;
+          eccentricity: 0.20563069;
           inclination: 7.00487 deg;
-          longitude-ascending-node: 48.33167 deg;     
+          longitude-ascending-node: 48.33167 deg;
           longitude-perihelion: 77.45645 deg;
           mean-longitude: 252.25084 deg;
           right-ascension: 281.01 deg; # - 0.003T
@@ -86,11 +86,11 @@ openorbit {
           axial-tilt: 23.439281 deg;
         }
         orbit {
-          semimajor-axis: 1.00000011 au;  
+          semimajor-axis: 1.00000011 au;
           eccentricity: 0.01671022; 
           inclination: 0.00005 deg;
           longitude-ascending-node: -11.26064 deg;
-          longitude-perihelion: 102.94719 deg;  
+          longitude-perihelion: 102.94719 deg;
           mean-longitude: 100.46435 deg;
           right-ascension:  0.00 deg; #- 0.641T
           declination    : 90.00 deg; #- 0.557T
