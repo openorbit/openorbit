@@ -152,6 +152,44 @@ ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body, float dx, float dy,
 }
 
 void
+ooSgCamRotate(OOcam *cam)
+{
+  assert(cam != NULL && "cam not set");
+  switch (cam->kind) {
+  case OOCam_Orbit:
+    assert(0 && "not supported yet");
+    {
+      const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
+      const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
+      gluLookAt(  ((OOorbitcam*)cam->camData)->r.x + pos[0],
+                ((OOorbitcam*)cam->camData)->r.y + pos[1],
+                ((OOorbitcam*)cam->camData)->r.x + pos[2],
+                pos[0], pos[1], pos[2], // center
+                  0.0, 1.0, 0.0); // up
+    }
+    break;
+  case OOCam_Fixed:
+    assert(0 && "not supported yet");
+    {
+        const dReal *pos = dBodyGetPosition(((OOfixedcam*)cam->camData)->body);
+        const dReal *rot = dBodyGetRotation(((OOfixedcam*)cam->camData)->body);
+        glTranslatef(((OOfixedcam*)cam->camData)->r.x + pos[0],
+                     ((OOfixedcam*)cam->camData)->r.y + pos[1],
+                     ((OOfixedcam*)cam->camData)->r.z + pos[2]);
+        
+    }
+    
+    break;
+  case OOCam_Free:
+    ((OOfreecam*)cam->camData)->q = q_mul(((OOfreecam*)cam->camData)->q,
+                                          ((OOfreecam*)cam->camData)->dq);
+    break;
+  default:
+    assert(0 && "invalid cam type");
+  }
+}
+
+void
 ooSgCamMove(OOcam *cam)
 {
     assert(cam != NULL && "cam not set");
@@ -159,34 +197,13 @@ ooSgCamMove(OOcam *cam)
     
     switch (cam->kind) {
     case OOCam_Orbit:
-        {
-            const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
-            const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
-            gluLookAt(  ((OOorbitcam*)cam->camData)->r.x + pos[0],
-         	            ((OOorbitcam*)cam->camData)->r.y + pos[1],
-         	            ((OOorbitcam*)cam->camData)->r.x + pos[2],
-         	            pos[0], pos[1], pos[2], // center
-                        0.0, 1.0, 0.0); // up
-        }
         break;
     case OOCam_Fixed:
-        {
-            const dReal *pos = dBodyGetPosition(((OOfixedcam*)cam->camData)->body);
-            const dReal *rot = dBodyGetRotation(((OOfixedcam*)cam->camData)->body);
-            glTranslatef(((OOfixedcam*)cam->camData)->r.x + pos[0],
-                         ((OOfixedcam*)cam->camData)->r.y + pos[1],
-                         ((OOfixedcam*)cam->camData)->r.z + pos[2]);
-            
-        }
         break;
     case OOCam_Free:
-//        glTranslatef(((OOfreecam*)cam->camData)->p.x,
-//                     ((OOfreecam*)cam->camData)->p.y,
-//                     ((OOfreecam*)cam->camData)->p.z);
-        ((OOfreecam*)cam->camData)->q = q_mul(((OOfreecam*)cam->camData)->q,
-                                              ((OOfreecam*)cam->camData)->dq);
-
-//        glRotatef(0.0, 1.0, 0.0, 0.0);
+        glTranslatef(((OOfreecam*)cam->camData)->p.x,
+                     ((OOfreecam*)cam->camData)->p.y,
+                     ((OOfreecam*)cam->camData)->p.z);
         break;
     default:
         assert(0 && "illegal case statement");

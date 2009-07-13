@@ -96,6 +96,7 @@ extern "C" {
                          float dx, float dy, float dz);
 
   void ooSgCamMove(OOcam *cam);
+  void ooSgCamRotate(OOcam *cam);
 
 #ifdef __cplusplus
 }

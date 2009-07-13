@@ -376,7 +376,7 @@ ooSgPaint(OOscenegraph *sg)
   OOscene *sc = sg->currentCam->scene->parent;
 
   quaternion_t q;
-  ooSgCamMove(sg->currentCam);
+  ooSgCamRotate(sg->currentCam);
   if (sg->currentCam->kind == OOCam_Free) {
     q = ((OOfreecam*)(sg->currentCam->camData))->q;
   } else {
@@ -405,6 +405,7 @@ ooSgPaint(OOscenegraph *sg)
   }
   // Now, in order to suport grand scales, we draw the scene with the current
   // camera (this will recursivly draw it's child scenes)
+  ooSgCamMove(sg->currentCam);
   ooSgSceneDraw(sg->currentCam->scene);
 
   // At this point we have not drawn the parent scene, so we start go upwards
