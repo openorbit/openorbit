@@ -74,7 +74,6 @@ ooOrbitNewRootSys(const char *name, OOscene *scene, float m, float rotPeriod)
   OOorbsys *sys = malloc(sizeof(OOorbsys));
   sys->world = dWorldCreate();
   sys->name = strdup(name);
-  sys->orbit = NULL;
   ooObjVecInit(&sys->sats);
   ooObjVecInit(&sys->objs);
 
@@ -87,11 +86,13 @@ ooOrbitNewRootSys(const char *name, OOscene *scene, float m, float rotPeriod)
 
   sys->phys.k.G = 6.67428e-11;
   sys->phys.param.m = m;
-  sys->phys.param.rotationPeriod = rotPeriod;
   sys->phys.param.orbitalPeriod = 0.0;
+  sys->phys.param.rotationPeriod = rotPeriod;
 
   sys->scene = scene;
   sys->level = 0;
+  sys->orbit = NULL;
+
   return sys;
 }
 
@@ -101,28 +102,9 @@ ooOrbitNewSys(const char *name, OOscene *scene,
               float m, float orbitPeriod, float rotPeriod,
               float semiMaj, float semiMin)
 {
-  OOorbsys *sys = malloc(sizeof(OOorbsys));
-  sys->world = dWorldCreate();
-  sys->name = strdup(name);
+  OOorbsys *sys = ooOrbitNewRootSys(name, scene, m, rotPeriod);
   sys->orbit = ooGeoEllipseAreaSeg(300, semiMaj, semiMin);
-  ooObjVecInit(&sys->sats);
-  ooObjVecInit(&sys->objs);
-
-  sys->parent = NULL;
-
-  sys->scale.dist = 1.0f;
-  sys->scale.distInv = 1.0f;
-  sys->scale.mass = 1.0f;
-  sys->scale.massInv = 1.0f;
-
-  sys->phys.k.G = 6.67428e-11;
-  sys->phys.param.m = m;
   sys->phys.param.orbitalPeriod = orbitPeriod;
-  sys->phys.param.rotationPeriod = rotPeriod;
-
-  sys->scene = scene;
-  sys->level = 0;
-
   return sys;
 }
 
@@ -246,16 +228,20 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
   dWorldStep(sys->world, stepSize);
 
   // Update current position
-  sys->phys.param.pos = ooGeoEllipseSegPoint(sys->orbit,
-                                   (ooTimeGetJD(ooSimTimeState())/sys->phys.param.orbitalPeriod)*
-                                   (float)sys->orbit->vec.length);
+  if (sys->orbit) {
+    sys->phys.param.pos = ooGeoEllipseSegPoint(sys->orbit,
+                                               (ooTimeGetJD(ooSimTimeState()) / 
+                                                 sys->phys.param.orbitalPeriod)*
+                                                 (float)sys->orbit->vec.length);
 
-  ooLogTrace("%f: %s: %f: %vf",
-             ooTimeGetJD(ooSimTimeState()),
-             sys->name,
-             sys->phys.param.orbitalPeriod,
-             sys->phys.param.pos);
-
+    ooLogTrace("%f: %s: %f: %vf",
+               ooTimeGetJD(ooSimTimeState()),
+               sys->name,
+               sys->phys.param.orbitalPeriod,
+               sys->phys.param.pos);
+  } else {
+    sys->phys.param.pos = v4f_make(0.0, 0.0, 0.0, 0.0);
+  }
   // Recurse and do the same for each subsystem
   for (size_t i = 0; i < sys->sats.length ; i ++) {
     ooOrbitStep(sys->sats.elems[i], stepSize);
@@ -320,6 +306,8 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong, rightAsc,
          declin;
   const char *tex = NULL;
+  HRMLobject *sats = NULL;
+  
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
     if (!strcmp(child->name, "physical")) {
       for (HRMLobject *phys = child->children; phys != NULL; phys = phys->next) {
@@ -363,6 +351,8 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
           tex = hrmlGetStr(rend);
         }
       }
+    } else if (!strcmp(child->name, "sattelites")) {
+      sats = child;
     }
   }
   
@@ -376,7 +366,7 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
   
   OOorbsys *sys = ooOrbitNewSys(planetName.u.str, sc,
                                 mass, period, 1.0,//float period,
-                                semiMajor, ecc*semiMajor);
+                                semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc));
 
   OOdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
@@ -425,13 +415,13 @@ ooOrbitLoadStar(HRMLobject *obj)
 
   OOscene *sc = ooSgNewScene(NULL, starName.u.str);
 
-  OOorbsys *sys = ooOrbitNewSys(starName.u.str, sc,
-                                mass, 0.0, 0.0, //float period,
-                                0.0, 0.0);
-
+  OOorbsys *sys = ooOrbitNewRootSys(starName.u.str, sc,
+                                    mass, 0.0 //float period
+                                    );
+  HRMLobject *sats = NULL;
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
     if (!strcmp(child->name, "satellites")) {
-      ooOrbitLoadSatellites(child, sys, sc);
+      sats = child;
     } else if (!strcmp(child->name, "physical")) {
       for (HRMLobject *phys = child->children; phys != NULL; phys = phys->next) {
         if (!strcmp(phys->name, "mass")) {
@@ -450,10 +440,15 @@ ooOrbitLoadStar(HRMLobject *obj)
       }
     }
   }
+  
 
   sys->phys.param.m = mass;
   sys->scale.dist = 1.0;
   sys->scale.distInv = 1.0;
+  
+  assert(sats != NULL);
+  ooOrbitLoadSatellites(sats, sys, sc);
+  
   return sys;
 }
 
