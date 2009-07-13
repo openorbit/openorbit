@@ -50,7 +50,7 @@ ooSgSetScenePos(OOscene *sc, float x, float y, float z)
 {
   assert(sc != NULL);
 
-  ooLogInfo("setting scene %s pos to [%f, %f, %f]", sc->name, x, y, z);
+  ooLogTrace("setting scene %s pos to [%f, %f, %f]", sc->name, x, y, z);
   sc->t.x = x;
   sc->t.y = y;
   sc->t.z = z;
@@ -81,7 +81,7 @@ void
 ooSgUpdateObject(dBodyID body)
 {
   OOdrawable *obj = dBodyGetData(body);
-  ooLogInfo("updating body %s", obj->name);
+  ooLogTrace("updating body %s", obj->name);
 
   const dReal *pos = dBodyGetPosition(body);
   //const dReal *rot = dBodyGetRotation(body);
@@ -314,7 +314,7 @@ void
 ooSgSceneDraw(OOscene *sc)
 {
     assert(sc != NULL);
-    ooLogInfo("drawing scene %s at %vf", sc->name, sc->t.v);
+    ooLogTrace("drawing scene %s at %vf", sc->name, sc->t.v);
 
     // Apply scene transforms
     glPushMatrix();
@@ -323,7 +323,7 @@ ooSgSceneDraw(OOscene *sc)
     // Render objects
     for (size_t i = 0 ; i < sc->objs.length ; i ++) {
       OOdrawable *obj = sc->objs.elems[i];
-      ooLogInfo("drawing object %s", obj->name);
+      ooLogTrace("drawing object %s", obj->name);
       glPushMatrix();
       glTranslatef(obj->p.x, obj->p.y, obj->p.z);
       matrix_t m;
