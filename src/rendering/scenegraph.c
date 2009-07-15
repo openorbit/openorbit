@@ -316,6 +316,8 @@ ooSgSceneDraw(OOscene *sc)
     assert(sc != NULL);
     ooLogTrace("drawing scene %s at %vf", sc->name, sc->t.v);
 
+    glDepthFunc(GL_LEQUAL);
+
     // Apply scene transforms
     glPushMatrix();
     glTranslatef(sc->t.x, sc->t.y, sc->t.z);
@@ -337,10 +339,7 @@ ooSgSceneDraw(OOscene *sc)
     // Render subscenes
     for (size_t i = 0 ; i < sc->scenes.length ; i ++) {
       OOscene *subScene = sc->scenes.elems[i];
-      glPushMatrix();
-      glScalef(subScene->s, subScene->s, subScene->s);
       ooSgSceneDraw(subScene);
-      glPopMatrix();
     }
 
     // Pop scene transform
@@ -375,15 +374,15 @@ ooSgPaint(OOscenegraph *sg)
   // Compute sky rotation
   OOscene *sc = sg->currentCam->scene->parent;
 
-  quaternion_t q;
+  quaternion_t q, q0;
   ooSgCamRotate(sg->currentCam);
   if (sg->currentCam->kind == OOCam_Free) {
-    q = ((OOfreecam*)(sg->currentCam->camData))->q;
+    q0 = ((OOfreecam*)(sg->currentCam->camData))->q;
   } else {
-    q = q_rot(0.0, 1.0, 0.0, 0.0);
+    q0 = q_rot(0.0, 1.0, 0.0, 0.0);
   }
 
-  q = q_mul(q, sg->currentCam->scene->q);
+  q = q_mul(q0, sg->currentCam->scene->q);
 
   while (sc) {
     q = q_mul(q, sc->q);
@@ -403,9 +402,15 @@ ooSgPaint(OOscenegraph *sg)
     ooLogTrace("draw overlay %d", i);
     ooSgDrawOverlay(sg->overlays.elems[i]);
   }
+  
   // Now, in order to suport grand scales, we draw the scene with the current
   // camera (this will recursivly draw it's child scenes)
+  q_m_convert(&m, q0);
+  glPushMatrix();
+  glMultMatrixf((GLfloat*)&m);
+  
   ooSgCamMove(sg->currentCam);
+  
   ooSgSceneDraw(sg->currentCam->scene);
 
   // At this point we have not drawn the parent scene, so we start go upwards
@@ -419,12 +424,12 @@ ooSgPaint(OOscenegraph *sg)
   while (sc) {
     // Note that for each step we do here we must adjust the scales
     // appropriatelly
-
     glScalef(prev->si, prev->si, prev->si);
+    glTranslatef(prev->t.x, prev->t.y, prev->t.z);
 
     for (size_t i = 0; i < sc->scenes.length ; i ++) {
       if (sc->scenes.elems[i] != prev) { // only draw non drawn scenes
-        //ooSgSceneDraw(sc->scenes.elems[i]);
+        ooSgSceneDraw(sc->scenes.elems[i]);
       }
     }
 
@@ -432,6 +437,7 @@ ooSgPaint(OOscenegraph *sg)
     prev = sc;
     sc = sc->parent;
   }
+  glPopMatrix();
 }
 
 
@@ -520,7 +526,15 @@ ooSgDrawSphere(OOsphere *sp)
 {
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, sp->texId);    
-  gluSphere(sp->quadratic, sp->radius, 64, 64);
+    
+//  glMatrixMode(GL_MODELVIEW);
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CCW);
+  
+  gluSphere(sp->quadratic, sp->radius, 128, 128);
+
+  glMatrixMode(GL_MODELVIEW);
+
 }
 
 OOdrawable*
@@ -531,9 +545,10 @@ ooSgNewSphere(const char *name, float radius, const char *tex)
   ooTexLoad(tex, tex);
   sp->texId = ooTexNum(tex);
   sp->quadratic = gluNewQuadric();
+  gluQuadricOrientation(sp->quadratic, GLU_OUTSIDE);
   gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
   gluQuadricTexture(sp->quadratic, GL_TRUE);
-  
+  gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
   return ooSgNewDrawable(name, sp, (OOdrawfunc) ooSgDrawSphere);
 }
 

@@ -113,7 +113,7 @@ ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
   ((OOfreecam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
 
   ((OOfreecam*)cam->camData)->dp = v_set(0.0,0.0,0.0,1.0f);
-  ((OOfreecam*)cam->camData)->dq = q_rot(rx,ry,rz, 0.0001f);
+  ((OOfreecam*)cam->camData)->dq = q_rot(rx,ry,rz, -0.001f);
 
   ooObjVecPush(&sg->cams, cam);
   return cam;
