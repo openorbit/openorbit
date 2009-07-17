@@ -29,6 +29,7 @@ typedef struct {
     GLint width, height;
     GLuint texId;
     GLenum texType;
+    GLint bytesPerTex;
     void *data;
 } OOtexture;
 

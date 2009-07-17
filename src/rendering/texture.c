@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2009 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -26,7 +26,7 @@
 
 #include "log.h"
 #include "texture.h"
-#include "parsers/tga.h"
+#include "parsers/image.h"
 
 #include "res-manager.h"
 
@@ -45,48 +45,60 @@ ooTexLoad(const char *key, const char *name)
         ooLogWarn("Tried to load texture '%s' which is already loaded", key);
         return -1;
     }
-    FILE *fp = ooResGetFile(name);
-    if (fp == NULL) return -1;
+    char *fname = ooResGetPath(name);
+    if (fname == NULL) return -1;
 
-    tga_image_t img;
-    
+    image_t img;
+
     OOtexture *tex = malloc(sizeof(OOtexture));
-    if (tex == NULL) return -1;
-    
-    int res = tga_read_file(&img, fp); 
-    if (res != 0) return -1;
-    
-    
-    if ((img.header.img_spec.depth == 32) && (img.header.img_spec.alpha_bits == 8)) {
-        tex->texType = GL_BGRA;
-    } else if ((img.header.img_spec.depth == 24) && (img.header.img_spec.alpha_bits == 0)) {
-        tex->texType = GL_BGR;
+    if (tex == NULL) {free(fname); return -1;}
+
+    int res = img_load(&img, fname); 
+    if (res != 0) {free(fname);free(tex);return -1;}
+
+    switch (img.kind) {
+    case IMG_BGRA:
+      tex->texType = GL_BGRA;
+      tex->bytesPerTex = 4;
+      break;
+    case IMG_BGR:
+      tex->texType = GL_BGR;
+      tex->bytesPerTex = 3;
+      break;
+    case IMG_RGB:
+      tex->texType = GL_RGB;
+      tex->bytesPerTex = 3;
+      break;
+    case IMG_RGBA:
+      tex->texType = GL_RGBA;
+      tex->bytesPerTex = 4;
+      break;
+    default:
+      assert(0 && "invalid case");
     }
-    
-    tex->width = img.header.img_spec.width;
-    tex->height = img.header.img_spec.height;
+
+    tex->width = img.w;
+    tex->height = img.h;
     tex->data = img.data;
+
     glEnable(GL_TEXTURE_2D);
     glGenTextures(1, &tex->texId);
-    
+
     glBindTexture(GL_TEXTURE_2D, tex->texId); 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    
-    if (tex->texType == GL_BGR) {
-        glTexImage2D(GL_TEXTURE_2D, 0, 3, tex->width, tex->height, 0, GL_BGR,
-                     GL_UNSIGNED_BYTE, tex->data);
-    } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, 4, tex->width, tex->height, 0, GL_BGRA,
-                     GL_UNSIGNED_BYTE, tex->data);
-    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, tex->bytesPerTex, tex->width, tex->height,
+                 0, tex->texType, GL_UNSIGNED_BYTE, tex->data);
+
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                     GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
                     GL_NEAREST);
-    
+
     hashtable_insert(gOOtexDict, key, tex);
+    free(fname);
     return 0;
 }
 

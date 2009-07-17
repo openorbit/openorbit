@@ -5,7 +5,7 @@
 
 set( lex_files ) # set to the base name of any lexfiles that shall be built here
 set( lex_c_files ) # make sure that this is empty
-set( parser_src tga.c png.c hrml.c)
+set( parser_src tga.c png.c jpg.c image.c hrml.c)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
