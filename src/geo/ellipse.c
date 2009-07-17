@@ -19,9 +19,20 @@
 
 #include <stdlib.h>
 #include <math.h>
-
+#include "SDL_opengl.h"
 #include "ellipse.h"
 #include "../log.h"
+
+void
+ooGeoEllipseDraw(OOellipse *e)
+{
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 4*sizeof(float), e->vec.elems);
+  glColor3f(1.0, 0.0, 0.0);
+  glDrawArrays(GL_LINE_LOOP, 0,  e->vec.length);
+  glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 
 void
 ooVecArrayInit(OOvecarray *vec)

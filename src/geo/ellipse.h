@@ -67,5 +67,7 @@ static inline double ooGeoComputeSemiMinor(double semiMajor, double ecc)
   return semiMajor * sqrt(1 - ecc * ecc);
 }
 
+void ooGeoEllipseDraw(OOellipse *e);
+
 #endif /* end of include guard: ELLIPSE_H_1304815C */
 
