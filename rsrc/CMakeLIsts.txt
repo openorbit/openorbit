@@ -2,7 +2,11 @@
 
 # Textures
 file(GLOB ORBIT_RES_TEX_LOCAL "textures/*.tga")
-set(ORBIT_RES_TEX ${ORBIT_RES_TEX_LOCAL} PARENT_SCOPE)
+file(GLOB ORBIT_RES_TEX_JPG_LOCAL "textures/*.jpg")
+file(GLOB ORBIT_RES_TEX_PNG_LOCAL "textures/*.png")
+set(ORBIT_RES_TEX
+    ${ORBIT_RES_TEX_LOCAL} ${ORBIT_RES_TEX_JPG_LOCAL} ${ORBIT_RES_TEX_PNG_LOCAL}
+    PARENT_SCOPE)
 set_source_files_properties(${ORBIT_RES_TEX}
                             PROPERTIES
                             MACOSX_PACKAGE_LOCATION Resources/textures)
