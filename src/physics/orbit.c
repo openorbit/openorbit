@@ -298,7 +298,7 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
          declin;
   const char *tex = NULL;
   HRMLobject *sats = NULL;
-  
+
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
     if (!strcmp(child->name, "physical")) {
       for (HRMLobject *phys = child->children; phys != NULL; phys = phys->next) {
@@ -346,15 +346,15 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
       sats = child;
     }
   }
-  
+
   OOscene *sc = ooSgNewScene(parentScene, planetName.u.str/*(planetName)*/);
   // Create scene object for planet
-  
-  
+
+
   //ooSgSetObjectAngularSpeed(drawable, )
   // Period will be in years assuming that semiMajor is in au
   double period = comp_orbital_period_for_planet(semiMajor);
-  
+
   OOorbsys *sys = ooOrbitNewSys(planetName.u.str, sc,
                                 mass, period, 1.0,//float period,
                                 semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc));
@@ -371,8 +371,12 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
                                    q.x, q.y, q.z, q.w,
                                    qr.x, qr.y, qr.z, qr.w);
 
+  // For now we just set the scale like the parent is in au and this scene in m
+  // this should be taken from the hrml file though...
   sys->scale.dist = 149598000000.0;
   sys->scale.distInv = 1.0/149598000000.0;
+  ooSgSetSceneScale(sc, 149598000000.0); // AU in m (always relative to parent)
+
   return sys;
 }
 
@@ -403,7 +407,7 @@ ooOrbitLoadStar(HRMLobject *obj)
   HRMLvalue starName = hrmlGetAttrForName(obj, "name");
   double mass = 0.0;
   double radius, siderealPeriod;
-
+  const char *tex = NULL;
   OOscene *sc = ooSgNewScene(NULL, starName.u.str);
 
   OOorbsys *sys = ooOrbitNewRootSys(starName.u.str, sc,
@@ -425,21 +429,38 @@ ooOrbitLoadStar(HRMLobject *obj)
       }
     } else if (!strcmp(child->name, "rendering")) {
       for (HRMLobject *rend = child->children; rend != NULL; rend = rend->next) {
-        if (!strcmp(rend->name, "texture")) {
-        
+        if (!strcmp(rend->name, "model")) {
+
+        } else if (!strcmp(rend->name, "texture")) {
+          tex = hrmlGetStr(rend);
         }
       }
     }
   }
-  
+
 
   sys->phys.param.m = mass;
   sys->scale.dist = 1.0;
   sys->scale.distInv = 1.0;
-  
+
   assert(sats != NULL);
   ooOrbitLoadSatellites(sats, sys, sc);
-  
+
+  OOdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
+  ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
+  ooSgSetObjectScale(drawable, 1.0/149598000000.0); // Adjust to m in au context
+  quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
+  quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(1.0)); // TODO: real rot
+
+  OOorbobj *orbObj = ooOrbitNewObj(sys, starName.u.str, drawable,
+                                   mass,
+                                   0.0, 0.0, 0.0,
+                                   0.0, 0.0, 0.0,
+                                   q.x, q.y, q.z, q.w,
+                                   qr.x, qr.y, qr.z, qr.w);
+
+  ooSgSetSceneScale(sc, 1.0); // AU in m (always relative to parent)
+
   return sys;
 }
 

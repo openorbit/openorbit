@@ -189,7 +189,7 @@ ooSgNewScene(OOscene *parent, const char *name)
 }
 
 void
-ooSgSceneAddChild(OOscene *parent, OOscene *child)
+ooSgSceneAddChild(OOscene * restrict parent, OOscene * restrict child)
 {
   assert(parent != NULL);
   assert(child != NULL);
@@ -298,39 +298,45 @@ ooSgSceneSetScale(OOscene *sc, float s)
   sc->si = 1.0f / s;
 }
 void
-ooSgSceneDraw(OOscene *sc)
+ooSgSceneDraw(OOscene *sc, bool recurse)
 {
-    assert(sc != NULL);
-    ooLogTrace("drawing scene %s at %vf", sc->name, sc->t.v);
+  assert(sc != NULL);
+  ooLogTrace("drawing scene %s at %vf", sc->name, sc->t.v);
 
-    glDepthFunc(GL_LEQUAL);
+  glDepthFunc(GL_LEQUAL);
 
-    // Apply scene transforms
+  // Apply scene transforms
+  glPushMatrix();
+  glTranslatef(sc->t.x, sc->t.y, sc->t.z);
+
+  // Render objects
+  for (size_t i = 0 ; i < sc->objs.length ; i ++) {
+    OOdrawable *obj = sc->objs.elems[i];
+    ooLogTrace("drawing object %s", obj->name);
     glPushMatrix();
-    glTranslatef(sc->t.x, sc->t.y, sc->t.z);
+    glTranslatef(obj->p.x, obj->p.y, obj->p.z);
+    matrix_t m;
+    q_m_convert(&m, obj->q);
+    glMultMatrixf((GLfloat*)&m);
+    glScalef(obj->s, obj->s, obj->s);
+    obj->draw(obj->obj);
+    glPopMatrix();
+  }
 
-    // Render objects
-    for (size_t i = 0 ; i < sc->objs.length ; i ++) {
-      OOdrawable *obj = sc->objs.elems[i];
-      ooLogTrace("drawing object %s", obj->name);
-      glPushMatrix();
-      glTranslatef(obj->p.x, obj->p.y, obj->p.z);
-      matrix_t m;
-      q_m_convert(&m, obj->q);
-      glMultMatrixf((GLfloat*)&m);
-      glScalef(obj->s, obj->s, obj->s);
-      obj->draw(obj->obj);
-      glPopMatrix();
-    }
-
+  if (recurse) {
     // Render subscenes
     for (size_t i = 0 ; i < sc->scenes.length ; i ++) {
       OOscene *subScene = sc->scenes.elems[i];
-      ooSgSceneDraw(subScene);
-    }
 
-    // Pop scene transform
-    glPopMatrix();
+      glPushMatrix();
+      glScalef(subScene->s, subScene->s, subScene->s);
+      
+      ooSgSceneDraw(subScene, true);
+      glPopMatrix();
+    }
+  }
+  // Pop scene transform
+  glPopMatrix();
 }
 
 
@@ -389,16 +395,15 @@ ooSgPaint(OOscenegraph *sg)
     ooLogTrace("draw overlay %d", i);
     ooSgDrawOverlay(sg->overlays.elems[i]);
   }
-  
+
   // Now, in order to suport grand scales, we draw the scene with the current
   // camera (this will recursivly draw it's child scenes)
   q_m_convert(&m, q0);
   glPushMatrix();
   glMultMatrixf((GLfloat*)&m);
-  
+
   ooSgCamMove(sg->currentCam);
-  
-  ooSgSceneDraw(sg->currentCam->scene);
+  ooSgSceneDraw(sg->currentCam->scene, true);
 
   // At this point we have not drawn the parent scene, so we start go upwards
   // in the scenegraph now and apply the scales. Note that the SG is a tree
@@ -411,15 +416,20 @@ ooSgPaint(OOscenegraph *sg)
   while (sc) {
     // Note that for each step we do here we must adjust the scales
     // appropriatelly
-    glScalef(prev->si, prev->si, prev->si);
+    glScalef(prev->s, prev->s, prev->s);
     glTranslatef(prev->t.x, prev->t.y, prev->t.z);
 
     for (size_t i = 0; i < sc->scenes.length ; i ++) {
       if (sc->scenes.elems[i] != prev) { // only draw non drawn scenes
-        ooSgSceneDraw(sc->scenes.elems[i]);
+        glPushMatrix();
+        OOscene *subScene = sc->scenes.elems[i];
+        glScalef(subScene->si, subScene->si, subScene->si);
+        ooSgSceneDraw(subScene, true);
+        glPopMatrix();
       }
     }
 
+    ooSgSceneDraw(sc, false);
     // go up in the tree
     prev = sc;
     sc = sc->parent;
