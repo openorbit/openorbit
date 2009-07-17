@@ -38,11 +38,9 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
   
   if ((infile = fopen(filename, "rb")) == NULL) {
     fprintf(stderr, "can't open %s\n", filename);
-    return 0;
+    return -1;
   }
   cinfo.err = jpeg_std_error(&jerr);
-  jpeg_destroy_decompress(&cinfo);
-  
   
   jpeg_create_decompress(&cinfo);
   jpeg_stdio_src(&cinfo, infile);
@@ -59,12 +57,14 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
     lines[i] = img->data + i * cinfo.output_width * cinfo.output_components;
   }
 
-  (void) jpeg_read_scanlines(&cinfo, lines, cinfo.output_height);
+  int i = 0;
+  while (jpeg_read_scanlines(&cinfo, &lines[i], 1)) i ++;
+
   assert(cinfo.output_scanline == cinfo.output_height);
-  
+
   (void) jpeg_finish_decompress(&cinfo);
   jpeg_destroy_decompress(&cinfo);
   fclose(infile);
-  
-  return 1;
+
+  return 0;
 }
