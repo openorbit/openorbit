@@ -329,7 +329,7 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
       OOscene *subScene = sc->scenes.elems[i];
 
       glPushMatrix();
-      glScalef(subScene->s, subScene->s, subScene->s);
+      glScalef(subScene->si, subScene->si, subScene->si);
       
       ooSgSceneDraw(subScene, true);
       glPopMatrix();

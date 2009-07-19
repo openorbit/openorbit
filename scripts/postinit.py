@@ -33,8 +33,10 @@ osys = ooscript.OrbitSys().new(sgr, "data/solsystem.hrml")
 ooscript.setOrbSys(osys)
 
 cam = ooscript.FreeCam()
-cam.setParams(sgr, sgr.getScene("Sol/Earth"),
+cam.setParams(sgr, sgr.getScene("Sol/Earth/Luna"),
               #6.96e8 + 1500000.0,
-              6.37e6 + 15000000.0,
-              0.0, 0.0, 0.0, 1.0, 0.0)
+              #6.37e6 + 15000000.0,
+              1.74e6 + 100.0,
+              0.0, 0.0,
+              0.0, 1.0, 0.0)
 sgr.setCam(cam)

@@ -8,7 +8,7 @@ openorbit {
     }
     rendering {
        model: "sphere"; # Special keys are sphere
-       texture: "tex/sol.tga";
+       texture: "tex/sun.jpg";
     }
     satellites {
       planet (name: Mercury) {
@@ -75,7 +75,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "tex/venus.tga";
+          texture: "tex/venus.jpg";
         }
       }
       planet (name: Earth) {
@@ -109,7 +109,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "tex/earth.tga";
+          texture: "tex/land_ocean_ice_cloud_2048.jpg";
         }
         satellites {
           moon (name: Luna) {
@@ -119,11 +119,19 @@ openorbit {
               sidereal-rotational-period: 27.321582 days;
               axial-tilt: 1.5424 deg; // To ecliptic, 6.687 to orbital plane
             }
-//          orbit {
-//          }
+            orbit {
+              semimajor-axis: 1384399000.0 m;
+              eccentricity: 0.0549;
+              inclination: 5.145 deg; // 18.29 - 28.58 to earth equator
+              longitude-ascending-node: -11.26064 deg;
+              longitude-perihelion: 0.0 deg; //TODO: unknown
+              mean-longitude: 0.0 deg;//TODO: unknown
+              right-ascension:  0.00 deg; //TODO: unknown
+              declination    : 90.00 deg; //TODO: unknown
+            }
             rendering {
               model: "sphere";
-              texture: "tex/luna.tga";
+              texture: "tex/moonmap4k.jpg";
             }
           }
         }

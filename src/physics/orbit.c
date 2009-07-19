@@ -261,6 +261,7 @@ ooOrbitSetConstant(OOorbsys *sys, const char *key, float k)
     }
 }
 
+void ooOrbitLoadSatellites(HRMLobject *obj, OOorbsys *sys, OOscene *parentScene);
 
 void
 ooOrbitLoadComet(HRMLobject *obj)
@@ -273,15 +274,99 @@ ooOrbitLoadComet(HRMLobject *obj)
   }
 }
 
-void
-ooOrbitLoadMoon(HRMLobject *obj)
+OOorbsys*
+ooOrbitLoadMoon(HRMLobject *obj, OOscene *parentScene)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
 
-  for (HRMLobject *child = obj->children; child != NULL; child = child->next) {
+  HRMLvalue moonName = hrmlGetAttrForName(obj, "name");
 
+  double mass, radius, siderealPeriod;
+  double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong, rightAsc,
+         declin;
+  const char *tex = NULL;
+  HRMLobject *sats = NULL;
+
+  for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
+    if (!strcmp(child->name, "physical")) {
+      for (HRMLobject *phys = child->children; phys != NULL; phys = phys->next) {
+        if (!strcmp(phys->name, "mass")) {
+          mass = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "radius")) {
+          radius = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "sidereal-rotational-period")) {
+          siderealPeriod = hrmlGetReal(phys);
+        }
+      }
+    } else if (!strcmp(child->name, "orbit")) {
+      for (HRMLobject *orbit = child->children; orbit != NULL; orbit = orbit->next) {
+        if (!strcmp(orbit->name, "semimajor-axis")) {
+          semiMajor = hrmlGetReal(orbit);
+        } else if (!strcmp(orbit->name, "eccentricity")) {
+          ecc = hrmlGetReal(orbit);
+        } else if (!strcmp(orbit->name, "inclination")) {
+          inc = hrmlGetReal(orbit);
+        } else if (!strcmp(orbit->name, "longitude-ascending-node")) {
+          longAscNode = hrmlGetReal(orbit);
+        } else if (!strcmp(orbit->name, "longitude-perihelion")) {
+          longPerihel = hrmlGetReal(orbit);
+        } else if (!strcmp(orbit->name, "mean-longitude")) {
+          meanLong = hrmlGetReal(orbit);
+        } else if (!strcmp(orbit->name, "right-ascension")) {
+          rightAsc = hrmlGetReal(orbit);
+        } else if (!strcmp(orbit->name, "declination")) {
+          declin = hrmlGetReal(orbit);
+        } else if (!strcmp(orbit->name, "reference-date")) {
+
+        }
+      }
+    } else if (!strcmp(child->name, "atmosphere")) {
+
+    } else if (!strcmp(child->name, "rendering")) {
+      for (HRMLobject *rend = child->children; rend != NULL; rend = rend->next) {
+        if (!strcmp(rend->name, "model")) {
+
+        } else if (!strcmp(rend->name, "texture")) {
+          tex = hrmlGetStr(rend);
+        }
+      }
+    } else if (!strcmp(child->name, "sattelites")) {
+      sats = child;
+    }
   }
+
+  OOscene *sc = ooSgNewScene(parentScene, moonName.u.str/*(planetName)*/);
+  // Create scene object for planet
+
+
+  //ooSgSetObjectAngularSpeed(drawable, )
+  // Period will be in years assuming that semiMajor is in au
+  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
+
+  OOorbsys *sys = ooOrbitNewSys(moonName.u.str, sc,
+                                mass, period, 1.0,//float period,
+                                semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc));
+
+  OOdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
+  ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
+  quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
+  quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(1.0)); // TODO: real rot
+
+  OOorbobj *orbObj = ooOrbitNewObj(sys, moonName.u.str, drawable,
+                                   mass,
+                                   0.0, 0.0, 0.0,
+                                   0.0, 0.0, 0.0,
+                                   q.x, q.y, q.z, q.w,
+                                   qr.x, qr.y, qr.z, qr.w);
+
+  // For now we just set the scale like the parent is in au and this scene in m
+  // this should be taken from the hrml file though...
+  sys->scale.dist = 1.0;
+  sys->scale.distInv = 1.0;
+  ooSgSetSceneScale(sc, 1.0);
+
+  return sys;
 }
 
 
@@ -342,7 +427,7 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
           tex = hrmlGetStr(rend);
         }
       }
-    } else if (!strcmp(child->name, "sattelites")) {
+    } else if (!strcmp(child->name, "satellites")) {
       sats = child;
     }
   }
@@ -377,6 +462,10 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
   sys->scale.distInv = 1.0/149598000000.0;
   ooSgSetSceneScale(sc, 149598000000.0); // AU in m (always relative to parent)
 
+  if (sats) {
+    ooOrbitLoadSatellites(sats, sys, sc);
+  }
+
   return sys;
 }
 
@@ -391,7 +480,8 @@ ooOrbitLoadSatellites(HRMLobject *obj, OOorbsys *sys, OOscene *parentScene)
       OOorbsys *psys = ooOrbitLoadPlanet(child, parentScene);
       ooOrbitAddChildSys(sys, psys);
     } else if (!strcmp(child->name, "moon")) {
-      ooOrbitLoadMoon(child);
+      OOorbsys *msys = ooOrbitLoadMoon(child, parentScene);
+      ooOrbitAddChildSys(sys, msys);      
     } else if (!strcmp(child->name, "comet")) {
 
     }
