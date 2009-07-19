@@ -23,7 +23,8 @@
 #include <stdint.h>
 
 typedef enum jpg_kind_t {
-  JPG_RGB
+  JPG_RGB,
+  JPG_GRAY
 } jpg_kind_t;
 
 typedef struct jpg_image_t {

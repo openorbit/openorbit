@@ -88,6 +88,10 @@ img_load(image_t * restrict img, const char * restrict fileName)
         case JPG_RGB:
           img->kind = IMG_RGB;
           break;
+        case JPG_GRAY:
+          img->kind = IMG_GRAY8;
+          fprintf(stderr, "set img to gray8\n");
+          break;
         default:
           assert(0 && "invalid case");
         }

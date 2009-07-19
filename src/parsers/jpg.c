@@ -48,8 +48,16 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
   (void) jpeg_start_decompress(&cinfo);
   img->w = cinfo.output_width;
   img->h = cinfo.output_height;
-  img->kind = JPG_RGB;
-  assert(cinfo.output_components == 3);
+  if (cinfo.output_components == 3) {
+    img->kind = JPG_RGB;
+    fprintf(stderr, "loading colour jpg %s\n", filename);
+  } else if (cinfo.output_components == 1) {
+    img->kind = JPG_GRAY;
+    fprintf(stderr, "loading grayscale jpg %s\n", filename);
+  } else {
+    assert(0 && "no support for non RGB or GRAYSCALE jpgs");
+  }
+  
   img->data = malloc(cinfo.output_width * cinfo.output_height *
                      cinfo.output_components);
   uint8_t *lines[cinfo.output_height];

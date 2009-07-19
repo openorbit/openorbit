@@ -73,6 +73,10 @@ ooTexLoad(const char *key, const char *name)
       tex->texType = GL_RGBA;
       tex->bytesPerTex = 4;
       break;
+    case IMG_GRAY8:
+      tex->texType = GL_LUMINANCE;
+      tex->bytesPerTex = 1;
+      break;
     default:
       assert(0 && "invalid case");
     }
