@@ -60,14 +60,11 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
   
   img->data = malloc(cinfo.output_width * cinfo.output_height *
                      cinfo.output_components);
-  uint8_t *lines[cinfo.output_height];
+  uint8_t *line;
   for (int i = 0 ; i < cinfo.output_height; i ++) {
-    lines[i] = img->data + i * cinfo.output_width * cinfo.output_components;
+    line = img->data + i * cinfo.output_width * cinfo.output_components;
+    jpeg_read_scanlines(&cinfo, &line, 1);
   }
-
-  int i = 0;
-  while (jpeg_read_scanlines(&cinfo, &lines[i], 1)) i ++;
-
   assert(cinfo.output_scanline == cinfo.output_height);
 
   (void) jpeg_finish_decompress(&cinfo);
