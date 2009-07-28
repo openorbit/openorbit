@@ -26,8 +26,10 @@ extern "C" {
 
 #include <stdbool.h>
 
-bool init_renderer(void);
-void render_scene(void);
+void ooInitGlAttributes(void);
+void ooSetPerspective(float fovy, int width, int height);
+void ooSetVideoDefaults(void);
+void ooResizeScreen(int width, int height, bool fullscreen);
 
 #ifdef __cplusplus
 }

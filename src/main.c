@@ -102,7 +102,7 @@ main_loop(void)
   int done = 0;
   SDL_AddTimer(SIM_STEP_PERIOD, sim_step_event, NULL);
   SDL_AddTimer(1000, fps_event, NULL);
-        
+
   while ( !done ) {
   /* Check for events, will do the initial io-decoding */
     while ( SDL_PollEvent (&event) ) {
@@ -130,10 +130,18 @@ main_loop(void)
         break;
       case SDL_JOYAXISMOTION:
       case SDL_JOYBALLMOTION:
+        break; // Skip axis motions, we poll these every sim step
       case SDL_JOYHATMOTION:
       case SDL_JOYBUTTONDOWN:
       case SDL_JOYBUTTONUP:
+        break;
       case SDL_VIDEORESIZE:
+        {
+          bool fullscreen;
+          ooConfGetBoolDef("openorbit/video/fullscreen", &fullscreen, false);
+          ooResizeScreen(event.resize.w, event.resize.h, fullscreen);
+        }
+        break;
       case SDL_VIDEOEXPOSE:
         break;
       case SDL_USEREVENT:
@@ -206,15 +214,15 @@ main(int argc, char*argv[])
   }
 
   // Init GL state
-  init_renderer();
+  ooSetVideoDefaults();
+
+  ooTexInit(); // Requires that GL has been initialised
 
   if (!ooScriptingRunFile("script/postinit.py")) {
     ooLogFatal("script/postinit.py missing");
   }
 
-
   atexit(SDL_Quit);
-
 
   // Draw, get events...
   main_loop();
