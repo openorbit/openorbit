@@ -97,11 +97,16 @@ static void
 main_loop(void)
 {
   extern SIMstate gSIM_state;
+  float freq;
+  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
+  float period = 1.0 / freq; // Period in s
+  Uint32 interv = (Uint32) (period * 1000.0); // SDL wants time in ms
   SDL_Event event;
   const char *evName;
   int done = 0;
-  SDL_AddTimer(SIM_STEP_PERIOD, sim_step_event, NULL);
+  SDL_AddTimer(interv, sim_step_event, NULL);
   SDL_AddTimer(1000, fps_event, NULL);
+
 
   while ( !done ) {
   /* Check for events, will do the initial io-decoding */
@@ -147,7 +152,7 @@ main_loop(void)
       case SDL_USEREVENT:
         switch (event.user.code) {
         case SIM_STEP_EVENT: // this event will make a time step
-          ooSimStep(0.05);
+          ooSimStep(period);
           break;
         case SIM_DEBUG_EVENT: // display console?
           break;

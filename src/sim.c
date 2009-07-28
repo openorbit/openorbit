@@ -28,11 +28,12 @@
 
 #include "physics/orbit.h"
 #include "rendering/planet.h"
+#include "settings.h"
 
 #include "log.h"
 // epoch = ???
 
-SIMstate gSIM_state = {NULL, 0.05, NULL, NULL, NULL};
+SIMstate gSIM_state = {NULL, 0.0, NULL, NULL, NULL};
 
 void
 ooSimInit(void) {
@@ -52,6 +53,10 @@ ooSimInit(void) {
   tm.tm_gmtoff = 0;
   time_t unixJ2000Epoch = timegm(&tm);
   gSIM_state.timeState = ooSimTimeInit(unixJ2000Epoch);
+
+  float freq;
+  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
+  gSIM_state.stepSize = 1.0 / freq; // Period in s
 }
 
 
@@ -78,6 +83,8 @@ ooSimStep(float dt)
   struct timeval start;
   struct timeval end;
   gettimeofday(&start, NULL);
+
+  ooSgCamStep(gSIM_state.sg->currentCam, dt);
 
   ooOrbitClear(gSIM_state.orbSys);
   ooOrbitStep(gSIM_state.orbSys, dt);
