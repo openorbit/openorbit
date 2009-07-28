@@ -307,7 +307,6 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
 
   // Apply scene transforms
   glPushMatrix();
-  glTranslatef(sc->t.x, sc->t.y, sc->t.z);
 
   // Render objects
   for (size_t i = 0 ; i < sc->objs.length ; i ++) {
@@ -319,6 +318,7 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
     q_m_convert(&m, obj->q);
     glMultMatrixf((GLfloat*)&m);
     glScalef(obj->s, obj->s, obj->s);
+
     obj->draw(obj->obj);
     glPopMatrix();
   }
@@ -330,6 +330,7 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
 
       glPushMatrix();
       glScalef(subScene->si, subScene->si, subScene->si);
+      glTranslatef(subScene->t.x, subScene->t.y, subScene->t.z);
       
       ooSgSceneDraw(subScene, true);
       glPopMatrix();
@@ -414,16 +415,19 @@ ooSgPaint(OOscenegraph *sg)
   OOscene *prev = sg->currentCam->scene;
 
   while (sc) {
+    glScalef(prev->s, prev->s, prev->s);
+     // Invert translation as we are going up in hierarchy
+    glTranslatef(-prev->t.x, -prev->t.y, -prev->t.z);
+    
     // Note that for each step we do here we must adjust the scales
     // appropriatelly
-    glScalef(prev->s, prev->s, prev->s);
-    glTranslatef(prev->t.x, prev->t.y, prev->t.z);
-
     for (size_t i = 0; i < sc->scenes.length ; i ++) {
       if (sc->scenes.elems[i] != prev) { // only draw non drawn scenes
         glPushMatrix();
         OOscene *subScene = sc->scenes.elems[i];
         glScalef(subScene->si, subScene->si, subScene->si);
+        glTranslatef(subScene->t.x, subScene->t.y, subScene->t.z);
+        
         ooSgSceneDraw(subScene, true);
         glPopMatrix();
       }
