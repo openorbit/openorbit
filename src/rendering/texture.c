@@ -91,15 +91,26 @@ ooTexLoad(const char *key, const char *name)
     glBindTexture(GL_TEXTURE_2D, tex->texId); 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, tex->bytesPerTex, tex->width, tex->height,
-                 0, tex->texType, GL_UNSIGNED_BYTE, tex->data);
+    //glTexImage2D(GL_TEXTURE_2D, 0, tex->bytesPerTex, tex->width, tex->height,
+    //             0, tex->texType, GL_UNSIGNED_BYTE, tex->data);
+    GLint err;
+    if (err = gluBuild2DMipmaps(GL_TEXTURE_2D,
+                                tex->bytesPerTex,
+                                tex->width, tex->height,
+                                tex->texType,
+                                GL_UNSIGNED_BYTE,
+                                tex->data) )
+    {
+      ooLogFatal("failed mipmap generation %s", gluErrorString(err));
+    }
 
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                    GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-                    GL_NEAREST);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                    GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+                    GL_LINEAR_MIPMAP_LINEAR);
 
     hashtable_insert(gOOtexDict, key, tex);
     free(fname);
