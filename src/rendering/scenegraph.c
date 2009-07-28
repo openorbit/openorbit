@@ -365,28 +365,10 @@ ooSgPaint(OOscenegraph *sg)
   glLoadIdentity();
 
 
-  // Compute sky rotation
   OOscene *sc = sg->currentCam->scene->parent;
 
-  quaternion_t q, q0;
-  ooSgCamRotate(sg->currentCam);
-  if (sg->currentCam->kind == OOCam_Free) {
-    q0 = ((OOfreecam*)(sg->currentCam->camData))->q;
-  } else {
-    q0 = q_rot(0.0, 1.0, 0.0, 0.0);
-  }
-
-  q = q_mul(q0, sg->currentCam->scene->q);
-
-  while (sc) {
-    q = q_mul(q, sc->q);
-    sc = sc->parent;
-  }
-
-  matrix_t m;
-  q_m_convert(&m, q);
   glPushMatrix();
-  glMultMatrixf((GLfloat*)&m);
+  ooSgCamRotate(sg->currentCam);
   // Draw the sky
   sg->sky->draw(sg->sky->obj);
   glPopMatrix();
@@ -399,9 +381,7 @@ ooSgPaint(OOscenegraph *sg)
 
   // Now, in order to suport grand scales, we draw the scene with the current
   // camera (this will recursivly draw it's child scenes)
-  q_m_convert(&m, q0);
   glPushMatrix();
-  glMultMatrixf((GLfloat*)&m);
 
   ooSgCamMove(sg->currentCam);
   ooSgSceneDraw(sg->currentCam->scene, true);
@@ -427,7 +407,6 @@ ooSgPaint(OOscenegraph *sg)
         OOscene *subScene = sc->scenes.elems[i];
         glScalef(subScene->si, subScene->si, subScene->si);
         glTranslatef(subScene->t.x, subScene->t.y, subScene->t.z);
-        
         ooSgSceneDraw(subScene, true);
         glPopMatrix();
       }

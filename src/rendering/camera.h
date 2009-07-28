@@ -49,16 +49,16 @@ extern "C" {
   };
 
   struct OOfixedcam {
-      dBodyID body;
+      dBodyID body; // Camera fixed to this body
 
-      vector_t r;
-      quaternion_t q;   
+      vector_t r; // With this offset
+      quaternion_t q; // and this rotation (rotate before translation)
   };
 
   struct OOorbitcam {
-      dBodyID body;
+      dBodyID body; // Camera orbiting this body
 
-      vector_t r;
+      vector_t r; // Placed on this position (will always look at the body)
   };
 
   struct OOcam {
@@ -68,7 +68,6 @@ extern "C" {
   };
 
   void ooSgCamInit(void);
-  void ooSgCamStep(OOcam *cam);
 
   OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
                         float x, float y, float z, 
@@ -83,6 +82,7 @@ extern "C" {
 
   void ooSgCamMove(OOcam *cam);
   void ooSgCamRotate(OOcam *cam);
+  void ooSgCamStep(OOcam *cam, float dt);
 
 #ifdef __cplusplus
 }

@@ -66,7 +66,7 @@ ooSgCamInit(void)
     {"openorbit/controls/keyboard/cam-pitch-down", "cam-pitch-down", ooSgCamPitchDown},
     {"openorbit/controls/keyboard/cam-pitch-up", "cam-pitch-up", ooSgCamPitchUp}
   };
-  
+
   // Register camera actions
   for (int i = 0 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
     ooIoRegCKeyHandler(keyBindings[i].ioKey, keyBindings[i].action);        
@@ -78,13 +78,6 @@ ooSgCamInit(void)
   }
 }
 
-void
-ooSgCamStep(OOcam *cam)
-{
-  
-}
-
-
 OOcam*
 ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
                float x, float y, float z, float rx, float ry, float rz)
@@ -93,13 +86,13 @@ ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
   OOcam *cam = malloc(sizeof(OOcam));
   cam->camData = malloc(sizeof(OOfreecam));
   cam->kind = OOCam_Free;
-  
+
   cam->scene = sc;
   ((OOfreecam*)cam->camData)->p = v_set(x,y,z,1.0f);
   ((OOfreecam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
 
   ((OOfreecam*)cam->camData)->dp = v_set(0.0,0.0,0.0,1.0f);
-  ((OOfreecam*)cam->camData)->dq = q_rot(rx,ry,rz, -0.001f);
+  ((OOfreecam*)cam->camData)->dq = q_rot(rx,ry,rz, -0.01f);
 
   ooObjVecPush(&sg->cams, cam);
   return cam;
@@ -137,6 +130,8 @@ ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body, float dx, float dy,
     return cam;
 }
 
+// Only rotate, used for things like sky painting that requires camera rotation but not
+// translation
 void
 ooSgCamRotate(OOcam *cam)
 {
@@ -164,7 +159,30 @@ ooSgCamRotate(OOcam *cam)
                      ((OOfixedcam*)cam->camData)->r.z + pos[2]);
         
     }
-    
+    break;
+  case OOCam_Free:
+    {
+      quaternion_t q = ((OOfreecam*)(cam->camData))->q;
+      matrix_t m;
+      q_m_convert(&m, q);
+      glMultMatrixf((GLfloat*)&m);
+    }
+    break;
+  default:
+    assert(0 && "invalid cam type");
+  }
+}
+
+void
+ooSgCamStep(OOcam *cam, float dt)
+{
+  assert(cam != NULL && "cam not set");
+  switch (cam->kind) {
+  case OOCam_Orbit:
+    assert(0 && "not supported yet");
+    break;
+  case OOCam_Fixed:
+    assert(0 && "not supported yet");
     break;
   case OOCam_Free:
     ((OOfreecam*)cam->camData)->q = q_mul(((OOfreecam*)cam->camData)->q,
@@ -178,26 +196,29 @@ ooSgCamRotate(OOcam *cam)
 void
 ooSgCamMove(OOcam *cam)
 {
-    assert(cam != NULL && "cam not set");
+  assert(cam != NULL && "cam not set");
 //    glPushMatrix();
-    
-    switch (cam->kind) {
-    case OOCam_Orbit:
-        break;
-    case OOCam_Fixed:
-        break;
-    case OOCam_Free:
-        glTranslatef(((OOfreecam*)cam->camData)->p.x,
-                     ((OOfreecam*)cam->camData)->p.y,
-                     ((OOfreecam*)cam->camData)->p.z);
-        break;
-    default:
-        assert(0 && "illegal case statement");
+
+  switch (cam->kind) {
+  case OOCam_Orbit:
+    break;
+  case OOCam_Fixed:
+    break;
+  case OOCam_Free:
+    {
+      quaternion_t q = ((OOfreecam*)(cam->camData))->q;
+      matrix_t m;
+      q_m_convert(&m, q);
+      glMultMatrixf((GLfloat*)&m);
+      glTranslatef(((OOfreecam*)cam->camData)->p.x,
+                   ((OOfreecam*)cam->camData)->p.y,
+                   ((OOfreecam*)cam->camData)->p.z);
     }
-    
+    break;
+  default:
+      assert(0 && "illegal case statement");
+  }
 }
-
-
 
 
 #include "sim.h"
