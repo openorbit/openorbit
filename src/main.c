@@ -130,7 +130,7 @@ main_loop(void)
         if (event.key.keysym.sym == SDLK_q) done = 1; // for now dont remap q
         else {
           evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
-          ooIoDispatchKeyDown(evName, event.key.keysym.mod);
+          ooIoDispatchKeyUp(evName, event.key.keysym.mod);
         }
         break;
       case SDL_JOYAXISMOTION:
@@ -220,6 +220,7 @@ main(int argc, char*argv[])
 
   // Init GL state
   ooSetVideoDefaults();
+  ooSgCamInit();
 
   ooTexInit(); // Requires that GL has been initialised
 

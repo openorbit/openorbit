@@ -92,7 +92,7 @@ ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
   ((OOfreecam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
 
   ((OOfreecam*)cam->camData)->dp = v_set(0.0,0.0,0.0,1.0f);
-  ((OOfreecam*)cam->camData)->dq = q_rot(rx,ry,rz, -0.01f);
+  ((OOfreecam*)cam->camData)->dq = q_rot(rx,ry,rz, 0.0f);
 
   ooObjVecPush(&sg->cams, cam);
   return cam;
@@ -150,14 +150,14 @@ ooSgCamRotate(OOcam *cam)
     }
     break;
   case OOCam_Fixed:
-    assert(0 && "not supported yet");
     {
-        const dReal *pos = dBodyGetPosition(((OOfixedcam*)cam->camData)->body);
-        const dReal *rot = dBodyGetRotation(((OOfixedcam*)cam->camData)->body);
-        glTranslatef(((OOfixedcam*)cam->camData)->r.x + pos[0],
-                     ((OOfixedcam*)cam->camData)->r.y + pos[1],
-                     ((OOfixedcam*)cam->camData)->r.z + pos[2]);
-        
+      OOfixedcam* fix = cam->camData;
+      const dReal *quat = dBodyGetQuaternion(fix->body);
+      quaternion_t q = v_set(quat[1], quat[2], quat[3], quat[0]);
+      q = q_mul(q, fix->q);
+      matrix_t m;
+      q_m_convert(&m, q);
+      glMultMatrixf((GLfloat*)&m);
     }
     break;
   case OOCam_Free:
@@ -185,8 +185,10 @@ ooSgCamStep(OOcam *cam, float dt)
     assert(0 && "not supported yet");
     break;
   case OOCam_Free:
-    ((OOfreecam*)cam->camData)->q = q_mul(((OOfreecam*)cam->camData)->q,
-                                          ((OOfreecam*)cam->camData)->dq);
+    {
+      ((OOfreecam*)cam->camData)->q = q_mul(((OOfreecam*)cam->camData)->q,
+                                            ((OOfreecam*)cam->camData)->dq);
+    }
     break;
   default:
     assert(0 && "invalid cam type");
@@ -201,8 +203,24 @@ ooSgCamMove(OOcam *cam)
 
   switch (cam->kind) {
   case OOCam_Orbit:
+    {
+
+    }
     break;
   case OOCam_Fixed:
+    {
+      OOfixedcam* fix = cam->camData;
+      const dReal *pos = dBodyGetPosition(fix->body);
+      const dReal *quat = dBodyGetQuaternion(fix->body);
+      vector_t p = v_set(pos[0], pos[1], pos[2], 0.0);
+      p = v_add(p, fix->r);
+      quaternion_t q = v_set(quat[1], quat[2], quat[3], quat[0]);
+      q = q_mul(q, fix->q);
+      matrix_t m;
+      q_m_convert(&m, q);
+      glMultMatrixf((GLfloat*)&m);
+      glTranslatef(p.x, p.y, p.z);
+    }
     break;
   case OOCam_Free:
     {
@@ -230,9 +248,9 @@ ooSgCamFwd(bool up, void *data)
   if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
     OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
     if (up) {
-      //fcam->dp = v_sub(fcam->dp, );
+      fcam->dp = v_set(0.0, 0.0, -1000.0, 0.0);
     } else {
-      //fcam->dp = v_add(fcam->dp, );
+      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
     }
   }
 }
@@ -240,49 +258,137 @@ ooSgCamFwd(bool up, void *data)
 void
 ooSgCamBack(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dp = v_set(0.0, 0.0, 1000.0, 0.0);
+    } else {
+      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+    }
+  }
 }
 void
 ooSgCamLeft(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dp = v_set(-1000.0, 0.0, 0.0, 0.0);
+    } else {
+      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+    }
+  }
 }
 void
 ooSgCamRight(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dp = v_set(1000.0, 0.0, 0.0, 0.0);
+    } else {
+      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+    }
+  }
 }
 void
 ooSgCamUp(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dp = v_set(0.0, 1000.0, 0.0, 0.0);
+    } else {
+      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+    }
+  }
 }
 void
 ooSgCamDown(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dp = v_set(0.0, -1000.0, 0.0, 0.0);
+    } else {
+      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+    }
+  }
 }
 void
 ooSgCamRollLeft(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.00f);
+    } else {
+      fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.01f);
+    }
+  }
 }
 void
 ooSgCamRollRight(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.00f);
+    } else {
+      fcam->dq = q_rot(0.0f,0.0f,1.0f, -0.01f);
+    }
+  }
 }
 
 void
 ooSgCamYawLeft(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.00f);
+    } else {
+      fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.01f);
+    }
+  }
 }
 
 void
 ooSgCamYawRight(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.00f);
+    } else {
+      fcam->dq = q_rot(0.0f,1.0f,0.0f, -0.01f);
+    }
+  }
 }
 
 void
 ooSgCamPitchDown(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.00f);
+    } else {
+      fcam->dq = q_rot(1.0f,0.0f,0.0f, -0.01f);
+    }
+  }
 }
 
 
 void
 ooSgCamPitchUp(bool up, void *data)
 {
+  if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
+    OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
+    if (up) {
+      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.00f);
+    } else {
+      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.01f);
+    }
+  }
 }
