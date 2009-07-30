@@ -26,10 +26,20 @@
 #include <vmath/vmath-quaternions.h>
 #include <assert.h>
 
- scalar_t
+scalar_t
 q_scalar(const quaternion_t q)
 {
     return q.w;
+}
+
+vector_t
+v_q_rot(vector_t v, quaternion_t q)
+{
+  matrix_t m;
+  q_m_convert(&m, q);
+
+  vector_t res = m_v_mul(&m, v);
+  return res;
 }
 
 vector_t

@@ -47,6 +47,7 @@ extern "C" {
 
 
 vector_t q_vector(const quaternion_t q);
+vector_t v_q_rot(vector_t v, quaternion_t q);
 
 
 /*!
