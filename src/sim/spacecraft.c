@@ -22,11 +22,13 @@
 #include "log.h" 
 #include "sim.h"
 #include "sim/spacecraft.h"
+#include "res-manager.h"
+#include "parsers/hrml.h"
 
 extern SIMstate gSIM_state;
 
 
-OOspacecraft* ooScGetCurrent()
+OOspacecraft* ooScGetCurrent(void)
 {
   return gSIM_state.currentSc;
 }
@@ -50,13 +52,13 @@ OOspacecraft*
 ooScNew(dWorldID world, size_t stageCount)
 {
   OOspacecraft *sc = malloc(sizeof(OOspacecraft));
-  ooObjVecInit(&sc->stages);
-  sc->mainEngine = NULL;
+  //ooObjVecInit(&sc->stages);
+  //sc->mainEngine = NULL;
   sc->id = dBodyCreate(world);
   
-  for (size_t i = 0 ; i < stageCount ; i ++) {
-    ooObjVecPush(&sc->stages, ooScStageNew(world, 100.0));
-  }
+  //for (size_t i = 0 ; i < stageCount ; i ++) {
+  //  ooObjVecPush(&sc->stages, ooScStageNew(world, 100.0));
+  //}
   
   return sc;
 }
@@ -106,9 +108,9 @@ ooScAddStage(OOspacecraft *sc, OOstage *stage)
 void
 ooScDetatchStage(OOspacecraft *sc)
 {
-  OOstage *stage = ooObjVecPop(&sc->stages);
+//  OOstage *stage = ooObjVecPop(&sc->stages);
   // TODO: Insert in free object vector
-  dBodyEnable(stage->id);
+//  dBodyEnable(stage->id);
 }
  
 void
@@ -116,25 +118,54 @@ ooScStep(OOspacecraft *sc)
 {
   assert(sc != NULL);
   
-  if (sc->mainEngine) {
-    switch (sc->mainEngine->state) {
-    case OO_Engine_Disabled:
-      ooLogInfo("step on turned of engine");
-      break;
-    case OO_Engine_Enabled:
-      ooLogInfo("step on burning engine");
-      break;
-    case OO_Engine_Fault:
-      ooLogInfo("engine step on faulty engine");
-      break;
-    default:
-      assert(0 && "invalid case");
-    }
-  }
+  //if (sc->mainEngine) {
+  //  switch (sc->mainEngine->state) {
+  //  case OO_Engine_Disabled:
+  //    ooLogInfo("step on turned of engine");
+  //    break;
+  //  case OO_Engine_Enabled:
+  //    ooLogInfo("step on burning engine");
+  //    break;
+  //  case OO_Engine_Fault:
+  //    ooLogInfo("engine step on faulty engine");
+  //    break;
+  //  default:
+  //    assert(0 && "invalid case");
+  //  }
+  //}
 }
 
 void
 ooScForce(OOspacecraft *sc, v4f_t f)
 {
 //  dBodyForceRelative();
+}
+
+
+OOspacecraft*
+ooScLoad(const char *fileName)
+{
+  char *path = ooResGetPath(fileName);
+  HRMLdocument *spaceCraftDoc = hrmlParse(path);
+  free(path);
+
+  if (spaceCraftDoc == NULL) {
+    // Parser is responsible for pestering the users with errors for now.
+    return NULL;
+  }
+
+  OOspacecraft *sc = NULL;
+  HRMLobject *root = hrmlGetRoot(spaceCraftDoc);
+  HRMLvalue scName = hrmlGetAttrForName(root, "name");
+
+  for (HRMLobject *node = root; node != NULL; node = node->next) {
+    if (!strcmp(node->name, "spacecraft")) {
+      
+    }
+  }
+
+  hrmlFreeDocument(spaceCraftDoc);
+
+  ooLogInfo("loaded spacecraft %s", scName.u.str);
+  return sc;
 }

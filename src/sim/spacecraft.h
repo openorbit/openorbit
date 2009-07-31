@@ -31,10 +31,6 @@ typedef enum OOenginestate {
   OO_Engine_Fault
 } OOenginestate;
 
-typedef struct OOengine {
-  OOenginestate state;
-  v4f_t p;
-} OOengine;
 
 typedef struct OOstage {
   OOobjvector engines;
@@ -43,14 +39,23 @@ typedef struct OOstage {
 
 
 typedef struct OOspacecraft {
-  OOengine *mainEngine;
-  OOobjvector stages;
+  OOobjvector engines;
+//  OOengine *mainEngine;
+//  OOobjvector stages;
   dBodyID id;
 } OOspacecraft;
+
+typedef struct OOengine {
+  OOspacecraft *sc;
+  OOenginestate state;
+  v4f_t p;
+} OOengine;
 
 void ooScDetatchStage(OOspacecraft *sc);
 void ooScStep(OOspacecraft *sc);
 void ooScForce(OOspacecraft *sc, v4f_t f);
-OOspacecraft* ooScGetCurrent();
+OOspacecraft* ooScGetCurrent(void);
+
+OOspacecraft* ooScLoad(const char *file);
 
 #endif /* end of include guard: SPACECRAFT_H_7SCB1CH8 */
