@@ -59,7 +59,7 @@ struct OOscene {
   char *name;
 
   vector_t t;
-  quaternion_t q;
+//  quaternion_t q;
   scalar_t s; // scale with respect to parent s
   scalar_t si; // inverse of s
 

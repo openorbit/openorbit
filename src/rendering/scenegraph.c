@@ -49,10 +49,10 @@ ooSgSetSceneQuat(OOscene *sc, float x, float y, float z, float w)
 {
   assert(sc != NULL);
 
-  sc->q.x = x;
-  sc->q.y = y;
-  sc->q.z = z;
-  sc->q.w = w;
+//  sc->q.x = x;
+//  sc->q.y = y;
+//  sc->q.z = z;
+//  sc->q.w = w;
 }
 
 void
@@ -174,7 +174,7 @@ ooSgNewScene(OOscene *parent, const char *name)
   sc->name = strdup(name);
 
   sc->t = v_set(0.0, 0.0, 0.0, 0.0);
-  sc->q = q_rot(0.0, 1.0, 0.0, 0.0); // Default with 0 deg rot around y
+//  sc->q = q_rot(0.0, 1.0, 0.0, 0.0); // Default with 0 deg rot around y
   sc->s = 1.0;
   sc->si = 1.0;
 
