@@ -76,10 +76,9 @@ png_read_file(png_image_t *img, FILE *file)
   png_read_info(png_struct, png_info);
   png_get_IHDR(png_struct, png_info, &width, &height, &bit_depth, 
       &color_type, NULL, NULL, NULL);
+
   png_read_update_info(png_struct, png_info);
-  
-  
-  
+
   if (bit_depth > 8) {
     png_set_strip_16(png_struct);
   }
@@ -89,16 +88,16 @@ png_read_file(png_image_t *img, FILE *file)
   if (color_type == PNG_COLOR_TYPE_PALETTE) {
      png_set_palette_to_rgb(png_struct);
   }
-  
-  png_read_update_info(png_struct, png_info);
   rowbytes = png_get_rowbytes(png_struct, png_info);
-  
+
+//  png_read_update_info(png_struct, png_info);
+
   void *data = malloc(rowbytes * height);
   if (!data) {
     png_destroy_read_struct(&png_struct, &png_info, NULL);
     return -1;
   }
-  
+
   png_bytepp row_pointers = NULL;
   if ((row_pointers = (png_bytepp)alloca(height*sizeof(png_bytep))) == NULL) {
        png_destroy_read_struct(&png_struct, &png_info, NULL);
@@ -106,12 +105,12 @@ png_read_file(png_image_t *img, FILE *file)
        //image_data = NULL;
        return -1;
   }
-  
+
   for (int i = 0;  i < height;  ++i) {
     row_pointers[i] = data + i*rowbytes;
   }
   png_read_image(png_struct, row_pointers);
-  free(row_pointers);
+  //free(row_pointers);
   png_destroy_read_struct(&png_struct, &png_info, NULL);
   
   // Data should be in RGB, here we check whether the picture had an alpha channel
@@ -124,6 +123,6 @@ png_read_file(png_image_t *img, FILE *file)
   img->w = width;
   img->h = height;
   img->data = data;
-  
+
   return 0;
 }
