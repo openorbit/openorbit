@@ -1,0 +1,14 @@
+* Fix physics and rendering integration
+* Add system simulation for spacecrafts
+* Reorganise source
+        /cmake          Auxiliary build scripts
+        /lib            Libraries
+        /lib/imageload  Image loading library
+        /lib/modelload  3d model loading library
+        /lib/gencds     Generic DS library
+        /tools          Build tools
+        /src            main source
+        /rsrc           Resources
+        /scripts        Scripts to be included in Open Orbit
+        
+* Move physics system to be part of a more generic scale-graph, a scale graph has objects and positions relating to parent systems

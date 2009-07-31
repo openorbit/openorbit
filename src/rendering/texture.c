@@ -103,7 +103,11 @@ ooTexLoad(const char *key, const char *name)
     {
       ooLogFatal("failed mipmap generation %s", gluErrorString(err));
     }
-
+    // TODO: At the moment we keep textures in main memory, the data should be freed
+    //       since it is copied to the GPU. This is not anything special in itself, but
+    //       what are the policy supposed to be if texture is unloaded from the GPU and
+    //       then reloaded? Should it be reloaded from file or do we just keep around the
+    //       texture in memory as well?
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
