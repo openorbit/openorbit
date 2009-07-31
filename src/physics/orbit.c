@@ -116,7 +116,7 @@ ooOrbitNewObj(OOorbsys *sys, const char *name,
 
   dQuaternion quat = {qw, qx, qy, qz};
   dBodySetQuaternion(obj->id, quat);
-  dBodySetAngularVel(obj->id, 0.0, 0.0, 1.0);
+  dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
 
   obj->sys = sys;
 
@@ -351,7 +351,7 @@ ooOrbitLoadMoon(HRMLobject *obj, OOscene *parentScene)
   OOdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
-  quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(1.0)); // TODO: real rot
+  quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(0.05)); // TODO: real rot
 
   OOorbobj *orbObj = ooOrbitNewObj(sys, moonName.u.str, drawable,
                                    mass,
@@ -447,7 +447,7 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
   OOdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
-  quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(1.0)); // TODO: real rot
+  quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(0.05)); // TODO: real rot
 
   OOorbobj *orbObj = ooOrbitNewObj(sys, planetName.u.str, drawable,
                                    mass,
