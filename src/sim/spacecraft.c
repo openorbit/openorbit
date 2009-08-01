@@ -18,7 +18,7 @@
 */
 
 #include <assert.h>
-
+#include <ode/ode.h>
 #include "log.h" 
 #include "sim.h"
 #include "sim/spacecraft.h"
@@ -54,7 +54,7 @@ ooScNew(dWorldID world, size_t stageCount)
   OOspacecraft *sc = malloc(sizeof(OOspacecraft));
   //ooObjVecInit(&sc->stages);
   //sc->mainEngine = NULL;
-  sc->id = dBodyCreate(world);
+  sc->body = dBodyCreate(world);
   
   //for (size_t i = 0 ; i < stageCount ; i ++) {
   //  ooObjVecPush(&sc->stages, ooScStageNew(world, 100.0));
@@ -136,11 +136,26 @@ ooScStep(OOspacecraft *sc)
 }
 
 void
-ooScForce(OOspacecraft *sc, v4f_t f)
+ooScForce(OOspacecraft *sc, float rx, float ry, float rz)
 {
-//  dBodyForceRelative();
+//    dBodyAddRelForceAtRelPos(sc->body, rx, ry, rz, sc->);
 }
 
+void
+ooScEngineStep(OOspacecraft *sc)
+{
+  for (size_t i = 0 ; i < sc->engines.length; ++ i) {
+    OOengine *engine = sc->engines.elems[i];
+    if (engine->state == OO_Engine_Enabled ||
+        engine->state == OO_Engine_Fault_Open) {
+      dBodyAddRelForceAtRelPos(sc->body,
+                               engine->dir.x * engine->forceMag,
+                               engine->dir.y * engine->forceMag,
+                               engine->dir.z * engine->forceMag,
+                               engine->p.x, engine->p.y, engine->p.z);
+    }
+  }
+}
 
 OOspacecraft*
 ooScLoad(const char *fileName)

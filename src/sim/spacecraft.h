@@ -28,7 +28,8 @@
 typedef enum OOenginestate {
   OO_Engine_Disabled,
   OO_Engine_Enabled,
-  OO_Engine_Fault
+  OO_Engine_Fault_Closed,
+  OO_Engine_Fault_Open
 } OOenginestate;
 
 
@@ -42,18 +43,21 @@ typedef struct OOspacecraft {
   OOobjvector engines;
 //  OOengine *mainEngine;
 //  OOobjvector stages;
-  dBodyID id;
+  dBodyID body;
 } OOspacecraft;
 
 typedef struct OOengine {
   OOspacecraft *sc;
   OOenginestate state;
-  v4f_t p;
+  vector_t p;
+  float forceMag; //!< Newton
+  vector_t dir; //!< Unit vector with direction of thruster
 } OOengine;
+
 
 void ooScDetatchStage(OOspacecraft *sc);
 void ooScStep(OOspacecraft *sc);
-void ooScForce(OOspacecraft *sc, v4f_t f);
+void ooScForce(OOspacecraft *sc, float rx, float ry, float rz);
 OOspacecraft* ooScGetCurrent(void);
 
 OOspacecraft* ooScLoad(const char *file);
