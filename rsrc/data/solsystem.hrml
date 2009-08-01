@@ -205,6 +205,76 @@ openorbit {
               //albedo: 0.62;
             }
           }
+          moon (name: Europa) {
+            physical {
+              mass: 480.0e20 kg;
+              radius: 1560.8e3 m;
+              sidereal-rotational-period: 3.551181 days; // Synchronous
+              axial-tilt: 1.5424 deg; // UNKNONW To ecliptic, 6.687 to orbital plane
+            }
+            orbit {
+              semimajor-axis: 670.9e6 m;
+              eccentricity: 0.0101;
+              inclination: 0.47 deg; // 18.29 - 28.58 to earth equator
+              longitude-ascending-node: 0.0 deg; // unknown
+              longitude-perihelion: 0.0 deg; //TODO: unknown
+              mean-longitude: 0.0 deg;//TODO: unknown
+              right-ascension:  0.00 deg; //TODO: unknown
+              declination    : 90.00 deg; //TODO: unknown
+            }
+            rendering {
+              model: "sphere";
+              texture: "tex/Europa.png";
+              //albedo: 0.68;
+            }
+          }
+          moon (name: Ganymede) {
+            physical {
+              mass: 1481.9e20 kg;
+              radius: 2631.2e3 m;
+              sidereal-rotational-period: 7.154553 days; // Synchronous
+              axial-tilt: 1.5424 deg; // UNKNONW To ecliptic, 6.687 to orbital plane
+            }
+            orbit {
+              semimajor-axis: 1070.4e6 m;
+              eccentricity: 0.0015;
+              inclination: 0.21 deg; // 18.29 - 28.58 to earth equator
+              longitude-ascending-node: 0.0 deg; // unknown
+              longitude-perihelion: 0.0 deg; //TODO: unknown
+              mean-longitude: 0.0 deg;//TODO: unknown
+              right-ascension:  0.00 deg; //TODO: unknown
+              declination    : 90.00 deg; //TODO: unknown
+            }
+            rendering {
+              model: "sphere";
+              texture: "tex/4kGanymede.png";
+              //albedo: 0.44;
+            }
+          }
+          moon (name: Callisto) {
+            physical {
+              mass: 1075.9e20 kg;
+              radius: 2410.3e3 m;
+              sidereal-rotational-period: 16.689018 days; // Synchronous
+              axial-tilt: 1.5424 deg; // UNKNONW To ecliptic, 6.687 to orbital plane
+            }
+            orbit {
+              semimajor-axis: 1882.7e6 m;
+              eccentricity: 0.007;
+              inclination: 0.51 deg; // 18.29 - 28.58 to earth equator
+              longitude-ascending-node: 0.0 deg; // unknown
+              longitude-perihelion: 0.0 deg; //TODO: unknown
+              mean-longitude: 0.0 deg;//TODO: unknown
+              right-ascension:  0.00 deg; //TODO: unknown
+              declination    : 90.00 deg; //TODO: unknown
+            }
+            rendering {
+              model: "sphere";
+              texture: "tex/Callisto.png";
+              //albedo: 0.19;
+            }
+          }
+          
         }
       }
     }
