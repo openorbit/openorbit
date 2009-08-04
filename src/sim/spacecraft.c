@@ -18,12 +18,14 @@
 */
 
 #include <assert.h>
+#include <stdlib.h>
 #include <ode/ode.h>
 #include "log.h" 
 #include "sim.h"
 #include "sim/spacecraft.h"
 #include "res-manager.h"
 #include "parsers/hrml.h"
+#include <vmath/vmath.h>
 
 extern SIMstate gSIM_state;
 
@@ -37,14 +39,14 @@ OOstage*
 ooScStageNew(dWorldID world, float m)
 {
   OOstage *stage = malloc(sizeof(OOstage));
-  
+
   stage->id = dBodyCreate(world);
-  
+
   dMass mass;
   dMassSetZero(&mass);
   dBodySetMass(stage->id, &mass);
   dBodyDisable(stage->id);
-  
+
   return stage;
 }
 
@@ -68,7 +70,6 @@ void
 dMassSetConeTotal(dMass *m, dReal total_mass,
                   dReal radius, dReal height)
 {
-  
   float i11 = 1.0/10.0 * total_mass * height * height + 
     3.0/20.0 * total_mass * radius * radius;
   float i22 = i11;
@@ -78,8 +79,8 @@ dMassSetConeTotal(dMass *m, dReal total_mass,
   cogx = 0.0;
   cogy = 0.25 * height; // 1/4 from base, see wikipedia entry on Cone_(geometry)
   cogz = 0.0;
-  
-  
+
+
   dMassSetParameters(m, total_mass,
                      cogx, cogy, cogz, // TODO: fix, COG 
                      i11, i22, i33,
@@ -117,37 +118,30 @@ void
 ooScStep(OOspacecraft *sc)
 {
   assert(sc != NULL);
-  
-  //if (sc->mainEngine) {
-  //  switch (sc->mainEngine->state) {
-  //  case OO_Engine_Disabled:
-  //    ooLogInfo("step on turned of engine");
-  //    break;
-  //  case OO_Engine_Enabled:
-  //    ooLogInfo("step on burning engine");
-  //    break;
-  //  case OO_Engine_Fault:
-  //    ooLogInfo("engine step on faulty engine");
-  //    break;
-  //  default:
-  //    assert(0 && "invalid case");
-  //  }
-  //}
+  for (size_t i = 0 ; i < sc->stages.length ; ++ i) {
+    OOstage *stage = sc->stages.elems[i];
+    if (stage->state == OO_Stage_Enabled) {
+      ooScStageStep(sc, stage);
+    }
+  }
 }
 
-void
+void // for scripts and events
 ooScForce(OOspacecraft *sc, float rx, float ry, float rz)
 {
 //    dBodyAddRelForceAtRelPos(sc->body, rx, ry, rz, sc->);
 }
 
 void
-ooScEngineStep(OOspacecraft *sc)
-{
-  for (size_t i = 0 ; i < sc->engines.length; ++ i) {
-    OOengine *engine = sc->engines.elems[i];
-    if (engine->state == OO_Engine_Enabled ||
-        engine->state == OO_Engine_Fault_Open) {
+ooScStageStep(OOspacecraft *sc, OOstage *stage) {
+  assert(sc != NULL);
+  assert(stage != NULL);
+
+  for (size_t i = 0 ; i < stage->engines.length; ++ i) {
+    OOengine *engine = stage->engines.elems[i];
+    if (engine->state == OO_Engine_Burning ||
+        engine->state == OO_Engine_Fault_Open)
+    {
       dBodyAddRelForceAtRelPos(sc->body,
                                engine->dir.x * engine->forceMag,
                                engine->dir.y * engine->forceMag,
@@ -155,6 +149,11 @@ ooScEngineStep(OOspacecraft *sc)
                                engine->p.x, engine->p.y, engine->p.z);
     }
   }
+}
+
+typedef int (*qsort_compar_t)(const void *, const void *);
+static int compar_stages(const OOstage **s0, const OOstage **s1) {
+  return (*s0)->detachOrder - (*s1)->detachOrder;
 }
 
 OOspacecraft*
@@ -182,5 +181,10 @@ ooScLoad(const char *fileName)
   hrmlFreeDocument(spaceCraftDoc);
 
   ooLogInfo("loaded spacecraft %s", scName.u.str);
+
+  // Ensure that stage vector is sorted by detachOrder
+  qsort(&sc->stages.elems[0], sc->stages.length, sizeof(void*),
+        (qsort_compar_t)compar_stages);
+
   return sc;
 }

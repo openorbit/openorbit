@@ -25,27 +25,50 @@
 #include <openorbit/openorbit.h>
 #include <vmath/vmath.h>
 
+/*!
+    Spacecraft system simulation header
+
+    The spacecrafts consist of multiple stages, where several stages may be active at the
+    same time (e.g. space shuttle where 2 SRBs are burning at the same time).
+*/
+
 typedef enum OOenginestate {
   OO_Engine_Disabled,
-  OO_Engine_Enabled,
+  OO_Engine_Idle,
+  OO_Engine_Burning,
   OO_Engine_Fault_Closed,
   OO_Engine_Fault_Open
 } OOenginestate;
 
+typedef enum OOtorquerstate {
+  OO_Torquer_Disabled,
+  OO_Torquer_Idle,
+  OO_Torquer_Spinning,
+  OO_Torquer_Fault_Stuck,
+  OO_Torquer_Fault_Spinning
+} OOtorquerstate;
+
+typedef enum OOstagestate {
+  OO_Stage_Idle,
+  OO_Stage_Enabled
+} OOstagestate;
 
 typedef struct OOstage {
+  OOstagestate state;
+  int detachOrder; // How and when to detach the stage
   OOobjvector engines;
+  OOobjvector torquers;
   dBodyID id;
 } OOstage;
 
-
 typedef struct OOspacecraft {
-  OOobjvector engines;
-//  OOengine *mainEngine;
-//  OOobjvector stages;
+  OOobjvector stages;
+  int activeStageIdx; // index in stage vector of active stage
+  int activeStageCnt; // number of active stages
   dBodyID body;
 } OOspacecraft;
 
+// Note engine structure is for both engines and RCS thrusters
 typedef struct OOengine {
   OOspacecraft *sc;
   OOenginestate state;
@@ -54,9 +77,19 @@ typedef struct OOengine {
   vector_t dir; //!< Unit vector with direction of thruster
 } OOengine;
 
+// The torquer structure is for more general torquers (that are not mass expelling
+// thrusters). These include magnetotorquers and anything else that include rotating
+// bodies.
+typedef struct OOtorquer {
+  OOspacecraft *sc;
+  OOtorquerstate state;
+  float torque; //!< Nm
+  vector_t torqueAxis; //!< Unit vector around which the torque is to be applied
+} OOtorquer;
 
 void ooScDetatchStage(OOspacecraft *sc);
 void ooScStep(OOspacecraft *sc);
+void ooScStageStep(OOspacecraft *sc, OOstage *stage);
 void ooScForce(OOspacecraft *sc, float rx, float ry, float rz);
 OOspacecraft* ooScGetCurrent(void);
 

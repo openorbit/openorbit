@@ -55,3 +55,75 @@ ooSimScCtrlMainEngineToggle(bool buttonUp, void *data)
 //    }
   }
 }
+
+void
+ooSimScCtrlRcsYawLeft(bool buttonUp, void *data)
+{
+  OOspacecraft *sc = ooScGetCurrent();
+
+  if (buttonUp) {
+    // zero out yaw
+  } else {
+    // apply yaw
+  }
+}
+
+void
+ooSimScCtrlRcsYawRight(bool buttonUp, void *data)
+{
+  OOspacecraft *sc = ooScGetCurrent();
+
+  if (buttonUp) {
+    // zero out yaw
+  } else {
+    // apply yaw
+  }
+}
+
+void
+ooSimScCtrlRcsPitchUp(bool buttonUp, void *data)
+{
+  OOspacecraft *sc = ooScGetCurrent();
+
+  if (buttonUp) {
+    // zero out pitch
+  } else {
+    // apply pitch
+  }
+}
+
+void
+ooSimScCtrlRcsPitchDown(bool buttonUp, void *data)
+{
+  OOspacecraft *sc = ooScGetCurrent();
+
+  if (buttonUp) {
+    // zero out pitch
+  } else {
+    // apply pitch
+  }
+}
+
+void
+ooSimScCtrlRcsRollLeft(bool buttonUp, void *data)
+{
+  OOspacecraft *sc = ooScGetCurrent();
+
+  if (buttonUp) {
+    // zero out roll
+  } else {
+    // apply roll
+  }
+}
+
+void
+ooSimScCtrlRcsRollRight(bool buttonUp, void *data)
+{
+  OOspacecraft *sc = ooScGetCurrent();
+
+  if (buttonUp) {
+    // zero out roll
+  } else {
+    // apply roll
+  }
+}
