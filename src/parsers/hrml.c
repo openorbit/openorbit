@@ -338,6 +338,17 @@ Token makeTok(TokenKind kind, const char *start, size_t len)
   return tok;
 }
 
+HRMLvalue makeRealArray(const double *array, size_t len)
+{
+  HRMLvalue val;
+  val.typ = HRMLFloatArray;
+  val.alen = len;
+  val.u.realArray = calloc(len, sizeof(double));
+  memcpy(val.u.realArray, array, len * sizeof(double));
+  return val;
+}
+
+
 HRMLvalue makeVal(Token tok)
 {
   HRMLvalue val;
@@ -1013,11 +1024,25 @@ void ParseVal(ParseState *parser)
       HRMLvalue val = makeVal(tok);
       InsertValueInNode(parser, val);
     } else if (Optional(parser, tk_lbrack)) {
-
-      while (!Peek(parser, tk_rbrack)) {
-        // Ensure that types are identical for all subvalues
+      if (Peek(parser, tk_real)) {
+        double realArr[128];
+        size_t realIdx = 0;
+        // BUG: Can only read 128 doubles
+        do {
+          // Ensure that types are identical for all subvalues
+          Require(parser, tk_real);
+          Token tok = lexGetCurrentTok(parser->lexer);
+          double val = getReal(tok);
+          assert(realIdx < 128 && "parser cannot handle long arrays");
+          realArr[realIdx ++] = val;
+        } while (Optional(parser, tk_comma));
+        
+        Require(parser, tk_rbrack);
+        HRMLvalue val = makeRealArray(realArr, realIdx);
+        InsertValueInNode(parser, val);
+      } else {
+        ParseErr("array of non supported type");
       }
-      Require(parser, tk_rbrack);
     }
 
     Require(parser, tk_semi);

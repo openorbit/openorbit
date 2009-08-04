@@ -44,6 +44,13 @@ START_TEST(test_path)
   HRMLobject *obj2 = hrmlGetObject(doc, "document/header/blaht");
   fail_unless(obj2 == NULL);
 
+  HRMLobject *obj3 = hrmlGetObject(doc, "document/body/paragraph/anArray");
+  fail_if(obj3 == NULL);
+  fail_unless(obj3->val.typ == HRMLFloatArray);
+  fail_unless(obj3->val.alen == 6);
+  fail_unless(obj3->val.u.realArray[0] == 0.0);
+  fail_unless(obj3->val.u.realArray[5] == 5.5);
+
   hrmlFreeDocument(doc);
 }
 END_TEST
