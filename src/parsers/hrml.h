@@ -232,6 +232,20 @@ hrmlGetReal(HRMLobject *obj)
   return obj->val.u.real;
 }
 
+static inline const double*
+hrmlGetRealArray(HRMLobject *obj)
+{
+  assert(obj->val.typ == HRMLFloatArray);
+  return obj->val.u.realArray;
+}
+static inline size_t
+hrmlGetRealArrayLen(HRMLobject *obj)
+{
+  assert(obj->val.typ == HRMLFloatArray);
+  return obj->val.alen;
+}
+
+
 static inline const char*
 hrmlGetStr(HRMLobject *obj)
 {
