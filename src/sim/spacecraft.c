@@ -57,11 +57,11 @@ ooScNew(dWorldID world, size_t stageCount)
   //ooObjVecInit(&sc->stages);
   //sc->mainEngine = NULL;
   sc->body = dBodyCreate(world);
-  
+
   //for (size_t i = 0 ; i < stageCount ; i ++) {
   //  ooObjVecPush(&sc->stages, ooScStageNew(world, 100.0));
   //}
-  
+
   return sc;
 }
 
@@ -70,12 +70,12 @@ void
 dMassSetConeTotal(dMass *m, dReal total_mass,
                   dReal radius, dReal height)
 {
-  float i11 = 1.0/10.0 * total_mass * height * height + 
+  float i11 = 3.0/5.0 * total_mass * height * height +
     3.0/20.0 * total_mass * radius * radius;
   float i22 = i11;
   float i33 = 3.0/10.0 * total_mass * radius * radius;
   float cogx, cogy, cogz;
-  
+
   cogx = 0.0;
   cogy = 0.25 * height; // 1/4 from base, see wikipedia entry on Cone_(geometry)
   cogz = 0.0;
@@ -90,20 +90,7 @@ dMassSetConeTotal(dMass *m, dReal total_mass,
 void
 ooScAddStage(OOspacecraft *sc, OOstage *stage)
 {
-//  dMassAdjust(dMass *, dReal newmass);
-//  dMassRotate(dMass *, const dMatrix3 R);
-//  dMassTranslate(dMass *, dReal x, dReal y, dReal z);
-//  dMassAdd(dMass *a, const dMass *b);
-//  dMassSetBoxTotal(dMass *, dReal total_mass, dReal lx, dReal ly, dReal lz);
-//  dMassSetCylinderTotal(dMass *, dReal total_mass, int direction, dReal radius, dReal length);
-//  dMassSetCapsuleTotal(dMass *, dReal total_mass, int direction, dReal radius, dReal length);
-//  dMassSetSphereTotal(dMass *, dReal total_mass, dReal radius);
-//  dMassSetParameters(dMass *, dReal themass,
-//                     dReal cgx, dReal cgy, dReal cgz,
-//                     dReal I11, dReal I22, dReal I33,
-//                     dReal I12, dReal I13, dReal I23);
-//  dMassSetZero(dMass *);
-//  
+  ooObjVecPush(&sc->stages, stage);
 }
 
 void
@@ -113,7 +100,7 @@ ooScDetatchStage(OOspacecraft *sc)
   // TODO: Insert in free object vector
 //  dBodyEnable(stage->id);
 }
- 
+
 void
 ooScStep(OOspacecraft *sc)
 {
@@ -153,8 +140,44 @@ ooScStageStep(OOspacecraft *sc, OOstage *stage) {
 
 typedef int (*qsort_compar_t)(const void *, const void *);
 static int compar_stages(const OOstage **s0, const OOstage **s1) {
-  return (*s0)->detachOrder - (*s1)->detachOrder;
+  return (*s0)->detatchOrder - (*s1)->detatchOrder;
 }
+
+OOengine*
+ooScNewEngine(OOspacecraft *sc,
+              float f,
+              float x, float y, float z,
+              float dx, float dy, float dz)
+{
+  OOengine *engine = malloc(sizeof(OOengine));
+  engine->sc = sc;
+  engine->state = OO_Engine_Disabled;
+  engine->forceMag = f;
+  engine->p.v = v3f_make(x, y, z);
+  engine->dir.v = v3f_make(dx, dy, dz);
+
+  return engine;
+}
+
+OOstage*
+ooScNewStage(void)
+{
+  OOstage *stage = malloc(sizeof(OOstage));
+  stage->state = OO_Stage_Idle;
+  ooObjVecInit(&stage->engines);
+  ooObjVecInit(&stage->torquers);
+  //stage->id = dBodyNew(...) // In which dWorld?;
+  stage->detatchOrder = 0;
+
+  return stage;
+}
+
+void
+ooScStageAddEngine(OOstage *stage, OOengine *engine)
+{
+  ooObjVecPush(&stage->engines, engine);
+}
+
 
 OOspacecraft*
 ooScLoad(const char *fileName)
@@ -174,7 +197,66 @@ ooScLoad(const char *fileName)
 
   for (HRMLobject *node = root; node != NULL; node = node->next) {
     if (!strcmp(node->name, "spacecraft")) {
-      
+      for (HRMLobject *child = node->children; child != NULL ; child = child->next) {
+        if (!strcmp(child->name, "stages")) {
+          for (HRMLobject *stage = child->children; stage != NULL ; stage = stage->next) {
+            HRMLvalue stageName = hrmlGetAttrForName(stage, "name");
+            OOstage *newStage = ooScNewStage();
+            for (HRMLobject *stageEntry = stage->children ; stageEntry != NULL; stageEntry = stageEntry->next) {
+              if (!strcmp(stageEntry->name, "detach-order")) {
+                newStage->detatchOrder = hrmlGetInt(stageEntry);
+              } else if (!strcmp(stageEntry->name, "mass")) {
+                newStage->mass = hrmlGetReal(stageEntry);
+              } else if (!strcmp(stageEntry->name, "inertial-tensor")) {
+                const double *arr = hrmlGetRealArray(stageEntry);
+                size_t len = hrmlGetRealArrayLen(stageEntry);
+                assert(len == 3 && "inertia tensor must be a 3 component real vector");
+                newStage->inertia[0] = arr[0];
+                newStage->inertia[1] = arr[1];
+                newStage->inertia[2] = arr[2];
+              } else if (!strcmp(stageEntry->name, "propulsion")) {
+                for (HRMLobject *prop = stageEntry->children; prop != NULL ; prop = prop->next) {
+                  if (!strcmp(prop->name, "engine")) {
+                    HRMLvalue engineName = hrmlGetAttrForName(prop, "name");
+                    const double *pos;
+                    const double *dir;
+                    double thrust;
+                    for (HRMLobject *engine = prop->children; engine != NULL ; engine = engine->next) {
+                      if (!strcmp(engine->name, "thrust")) {
+                        thrust = hrmlGetReal(engine);
+                      } else if (!strcmp(engine->name, "fire-once")) {
+                        // TODO: Ignored for now
+                      } else if (!strcmp(engine->name, "pos")) {
+                        pos = hrmlGetRealArray(engine);
+                        size_t len = hrmlGetRealArrayLen(engine);
+                        assert(len == 3 && "pos must be a 3 component real vector");
+                      } else if (!strcmp(engine->name, "dir")) {
+                        const double *dir = hrmlGetRealArray(engine);
+                        size_t len = hrmlGetRealArrayLen(engine);
+                        assert(len == 3 && "dir must be a 3 component real vector");
+                      }
+                    }
+
+                    OOengine *engine = ooScNewEngine(sc, thrust,
+                                                     pos[0], pos[1], pos[2],
+                                                     dir[0], dir[1], dir[2]);
+                    ooScStageAddEngine(newStage, engine);
+                  }
+                }
+              } else if (!strcmp(stageEntry->name, "attitude")) {
+                for (HRMLobject *att = stageEntry->children; att != NULL ; att = att->next) {
+                  if (!strcmp(att->name, "engine")) {
+                    assert(0 && "not implemented");
+                  } else if (!strcmp(att->name, "torquer")) {
+                    assert(0 && "not implemented");
+                  }
+                }
+              }
+            }
+            ooScAddStage(sc, newStage);
+          }
+        }
+      }
     }
   }
 

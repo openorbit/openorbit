@@ -55,7 +55,9 @@ typedef enum OOstagestate {
 
 typedef struct OOstage {
   OOstagestate state;
-  int detachOrder; // How and when to detach the stage
+  int detatchOrder; // How and when to detach the stage
+  float mass;
+  float inertia[3];
   OOobjvector engines;
   OOobjvector torquers;
   dBodyID id;
@@ -92,6 +94,14 @@ void ooScStep(OOspacecraft *sc);
 void ooScStageStep(OOspacecraft *sc, OOstage *stage);
 void ooScForce(OOspacecraft *sc, float rx, float ry, float rz);
 OOspacecraft* ooScGetCurrent(void);
+OOengine* ooScNewEngine(OOspacecraft *sc,
+                        float f,
+                        float x, float y, float z,
+                        float dx, float dy, float dz);
+
+OOstage* ooScNewStage(void);
+void ooScStageAddEngine(OOstage *stage, OOengine *engine);
+
 
 OOspacecraft* ooScLoad(const char *file);
 
