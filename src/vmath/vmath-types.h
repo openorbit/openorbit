@@ -92,6 +92,18 @@ v4f_make(float x, float y, float z, float w)
   return v.v;
 }
 
+static inline v4f_t
+v3f_make(float x, float y, float z)
+{
+  vector_t v;
+  v.x = x;
+  v.y = y;
+  v.z = z;
+  v.w = 0.0;
+  return v.v;
+}
+
+
 #ifdef __cplusplus
 }
 #endif 
