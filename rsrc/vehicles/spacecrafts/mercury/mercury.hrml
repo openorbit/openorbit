@@ -1,53 +1,58 @@
-/*
-    The main idea is that the physical parameters are described in this HRML file, the file
-    in term points out 3d-models and a plugin file that contain any necessary programatic
-    behaviour.
+//    The main idea is that the physical parameters are described in this HRML file, the file
+//    in term points out 3d-models and a plugin file that contain any necessary programatic
+//    behaviour.
 
-    This craft is modeled after the Mercury capsule, this in term means that it need to
-    point out some plugin (Python or C), that handles things like for example ripple
-    firing of the retro engines. The sim system does however support the distinction
-    between engines that can be turned off and not (i.e. solid / liquid fuel)
-*/
-spacecraft (name: "Mercury Capsule") {
+//    This craft is modeled after the Mercury capsule, this in term means that it need to
+//    point out some plugin (Python or C), that handles things like for example ripple
+//    firing of the retro engines. The sim system does however support the distinction
+//    between engines that can be turned off and not (i.e. solid / liquid fuel)
+//
+//
+//        Total lengh: 3.5 m
+//        Max diameter: 1.89 m
+//        Launch mass: 1934 kg
+//        Landing mass: 1130 kg
+//
+spacecraft (name: Mercury-Capsule) {
   mass: 1354.0 kg;
   stages {
-    stage (name: "Command Module") {
+    stage (name: Command-Module) {
       detach-order: 0; // No other stages at the moment
       mass: 1354.0 kg;
-      inertial-tensor: [1.0, 1.0, 1.0];
-      propulsion {
-        // Nice example, if multiple engines are used, they may either be fired in sequence
-        // or in parallel, this distinction is handled by the spacecraft plugin.
-        engine (name: "retro") {
-          // Should burn 10 s per rocket, solid fuel
-          thrust: 4.5 kN;
-          fire-once: true; // Solid rocket engine
-          pos: [1.0, 1.0, 1.0];
-          dir: [1.0, 1.0, 1.0];
-        }
-        engine (name: "posigrade") {
-          thrust: 1.8 kN;
-          fire-once: true; // Solid rocket engine
-          pos: [1.0, 1.0, 1.0];
-          dir: [1.0, 1.0, 1.0];
-        }
-      }
-      attitude {
-        engine (name: "rcs high") {
-          thrust: 108.0 N;
-          fire-once: false; // Liquid fueled thruster
-          pos: [1.0, 1.0, 1.0];
-          dir: [1.0, 1.0, 1.0];
-        }
-        engine (name: "rcs low") {
-          thrust: 48.0 N;
-          fire-once: false; // Liquid fueled thruster
-          pos: [1.0, 1.0, 1.0];
-          dir: [1.0, 1.0, 1.0];
-        }
-      }
-    }
-  }
+     inertial-tensor: [1.0, 1.0, 1.0];
+     propulsion {
+       // Nice example, if multiple engines are used, they may either be fired in sequence
+       // or in parallel, this distinction is handled by the spacecraft plugin.
+       engine (name: retro) {
+         // Should burn 10 s per rocket, solid fuel
+         thrust: 4.5 kN;
+         fire-once: true; // Solid rocket engine
+         pos: [1.0, 1.0, 1.0];
+         dir: [1.0, 1.0, 1.0];
+       }
+       engine (name: posigrade) {
+         thrust: 1.8 kN;
+         fire-once: true; // Solid rocket engine
+         pos: [1.0, 1.0, 1.0];
+         dir: [1.0, 1.0, 1.0];
+       }
+     }
+//     attitude {
+//       engine (name: rcs-high) {
+//         thrust: 108.0 N;
+//         fire-once: false; // Liquid fueled thruster
+//         pos: [1.0, 1.0, 1.0];
+//         dir: [1.0, 1.0, 1.0];
+//       }
+//       engine (name: rcs-low) {
+//         thrust: 48.0 N;
+//         fire-once: false; // Liquid fueled thruster
+//         pos: [1.0, 1.0, 1.0];
+//         dir: [1.0, 1.0, 1.0];
+//       }
+//     }
+   }
+ }
   //model {
     
   //}

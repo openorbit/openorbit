@@ -94,6 +94,9 @@ set_source_files_properties(${ORBIT_PLUGINS}
                             GENERATED true
                             MACOSX_PACKAGE_LOCATION Resources/plugins)
 
+set_source_files_properties(${ORBIT_RES_SC}
+                            PROPERTIES
+                            MACOSX_PACKAGE_LOCATION Resources/sc)
 
 add_executable(openorbit MACOSX_BUNDLE
                ${openorbit_SRC}
@@ -104,6 +107,7 @@ add_executable(openorbit MACOSX_BUNDLE
                ${ORBIT_SCRIPTS}
                ${ORBIT_DEP_YAML}
                ${ORBIT_PLUGINS}
+               ${ORBIT_RES_SC}
 			         )
 add_dependencies(openorbit ${ORBIT_PLUGIN_TARGETS})
 set_target_properties(openorbit
