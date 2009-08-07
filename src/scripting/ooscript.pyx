@@ -205,7 +205,7 @@ cdef class OrbitSys:
 cdef class Spacecraft:
   cdef OOspacecraft *sc
   def __init__(self, path):
-    self.sc = ooScLoad(pathPLorbsys)
+    self.sc = ooScLoad(path)
 
 
 def setSg(Scenegraph scg):
