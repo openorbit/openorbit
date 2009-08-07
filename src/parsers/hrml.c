@@ -36,6 +36,61 @@
 #include <execinfo.h>
 #include <inttypes.h>
 
+/* Unit conversion matrices */
+// Force
+typedef enum {
+  force_N = 0,
+  force_kN,
+  force_count
+} force_unit;
+static double forceFactors[force_count][force_count] = {
+  [force_N] = {[force_N] = 1.0, [force_kN] = 1.0/1000.0},
+  [force_kN] = {[force_N] = 1000.0, [force_kN] = 1.0}
+};
+
+typedef enum {
+  length_mm = 0,
+  length_cm,
+  length_dm,
+  length_m,
+  length_km,
+  length_au,
+  length_ly,
+  length_pc,
+  length_count
+} length_unit;
+static double lengthFactors[length_count][length_count] = {
+  [length_mm] = {[length_mm] = 1.0, [length_cm] = 1.0/10.0, [length_dm] = 1.0/100.0,
+                 [length_m] = 1.0/1000.0, [length_km] = 1.0/1000000.0, [length_au] = 1.0,
+                 [length_ly] = 1.0,
+                 [length_pc] = 1.0},
+  [length_cm] = {[length_mm] = 10.0, [length_cm] = 1.0, [length_dm] = 1.0/10.0,
+                 [length_m] = 1.0/100.0, [length_km] = 1.0, [length_au] = 1.0,
+                 [length_ly] = 1.0,
+                 [length_pc] = 1.0},
+  [length_dm] = {[length_mm] = 100.0, [length_cm] = 10.0, [length_dm] = 1.0,
+                 [length_m] = 1.0, [length_km] = 1.0,
+                 [length_au] = 1.0,
+                 [length_ly] = 1.0,
+                 [length_pc] = 1.0},
+  [length_m] = {[length_mm] = 1000.0, [length_cm] = 100.0, [length_dm] = 10.0,
+                [length_m] = 1.0, [length_km] = 1.0/1000.0, [length_au] = 1.0,
+                [length_ly] = 1.0,
+                [length_pc] = 1.0},
+  [length_km] = {[length_mm] = 1000000.0, [length_cm] = 100000.0, [length_dm] = 10000.0,
+                 [length_m] = 1000.0, [length_km] = 1.0, [length_au] = 1.0,
+                 [length_ly] = 1.0,
+                 [length_pc] = 1.0},
+  [length_ly] = {[length_mm] = 1.0, [length_cm] = 1.0, [length_dm] = 1.0,
+                 [length_m] = 9.4605284e15, [length_km] = 9.4605284e12,
+                 [length_au] = 63239.6717,
+                 [length_ly] = 1.0,
+                 [length_pc] = 0.30659458},
+  [length_pc] = {[length_mm] = 1.0, [length_cm] = 1.0, [length_dm] = 1.0,
+                 [length_m] = 1.0, [length_km] = 1.0, [length_au] = 1.0,
+                 [length_ly] = 1.0,
+                 [length_pc] = 1.0},
+};
 
 
 static inline HRMLobject*
@@ -971,7 +1026,10 @@ ParseAttributes(ParseState *parser)
       Token nameTok = lexGetCurrentTok(parser->lexer);
 
       Require(parser, tk_colon);
-      Require(parser, tk_ident);
+
+      if (!Optional(parser, tk_ident)) {
+        Require(parser, tk_str);
+      }
       Token valueTok = lexGetCurrentTok(parser->lexer);
 
       char *name = getString(nameTok);
