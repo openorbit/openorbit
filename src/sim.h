@@ -25,19 +25,18 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-
-#include "physics/orbit.h"
+#include "physics/physics.h"
 #include "rendering/scenegraph.h"
 #include "sim/spacecraft.h"
 #include "sim/simtime.h"
 #include "sim/simevent.h"
-    
+
 typedef struct {  
   OOsimtime *timeState;
 
   float stepSize;     //!< Step size for simulation in seconds
   OOspacecraft *currentSc; //!< Current active spacecraft
-  OOorbsys *orbSys;   //!< Root orbit system, this will be the sun initially
+  PLorbsys *orbSys;   //!< Root orbit system, this will be the sun initially
   //OOcam *cam;         //!< Current camera
   OOscenegraph *sg;   //!< Scenegraph of the world
 } SIMstate;
@@ -54,7 +53,7 @@ static inline OOsimtime* ooSimTimeState(void)
 
 void ooSimSetSg(OOscenegraph *sg);
 
-void ooSimSetOrbSys(OOorbsys *osys);
+void ooSimSetOrbSys(PLorbsys *osys);
 
 void ooSimStep(float dt);
 

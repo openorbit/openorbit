@@ -35,32 +35,15 @@ OOspacecraft* ooScGetCurrent(void)
   return gSIM_state.currentSc;
 }
 
-OOstage*
-ooScStageNew(dWorldID world, float m)
-{
-  OOstage *stage = malloc(sizeof(OOstage));
-
-  stage->id = dBodyCreate(world);
-
-  dMass mass;
-  dMassSetZero(&mass);
-  dBodySetMass(stage->id, &mass);
-  dBodyDisable(stage->id);
-
-  return stage;
-}
-
 OOspacecraft*
-ooScNew(dWorldID world, size_t stageCount)
+ooScNew(void)
 {
   OOspacecraft *sc = malloc(sizeof(OOspacecraft));
   //ooObjVecInit(&sc->stages);
   //sc->mainEngine = NULL;
-  sc->body = dBodyCreate(world);
-
-  //for (size_t i = 0 ; i < stageCount ; i ++) {
-  //  ooObjVecPush(&sc->stages, ooScStageNew(world, 100.0));
-  //}
+  //sc->body = dBodyCreate(world);
+  sc->activeStageIdx = 0;
+  ooObjVecInit(&sc->stages);
 
   return sc;
 }
@@ -94,8 +77,16 @@ ooScAddStage(OOspacecraft *sc, OOstage *stage)
 }
 
 void
-ooScDetatchStage(OOspacecraft *sc)
+ooScDetachStage(OOspacecraft *sc)
 {
+  int order = ((OOstage*)sc->stages.elems[sc->activeStageIdx])->detachOrder;
+
+  // Move active stage index to next stage with higher detach order
+  while (sc->activeStageIdx < sc->stages.length - 1 &&
+         ((OOstage*)sc->stages.elems[sc->activeStageIdx])->detachOrder == order)
+  {
+    sc->activeStageIdx ++;
+  }
 //  OOstage *stage = ooObjVecPop(&sc->stages);
   // TODO: Insert in free object vector
 //  dBodyEnable(stage->id);
@@ -105,7 +96,7 @@ void
 ooScStep(OOspacecraft *sc)
 {
   assert(sc != NULL);
-  for (size_t i = 0 ; i < sc->stages.length ; ++ i) {
+  for (size_t i = sc->activeStageIdx ; i < sc->stages.length ; ++ i) {
     OOstage *stage = sc->stages.elems[i];
     if (stage->state == OO_Stage_Enabled) {
       ooScStageStep(sc, stage);
@@ -140,7 +131,7 @@ ooScStageStep(OOspacecraft *sc, OOstage *stage) {
 
 typedef int (*qsort_compar_t)(const void *, const void *);
 static int compar_stages(const OOstage **s0, const OOstage **s1) {
-  return (*s0)->detatchOrder - (*s1)->detatchOrder;
+  return (*s1)->detachOrder - (*s0)->detachOrder;
 }
 
 OOengine*
@@ -167,7 +158,14 @@ ooScNewStage(void)
   ooObjVecInit(&stage->engines);
   ooObjVecInit(&stage->torquers);
   //stage->id = dBodyNew(...) // In which dWorld?;
-  stage->detatchOrder = 0;
+  stage->detachOrder = 0;
+
+//  stage->id = dBodyCreate(world);
+
+//  dMass mass;
+//  dMassSetZero(&mass);
+//  dBodySetMass(stage->id, &mass);
+//  dBodyDisable(stage->id);
 
   return stage;
 }
@@ -191,9 +189,9 @@ ooScLoad(const char *fileName)
     return NULL;
   }
 
-  OOspacecraft *sc = NULL;
   HRMLobject *root = hrmlGetRoot(spaceCraftDoc);
   HRMLvalue scName = hrmlGetAttrForName(root, "name");
+  OOspacecraft *sc = ooScNew();
 
   for (HRMLobject *node = root; node != NULL; node = node->next) {
     if (!strcmp(node->name, "spacecraft")) {
@@ -204,7 +202,7 @@ ooScLoad(const char *fileName)
             OOstage *newStage = ooScNewStage();
             for (HRMLobject *stageEntry = stage->children ; stageEntry != NULL; stageEntry = stageEntry->next) {
               if (!strcmp(stageEntry->name, "detach-order")) {
-                newStage->detatchOrder = hrmlGetInt(stageEntry);
+                newStage->detachOrder = hrmlGetInt(stageEntry);
               } else if (!strcmp(stageEntry->name, "mass")) {
                 newStage->mass = hrmlGetReal(stageEntry);
               } else if (!strcmp(stageEntry->name, "inertial-tensor")) {

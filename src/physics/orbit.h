@@ -26,11 +26,10 @@
 #include <ode/ode.h>
 #include <openorbit/openorbit.h>
 #include <vmath/vmath.h>
-
+#include "physics.h"
 #include "geo/geo.h"
 #include "rendering/scenegraph.h"
 
-typedef struct OOorbsys OOorbsys;
 
 static inline v4f_t
 ode2v4(const dReal *vec)
@@ -45,17 +44,8 @@ ode2v3(const dReal *vec)
 }
 
 
-typedef struct OOorbobj {
-    char *name;
-    dBodyID id;
-    float m;
-    OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
-                          //!< object.
 
-    OOorbsys *sys;
-} OOorbobj;
-
-struct OOorbsys {
+struct PLorbsys {
     dWorldID world;
     char *name;
     
@@ -79,7 +69,7 @@ struct OOorbsys {
       } k;
     } phys;
 
-    struct OOorbsys *parent; // parent
+    struct PLorbsys *parent; // parent
     unsigned level;
     OOscene *scene; //!< Link to scene graph scene corresponding to this system
 
@@ -90,11 +80,11 @@ struct OOorbsys {
 };
 
 
-OOorbsys* ooOrbitNewSys(const char *name, OOscene *scene,
+PLorbsys* ooOrbitNewSys(const char *name, OOscene *scene,
                         float m, float orbitPeriod, float rotPeriod,
                         float semiMaj, float semiMin);
-OOorbobj*
-ooOrbitNewObj(OOorbsys *sys, const char *name,
+PLobject*
+ooOrbitNewObj(PLorbsys *sys, const char *name,
               OOdrawable *drawable,
               float m,
               float x, float y, float z,
@@ -108,16 +98,16 @@ ooOrbitNewObj(OOorbsys *sys, const char *name,
 
    e.g. ooOrbitGetSys(solsys, "sol/earth/luna") would return the luna system.
  */
-OOorbsys* ooOrbitGetSys(const OOorbsys *root,  const char *name);
+PLorbsys* ooOrbitGetSys(const PLorbsys *root,  const char *name);
 
-void ooOrbitAddChildSys(OOorbsys * restrict sys, OOorbsys * restrict child);
+void ooOrbitAddChildSys(PLorbsys * restrict sys, PLorbsys * restrict child);
 
-void ooOrbitSetScale(OOorbsys *sys, float ms, float ds);
-void ooOrbitSetConstant(OOorbsys *sys, const char *key, float k);
-void ooOrbitSetScene(OOorbsys *sys, OOscene *scene);
+void ooOrbitSetScale(PLorbsys *sys, float ms, float ds);
+void ooOrbitSetConstant(PLorbsys *sys, const char *key, float k);
+void ooOrbitSetScene(PLorbsys *sys, OOscene *scene);
 
-void ooOrbitStep(OOorbsys *sys, float stepsize);
-void ooOrbitClear(OOorbsys *sys);
+void ooOrbitStep(PLorbsys *sys, float stepsize);
+void ooOrbitClear(PLorbsys *sys);
 
 /*!
    Loads an hrml description of a solar system and builds a solar system graph
@@ -126,6 +116,6 @@ void ooOrbitClear(OOorbsys *sys);
    This function does not belong in the physics system, but will be here for
    now beeing.
  */
-OOorbsys* ooOrbitLoad(OOscenegraph *sg, const char *file);
+PLorbsys* ooOrbitLoad(OOscenegraph *sg, const char *file);
 
 #endif /* ! _ORBIT_H_ */

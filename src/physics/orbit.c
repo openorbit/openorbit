@@ -20,7 +20,7 @@
 #include "orbit.h"
 #include <ode/ode.h>
 #include <assert.h>
-
+#include "physics.h"
 
 #include <vmath/vmath.h>
 #include "sim.h"
@@ -54,10 +54,10 @@ comp_orbital_period_for_planet(double semimajor)
   return sqrt(pow(semimajor, 3.0));
 }
 
-OOorbsys*
+PLorbsys*
 ooOrbitNewRootSys(const char *name, OOscene *scene, float m, float rotPeriod)
 {
-  OOorbsys *sys = malloc(sizeof(OOorbsys));
+  PLorbsys *sys = malloc(sizeof(PLorbsys));
   sys->world = dWorldCreate();
   sys->name = strdup(name);
   ooObjVecInit(&sys->sats);
@@ -83,19 +83,19 @@ ooOrbitNewRootSys(const char *name, OOscene *scene, float m, float rotPeriod)
 }
 
 
-OOorbsys*
+PLorbsys*
 ooOrbitNewSys(const char *name, OOscene *scene,
               float m, float orbitPeriod, float rotPeriod,
               float semiMaj, float semiMin)
 {
-  OOorbsys *sys = ooOrbitNewRootSys(name, scene, m, rotPeriod);
+  PLorbsys *sys = ooOrbitNewRootSys(name, scene, m, rotPeriod);
   sys->orbit = ooGeoEllipseAreaSeg(300, semiMaj, semiMin);
   sys->phys.param.orbitalPeriod = orbitPeriod;
   return sys;
 }
 
-OOorbobj*
-ooOrbitNewObj(OOorbsys *sys, const char *name,
+PLobject*
+ooOrbitNewObj(PLorbsys *sys, const char *name,
               OOdrawable *drawable,
               float m,
               float x, float y, float z,
@@ -105,7 +105,7 @@ ooOrbitNewObj(OOorbsys *sys, const char *name,
 {
   assert(sys != NULL);
   assert(m >= 0.0);
-  OOorbobj *obj = malloc(sizeof(OOorbobj));
+  PLobject *obj = malloc(sizeof(PLobject));
   obj->name = strdup(name);
   obj->m = m;
   obj->id = dBodyCreate(sys->world);
@@ -125,7 +125,7 @@ ooOrbitNewObj(OOorbsys *sys, const char *name,
   return obj;
 }
 
-v4f_t ooOrbitDist(OOorbobj * restrict a, OOorbobj * restrict b)
+v4f_t ooOrbitDist(PLobject * restrict a, PLobject * restrict b)
 {
   assert(a != NULL);
   assert(b != NULL);
@@ -144,7 +144,7 @@ v4f_t ooOrbitDist(OOorbobj * restrict a, OOorbobj * restrict b)
 
 
 void
-ooOrbitAddChildSys(OOorbsys * restrict parent, OOorbsys * restrict child)
+ooOrbitAddChildSys(PLorbsys * restrict parent, PLorbsys * restrict child)
 {
   assert(parent != NULL);
   assert(child != NULL);
@@ -157,7 +157,7 @@ ooOrbitAddChildSys(OOorbsys * restrict parent, OOorbsys * restrict child)
 }
 
 void
-ooOrbitSetScale(OOorbsys *sys, float ms, float ds)
+ooOrbitSetScale(PLorbsys *sys, float ms, float ds)
 {
   assert(sys != NULL);
 
@@ -168,7 +168,7 @@ ooOrbitSetScale(OOorbsys *sys, float ms, float ds)
 }
 
 void
-ooOrbitSetScene(OOorbsys *sys, OOscene *scene)
+ooOrbitSetScene(PLorbsys *sys, OOscene *scene)
 {
   assert(sys != NULL);
   assert(scene != NULL);
@@ -178,11 +178,11 @@ ooOrbitSetScene(OOorbsys *sys, OOscene *scene)
 
 
 void
-ooOrbitClear(OOorbsys *sys)
+ooOrbitClear(PLorbsys *sys)
 {
   for (size_t i ; i < sys->objs.length ; i ++) {
-    dBodySetForce(((OOorbobj*)sys->objs.elems[i])->id, 0.0f, 0.0f, 0.0f);
-    dBodySetTorque(((OOorbobj*)sys->objs.elems[i])->id, 0.0f, 0.0f, 0.0f);
+    dBodySetForce(((PLobject*)sys->objs.elems[i])->id, 0.0f, 0.0f, 0.0f);
+    dBodySetTorque(((PLobject*)sys->objs.elems[i])->id, 0.0f, 0.0f, 0.0f);
   }
 
   for (size_t i; i < sys->sats.length ; i ++) {
@@ -193,14 +193,14 @@ ooOrbitClear(OOorbsys *sys)
 
 
 void
-ooOrbitStep(OOorbsys *sys, float stepSize)
+ooOrbitStep(PLorbsys *sys, float stepSize)
 {
   bool needsCompacting = false;
   // First compute local gravity for each object
   for (size_t i ; i < sys->objs.length ; i ++) {
     // Since objects can migrate to other systems...
     if (sys->objs.elems[i] != NULL) {
-      OOorbobj *obj = sys->objs.elems[i];
+      PLobject *obj = sys->objs.elems[i];
       //sys->phys.param.m
       const dReal *objPos_ = dBodyGetPosition(obj->id);
       vector_t objPos = v_set(objPos_[0], objPos_[1], objPos_[2], 0.0f);
@@ -251,7 +251,7 @@ ooOrbitStep(OOorbsys *sys, float stepSize)
 }
 
 void
-ooOrbitSetConstant(OOorbsys *sys, const char *key, float k)
+ooOrbitSetConstant(PLorbsys *sys, const char *key, float k)
 {
     assert(sys != NULL && "sys is null");
     assert(key != NULL && "key is null");
@@ -261,7 +261,7 @@ ooOrbitSetConstant(OOorbsys *sys, const char *key, float k)
     }
 }
 
-void ooOrbitLoadSatellites(HRMLobject *obj, OOorbsys *sys, OOscene *parentScene);
+void ooOrbitLoadSatellites(HRMLobject *obj, PLorbsys *sys, OOscene *parentScene);
 
 void
 ooOrbitLoadComet(HRMLobject *obj)
@@ -274,7 +274,7 @@ ooOrbitLoadComet(HRMLobject *obj)
   }
 }
 
-OOorbsys*
+PLorbsys*
 ooOrbitLoadMoon(HRMLobject *obj, OOscene *parentScene)
 {
   assert(obj);
@@ -344,7 +344,7 @@ ooOrbitLoadMoon(HRMLobject *obj, OOscene *parentScene)
   // Period will be in years assuming that semiMajor is in au
   double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
 
-  OOorbsys *sys = ooOrbitNewSys(moonName.u.str, sc,
+  PLorbsys *sys = ooOrbitNewSys(moonName.u.str, sc,
                                 mass, period, 1.0,//float period,
                                 semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc));
 
@@ -353,7 +353,7 @@ ooOrbitLoadMoon(HRMLobject *obj, OOscene *parentScene)
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
   quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(0.05)); // TODO: real rot
 
-  OOorbobj *orbObj = ooOrbitNewObj(sys, moonName.u.str, drawable,
+  PLobject *orbObj = ooOrbitNewObj(sys, moonName.u.str, drawable,
                                    mass,
                                    0.0, 0.0, 0.0,
                                    0.0, 0.0, 0.0,
@@ -370,7 +370,7 @@ ooOrbitLoadMoon(HRMLobject *obj, OOscene *parentScene)
 }
 
 
-OOorbsys*
+PLorbsys*
 ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
 {
   assert(obj);
@@ -440,7 +440,7 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
   // Period will be in years assuming that semiMajor is in au
   double period = comp_orbital_period_for_planet(semiMajor);
 
-  OOorbsys *sys = ooOrbitNewSys(planetName.u.str, sc,
+  PLorbsys *sys = ooOrbitNewSys(planetName.u.str, sc,
                                 mass, period, 1.0,//float period,
                                 semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc));
 
@@ -449,7 +449,7 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
   quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(0.05)); // TODO: real rot
 
-  OOorbobj *orbObj = ooOrbitNewObj(sys, planetName.u.str, drawable,
+  PLobject *orbObj = ooOrbitNewObj(sys, planetName.u.str, drawable,
                                    mass,
                                    0.0, 0.0, 0.0,
                                    0.0, 0.0, 0.0,
@@ -470,17 +470,17 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
 }
 
 void
-ooOrbitLoadSatellites(HRMLobject *obj, OOorbsys *sys, OOscene *parentScene)
+ooOrbitLoadSatellites(HRMLobject *obj, PLorbsys *sys, OOscene *parentScene)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
 
   for (HRMLobject *child = obj->children; child != NULL; child = child->next) {
     if (!strcmp(child->name, "planet")) {
-      OOorbsys *psys = ooOrbitLoadPlanet(child, parentScene);
+      PLorbsys *psys = ooOrbitLoadPlanet(child, parentScene);
       ooOrbitAddChildSys(sys, psys);
     } else if (!strcmp(child->name, "moon")) {
-      OOorbsys *msys = ooOrbitLoadMoon(child, parentScene);
+      PLorbsys *msys = ooOrbitLoadMoon(child, parentScene);
       ooOrbitAddChildSys(sys, msys);      
     } else if (!strcmp(child->name, "comet")) {
 
@@ -489,7 +489,7 @@ ooOrbitLoadSatellites(HRMLobject *obj, OOorbsys *sys, OOscene *parentScene)
 }
 
 
-OOorbsys*
+PLorbsys*
 ooOrbitLoadStar(HRMLobject *obj)
 {
   assert(obj);
@@ -500,7 +500,7 @@ ooOrbitLoadStar(HRMLobject *obj)
   const char *tex = NULL;
   OOscene *sc = ooSgNewScene(NULL, starName.u.str);
 
-  OOorbsys *sys = ooOrbitNewRootSys(starName.u.str, sc,
+  PLorbsys *sys = ooOrbitNewRootSys(starName.u.str, sc,
                                     mass, 0.0 //float period
                                     );
   HRMLobject *sats = NULL;
@@ -542,7 +542,7 @@ ooOrbitLoadStar(HRMLobject *obj)
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
   quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(1.0)); // TODO: real rot
 
-  OOorbobj *orbObj = ooOrbitNewObj(sys, starName.u.str, drawable,
+  PLobject *orbObj = ooOrbitNewObj(sys, starName.u.str, drawable,
                                    mass,
                                    0.0, 0.0, 0.0,
                                    0.0, 0.0, 0.0,
@@ -554,7 +554,7 @@ ooOrbitLoadStar(HRMLobject *obj)
   return sys;
 }
 
-OOorbsys*
+PLorbsys*
 ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 {
   char *file = ooResGetPath(fileName);
@@ -567,7 +567,7 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
     return NULL;
   }
 
-  OOorbsys *sys = NULL;
+  PLorbsys *sys = NULL;
   // Go through the document and handle each entry in the document
 
   for (HRMLobject *node = hrmlGetRoot(solarSys); node != NULL; node = node->next) {
@@ -585,14 +585,14 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
   return sys;
 }
 
-OOorbsys*
-ooOrbitGetSys(const OOorbsys *root,  const char *name)
+PLorbsys*
+ooOrbitGetSys(const PLorbsys *root,  const char *name)
 {
   char str[strlen(name)+1];
   strcpy(str, name); // TODO: We do not trust the user, should probably
                      // check alloca result
 
-  OOorbsys *sys = (OOorbsys*)root;
+  PLorbsys *sys = (PLorbsys*)root;
   char *strp = str;
   char *strTok = strsep(&strp, "/");
   int idx = 0;

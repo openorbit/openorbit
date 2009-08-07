@@ -55,20 +55,26 @@ typedef enum OOstagestate {
 
 typedef struct OOstage {
   OOstagestate state;
-  int detatchOrder; // How and when to detach the stage
+  int detachOrder; // How and when to detach the stage
   float mass;
   float inertia[3];
-  OOobjvector engines;
+  OOobjvector engines; // Main orbital engines
   OOobjvector torquers;
   dBodyID id;
 } OOstage;
 
-typedef struct OOspacecraft {
+typedef struct OOspacecraft OOspacecraft;
+typedef void (*OOscstepfunc)(OOspacecraft*, double dt);
+
+struct OOspacecraft {
   OOobjvector stages;
-  int activeStageIdx; // index in stage vector of active stage
-  int activeStageCnt; // number of active stages
+  int activeStageIdx; // index in stage vector of active stage, this point out where
+                      // detachment happens
   dBodyID body;
-} OOspacecraft;
+  
+  OOscstepfunc prestep;
+  OOscstepfunc poststep;
+};
 
 // Note engine structure is for both engines and RCS thrusters
 typedef struct OOengine {
@@ -78,6 +84,9 @@ typedef struct OOengine {
   float forceMag; //!< Newton
   vector_t dir; //!< Unit vector with direction of thruster
 } OOengine;
+
+typedef OOengine OOthruster;
+
 
 // The torquer structure is for more general torquers (that are not mass expelling
 // thrusters). These include magnetotorquers and anything else that include rotating

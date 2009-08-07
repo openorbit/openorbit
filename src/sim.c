@@ -68,7 +68,7 @@ ooSimSetSg(OOscenegraph *sg)
 
 
 void
-ooSimSetOrbSys(OOorbsys *osys)
+ooSimSetOrbSys(PLorbsys *osys)
 {
   gSIM_state.orbSys = osys;
 }
