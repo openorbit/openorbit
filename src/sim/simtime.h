@@ -29,9 +29,10 @@ typedef struct OOsimtime {
 OOsimtime* ooSimTimeInit(time_t epoch);
 
 static inline void
-ooSimTimeTick(OOsimtime *self)
+ooSimTimeTick(OOsimtime *self, double dt)
 {
   self->timeStamp ++;
+  self->currentTime = (((double)(self->timeStamp)) * dt) / (24.0 * 3600.0);
 }
 
 float ooTimeGetJD(OOsimtime *self);

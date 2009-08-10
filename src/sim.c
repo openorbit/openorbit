@@ -76,10 +76,7 @@ ooSimSetOrbSys(PLorbsys *osys)
 void
 ooSimStep(float dt)
 {
-  ooSimTimeTick(gSIM_state.timeState);
-
-  gSIM_state.timeState->currentTime = (float)gSIM_state.timeState->timeStamp * dt / (24.0 * 3600.0);
-
+  ooSimTimeTick(gSIM_state.timeState, dt);
   struct timeval start;
   struct timeval end;
   gettimeofday(&start, NULL);
