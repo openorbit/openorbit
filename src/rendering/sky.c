@@ -167,6 +167,9 @@ ooSkyDrawStars(OOstars *stars)
 
   glDisable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
 }
 
 

@@ -89,7 +89,10 @@ ooOrbitNewSys(const char *name, OOscene *scene,
               float semiMaj, float semiMin)
 {
   PLorbsys *sys = ooOrbitNewRootSys(name, scene, m, rotPeriod);
-  sys->orbit = ooGeoEllipseAreaSeg(300, semiMaj, semiMin);
+  sys->orbit = ooGeoEllipseAreaSeg(1000, semiMaj, semiMin);
+
+  ooSgSceneAddObj(scene->parent, ooSgNewDrawable(name, sys->orbit, ooGeoEllipseDraw));
+
   sys->phys.param.orbitalPeriod = orbitPeriod;
   return sys;
 }

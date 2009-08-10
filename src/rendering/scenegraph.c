@@ -510,7 +510,7 @@ ooSgDrawSphere(OOsphere *sp)
 //  glMatrixMode(GL_MODELVIEW);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
-  
+  glColor3f(1.0f, 1.0f, 1.0f);
   gluSphere(sp->quadratic, sp->radius, 128, 128);
 
   glMatrixMode(GL_MODELVIEW);

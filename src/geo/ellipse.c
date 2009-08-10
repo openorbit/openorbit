@@ -29,7 +29,7 @@ ooGeoEllipseDraw(OOellipse *e)
   glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(3, GL_FLOAT, 4*sizeof(float), e->vec.elems);
   glColor3f(1.0, 0.0, 0.0);
-  glDrawArrays(GL_LINE_LOOP, 0,  e->vec.length);
+  glDrawArrays(GL_LINE_STRIP, 0,  e->vec.length);
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
@@ -73,7 +73,7 @@ ooVecArrayPushC(OOvecarray *vec, float x, float y, float z, float w)
 
 v4f_t
 ooVecArrayPop(OOvecarray *vec)
-{    
+{
     return vec->elems[vec->length --];
 }
 
@@ -105,18 +105,18 @@ OOellipse* ooGeoEllipseAreaSeg(size_t segs, float semiMajor, float semiMinor)
   e->semiMajor = semiMajor;
   e->semiMinor = semiMinor;
   e->ecc = ooGeoEllipseEcc(e);
-  
+
   double area = ooGeoEllipseArea(e);
-  
+
   double sweep = area / (double)segs;
-  
+
   ooVecArrayPushC(&e->vec,
                   semiMajor * cos(0.0), semiMinor * sin(0.0), 0.0f, 0.0f);
   double segArea, tol;
   double prevAngle = 0.0f;
   double newAngle = prevAngle + 1.0*DEG_TO_RAD(360.0/(double)segs);
   double delta;
-  
+
   for (size_t i = 1 ; i < segs ; i ++) {
     int count = 0;
     segArea = ooGeoEllipseSegmentArea(e, prevAngle, newAngle);
@@ -149,7 +149,7 @@ OOellipse* ooGeoEllipseAreaSeg(size_t segs, float semiMajor, float semiMinor)
     prevAngle = newAngle;
     newAngle = nextNewAngle;
   }
-  
+
   return e;
 }
 
@@ -167,7 +167,7 @@ ooGeoEllipseCircumferenceAccurate(OOellipse *e)
 {
   double abOverAb = (e->semiMajor-e->semiMinor)/(e->semiMajor+e->semiMinor);
   double abOverAbSquare3 = 3.0f * abOverAb * abOverAb;
-  
+
   return M_PI * (e->semiMajor + e->semiMinor) *
                 (1.0f + abOverAbSquare3 /
                         (10.0f + sqrtf(4.0f-abOverAbSquare3)));
@@ -195,12 +195,11 @@ ooGeoEllipseSegmentArea(OOellipse *e, double fi0, double fi1)
   double y0 = r0 * sin(fi0);
   double x1 = r1 * cos(fi1);
   double y1 = r1 * sin(fi1);
-  
+
   double seg = 0.5 * fabs(x0*y1-x1*y0);
   //printf("segArea: r0: %f r1: %f, v0 = (%f, %f), v1 = (%f, %f)\n", r0, r1, x0, y0, x1, y1);
-  
+
   return seg;
-  
 }
 
 double
@@ -212,23 +211,24 @@ ooGeoEllipseEcc(OOellipse *e)
 v4f_t
 ooGeoEllipseSegPoint(OOellipse *e, double t)
 {
-  double pos = fmod(t, (double)e->vec.length);
+  double pos = fmod(t, (double)(e->vec.length));
   size_t i = (size_t) pos;
 
   v4f_t a = e->vec.elems[(i + 1) % e->vec.length];  
   v4f_t b = e->vec.elems[i % e->vec.length];
-  
+
   double frac = pos - floor(pos);
-  
+
   // TODO: Vectors should not use unions anymore
   vector_t av, bv;
   av.v = a;
   bv.v = b;
-  
+
   // Lineraly interpolate between point b and a
   vector_t abdiff = v_sub(av, bv);
-  vector_t fv = v_s_mul(abdiff, (float)frac);
+  vector_t tmp = v_set(frac, frac, frac, 0.0);
+  vector_t fv = {.v = abdiff.v * tmp.v};//v_s_mul(abdiff, (float)frac); BUG IN v_s_mul???
   vector_t res = v_add(bv, fv);
-  
+
   return res.v;
 }
