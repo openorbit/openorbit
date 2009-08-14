@@ -50,22 +50,22 @@ struct PLorbsys {
     char *name;
     
     struct {
-      float dist;
-      float distInv;
-      float mass;
-      float massInv;
+      double dist;
+      double distInv;
+      double mass;
+      double massInv;
     } scale;
 
     struct {
       struct {
-        float m;
-        float orbitalPeriod;
-        float rotationPeriod;
+        double m;
+        double orbitalPeriod;
+        double rotationPeriod;
         v4f_t pos;
         v4f_t rot;
       } param;
       struct {
-        float G; //!< Gravitational constant (6.67428e-11)
+        double G; //!< Gravitational constant (6.67428e-11)
       } k;
     } phys;
 
@@ -81,16 +81,16 @@ struct PLorbsys {
 
 
 PLorbsys* ooOrbitNewSys(const char *name, OOscene *scene,
-                        float m, float orbitPeriod, float rotPeriod,
-                        float semiMaj, float semiMin);
+                        double m, double orbitPeriod, double rotPeriod,
+                        double semiMaj, double semiMin);
 PLobject*
 ooOrbitNewObj(PLorbsys *sys, const char *name,
               OOdrawable *drawable,
-              float m,
-              float x, float y, float z,
-              float vx, float vy, float vz,
-              float qx, float qy, float qz, float qw,
-              float rqx, float rqy, float rqz, float rqw);
+              double m,
+              double x,   double y,   double z,
+              double vx,  double vy,  double vz,
+              double qx,  double qy,  double qz,  double qw,
+              double rqx, double rqy, double rqz, double rqw);
 
 /*!
    Searches the system graph for a system with the given name. The name must be
@@ -102,11 +102,11 @@ PLorbsys* ooOrbitGetSys(const PLorbsys *root,  const char *name);
 
 void ooOrbitAddChildSys(PLorbsys * restrict sys, PLorbsys * restrict child);
 
-void ooOrbitSetScale(PLorbsys *sys, float ms, float ds);
-void ooOrbitSetConstant(PLorbsys *sys, const char *key, float k);
+void ooOrbitSetScale(PLorbsys *sys, double ms, double ds);
+void ooOrbitSetConstant(PLorbsys *sys, const char *key, double k);
 void ooOrbitSetScene(PLorbsys *sys, OOscene *scene);
 
-void ooOrbitStep(PLorbsys *sys, float stepsize);
+void ooOrbitStep(PLorbsys *sys, double stepsize);
 void ooOrbitClear(PLorbsys *sys);
 
 /*!

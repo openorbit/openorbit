@@ -55,7 +55,7 @@ comp_orbital_period_for_planet(double semimajor)
 }
 
 PLorbsys*
-ooOrbitNewRootSys(const char *name, OOscene *scene, float m, float rotPeriod)
+ooOrbitNewRootSys(const char *name, OOscene *scene, double m, double rotPeriod)
 {
   PLorbsys *sys = malloc(sizeof(PLorbsys));
   sys->world = dWorldCreate();
@@ -85,13 +85,14 @@ ooOrbitNewRootSys(const char *name, OOscene *scene, float m, float rotPeriod)
 
 PLorbsys*
 ooOrbitNewSys(const char *name, OOscene *scene,
-              float m, float orbitPeriod, float rotPeriod,
-              float semiMaj, float semiMin)
+              double m, double orbitPeriod, double rotPeriod,
+              double semiMaj, double semiMin)
 {
   PLorbsys *sys = ooOrbitNewRootSys(name, scene, m, rotPeriod);
   sys->orbit = ooGeoEllipseAreaSeg(1000, semiMaj, semiMin);
 
-  ooSgSceneAddObj(scene->parent, ooSgNewDrawable(name, sys->orbit, ooGeoEllipseDraw));
+  ooSgSceneAddObj(scene->parent, ooSgNewDrawable(name, sys->orbit,
+                                                 (OOdrawfunc)ooGeoEllipseDraw));
 
   sys->phys.param.orbitalPeriod = orbitPeriod;
   return sys;
@@ -100,11 +101,11 @@ ooOrbitNewSys(const char *name, OOscene *scene,
 PLobject*
 ooOrbitNewObj(PLorbsys *sys, const char *name,
               OOdrawable *drawable,
-              float m,
-              float x, float y, float z,
-              float vx, float vy, float vz,
-              float qx, float qy, float qz, float qw,
-              float rqx, float rqy, float rqz, float rqw)
+              double m,
+              double x, double y, double z,
+              double vx, double vy, double vz,
+              double qx, double qy, double qz, double qw,
+              double rqx, double rqy, double rqz, double rqw)
 {
   assert(sys != NULL);
   assert(m >= 0.0);
@@ -160,7 +161,7 @@ ooOrbitAddChildSys(PLorbsys * restrict parent, PLorbsys * restrict child)
 }
 
 void
-ooOrbitSetScale(PLorbsys *sys, float ms, float ds)
+ooOrbitSetScale(PLorbsys *sys, double ms, double ds)
 {
   assert(sys != NULL);
 
@@ -196,7 +197,7 @@ ooOrbitClear(PLorbsys *sys)
 
 
 void
-ooOrbitStep(PLorbsys *sys, float stepSize)
+ooOrbitStep(PLorbsys *sys, double stepSize)
 {
   bool needsCompacting = false;
   // First compute local gravity for each object
@@ -226,7 +227,7 @@ ooOrbitStep(PLorbsys *sys, float stepSize)
     sys->phys.param.pos = ooGeoEllipseSegPoint(sys->orbit,
                                                (ooTimeGetJD(ooSimTimeState()) / 
                                                  sys->phys.param.orbitalPeriod)*
-                                                 (float)sys->orbit->vec.length);
+                                                 (double)sys->orbit->vec.length);
 
     ooLogTrace("%f: %s: %f: %vf",
                ooTimeGetJD(ooSimTimeState()),
@@ -254,7 +255,7 @@ ooOrbitStep(PLorbsys *sys, float stepSize)
 }
 
 void
-ooOrbitSetConstant(PLorbsys *sys, const char *key, float k)
+ooOrbitSetConstant(PLorbsys *sys, const char *key, double k)
 {
     assert(sys != NULL && "sys is null");
     assert(key != NULL && "key is null");

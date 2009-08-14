@@ -25,7 +25,6 @@
 #include <vmath/vmath.h>
 
 #include <openorbit/openorbit.h>
-#include "texture.h"
 //#include "physics/orbit.h"
 #include "sim/simtime.h"
 
@@ -68,7 +67,7 @@ struct OOscene {
 };
 
 struct OOoverlay {
-  OOtexture *tex;
+//  OOtexture *tex;
   float x, y;
   float w, h;
 };
@@ -137,40 +136,6 @@ void ooSgSceneAddChild(OOscene *parent, OOscene *child);
 void ooSgSceneAddObj(OOscene *sc, OOdrawable *object);
 
 
-typedef struct {
-    matrix_t t;
-    quaternion_t q;
-} OOtransform;
-
-typedef struct {
-    scalar_t s;
-} OOscale;
-
-typedef struct {
-    dWorldID world;
-    dBodyID body;
-} OOodetransform;
-
-typedef struct {
-    float uv[2];
-    float rgba[4];
-    float norm[3];
-    float vert[3];
-} OOvertex;
-
-
-typedef struct {
-    size_t vSize;
-    size_t vCount;
-    OOvertex *vertices;
-    GLuint texId;
-} OOmesh;
-
-typedef struct {
-    GLuint texId;
-    GLUquadricObj *quadratic;
-    GLfloat radius;
-} OOsphere;
 
 OOdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
 

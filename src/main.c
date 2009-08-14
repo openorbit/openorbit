@@ -51,6 +51,7 @@
 #include "rendering/camera.h"
 #include "rendering/sky.h"
 #include "scripting/scripting.h"
+#include "rendering/texture.h"
 
 #include <ode/ode.h>
 #include "SDL.h"

@@ -20,15 +20,17 @@
 
 // Tsiolkovsky Rocket Equation
 // Note that this is used by engine models to model their behaviour, the values dm and ve
-vector_t
-plTsiolkovsky(vector_t ve, float m0, float dm)
+#include "physics.h"
+#include <vmath/vmath.h>
+PLdouble3
+plTsiolkovsky(PLdouble3 ve, double m0, double dm)
 {
-  return v_s_mul(ve, log(m0 / (m0 - dm)));
+  return vd3_s_mul(ve, log(m0 / (m0 - dm)));
 }
 
 // Thrust for exhaust velocity ve, delta m and delta t
-vector_t
-plThrust(vector_t ve, float dm, float dt)
+PLdouble3
+plThrust(PLdouble3 ve, double dm, double dt)
 {
-  return v_s_mul(ve, dm / dt);
+  return vd3_s_mul(ve, dm / dt);
 }

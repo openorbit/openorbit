@@ -38,6 +38,62 @@ typedef float scalar_t;
 
 typedef float vec_arr_t[4];
 
+typedef float __attribute__((vector_size (16))) float3;
+typedef float __attribute__((vector_size (16))) float4;
+typedef float __attribute__((vector_size (64))) float16;
+
+typedef float3 float3x3[4];
+typedef float4 float4x4[4];
+
+typedef union float3_u {
+  float3 v;
+  float a[4];
+} float3_u;
+
+typedef union float4_u {
+  float4 v;
+  float a[4];
+} float4_u;
+
+typedef union float4x4_u {
+  float4x4 v;
+  float a[4][4];
+} float4x4_u;
+
+typedef union float16_u {
+  float16 v;
+  float a[16];
+} float16_u;
+
+
+typedef double __attribute__((vector_size (32))) double3;
+typedef double __attribute__((vector_size (32))) double4;
+typedef double __attribute__((vector_size (128))) double16;
+typedef double3 double3x3[4];
+typedef double4 double4x4[4];
+
+typedef union double3_u {
+  double3 v;
+  double a[4];
+} double3_u;
+
+typedef union double4_u {
+  double4 v;
+  double a[4];
+} double4_u;
+
+typedef union double4x4_u {
+  double4x4 v;
+  double a[4][4];
+} double4x4_u;
+
+
+typedef union double16_u {
+  double16 v;
+  double a[16];
+} double16_u;
+
+
 typedef float __attribute__((vector_size (16))) v4f_t;
 typedef float __attribute__((vector_size (64))) m4f_t;
 
@@ -81,7 +137,7 @@ typedef vec_arr_t axis_arr_t;
 typedef vector_t axis_t;
 typedef scalar_t angle_t;
 
-static inline v4f_t
+static inline float4
 v4f_make(float x, float y, float z, float w)
 {
   vector_t v;
@@ -92,7 +148,7 @@ v4f_make(float x, float y, float z, float w)
   return v.v;
 }
 
-static inline v4f_t
+static inline float3
 v3f_make(float x, float y, float z)
 {
   vector_t v;

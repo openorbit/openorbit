@@ -28,6 +28,43 @@
 #include <vmath/vmath.h>
 #include "geo/geo.h"
 #include "physics/orbit.h"
+#include "texture.h"
+
+typedef struct {
+    matrix_t t;
+    quaternion_t q;
+} OOtransform;
+
+typedef struct {
+    scalar_t s;
+} OOscale;
+
+typedef struct {
+    dWorldID world;
+    dBodyID body;
+} OOodetransform;
+
+
+typedef struct {
+    float uv[2];
+    float rgba[4];
+    float norm[3];
+    float vert[3];
+} OOvertex;
+
+
+typedef struct {
+    size_t vSize;
+    size_t vCount;
+    OOvertex *vertices;
+    uint64_t texId;
+} OOmesh;
+
+typedef struct {
+    GLuint texId;
+    GLUquadricObj *quadratic;
+    GLfloat radius;
+} OOsphere;
 
 /*!
     Updates a drawable object with ode-data.
@@ -279,7 +316,7 @@ ooSgDrawOverlay(OOoverlay *overlay)
   glPushMatrix();
   glLoadIdentity();
 
-  glBindTexture(GL_TEXTURE_2D, overlay->tex->texId);
+//  glBindTexture(GL_TEXTURE_2D, overlay->tex->texId);
 
   glBegin(GL_QUADS);
     glVertex2f(overlay->x, overlay->y);

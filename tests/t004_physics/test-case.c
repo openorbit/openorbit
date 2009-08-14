@@ -20,53 +20,58 @@
 #include <stdlib.h>
 #include <string.h>
 #include <check.h>
+#include "physics/physics.h"
+#include "vmath/vmath.h"
 
-START_TEST(test_apply_force_at_pos)
+#define IN_RANGE(v, a, b) ((a <= v) && (v <= b))
+
+START_TEST(test_create_obj)
 {
-//    ph_obj_t *obj = ph_new_obj();
-    //memset(&obj, 0, sizeof(ph_obj_t));
-    
-//    vector_t pos, f;
-//    ph_apply_force_at_pos(&obj, pos, f);
-    ;
+  PLobject2 *obj = plObject3d(PL_CHUNK_RAD * 4.0 + 1000.0,
+                              - (PL_CHUNK_RAD * 2.0 + 1000.0),
+                              0.0);
+  fail_unless(obj->i == 2, "calculation of i failed");
+  fail_unless(obj->j == -1, "calculation of j failed");
+  fail_unless(obj->k == 0, "calculation of k failed");
+
+  fail_unless(IN_RANGE(vd3_get(obj->p, 0), 999.99, 1000.01), "calculation of x failed");
+  fail_unless(IN_RANGE(vd3_get(obj->p, 1), -1000.01, -999.99), "calculation of y failed");
+  fail_unless(IN_RANGE(vd3_get(obj->p, 2), 0.0, 0.0), "calculation of z failed");
+
+
+  plObjectDelete(obj);
 }
 END_TEST
 
-START_TEST(test_apply_force_relative)
+START_TEST(test_translate_obj)
 {
-//    ph_obj_t obj;
-//    memset(&obj, 0, sizeof(ph_obj_t));
-
-//    vector_t pos, f;
-
-//    ph_apply_force_relative(&obj, pos, f);
+  PLobject2 *obj = plObject3d(PL_CHUNK_RAD * 4.0 + 1000.0,
+                              - (PL_CHUNK_RAD * 2.0 + 1000.0),
+                              0.0);
+  
+  fail_unless(obj->i == 2, "i was not set properly (%d)", (int)obj->i);
+  fail_unless(obj->j == -1, "j was not set properly (%d)", (int)obj->j);
+  fail_unless(obj->k == 0, "k was not set properly (%d)", (int)obj->k);
+  
+  
+  PLdouble3 dp = vd3_set(PL_CHUNK_LEN * 1.0,
+                         PL_CHUNK_LEN * 1.0,
+                         - PL_CHUNK_LEN * 1.0);
+  plTranslateObject3dv(obj, dp);
+  
+  fail_unless(obj->i == 3, "i was not incremented (%d)", (int)obj->i);
+  fail_unless(obj->j == 0, "j was not incremented (%d)", (int)obj->j);
+  fail_unless(obj->k == -1, "k was not decremented (%d)", (int)obj->k);
+  
+  fail_unless(IN_RANGE(vd3_get(obj->p, 0), -PL_CHUNK_RAD + 999.99,- PL_CHUNK_RAD + 1000.01),
+              "calculation of x failed (%f)", vd3_get(obj->p, 0));
+  fail_unless(IN_RANGE(vd3_get(obj->p, 1),- PL_CHUNK_RAD + -1000.01, -999.99),
+              "calculation of y failed (%f)", vd3_get(obj->p, 1));
+  fail_unless(IN_RANGE(vd3_get(obj->p, 2), -0.001, 0.001),
+              "calculation of z failed (%f)", vd3_get(obj->p, 2));
 }
 END_TEST
 
-START_TEST(test_apply_force)
-{
-//    ph_obj_t obj;
-//    memset(&obj, 0, sizeof(ph_obj_t));
-    
-//    vector_t f = {4.0, 4.0, 4.0, 0.0};
-
-//    ph_apply_force(&obj, f);
-    
-//    fail_unless( obj.f_acc.x == 4.0, "apply force failed");
-//    fail_unless( obj.f_acc.y == 4.0, "apply force failed");
-//    fail_unless( obj.f_acc.z == 4.0, "apply force failed");
-//    fail_unless( obj.f_acc.w == 0.0, "apply force failed");
-
-//    vector_t f2 = {1.0, 2.0, 3.0, 0.0};
-//    ph_apply_force(&obj, f2);
-
-//    fail_unless( obj.f_acc.x == 5.0, "apply force failed");
-//    fail_unless( obj.f_acc.y == 6.0, "apply force failed");
-//    fail_unless( obj.f_acc.z == 7.0, "apply force failed");
- //   fail_unless( obj.f_acc.w == 0.0, "apply force failed");
-    
-}
-END_TEST
 
 Suite
 *test_suite (void)
@@ -75,10 +80,9 @@ Suite
     
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
+    tcase_add_test(tc_core, test_create_obj);
 
-    tcase_add_test(tc_core, test_apply_force);
-    tcase_add_test(tc_core, test_apply_force_relative);
-    tcase_add_test(tc_core, test_apply_force_at_pos);
+    tcase_add_test(tc_core, test_translate_obj);
     
     suite_add_tcase(s, tc_core);
     
