@@ -25,6 +25,7 @@
 
 typedef float __attribute__((vector_size (16))) PLfloat3;
 typedef double __attribute__((vector_size (32))) PLdouble3;
+typedef int16_t __attribute__((vector_size (8))) PLshort3;
 
 typedef struct PLorbsys PLorbsys;
 
@@ -46,6 +47,12 @@ typedef struct PLobject {
 #define PL_CHUNK_RAD  500000000.0
 typedef struct PLocttree PLocttree;
 typedef struct PLobject2 PLobject2;
+typedef struct PLlwcoord PLlwcoord;
+
+struct PLlwcoord {
+  PLdouble3 offs;
+  PLshort3 seg;
+};
 
 struct PLobject2 {
   struct PLobject2 *next;
@@ -57,13 +64,13 @@ struct PLobject2 {
   float m;
   OOdrawable *drawable;
   
-  PLdouble3 p; // Coords for objects within the node (in metres)
-  int16_t i, j, k; // Position (node in solar system, 1 000 000.0 km chunks), 16 bit
-                   // integers here gives us a volume of 438 au on each side
-                   // unfortunatelly 16 bit integers cannot cover the oort cloud as it reach
-                   // out a couple of thousand au's, but we can change the index to 32 bit
-                   // later if needed (this would give us 453 ly or for 64 bit 598 Gpc)
-                   // note that each volume is between +/- 500 Gm
+  PLlwcoord p; // Coords for objects within the node (in metres)
+               // Position (node in solar system, 1 000 000.0 km chunks), 16 bit
+               // integers here gives us a volume of 438 au on each side
+               // unfortunatelly 16 bit integers cannot cover the oort cloud as it reach
+               // out a couple of thousand au's, but we can change the index to 32 bit
+               // later if needed (this would give us 453 ly or for 64 bit 598 Gpc)
+               // note that each volume is between +/- 500 Gm
   short boxradius; // How many adjacent boxes does this object fill up (normally 1, but the
                    // sun would use 2)
 };
