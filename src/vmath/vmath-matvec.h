@@ -207,6 +207,11 @@ vf4_s_add(float4 a, float b)
   float4 bv = vf4_set(b,b,b,b);
   return a + bv;
 }
+static inline float3
+vf3_add(float3 a, float3 b)
+{
+  return a + b;
+}
 
 static inline float4
 vf4_add(float4 a, float4 b)
@@ -247,6 +252,13 @@ vd3_copysign(double3 a, double3 b)
 
   return res.v;
 }
+
+static inline float3
+vf3_sub(float3 a, float3 b)
+{
+  return a - b;
+}
+
 
 static inline float4
 vf4_sub(float4 a, float4 b)

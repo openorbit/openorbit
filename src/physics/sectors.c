@@ -19,30 +19,14 @@
 
 #include "physics.h"
 
-#define OFFS_X(c) (((double*)&(c)->offs)[0])
-#define OFFS_Y(c) (((double*)&(c)->offs)[1])
-#define OFFS_Z(c) (((double*)&(c)->offs)[2])
+#define OFFS_X(c) (((float*)&(c)->offs)[0])
+#define OFFS_Y(c) (((float*)&(c)->offs)[1])
+#define OFFS_Z(c) (((float*)&(c)->offs)[2])
 
-#define SEG_X(c) (((int16_t*)&(c)->seg)[0])
-#define SEG_Y(c) (((int16_t*)&(c)->seg)[1])
-#define SEG_Z(c) (((int16_t*)&(c)->seg)[2])
+#define SEG_X(c) (((int32_t*)&(c)->seg)[0])
+#define SEG_Y(c) (((int32_t*)&(c)->seg)[1])
+#define SEG_Z(c) (((int32_t*)&(c)->seg)[2])
 
-PLshort3
-vs3_set(int16_t a, int16_t b, int16_t c)
-{
-  union {
-    PLshort3 v;
-    struct {
-      int16_t x, y, z;
-    } s;
-  } u;
-
-  u.s.x = a;
-  u.s.y = b;
-  u.s.z = c;
-
-  return u.v;
-}
 
 PLocttree*
 plOcttree(double width, int levels)
@@ -55,65 +39,65 @@ plOcttree(double width, int levels)
 void
 plLwcNormalise(PLlwcoord *coord)
 {
-  if (fabs(OFFS_X(coord)) >= PL_CHUNK_RAD) {
-    SEG_X(coord) += (int16_t) (OFFS_X(coord) / PL_CHUNK_RAD);
-    OFFS_X(coord) = fmod(OFFS_X(coord), PL_CHUNK_RAD);
+  if (fabsf(OFFS_X(coord)) >= PL_SEGMENT_LEN) {
+    SEG_X(coord) += (int16_t) (OFFS_X(coord) / PL_SEGMENT_LEN);
+    OFFS_X(coord) = fmodf(OFFS_X(coord), PL_SEGMENT_LEN);
   }
-  if (fabs(OFFS_Y(coord)) >= PL_CHUNK_RAD) {
-    SEG_Y(coord) += (int16_t) (OFFS_Y(coord) / PL_CHUNK_RAD);
-    OFFS_Y(coord) = fmod(OFFS_Y(coord), PL_CHUNK_RAD);
+  if (fabsf(OFFS_Y(coord)) >= PL_SEGMENT_LEN) {
+    SEG_Y(coord) += (int16_t) (OFFS_Y(coord) / PL_SEGMENT_LEN);
+    OFFS_Y(coord) = fmodf(OFFS_Y(coord), PL_SEGMENT_LEN);
   }
-  if (fabs(OFFS_Z(coord)) >= PL_CHUNK_RAD) {
-    SEG_Z(coord) += (int16_t) (OFFS_Z(coord) / PL_CHUNK_RAD);
-    OFFS_Z(coord) = fmod(OFFS_Z(coord), PL_CHUNK_RAD);
+  if (fabsf(OFFS_Z(coord)) >= PL_SEGMENT_LEN) {
+    SEG_Z(coord) += (int16_t) (OFFS_Z(coord) / PL_SEGMENT_LEN);
+    OFFS_Z(coord) = fmodf(OFFS_Z(coord), PL_SEGMENT_LEN);
   }
 }
 
 void
-plLwcTranslate(PLlwcoord *coord, PLdouble3 offs)
+plLwcTranslate(PLlwcoord *coord, PLfloat3 offs)
 {
-  coord->offs = vd3_add(coord->offs, offs);
+  coord->offs = vf3_add(coord->offs, offs);
   plLwcNormalise(coord);
 }
 
-PLdouble3
+PLfloat3
 plLwcGlobal(const PLlwcoord *coord)
 {
-  PLdouble3 p = coord->offs;
-  return vd3_add(p, vd3_s_mul(p, PL_CHUNK_RAD));
+  PLfloat3 p = coord->offs;
+  return vf3_add(p, vf3_s_mul(p, PL_SEGMENT_LEN));
 }
 
-PLdouble3
-plLwcRelVec(const PLlwcoord *coord, PLshort3 seg)
+PLfloat3
+plLwcRelVec(const PLlwcoord *coord, PLint3 seg)
 {
-  PLdouble3 r = coord->offs;
-  PLshort3 segdiff = coord->seg - seg;
-  PLdouble3 segdiffr = vd3_set((double)((int16_t*)&segdiff)[0],
-                               (double)((int16_t*)&segdiff)[1],
-                               (double)((int16_t*)&segdiff)[2]);
-  r = vd3_add(r, vd3_s_mul(segdiffr, PL_CHUNK_RAD));
+  PLfloat3 r = coord->offs;
+  PLint3 segdiff = coord->seg - seg;
+  PLfloat3 segdiffr = vf3_set((float)((int32_t*)&segdiff)[0],
+                               (float)((int32_t*)&segdiff)[1],
+                               (float)((int32_t*)&segdiff)[2]);
+  r = vf3_add(r, vf3_s_mul(segdiffr, PL_SEGMENT_LEN));
   return r;
 }
 
-PLdouble3
+PLfloat3
 plLwcDist(const PLlwcoord *a, const PLlwcoord * b)
 {
-  PLdouble3 diff = vd3_sub(a->offs, b->offs);
-  PLshort3 segdiff = a->seg - b->seg;
-  PLdouble3 segdiffr = vd3_set((double)((int16_t*)&segdiff)[0],
-                               (double)((int16_t*)&segdiff)[1],
-                               (double)((int16_t*)&segdiff)[2]);
+  PLfloat3 diff = vf3_sub(a->offs, b->offs);
+  PLint3 segdiff = a->seg - b->seg;
+  PLfloat3 segdiffr = vf3_set((float)((int32_t*)&segdiff)[0],
+                              (float)((int32_t*)&segdiff)[1],
+                              (float)((int32_t*)&segdiff)[2]);
 
-  return vd3_add(diff, vd3_s_mul(segdiffr, PL_CHUNK_RAD));
+  return vf3_add(diff, vf3_s_mul(segdiffr, PL_SEGMENT_LEN));
 }
 
-PLdouble3
+PLfloat3
 plGetObjGlobal3d(PLobject2 *obj)
 {
   return plLwcGlobal(&obj->p);
 }
 
-PLdouble3
+PLfloat3
 plObjectDistance(PLobject2 *a, PLobject2 *b)
 {
   return plLwcDist(&a->p, &b->p);
@@ -123,8 +107,8 @@ PLobject2*
 plObject3d(double x, double y, double z)
 {
   PLobject2 *obj = malloc(sizeof(PLobject2));
-  obj->p.offs = vd3_set(x, y, z);
-  obj->p.seg = vs3_set(0, 0, 0);
+  obj->p.offs = vf3_set(x, y, z);
+  obj->p.seg = vi3_set(0, 0, 0);
   plLwcNormalise(&obj->p);
   return obj;
 }
@@ -136,12 +120,12 @@ plObjectDelete(PLobject2 *obj)
 }
 
 void
-plTranslateObject3dv(PLobject2 *obj, PLdouble3 dp)
+plTranslateObject3fv(PLobject2 *obj, PLfloat3 dp)
 {
   plLwcTranslate(&obj->p, dp);
 }
 
-PLdouble3
+PLfloat3
 plObjectGlobal(PLobject2 *obj)
 {
   return plLwcGlobal(&obj->p);

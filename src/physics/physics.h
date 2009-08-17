@@ -25,6 +25,8 @@
 
 typedef float __attribute__((vector_size (16))) PLfloat3;
 typedef double __attribute__((vector_size (32))) PLdouble3;
+typedef int64_t __attribute__((vector_size (32))) PLlong3;
+typedef int32_t __attribute__((vector_size (16))) PLint3;
 typedef int16_t __attribute__((vector_size (8))) PLshort3;
 
 typedef struct PLorbsys PLorbsys;
@@ -45,13 +47,14 @@ typedef struct PLobject {
 // total volume available is something like +/- 200 au on each side
 #define PL_CHUNK_LEN 1000000000.0
 #define PL_CHUNK_RAD  500000000.0
+#define PL_SEGMENT_LEN 1024.0f
 typedef struct PLocttree PLocttree;
 typedef struct PLobject2 PLobject2;
 typedef struct PLlwcoord PLlwcoord;
 
 struct PLlwcoord {
-  PLdouble3 offs;
-  PLshort3 seg;
+  PLfloat3 offs;
+  PLint3 seg;
 };
 
 struct PLobject2 {
@@ -86,7 +89,8 @@ struct PLocttree {
 
 PLobject2* plObject3d(double x,double y, double z);
 void plObjectDelete(PLobject2 *obj);
+PLfloat3 plObjectDistance(PLobject2 *a, PLobject2 *b);
 
-void plTranslateObject3dv(PLobject2 *obj, PLdouble3 dp);
+void plTranslateObject3fv(PLobject2 *obj, PLfloat3 dp);
 
 #endif /* end of include guard: PHYSICS_H_MW8CHG7V */

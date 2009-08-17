@@ -36,6 +36,6 @@
 #include <vmath/vmath-matvec.h>
 #include <vmath/vmath-quaternions.h>
 #include <vmath/vmath-convert.h>
-
+#include <vmath/vmath-integer.h>
 
 #endif /* ! VMATH_H__ */

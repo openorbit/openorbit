@@ -28,7 +28,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif 
-
+#include <stdint.h>
 
 /* SIMD-friendly 4 element-vectors */
 /* all functions take restricted pointers as arguments */
@@ -69,6 +69,16 @@ typedef union float16_u {
 typedef double __attribute__((vector_size (32))) double3;
 typedef double __attribute__((vector_size (32))) double4;
 typedef double __attribute__((vector_size (128))) double16;
+
+typedef int16_t __attribute__((vector_size (8))) short3;
+typedef int16_t __attribute__((vector_size (8))) short4;
+typedef uint16_t __attribute__((vector_size (8))) ushort3;
+typedef uint16_t __attribute__((vector_size (8))) ushort4;
+typedef int32_t __attribute__((vector_size (16))) int3;
+typedef int32_t __attribute__((vector_size (16))) int4;
+typedef uint32_t __attribute__((vector_size (16))) uint3;
+typedef uint32_t __attribute__((vector_size (16))) uint4;
+
 typedef double3 double3x3[4];
 typedef double4 double4x4[4];
 
@@ -158,6 +168,7 @@ v3f_make(float x, float y, float z)
   v.w = 0.0;
   return v.v;
 }
+
 
 
 #ifdef __cplusplus
