@@ -45,17 +45,49 @@ typedef struct PLobject {
 // If we take 1.0 Tm side boxes, we can maintain decent double precision units and still
 // use metres. For now, we use 16 bit integers to identify the box, which means that the
 // total volume available is something like +/- 200 au on each side
-#define PL_CHUNK_LEN 1000000000.0
-#define PL_CHUNK_RAD  500000000.0
 #define PL_SEGMENT_LEN 1024.0f
+#define PL_SEGMENT_LEN64 1024.0
+
 typedef struct PLocttree PLocttree;
 typedef struct PLobject2 PLobject2;
 typedef struct PLlwcoord PLlwcoord;
+typedef struct PLlwcoord64 PLlwcoord64;
 
+/*! Large world coordinate
+  Extends the floating point precision coordinates with additional bits yealding us
+  a hybrid of floating point and fixed point coordinates.
+
+  The large world coordinate system works by segmenting the space in multiple segments,
+  each segment is a fixed width where we can keep a reasonable floating point precision
+  intact and working.
+
+  We might convert this back to doubles in the future, depending physics engine
+  constraints, the segment size must however continue to be defined for floats and not
+  doubles, at least until GPUs start to support doubles for OpenGL.
+
+  Note that the segments are overlapping so you cannot cull collissions with the segment
+  id as is. The overlap occurrs with seg N (-1024.0, -0.0] = seg N-1 [0.0, 1024.0)
+*/
 struct PLlwcoord {
   PLfloat3 offs;
   PLint3 seg;
 };
+void plLwcNormalise(PLlwcoord *coord);
+void plLwcTranslate(PLlwcoord *coord, PLfloat3 offs);
+PLfloat3 plLwcGlobal(const PLlwcoord *coord);
+PLfloat3 plLwcRelVec(const PLlwcoord *coord, PLint3 seg);
+PLfloat3 plLwcDist(const PLlwcoord *a, const PLlwcoord * b);
+
+struct PLlwcoord64 {
+  PLdouble3 offs;
+  PLint3 seg;
+};
+
+void plLwcNormalise64(PLlwcoord64 *coord);
+void plLwcTranslate64(PLlwcoord64 *coord, PLdouble3 offs);
+PLdouble3 plLwcGlobal64(const PLlwcoord64 *coord);
+PLdouble3 plLwcRelVec64(const PLlwcoord64 *coord, PLint3 seg);
+PLdouble3 plLwcDist64(const PLlwcoord64 *a, const PLlwcoord64 * b);
 
 struct PLobject2 {
   struct PLobject2 *next;
