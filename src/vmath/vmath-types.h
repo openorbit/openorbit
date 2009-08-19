@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006, 2009 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -169,6 +169,25 @@ v3f_make(float x, float y, float z)
   return v.v;
 }
 
+// Note, this is not the initial idea of the vmath lib, the vmath lib was supposed to
+// include real vectors only, but in order to keep all the math stuff at the same place
+// we add fixed point numbers here as well.
+// Fixed point numbers
+typedef struct fix128 {
+  uint64_t hi;
+  uint64_t lo;
+} fix128;
+
+typedef struct fix256 {
+  struct {
+    uint64_t x;
+    uint64_t y;
+  } hi;
+  struct {
+    uint64_t x;
+    uint64_t y;
+  } lo;
+} fix256;
 
 
 #ifdef __cplusplus
