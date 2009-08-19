@@ -36,6 +36,13 @@
 #define SEG_Y64(c) (((int32_t*)&(c)->seg)[1])
 #define SEG_Z64(c) (((int32_t*)&(c)->seg)[2])
 
+void
+plUpdateDrawable(PLobject2 *obj)
+{
+  PLint3 camSect;
+  // Update drawable position, in this case we must know in which sector the camera is
+  PLfloat3 newPos = plLwcRelVec(&obj->p, camSect);
+}
 
 PLocttree*
 plOcttree(double width, int levels)

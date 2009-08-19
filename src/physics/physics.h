@@ -125,4 +125,72 @@ PLfloat3 plObjectDistance(PLobject2 *a, PLobject2 *b);
 
 void plTranslateObject3fv(PLobject2 *obj, PLfloat3 dp);
 
+typedef struct PLorbitingsystem PLorbitingsystem;
+typedef struct PLdynamicobj PLdynamicobj;
+typedef struct PLheavyobj PLheavyobj;
+typedef struct PLorbitingobj PLorbitingobj;
+
+struct PLdynamicobj {
+  char *name;
+  PLlwcoord p; // Large world coord
+  dBodyID id; // ODE identifier
+  OOdrawable *drawable; // Drawable identifier
+};
+
+// Assumed to have perfect orbits
+struct PLorbitingobj {
+  char *name;
+  double mass;
+  // elipsis
+};
+
+struct PLheavyobj {
+  char *name;
+  double mass;
+  double radius;
+  double groundLevelPreasure;
+  double oneHundredKmPreasure;
+
+  PLlwcoord p; // Large world coord
+  dBodyID id; // ODE identifier
+  OOdrawable *drawable; // Drawable identifier
+  // elipsis
+};
+
+
+struct PLorbitingsystem {
+  size_t objCount;
+  // Elipsis...
+  PLdynamicobj **dynamicObjs;
+  PLorbitingobj **orbitingObjs;
+  PLheavyobj **heavyObjs; // These cause gravity and have atmospheres et.c.
+};
+
+struct PLroot {
+  size_t systemCount;
+  PLorbitingsystem **systems;
+};
+
+typedef struct PLstar PLstar;
+typedef struct PLplanet PLplanet;
+typedef struct PLmoon PLmoon;
+
+struct PLstar {
+  size_t planetCount;
+  PLplanet **planets;
+};
+
+struct PLplanet {
+  PLlwcoord p; // wrt orbit base, typically 0,0,0
+//  OOellipse *orbit;
+  size_t moonCount;
+  PLmoon **moons;
+};
+
+struct PLmoon {
+  PLlwcoord p; // wrt orbit
+//  OOellipse *orbit;
+  double m;
+};
+
 #endif /* end of include guard: PHYSICS_H_MW8CHG7V */
