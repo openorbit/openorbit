@@ -32,9 +32,9 @@
 #define OFFS_Y64(c) (((double*)&(c)->offs)[1])
 #define OFFS_Z64(c) (((double*)&(c)->offs)[2])
 
-#define SEG_X64(c) (((int32_t*)&(c)->seg)[0])
-#define SEG_Y64(c) (((int32_t*)&(c)->seg)[1])
-#define SEG_Z64(c) (((int32_t*)&(c)->seg)[2])
+#define SEG_X64(c) (((int64_t*)&(c)->seg)[0])
+#define SEG_Y64(c) (((int64_t*)&(c)->seg)[1])
+#define SEG_Z64(c) (((int64_t*)&(c)->seg)[2])
 
 void
 plUpdateDrawable(PLobject2 *obj)
@@ -113,8 +113,8 @@ void
 plLwcNormalise64(PLlwcoord64 *coord)
 {
   if (fabs(OFFS_X64(coord)) >= PL_SEGMENT_LEN64) {
-    SEG_X(coord) += (int32_t) (OFFS_X64(coord) / PL_SEGMENT_LEN64);
-    OFFS_X(coord) = fmod(OFFS_X64(coord), PL_SEGMENT_LEN64);
+    OFFS_X64(coord) += (int32_t) (OFFS_X64(coord) / PL_SEGMENT_LEN64);
+    OFFS_X64(coord) = fmod(OFFS_X64(coord), PL_SEGMENT_LEN64);
   }
   if (fabs(OFFS_Y64(coord)) >= PL_SEGMENT_LEN64) {
     SEG_Y64(coord) += (int32_t) (OFFS_Y64(coord) / PL_SEGMENT_LEN64);
@@ -141,10 +141,10 @@ plLwcGlobal64(const PLlwcoord64 *coord)
 }
 
 PLdouble3
-plLwcRelVec64(const PLlwcoord64 *coord, PLint3 seg)
+plLwcRelVec64(const PLlwcoord64 *coord, PLlong3 seg)
 {
   PLdouble3 r = coord->offs;
-  PLint3 segdiff = coord->seg - seg;
+  PLlong3 segdiff = coord->seg - seg;
   PLdouble3 segdiffr = vd3_set((double)((int32_t*)&segdiff)[0],
                                (double)((int32_t*)&segdiff)[1],
                                (double)((int32_t*)&segdiff)[2]);
@@ -156,7 +156,7 @@ PLdouble3
 plLwcDist64(const PLlwcoord64 *a, const PLlwcoord64 * b)
 {
   PLdouble3 diff = vd3_sub(a->offs, b->offs);
-  PLint3 segdiff = a->seg - b->seg;
+  PLlong3 segdiff = a->seg - b->seg;
   PLdouble3 segdiffr = vd3_set((double)((int32_t*)&segdiff)[0],
                                (double)((int32_t*)&segdiff)[1],
                                (double)((int32_t*)&segdiff)[2]);

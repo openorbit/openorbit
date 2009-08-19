@@ -80,13 +80,13 @@ PLfloat3 plLwcDist(const PLlwcoord *a, const PLlwcoord * b);
 
 struct PLlwcoord64 {
   PLdouble3 offs;
-  PLint3 seg;
+  PLlong3 seg;
 };
 
 void plLwcNormalise64(PLlwcoord64 *coord);
 void plLwcTranslate64(PLlwcoord64 *coord, PLdouble3 offs);
 PLdouble3 plLwcGlobal64(const PLlwcoord64 *coord);
-PLdouble3 plLwcRelVec64(const PLlwcoord64 *coord, PLint3 seg);
+PLdouble3 plLwcRelVec64(const PLlwcoord64 *coord, PLlong3 seg);
 PLdouble3 plLwcDist64(const PLlwcoord64 *a, const PLlwcoord64 * b);
 
 struct PLobject2 {
