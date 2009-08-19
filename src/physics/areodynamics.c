@@ -19,13 +19,13 @@
 
 #include "physics.h"
 
-vector_t
+PLdouble3
 plGetAirspeed(PLobject *obj)
 {
   
 }
 
-vector_t
+PLdouble3
 plGetAirpressure(PLobject *obj)
 {
   
