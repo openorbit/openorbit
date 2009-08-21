@@ -78,6 +78,11 @@ PLfloat3 plLwcGlobal(const PLlwcoord *coord);
 PLfloat3 plLwcRelVec(const PLlwcoord *coord, PLint3 seg);
 PLfloat3 plLwcDist(const PLlwcoord *a, const PLlwcoord * b);
 
+// Using 64bit ints for the segment numebers give us a world size of
+// 1.949864 Mly which should cover almost the entire distance to the andromeda galaxy
+// This precision should be sufficient for anyone...
+// Note that the 64 bit lwcoords are also clamping the real component to 1000.0 metres,
+// this is in order to be compatible with the rendering engine
 struct PLlwcoord64 {
   PLdouble3 offs;
   PLlong3 seg;
