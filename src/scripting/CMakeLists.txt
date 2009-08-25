@@ -1,5 +1,4 @@
-set( pyrex_files #io config ode orbits res texture plugin sg sim
-                 ooscript )
+set( pyrex_files ooscript )
 set( pyrex_c_files )
 set( scripting_src scripting.c )
 set( scripting_FILES scripting.h CMakeLists.txt)
