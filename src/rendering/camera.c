@@ -25,6 +25,9 @@
 #include "io-manager.h"
 #include "camera.h"
 #include "settings.h"
+#include "scenegraph.h"
+#include "scenegraph-private.h"
+
 /* Camera actions, registered as action handlers */
 
 

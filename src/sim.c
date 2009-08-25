@@ -81,7 +81,7 @@ ooSimStep(float dt)
   struct timeval end;
   gettimeofday(&start, NULL);
 
-  ooSgCamStep(gSIM_state.sg->currentCam, dt);
+  ooSgCamStep(ooSgGetCam(gSIM_state.sg), dt);
 
   ooOrbitClear(gSIM_state.orbSys);
   ooOrbitStep(gSIM_state.orbSys, dt);

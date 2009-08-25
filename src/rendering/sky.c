@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include <stdlib.h>
+#include "scenegraph-private.h"
 
 vector_t
 ooEquToCart(angle_t ra, angle_t dec)

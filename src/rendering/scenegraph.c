@@ -23,26 +23,13 @@
 //#include <OpenGL/gl.h>
 #include "SDL_opengl.h"
 #include "scenegraph.h"
+#include "scenegraph-private.h"
 #include "sky.h"
 #include "log.h"
 #include <vmath/vmath.h>
 #include "geo/geo.h"
 #include "physics/orbit.h"
 #include "texture.h"
-
-typedef struct {
-    matrix_t t;
-    quaternion_t q;
-} OOtransform;
-
-typedef struct {
-    scalar_t s;
-} OOscale;
-
-typedef struct {
-    dWorldID world;
-    dBodyID body;
-} OOodetransform;
 
 
 typedef struct {
@@ -66,6 +53,29 @@ typedef struct {
     GLfloat radius;
 } OOsphere;
 
+OOscene*
+ooSgGetRoot(OOscenegraph *sg)
+{
+  assert(sg != NULL);
+  
+  return sg->root;
+}
+
+OOcam*
+ooSgGetCam(OOscenegraph *sg)
+{
+  assert(sg != NULL);
+  
+  return sg->currentCam;
+}
+
+OOscene*
+ooSgSceneGetParent(OOscene *sc)
+{
+  assert(sc != NULL);
+  return sc->parent;
+}
+
 /*!
     Updates a drawable object with ode-data.
 */
@@ -82,17 +92,6 @@ ooSgSetScenePos(OOscene *sc, float x, float y, float z)
 }
 
 void
-ooSgSetSceneQuat(OOscene *sc, float x, float y, float z, float w)
-{
-  assert(sc != NULL);
-
-//  sc->q.x = x;
-//  sc->q.y = y;
-//  sc->q.z = z;
-//  sc->q.w = w;
-}
-
-void
 ooSgSetSceneScale(OOscene *sc, float scale)
 {
   assert(sc != NULL);
@@ -100,25 +99,6 @@ ooSgSetSceneScale(OOscene *sc, float scale)
   sc->si = 1.0f/scale;
 }
 
-// Conforms to dBodySetMovedCallback registered callbacks
-void
-ooSgUpdateObject(dBodyID body)
-{
-  OOdrawable *obj = dBodyGetData(body);
-  ooLogTrace("updating body %s", obj->name);
-
-  const dReal *pos = dBodyGetPosition(body);
-  //const dReal *rot = dBodyGetRotation(body);
-  const dReal *quat = dBodyGetQuaternion(body);
-  const dReal *linVel = dBodyGetLinearVel(body);
-  const dReal *angVel = dBodyGetAngularVel(body);
-
-  obj->p = v_set(pos[0], pos[1], pos[2], 0.0);
-  obj->q = v_set(quat[1], quat[2], quat[3], quat[0]);
-
-  obj->dp = v_set(linVel[0], linVel[1], linVel[2], 0.0);
-  obj->dr = v_set(angVel[0], angVel[1], angVel[2], 0.0);
-}
 
 void
 ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z)
@@ -211,7 +191,6 @@ ooSgNewScene(OOscene *parent, const char *name)
   sc->name = strdup(name);
 
   sc->t = v_set(0.0, 0.0, 0.0, 0.0);
-//  sc->q = q_rot(0.0, 1.0, 0.0, 0.0); // Default with 0 deg rot around y
   sc->s = 1.0;
   sc->si = 1.0;
 

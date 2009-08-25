@@ -38,49 +38,6 @@
 //typedef void OOobject;
 typedef void (*OOdrawfunc)(OOobject*);
 
-
-struct OOdrawable {
-  const char *name;
-  vector_t p;
-  vector_t dp;
-
-  vector_t dr;
-
-  quaternion_t q;
-  float s;
-
-  OOobject *obj;
-  OOdrawfunc draw;
-};
-
-struct OOscene {
-  struct OOscene *parent;
-  char *name;
-
-  vector_t t;
-//  quaternion_t q;
-  scalar_t s; // scale with respect to parent s
-  scalar_t si; // inverse of s
-
-  OOobjvector scenes;
-  OOobjvector objs;
-};
-
-struct OOoverlay {
-//  OOtexture *tex;
-  float x, y;
-  float w, h;
-};
-
-struct OOscenegraph {
-  OOscene *root;
-  OOcam *currentCam;
-  OOobjvector cams;
-
-  OOdrawable *sky;
-  OOobjvector overlays;
-};
-
 OOdrawable* ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df);
 
 void ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w);
@@ -88,11 +45,8 @@ void ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z);
 void ooSgSetObjectScale(OOdrawable *obj, float s);
 void ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);
 void ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz);
-void ooSgUpdateObject(dBodyID body);
-
 
 void ooSgSetScenePos(OOscene *sc, float x, float y, float z);
-void ooSgSetSceneQuat(OOscene *sc, float x, float y, float z, float w);
 void ooSgSetSceneScale(OOscene *sc, float scale);
 
 void ooSgDrawOverlay(OOoverlay *overlay);
@@ -130,6 +84,10 @@ void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj);
 */
 OOscene* ooSgSceneGetRoot(OOscene *sc);
 void ooSgSetRoot(OOscenegraph *sg, OOscene *sc);
+OOscene* ooSgGetRoot(OOscenegraph *sg);
+OOcam* ooSgGetCam(OOscenegraph *sg);
+
+OOscene* ooSgSceneGetParent(OOscene *sc);
 
 OOscene* ooSgGetScene(OOscenegraph *sg, const char *sceneName);
 void ooSgSceneAddChild(OOscene *parent, OOscene *child);
@@ -138,5 +96,6 @@ void ooSgSceneAddObj(OOscene *sc, OOdrawable *object);
 
 
 OOdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
+
 
 #endif /* SCENEGRAPH_H_ */

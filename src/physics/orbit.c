@@ -41,6 +41,24 @@
       1 au = 149 597 870 000 m
 
 */
+// Conforms to dBodySetMovedCallback registered callbacks
+void
+ooUpdateObject(dBodyID body)
+{
+  PLobject *obj = dBodyGetData(body);
+  ooLogTrace("updating body %s", obj->name);
+
+  const dReal *pos = dBodyGetPosition(body);
+  //const dReal *rot = dBodyGetRotation(body);
+  const dReal *quat = dBodyGetQuaternion(body);
+  const dReal *linVel = dBodyGetLinearVel(body);
+  const dReal *angVel = dBodyGetAngularVel(body);
+
+  ooSgSetObjectPos(obj->drawable, pos[0], pos[1], pos[2]);
+  ooSgSetObjectQuat(obj->drawable, quat[1], quat[2], quat[3], quat[0]);
+  ooSgSetObjectSpeed(obj->drawable, linVel[0], linVel[1], linVel[2]);
+  ooSgSetObjectAngularSpeed(obj->drawable, angVel[0], angVel[1], angVel[2]);
+}
 
 double
 comp_orbital_period(double semimajor, double g, double m1, double m2)
@@ -91,8 +109,9 @@ ooOrbitNewSys(const char *name, OOscene *scene,
   PLorbsys *sys = ooOrbitNewRootSys(name, scene, m, rotPeriod);
   sys->orbit = ooGeoEllipseAreaSeg(1000, semiMaj, semiMin);
 
-  ooSgSceneAddObj(scene->parent, ooSgNewDrawable(name, sys->orbit,
-                                                 (OOdrawfunc)ooGeoEllipseDraw));
+  ooSgSceneAddObj(ooSgSceneGetParent(scene),
+                  ooSgNewDrawable(name, sys->orbit,
+                  (OOdrawfunc)ooGeoEllipseDraw));
 
   sys->phys.param.orbitalPeriod = orbitPeriod;
   return sys;
@@ -115,8 +134,9 @@ ooOrbitNewObj(PLorbsys *sys, const char *name,
   obj->id = dBodyCreate(sys->world);
   dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
 
-  dBodySetData(obj->id, drawable); // 
-  dBodySetMovedCallback(obj->id, ooSgUpdateObject);
+  obj->drawable = drawable;
+  dBodySetData(obj->id, obj); // 
+  dBodySetMovedCallback(obj->id, ooUpdateObject);
 
   dQuaternion quat = {qw, qx, qy, qz};
   dBodySetQuaternion(obj->id, quat);

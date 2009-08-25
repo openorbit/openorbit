@@ -17,12 +17,14 @@ cdef extern from "rendering/scenegraph.h":
   ctypedef struct OOcam:
     OOscene *scene
 
-  ctypedef struct OOscenegraph:
-    OOscene *root
+  ctypedef struct OOscenegraph
 
   ctypedef struct OOdrawable:
     OOobject *obj
     OOdrawfunc draw
+
+  OOscene* ooSgGetRoot(OOscenegraph *sg)
+
   void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj)
   void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
 
@@ -161,7 +163,7 @@ cdef class Scenegraph:
   def getRoot(self):
       cdef Scene sc
       sc = Scene()
-      sc.sc = self.sg.root
+      sc.sc = ooSgGetRoot(self.sg)
       return sc
   
   def getScene(self, key):
