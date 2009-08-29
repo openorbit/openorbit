@@ -93,7 +93,7 @@ hashtable_string_key_del(char *key)
 unsigned int
 hashtable_ptr_hash(const char *key)
 {
-    return ((unsigned int)key & 0xfffffff0) >> 4; 
+    return ((uintptr_t)key & (-1 ^ 0x0f)) >> 4; 
 }
 
 bool
@@ -387,14 +387,14 @@ hashtable_print(hashtable_t *ht)
 {
     assert(ht != NULL);
     
-    printf("ht = {\n\tts = %d\n\tt = {\n", ht->ts);
+    printf("ht = {\n\tts = %d\n\tt = {\n", (int)ht->ts);
     for (int i = 0 ; i < ht->ts ; i ++) {
         if (ht->t[i]) {
             printf("\t\tid = %d {\n", i);
             hashentry_t *entry = ht->t[i];
             
             while (entry) {
-                printf("\t\t\tentry = {\n\t\t\t\tkey = %s\n\t\t\t\tobj = %x\n\t\t\t}\n",
+                printf("\t\t\tentry = {\n\t\t\t\tkey = %s\n\t\t\t\tobj = %p\n\t\t\t}\n",
                        entry->key, entry->object);
                 entry = entry->next;
             }
