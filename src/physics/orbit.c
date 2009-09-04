@@ -1,5 +1,5 @@
 /*
-  Copyright 2008 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2008, 2009 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -48,13 +48,20 @@ ooUpdateObject(dBodyID body)
   PLobject *obj = dBodyGetData(body);
   ooLogTrace("updating body %s", obj->name);
 
-  const dReal *pos = dBodyGetPosition(body);
+  //const dReal *pos = dBodyGetPosition(body);
   //const dReal *rot = dBodyGetRotation(body);
   const dReal *quat = dBodyGetQuaternion(body);
   const dReal *linVel = dBodyGetLinearVel(body);
   const dReal *angVel = dBodyGetAngularVel(body);
 
-  ooSgSetObjectPos(obj->drawable, pos[0], pos[1], pos[2]);
+  plNormaliseObject(obj);
+  PLint3 camPos = v3i_make(0, 0, 0); // TODO: Should set at camera point
+  PLfloat3 relPos = plLwcRelVec(&obj->p, camPos); // Compute relative position with
+                                                  // respect to camera segment
+
+  ooSgSetObjectPos(obj->drawable,
+                   ((float*)&relPos)[0], ((float*)&relPos)[1], ((float*)&relPos)[2]);
+
   ooSgSetObjectQuat(obj->drawable, quat[1], quat[2], quat[3], quat[0]);
   ooSgSetObjectSpeed(obj->drawable, linVel[0], linVel[1], linVel[2]);
   ooSgSetObjectAngularSpeed(obj->drawable, angVel[0], angVel[1], angVel[2]);

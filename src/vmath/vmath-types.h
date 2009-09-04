@@ -169,6 +169,21 @@ v3f_make(float x, float y, float z)
   return v.v;
 }
 
+static inline int3
+v3i_make(int32_t x, int32_t y, int32_t z)
+{
+  union {
+    int32_t a[4];
+    int3 p;
+  } u;
+
+  u.a[0] = x;
+  u.a[1] = y;
+  u.a[2] = z;
+  u.a[4] = 0;
+  
+  return u.p;
+}
 // Note, this is not the initial idea of the vmath lib, the vmath lib was supposed to
 // include real vectors only, but in order to keep all the math stuff at the same place
 // we add fixed point numbers here as well.

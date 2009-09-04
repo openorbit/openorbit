@@ -1,4 +1,4 @@
-set(ph_SRC orbit.c sectors.c rockets.c)
+set(ph_SRC orbit.c sectors.c rockets.c object.c)
 set(ph_FILES orbit.h CMakeLists.txt)
 
 add_cmake_list()

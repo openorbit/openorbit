@@ -206,3 +206,17 @@ plObjectGlobal(PLobject2 *obj)
   return plLwcGlobal(&obj->p);
 }
 
+// Computes whether two lines with radius w both having their origin in some LW coord
+// intersects at some point. This can be used for implementing a sweeping collission
+// detection system in a large world
+void
+plLwcIntersectionPoint(const PLlwcoord * restrict a, PLfloat3 da, float wa,
+                       const PLlwcoord * restrict b, PLfloat3 db, float wb)
+{
+  // Transform b to a's segment and compute the intersection point
+  PLfloat3 bPosInASeg = plLwcRelVec(b, a->seg);
+  PLfloat3 bNext = vf3_add(bPosInASeg, db);
+  PLfloat3 aNext = vf3_add(a->offs, da);
+  
+  
+}

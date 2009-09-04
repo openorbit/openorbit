@@ -29,17 +29,6 @@ typedef int64_t __attribute__((vector_size (32))) PLlong3;
 typedef int32_t __attribute__((vector_size (16))) PLint3;
 typedef int16_t __attribute__((vector_size (8))) PLshort3;
 
-typedef struct PLorbsys PLorbsys;
-
-typedef struct PLobject {
-  char *name;
-  dBodyID id;
-  float m;
-  OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
-                        //!< object.
-  PLorbsys *sys;
-} PLobject;
-
 
 // We cannot cope with the precision issues without subdividing the universe
 // If we take 1.0 Tm side boxes, we can maintain decent double precision units and still
@@ -93,6 +82,35 @@ void plLwcTranslate64(PLlwcoord64 *coord, PLdouble3 offs);
 PLdouble3 plLwcGlobal64(const PLlwcoord64 *coord);
 PLdouble3 plLwcRelVec64(const PLlwcoord64 *coord, PLlong3 seg);
 PLdouble3 plLwcDist64(const PLlwcoord64 *a, const PLlwcoord64 * b);
+
+
+
+typedef struct PLorbsys PLorbsys;
+
+typedef struct PLobject {
+  char *name;
+  dBodyID id; // Using ODE at the moment, but this is not really necisary
+  PLlwcoord p; // Large world coordinates
+  float m;
+  OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
+                        //!< object.
+  PLorbsys *sys;
+} PLobject;
+
+PLobject* plObject3f(float x, float y, float z);
+void plForce3f(PLobject *obj, float x, float y, float z);
+void plForce3d(PLobject *obj, double x, double y, double z);
+void plForce3dv(PLobject *obj, PLdouble3 f);
+
+void plForceRelative3f(PLobject *obj, float x, float y, float z);
+void plForceRelative3d(PLobject *obj, double x, double y, double z);
+void plForceRelative3dv(PLobject *obj, PLdouble3 f);
+
+void plStepObjectf(PLobject *obj, float dt);
+void plStepObjectd(PLobject *obj, double dt);
+
+void plNormaliseObject(PLobject *obj);
+void plClearObject(PLobject *obj);
 
 struct PLobject2 {
   struct PLobject2 *next;
