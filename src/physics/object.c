@@ -19,7 +19,7 @@
 
 #include <ode/ode.h>
 #include "physics.h"
-
+#include <assert.h>
 /*
   One of the problems with space is that it is big
   
