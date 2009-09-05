@@ -56,11 +56,16 @@ ooUpdateObject(dBodyID body)
 
   plNormaliseObject(obj);
   PLint3 camPos = v3i_make(0, 0, 0); // TODO: Should set at camera point
-  PLfloat3 relPos = plLwcRelVec(&obj->p, camPos); // Compute relative position with
-                                                  // respect to camera segment
+
+  union {
+    PLfloat3 v;
+    float a[4];
+  } relPos;
+  relPos.v = plLwcRelVec(&obj->p, camPos); // Compute relative position with
+                                           // respect to camera segment
 
   ooSgSetObjectPos(obj->drawable,
-                   ((float*)&relPos)[0], ((float*)&relPos)[1], ((float*)&relPos)[2]);
+                   relPos.a[0], relPos.a[1], relPos.a[2]);
 
   ooSgSetObjectQuat(obj->drawable, quat[1], quat[2], quat[3], quat[0]);
   ooSgSetObjectSpeed(obj->drawable, linVel[0], linVel[1], linVel[2]);
