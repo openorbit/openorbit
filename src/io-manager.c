@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2008 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2008,2009 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -23,7 +23,7 @@
 #include "sim.h"
 #include "io-manager.h"
 #include "SDL.h"
-
+#include "log.h"
 
 
 static const char * gIoSdlKeyStringMap[SDLK_LAST];
@@ -31,6 +31,7 @@ static const char * gIoSdlMouseStringMap[7];
 static hashtable_t *gIoBoundKeyTable;  // of type OOkeyevent
 static hashtable_t *gIoButtonHandlers; // of type OObuttonhandler
 
+static hashtable_t *gIoAxisHandlers; // of type OOaxishandler
 
 void
 ooButtonHandlerGnd(bool buttonUp, void *data)
@@ -67,6 +68,13 @@ typedef struct _OOkeyevent {
     void *data;
     struct _OOkeyevent *next;
 } OOkeyevent;
+
+typedef struct OOaxishandler {
+  SDL_Joystick *joyId;
+  int axisId;
+  float nullZone;
+  float trim;
+} OOaxishandler;
 
 void
 ooIoRegCKeyHandler(const char *name, OObuttonhandlerfunc handlerFunc)
@@ -380,3 +388,80 @@ void ooIoInitSdlStringMap(void)
 }
 
 
+
+void
+ooIoInitJoystick(void)
+{
+  gIoAxisHandlers = hashtable_new_with_str_keys(128);
+}
+
+int
+ooIoGetJoystickId(const char *name)
+{
+  int joyCount = SDL_NumJoysticks();
+  for (int i = 0 ; i < joyCount ; ++ i) {
+    const char *joyName = SDL_JoystickName(i);
+    if (!strcmp(joyName, name)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+void
+ooIoBindAxis(const char *key, int joyStick, int axis)
+{
+  OOaxishandler *handler
+      = hashtable_lookup(gIoAxisHandlers, key);
+  if (handler) {
+    
+  }
+}
+
+void
+ooIoAdjustTrim(const char *key, float dtrim)
+{
+  OOaxishandler *handler
+      = hashtable_lookup(gIoAxisHandlers, key);
+  if (handler) {
+    handler->trim += dtrim;
+  }
+}
+
+void
+ooIoSetNullZone(const char *key, float nz)
+{
+  OOaxishandler *handler
+      = hashtable_lookup(gIoAxisHandlers, key);
+  if (handler) {
+    handler->nullZone = nz;
+  }
+}
+
+
+
+float
+ooIoGetAxis(const char *axis)
+{
+  OOaxishandler *handler
+      = hashtable_lookup(gIoAxisHandlers, axis);
+
+  if (!handler) {
+    ooLogWarn("axis '%s' is not known", axis);
+    return 0.0;
+  }
+
+  int16_t axisVal = SDL_JoystickGetAxis(handler->joyId, handler->axisId);
+  float normalisedAxis;
+  if (axisVal >= 0) {
+    normalisedAxis = axisVal / 32767.0;
+  } else {
+    normalisedAxis = axisVal / 32768.0;
+  }
+
+  if (handler->nullZone + handler->trim > fabs(normalisedAxis + handler->trim)) {
+    return normalisedAxis + handler->trim;
+  }
+
+  return 0.0;
+}

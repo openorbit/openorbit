@@ -72,6 +72,8 @@ void ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up,
 void ooIoDispatchKeyUp(const char *name, uint16_t mask);
 void ooIoDispatchKeyDown(const char *name, uint16_t mask);
 
+float ooIoGetAxis(const char *axis);
+
 const char *ooIoSdlKeyNameLookup(SDLKey keyId);
 const char *ooIoSdlMouseButtonNameLookup(unsigned buttonId);
 
