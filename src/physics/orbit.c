@@ -118,7 +118,7 @@ ooOrbitNewSys(const char *name, OOscene *scene,
               double semiMaj, double semiMin)
 {
   PLorbsys *sys = ooOrbitNewRootSys(name, scene, m, rotPeriod);
-  sys->orbit = ooGeoEllipseAreaSeg(1000, semiMaj, semiMin);
+  sys->orbit = ooGeoEllipseAreaSeg(500, semiMaj, semiMin);
 
   ooSgSceneAddObj(ooSgSceneGetParent(scene),
                   ooSgNewDrawable(name, sys->orbit,
@@ -389,7 +389,7 @@ ooOrbitLoadMoon(HRMLobject *obj, OOscene *parentScene)
 
   OOdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
-  quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
+  quaternion_t q = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(90.0));
   quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(0.05)); // TODO: real rot
 
   PLobject *orbObj = ooOrbitNewObj(sys, moonName.u.str, drawable,
@@ -485,7 +485,7 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
 
   OOdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
-  quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
+  quaternion_t q = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(90.0));
   quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(0.05)); // TODO: real rot
 
   PLobject *orbObj = ooOrbitNewObj(sys, planetName.u.str, drawable,
@@ -578,7 +578,7 @@ ooOrbitLoadStar(HRMLobject *obj)
   OOdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   ooSgSetObjectScale(drawable, 1.0/149598000000.0); // Adjust to m in au context
-  quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(90.0));
+  quaternion_t q = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(90.0));
   quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(1.0)); // TODO: real rot
 
   PLobject *orbObj = ooOrbitNewObj(sys, starName.u.str, drawable,
