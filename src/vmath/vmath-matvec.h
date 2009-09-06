@@ -301,6 +301,13 @@ vf3_s_div(float3 a, float b)
   return a / bv;
 }
 
+static inline double3
+vd3_s_div(double3 a, double b)
+{
+  double4 bv = vd4_set(b,b,b,1.0f);
+  return a / bv;
+}
+
 
 static inline float4
 vf4_s_div(float4 a, float b)

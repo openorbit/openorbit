@@ -216,4 +216,83 @@ struct PLmoon {
   double m;
 };
 
+// Unit conversion macros
+
+static inline double
+plMetresToAu(double m)
+{
+  return m / 149598000000.0;
+}
+
+static inline PLdouble3
+plMetresToAu_v(PLdouble3 m)
+{
+  return vd3_s_div(m, 149598000000.0);
+}
+
+
+static inline double
+plAuToMetres(double au)
+{
+  return au * 149598000000.0;
+}
+
+static inline PLdouble3
+plAuToMetres_v(PLdouble3 au)
+{
+  return vd3_s_mul(au, 149598000000.0);
+}
+
+
+static inline double
+plMetresToPc(double m)
+{
+  return m / 3.08e16;
+}
+
+static inline double
+plPcToMetres(double pc)
+{
+  return pc * 3.08e16;
+}
+
+static inline PLdouble3
+plMetresToPc_v(PLdouble3 m)
+{
+  return vd3_s_div(m, 3.08e16);
+}
+
+static inline PLdouble3
+plPcToMetres_v(PLdouble3 pc)
+{
+  return vd3_s_mul(pc, 3.08e16);
+}
+
+
+
+static inline double
+plPaToBar(double p)
+{
+  return p / 100000.0;
+}
+
+static inline double
+plBarToPa(double p)
+{
+  return p * 100000.0;
+}
+
+
+static inline double
+plCToK(double t)
+{
+  return t + 273.16;
+}
+
+static inline double
+plKToC(double t)
+{
+  return t - 273.16;
+}
+
 #endif /* end of include guard: PHYSICS_H_MW8CHG7V */
