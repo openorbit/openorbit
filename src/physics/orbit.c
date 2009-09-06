@@ -63,7 +63,6 @@ ooUpdateObject(dBodyID body)
   } relPos;
   relPos.v = plLwcRelVec(&obj->p, camPos); // Compute relative position with
                                            // respect to camera segment
-
   ooSgSetObjectPos(obj->drawable,
                    relPos.a[0], relPos.a[1], relPos.a[2]);
 
@@ -155,6 +154,10 @@ ooOrbitNewObj(PLorbsys *sys, const char *name,
   dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
 
   obj->sys = sys;
+
+  obj->p.offs = vf3_set(x, y, z);
+  obj->p.seg = vi3_set(0, 0, 0);
+  plLwcNormalise(&obj->p);
 
   ooObjVecPush(&sys->objs, obj);
 
