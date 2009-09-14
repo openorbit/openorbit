@@ -21,6 +21,7 @@
 #define PHYSICS_H_MW8CHG7V
 #include <ode/ode.h>
 #include <vmath/vmath.h>
+#include "common/lwcoord.h"
 #include "rendering/scenegraph.h"
 
 typedef float __attribute__((vector_size (16))) PLfloat3;
@@ -39,8 +40,8 @@ typedef int16_t __attribute__((vector_size (8))) PLshort3;
 
 typedef struct PLocttree PLocttree;
 typedef struct PLobject2 PLobject2;
-typedef struct PLlwcoord PLlwcoord;
-typedef struct PLlwcoord64 PLlwcoord64;
+typedef struct OOlwcoord PLlwcoord;
+typedef struct OOlwcoord64 PLlwcoord64;
 
 /*! Large world coordinate
   Extends the floating point precision coordinates with additional bits yealding us
@@ -57,31 +58,31 @@ typedef struct PLlwcoord64 PLlwcoord64;
   Note that the segments are overlapping so you cannot cull collissions with the segment
   id as is. The overlap occurrs with seg N (-1024.0, -0.0] = seg N-1 [0.0, 1024.0)
 */
-struct PLlwcoord {
-  PLfloat3 offs;
-  PLint3 seg;
-};
-void plLwcNormalise(PLlwcoord *coord);
-void plLwcTranslate(PLlwcoord *coord, PLfloat3 offs);
-PLfloat3 plLwcGlobal(const PLlwcoord *coord);
-PLfloat3 plLwcRelVec(const PLlwcoord *coord, PLint3 seg);
-PLfloat3 plLwcDist(const PLlwcoord *a, const PLlwcoord * b);
+//struct PLlwcoord {
+//  PLfloat3 offs;
+//  PLint3 seg;
+//};
+//void plLwcNormalise(PLlwcoord *coord);
+//void plLwcTranslate(PLlwcoord *coord, PLfloat3 offs);
+//PLfloat3 plLwcGlobal(const PLlwcoord *coord);
+//PLfloat3 plLwcRelVec(const PLlwcoord *coord, PLint3 seg);
+//PLfloat3 plLwcDist(const PLlwcoord *a, const PLlwcoord * b);
 
 // Using 64bit ints for the segment numebers give us a world size of
 // 1.949864 Mly which should cover almost the entire distance to the andromeda galaxy
 // This precision should be sufficient for anyone...
 // Note that the 64 bit lwcoords are also clamping the real component to 1000.0 metres,
 // this is in order to be compatible with the rendering engine
-struct PLlwcoord64 {
-  PLdouble3 offs;
-  PLlong3 seg;
-};
+//struct PLlwcoord64 {
+//  PLdouble3 offs;
+//  PLlong3 seg;
+//};
 
-void plLwcNormalise64(PLlwcoord64 *coord);
-void plLwcTranslate64(PLlwcoord64 *coord, PLdouble3 offs);
-PLdouble3 plLwcGlobal64(const PLlwcoord64 *coord);
-PLdouble3 plLwcRelVec64(const PLlwcoord64 *coord, PLlong3 seg);
-PLdouble3 plLwcDist64(const PLlwcoord64 *a, const PLlwcoord64 * b);
+//void plLwcNormalise64(PLlwcoord64 *coord);
+//void plLwcTranslate64(PLlwcoord64 *coord, PLdouble3 offs);
+//PLdouble3 plLwcGlobal64(const PLlwcoord64 *coord);
+//PLdouble3 plLwcRelVec64(const PLlwcoord64 *coord, PLlong3 seg);
+//PLdouble3 plLwcDist64(const PLlwcoord64 *a, const PLlwcoord64 * b);
 
 
 
