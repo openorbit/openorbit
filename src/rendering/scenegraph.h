@@ -27,6 +27,7 @@
 #include <openorbit/openorbit.h>
 //#include "physics/orbit.h"
 #include "sim/simtime.h"
+#include "common/lwcoord.h"
 
   typedef struct OOdrawable OOdrawable;
   typedef struct OOscene OOscene;
@@ -34,13 +35,14 @@
   typedef struct OOscenegraph OOscenegraph;
 
 #include "camera.h"
-  
+
 //typedef void OOobject;
 typedef void (*OOdrawfunc)(OOobject*);
 
 OOdrawable* ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df);
 
 void ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w);
+void ooSgSetObjectPosLW(OOdrawable *obj, const OOlwcoord *lw);
 void ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z);
 void ooSgSetObjectScale(OOdrawable *obj, float s);
 void ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);

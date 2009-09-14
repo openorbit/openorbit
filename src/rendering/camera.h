@@ -26,7 +26,7 @@ extern "C" {
 #include <stdbool.h>
 #include <vmath/vmath.h>
 #include <ode/ode.h>
-
+#include "common/lwcoord.h"
   typedef enum OOcamtype OOcamtype;
   typedef struct OOfreecam OOfreecam;
   typedef struct OOfixedcam OOfixedcam;
@@ -36,35 +36,36 @@ extern "C" {
 #include "scenegraph.h"
 
   enum OOcamtype {
-      OOCam_Free,
-      OOCam_Fixed,
-      OOCam_Orbit
+    OOCam_Free,
+    OOCam_Fixed,
+    OOCam_Orbit
   };
 
   struct OOfreecam {
-      vector_t p;
-      vector_t dp;
-      quaternion_t q;
-      quaternion_t dq;
+    OOlwcoord lwc;
+//    vector_t p;
+    vector_t dp;
+    quaternion_t q;
+    quaternion_t dq;
   };
 
   struct OOfixedcam {
-      dBodyID body; // Camera fixed to this body
+    dBodyID body; // Camera fixed to this body
 
-      vector_t r; // With this offset
-      quaternion_t q; // and this rotation (rotate before translation)
+    vector_t r; // With this offset
+    quaternion_t q; // and this rotation (rotate before translation)
   };
 
   struct OOorbitcam {
-      dBodyID body; // Camera orbiting this body
+    dBodyID body; // Camera orbiting this body
 
-      vector_t r; // Placed on this position (will always look at the body)
+    vector_t r; // Placed on this position (will always look at the body)
   };
 
   struct OOcam {
-      OOcamtype kind;
-      OOscene *scene;
-      OOobject *camData;
+    OOcamtype kind;
+    OOscene *scene;
+    OOobject *camData;
   };
 
   void ooSgCamInit(void);

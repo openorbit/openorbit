@@ -33,6 +33,8 @@ struct OOdrawable {
 
   OOobject *obj;
   OOdrawfunc draw;
+  
+  OOscene *scene;
 };
 
 struct OOscene {
@@ -44,8 +46,10 @@ struct OOscene {
   scalar_t s; // scale with respect to parent s
   scalar_t si; // inverse of s
 
-  OOobjvector scenes;
-  OOobjvector objs;
+  OOscenegraph *sg;
+
+  OOobjvector scenes; // Subscenes
+  OOobjvector objs;   // Objects in this scene
 };
 
 struct OOoverlay {

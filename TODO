@@ -3,11 +3,17 @@
 * Reorganise source
         /cmake          Auxiliary build scripts
         /lib            Libraries
-        /lib/imageload  Image loading library
-        /lib/modelload  3d model loading library
+        /lib/mediaload  Image, 3d model and audio loading library
         /lib/gencds     Generic DS library
+        /lib/res        Resource manager library (depends on media load)
+        /include        Open Orbit public includes
         /tools          Build tools
         /src            main source
+        /src/physics    Source Related To physics
+        /src/sg         Source related to scene graph / rendering system
+        /src/sim        Simulation logics (systems simulation, sim loop etc)
+        /src/common     Common stuff (byte swapping, large world coordinates et.c.)
+        /plugins        Source for stand alone plugins
         /rsrc           Resources
         /scripts        Scripts to be included in Open Orbit
         

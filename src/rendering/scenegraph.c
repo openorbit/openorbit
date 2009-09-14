@@ -30,7 +30,7 @@
 #include "geo/geo.h"
 #include "physics/orbit.h"
 #include "texture.h"
-
+#include "common/lwcoord.h"
 
 typedef struct {
     float uv[2];
@@ -99,7 +99,19 @@ ooSgSetSceneScale(OOscene *sc, float scale)
   sc->si = 1.0f/scale;
 }
 
-
+void
+ooSgSetObjectPosLW(OOdrawable *obj, const OOlwcoord *lw)
+{
+  // Get camera position and translate the lw coord with respect to the camera
+  OOscene *sc = obj->scene;
+  OOscenegraph *sg = sc->sg;
+  OOcam *cam = sg->currentCam;
+  
+  if (cam->kind == OOCam_Free) {
+    float3 relPos = ooLwcRelVec(lw, ((OOfreecam*)cam->camData)->lwc.seg);
+    obj->p.v = relPos;
+  }
+}
 void
 ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z)
 {
@@ -151,6 +163,9 @@ ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df)
 
   drawable->draw = df;
   drawable->obj = obj;
+  
+  drawable->scene = NULL;
+  
   return drawable;
 }
 
@@ -159,6 +174,8 @@ ooSgNewSceneGraph()
 {
   OOscenegraph *sg = malloc(sizeof(OOscenegraph));
   sg->root = ooSgNewScene(NULL, "root");
+  sg->root->sg = sg;
+  
   ooObjVecInit(&sg->cams);
   ooObjVecInit(&sg->overlays);
   return sg;
@@ -193,11 +210,14 @@ ooSgNewScene(OOscene *parent, const char *name)
   sc->t = v_set(0.0, 0.0, 0.0, 0.0);
   sc->s = 1.0;
   sc->si = 1.0;
-
+  
+  sc->sg = NULL;
+  
   ooObjVecInit(&sc->scenes);
   ooObjVecInit(&sc->objs);
 
   if (parent) {
+    sc->sg = parent->sg;
     ooObjVecPush(&parent->scenes, sc);
   }
 
@@ -219,6 +239,7 @@ ooSgSceneAddObj(OOscene *sc, OOdrawable *object)
   assert(sc != NULL);
   assert(object != NULL);
 
+  object->scene = sc;
   ooObjVecPush(&sc->objs, object);
 }
 
