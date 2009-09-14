@@ -32,10 +32,11 @@ aux_source_directory(rendering rendering_src)
 aux_source_directory(vessel vessel_src)
 aux_source_directory(geo geo_src)
 aux_source_directory(sim sim_src)
+aux_source_directory(common common_src)
 
 set(openorbit_SRC
 	main.c sim.c settings.c io-manager.c plugin-handler.c log.c
-	${rendering_src} ${vessel_src} ${geo_src} ${sim_src} ${gencds_src})
+	${rendering_src} ${vessel_src} ${geo_src} ${sim_src} ${gencds_src} ${common_src})
 
 set(openorbit_FILES
 	sim.h io-manager.h settings.h plugin-handler.h

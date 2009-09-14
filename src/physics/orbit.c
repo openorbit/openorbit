@@ -30,6 +30,7 @@
 #include "parsers/hrml.h"
 #include "res-manager.h"
 #include "rendering/scenegraph.h"
+#include "common/lwcoord.h"
 
 /*
     NOTE: G is defined as 6.67428 e-11 (m^3)/kg/(s^2), let's call that G_m. In AU,
@@ -61,7 +62,7 @@ ooUpdateObject(dBodyID body)
     PLfloat3 v;
     float a[4];
   } relPos;
-  relPos.v = plLwcRelVec(&obj->p, camPos); // Compute relative position with
+  relPos.v = ooLwcRelVec(&obj->p, camPos); // Compute relative position with
                                            // respect to camera segment
   ooSgSetObjectPos(obj->drawable,
                    relPos.a[0], relPos.a[1], relPos.a[2]);
@@ -157,7 +158,7 @@ ooOrbitNewObj(PLorbsys *sys, const char *name,
 
   obj->p.offs = vf3_set(x, y, z);
   obj->p.seg = vi3_set(0, 0, 0);
-  plLwcNormalise(&obj->p);
+  ooLwcNormalise(&obj->p);
 
   ooObjVecPush(&sys->objs, obj);
 

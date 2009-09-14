@@ -19,6 +19,7 @@
 
 #include <ode/ode.h>
 #include "physics.h"
+#include "common/lwcoord.h"
 #include <assert.h>
 /*
   One of the problems with space is that it is big
@@ -144,7 +145,7 @@ plNormaliseObject(PLobject *obj)
   ((float*)&obj->p.offs)[1] = pos[1];
   ((float*)&obj->p.offs)[2] = pos[2];
   
-  plLwcNormalise(&obj->p);
+  ooLwcNormalise(&obj->p);
   
   dBodySetPosition(obj->id,
                   ((float*)&obj->p.offs)[0],

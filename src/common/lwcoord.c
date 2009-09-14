@@ -17,7 +17,7 @@
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include "lwcoord.h"
 #define OFFS_X(c) (((float*)&(c)->offs)[0])
 #define OFFS_Y(c) (((float*)&(c)->offs)[1])
 #define OFFS_Z(c) (((float*)&(c)->offs)[2])
@@ -80,7 +80,7 @@ float3
 ooLwcGlobal(const OOlwcoord *coord)
 {
   float3 p = coord->offs;
-  return vf3_add(p, vf3_s_mul(p, PL_SEGMENT_LEN));
+  return vf3_add(p, vf3_s_mul(p, OO_LW_SEGMENT_LEN));
 }
 
 float3

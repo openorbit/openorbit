@@ -18,7 +18,7 @@
 */
 
 #include "physics.h"
-
+#include "common/lwcoord.h"
 #define OFFS_X(c) (((float*)&(c)->offs)[0])
 #define OFFS_Y(c) (((float*)&(c)->offs)[1])
 #define OFFS_Z(c) (((float*)&(c)->offs)[2])
@@ -41,7 +41,7 @@ plUpdateDrawable(PLobject2 *obj)
 {
   PLint3 camSect;
   // Update drawable position, in this case we must know in which sector the camera is
-  PLfloat3 newPos = plLwcRelVec(&obj->p, camSect);
+  PLfloat3 newPos = ooLwcRelVec(&obj->p, camSect);
 }
 
 PLocttree*
@@ -51,7 +51,7 @@ plOcttree(double width, int levels)
   octtree->level = levels;
   return octtree;
 }
-
+#if 0
 void
 plLwcNormalise(PLlwcoord *coord)
 {
@@ -164,18 +164,18 @@ plLwcDist64(const PLlwcoord64 *a, const PLlwcoord64 * b)
   return vd3_add(diff, vd3_s_mul(segdiffr, PL_SEGMENT_LEN64));
 }
 
-
+#endif // 0
 
 PLfloat3
 plGetObjGlobal3d(PLobject2 *obj)
 {
-  return plLwcGlobal(&obj->p);
+  return ooLwcGlobal(&obj->p);
 }
 
 PLfloat3
 plObjectDistance(PLobject2 *a, PLobject2 *b)
 {
-  return plLwcDist(&a->p, &b->p);
+  return ooLwcDist(&a->p, &b->p);
 }
 
 PLobject2*
@@ -184,7 +184,7 @@ plObject3d(double x, double y, double z)
   PLobject2 *obj = malloc(sizeof(PLobject2));
   obj->p.offs = vf3_set(x, y, z);
   obj->p.seg = vi3_set(0, 0, 0);
-  plLwcNormalise(&obj->p);
+  ooLwcNormalise(&obj->p);
   return obj;
 }
 
@@ -197,13 +197,13 @@ plObjectDelete(PLobject2 *obj)
 void
 plTranslateObject3fv(PLobject2 *obj, PLfloat3 dp)
 {
-  plLwcTranslate(&obj->p, dp);
+  ooLwcTranslate(&obj->p, dp);
 }
 
 PLfloat3
 plObjectGlobal(PLobject2 *obj)
 {
-  return plLwcGlobal(&obj->p);
+  return ooLwcGlobal(&obj->p);
 }
 
 // Computes whether two lines with radius w both having their origin in some LW coord
@@ -214,7 +214,7 @@ plLwcIntersectionPoint(const PLlwcoord * restrict a, PLfloat3 da, float wa,
                        const PLlwcoord * restrict b, PLfloat3 db, float wb)
 {
   // Transform b to a's segment and compute the intersection point
-  PLfloat3 bPosInASeg = plLwcRelVec(b, a->seg);
+  PLfloat3 bPosInASeg = ooLwcRelVec(b, a->seg);
   PLfloat3 bNext = vf3_add(bPosInASeg, db);
   PLfloat3 aNext = vf3_add(a->offs, da);
   

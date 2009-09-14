@@ -191,7 +191,7 @@ ooSgCamStep(OOcam *cam, float dt)
     break;
   case OOCam_Free:
     {
-      ooLwcTranslate3f(&((OOfreecam*)cam->camData)->lwc, ((OOfreecam*)cam->camData)->dp.v);
+      ooLwcTranslate(&((OOfreecam*)cam->camData)->lwc, ((OOfreecam*)cam->camData)->dp.v);
       
 //      ((OOfreecam*)cam->camData)->p = v_add(((OOfreecam*)cam->camData)->p,
 //                                            ((OOfreecam*)cam->camData)->dp);
@@ -237,9 +237,9 @@ ooSgCamMove(OOcam *cam)
       matrix_t m;
       q_m_convert(&m, q);
       glMultMatrixf((GLfloat*)&m);
-      glTranslatef(-vf3_get(((OOfreecam*)cam->camData)->lwc.p, 0),
-                   -vf3_get(((OOfreecam*)cam->camData)->lwc.p, 1),
-                   -vf3_get(((OOfreecam*)cam->camData)->lwc.p, 2);
+      glTranslatef(-vf3_get(((OOfreecam*)cam->camData)->lwc.offs, 0),
+                   -vf3_get(((OOfreecam*)cam->camData)->lwc.offs, 1),
+                   -vf3_get(((OOfreecam*)cam->camData)->lwc.offs, 2));
       //glTranslatef(-((OOfreecam*)cam->camData)->p.x,
       //             -((OOfreecam*)cam->camData)->p.y,
       //             -((OOfreecam*)cam->camData)->p.z);

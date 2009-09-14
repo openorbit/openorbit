@@ -78,6 +78,10 @@ typedef int32_t __attribute__((vector_size (16))) int3;
 typedef int32_t __attribute__((vector_size (16))) int4;
 typedef uint32_t __attribute__((vector_size (16))) uint3;
 typedef uint32_t __attribute__((vector_size (16))) uint4;
+typedef int64_t __attribute__((vector_size (32))) long3;
+typedef int64_t __attribute__((vector_size (32))) long4;
+typedef uint64_t __attribute__((vector_size (32))) ulong3;
+typedef uint64_t __attribute__((vector_size (32))) ulong4;
 
 typedef double3 double3x3[4];
 typedef double4 double4x4[4];
