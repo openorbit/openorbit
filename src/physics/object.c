@@ -144,9 +144,9 @@ plNormaliseObject(PLobject *obj)
   ((float*)&obj->p.offs)[0] = pos[0];
   ((float*)&obj->p.offs)[1] = pos[1];
   ((float*)&obj->p.offs)[2] = pos[2];
-  
+
   ooLwcNormalise(&obj->p);
-  
+
   dBodySetPosition(obj->id,
                   ((float*)&obj->p.offs)[0],
                   ((float*)&obj->p.offs)[1],

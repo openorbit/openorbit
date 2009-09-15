@@ -49,24 +49,14 @@ ooUpdateObject(dBodyID body)
   PLobject *obj = dBodyGetData(body);
   ooLogTrace("updating body %s", obj->name);
 
-  //const dReal *pos = dBodyGetPosition(body);
   //const dReal *rot = dBodyGetRotation(body);
   const dReal *quat = dBodyGetQuaternion(body);
   const dReal *linVel = dBodyGetLinearVel(body);
   const dReal *angVel = dBodyGetAngularVel(body);
 
   plNormaliseObject(obj);
-  PLint3 camPos = v3i_make(0, 0, 0); // TODO: Should set at camera point
-
-  union {
-    PLfloat3 v;
-    float a[4];
-  } relPos;
-  relPos.v = ooLwcRelVec(&obj->p, camPos); // Compute relative position with
-                                           // respect to camera segment
-  ooSgSetObjectPos(obj->drawable,
-                   relPos.a[0], relPos.a[1], relPos.a[2]);
-
+  
+  ooSgSetObjectPosLW(obj->drawable, &obj->p);
   ooSgSetObjectQuat(obj->drawable, quat[1], quat[2], quat[3], quat[0]);
   ooSgSetObjectSpeed(obj->drawable, linVel[0], linVel[1], linVel[2]);
   ooSgSetObjectAngularSpeed(obj->drawable, angVel[0], angVel[1], angVel[2]);

@@ -231,6 +231,7 @@ ooSgSceneAddChild(OOscene * restrict parent, OOscene * restrict child)
   assert(child != NULL);
   ooObjVecPush(&parent->scenes, child);
   child->parent = parent;
+  child->sg = parent->sg;
 }
 
 void
@@ -569,10 +570,29 @@ ooSgNewSphere(const char *name, float radius, const char *tex)
   return ooSgNewDrawable(name, sp, (OOdrawfunc) ooSgDrawSphere);
 }
 
-void ooSgSetRoot(OOscenegraph *sg, OOscene *sc)
+
+static void
+setSgRec(OOscenegraph *sg, OOscene *sc)
+{
+  for (size_t i = 0; i < sc->scenes.length ; i ++) {
+    ((OOscene*)sc->scenes.elems[i])->sg = sg;
+    setSgRec(sg, sc->scenes.elems[i]);
+  }
+}
+void
+ooSgSetRoot(OOscenegraph *sg, OOscene *sc)
 {
   // TODO: Delete previous scene
   sg->root = sc;
+
+  // This is really ugly, we should initialise these properly when the objects
+  // are created
+  // TODO: RAII please
+  sc->sg = sg;
+  for (size_t i = 0; i < sc->scenes.length ; i ++) {
+    ((OOscene*)sc->scenes.elems[i])->sg = sg;
+    setSgRec(sg, sc->scenes.elems[i]);
+  }
 }
 
 #if 0
