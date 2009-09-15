@@ -18,6 +18,7 @@
 */
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <err.h>
 #include <gencds/hashtable.h>
 #include "sim.h"
@@ -393,6 +394,27 @@ void
 ooIoInitJoystick(void)
 {
   gIoAxisHandlers = hashtable_new_with_str_keys(128);
+}
+
+int
+ooIoGetJoystickCount(void)
+{
+  return SDL_NumJoysticks();
+}
+
+void
+ooIoPrintJoystickNames(void)
+{
+  printf("===== Joystick =====\n");
+  
+  int joyCount = SDL_NumJoysticks();
+  for (int i = 0 ; i < joyCount ; ++ i) {
+    const char *joyName = SDL_JoystickName(i);
+    printf("Joystick %d: '%s' available\n", i, joyName);
+  }
+  printf("====================\n");
+
+
 }
 
 int

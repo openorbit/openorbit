@@ -225,6 +225,9 @@ main(int argc, char*argv[])
 
   ooTexInit(); // Requires that GL has been initialised
 
+  // Give the user some nice info on which joysticks are available
+  ooIoPrintJoystickNames();
+
   if (!ooScriptingRunFile("script/postinit.py")) {
     ooLogFatal("script/postinit.py missing");
   }
