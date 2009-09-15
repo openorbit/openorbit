@@ -93,7 +93,7 @@ hashtable_string_key_del(char *key)
 unsigned int
 hashtable_ptr_hash(const char *key)
 {
-    return ((uintptr_t)key & (-1 ^ 0x0f)) >> 4; 
+    return ((uintptr_t)key & (-1 << 4)) >> 4; 
 }
 
 bool
