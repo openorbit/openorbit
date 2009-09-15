@@ -253,6 +253,29 @@ ooSgCamMove(OOcam *cam)
 
 #include "sim.h"
 extern SIMstate gSIM_state;
+
+// Axis checker
+void
+ooSgCamAxisUpdate(OOcam *cam)
+{
+  if (cam->kind == OOCam_Free) {
+    OOfreecam *fcam = cam->camData;
+    // Nice thing is that these return 0.0 if they are not assigned
+    float yaw = ooIoGetAxis("yaw");
+    float pitch = ooIoGetAxis("pitch");
+    float roll = ooIoGetAxis("roll");
+    float horizontal = ooIoGetAxis("horizontal");
+    float vertical = ooIoGetAxis("vertical");
+
+    vector_t v = v_set(-10000.0 * vertical, 0.0, -10000.0 * horizontal, 0.0);
+    fcam->dp = v_q_rot(v, fcam->q);
+
+    fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.01f * yaw);
+    fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.01f * pitch);
+    fcam->dq = q_mul(fcam->dq, q_rot(0.0f,0.0f,1.0f, 0.01f * roll);
+  }
+}
+
 /* Camera actions, registered as action handlers */
 void
 ooSgCamFwd(bool up, void *data)
