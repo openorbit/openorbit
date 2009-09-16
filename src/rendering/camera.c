@@ -77,7 +77,7 @@ ooSgCamInit(void)
     if (key) {
       ooIoBindKeyHandler(key, keyBindings[i].ioKey, 0, 0);
       ooIoBindKeyHandler(key, keyBindings[i].ioKey, 1, 0);
-    }    
+    }
   }
 }
 
@@ -192,11 +192,9 @@ ooSgCamStep(OOcam *cam, float dt)
   case OOCam_Free:
     {
       ooLwcTranslate(&((OOfreecam*)cam->camData)->lwc, ((OOfreecam*)cam->camData)->dp.v);
-      
-//      ((OOfreecam*)cam->camData)->p = v_add(((OOfreecam*)cam->camData)->p,
-//                                            ((OOfreecam*)cam->camData)->dp);
       ((OOfreecam*)cam->camData)->q = q_mul(((OOfreecam*)cam->camData)->q,
                                             ((OOfreecam*)cam->camData)->dq);
+      ooSgCamAxisUpdate(cam);
     }
     break;
   default:
@@ -271,8 +269,8 @@ ooSgCamAxisUpdate(OOcam *cam)
     fcam->dp = v_q_rot(v, fcam->q);
 
     fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.01f * yaw);
-    fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.01f * pitch);
-    fcam->dq = q_mul(fcam->dq, q_rot(0.0f,0.0f,1.0f, 0.01f * roll);
+    fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.01f * pitch));
+    fcam->dq = q_mul(fcam->dq, q_rot(0.0f,0.0f,1.0f, 0.01f * roll));
   }
 }
 

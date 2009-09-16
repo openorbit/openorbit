@@ -25,6 +25,8 @@
 #include "io-manager.h"
 #include "SDL.h"
 #include "log.h"
+#include "parsers/hrml.h"
+#include "settings.h"
 
 
 static const char * gIoSdlKeyStringMap[SDLK_LAST];
@@ -394,6 +396,38 @@ void
 ooIoInitJoystick(void)
 {
   gIoAxisHandlers = hashtable_new_with_str_keys(128);
+  HRMLobject *confObj = ooConfGetNode("openorbit/controls");
+
+  for (HRMLobject *jstick = confObj->children; jstick != NULL ; jstick = jstick->next) {
+    if (!strcmp(jstick->name, "joystick")) {
+      HRMLvalue name = hrmlGetAttrForName(jstick, "name");
+      HRMLvalue id = hrmlGetAttrForName(jstick, "id");
+      
+      int idVal = 0;
+      if (name.typ != HRMLStr) {
+        fprintf(stderr, "joystick name is not a string\n");
+        return;
+      }
+      const char *nameStr = name.u.str;
+
+      if (id.typ == HRMLInt) {
+        idVal = id.u.integer;
+      }
+      
+      int joystickId = ooIoGetJoystickId(nameStr, idVal);
+      
+      for (HRMLobject *joystickSensor = jstick->children; joystickSensor != NULL;
+           joystickSensor = joystickSensor->next)
+      {
+        if (!strcmp(joystickSensor->name, "axis")) {
+          const char *axisName = hrmlGetStr(joystickSensor);
+          HRMLvalue axisId = hrmlGetAttrForName(joystickSensor, "id");
+          assert(axisId.typ == HRMLInt);
+          ooIoBindAxis(axisName, joystickId, axisId.u.integer);
+        }
+      }
+    }
+  }
 }
 
 int
@@ -418,7 +452,7 @@ ooIoPrintJoystickNames(void)
 }
 
 int
-ooIoGetJoystickId(const char *name)
+ooIoGetJoystickId(const char *name, int subId)
 {
   int joyCount = SDL_NumJoysticks();
   for (int i = 0 ; i < joyCount ; ++ i) {
@@ -436,7 +470,19 @@ ooIoBindAxis(const char *key, int joyStick, int axis)
   OOaxishandler *handler
       = hashtable_lookup(gIoAxisHandlers, key);
   if (handler) {
-    
+    handler->joyId = SDL_JoystickOpen(joyStick);
+    assert(handler->joyId);
+    handler->axisId = axis;
+    handler->nullZone = 0.1;
+    handler->trim = 0.0;
+  } else {
+    OOaxishandler *axisHandler = malloc(sizeof(OOaxishandler));
+    axisHandler->joyId = SDL_JoystickOpen(joyStick);
+    assert(axisHandler->joyId);
+    axisHandler->axisId = axis;
+    axisHandler->nullZone = 0.1;
+    axisHandler->trim = 0.0;
+    hashtable_insert(gIoAxisHandlers, key, axisHandler);
   }
 }
 
@@ -469,7 +515,7 @@ ooIoGetAxis(const char *axis)
       = hashtable_lookup(gIoAxisHandlers, axis);
 
   if (!handler) {
-    ooLogWarn("axis '%s' is not known", axis);
+    ooLogTrace("axis '%s' is not known", axis);
     return 0.0;
   }
 
@@ -480,8 +526,8 @@ ooIoGetAxis(const char *axis)
   } else {
     normalisedAxis = axisVal / 32768.0;
   }
-
-  if (handler->nullZone + handler->trim > fabs(normalisedAxis + handler->trim)) {
+  
+  if (fabs(normalisedAxis + handler->trim) > handler->nullZone + handler->trim) {
     return normalisedAxis + handler->trim;
   }
 

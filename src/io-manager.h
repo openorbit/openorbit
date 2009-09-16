@@ -72,8 +72,11 @@ void ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up,
 void ooIoDispatchKeyUp(const char *name, uint16_t mask);
 void ooIoDispatchKeyDown(const char *name, uint16_t mask);
 
+void ooIoInitJoystick(void);
 void ooIoPrintJoystickNames(void);
 float ooIoGetAxis(const char *axis);
+int ooIoGetJoystickId(const char *name, int subId);
+void ooIoBindAxis(const char *key, int joyStick, int axis);
 
 const char *ooIoSdlKeyNameLookup(SDLKey keyId);
 const char *ooIoSdlMouseButtonNameLookup(unsigned buttonId);

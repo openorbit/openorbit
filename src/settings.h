@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
-
+#include "parsers/hrml.h"
 /*! The settings structure stores global information on the game such as video
  *  and audio configuration parameters. This should be the central store for
  *  most information abour the current game instance's more technical data,
@@ -47,6 +47,8 @@ int ooConfGetIntDef(const char *key, int *val, int defVal);
 int ooConfGetFloatDef(const char *key, float *val, float defVal);
 int ooConfGetStrDef(const char *key, const char **val, const char *defVal);
 
+HRMLobject* ooConfGetNode(const char *key);
+  
 #ifdef __cplusplus
 }
 #endif

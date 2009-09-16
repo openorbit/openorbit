@@ -126,3 +126,9 @@ ooConfGetStrDef(const char *key, const char **val, const char *defVal)
 
   return 0;
 }
+
+HRMLobject*
+ooConfGetNode(const char *key)
+{
+  return hrmlGetObject(gConfSingleton.doc, key);
+}

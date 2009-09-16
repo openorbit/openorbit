@@ -1028,7 +1028,9 @@ ParseAttributes(ParseState *parser)
       Require(parser, tk_colon);
 
       if (!Optional(parser, tk_ident)) {
-        Require(parser, tk_str);
+        if (!Optional(parser, tk_int)) {
+          Require(parser, tk_str);
+        }
       }
       Token valueTok = lexGetCurrentTok(parser->lexer);
 

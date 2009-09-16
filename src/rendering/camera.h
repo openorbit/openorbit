@@ -84,6 +84,7 @@ extern "C" {
   void ooSgCamMove(OOcam *cam);
   void ooSgCamRotate(OOcam *cam);
   void ooSgCamStep(OOcam *cam, float dt);
+  void ooSgCamAxisUpdate(OOcam *cam);
 
 #ifdef __cplusplus
 }
