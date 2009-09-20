@@ -25,6 +25,24 @@
 void ooSimScCtrlMainEngineToggle(bool buttonUp, void *data);
 
 void
+ooScReadAxis(OOspacecraft *sc)
+{
+  // Nice thing is that these return 0.0 if they are not assigned
+  float yaw = ooIoGetAxis("yaw");
+  float pitch = ooIoGetAxis("pitch");
+  float roll = ooIoGetAxis("roll");
+  float horizontal = ooIoGetAxis("horizontal");
+  float vertical = ooIoGetAxis("vertical");
+
+  ooScFireHorizontal(sc, horizontal);
+  ooScFireVertical(sc, vertical);
+
+  ooScEngageYaw(sc, yaw);
+  ooScEngagePitch(sc, pitch);
+  ooScEngageRoll(sc, roll);
+}
+
+void
 ooSimScCtrlInit()
 {
   ooIoRegCKeyHandler("sc-main-engine-toggle", ooSimScCtrlMainEngineToggle);

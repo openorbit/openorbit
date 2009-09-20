@@ -111,6 +111,48 @@ ooScForce(OOspacecraft *sc, float rx, float ry, float rz)
 }
 
 void
+ooScFireOrbital(OOspacecraft *sc)
+{
+
+}
+
+void
+ooScFireVertical(OOspacecraft *sc, float dv)
+{
+
+}
+void
+ooScFireHorizontal(OOspacecraft *sc, float dh)
+{
+
+}
+
+void
+ooScFireForward(OOspacecraft *sc)
+{
+
+}
+
+void
+ooScEngageYaw(OOspacecraft *sc, float dy)
+{
+
+}
+
+void
+ooScEngagePitch(OOspacecraft *sc, float dp)
+{
+
+}
+
+void
+ooScEngageRoll(OOspacecraft *sc, float dr)
+{
+
+}
+
+
+void
 ooScStageStep(OOspacecraft *sc, OOstage *stage) {
   assert(sc != NULL);
   assert(stage != NULL);

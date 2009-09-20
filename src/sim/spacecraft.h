@@ -77,11 +77,19 @@ struct OOspacecraft {
 };
 
 // Note engine structure is for both engines and RCS thrusters
+typedef enum OOenginetype {
+  OO_Engine_Solid,
+  OO_Engine_Liquid,
+  OO_Engine_Jet
+} OOenginetype;
+
 typedef struct OOengine {
+  OOenginetype kind;
   OOspacecraft *sc;
   OOenginestate state;
   vector_t p;
   float forceMag; //!< Newton
+  float throttle; //!< Percentage of force magnitude to apply
   vector_t dir; //!< Unit vector with direction of thruster
 } OOengine;
 
@@ -110,6 +118,16 @@ OOengine* ooScNewEngine(OOspacecraft *sc,
 
 OOstage* ooScNewStage(void);
 void ooScStageAddEngine(OOstage *stage, OOengine *engine);
+
+void ooScFireOrbital(OOspacecraft *sc);
+void ooScFireVertical(OOspacecraft *sc, float dv);
+void ooScFireHorizontal(OOspacecraft *sc, float dh);
+void ooScFireForward(OOspacecraft *sc);
+void ooScFireReverse(OOspacecraft *sc);
+
+void ooScEngageYaw(OOspacecraft *sc, float dy);
+void ooScEngagePitch(OOspacecraft *sc, float dp);
+void ooScEngageRoll(OOspacecraft *sc, float dr);
 
 
 OOspacecraft* ooScLoad(const char *file);
