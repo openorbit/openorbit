@@ -265,12 +265,15 @@ ooSgCamAxisUpdate(OOcam *cam)
     float horizontal = ooIoGetAxis("horizontal");
     float vertical = ooIoGetAxis("vertical");
 
-    vector_t v = v_set(-10000.0 * vertical, 0.0, -10000.0 * horizontal, 0.0);
-    fcam->dp = v_q_rot(v, fcam->q);
-
-    fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.01f * yaw);
-    fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.01f * pitch));
-    fcam->dq = q_mul(fcam->dq, q_rot(0.0f,0.0f,1.0f, 0.01f * roll));
+    if (horizontal != 0.0 && vertical != 0.0) {
+      vector_t v = v_set(10000.0 * horizontal, -10000.0 * vertical, 0.0, 0.0);
+      fcam->dp = v_q_rot(v, fcam->q);
+    }
+    if (yaw != 0.0 && roll != 0.0 && roll != 0.0) {
+      fcam->dq = q_rot(0.0f,1.0f,0.0f, -0.01f * yaw);
+      fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.01f * pitch));
+      fcam->dq = q_mul(fcam->dq, q_rot(0.0f,0.0f,1.0f, -0.01f * roll));
+    }
   }
 }
 
