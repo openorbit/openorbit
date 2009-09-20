@@ -415,7 +415,7 @@ ooIoInitJoystick(void)
       }
       
       int joystickId = ooIoGetJoystickId(nameStr, idVal);
-      
+      if (joystickId == -1) continue;
       for (HRMLobject *joystickSensor = jstick->children; joystickSensor != NULL;
            joystickSensor = joystickSensor->next)
       {
