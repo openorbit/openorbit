@@ -43,8 +43,8 @@ struct OOscene {
 
   vector_t t;
 //  quaternion_t q;
-  scalar_t s; // scale with respect to parent s
-  scalar_t si; // inverse of s
+//  scalar_t s; // scale with respect to parent s
+//  scalar_t si; // inverse of s
 
   OOscenegraph *sg;
 

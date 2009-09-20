@@ -394,7 +394,7 @@ ooOrbitLoadMoon(HRMLobject *obj, OOscene *parentScene)
   // this should be taken from the hrml file though...
   sys->scale.dist = 1.0;
   sys->scale.distInv = 1.0;
-  ooSgSetSceneScale(sc, 1.0);
+  //ooSgSetSceneScale(sc, 1.0);
 
   return sys;
 }
@@ -472,7 +472,8 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
 
   PLorbsys *sys = ooOrbitNewSys(planetName.u.str, sc,
                                 mass, period, 1.0,//float period,
-                                semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc));
+                                149598000000.0 * semiMajor,
+                                149598000000.0 * ooGeoComputeSemiMinor(semiMajor, ecc));
 
   OOdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
@@ -490,7 +491,7 @@ ooOrbitLoadPlanet(HRMLobject *obj, OOscene *parentScene)
   // this should be taken from the hrml file though...
   sys->scale.dist = 149598000000.0;
   sys->scale.distInv = 1.0/149598000000.0;
-  ooSgSetSceneScale(sc, 149598000000.0); // AU in m (always relative to parent)
+  //ooSgSetSceneScale(sc, 149598000000.0); // AU in m (always relative to parent)
 
   if (sats) {
     ooOrbitLoadSatellites(sats, sys, sc);
@@ -568,7 +569,7 @@ ooOrbitLoadStar(HRMLobject *obj)
 
   OOdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
-  ooSgSetObjectScale(drawable, 1.0/149598000000.0); // Adjust to m in au context
+  //ooSgSetObjectScale(drawable, 1.0/149598000000.0); // Adjust to m in au context
   quaternion_t q = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(90.0));
   quaternion_t qr = q_rot(0.0/*x*/,1.0/*y*/,0.0/*z*/,DEG_TO_RAD(1.0)); // TODO: real rot
 
@@ -579,7 +580,7 @@ ooOrbitLoadStar(HRMLobject *obj)
                                    q.x, q.y, q.z, q.w,
                                    qr.x, qr.y, qr.z, qr.w);
 
-  ooSgSetSceneScale(sc, 1.0); // AU in m (always relative to parent)
+  //ooSgSetSceneScale(sc, 1.0); // AU in m (always relative to parent)
 
   return sys;
 }
