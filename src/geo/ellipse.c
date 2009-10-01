@@ -232,3 +232,10 @@ ooGeoEllipseSegPoint(OOellipse *e, double t)
 
   return res.v;
 }
+
+void
+ooGeoEllipseFree(OOellipse *el)
+{
+  free(el->vec.elems);
+  free(el);
+}

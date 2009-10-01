@@ -54,6 +54,8 @@ typedef struct {
  * \todo Replace sovler with more efficient method.
  */
 OOellipse* ooGeoEllipseAreaSeg(size_t segs, float semiMajor, float semiMinor);
+void ooGeoEllipseFree(OOellipse *el);
+
 double ooGeoEllipseCircumferenceFast(OOellipse *e);
 double ooGeoEllipseCircumferenceAccurate(OOellipse *e);
 double ooGeoEllipseArea(OOellipse *e);
