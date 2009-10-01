@@ -26,6 +26,18 @@
 
 void ooPlanetDraw(OOplanet *planet)
 {
+//  if (planet->)
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, planet->texId);
+
+  //  glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    gluSphere(planet->quadratic, planet->radius, 128, 128);
+
+    glMatrixMode(GL_MODELVIEW);
+
   // Switch rendering options based on distance to camera
   // Get 
 //  if ()
