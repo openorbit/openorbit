@@ -191,10 +191,11 @@ ooSgCamStep(OOcam *cam, float dt)
     break;
   case OOCam_Free:
     {
+      ooSgCamAxisUpdate(cam);
+
       ooLwcTranslate(&((OOfreecam*)cam->camData)->lwc, ((OOfreecam*)cam->camData)->dp.v);
       ((OOfreecam*)cam->camData)->q = q_mul(((OOfreecam*)cam->camData)->q,
                                             ((OOfreecam*)cam->camData)->dq);
-      ooSgCamAxisUpdate(cam);
     }
     break;
   default:
@@ -265,15 +266,16 @@ ooSgCamAxisUpdate(OOcam *cam)
     float horizontal = ooIoGetAxis("horizontal");
     float vertical = ooIoGetAxis("vertical");
 
-    if (horizontal != 0.0 && vertical != 0.0) {
+    //fprintf(stderr, "%f %f %f: %f %f\n", yaw, pitch, roll, horizontal, vertical);
+    //if (horizontal != 0.0 || vertical != 0.0) {
       vector_t v = v_set(10000.0 * horizontal, -10000.0 * vertical, 0.0, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
-    }
-    if (yaw != 0.0 && roll != 0.0 && roll != 0.0) {
+    //}
+    //if (yaw != 0.0 || roll != 0.0 || roll != 0.0) {
       fcam->dq = q_rot(0.0f,1.0f,0.0f, -0.01f * yaw);
       fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.01f * pitch));
       fcam->dq = q_mul(fcam->dq, q_rot(0.0f,0.0f,1.0f, -0.01f * roll));
-    }
+    //}
   }
 }
 
