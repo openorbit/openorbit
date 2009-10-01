@@ -258,8 +258,8 @@ ooScLoad(const char *fileName)
                 for (HRMLobject *prop = stageEntry->children; prop != NULL ; prop = prop->next) {
                   if (!strcmp(prop->name, "engine")) {
                     HRMLvalue engineName = hrmlGetAttrForName(prop, "name");
-                    const double *pos;
-                    const double *dir;
+                    const double *pos = NULL;
+                    const double *dir = NULL;
                     double thrust;
                     for (HRMLobject *engine = prop->children; engine != NULL ; engine = engine->next) {
                       if (!strcmp(engine->name, "thrust")) {
@@ -277,10 +277,14 @@ ooScLoad(const char *fileName)
                       }
                     }
 
-                    OOengine *engine = ooScNewEngine(sc, thrust,
-                                                     pos[0], pos[1], pos[2],
-                                                     dir[0], dir[1], dir[2]);
-                    ooScStageAddEngine(newStage, engine);
+                    if (pos && dir) {
+                      OOengine *engine = ooScNewEngine(sc, thrust,
+                                                      pos[0], pos[1], pos[2],
+                                                      dir[0], dir[1], dir[2]);
+                      ooScStageAddEngine(newStage, engine);
+                    } else {
+                      fprintf(stderr, "no pos or direction of engine found\n");
+                    }
                   }
                 }
               } else if (!strcmp(stageEntry->name, "attitude")) {
