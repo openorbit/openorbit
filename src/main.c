@@ -55,7 +55,7 @@
 
 #include <ode/ode.h>
 #include "SDL.h"
-#include "SDL_ttf.h"
+//#include "SDL_ttf.h"
 
 //extern settings_t SETTINGS;
 /* Simulator SDL events */
@@ -215,9 +215,9 @@ main(int argc, char*argv[])
     ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
   }
 
-  if (TTF_Init() == -1) {
-    ooLogFatal("Couldn't initialize SDL_ttf: %s", TTF_GetError());
-  }
+//  if (TTF_Init() == -1) {
+//    ooLogFatal("Couldn't initialize SDL_ttf: %s", TTF_GetError());
+//  }
 
   // Init GL state
   ooSetVideoDefaults();

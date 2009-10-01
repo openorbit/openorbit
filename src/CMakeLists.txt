@@ -1,7 +1,10 @@
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${ODE_INC})
-include_directories(${SDLTTF_INCLUDE_DIR})
+if (${SDLTTF_FOUND})
+  include_directories(${SDLTTF_INCLUDE_DIR})
+endif (${SDLTTF_FOUND})
+
 include_directories(${CONFIG_INC})
 include_directories(${PNG_INCLUDE_DIR})
 include_directories(${JPEG_INCLUDE_DIR})
@@ -119,8 +122,12 @@ set_target_properties(openorbit
 target_link_libraries(openorbit
                       math scripting parsers dl ph
                       ${ODE_LIB} ${PNG_LIBRARIES} ${JPEG_LIBRARIES}
-                      ${OPENGL_LIBRARIES} ${SDL_LIBRARY} ${SDLTTF_LIBRARY}
+                      ${OPENGL_LIBRARIES} ${SDL_LIBRARY}
                       ${GLUT_LIBRARIES})
+                      
+if (${SDLTTF_FOUND})
+  target_link_libraries(openorbit ${SDLTTF_LIBRARY})
+endif (${SDLTTF_FOUND})
 #target_link_libraries(openorbit ${ORBIT_PLUGINS})
 
 install(TARGETS openorbit
