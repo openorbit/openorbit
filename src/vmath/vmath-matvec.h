@@ -93,6 +93,33 @@ vd4_set(double x, double y, double z, double w)
   return uc.v;
 }
 
+static inline float
+vf3_abs(float3 v)
+{
+  float3 res = v * v;
+  return sqrt(vf3_get(res, 0) + vf3_get(res, 1) + vf3_get(res, 2));
+}
+static inline double
+vd3_abs(double3 v)
+{
+  double3 res = v * v;
+  return sqrt(vd3_get(res, 0) + vd3_get(res, 1) + vd3_get(res, 2));
+}
+
+static inline float
+vf3_abs_square(float3 v)
+{
+  float3 res = v * v;
+  return vf3_get(res, 0) + vf3_get(res, 1) + vf3_get(res, 2);
+}
+
+static inline double
+vd3_abs_square(double3 v)
+{
+  double3 res = v * v;
+  return vd3_get(res, 0) + vd3_get(res, 1) + vd3_get(res, 2);
+}
+
 static inline float3
 vf3_neg(float3 v)
 {
@@ -317,7 +344,7 @@ vf4_s_div(float4 a, float b)
 }
 
 static inline double3
-vd3_abs(double3 a)
+vd3_abs_c(double3 a)
 {
   double3_u ua = {.v = a};
   
@@ -385,6 +412,20 @@ bool m_eq(const matrix_t *a, const matrix_t *b, scalar_t tol)
 
 
 void m_translate(matrix_t *m, scalar_t x, scalar_t y, scalar_t z, scalar_t w);
+
+static inline float3
+vf3_normalise(float3 v)
+{
+  float norm = vf3_abs(v);
+  return vf3_s_mul(v, 1.0f/norm);
+}
+
+static inline double3
+vd3_normalise(double3 v)
+{
+  double norm = vd3_abs(v);
+  return vd3_s_mul(v, 1.0/norm);
+}
 
 
 #ifdef __cplusplus
