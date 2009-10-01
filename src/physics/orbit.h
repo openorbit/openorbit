@@ -43,7 +43,53 @@ ode2v3(const dReal *vec)
   return v4f_make(vec[0], vec[1], vec[2], 1.0f);
 }
 
+typedef struct PLworld__ PLworld__;
+typedef struct PLorbsys__ PLorbsys__;
+typedef struct PLobject__ PLobject__;
 
+struct PLobject__ {
+  char *name;
+  PLworld__ *world;
+  PLorbsys__ *sys;
+  dBodyID id; // Using ODE at the moment, but this is not really necisary
+  PLlwcoord p; // Large world coordinates
+  double m;
+  OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
+                        //!< object.
+};
+
+
+struct PLorbsys__ {
+  PLworld__ *world;
+  PLorbsys__ *parent;
+
+  const char *name;
+
+  OOobjvector orbits; // suborbits
+  OOobjvector objs; // objects in this system
+
+  PLobject__ *orbitalBody; // The body actually orbiting at this point, note that it is
+  double orbitalPeriod;
+  OOellipse *orbitalPath; // Contains the actual ellipsis for the orbit
+  OOdrawable *orbitDrawable; // Pointer to the drawable representing the ellipsis
+};
+
+struct PLworld__ {
+  dWorldID world;
+  const char *name;
+  OOscene *scene; // Scene in the sg
+  OOobjvector orbits;
+  OOobjvector objs;
+  PLobject__ *centralBody;
+};
+
+PLworld__* plNewWorld(const char *name, OOscene *sc,
+                      double m, double radius, double siderealPeriod);
+
+PLorbsys__* plNewOrbit(PLworld__ *world, const char *name, double m,
+                       double orbitPeriod, double semiMaj, double semiMin);
+PLorbsys__* plNewSubOrbit(PLorbsys__ *orb, const char *name, double m,
+                          double orbitPeriod, double semiMaj, double semiMin);
 
 struct PLorbsys {
     dWorldID world;
@@ -74,7 +120,7 @@ struct PLorbsys {
     OOscene *scene; //!< Link to scene graph scene corresponding to this system
 
     OOellipse *orbit;
-
+    OOdrawable *orbitDrawable;
     OOobjvector sats; //!< Natural satellites, i.e. other orbital systems
     OOobjvector objs; //!< Synthetic satellites, i.e. stuff that is handled by ODE
 };
