@@ -2,6 +2,15 @@
 #define BITUTILS_H_HBYMFJ6H
 #include <assert.h>
 #include <stdint.h>
+
+#if !defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN)
+  #if defined(PPC) || defined(SPARC)
+    #define BIG_ENDIAN 1
+  #else
+    #define LITTLE_ENDIAN 1
+  #endif
+#endif
+
 #if defined(LITTLE_ENDIAN)
 static inline uint16_t ooLittleToHost16(uint16_t a) {return a;}
 static inline uint32_t ooLittleToHost32(uint32_t a) {return a;}
