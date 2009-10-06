@@ -76,8 +76,6 @@
 		EC34BCA81079EE080011B76E /* spacecraft.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC511079EE080011B76E /* spacecraft.c */; };
 		EC34BCA91079EE080011B76E /* sim.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC531079EE080011B76E /* sim.c */; };
 		EC34BCAA1079EE080011B76E /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC581079EE080011B76E /* control.c */; };
-		EC34BCAD1079EE080011B76E /* vmath-matvec.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC621079EE080011B76E /* vmath-matvec.c */; };
-		EC34BCAF1079EE080011B76E /* vmath-quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC651079EE080011B76E /* vmath-quaternions.c */; };
 		EC34BCBA1079EECB0011B76E /* data in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCB21079EECB0011B76E /* data */; };
 		EC34BCD11079EEE00011B76E /* textures in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCBB1079EEE00011B76E /* textures */; };
 		EC34BD291079EEF60011B76E /* spacecrafts in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCD21079EEF60011B76E /* spacecrafts */; };
@@ -88,6 +86,21 @@
 		EC34BD341079EF5A0011B76E /* postinit.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2F1079EF5A0011B76E /* postinit.py */; };
 		EC34BD351079EF650011B76E /* init.py in Copy Scripts */ = {isa = PBXBuildFile; fileRef = EC34BD2D1079EF5A0011B76E /* init.py */; };
 		EC34BD361079EF650011B76E /* postinit.py in Copy Scripts */ = {isa = PBXBuildFile; fileRef = EC34BD2F1079EF5A0011B76E /* postinit.py */; };
+		EC34BD63107B26F00011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
+		EC34BD64107B26F50011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
+		EC34BD65107B26F90011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
+		EC34BD66107B26FF0011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
+		EC34BD67107B27070011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
+		EC34BD68107B270E0011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
+		EC34BD69107B27130011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
+		EC34BD7B107B28B90011B76E /* hashtable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF01079EE080011B76E /* hashtable.c */; };
+		EC34BD82107B29150011B76E /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF31079EE080011B76E /* list.c */; };
+		EC34BD9E107B2B050011B76E /* heap.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF11079EE080011B76E /* heap.c */; };
+		EC34BDA0107B2B3D0011B76E /* tga.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC0C1079EE080011B76E /* tga.c */; };
+		EC34BDA1107B2B570011B76E /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF31079EE080011B76E /* list.c */; };
+		EC34BDC1107B2CBD0011B76E /* vmath-matvec.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB7107B2C480011B76E /* vmath-matvec.c */; };
+		EC34BDC2107B2CBD0011B76E /* vmath-quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB8107B2C480011B76E /* vmath-quaternions.c */; };
+		EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BDBE107B2C900011B76E /* libvmath.a */; };
 		EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC4485680CCD250C001C88AD /* hash-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485390CCD247E001C88AD /* hash-test.c */; };
 		EC4485690CCD251E001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
@@ -126,6 +139,13 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
+		EC34BDCA107B2D660011B76E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC34BDBD107B2C900011B76E;
+			remoteInfo = vmath;
+		};
 		EC4476990CCBFF7B001C88AD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
@@ -327,19 +347,6 @@
 		EC34BC541079EE080011B76E /* sim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sim.h; sourceTree = "<group>"; };
 		EC34BC561079EE080011B76E /* bitutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitutils.h; sourceTree = "<group>"; };
 		EC34BC581079EE080011B76E /* control.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = control.c; sourceTree = "<group>"; };
-		EC34BC5C1079EE080011B76E /* vmath-matvec-sse4.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "vmath-matvec-sse4.inl"; sourceTree = "<group>"; };
-		EC34BC5E1079EE080011B76E /* vmath-constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-constants.h"; sourceTree = "<group>"; };
-		EC34BC5F1079EE080011B76E /* vmath-convert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-convert.h"; sourceTree = "<group>"; };
-		EC34BC601079EE080011B76E /* vmath-fixed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-fixed.h"; sourceTree = "<group>"; };
-		EC34BC611079EE080011B76E /* vmath-integer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-integer.h"; sourceTree = "<group>"; };
-		EC34BC621079EE080011B76E /* vmath-matvec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-matvec.c"; sourceTree = "<group>"; };
-		EC34BC631079EE080011B76E /* vmath-matvec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-matvec.h"; sourceTree = "<group>"; };
-		EC34BC641079EE080011B76E /* vmath-matvec.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "vmath-matvec.inl"; sourceTree = "<group>"; };
-		EC34BC651079EE080011B76E /* vmath-quaternions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-quaternions.c"; sourceTree = "<group>"; };
-		EC34BC661079EE080011B76E /* vmath-quaternions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-quaternions.h"; sourceTree = "<group>"; };
-		EC34BC671079EE080011B76E /* vmath-quaternions.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "vmath-quaternions.inl"; sourceTree = "<group>"; };
-		EC34BC681079EE080011B76E /* vmath-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-types.h"; sourceTree = "<group>"; };
-		EC34BC691079EE080011B76E /* vmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vmath.h; sourceTree = "<group>"; };
 		EC34BCB21079EECB0011B76E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 		EC34BCBB1079EEE00011B76E /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; path = textures; sourceTree = "<group>"; };
 		EC34BCD21079EEF60011B76E /* spacecrafts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = spacecrafts; path = vehicles/spacecrafts; sourceTree = "<group>"; };
@@ -348,6 +355,22 @@
 		EC34BD2D1079EF5A0011B76E /* init.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = init.py; sourceTree = "<group>"; };
 		EC34BD2E1079EF5A0011B76E /* install-mac-res.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "install-mac-res.sh"; sourceTree = "<group>"; };
 		EC34BD2F1079EF5A0011B76E /* postinit.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = postinit.py; sourceTree = "<group>"; };
+		EC34BD62107B26D30011B76E /* libcheck.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcheck.a; path = /usr/local/lib/libcheck.a; sourceTree = "<absolute>"; };
+		EC34BDA7107B2C2B0011B76E /* vmath-constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-constants.h"; sourceTree = "<group>"; };
+		EC34BDA8107B2C2B0011B76E /* vmath-convert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-convert.h"; sourceTree = "<group>"; };
+		EC34BDA9107B2C2B0011B76E /* vmath-fixed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-fixed.h"; sourceTree = "<group>"; };
+		EC34BDAA107B2C2B0011B76E /* vmath-integer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-integer.h"; sourceTree = "<group>"; };
+		EC34BDAB107B2C2B0011B76E /* vmath-matvec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-matvec.h"; sourceTree = "<group>"; };
+		EC34BDAC107B2C2B0011B76E /* vmath-matvec.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "vmath-matvec.inl"; sourceTree = "<group>"; };
+		EC34BDAD107B2C2B0011B76E /* vmath-quaternions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-quaternions.h"; sourceTree = "<group>"; };
+		EC34BDAE107B2C2B0011B76E /* vmath-quaternions.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "vmath-quaternions.inl"; sourceTree = "<group>"; };
+		EC34BDAF107B2C2B0011B76E /* vmath-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-types.h"; sourceTree = "<group>"; };
+		EC34BDB0107B2C2B0011B76E /* vmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vmath.h; sourceTree = "<group>"; };
+		EC34BDB5107B2C480011B76E /* vmath-matvec-sse4.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "vmath-matvec-sse4.inl"; sourceTree = "<group>"; };
+		EC34BDB6107B2C480011B76E /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		EC34BDB7107B2C480011B76E /* vmath-matvec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-matvec.c"; sourceTree = "<group>"; };
+		EC34BDB8107B2C480011B76E /* vmath-quaternions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-quaternions.c"; sourceTree = "<group>"; };
+		EC34BDBE107B2C900011B76E /* libvmath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libvmath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4476970CCBFF73001C88AD /* t000_hashtable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t000_hashtable; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC44769E0CCBFF95001C88AD /* t001_heap */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t001_heap; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4476A30CCBFFB1001C88AD /* t002_tga */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t002_tga; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -380,10 +403,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		EC34BDBC107B2C900011B76E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EC4476950CCBFF73001C88AD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC34BD63107B26F00011B76E /* libcheck.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,6 +422,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC34BD64107B26F50011B76E /* libcheck.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,6 +430,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC34BD65107B26F90011B76E /* libcheck.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +438,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC34BD66107B26FF0011B76E /* libcheck.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,6 +446,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC34BD67107B27070011B76E /* libcheck.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,6 +454,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC34BD68107B270E0011B76E /* libcheck.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,6 +462,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC34BD69107B27130011B76E /* libcheck.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,6 +476,7 @@
 				EC4FCC6110748ECA00EB6DDF /* libjpeg.a in Frameworks */,
 				EC4FCC6310748F4B00EB6DDF /* libpng.dylib in Frameworks */,
 				ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */,
+				EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,6 +486,7 @@
 		EC34BBCD1079EDE90011B76E /* include */ = {
 			isa = PBXGroup;
 			children = (
+				EC34BDA6107B2C2B0011B76E /* vmath */,
 				EC34BBCF1079EDE90011B76E /* gencds */,
 				EC34BBD71079EDE90011B76E /* openorbit */,
 			);
@@ -516,7 +555,6 @@
 				EC34BC541079EE080011B76E /* sim.h */,
 				EC34BC551079EE080011B76E /* utils */,
 				EC34BC571079EE080011B76E /* vessel */,
-				EC34BC591079EE080011B76E /* vmath */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -732,42 +770,6 @@
 			path = vessel;
 			sourceTree = "<group>";
 		};
-		EC34BC591079EE080011B76E /* vmath */ = {
-			isa = PBXGroup;
-			children = (
-				EC34BC5A1079EE080011B76E /* arch */,
-				EC34BC5E1079EE080011B76E /* vmath-constants.h */,
-				EC34BC5F1079EE080011B76E /* vmath-convert.h */,
-				EC34BC601079EE080011B76E /* vmath-fixed.h */,
-				EC34BC611079EE080011B76E /* vmath-integer.h */,
-				EC34BC621079EE080011B76E /* vmath-matvec.c */,
-				EC34BC631079EE080011B76E /* vmath-matvec.h */,
-				EC34BC641079EE080011B76E /* vmath-matvec.inl */,
-				EC34BC651079EE080011B76E /* vmath-quaternions.c */,
-				EC34BC661079EE080011B76E /* vmath-quaternions.h */,
-				EC34BC671079EE080011B76E /* vmath-quaternions.inl */,
-				EC34BC681079EE080011B76E /* vmath-types.h */,
-				EC34BC691079EE080011B76E /* vmath.h */,
-			);
-			path = vmath;
-			sourceTree = "<group>";
-		};
-		EC34BC5A1079EE080011B76E /* arch */ = {
-			isa = PBXGroup;
-			children = (
-				EC34BC5B1079EE080011B76E /* x86 */,
-			);
-			path = arch;
-			sourceTree = "<group>";
-		};
-		EC34BC5B1079EE080011B76E /* x86 */ = {
-			isa = PBXGroup;
-			children = (
-				EC34BC5C1079EE080011B76E /* vmath-matvec-sse4.inl */,
-			);
-			path = x86;
-			sourceTree = "<group>";
-		};
 		EC34BCB11079EEA80011B76E /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
@@ -790,9 +792,62 @@
 			path = scripts;
 			sourceTree = "<group>";
 		};
+		EC34BDA6107B2C2B0011B76E /* vmath */ = {
+			isa = PBXGroup;
+			children = (
+				EC34BDA7107B2C2B0011B76E /* vmath-constants.h */,
+				EC34BDA8107B2C2B0011B76E /* vmath-convert.h */,
+				EC34BDA9107B2C2B0011B76E /* vmath-fixed.h */,
+				EC34BDAA107B2C2B0011B76E /* vmath-integer.h */,
+				EC34BDAB107B2C2B0011B76E /* vmath-matvec.h */,
+				EC34BDAC107B2C2B0011B76E /* vmath-matvec.inl */,
+				EC34BDAD107B2C2B0011B76E /* vmath-quaternions.h */,
+				EC34BDAE107B2C2B0011B76E /* vmath-quaternions.inl */,
+				EC34BDAF107B2C2B0011B76E /* vmath-types.h */,
+				EC34BDB0107B2C2B0011B76E /* vmath.h */,
+			);
+			path = vmath;
+			sourceTree = "<group>";
+		};
+		EC34BDB1107B2C480011B76E /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				EC34BDB2107B2C480011B76E /* vmath */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		EC34BDB2107B2C480011B76E /* vmath */ = {
+			isa = PBXGroup;
+			children = (
+				EC34BDB3107B2C480011B76E /* arch */,
+				EC34BDB6107B2C480011B76E /* CMakeLists.txt */,
+				EC34BDB7107B2C480011B76E /* vmath-matvec.c */,
+				EC34BDB8107B2C480011B76E /* vmath-quaternions.c */,
+			);
+			path = vmath;
+			sourceTree = "<group>";
+		};
+		EC34BDB3107B2C480011B76E /* arch */ = {
+			isa = PBXGroup;
+			children = (
+				EC34BDB4107B2C480011B76E /* x86 */,
+			);
+			path = arch;
+			sourceTree = "<group>";
+		};
+		EC34BDB4107B2C480011B76E /* x86 */ = {
+			isa = PBXGroup;
+			children = (
+				EC34BDB5107B2C480011B76E /* vmath-matvec-sse4.inl */,
+			);
+			path = x86;
+			sourceTree = "<group>";
+		};
 		EC4476740CCBFEDB001C88AD = {
 			isa = PBXGroup;
 			children = (
+				EC34BDB1107B2C480011B76E /* lib */,
 				EC34BD2A1079EF5A0011B76E /* scripts */,
 				EC34BCB11079EEA80011B76E /* rsrc */,
 				EC34BBDE1079EE080011B76E /* src */,
@@ -818,6 +873,7 @@
 				EC4476C10CCBFFF9001C88AD /* t005_object_manager */,
 				EC4476C60CCC0010001C88AD /* t006_list */,
 				EC4476DE0CCC0076001C88AD /* Open Orbit.app */,
+				EC34BDBE107B2C900011B76E /* libvmath.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -825,6 +881,7 @@
 		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EC34BD62107B26D30011B76E /* libcheck.a */,
 				EC4FCC6210748F4B00EB6DDF /* libpng.dylib */,
 				EC4FCC6010748ECA00EB6DDF /* libjpeg.a */,
 				EC4FCC1310748AC900EB6DDF /* libode.a */,
@@ -953,7 +1010,34 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		EC34BDBA107B2C900011B76E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		EC34BDBD107B2C900011B76E /* vmath */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC34BDC3107B2CDB0011B76E /* Build configuration list for PBXNativeTarget "vmath" */;
+			buildPhases = (
+				EC34BDBA107B2C900011B76E /* Headers */,
+				EC34BDBB107B2C900011B76E /* Sources */,
+				EC34BDBC107B2C900011B76E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = vmath;
+			productName = vmath;
+			productReference = EC34BDBE107B2C900011B76E /* libvmath.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		EC4476960CCBFF73001C88AD /* t000_hashtable */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EC4476AF0CCBFFF7001C88AD /* Build configuration list for PBXNativeTarget "t000_hashtable" */;
@@ -1082,6 +1166,7 @@
 				EC4485D50CCD4A19001C88AD /* PBXBuildRule */,
 			);
 			dependencies = (
+				EC34BDCB107B2D660011B76E /* PBXTargetDependency */,
 			);
 			name = "Open Orbit";
 			productName = "Open Orbit";
@@ -1113,6 +1198,7 @@
 				EC4476AC0CCBFFD8001C88AD /* t004_physics */,
 				EC4476C00CCBFFF9001C88AD /* t005_object_manager */,
 				EC4476C50CCC0010001C88AD /* t006_list */,
+				EC34BDBD107B2C900011B76E /* vmath */,
 			);
 		};
 /* End PBXProject section */
@@ -1139,11 +1225,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		EC34BDBB107B2C900011B76E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC34BDC1107B2CBD0011B76E /* vmath-matvec.c in Sources */,
+				EC34BDC2107B2CBD0011B76E /* vmath-quaternions.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EC4476940CCBFF73001C88AD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				EC4485690CCD251E001C88AD /* testdriver-main.c in Sources */,
+				EC34BD82107B29150011B76E /* list.c in Sources */,
+				EC34BD7B107B28B90011B76E /* hashtable.c in Sources */,
 				EC4485680CCD250C001C88AD /* hash-test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1153,6 +1250,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC44856A0CCD252D001C88AD /* testdriver-main.c in Sources */,
+				EC34BD9E107B2B050011B76E /* heap.c in Sources */,
 				EC4485700CCD2568001C88AD /* heap-test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1162,6 +1260,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC44856B0CCD253A001C88AD /* testdriver-main.c in Sources */,
+				EC34BDA0107B2B3D0011B76E /* tga.c in Sources */,
 				EC4485710CCD2575001C88AD /* tga-test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1198,6 +1297,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC44856E0CCD254D001C88AD /* testdriver-main.c in Sources */,
+				EC34BDA1107B2B570011B76E /* list.c in Sources */,
 				EC4485750CCD25AB001C88AD /* list-test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1253,14 +1353,17 @@
 				EC34BCA81079EE080011B76E /* spacecraft.c in Sources */,
 				EC34BCA91079EE080011B76E /* sim.c in Sources */,
 				EC34BCAA1079EE080011B76E /* control.c in Sources */,
-				EC34BCAD1079EE080011B76E /* vmath-matvec.c in Sources */,
-				EC34BCAF1079EE080011B76E /* vmath-quaternions.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		EC34BDCB107B2D660011B76E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC34BDBD107B2C900011B76E /* vmath */;
+			targetProxy = EC34BDCA107B2D660011B76E /* PBXContainerItemProxy */;
+		};
 		EC44769A0CCBFF7B001C88AD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = EC4476960CCBFF73001C88AD /* t000_hashtable */;
@@ -1299,16 +1402,54 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		EC34BDBF107B2C910011B76E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = 4.2;
+				HEADER_SEARCH_PATHS = include;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = vmath;
+			};
+			name = Debug;
+		};
+		EC34BDC0107B2C910011B76E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_VERSION = 4.2;
+				HEADER_SEARCH_PATHS = include;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = vmath;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		EC4476780CCBFEDB001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = include;
 				LIBRARY_SEARCH_PATHS = "";
 				SDKROOT = macosx10.6;
+				USER_HEADER_SEARCH_PATHS = src;
 			};
 			name = Debug;
 		};
@@ -1316,12 +1457,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = include;
 				LIBRARY_SEARCH_PATHS = "";
 				SDKROOT = macosx10.6;
+				USER_HEADER_SEARCH_PATHS = src;
 			};
 			name = Release;
 		};
@@ -1349,30 +1492,50 @@
 		};
 		EC4476B00CCBFFF7001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					include,
+					"${TEST_INCPATH}",
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t000_hashtable;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
 		};
 		EC4476B10CCBFFF7001C88AD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					include,
+					"${TEST_INCPATH}",
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t000_hashtable;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1380,15 +1543,22 @@
 		EC4476B30CCBFFF7001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					"${TEST_INCPATH}",
+					include,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t001_heap;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1396,13 +1566,20 @@
 		EC4476B40CCBFFF7001C88AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					"${TEST_INCPATH}",
+					include,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t001_heap;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1410,15 +1587,22 @@
 		EC4476B60CCBFFF7001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					"${TEST_INCPATH}",
+					include,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t002_tga;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1426,13 +1610,20 @@
 		EC4476B70CCBFFF7001C88AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					"${TEST_INCPATH}",
+					include,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t002_tga;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1440,15 +1631,22 @@
 		EC4476B90CCBFFF7001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					include,
+					"${TEST_INCPATH}",
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t003_math;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1456,13 +1654,20 @@
 		EC4476BA0CCBFFF7001C88AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					include,
+					"${TEST_INCPATH}",
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t003_math;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1470,15 +1675,22 @@
 		EC4476BC0CCBFFF7001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					"${TEST_INCPATH}",
+					include,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t004_physics;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1486,13 +1698,20 @@
 		EC4476BD0CCBFFF7001C88AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					"${TEST_INCPATH}",
+					include,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t004_physics;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1500,15 +1719,22 @@
 		EC4476D50CCC0038001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					"${TEST_INCPATH}",
+					include,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t005_object_manager;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1516,13 +1742,20 @@
 		EC4476D60CCC0038001C88AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					"${TEST_INCPATH}",
+					include,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t005_object_manager;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1530,15 +1763,22 @@
 		EC4476D80CCC0038001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					include,
+					"${TEST_INCPATH}",
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t006_list;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1546,13 +1786,20 @@
 		EC4476D90CCC0038001C88AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					include,
+					"${TEST_INCPATH}",
+				);
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
 				PREBINDING = NO;
 				PRODUCT_NAME = t006_list;
+				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1655,6 +1902,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		EC34BDC3107B2CDB0011B76E /* Build configuration list for PBXNativeTarget "vmath" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC34BDBF107B2C910011B76E /* Debug */,
+				EC34BDC0107B2C910011B76E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		EC4476770CCBFEDB001C88AD /* Build configuration list for PBXProject "orbit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

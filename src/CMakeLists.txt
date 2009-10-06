@@ -24,7 +24,6 @@ if (APPLE)
 endif (APPLE)
 
 #add_subdirectory(libgencds)
-add_subdirectory(vmath)
 add_subdirectory(physics)
 add_subdirectory(scripting)
 add_subdirectory(parsers)
@@ -120,7 +119,7 @@ set_target_properties(openorbit
                       DEBUG_OUTPUT_NAME "${open_orbit_debug_name}")
 
 target_link_libraries(openorbit
-                      math scripting parsers dl ph
+                      vmath scripting parsers dl ph
                       ${ODE_LIB} ${PNG_LIBRARIES} ${JPEG_LIBRARIES}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY}
                       ${GLUT_LIBRARIES})
