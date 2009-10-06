@@ -36,7 +36,7 @@ hrml3d_load(model_t *model, const char *fileName)
   
   HRMLobject *rootNode = hrmlGetRoot(doc);
   
-  if (!strcmp(rootNode, "h3d")) {
+  if (!strcmp(rootNode->name, "h3d")) {
     for (HRMLobject *obj = rootNode->children; obj != NULL; obj = obj->next) {
       
     }

@@ -20,6 +20,8 @@
 #ifndef HRML3D_H_GNLUZTN5
 #define HRML3D_H_GNLUZTN5
 
+#include "model.h"
+
 int hrml3d_load(model_t *model, const char *fileName);
 
 #endif /* end of include guard: HRML3D_H_GNLUZTN5 */

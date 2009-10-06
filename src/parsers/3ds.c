@@ -165,7 +165,7 @@ void m3derror(const char *str)
 int readFaces(int fd, size_t maxBytes)
 {
   chunk_3ds_t chnk = {0, 0};
-  fprintf(stderr, "reading faces... %d\n", maxBytes);
+  fprintf(stderr, "reading faces... %d\n", (int)maxBytes);
   size_t remBytes = maxBytes;
   
   uint16_t nfaces = readU16(fd);
@@ -218,7 +218,7 @@ int readFaces(int fd, size_t maxBytes)
 int readTriangles(int fd, size_t maxBytes)
 {
   chunk_3ds_t chnk = {0, 0};
-  fprintf(stderr, "reading triangles... %d\n", maxBytes);
+  fprintf(stderr, "reading triangles... %d\n", (int)maxBytes);
   size_t remBytes = maxBytes;
   
   while (remBytes > 0 && (readChunkHeader(&chnk, fd) == 0)) {

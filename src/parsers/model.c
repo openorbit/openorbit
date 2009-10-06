@@ -19,7 +19,7 @@
 
 #include "model.h"
 #include <string.h>
-
+#include <assert.h>
 int
 model_load(model_t * restrict model, const char * restrict fileName)
 {
