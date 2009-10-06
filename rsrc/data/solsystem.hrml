@@ -8,7 +8,7 @@ openorbit {
     }
     rendering {
        model: "sphere"; # Special keys are sphere
-       texture: "tex/sol.tga";
+       texture: "textures/sol.tga";
     }
     satellites {
       planet (name: Mercury) {
@@ -42,7 +42,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "tex/mercury.tga";
+          texture: "textures/mercury.tga";
         }
       }
       planet (name: Venus) {
@@ -75,7 +75,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "tex/venus.jpg";
+          texture: "textures/venus.jpg";
         }
       }
       planet (name: Earth) {
@@ -109,7 +109,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "tex/land_ocean_ice_cloud_2048.jpg";
+          texture: "textures/land_ocean_ice_cloud_2048.jpg";
         }
         satellites {
           moon (name: Luna) {
@@ -131,7 +131,7 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "tex/moonmap4k.jpg";
+              texture: "textures/moonmap4k.jpg";
             }
           }
         }
@@ -156,7 +156,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "tex/mars.jpg";
+          texture: "textures/mars.jpg";
         }
       }
       planet (name: Jupiter) {
@@ -179,7 +179,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "tex/JupiterNormalized2k.jpg";
+          texture: "textures/JupiterNormalized2k.jpg";
         }
         satellites {
           moon (name: Io) {
@@ -201,7 +201,7 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "tex/Io.png";
+              texture: "textures/Io.png";
               //albedo: 0.62;
             }
           }
@@ -224,7 +224,7 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "tex/Europa.png";
+              texture: "textures/Europa.png";
               //albedo: 0.68;
             }
           }
@@ -247,7 +247,7 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "tex/4kGanymede.png";
+              texture: "textures/4kGanymede.png";
               //albedo: 0.44;
             }
           }
@@ -270,7 +270,7 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "tex/Callisto.png";
+              texture: "textures/Callisto.png";
               //albedo: 0.19;
             }
           }

@@ -1,0 +1,47 @@
+//
+//  openorbit.xcconfig
+//  orbit
+//
+//  Created by Mattias Holm on 2009-09-16.
+//  Copyright 2009. All rights reserved.
+//
+
+// Idea is that we add paths for macports, fink, /usr/local and a project local
+// {PRJ}/build/dependencies as prefixes
+PORTS_BASE=/opt/local
+PORTS_INC=${PORTS_BASE}/include
+PORTS_LIB=${PORTS_BASE}/lib
+
+FINK_BASE=/sw
+FINK_INC=${FINK_BASE}/include
+FINK_LIB=${FINK_BASE}/lib
+
+SDL_FW=/Library/Frameworks/SDL.framework
+SDL_INC=${SDL_FW}/Versions/A/Headers
+// Customise prefixes for your environment
+ODE_PREFIX=/opt/ode/0.11_float
+CHECK_PREFIX=/opt/local
+PNG_PREFIX=/usr/X11R6
+JPG_PREFIX=/opt/local
+PYTHON_PREFIX=/usr
+
+CHECK_LIB=${CHECK_PREFIX}/lib
+CHECK_INC=${CHECK_PREFIX}/include
+
+PNG_LIB=${PNG_PREFIX}/lib
+PNG_INC=${PNG_PREFIX}/include
+
+JPG_LIB=${JPG_PREFIX}/lib
+JPG_INC=${JPG_PREFIX}/include
+
+ODE_LIB=${ODE_PREFIX}/lib
+ODE_INC=${ODE_PREFIX}/include
+
+PYTHON_LIB=${PYTHON_PREFIX}/lib
+PYTHON_INC=${PYTHON_PREFIX}/include/python2.5
+
+ORBIT_LIBPATH=${ODE_LIB} ${JPG_LIB} ${PNG_LIB} ${PYTHON_LIB}
+ORBIT_INCPATH=${ODE_INC} ${JPG_INC} ${PNG_INC} ${PYTHON_INC}
+
+TEST_LIBPATH=${ODE_LIB} ${JPG_LIB} ${PNG_LIB} ${CHECK_LIB}
+TEST_INCPATH=${ODE_INC} ${JPG_INC} ${PNG_INC} ${CHECK_INC}

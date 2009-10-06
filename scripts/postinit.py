@@ -45,4 +45,4 @@ cam.setParams(sgr, sgr.getScene("Sol/Jupiter/Io"),
               0.0, 1.0, 0.0)
 sgr.setCam(cam)
 
-sc = ooscript.Spacecraft("sc/mercury.hrml")
+sc = ooscript.Spacecraft("spacecrafts/mercury/mercury.hrml")

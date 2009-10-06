@@ -75,7 +75,7 @@ endif (APPLE)
 
 set_source_files_properties(${ORBIT_RES_TEX}
                             PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/tex/)
+                            MACOSX_PACKAGE_LOCATION Resources/textures/)
 
 set_source_files_properties(${ORBIT_RES_DATA}
                             PROPERTIES
@@ -100,7 +100,7 @@ set_source_files_properties(${ORBIT_PLUGINS}
 
 set_source_files_properties(${ORBIT_RES_SC}
                             PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/sc)
+                            MACOSX_PACKAGE_LOCATION Resources/)
 
 add_executable(openorbit MACOSX_BUNDLE
                ${openorbit_SRC}
