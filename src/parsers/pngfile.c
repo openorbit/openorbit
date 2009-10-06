@@ -16,7 +16,7 @@
   You should have received a copy of the GNU Lesser General Public License
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "parsers/png.h"
+#include "parsers/pngfile.h"
 
 // Include the libpng header
 #include <png.h>

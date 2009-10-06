@@ -26,7 +26,7 @@
 
 #include "tga.h"
 #include "jpg.h"
-#include "png.h"
+#include "pngfile.h"
 
 int
 img_load(image_t * restrict img, const char * restrict fileName)
