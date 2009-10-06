@@ -271,7 +271,7 @@ ooScLoad(const char *fileName)
                         size_t len = hrmlGetRealArrayLen(engine);
                         assert(len == 3 && "pos must be a 3 component real vector");
                       } else if (!strcmp(engine->name, "dir")) {
-                        const double *dir = hrmlGetRealArray(engine);
+                        dir = hrmlGetRealArray(engine);
                         size_t len = hrmlGetRealArrayLen(engine);
                         assert(len == 3 && "dir must be a 3 component real vector");
                       }

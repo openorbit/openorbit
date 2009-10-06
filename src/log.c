@@ -134,5 +134,5 @@ ooLogMsg(OOloglev lev, const char *msg, ...)
     va_start(vaList, msg);
     ooLogWriteV(lev, msg, vaList);
     va_end(vaList);
-    if (lev = OOLog_Fatal) exit(EX_SOFTWARE);
+    if (lev == OOLog_Fatal) exit(EX_SOFTWARE);
 }

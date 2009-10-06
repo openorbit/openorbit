@@ -403,7 +403,7 @@ ooSgPaint(OOscenegraph *sg)
   glLoadIdentity();
 
 
-  OOscene *sc = sg->currentCam->scene->parent;
+  //OOscene *sc = sg->currentCam->scene->parent;
 
   glPushMatrix();
   ooSgCamRotate(sg->currentCam);
@@ -429,7 +429,7 @@ ooSgPaint(OOscenegraph *sg)
   // with respect to the scenes, so we only keep track of the leaf we came
   // from in order to prevent us from recursing back into scenes that have
   // already been drawn
-  sc = sg->currentCam->scene->parent;
+  OOscene *sc = sg->currentCam->scene->parent;
   OOscene *prev = sg->currentCam->scene;
 
   while (sc) {

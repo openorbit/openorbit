@@ -146,7 +146,7 @@ ooSgCamRotate(OOcam *cam)
     assert(0 && "not supported yet");
     {
       const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
-      const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
+      //const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
       gluLookAt(  ((OOorbitcam*)cam->camData)->r.x + pos[0],
                 ((OOorbitcam*)cam->camData)->r.y + pos[1],
                 ((OOorbitcam*)cam->camData)->r.x + pos[2],

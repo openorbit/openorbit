@@ -1125,6 +1125,7 @@ void Parse(ParseState *parser)
   if (res = setjmp(gParseError)) {
     parser->errors = true;
     // Longjumped here, error code is in res
+    fprintf(stderr, "parse error %d\n", res);
   } else {
     Parse2(parser);
   }

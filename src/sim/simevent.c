@@ -72,9 +72,10 @@
  int
  ooSimHandleNextEvent(OOeventqueue *q)
  {
-     OOevent *ev = heap_peek(q->activeEventHeap);
-     ev = heap_remove(q->activeEventHeap);
+   //OOevent *ev = heap_peek(q->activeEventHeap);
+   // ev = heap_remove(q->activeEventHeap);
 
-     return ev->fireTime;
+   //  return ev->fireTime;
+   return 0;
  }
  
