@@ -1,37 +1,32 @@
 # Get sounds, textures and relevant data
 
 # Textures
-file(GLOB ORBIT_RES_TEX_LOCAL "textures/*.tga")
-file(GLOB ORBIT_RES_TEX_JPG_LOCAL "textures/*.jpg")
-file(GLOB ORBIT_RES_TEX_PNG_LOCAL "textures/*.png")
-set(ORBIT_RES_TEX
-    ${ORBIT_RES_TEX_LOCAL} ${ORBIT_RES_TEX_JPG_LOCAL} ${ORBIT_RES_TEX_PNG_LOCAL}
-    PARENT_SCOPE)
+file(GLOB ORBIT_RES_TEX
+    "${CMAKE_SOURCE_DIR}/rsrc/textures/*.tga"
+    "${CMAKE_SOURCE_DIR}/rsrc/textures/*.jpg"
+    "${CMAKE_SOURCE_DIR}/rsrc/textures/*.png")
+
 set_source_files_properties(${ORBIT_RES_TEX}
                             PROPERTIES
                             MACOSX_PACKAGE_LOCATION Resources/textures)
 
 
 
-
 # Data
-file(GLOB ORBIT_RES_DATA_LOCAL "data/*.csv" "data/*.yaml" "data/*.hrml" "data/*.hrsc")
-set(ORBIT_RES_DATA ${ORBIT_RES_DATA_LOCAL} PARENT_SCOPE)
+file(GLOB ORBIT_RES_DATA
+    "${CMAKE_SOURCE_DIR}/rsrc/data/*.csv"
+    "${CMAKE_SOURCE_DIR}/rsrc/data/*.yaml"
+    "${CMAKE_SOURCE_DIR}/rsrc/data/*.hrml"
+    "${CMAKE_SOURCE_DIR}/rsrc/data/*.hrsc")
 set_source_files_properties(${ORBIT_RES_DATA}
                             PROPERTIES
                             MACOSX_PACKAGE_LOCATION Resources/data)
-
+message(${ORBIT_RES_DATA})
 # Fonts
-file(GLOB ORBIT_RES_FONT_LOCAL "font/*.ttf")
-set(ORBIT_RES_FONT ${ORBIT_RES_FONT_LOCAL} PARENT_SCOPE)
+file(GLOB ORBIT_RES_FONT "font/*.ttf")
 set_source_files_properties(${ORBIT_RES_FONT}
                             PROPERTIES
                             MACOSX_PACKAGE_LOCATION Resources/font)
 
 
-file(GLOB ORBIT_RES_SC_LOCAL "vehicles/spacecrafts")
-set(ORBIT_RES_SC ${ORBIT_RES_SC_LOCAL} PARENT_SCOPE)
-set_source_files_properties(${ORBIT_RES_SC}
-                            PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/)
-
+include(${CMAKE_SOURCE_DIR}/rsrc/vehicles/CMakeLists.txt)

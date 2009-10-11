@@ -72,18 +72,6 @@ if (APPLE)
     set(open_orbit_debug_name "Open Orbit Debug")
 endif (APPLE)
 
-set_source_files_properties(${ORBIT_RES_TEX}
-                            PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/textures/)
-
-set_source_files_properties(${ORBIT_RES_DATA}
-                            PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/data/)
-
-set_source_files_properties(${ORBIT_RES_FONT}
-                            PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/font/)
-
 set_source_files_properties(${ORBIT_SCRIPTS}
                             PROPERTIES
                             MACOSX_PACKAGE_LOCATION Resources/script/)
@@ -97,9 +85,7 @@ set_source_files_properties(${ORBIT_PLUGINS}
                             GENERATED true
                             MACOSX_PACKAGE_LOCATION Resources/plugins)
 
-set_source_files_properties(${ORBIT_RES_SC}
-                            PROPERTIES
-                            MACOSX_PACKAGE_LOCATION Resources/)
+include(../rsrc/CMakeLists.txt)
 
 add_executable(openorbit MACOSX_BUNDLE
                ${openorbit_SRC}
@@ -107,11 +93,12 @@ add_executable(openorbit MACOSX_BUNDLE
                ${ORBIT_RES_TEX}
                ${ORBIT_RES_DATA}
                ${ORBIT_RES_FONT}
+               ${ORBIT_RES_VEHICLES}
                ${ORBIT_SCRIPTS}
                ${ORBIT_DEP_YAML}
                ${ORBIT_PLUGINS}
-               ${ORBIT_RES_SC}
-			         )
+             )
+
 add_dependencies(openorbit ${ORBIT_PLUGIN_TARGETS})
 set_target_properties(openorbit
                       PROPERTIES
@@ -123,7 +110,7 @@ target_link_libraries(openorbit
                       ${ODE_LIB} ${PNG_LIBRARIES} ${JPEG_LIBRARIES}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY}
                       ${GLUT_LIBRARIES})
-                      
+
 if (${SDLTTF_FOUND})
   target_link_libraries(openorbit ${SDLTTF_LIBRARY})
 endif (${SDLTTF_FOUND})

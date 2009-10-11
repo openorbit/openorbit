@@ -112,7 +112,6 @@ include(cmake/Autowrap.cmake)
 
 include_directories(include)
 add_subdirectory(lib)
-add_subdirectory(rsrc)
 add_subdirectory(scripts)
 add_subdirectory(src)
 add_subdirectory(include)

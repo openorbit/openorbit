@@ -29,8 +29,10 @@ sgr = ooscript.Scenegraph().new()
 sgr.setBackground(stars)
 
 ooscript.setSg(sgr)
-osys = ooscript.OrbitSys().new(sgr, "data/solsystem.hrml")
-ooscript.setOrbSys(osys)
+#osys = ooscript.OrbitSys().new(sgr, "data/solsystem.hrml")
+#ooscript.setOrbSys(osys)
+oworld = ooscript.OrbitWorld().new(sgr, "data/solsystem.hrml")
+ooscript.setOrbWorld(oworld)
 
 cam = ooscript.FreeCam()
 cam.setParams(sgr, sgr.getScene("Sol/Jupiter/Io"),

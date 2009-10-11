@@ -4,9 +4,8 @@ cdef extern from "ode/ode.h":
 
 cdef extern from "sim/spacecraft.h":
   ctypedef struct OOspacecraft
-  
   OOspacecraft* ooScLoad(char *fileName)
-  
+
 
 cdef extern from "rendering/scenegraph.h":
   ctypedef void OOobject
@@ -61,14 +60,16 @@ cdef extern from "rendering/sky.h":
 cdef extern from "physics/orbit.h":
     ctypedef struct PLorbsys:
         char *name
+    ctypedef struct PLworld__
 
     PLorbsys* ooOrbitLoad(OOscenegraph *scg, char *file)
+    PLworld__* ooOrbitLoad__(OOscenegraph *sg, char *fileName)
 
 
 cdef extern from "rendering/texture.h":
     ctypedef struct OOtexture:
         unsigned texId
-        
+
     int ooTexLoad(char *key, char *name)
     int ooTexBind(char *key)
     int ooTexNum(char *key)
@@ -79,6 +80,7 @@ cdef extern from "sim.h":
     void ooSimSetSg(OOscenegraph *sg)
     void ooSimSetCam(OOcam *cam)
     void ooSimSetOrbSys(PLorbsys *osys)
+    void ooSimSetOrbWorld(PLworld__ *world)
 
     cdef struct SIMstate:
       PLorbsys *orbSys
@@ -204,6 +206,17 @@ cdef class OrbitSys:
     self.osys = ooOrbitLoad(scg.sg, fileName)
     return self
 
+cdef class OrbitWorld:
+  cdef PLworld__ *world
+  def __cinit__(self):
+    self.world = <PLworld__*>0
+  def __dealloc__(self):
+    # C function call to delete obj_sys object.
+    pass
+  def new(self, Scenegraph scg, char *fileName):
+    self.world = ooOrbitLoad__(scg.sg, fileName)
+    return self
+
 cdef class Spacecraft:
   cdef OOspacecraft *sc
   def __init__(self, path):
@@ -215,6 +228,9 @@ def setSg(Scenegraph scg):
 
 def setOrbSys(OrbitSys sys):
     ooSimSetOrbSys(sys.osys)
+
+def setOrbWorld(OrbitWorld world):
+  ooSimSetOrbWorld(world.world)
 
 
 def getResPath(str):

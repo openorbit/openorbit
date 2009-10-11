@@ -74,6 +74,13 @@ ooSimSetOrbSys(PLorbsys *osys)
 }
 
 void
+ooSimSetOrbWorld(PLworld__ *world)
+{
+  gSIM_state.orbWorld = world;
+}
+
+
+void
 ooSimStep(float dt)
 {
   ooSimTimeTick(gSIM_state.timeState, dt);
@@ -83,8 +90,11 @@ ooSimStep(float dt)
 
   ooSgCamStep(ooSgGetCam(gSIM_state.sg), dt);
 
-  ooOrbitClear(gSIM_state.orbSys);
-  ooOrbitStep(gSIM_state.orbSys, dt);
+  plWorldClear(gSIM_state.orbWorld);
+  plWorldStep(gSIM_state.orbWorld, dt);
+
+//  ooOrbitClear(gSIM_state.orbSys);
+//  ooOrbitStep(gSIM_state.orbSys, dt);
 
   gettimeofday(&end, NULL);
 

@@ -91,6 +91,11 @@ PLorbsys__* plNewOrbit(PLworld__ *world, const char *name, double m,
 PLorbsys__* plNewSubOrbit(PLorbsys__ *orb, const char *name, double m,
                           double orbitPeriod, double semiMaj, double semiMin);
 
+PLworld__* ooOrbitLoad__(OOscenegraph *sg, const char *fileName);
+void plWorldStep(PLworld__ *world, double dt);
+void plWorldClear(PLworld__ *world);
+
+
 struct PLorbsys {
     dWorldID world;
     char *name;

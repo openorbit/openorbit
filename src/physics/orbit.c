@@ -1110,13 +1110,13 @@ ooLoadPlanet__(PLworld__ *world, HRMLobject *obj, OOscenegraph *sg)
                                149598000000.0 * ooGeoComputeSemiMinor(semiMajor, ecc));  
   plSetDrawable(sys->orbitalBody, drawable);
 
-  assert(sats != NULL);
-  for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {
-    if (!strcmp(sat->name, "moon")) {
-      ooLoadMoon__(sys, sat, sg);
+  if (sats) {
+    for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {
+      if (!strcmp(sat->name, "moon")) {
+        ooLoadMoon__(sys, sat, sg);
+      }
     }
   }
-
 }
 
 
