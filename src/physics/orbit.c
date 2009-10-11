@@ -1169,6 +1169,8 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
     } else if (!strcmp(sat->name, "comet")) {
     }
   }
+
+  return world;
 }
 PLworld__*
 ooOrbitLoad__(OOscenegraph *sg, const char *fileName)
