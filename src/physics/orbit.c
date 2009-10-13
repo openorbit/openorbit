@@ -34,6 +34,87 @@
 
 #define PL_GRAVITATIONAL_CONST 6.67428e-11
 
+PLobject__*
+plGetObject(PLworld__ *world, const char *name)
+{
+  char str[strlen(name)+1];
+  strcpy(str, name); // TODO: We do not trust the user, should probably
+                     //       check alloca result
+  char *strp = str;
+  char *strTok = strsep(&strp, "/");
+
+  // One level name?
+  if (strp == NULL) {
+    if (!strcmp(strTok, world->centralBody->name)) {
+      return world->centralBody;
+    }
+    return NULL;
+  } else if (strcmp(strTok, world->centralBody->name)) {
+    return NULL;
+  }
+
+  int idx = 0;
+  OOobjvector *vec = &world->orbits;
+
+  if (vec->length == 0) {
+    return NULL;
+  }
+
+  PLorbsys__ *sys = vec->elems[idx];
+  strTok = strsep(&strp, "/");
+
+  while (sys) {
+    if (!strcmp(sys->name, strTok)) {
+      if (strp == NULL) {
+        // At the end of the sys path
+        return sys->orbitalBody;
+      }
+
+      // If this is not the lowest level, go one level down
+      strTok = strsep(&strp, "/");
+
+      vec = &sys->orbits;
+      idx = 0;
+      if (vec->length <= 0) return NULL;
+      sys = vec->elems[idx];
+    } else {
+      if (vec == NULL) return NULL;
+      idx ++;
+      if (vec->length <= idx) return NULL;
+      sys = vec->elems[idx];
+    }
+  }
+  return NULL;
+}
+
+float3
+plGetPos(const PLobject__ *obj)
+{
+  return ooLwcGlobal(&obj->p);
+}
+
+float3
+plGetPosForName(const PLworld__ *world, const char *name)
+{
+  PLobject__ *obj = plGetObject((PLworld__*)world, name);
+  assert(obj);
+
+  return plGetPos(obj);
+}
+
+void
+plGetPosForName3f(const PLworld__ *world, const char *name,
+                  float *x, float *y, float *z)
+{
+  assert(world && name && x && y && z);
+
+  float3 p = plGetPosForName(world, name);
+
+  // TODO: Move to clang ext vector support
+  *x = vf3_get(p, 0);
+  *y = vf3_get(p, 1);
+  *z = vf3_get(p, 2);
+}
 
 void
 plNormaliseObject__(PLobject__ *obj)
@@ -80,10 +161,10 @@ plUpdateObject(dBodyID body)
 
   plNormaliseObject__(obj);
 
-  ooSgSetObjectPosLW(obj->drawable, &obj->p);
-  ooSgSetObjectQuat(obj->drawable, quat[1], quat[2], quat[3], quat[0]);
-  ooSgSetObjectSpeed(obj->drawable, linVel[0], linVel[1], linVel[2]);
-  ooSgSetObjectAngularSpeed(obj->drawable, angVel[0], angVel[1], angVel[2]);
+  // ooSgSetObjectPosLW(obj->drawable, &obj->p);
+  // ooSgSetObjectQuat(obj->drawable, quat[1], quat[2], quat[3], quat[0]);
+  // ooSgSetObjectSpeed(obj->drawable, linVel[0], linVel[1], linVel[2]);
+  // ooSgSetObjectAngularSpeed(obj->drawable, angVel[0], angVel[1], angVel[2]);
 }
 
 
@@ -153,11 +234,11 @@ plNewObj(PLworld__*world, const char *name, double m, OOlwcoord *coord)
   return obj;
 }
 
-void
-plObjSetSceneObj(PLobject__ *obj, OOdrawable *drawable)
-{
-  obj->drawable = drawable;
-}
+//void
+//plObjSetSceneObj(PLobject__ *obj, OOdrawable *drawable)
+//{
+// obj->drawable = drawable;
+//}
 
 PLobject__*
 plNewObjInWorld(PLworld__*world, const char *name, double m, OOlwcoord *coord)
@@ -198,9 +279,9 @@ plNewWorld(const char *name, OOscene *sc,
 }
 
 PLorbsys__*
-plNewOrbit(PLworld__ *world, const char *name,
-           double m,
-           double orbitPeriod, double semiMaj, double semiMin)
+plCreateOrbit(PLworld__ *world, const char *name,
+              double m,
+              double orbitPeriod, double semiMaj, double semiMin)
 {
   assert(world);
 
@@ -215,16 +296,33 @@ plNewOrbit(PLworld__ *world, const char *name,
   sys->orbitalPeriod = orbitPeriod;
   sys->orbitalPath = ooGeoEllipseAreaSeg(500, semiMaj, semiMin);
 
-  sys->orbitDrawable = ooSgNewDrawable(name, sys->orbitalPath,
+  // TODO: Stack allocation based on untrusted length should not be here
+  char orbitName[strlen(name) + strlen(" Orbit") + 1];
+  strcpy(orbitName, name); // safe as size is checked in allocation
+  strcat(orbitName, " Orbit");
+  // TODO: Simplify ellipsis, we do not actually want to draw the generated
+  //       ellipsis, except in the case when we want to draw the segments
+  sys->orbitDrawable = ooSgNewDrawable(orbitName, sys->orbitalPath,
                                        (OOdrawfunc)ooGeoEllipseDraw);
   ooSgSceneAddObj(sys->world->scene,
                   sys->orbitDrawable);
 
-  ooObjVecPush(&world->orbits, sys);
-
   OOlwcoord p;
   ooLwcSet(&p, 0.0, 0.0, 0.0);
   sys->orbitalBody = plNewObj(world, name, m, &p);
+
+  return sys;
+}
+
+
+PLorbsys__*
+plNewOrbit(PLworld__ *world, const char *name,
+           double m,
+           double orbitPeriod, double semiMaj, double semiMin)
+{
+  assert(world);
+  PLorbsys__ * sys = plCreateOrbit(world, name, m, orbitPeriod, semiMaj, semiMin);
+  ooObjVecPush(&world->orbits, sys);
   plSysSetCurrentPos(sys);
 
   return sys;
@@ -237,8 +335,10 @@ plNewSubOrbit(PLorbsys__ *parent, const char *name,
   assert(parent);
   assert(parent->world);
 
-  PLorbsys__ *sys = plNewOrbit(parent->world, name, m, orbitPeriod, semiMaj, semiMin);
+  PLorbsys__ * sys = plCreateOrbit(parent->world,
+                                   name, m, orbitPeriod, semiMaj, semiMin);
   sys->parent = parent;
+  ooObjVecPush(&parent->orbits, sys);
   plSysSetCurrentPos(sys);
 
   return sys;
@@ -295,9 +395,17 @@ plSysUpateSg(PLorbsys__ *sys)
   ooSgSetObjectQuat(sys->orbitalBody->drawable,
                     quat[1], quat[2], quat[3], quat[0]);
   ooSgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->p);
+
+  // Update orbital path base
+  if (sys->parent) {
+    ooSgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->p);
+  } else {
+    ooSgSetObjectPosLW(sys->orbitDrawable, &sys->world->centralBody->p);
+  }
+
   //ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);
   //ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz);
-  
+
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysUpateSg(sys->orbits.elems[i]);
   }

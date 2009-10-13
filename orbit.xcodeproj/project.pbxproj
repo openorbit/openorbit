@@ -101,6 +101,7 @@
 		EC34BDC1107B2CBD0011B76E /* vmath-matvec.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB7107B2C480011B76E /* vmath-matvec.c */; };
 		EC34BDC2107B2CBD0011B76E /* vmath-quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB8107B2C480011B76E /* vmath-quaternions.c */; };
 		EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BDBE107B2C900011B76E /* libvmath.a */; };
+		EC3CD7AA108457BD00C1B458 /* ooscript.pyx in Resources */ = {isa = PBXBuildFile; fileRef = EC34BC411079EE080011B76E /* ooscript.pyx */; };
 		EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC4485680CCD250C001C88AD /* hash-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485390CCD247E001C88AD /* hash-test.c */; };
 		EC4485690CCD251E001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
@@ -254,7 +255,7 @@
 		EC34BBDA1079EDE90011B76E /* spacecraft-if.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spacecraft-if.h"; sourceTree = "<group>"; };
 		EC34BBDB1079EDE90011B76E /* openorbit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = openorbit.h; sourceTree = "<group>"; };
 		EC34BBDC1079EDE90011B76E /* plugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plugin.h; sourceTree = "<group>"; };
-		EC34BBE11079EE080011B76E /* lwcoord.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lwcoord.c; sourceTree = "<group>"; };
+		EC34BBE11079EE080011B76E /* lwcoord.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.c; path = lwcoord.c; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		EC34BBE21079EE080011B76E /* lwcoord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lwcoord.h; sourceTree = "<group>"; };
 		EC34BBE31079EE080011B76E /* config.h.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = config.h.in; sourceTree = "<group>"; };
 		EC34BBE51079EE080011B76E /* ellipse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ellipse.c; sourceTree = "<group>"; };
@@ -1219,6 +1220,7 @@
 				EC34BD321079EF5A0011B76E /* init.py in Resources */,
 				EC34BD331079EF5A0011B76E /* install-mac-res.sh in Resources */,
 				EC34BD341079EF5A0011B76E /* postinit.py in Resources */,
+				EC3CD7AA108457BD00C1B458 /* ooscript.pyx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

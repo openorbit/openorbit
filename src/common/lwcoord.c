@@ -38,9 +38,8 @@
 void
 ooLwcSet(OOlwcoord *coord, float x, float y, float z)
 {
-  OFFS_X(coord) = x;
-  OFFS_Y(coord) = y;
-  OFFS_Z(coord) = z;
+  coord->offs = vf3_set(x, y, z);
+  coord->seg = vi3_set(0, 0, 0);
 
   ooLwcNormalise(coord);
 }
@@ -80,7 +79,9 @@ float3
 ooLwcGlobal(const OOlwcoord *coord)
 {
   float3 p = coord->offs;
-  return vf3_add(p, vf3_s_mul(p, OO_LW_SEGMENT_LEN));
+  float3 seg = v3i_to_v3f(coord->seg);
+
+  return vf3_add(p, vf3_s_mul(seg, OO_LW_SEGMENT_LEN));
 }
 
 float3
@@ -110,9 +111,8 @@ ooLwcDist(const OOlwcoord *a, const OOlwcoord * b)
 void
 ooLwcSet64(OOlwcoord64 *coord, double x, double y, double z)
 {
-  OFFS_X64(coord) = x;
-  OFFS_Y64(coord) = y;
-  OFFS_Z64(coord) = z;
+  coord->offs = vd3_set(x, y, z);
+  coord->seg = vl3_set(0, 0, 0);
 
   ooLwcNormalise64(coord);
 }
@@ -146,7 +146,8 @@ double3
 ooLwcGlobal64(const OOlwcoord64 *coord)
 {
   double3 p = coord->offs;
-  return vd3_add(p, vd3_s_mul(p, OO_LW_SEGMENT_LEN64));
+  double3 seg = v3l_to_v3d(coord->seg);
+  return vd3_add(p, vd3_s_mul(seg, OO_LW_SEGMENT_LEN64));
 }
 
 double3

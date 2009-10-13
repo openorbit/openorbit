@@ -58,12 +58,14 @@ cdef extern from "rendering/sky.h":
 
 
 cdef extern from "physics/orbit.h":
-    ctypedef struct PLorbsys:
-        char *name
-    ctypedef struct PLworld__
+  ctypedef struct PLorbsys:
+    char *name
+  ctypedef struct PLworld__
 
-    PLorbsys* ooOrbitLoad(OOscenegraph *scg, char *file)
-    PLworld__* ooOrbitLoad__(OOscenegraph *sg, char *fileName)
+  PLorbsys* ooOrbitLoad(OOscenegraph *scg, char *file)
+  PLworld__* ooOrbitLoad__(OOscenegraph *sg, char *fileName)
+  void plGetPosForName3f(PLworld__ *world, char *name,
+                         float *x, float *y, float *z)
 
 
 cdef extern from "rendering/texture.h":
@@ -216,6 +218,11 @@ cdef class OrbitWorld:
   def new(self, Scenegraph scg, char *fileName):
     self.world = ooOrbitLoad__(scg.sg, fileName)
     return self
+  def getPosForObjName(self, char *name):
+    cdef float x, y, z
+    plGetPosForName3f(self.world, name, &x, &y, &z)
+    return (x, y, z)
+
 
 cdef class Spacecraft:
   cdef OOspacecraft *sc

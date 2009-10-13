@@ -43,7 +43,6 @@ extern "C" {
 
   struct OOfreecam {
     OOlwcoord lwc;
-//    vector_t p;
     vector_t dp;
     quaternion_t q;
     quaternion_t dq;

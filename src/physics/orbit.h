@@ -91,6 +91,13 @@ PLorbsys__* plNewOrbit(PLworld__ *world, const char *name, double m,
 PLorbsys__* plNewSubOrbit(PLorbsys__ *orb, const char *name, double m,
                           double orbitPeriod, double semiMaj, double semiMin);
 
+PLobject__* plGetObject(PLworld__ *world, const char *name);
+float3 plGetPos(const PLobject__ *obj);
+float3 plGetPosForName(const PLworld__ *world, const char *name);
+void plGetPosForName3f(const PLworld__ *world, const char *name,
+                       float *x, float *y, float *z);
+
+
 PLworld__* ooOrbitLoad__(OOscenegraph *sg, const char *fileName);
 void plWorldStep(PLworld__ *world, double dt);
 void plWorldClear(PLworld__ *world);

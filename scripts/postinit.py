@@ -35,15 +35,18 @@ oworld = ooscript.OrbitWorld().new(sgr, "data/solsystem.hrml")
 ooscript.setOrbWorld(oworld)
 
 cam = ooscript.FreeCam()
-cam.setParams(sgr, sgr.getScene("Sol/Jupiter/Io"),
+(x, y, z) = oworld.getPosForObjName("Sol/Earth/Luna") # TODO: Throw exception
+                                                      #       if fail
+
+cam.setParams(sgr, sgr.getScene("root"),
               #6.96e8 + 1500000.0,
-              1821.6e3 + 100000.0,
+              x + 1821.6e3 + 100000.0,
               #6.37e6 + 15000000.0,
               #1.74e6 + 100000.0,
               #- (1.74e6 + 100000.0),
-              0.0,
+              y + 0.0,
 #              + (1.74e6 + 100000.0),
-              0.0,
+              z + 0.0,
               0.0, 1.0, 0.0)
 sgr.setCam(cam)
 
