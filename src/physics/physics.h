@@ -85,9 +85,6 @@ typedef struct OOlwcoord64 PLlwcoord64;
 //PLdouble3 plLwcDist64(const PLlwcoord64 *a, const PLlwcoord64 * b);
 
 
-
-typedef struct PLorbsys PLorbsys;
-
 typedef struct PLobject {
   char *name;
   dBodyID id; // Using ODE at the moment, but this is not really necisary
@@ -95,7 +92,7 @@ typedef struct PLobject {
   float m;
   OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
-  PLorbsys *sys;
+                        //  PLorbsys *sys;
 } PLobject;
 
 PLobject* plObject3f(float x, float y, float z);

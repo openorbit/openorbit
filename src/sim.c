@@ -74,7 +74,7 @@ ooSimSetOrbSys(PLorbsys *osys)
 }
 
 void
-ooSimSetOrbWorld(PLworld__ *world)
+ooSimSetOrbWorld(PLworld *world)
 {
   gSIM_state.orbWorld = world;
 }

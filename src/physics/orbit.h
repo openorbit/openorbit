@@ -43,14 +43,14 @@ ode2v3(const dReal *vec)
   return v4f_make(vec[0], vec[1], vec[2], 1.0f);
 }
 
-typedef struct PLworld__ PLworld__;
-typedef struct PLorbsys__ PLorbsys__;
+typedef struct PLworld__ PLworld;
+typedef struct PLorbsys__ PLorbsys;
 typedef struct PLobject__ PLobject__;
 
 struct PLobject__ {
   char *name;
-  PLworld__ *world;
-  PLorbsys__ *sys;
+  PLworld *world;
+  PLorbsys *sys;
   dBodyID id; // Using ODE at the moment, but this is not really necisary
   PLlwcoord p; // Large world coordinates
   double m;
@@ -60,8 +60,8 @@ struct PLobject__ {
 
 
 struct PLorbsys__ {
-  PLworld__ *world;
-  PLorbsys__ *parent;
+  PLworld *world;
+  PLorbsys *parent;
 
   const char *name;
 
@@ -83,97 +83,33 @@ struct PLworld__ {
   PLobject__ *centralBody;
 };
 
-PLworld__* plNewWorld(const char *name, OOscene *sc,
+PLworld* plNewWorld(const char *name, OOscene *sc,
                       double m, double radius, double siderealPeriod);
 
-PLorbsys__* plNewOrbit(PLworld__ *world, const char *name, double m,
+PLorbsys* plNewOrbit(PLworld *world, const char *name, double m,
                        double orbitPeriod, double semiMaj, double semiMin);
-PLorbsys__* plNewSubOrbit(PLorbsys__ *orb, const char *name, double m,
+PLorbsys* plNewSubOrbit(PLorbsys *orb, const char *name, double m,
                           double orbitPeriod, double semiMaj, double semiMin);
 
-PLobject__* plGetObject(PLworld__ *world, const char *name);
+PLobject__* plGetObject(PLworld *world, const char *name);
 float3 plGetPos(const PLobject__ *obj);
-float3 plGetPosForName(const PLworld__ *world, const char *name);
-void plGetPosForName3f(const PLworld__ *world, const char *name,
+float3 plGetPosForName(const PLworld *world, const char *name);
+void plGetPosForName3f(const PLworld *world, const char *name,
                        float *x, float *y, float *z);
 
 
-PLworld__* ooOrbitLoad__(OOscenegraph *sg, const char *fileName);
-void plWorldStep(PLworld__ *world, double dt);
-void plWorldClear(PLworld__ *world);
-
-
-struct PLorbsys {
-    dWorldID world;
-    char *name;
-    
-    struct {
-      double dist;
-      double distInv;
-      double mass;
-      double massInv;
-    } scale;
-
-    struct {
-      struct {
-        double m;
-        double orbitalPeriod;
-        double rotationPeriod;
-        v4f_t pos;
-        v4f_t rot;
-      } param;
-      struct {
-        double G; //!< Gravitational constant (6.67428e-11)
-      } k;
-    } phys;
-
-    struct PLorbsys *parent; // parent
-    unsigned level;
-    OOscene *scene; //!< Link to scene graph scene corresponding to this system
-
-    OOellipse *orbit;
-    OOdrawable *orbitDrawable;
-    OOobjvector sats; //!< Natural satellites, i.e. other orbital systems
-    OOobjvector objs; //!< Synthetic satellites, i.e. stuff that is handled by ODE
-};
-
-
-PLorbsys* ooOrbitNewSys(const char *name, OOscene *scene,
-                        double m, double orbitPeriod, double rotPeriod,
-                        double semiMaj, double semiMin);
-PLobject*
-ooOrbitNewObj(PLorbsys *sys, const char *name,
-              OOdrawable *drawable,
-              double m,
-              double x,   double y,   double z,
-              double vx,  double vy,  double vz,
-              double qx,  double qy,  double qz,  double qw,
-              double rqx, double rqy, double rqz, double rqw);
-
 /*!
-   Searches the system graph for a system with the given name. The name must be
-   a search path.
-
-   e.g. ooOrbitGetSys(solsys, "sol/earth/luna") would return the luna system.
+ Loads an hrml description of a solar system and builds a solar system graph
+ it also connects the physics system to the graphics system.
+ 
+ This function does not belong in the physics system, but will be here for
+ now beeing.
  */
-PLorbsys* ooOrbitGetSys(const PLorbsys *root,  const char *name);
+PLworld* ooOrbitLoad__(OOscenegraph *sg, const char *fileName);
 
-void ooOrbitAddChildSys(PLorbsys * restrict sys, PLorbsys * restrict child);
+void plWorldStep(PLworld *world, double dt);
+void plWorldClear(PLworld *world);
 
-void ooOrbitSetScale(PLorbsys *sys, double ms, double ds);
-void ooOrbitSetConstant(PLorbsys *sys, const char *key, double k);
-void ooOrbitSetScene(PLorbsys *sys, OOscene *scene);
 
-void ooOrbitStep(PLorbsys *sys, double stepsize);
-void ooOrbitClear(PLorbsys *sys);
-
-/*!
-   Loads an hrml description of a solar system and builds a solar system graph
-   it also connects the physics system to the graphics system.
-
-   This function does not belong in the physics system, but will be here for
-   now beeing.
- */
-PLorbsys* ooOrbitLoad(OOscenegraph *sg, const char *file);
 
 #endif /* ! _ORBIT_H_ */
