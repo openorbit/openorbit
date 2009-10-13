@@ -60,7 +60,7 @@ cdef extern from "rendering/sky.h":
 cdef extern from "physics/orbit.h":
   ctypedef struct PLworld
 
-  PLworld* ooOrbitLoad__(OOscenegraph *sg, char *fileName)
+  PLworld* ooOrbitLoad(OOscenegraph *sg, char *fileName)
   void plGetPosForName3f(PLworld *world, char *name,
                          float *x, float *y, float *z)
 
@@ -198,7 +198,7 @@ cdef class OrbitWorld:
     # C function call to delete obj_sys object.
     pass
   def new(self, Scenegraph scg, char *fileName):
-    self.world = ooOrbitLoad__(scg.sg, fileName)
+    self.world = ooOrbitLoad(scg.sg, fileName)
     return self
   def getPosForObjName(self, char *name):
     cdef float x, y, z

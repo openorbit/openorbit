@@ -648,8 +648,8 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
   PLorbsys *sys = plNewOrbit(world, planetName.u.str,
                                mass,
                                comp_orbital_period_for_planet(semiMajor),
-                               149598000000.0 * semiMajor,
-                               149598000000.0 * ooGeoComputeSemiMinor(semiMajor, ecc));  
+                               plAuToMetres(semiMajor),
+                               plAuToMetres(ooGeoComputeSemiMinor(semiMajor, ecc)));  
   plSetDrawable(sys->orbitalBody, drawable);
 
   if (sats) {
@@ -715,7 +715,7 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
   return world;
 }
 PLworld*
-ooOrbitLoad__(OOscenegraph *sg, const char *fileName)
+ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 {
   char *file = ooResGetPath(fileName);
   HRMLdocument *solarSys = hrmlParse(file);

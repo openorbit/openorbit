@@ -105,7 +105,7 @@ void plGetPosForName3f(const PLworld *world, const char *name,
  This function does not belong in the physics system, but will be here for
  now beeing.
  */
-PLworld* ooOrbitLoad__(OOscenegraph *sg, const char *fileName);
+PLworld* ooOrbitLoad(OOscenegraph *sg, const char *fileName);
 
 void plWorldStep(PLworld *world, double dt);
 void plWorldClear(PLworld *world);
