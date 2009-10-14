@@ -23,7 +23,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -46,12 +45,11 @@ extern "C" {
 #define OO_IO_MOD_CAPS   0x2000
 #define OO_IO_MOD_MODE   0x4000
 
-/*! Initialises map between SDL key / button IDs and the internal hashtable keys
+  void ioInit(void);
+  void ioDispatchKeyUp(int key, uint16_t mask);
+  void ioDispatchKeyDown(int key, uint16_t mask);
 
-    \pre None
-*/
-void ooIoInitSdlStringMap(void);
-typedef void (*OObuttonhandlerfunc)(bool buttonUp, void *data);
+  typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
 /*! Register key handler C function */
 void ooIoRegCKeyHandler(const char *name, OObuttonhandlerfunc handlerFunc);
 /*! Register key handler Python function */
@@ -69,17 +67,12 @@ void ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up,
                         uint16_t mask);
 
 
-void ooIoDispatchKeyUp(const char *name, uint16_t mask);
-void ooIoDispatchKeyDown(const char *name, uint16_t mask);
-
-void ooIoInitJoystick(void);
 void ooIoPrintJoystickNames(void);
 float ooIoGetAxis(const char *axis);
 int ooIoGetJoystickId(const char *name, int subId);
 void ooIoBindAxis(const char *key, int joyStick, int axis);
 
-const char *ooIoSdlKeyNameLookup(SDLKey keyId);
-const char *ooIoSdlMouseButtonNameLookup(unsigned buttonId);
+  const char *ooIoSdlMouseButtonNameLookup(unsigned buttonId);
 
 #ifdef __cplusplus
 }

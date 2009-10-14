@@ -29,15 +29,17 @@
 #include "settings.h"
 
 
-static const char * gIoSdlKeyStringMap[SDLK_LAST];
 static const char * gIoSdlMouseStringMap[7];
-static hashtable_t *gIoBoundKeyTable;  // of type OOkeyevent
 static hashtable_t *gIoButtonHandlers; // of type OObuttonhandler
 
 static hashtable_t *gIoAxisHandlers; // of type OOaxishandler
 
+
+#define SPEC_KEY_COUNT 8/* shft, cmd, ctrl, alt (left and right) */
+
+
 void
-ooButtonHandlerGnd(bool buttonUp, void *data)
+ooButtonHandlerGnd(bool buttonDown, void *data)
 {
     /*Nothing*/
 }
@@ -50,27 +52,6 @@ typedef struct {
     };
 } OObuttonhandler;
 
-typedef struct _OOkeyevent {
-    struct {
-        bool upIsScript;
-        union {
-            OObuttonhandlerfunc cUp;
-            PyObject *pyUp;
-        };
-    };
-    
-    struct {
-        bool downIsScript;
-        union {
-            OObuttonhandlerfunc cDown;
-            PyObject *pyDown;
-        };
-    };
-    
-    uint16_t modMask;
-    void *data;
-    struct _OOkeyevent *next;
-} OOkeyevent;
 
 typedef struct OOaxishandler {
   SDL_Joystick *joyId;
@@ -79,330 +60,470 @@ typedef struct OOaxishandler {
   float trim;
 } OOaxishandler;
 
+
+typedef enum IOkeymod {
+  OO_None = 0,
+
+  OO_L_Shift,
+  OO_L_Ctrl,
+  OO_L_Cmd,
+  OO_L_Alt,
+
+  OO_R_Shift,
+  OO_R_Ctrl,
+  OO_R_Cmd,
+  OO_R_Alt,
+
+  OO_Key_Mod_Count
+} IOkeymod;
+
+typedef struct OOkeyhandler {
+  OObuttonhandler up[OO_Key_Mod_Count];
+  OObuttonhandler down[OO_Key_Mod_Count];
+} OOkeyhandler;
+OOkeyhandler gIoKeyData[SDLK_LAST];
+
+#define MOUSE_BUTTONS 8
+typedef struct OOmousebuttons {
+  OObuttonhandler down[MOUSE_BUTTONS];
+  OObuttonhandler up[MOUSE_BUTTONS];
+} OOmousebuttons;
+OOmousebuttons gIoMouseButtons;
+
+#if 0
+[SDL_BUTTON_LEFT-1]	= "mouse-left";
+[SDL_BUTTON_MIDDLE-1] =	"mouse-middle";
+[SDL_BUTTON_RIGHT-1] = "mouse-right";
+[SDL_BUTTON_WHEELUP-1] = "mouse-up";
+[SDL_BUTTON_WHEELDOWN-1] = "mouse-down";
+[SDL_BUTTON_X1-1] = "mouse-x1";
+[SDL_BUTTON_X2-1] = "mouse-x2";
+#endif
+
+static const char *keysymmap [SDLK_LAST] = {
+  [SDLK_LSHIFT] = "lshift",
+  [SDLK_RSHIFT] = "rshift",
+  [SDLK_LMETA] = "lmeta",
+  [SDLK_RMETA] = "rmeta",
+  [SDLK_LCTRL] = "lctrl",
+  [SDLK_RCTRL] = "rctrl",
+  [SDLK_LSUPER] = "lsuper",
+  [SDLK_RSUPER] = "rsuper",
+
+  [SDLK_MODE] = "mode",
+  [SDLK_HELP] = "help",
+  [SDLK_PRINT] = "print-screen",
+  [SDLK_SYSREQ] = "sys-req",
+  [SDLK_BREAK] = "break",
+  [SDLK_MENU] = "menu",
+  [SDLK_POWER] = "power",
+  [SDLK_EURO] = "euro",
+
+  [SDLK_RETURN] = "return",
+  [SDLK_SPACE] = "space",
+  [SDLK_TAB] = "tab",
+  [SDLK_BACKSPACE] = "backspace",
+  [SDLK_ESCAPE] = "esc",
+  [SDLK_PERIOD] = ".",
+  [SDLK_COMMA] = ",",
+  [SDLK_BACKQUOTE] = "`",
+  [SDLK_CLEAR] = "clear",
+  [SDLK_PAUSE] = "pause",
+  [SDLK_EXCLAIM] = "!",
+  [SDLK_QUOTEDBL] = "\"",
+  [SDLK_HASH] = "#",
+  [SDLK_DOLLAR] = "$",
+  [SDLK_AMPERSAND] = "&",
+  [SDLK_QUOTE] = "'",
+  [SDLK_LEFTPAREN] = "(",
+  [SDLK_RIGHTPAREN] = ")",
+  [SDLK_ASTERISK] = "*",
+  [SDLK_PLUS] = "+",
+  [SDLK_MINUS] = "-",
+  [SDLK_SLASH] = "/",
+
+  [SDLK_COLON] = ":",
+  [SDLK_SEMICOLON] = ";",
+  [SDLK_LESS] = "<",
+  [SDLK_EQUALS] = "=",
+  [SDLK_GREATER] = ">",
+  [SDLK_QUESTION] = "?",
+  [SDLK_AT] = "@",
+  [SDLK_LEFTBRACKET] = "[",
+  [SDLK_BACKSLASH] = "\\",
+  [SDLK_RIGHTBRACKET] = "]",
+  [SDLK_CARET] = "^",
+  [SDLK_UNDERSCORE] = "_",
+
+  [SDLK_0] = "0",
+  [SDLK_1] = "1",
+  [SDLK_2] = "2",
+  [SDLK_3] = "3",
+  [SDLK_4] = "4",
+  [SDLK_5] = "5",
+  [SDLK_6] = "6",
+  [SDLK_7] = "7",
+  [SDLK_8] = "8",
+  [SDLK_9] = "9",
+
+  [SDLK_KP0] = "kp 0",
+  [SDLK_KP1] = "kp 1",
+  [SDLK_KP2] = "kp 2",
+  [SDLK_KP3] = "kp 3",
+  [SDLK_KP4] = "kp 4",
+  [SDLK_KP5] = "kp 5",
+  [SDLK_KP6] = "kp 6",
+  [SDLK_KP7] = "kp 7",
+  [SDLK_KP8] = "kp 8",
+  [SDLK_KP9] = "kp 9",
+
+  [SDLK_KP_PERIOD] = "kp .",
+  [SDLK_KP_DIVIDE] = "kp /",
+  [SDLK_KP_MULTIPLY] = "kp *",
+  [SDLK_KP_MINUS] = "kp -",
+  [SDLK_KP_PLUS] = "kp +",
+  [SDLK_KP_ENTER] = "enter",
+  [SDLK_KP_EQUALS] = "kp =",
+  [SDLK_DELETE] = "delete",
+
+  [SDLK_a] = "a",
+  [SDLK_b] = "b",
+  [SDLK_c] = "c",
+  [SDLK_d] = "d",
+  [SDLK_e] = "e",
+  [SDLK_f] = "f",
+  [SDLK_g] = "g",
+  [SDLK_h] = "h",
+  [SDLK_i] = "i",
+  [SDLK_j] = "j",
+  [SDLK_k] = "k",
+  [SDLK_l] = "l",
+  [SDLK_m] = "m",
+  [SDLK_n] = "n",
+  [SDLK_o] = "o",
+  [SDLK_p] = "p",
+  [SDLK_q] = "q",
+  [SDLK_r] = "r",
+  [SDLK_s] = "s",
+  [SDLK_t] = "t",
+  [SDLK_u] = "u",
+  [SDLK_v] = "v",
+  [SDLK_w] = "w",
+  [SDLK_x] = "x",
+  [SDLK_y] = "y",
+  [SDLK_z] = "z",
+
+  [SDLK_F1] = "f1",
+  [SDLK_F2] = "f2",
+  [SDLK_F3] = "f3",
+  [SDLK_F4] = "f4",
+  [SDLK_F5] = "f5",
+  [SDLK_F6] = "f6",
+  [SDLK_F7] = "f7",
+  [SDLK_F8] = "f8",
+  [SDLK_F9] = "f9",
+  [SDLK_F10] = "f10",
+  [SDLK_F11] = "f11",
+  [SDLK_F12] = "f12",
+  [SDLK_F13] = "f13",
+  [SDLK_F14] = "f14",
+  [SDLK_F15] = "f15",
+
+  [SDLK_UP] = "up",
+  [SDLK_DOWN] = "down",
+  [SDLK_LEFT] = "left",
+  [SDLK_RIGHT] = "right",
+
+  [SDLK_INSERT] = "insert",
+  [SDLK_HOME] = "home",
+  [SDLK_END] = "end",
+  [SDLK_PAGEUP] = "page up",
+  [SDLK_PAGEDOWN] = "page down",
+};
+hashtable_t *gIoReverseKeySymMap;
+
+void
+ioQuitHandler(bool buttonDown, void *data)
+{
+  SDL_Event quitEvent;
+  quitEvent.type = SDL_QUIT;
+  if (SDL_PushEvent(&quitEvent) != 0) {
+    ooLogFatal("Clean shutdown prevented by push event failure");
+  } else {
+    ooLogTrace("Pushed SDL_QUIT event");
+  }
+}
+
+void
+ioGetMousePos(float *x, float *y)
+{
+  assert(x != NULL);
+  assert(y != NULL);
+  int xp, yp;
+
+  SDL_GetMouseState(&xp, &yp);
+  SDL_Surface *videoSurface = SDL_GetVideoSurface();
+
+  *x = ((float)xp / (float)videoSurface->w) * 2.0f - 1.0f;
+  *y = ((float)yp / (float)videoSurface->h) * 2.0f - 1.0f;
+}
+
+void ioInitJoysticks(void);
+
+/*
+    Used to filter away joystick axis events
+ */
+static int ioFilter(const SDL_Event *ev)
+{
+  switch (ev->type) {
+  case SDL_JOYAXISMOTION:
+  case SDL_JOYBALLMOTION:
+    return 0;
+  default:
+    // Accept all other events
+    return 1;
+  }
+}
+
+void
+ioInit(void)
+{
+  assert(SDL_WasInit(SDL_INIT_JOYSTICK) == SDL_INIT_JOYSTICK);
+
+  SDL_SetEventFilter(ioFilter);
+
+  gIoReverseKeySymMap = hashtable_new_with_str_keys(1024);
+  gIoButtonHandlers = hashtable_new_with_str_keys(2048);
+  for (size_t i = 0 ; i < SDLK_LAST ; ++ i) {
+    if (keysymmap[i] != NULL) {
+      hashtable_insert(gIoReverseKeySymMap, keysymmap[i], (void*)i);      
+    }
+  }
+
+  for (size_t i = 0 ; i < SDLK_LAST ; ++ i) {
+    for (size_t j = 0 ; j < OO_Key_Mod_Count ; ++ j) {
+      gIoKeyData[i].up[j].isScript = false;
+      gIoKeyData[i].up[j].cHandler = ooButtonHandlerGnd;
+      gIoKeyData[i].down[j].isScript = false;
+      gIoKeyData[i].down[j].cHandler = ooButtonHandlerGnd;
+    }
+  }
+
+  for (size_t i = 0 ; i < MOUSE_BUTTONS ; ++ i) {
+    gIoMouseButtons.down[i].isScript = false;
+    gIoMouseButtons.down[i].cHandler = ooButtonHandlerGnd;
+    gIoMouseButtons.up[i].isScript = false;
+    gIoMouseButtons.up[i].cHandler = ooButtonHandlerGnd;
+  }
+
+  // Hook up the quit handler as default to cmd / meta q
+  gIoKeyData[SDLK_q].down[OO_L_Cmd].isScript = false;
+  gIoKeyData[SDLK_q].down[OO_L_Cmd].cHandler = ioQuitHandler;
+  gIoKeyData[SDLK_q].down[OO_R_Cmd].isScript = false;
+  gIoKeyData[SDLK_q].down[OO_R_Cmd].cHandler = ioQuitHandler;
+
+  // Now initialize joysticks
+  ioInitJoysticks();
+}
+
+void
+ioDispatchKeyUp(int key, uint16_t mask)
+{
+  assert(key < SDLK_LAST);
+
+  IOkeymod kmod = OO_None;
+  if (mask == OO_IO_MOD_NONE) {
+    kmod = OO_None;
+  } else if (mask & OO_IO_MOD_LSHIFT) {
+    kmod = OO_L_Shift;
+  } else if (mask & OO_IO_MOD_RSHIFT) {
+    kmod = OO_R_Shift;
+  } else if (mask & OO_IO_MOD_LCTRL) {
+    kmod = OO_L_Ctrl;
+  } else if (mask & OO_IO_MOD_RCTRL) {
+    kmod = OO_R_Ctrl;
+  } else if (mask & OO_IO_MOD_LALT ) {
+    kmod = OO_L_Alt;
+  } else if (mask & OO_IO_MOD_RALT ) {
+    kmod = OO_R_Alt;
+  } else if (mask & OO_IO_MOD_LMETA) {
+    kmod = OO_L_Cmd;
+  } else if (mask & OO_IO_MOD_RMETA) {
+    kmod = OO_R_Cmd;
+  }
+
+  if (gIoKeyData[key].up[kmod].isScript) {
+
+  } else {
+    gIoKeyData[key].up[kmod].cHandler(false, NULL);
+  }
+}
+
+void
+ioDispatchKeyDown(int key, uint16_t mask)
+{
+  assert(key < SDLK_LAST);
+
+  IOkeymod kmod = OO_None;
+  if (mask == OO_IO_MOD_NONE) {
+    kmod = OO_None;
+  } else if (mask & OO_IO_MOD_LSHIFT) {
+    kmod = OO_L_Shift;
+  } else if (mask & OO_IO_MOD_RSHIFT) {
+    kmod = OO_R_Shift;
+  } else if (mask & OO_IO_MOD_LCTRL) {
+    kmod = OO_L_Ctrl;
+  } else if (mask & OO_IO_MOD_RCTRL) {
+    kmod = OO_R_Ctrl;
+  } else if (mask & OO_IO_MOD_LALT ) {
+    kmod = OO_L_Alt;
+  } else if (mask & OO_IO_MOD_RALT ) {
+    kmod = OO_R_Alt;
+  } else if (mask & OO_IO_MOD_LMETA) {
+    kmod = OO_L_Cmd;
+  } else if (mask & OO_IO_MOD_RMETA) {
+    kmod = OO_R_Cmd;
+  }
+
+  if (gIoKeyData[key].down[kmod].isScript) {
+
+  } else {
+    gIoKeyData[key].down[kmod].cHandler(true, NULL);
+  }
+}
+
+void
+ioDispatchButtonDown(int dev, int button)
+{
+
+}
+
+void
+ioDispatchButtonUp(int dev, int button)
+{
+
+}
+
+
 void
 ooIoRegCKeyHandler(const char *name, OObuttonhandlerfunc handlerFunc)
 {
-    OObuttonhandler *handler
-        = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, name);
-    if (handler != NULL) {
-        warnx("%s already registered as button handler", name);
-        return;
-    }
-    
-    handler = malloc(sizeof(OObuttonhandler));
-    handler->isScript = false;
-    handler->cHandler = handlerFunc;
-    
-    hashtable_insert(gIoButtonHandlers, name, handler);
+  OObuttonhandler *handler
+       = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, name);
+  if (handler != NULL) {
+      ooLogWarn("%s already registered as button handler", name);
+      return;
+  }
+
+  handler = malloc(sizeof(OObuttonhandler));
+  handler->isScript = false;
+  handler->cHandler = handlerFunc;
+
+  hashtable_insert(gIoButtonHandlers, name, handler);
 }
 
 void
 ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc)
 {
-    OObuttonhandler *handler
-        = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, name);
-    if (handler != NULL) {
-        warnx("%s already registered as button handler", name);
-        return;
-    }
-    
-    handler = malloc(sizeof(OObuttonhandler));
-    handler->isScript = true;
-    handler->pyHandler = handlerFunc;
-    
-    hashtable_insert(gIoButtonHandlers, name, handler);
+  OObuttonhandler *handler
+       = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, name);
+  if (handler != NULL) {
+    ooLogWarn("%s already registered as button handler", name);
+    return;
+  }
+
+  handler = malloc(sizeof(OObuttonhandler));
+  handler->isScript = true;
+  handler->pyHandler = handlerFunc;
+
+  hashtable_insert(gIoButtonHandlers, name, handler);
 }
 
 
 void
 ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up, uint16_t mask)
 {
-    OOkeyevent *ev = hashtable_lookup(gIoBoundKeyTable, keyName);
-    OOkeyevent *firstEv = ev;
+  uintptr_t key_id = (uintptr_t) hashtable_lookup(gIoReverseKeySymMap, keyName);
+  IOkeymod kmod = OO_None;
+  if (mask == OO_IO_MOD_NONE) {
+    kmod = OO_None;
+  } else if (mask & OO_IO_MOD_LSHIFT) {
+    kmod = OO_L_Shift;
+  } else if (mask & OO_IO_MOD_RSHIFT) {
+    kmod = OO_R_Shift;
+  } else if (mask & OO_IO_MOD_LCTRL) {
+    kmod = OO_L_Ctrl;
+  } else if (mask & OO_IO_MOD_RCTRL) {
+    kmod = OO_R_Ctrl;
+  } else if (mask & OO_IO_MOD_LALT ) {
+    kmod = OO_L_Alt;
+  } else if (mask & OO_IO_MOD_RALT ) {
+    kmod = OO_R_Alt;
+  } else if (mask & OO_IO_MOD_LMETA) {
+    kmod = OO_L_Cmd;
+  } else if (mask & OO_IO_MOD_RMETA) {
+    kmod = OO_R_Cmd;
+  }
 
-    OObuttonhandler *keyHandler = hashtable_lookup(gIoButtonHandlers, keyAction);
-    if (keyHandler == NULL) {
-        warnx("%s not found in button handler dictionary", keyAction);
-        return;
+  OObuttonhandler *keyHandler = hashtable_lookup(gIoButtonHandlers, keyAction);
+
+  if (keyHandler == NULL) {
+    ooLogWarn("%s not found in button handler dictionary", keyAction);
+    return;
+  }
+
+
+  if (keyHandler) {
+    if (key_id == 0) {
+      ooLogWarn("got key id 0 for %s", keyName);
     }
-    
-    while (ev && (ev->modMask != mask)) {
-        ev = ev->next;
-    }
-    
-    if (ev != NULL) {
-        // does the event handler already exist, if so just replace the mapping
-        if (up) {
-            if (ev->upIsScript) Py_XDECREF(ev->pyUp);
-            ev->upIsScript = keyHandler->isScript;
-            if (keyHandler->isScript) ev->pyUp = keyHandler->pyHandler;
-            else ev->cUp = keyHandler->cHandler;
-        } else {
-            if (ev->downIsScript) Py_XDECREF(ev->pyDown);
-            ev->downIsScript = keyHandler->isScript;
-            if (keyHandler->isScript) ev->pyDown = keyHandler->pyHandler;
-            else ev->cDown = keyHandler->cHandler;
-        }
+    if (up) {
+      gIoKeyData[key_id].up[kmod] = *keyHandler;
     } else {
-        ev = malloc(sizeof(OOkeyevent));
-        
-        if (up) {
-            ev->upIsScript = keyHandler->isScript;
-            if (keyHandler->isScript) ev->pyUp = keyHandler->pyHandler;
-            else ev->cUp = keyHandler->cHandler;
-            
-            ev->modMask = mask;
-            ev->data = NULL;
-            ev->downIsScript = false;
-            ev->cDown = ooButtonHandlerGnd;
-            ev->next = NULL;
-        } else {
-            ev->downIsScript = keyHandler->isScript;
-            if (keyHandler->isScript) ev->pyDown = keyHandler->pyHandler;
-            else ev->cDown = keyHandler->cHandler;
-            ev->modMask = mask;
-            ev->data = NULL;
-            ev->upIsScript = false;
-            ev->cUp = ooButtonHandlerGnd;
-            ev->next = NULL;
-        }
-        
-        /* Insert in hashtable */
-        if (firstEv == NULL) {
-            hashtable_insert(gIoBoundKeyTable, keyName, ev);
-        } else {
-            // After first event since this is the simplest
-            ev->next = firstEv->next;
-            firstEv->next = ev;
-        }
+      gIoKeyData[key_id].down[kmod] = *keyHandler;
     }
+  }
 }
 
 
 void
-ooIoDispatchKeyUp(const char *name, uint16_t mask)
+ooAxisEmulation(bool buttonUp, void *data)
 {
-    OOkeyevent *ev = (OOkeyevent*)hashtable_lookup(gIoBoundKeyTable, name);
 
-    while (ev && (ev->modMask & mask) != mask) {
-        ev = ev->next;
-    }
-    
-    if (ev != NULL) {
-        if (ev->upIsScript) {
-            //PyObject *res = PyObject_CallFunction(f, "(dd)", (double)dx, (double)dy);
-            //if (! res) PyErr_Print();
-            //Py_XDECREF(res);
-            ;
-        } else {
-            ev->cUp(true, ev->data);
-        }
-    }
 }
-
 
 void
-ooIoDispatchKeyDown(const char *name, uint16_t mask)
+ooIoSetKeyAsAxisFull(const char *buttonName, const char *axisName)
 {
-    OOkeyevent *ev = (OOkeyevent*)hashtable_lookup(gIoBoundKeyTable, name);
+  OObuttonhandler *handler
+    = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, buttonName);
+  if (handler) {
 
-    while (ev && (ev->modMask & mask) != mask) {
-        ev = ev->next;
-    }
-    
-    if (ev != NULL) {
-        if (ev->downIsScript) {
-            ;
-        } else {
-            ev->cDown(false, ev->data);
-        }
-    }
+  } else {
+
+  }
 }
-
-const char *
-ooIoSdlKeyNameLookup(SDLKey keyId)
-{
-    if (keyId >= SDLK_LAST) return NULL;
-    return gIoSdlKeyStringMap[keyId];
-}
-
-const char *
-ooIoSdlMouseButtonNameLookup(unsigned buttonId)
-{
-    if (buttonId > 7) return NULL;
-    return gIoSdlMouseStringMap[buttonId-1];
-}
-
-
-void ooIoInitSdlStringMap(void)
-{
-    memset(gIoSdlKeyStringMap, 0, SDLK_LAST * sizeof(const char*));
-    
-    gIoBoundKeyTable = hashtable_new_with_str_keys(128);
-    gIoButtonHandlers = hashtable_new_with_str_keys(256);
-
-    gIoSdlMouseStringMap[SDL_BUTTON_LEFT-1]	= "mouse-left";
-    gIoSdlMouseStringMap[SDL_BUTTON_MIDDLE-1] =	"mouse-middle";
-    gIoSdlMouseStringMap[SDL_BUTTON_RIGHT-1] = "mouse-right";
-    gIoSdlMouseStringMap[SDL_BUTTON_WHEELUP-1] = "mouse-up";
-    gIoSdlMouseStringMap[SDL_BUTTON_WHEELDOWN-1] = "mouse-down";
-    gIoSdlMouseStringMap[SDL_BUTTON_X1-1] = "mouse-x1";
-    gIoSdlMouseStringMap[SDL_BUTTON_X2-1] = "mouse-x2";
-    
-    
-    gIoSdlKeyStringMap[SDLK_LSHIFT] = "lshift";
-    gIoSdlKeyStringMap[SDLK_RSHIFT] = "rshift";
-    gIoSdlKeyStringMap[SDLK_LMETA] = "lmeta";
-    gIoSdlKeyStringMap[SDLK_RMETA] = "rmeta";
-    gIoSdlKeyStringMap[SDLK_LCTRL] = "lctrl";
-    gIoSdlKeyStringMap[SDLK_RCTRL] = "rctrl";
-    gIoSdlKeyStringMap[SDLK_LSUPER] = "lsuper";
-    gIoSdlKeyStringMap[SDLK_RSUPER] = "rsuper";
-    
-    gIoSdlKeyStringMap[SDLK_MODE] = "mode";
-    gIoSdlKeyStringMap[SDLK_HELP] = "help";
-    gIoSdlKeyStringMap[SDLK_PRINT] = "print-screen";
-    gIoSdlKeyStringMap[SDLK_SYSREQ] = "sys-req";
-    gIoSdlKeyStringMap[SDLK_BREAK] = "break";
-    gIoSdlKeyStringMap[SDLK_MENU] = "menu";
-    gIoSdlKeyStringMap[SDLK_POWER] = "power";
-    gIoSdlKeyStringMap[SDLK_EURO] = "euro";
-
-    gIoSdlKeyStringMap[SDLK_RETURN] = "return";
-    gIoSdlKeyStringMap[SDLK_SPACE] = "space";
-    gIoSdlKeyStringMap[SDLK_TAB] = "tab";
-    gIoSdlKeyStringMap[SDLK_BACKSPACE] = "backspace";
-    gIoSdlKeyStringMap[SDLK_ESCAPE] = "esc";
-    gIoSdlKeyStringMap[SDLK_PERIOD] = ".";
-    gIoSdlKeyStringMap[SDLK_COMMA] = ",";
-    gIoSdlKeyStringMap[SDLK_BACKQUOTE] = "`";
-    gIoSdlKeyStringMap[SDLK_CLEAR] = "clear";
-    gIoSdlKeyStringMap[SDLK_PAUSE] = "pause";
-    gIoSdlKeyStringMap[SDLK_EXCLAIM] = "!";
-    gIoSdlKeyStringMap[SDLK_QUOTEDBL] = "\"";
-    gIoSdlKeyStringMap[SDLK_HASH] = "#";
-    gIoSdlKeyStringMap[SDLK_DOLLAR] = "$";
-    gIoSdlKeyStringMap[SDLK_AMPERSAND] = "&";
-    gIoSdlKeyStringMap[SDLK_QUOTE] = "'";
-    gIoSdlKeyStringMap[SDLK_LEFTPAREN] = "(";
-    gIoSdlKeyStringMap[SDLK_RIGHTPAREN] = ")";
-    gIoSdlKeyStringMap[SDLK_ASTERISK] = "*";
-    gIoSdlKeyStringMap[SDLK_PLUS] = "+";
-    gIoSdlKeyStringMap[SDLK_MINUS] = "-";
-    gIoSdlKeyStringMap[SDLK_SLASH] = "/";
-
-    gIoSdlKeyStringMap[SDLK_COLON] = ":";
-    gIoSdlKeyStringMap[SDLK_SEMICOLON] = ";";
-    gIoSdlKeyStringMap[SDLK_LESS] = "<";
-    gIoSdlKeyStringMap[SDLK_EQUALS] = "=";
-    gIoSdlKeyStringMap[SDLK_GREATER] = ">";
-    gIoSdlKeyStringMap[SDLK_QUESTION] = "?";
-    gIoSdlKeyStringMap[SDLK_AT] = "@";
-    gIoSdlKeyStringMap[SDLK_LEFTBRACKET] = "[";
-    gIoSdlKeyStringMap[SDLK_BACKSLASH] = "\\";
-    gIoSdlKeyStringMap[SDLK_RIGHTBRACKET] = "]";
-    gIoSdlKeyStringMap[SDLK_CARET] = "^";
-    gIoSdlKeyStringMap[SDLK_UNDERSCORE] = "_";
-
-    gIoSdlKeyStringMap[SDLK_0] = "0";
-    gIoSdlKeyStringMap[SDLK_1] = "1";
-    gIoSdlKeyStringMap[SDLK_2] = "2";
-    gIoSdlKeyStringMap[SDLK_3] = "3";
-    gIoSdlKeyStringMap[SDLK_4] = "4";
-    gIoSdlKeyStringMap[SDLK_5] = "5";
-    gIoSdlKeyStringMap[SDLK_6] = "6";
-    gIoSdlKeyStringMap[SDLK_7] = "7";
-    gIoSdlKeyStringMap[SDLK_8] = "8";
-    gIoSdlKeyStringMap[SDLK_9] = "9";
-    
-    gIoSdlKeyStringMap[SDLK_KP0] = "kp 0";
-    gIoSdlKeyStringMap[SDLK_KP1] = "kp 1";
-    gIoSdlKeyStringMap[SDLK_KP2] = "kp 2";
-    gIoSdlKeyStringMap[SDLK_KP3] = "kp 3";
-    gIoSdlKeyStringMap[SDLK_KP4] = "kp 4";
-    gIoSdlKeyStringMap[SDLK_KP5] = "kp 5";
-    gIoSdlKeyStringMap[SDLK_KP6] = "kp 6";
-    gIoSdlKeyStringMap[SDLK_KP7] = "kp 7";
-    gIoSdlKeyStringMap[SDLK_KP8] = "kp 8";
-    gIoSdlKeyStringMap[SDLK_KP9] = "kp 9";    
-
-    gIoSdlKeyStringMap[SDLK_KP_PERIOD] = "kp .";
-    gIoSdlKeyStringMap[SDLK_KP_DIVIDE] = "kp /";
-    gIoSdlKeyStringMap[SDLK_KP_MULTIPLY] = "kp *";
-    gIoSdlKeyStringMap[SDLK_KP_MINUS] = "kp -";
-    gIoSdlKeyStringMap[SDLK_KP_PLUS] = "kp +";
-    gIoSdlKeyStringMap[SDLK_KP_ENTER] = "enter";
-    gIoSdlKeyStringMap[SDLK_KP_EQUALS] = "kp =";
-    gIoSdlKeyStringMap[SDLK_DELETE] = "delete";
-
-    gIoSdlKeyStringMap[SDLK_a] = "a";
-    gIoSdlKeyStringMap[SDLK_b] = "b";
-    gIoSdlKeyStringMap[SDLK_c] = "c";
-    gIoSdlKeyStringMap[SDLK_d] = "d";
-    gIoSdlKeyStringMap[SDLK_e] = "e";
-    gIoSdlKeyStringMap[SDLK_f] = "f";
-    gIoSdlKeyStringMap[SDLK_g] = "g";
-    gIoSdlKeyStringMap[SDLK_h] = "h";
-    gIoSdlKeyStringMap[SDLK_i] = "i";
-    gIoSdlKeyStringMap[SDLK_j] = "j";
-    gIoSdlKeyStringMap[SDLK_k] = "k";
-    gIoSdlKeyStringMap[SDLK_l] = "l";
-    gIoSdlKeyStringMap[SDLK_m] = "m";
-    gIoSdlKeyStringMap[SDLK_n] = "n";
-    gIoSdlKeyStringMap[SDLK_o] = "o";
-    gIoSdlKeyStringMap[SDLK_p] = "p";
-    gIoSdlKeyStringMap[SDLK_q] = "q";
-    gIoSdlKeyStringMap[SDLK_r] = "r";
-    gIoSdlKeyStringMap[SDLK_s] = "s";
-    gIoSdlKeyStringMap[SDLK_t] = "t";
-    gIoSdlKeyStringMap[SDLK_u] = "u";
-    gIoSdlKeyStringMap[SDLK_v] = "v";
-    gIoSdlKeyStringMap[SDLK_w] = "w";
-    gIoSdlKeyStringMap[SDLK_x] = "x";
-    gIoSdlKeyStringMap[SDLK_y] = "y";
-    gIoSdlKeyStringMap[SDLK_z] = "z";
-
-    gIoSdlKeyStringMap[SDLK_F1] = "f1";
-    gIoSdlKeyStringMap[SDLK_F2] = "f2";
-    gIoSdlKeyStringMap[SDLK_F3] = "f3";
-    gIoSdlKeyStringMap[SDLK_F4] = "f4";
-    gIoSdlKeyStringMap[SDLK_F5] = "f5";
-    gIoSdlKeyStringMap[SDLK_F6] = "f6";
-    gIoSdlKeyStringMap[SDLK_F7] = "f7";
-    gIoSdlKeyStringMap[SDLK_F8] = "f8";
-    gIoSdlKeyStringMap[SDLK_F9] = "f9";
-    gIoSdlKeyStringMap[SDLK_F10] = "f10";
-    gIoSdlKeyStringMap[SDLK_F11] = "f11";
-    gIoSdlKeyStringMap[SDLK_F12] = "f12";
-    gIoSdlKeyStringMap[SDLK_F13] = "f13";
-    gIoSdlKeyStringMap[SDLK_F14] = "f14";
-    gIoSdlKeyStringMap[SDLK_F15] = "f15";
-
-    gIoSdlKeyStringMap[SDLK_UP] = "up";
-    gIoSdlKeyStringMap[SDLK_DOWN] = "down";
-    gIoSdlKeyStringMap[SDLK_LEFT] = "left";
-    gIoSdlKeyStringMap[SDLK_RIGHT] = "right";
-
-    gIoSdlKeyStringMap[SDLK_INSERT] = "insert";
-    gIoSdlKeyStringMap[SDLK_HOME] = "home";
-    gIoSdlKeyStringMap[SDLK_END] = "end";
-    gIoSdlKeyStringMap[SDLK_PAGEUP] = "page up";
-    gIoSdlKeyStringMap[SDLK_PAGEDOWN] = "page down";
-}
-
-
 
 void
-ooIoInitJoystick(void)
+ooIoSetKeyAsAxisLow(const char *buttonName, const char *axisName)
+{
+  OObuttonhandler *handler
+    = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, buttonName);
+
+}
+
+void
+ioInitJoysticks(void)
 {
   gIoAxisHandlers = hashtable_new_with_str_keys(128);
   HRMLobject *confObj = ooConfGetNode("openorbit/controls");
+  assert(confObj != NULL);
 
   for (HRMLobject *jstick = confObj->children; jstick != NULL ; jstick = jstick->next) {
     if (!strcmp(jstick->name, "joystick")) {
       HRMLvalue name = hrmlGetAttrForName(jstick, "name");
       HRMLvalue id = hrmlGetAttrForName(jstick, "id");
-      
+
       int idVal = 0;
       if (name.typ != HRMLStr) {
         fprintf(stderr, "joystick name is not a string\n");
@@ -413,7 +534,7 @@ ooIoInitJoystick(void)
       if (id.typ == HRMLInt) {
         idVal = id.u.integer;
       }
-      
+
       int joystickId = ooIoGetJoystickId(nameStr, idVal);
       if (joystickId == -1) continue;
       for (HRMLobject *joystickSensor = jstick->children; joystickSensor != NULL;
@@ -424,6 +545,15 @@ ooIoInitJoystick(void)
           HRMLvalue axisId = hrmlGetAttrForName(joystickSensor, "id");
           assert(axisId.typ == HRMLInt);
           ooIoBindAxis(axisName, joystickId, axisId.u.integer);
+        } else if (!strcmp(joystickSensor->name, "button-axis")) {
+          const char *axisName = hrmlGetStr(joystickSensor);
+          HRMLvalue buttonId = hrmlGetAttrForName(joystickSensor, "id");
+          assert(buttonId.typ == HRMLInt);
+
+          HRMLvalue buttonDir = hrmlGetAttrForName(joystickSensor, "dir");
+          assert(buttonDir.typ == HRMLInt);
+          ioBindVirtualAxis(axisName, joystickId,
+                            buttonId.u.integer, buttonDir.u.integer);
         }
       }
     }
@@ -440,15 +570,13 @@ void
 ooIoPrintJoystickNames(void)
 {
   printf("===== Joystick =====\n");
-  
+
   int joyCount = SDL_NumJoysticks();
   for (int i = 0 ; i < joyCount ; ++ i) {
     const char *joyName = SDL_JoystickName(i);
     printf("Joystick %d: '%s' available\n", i, joyName);
   }
   printf("====================\n");
-
-
 }
 
 int
@@ -484,6 +612,12 @@ ooIoBindAxis(const char *key, int joyStick, int axis)
     axisHandler->trim = 0.0;
     hashtable_insert(gIoAxisHandlers, key, axisHandler);
   }
+}
+
+void
+ioBindVirtualAxis(const char *key, int joyStick, int button, int dir)
+{
+
 }
 
 void
@@ -526,7 +660,7 @@ ooIoGetAxis(const char *axis)
   } else {
     normalisedAxis = axisVal / 32768.0;
   }
-  
+
   if (fabs(normalisedAxis + handler->trim) > handler->nullZone + handler->trim) {
     return normalisedAxis + handler->trim;
   }

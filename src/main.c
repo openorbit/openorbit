@@ -124,19 +124,11 @@ main_loop(void)
       case SDL_MOUSEBUTTONUP:
         break;
       case SDL_KEYDOWN:
-        evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
-        ooIoDispatchKeyDown(evName, event.key.keysym.mod);
+        ioDispatchKeyDown(event.key.keysym.sym, event.key.keysym.mod);
         break;
       case SDL_KEYUP:
-        if (event.key.keysym.sym == SDLK_q) done = 1; // for now dont remap q
-        else {
-          evName = ooIoSdlKeyNameLookup(event.key.keysym.sym);
-          ooIoDispatchKeyUp(evName, event.key.keysym.mod);
-        }
+        ioDispatchKeyUp(event.key.keysym.sym, event.key.keysym.mod);
         break;
-      case SDL_JOYAXISMOTION:
-      case SDL_JOYBALLMOTION:
-        break; // Skip axis motions, we poll these every sim step
       case SDL_JOYHATMOTION:
       case SDL_JOYBUTTONDOWN:
       case SDL_JOYBUTTONUP:
@@ -165,7 +157,7 @@ main_loop(void)
         done = 1;
         break;
       default:
-        break;
+        assert(0 && "unhandled event in main event loop");
       }
     }
 
@@ -191,9 +183,6 @@ main(int argc, char*argv[])
   ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
   ooLogSetLevel(ooLogGetLevFromStr(levStr));
 
-  // Setup IO-tables
-  ooIoInitSdlStringMap();
-
   ooSimInit();
 
   ooPluginInit();
@@ -215,6 +204,9 @@ main(int argc, char*argv[])
     ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
   }
 
+  // Setup IO-tables, must be done after joystick system has been initialised
+  ioInit();
+
 //  if (TTF_Init() == -1) {
 //    ooLogFatal("Couldn't initialize SDL_ttf: %s", TTF_GetError());
 //  }
@@ -225,8 +217,6 @@ main(int argc, char*argv[])
 
   ooTexInit(); // Requires that GL has been initialised
 
-  // Give the user some nice info on which joysticks are available
-  ooIoInitJoystick();
   ooIoPrintJoystickNames();
 
   if (!ooScriptingRunFile("script/postinit.py")) {
