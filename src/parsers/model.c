@@ -20,11 +20,15 @@
 #include "model.h"
 #include <string.h>
 #include <assert.h>
-int
-model_load(model_t * restrict model, const char * restrict fileName)
+#include "ac3d.h"
+
+model_t*
+model_load(const char * restrict fileName)
 {
-  assert(model && "not null");
   assert(fileName && "not null");
+  
+  model_t *model = NULL;
+  
   char *dot = strrchr(fileName, '.');
   if (dot) {
     char *endptr = strchr(dot, '\0');
@@ -37,12 +41,15 @@ model_load(model_t * restrict model, const char * restrict fileName)
       
     } else if (!strcmp(dot, ".dae")) {
       
+    } else if (!strcmp(dot, ".ac")) {
+      model = ac3d_load(fileName);
     }
   }
+  return model;
 }
 
 int
-model_dispose(model_t * restrict model)
+model_dispose(model_t * model)
 {
   
 }

@@ -102,6 +102,7 @@
 		EC34BDC2107B2CBD0011B76E /* vmath-quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB8107B2C480011B76E /* vmath-quaternions.c */; };
 		EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BDBE107B2C900011B76E /* libvmath.a */; };
 		EC3CD7AA108457BD00C1B458 /* ooscript.pyx in Resources */ = {isa = PBXBuildFile; fileRef = EC34BC411079EE080011B76E /* ooscript.pyx */; };
+		EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CDA2C108677C000C1B458 /* ac3d.c */; };
 		EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC4485680CCD250C001C88AD /* hash-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485390CCD247E001C88AD /* hash-test.c */; };
 		EC4485690CCD251E001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
@@ -329,7 +330,7 @@
 		EC34BC3B1079EE080011B76E /* texture.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = texture.c; sourceTree = "<group>"; };
 		EC34BC3C1079EE080011B76E /* texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
 		EC34BC3D1079EE080011B76E /* res-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "res-manager.h"; sourceTree = "<group>"; };
-		EC34BC411079EE080011B76E /* ooscript.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ooscript.pyx; sourceTree = "<group>"; };
+		EC34BC411079EE080011B76E /* ooscript.pyx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ooscript.pyx; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.python; };
 		EC34BC431079EE080011B76E /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
 		EC34BC441079EE080011B76E /* scripting.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scripting.c; sourceTree = "<group>"; };
 		EC34BC451079EE080011B76E /* scripting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scripting.h; sourceTree = "<group>"; };
@@ -372,6 +373,8 @@
 		EC34BDB7107B2C480011B76E /* vmath-matvec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-matvec.c"; sourceTree = "<group>"; };
 		EC34BDB8107B2C480011B76E /* vmath-quaternions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-quaternions.c"; sourceTree = "<group>"; };
 		EC34BDBE107B2C900011B76E /* libvmath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libvmath.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC3CDA2B108677C000C1B458 /* ac3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ac3d.h; sourceTree = "<group>"; };
+		EC3CDA2C108677C000C1B458 /* ac3d.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ac3d.c; sourceTree = "<group>"; };
 		EC4476970CCBFF73001C88AD /* t000_hashtable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t000_hashtable; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC44769E0CCBFF95001C88AD /* t001_heap */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t001_heap; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4476A30CCBFFB1001C88AD /* t002_tga */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t002_tga; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -615,6 +618,8 @@
 				EC34BC0B1079EE080011B76E /* pngfile.h */,
 				EC34BC0C1079EE080011B76E /* tga.c */,
 				EC34BC0D1079EE080011B76E /* tga.h */,
+				EC3CDA2B108677C000C1B458 /* ac3d.h */,
+				EC3CDA2C108677C000C1B458 /* ac3d.c */,
 			);
 			path = parsers;
 			sourceTree = "<group>";
@@ -1355,6 +1360,7 @@
 				EC34BCA81079EE080011B76E /* spacecraft.c in Sources */,
 				EC34BCA91079EE080011B76E /* sim.c in Sources */,
 				EC34BCAA1079EE080011B76E /* control.c in Sources */,
+				EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,8 +17,8 @@
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MODEL_H_KPXSQOCU
-#define MODEL_H_KPXSQOCU
+#ifndef MODEL_H
+#define MODEL_H
 
 #include <stdint.h>
 
@@ -30,8 +30,8 @@ typedef struct model_t {
   uint32_t *faces;
 } model_t;
 
-int model_load(model_t * restrict model, const char * restrict fileName);
+model_t * model_load(const char * restrict fileName);
 int model_dispose(model_t * restrict model);
 
-#endif /* end of include guard: MODEL_H_KPXSQOCU */
+#endif /* end of include guard: MODEL_H */
 
