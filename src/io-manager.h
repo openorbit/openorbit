@@ -48,6 +48,7 @@ extern "C" {
   void ioInit(void);
   void ioDispatchKeyUp(int key, uint16_t mask);
   void ioDispatchKeyDown(int key, uint16_t mask);
+  void ioBindVirtualAxis(const char *key, int joyStick, int button, int dir);
 
   typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
 /*! Register key handler C function */
