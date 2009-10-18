@@ -111,7 +111,7 @@ main_loop(void)
 
   while ( !done ) {
   /* Check for events, will do the initial io-decoding */
-    while ( SDL_PollEvent (&event) ) {
+    while ( SDL_PollEvent(&event) ) {
       switch (event.type) {
       case SDL_ACTIVEEVENT:
         break;
@@ -130,8 +130,12 @@ main_loop(void)
         ioDispatchKeyUp(event.key.keysym.sym, event.key.keysym.mod);
         break;
       case SDL_JOYHATMOTION:
+        break;
       case SDL_JOYBUTTONDOWN:
+        ioDispatchButtonDown(event.jbutton.which, event.jbutton.button);
+        break;
       case SDL_JOYBUTTONUP:
+        ioDispatchButtonUp(event.jbutton.which, event.jbutton.button);
         break;
       case SDL_VIDEORESIZE:
         {
