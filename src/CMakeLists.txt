@@ -106,7 +106,8 @@ set_target_properties(openorbit
                       DEBUG_OUTPUT_NAME "${open_orbit_debug_name}")
 
 target_link_libraries(openorbit
-                      vmath scripting parsers dl ph
+                      vmath scripting parsers imgload
+                      dl ph
                       ${ODE_LIB} ${PNG_LIBRARIES} ${JPEG_LIBRARIES}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY}
                       ${GLUT_LIBRARIES})

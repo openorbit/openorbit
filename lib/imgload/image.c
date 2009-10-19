@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "image.h"
+#include <imgload/image.h>
 
 #include "tga.h"
 #include "jpg.h"

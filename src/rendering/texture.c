@@ -26,7 +26,7 @@
 
 #include "log.h"
 #include "texture.h"
-#include "parsers/image.h"
+#include <imgload/image.h>
 
 #include "res-manager.h"
 

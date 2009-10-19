@@ -42,11 +42,7 @@
 		EC34BC7A1079EE080011B76E /* 3ds.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBFB1079EE080011B76E /* 3ds.c */; };
 		EC34BC7C1079EE080011B76E /* hrml.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBFE1079EE080011B76E /* hrml.c */; };
 		EC34BC7D1079EE080011B76E /* hrml3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC001079EE080011B76E /* hrml3d.c */; };
-		EC34BC7E1079EE080011B76E /* image.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC021079EE080011B76E /* image.c */; };
-		EC34BC7F1079EE080011B76E /* jpg.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC041079EE080011B76E /* jpg.c */; };
 		EC34BC801079EE080011B76E /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC061079EE080011B76E /* model.c */; };
-		EC34BC831079EE080011B76E /* pngfile.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC0A1079EE080011B76E /* pngfile.c */; };
-		EC34BC841079EE080011B76E /* tga.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC0C1079EE080011B76E /* tga.c */; };
 		EC34BC851079EE080011B76E /* areodynamics.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC0F1079EE080011B76E /* areodynamics.c */; };
 		EC34BC871079EE080011B76E /* object.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC111079EE080011B76E /* object.c */; };
 		EC34BC881079EE080011B76E /* orbit.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC121079EE080011B76E /* orbit.c */; };
@@ -96,7 +92,6 @@
 		EC34BD7B107B28B90011B76E /* hashtable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF01079EE080011B76E /* hashtable.c */; };
 		EC34BD82107B29150011B76E /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF31079EE080011B76E /* list.c */; };
 		EC34BD9E107B2B050011B76E /* heap.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF11079EE080011B76E /* heap.c */; };
-		EC34BDA0107B2B3D0011B76E /* tga.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC0C1079EE080011B76E /* tga.c */; };
 		EC34BDA1107B2B570011B76E /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF31079EE080011B76E /* list.c */; };
 		EC34BDC1107B2CBD0011B76E /* vmath-matvec.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB7107B2C480011B76E /* vmath-matvec.c */; };
 		EC34BDC2107B2CBD0011B76E /* vmath-quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB8107B2C480011B76E /* vmath-quaternions.c */; };
@@ -119,9 +114,16 @@
 		EC4485740CCD259D001C88AD /* om-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854A0CCD247E001C88AD /* om-test.c */; };
 		EC4485750CCD25AB001C88AD /* list-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854D0CCD247E001C88AD /* list-test.c */; };
 		EC4FCC1410748AC900EB6DDF /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC1310748AC900EB6DDF /* libode.a */; };
-		EC4FCC6110748ECA00EB6DDF /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6010748ECA00EB6DDF /* libjpeg.a */; };
-		EC4FCC6310748F4B00EB6DDF /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
+		ECBF1748108C566E00D3E412 /* image.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1734108C55ED00D3E412 /* image.c */; };
+		ECBF1749108C566E00D3E412 /* jpg.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1735108C55ED00D3E412 /* jpg.c */; };
+		ECBF174B108C566E00D3E412 /* pngfile.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1737108C55ED00D3E412 /* pngfile.c */; };
+		ECBF174D108C566E00D3E412 /* tga.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1739108C55ED00D3E412 /* tga.c */; };
+		ECBF174F108C568900D3E412 /* image.h in Headers */ = {isa = PBXBuildFile; fileRef = ECBF173B108C563800D3E412 /* image.h */; };
+		ECBF1750108C569F00D3E412 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
+		ECBF1751108C569F00D3E412 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6010748ECA00EB6DDF /* libjpeg.a */; };
+		ECBF1754108C56CF00D3E412 /* libimgload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECBF1745108C565600D3E412 /* libimgload.a */; };
+		ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
 		ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
 		ECE17AB31079E043006B6A37 /* ooscript.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE17AB21079E043006B6A37 /* ooscript.c */; };
 /* End PBXBuildFile section */
@@ -196,6 +198,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = EC44769D0CCBFF95001C88AD;
 			remoteInfo = t001_heap;
+		};
+		ECBF1752108C56C700D3E412 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ECBF1744108C565600D3E412 /* imgload */;
+			remoteInfo = imgload;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -283,16 +292,8 @@
 		EC34BBFF1079EE080011B76E /* hrml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hrml.h; sourceTree = "<group>"; };
 		EC34BC001079EE080011B76E /* hrml3d.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hrml3d.c; sourceTree = "<group>"; };
 		EC34BC011079EE080011B76E /* hrml3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hrml3d.h; sourceTree = "<group>"; };
-		EC34BC021079EE080011B76E /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
-		EC34BC031079EE080011B76E /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
-		EC34BC041079EE080011B76E /* jpg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jpg.c; sourceTree = "<group>"; };
-		EC34BC051079EE080011B76E /* jpg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jpg.h; sourceTree = "<group>"; };
 		EC34BC061079EE080011B76E /* model.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = model.c; sourceTree = "<group>"; };
 		EC34BC071079EE080011B76E /* model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = model.h; sourceTree = "<group>"; };
-		EC34BC0A1079EE080011B76E /* pngfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngfile.c; sourceTree = "<group>"; };
-		EC34BC0B1079EE080011B76E /* pngfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pngfile.h; sourceTree = "<group>"; };
-		EC34BC0C1079EE080011B76E /* tga.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tga.c; sourceTree = "<group>"; };
-		EC34BC0D1079EE080011B76E /* tga.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tga.h; sourceTree = "<group>"; };
 		EC34BC0F1079EE080011B76E /* areodynamics.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = areodynamics.c; sourceTree = "<group>"; };
 		EC34BC111079EE080011B76E /* object.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = object.c; sourceTree = "<group>"; };
 		EC34BC121079EE080011B76E /* orbit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = orbit.c; sourceTree = "<group>"; };
@@ -402,6 +403,15 @@
 		EC4FCC6210748F4B00EB6DDF /* libpng.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng.dylib; path = /usr/X11/lib/libpng.dylib; sourceTree = "<absolute>"; };
 		EC768C4E1060D651009B558C /* openorbit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = openorbit.xcconfig; sourceTree = "<group>"; };
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
+		ECBF1734108C55ED00D3E412 /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
+		ECBF1735108C55ED00D3E412 /* jpg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jpg.c; sourceTree = "<group>"; };
+		ECBF1736108C55ED00D3E412 /* jpg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jpg.h; sourceTree = "<group>"; };
+		ECBF1737108C55ED00D3E412 /* pngfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngfile.c; sourceTree = "<group>"; };
+		ECBF1738108C55ED00D3E412 /* pngfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pngfile.h; sourceTree = "<group>"; };
+		ECBF1739108C55ED00D3E412 /* tga.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tga.c; sourceTree = "<group>"; };
+		ECBF173A108C55ED00D3E412 /* tga.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tga.h; sourceTree = "<group>"; };
+		ECBF173B108C563800D3E412 /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
+		ECBF1745108C565600D3E412 /* libimgload.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libimgload.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECE17A871079DE71006B6A37 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		ECE17AB21079E043006B6A37 /* ooscript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ooscript.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -474,13 +484,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */,
 				EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */,
 				EC89155C0CD503EC000E662E /* Python.framework in Frameworks */,
 				EC4FCC1410748AC900EB6DDF /* libode.a in Frameworks */,
-				EC4FCC6110748ECA00EB6DDF /* libjpeg.a in Frameworks */,
-				EC4FCC6310748F4B00EB6DDF /* libpng.dylib in Frameworks */,
 				ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */,
 				EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */,
+				ECBF1754108C56CF00D3E412 /* libimgload.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ECBF1743108C565600D3E412 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ECBF1750108C569F00D3E412 /* libpng.dylib in Frameworks */,
+				ECBF1751108C569F00D3E412 /* libjpeg.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,6 +509,7 @@
 		EC34BBCD1079EDE90011B76E /* include */ = {
 			isa = PBXGroup;
 			children = (
+				ECBF1732108C548F00D3E412 /* imgload */,
 				EC34BDA6107B2C2B0011B76E /* vmath */,
 				EC34BBCF1079EDE90011B76E /* gencds */,
 				EC34BBD71079EDE90011B76E /* openorbit */,
@@ -608,16 +628,8 @@
 				EC34BBFF1079EE080011B76E /* hrml.h */,
 				EC34BC001079EE080011B76E /* hrml3d.c */,
 				EC34BC011079EE080011B76E /* hrml3d.h */,
-				EC34BC021079EE080011B76E /* image.c */,
-				EC34BC031079EE080011B76E /* image.h */,
-				EC34BC041079EE080011B76E /* jpg.c */,
-				EC34BC051079EE080011B76E /* jpg.h */,
 				EC34BC061079EE080011B76E /* model.c */,
 				EC34BC071079EE080011B76E /* model.h */,
-				EC34BC0A1079EE080011B76E /* pngfile.c */,
-				EC34BC0B1079EE080011B76E /* pngfile.h */,
-				EC34BC0C1079EE080011B76E /* tga.c */,
-				EC34BC0D1079EE080011B76E /* tga.h */,
 				EC3CDA2B108677C000C1B458 /* ac3d.h */,
 				EC3CDA2C108677C000C1B458 /* ac3d.c */,
 			);
@@ -818,6 +830,7 @@
 		EC34BDB1107B2C480011B76E /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				ECBF1731108C547800D3E412 /* imgload */,
 				EC34BDB2107B2C480011B76E /* vmath */,
 			);
 			path = lib;
@@ -880,6 +893,7 @@
 				EC4476C60CCC0010001C88AD /* t006_list */,
 				EC4476DE0CCC0076001C88AD /* Open Orbit.app */,
 				EC34BDBE107B2C900011B76E /* libvmath.a */,
+				ECBF1745108C565600D3E412 /* libimgload.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -988,6 +1002,28 @@
 			path = template;
 			sourceTree = "<group>";
 		};
+		ECBF1731108C547800D3E412 /* imgload */ = {
+			isa = PBXGroup;
+			children = (
+				ECBF1734108C55ED00D3E412 /* image.c */,
+				ECBF1735108C55ED00D3E412 /* jpg.c */,
+				ECBF1736108C55ED00D3E412 /* jpg.h */,
+				ECBF1737108C55ED00D3E412 /* pngfile.c */,
+				ECBF1738108C55ED00D3E412 /* pngfile.h */,
+				ECBF1739108C55ED00D3E412 /* tga.c */,
+				ECBF173A108C55ED00D3E412 /* tga.h */,
+			);
+			path = imgload;
+			sourceTree = "<group>";
+		};
+		ECBF1732108C548F00D3E412 /* imgload */ = {
+			isa = PBXGroup;
+			children = (
+				ECBF173B108C563800D3E412 /* image.h */,
+			);
+			path = imgload;
+			sourceTree = "<group>";
+		};
 		ECE17AB11079E005006B6A37 /* derived */ = {
 			isa = PBXGroup;
 			children = (
@@ -1021,6 +1057,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ECBF1741108C565600D3E412 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ECBF174F108C568900D3E412 /* image.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1173,11 +1217,29 @@
 			);
 			dependencies = (
 				EC34BDCB107B2D660011B76E /* PBXTargetDependency */,
+				ECBF1753108C56C700D3E412 /* PBXTargetDependency */,
 			);
 			name = "Open Orbit";
 			productName = "Open Orbit";
 			productReference = EC4476DE0CCC0076001C88AD /* Open Orbit.app */;
 			productType = "com.apple.product-type.application";
+		};
+		ECBF1744108C565600D3E412 /* imgload */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ECBF1757108C56ED00D3E412 /* Build configuration list for PBXNativeTarget "imgload" */;
+			buildPhases = (
+				ECBF1741108C565600D3E412 /* Headers */,
+				ECBF1742108C565600D3E412 /* Sources */,
+				ECBF1743108C565600D3E412 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = imgload;
+			productName = imgload;
+			productReference = ECBF1745108C565600D3E412 /* libimgload.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
@@ -1197,6 +1259,8 @@
 			targets = (
 				EC4476DD0CCC0076001C88AD /* Open Orbit */,
 				EC4476890CCBFF1C001C88AD /* tests */,
+				EC34BDBD107B2C900011B76E /* vmath */,
+				ECBF1744108C565600D3E412 /* imgload */,
 				EC4476960CCBFF73001C88AD /* t000_hashtable */,
 				EC44769D0CCBFF95001C88AD /* t001_heap */,
 				EC4476A20CCBFFB1001C88AD /* t002_tga */,
@@ -1204,7 +1268,6 @@
 				EC4476AC0CCBFFD8001C88AD /* t004_physics */,
 				EC4476C00CCBFFF9001C88AD /* t005_object_manager */,
 				EC4476C50CCC0010001C88AD /* t006_list */,
-				EC34BDBD107B2C900011B76E /* vmath */,
 			);
 		};
 /* End PBXProject section */
@@ -1267,7 +1330,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC44856B0CCD253A001C88AD /* testdriver-main.c in Sources */,
-				EC34BDA0107B2B3D0011B76E /* tga.c in Sources */,
 				EC4485710CCD2575001C88AD /* tga-test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1329,11 +1391,7 @@
 				EC34BC7A1079EE080011B76E /* 3ds.c in Sources */,
 				EC34BC7C1079EE080011B76E /* hrml.c in Sources */,
 				EC34BC7D1079EE080011B76E /* hrml3d.c in Sources */,
-				EC34BC7E1079EE080011B76E /* image.c in Sources */,
-				EC34BC7F1079EE080011B76E /* jpg.c in Sources */,
 				EC34BC801079EE080011B76E /* model.c in Sources */,
-				EC34BC831079EE080011B76E /* pngfile.c in Sources */,
-				EC34BC841079EE080011B76E /* tga.c in Sources */,
 				EC34BC851079EE080011B76E /* areodynamics.c in Sources */,
 				EC34BC871079EE080011B76E /* object.c in Sources */,
 				EC34BC881079EE080011B76E /* orbit.c in Sources */,
@@ -1361,6 +1419,17 @@
 				EC34BCA91079EE080011B76E /* sim.c in Sources */,
 				EC34BCAA1079EE080011B76E /* control.c in Sources */,
 				EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ECBF1742108C565600D3E412 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ECBF1748108C566E00D3E412 /* image.c in Sources */,
+				ECBF1749108C566E00D3E412 /* jpg.c in Sources */,
+				ECBF174B108C566E00D3E412 /* pngfile.c in Sources */,
+				ECBF174D108C566E00D3E412 /* tga.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1406,6 +1475,11 @@
 			isa = PBXTargetDependency;
 			target = EC44769D0CCBFF95001C88AD /* t001_heap */;
 			targetProxy = EC4476D20CCC001A001C88AD /* PBXContainerItemProxy */;
+		};
+		ECBF1753108C56C700D3E412 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ECBF1744108C565600D3E412 /* imgload */;
+			targetProxy = ECBF1752108C56C700D3E412 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1907,6 +1981,58 @@
 			};
 			name = Release;
 		};
+		ECBF1746108C565700D3E412 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					"${ORBIT_INCPATH}",
+					include,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"${ORBIT_LIBPATH}",
+					"$(inherited)",
+					/usr/X11/lib,
+					/opt/local/lib,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = imgload;
+			};
+			name = Debug;
+		};
+		ECBF1747108C565700D3E412 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					"${ORBIT_INCPATH}",
+					include,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"${ORBIT_LIBPATH}",
+					"$(inherited)",
+					/usr/X11/lib,
+					/opt/local/lib,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = imgload;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2005,6 +2131,15 @@
 			buildConfigurations = (
 				EC4476E20CCC0077001C88AD /* Debug */,
 				EC4476E30CCC0077001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ECBF1757108C56ED00D3E412 /* Build configuration list for PBXNativeTarget "imgload" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ECBF1746108C565700D3E412 /* Debug */,
+				ECBF1747108C565700D3E412 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
