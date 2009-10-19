@@ -37,6 +37,8 @@ static hashtable_t *gIoAxisHandlers; // of type OOaxishandler
 
 #define SPEC_KEY_COUNT 8/* shft, cmd, ctrl, alt (left and right) */
 
+void ioBindJoystickButton(const char *key, int joyStick, int button);
+void ioBindButtonToAxis(const char *axisKey, int joystick, int button, float val);
 
 void
 ooButtonHandlerGnd(bool buttonDown, void *data)
@@ -302,6 +304,7 @@ static int ioFilter(const SDL_Event *ev)
     return 1;
   }
 }
+void ioInitKeys(void);
 
 void
 ioInit(void)
@@ -336,16 +339,49 @@ ioInit(void)
     gIoMouseButtons.up[i].isScript = false;
     gIoMouseButtons.up[i].cHandler = ooButtonHandlerGnd;
   }
+  
+  // Now initialize joysticks
+  ioInitJoysticks();
+  
+  // Init key data
+  ioInitKeys();
 
-  // Hook up the quit handler as default to cmd / meta q
+  
+  // Hook up the quit handler as default to cmd / meta q, this overrides the initkeys conf
   gIoKeyData[SDLK_q].down[OO_L_Cmd].isScript = false;
   gIoKeyData[SDLK_q].down[OO_L_Cmd].cHandler = ioQuitHandler;
   gIoKeyData[SDLK_q].down[OO_L_Cmd].data = NULL;
   gIoKeyData[SDLK_q].down[OO_R_Cmd].isScript = false;
   gIoKeyData[SDLK_q].down[OO_R_Cmd].cHandler = ioQuitHandler;
   gIoKeyData[SDLK_q].down[OO_R_Cmd].data = NULL;
-  // Now initialize joysticks
-  ioInitJoysticks();
+}
+
+void
+ioInitKeys(void)
+{
+  HRMLobject *confObj = ooConfGetNode("openorbit/controls");
+  for (HRMLobject *keyboard = confObj->children; keyboard != NULL ; keyboard = keyboard->next) {
+    if (!strcmp(keyboard->name, "keyboard")) {      
+
+      for (HRMLobject *keyInfo = keyboard->children; keyInfo != NULL;
+           keyInfo = keyInfo->next)
+      {
+        if (!strcmp(keyInfo->name, "key")) {
+          const char *actionName = hrmlGetStr(keyInfo);
+          HRMLvalue keyId = hrmlGetAttrForName(keyInfo, "id");
+          assert(keyId.typ == HRMLStr);
+          ooIoBindKeyHandler(keyId.u.str, actionName, 0, 0);
+        } else if (!strcmp(keyInfo->name, "key-axis")) {
+          const char *axisName = hrmlGetStr(keyInfo);
+          HRMLvalue keyId = hrmlGetAttrForName(keyInfo, "id");
+          assert(keyId.typ == HRMLStr);
+          HRMLvalue buttonVal = hrmlGetAttrForName(keyInfo, "val");
+          assert(buttonVal.typ == HRMLFloat);
+          ioBindKeyToAxis(axisName, keyId.u.str, buttonVal.u.real);
+        }
+      }
+    }
+  }
 }
 
 void
@@ -417,13 +453,21 @@ ioDispatchKeyDown(int key, uint16_t mask)
 void
 ioDispatchButtonDown(int dev, int button)
 {
-
+  if (gJoyButtons.joy[dev]->down[button].isScript) {
+    
+  } else {
+    gJoyButtons.joy[dev]->down[button].cHandler(true, gJoyButtons.joy[dev]->down[button].data);
+  }
 }
 
 void
 ioDispatchButtonUp(int dev, int button)
 {
-
+  if (gJoyButtons.joy[dev]->up[button].isScript) {
+    
+  } else {
+    gJoyButtons.joy[dev]->up[button].cHandler(false, gJoyButtons.joy[dev]->up[button].data);
+  }
 }
 
 
@@ -531,25 +575,6 @@ ooAxisEmulation(bool buttonDown, void *data)
   }
 }
 
-void
-ooIoSetKeyAsAxisFull(const char *buttonName, const char *axisName)
-{
-  OObuttonhandler *handler
-    = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, buttonName);
-  if (handler) {
-
-  } else {
-
-  }
-}
-
-void
-ooIoSetKeyAsAxisLow(const char *buttonName, const char *axisName)
-{
-  OObuttonhandler *handler
-    = (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, buttonName);
-
-}
 
 void
 ioInitJoysticks(void)
@@ -569,6 +594,17 @@ ioInitJoysticks(void)
     gJoyButtons.joy[i]->up = calloc(gJoyButtons.joy[i]->buttonCount, sizeof(OObuttonhandler));
   }
 
+  for (int i = 0 ; i < gJoyButtons.joyCount; ++ i) {
+    for (int j = 0 ; j < gJoyButtons.joy[i]->buttonCount ; ++ j) {
+      gJoyButtons.joy[i]->down[j].isScript = false;
+      gJoyButtons.joy[i]->down[j].cHandler = ooButtonHandlerGnd;
+      gJoyButtons.joy[i]->down[j].data = NULL;
+      gJoyButtons.joy[i]->up[j].isScript = false;
+      gJoyButtons.joy[i]->up[j].cHandler = ooButtonHandlerGnd;
+      gJoyButtons.joy[i]->up[j].data = NULL;
+    }
+  }
+  
   for (HRMLobject *jstick = confObj->children; jstick != NULL ; jstick = jstick->next) {
     if (!strcmp(jstick->name, "joystick")) {
       HRMLvalue name = hrmlGetAttrForName(jstick, "name");
@@ -600,20 +636,19 @@ ioInitJoysticks(void)
           HRMLvalue buttonId = hrmlGetAttrForName(joystickSensor, "id");
           assert(buttonId.typ == HRMLInt);
 
-          HRMLvalue buttonDir = hrmlGetAttrForName(joystickSensor, "dir");
-          assert(buttonDir.typ == HRMLInt);
-          //ioBindVirtualAxis(axisName, joystickId,
-          //                  buttonId.u.integer, buttonDir.u.integer);
+          HRMLvalue buttonDir = hrmlGetAttrForName(joystickSensor, "val");
+          assert(buttonDir.typ == HRMLFloat);
+          ioBindButtonToAxis(axisName, joystickId, buttonId.u.integer,
+                             buttonDir.u.real);
+        } else if (!strcmp(joystickSensor->name, "button")) {
+          const char *actionName = hrmlGetStr(joystickSensor);
+          HRMLvalue buttonId = hrmlGetAttrForName(joystickSensor, "id");
+          assert(buttonId.typ == HRMLInt);
+          ioBindJoystickButton(actionName, joystickId, buttonId.u.integer);
         }
       }
     }
   }
-}
-
-int
-ooIoGetJoystickCount(void)
-{
-  return SDL_NumJoysticks();
 }
 
 void
@@ -632,15 +667,88 @@ ooIoPrintJoystickNames(void)
 int
 ooIoGetJoystickId(const char *name, int subId)
 {
+  assert(name != NULL);
+  assert(0 <= subId);
+  
   int joyCount = SDL_NumJoysticks();
   for (int i = 0 ; i < joyCount ; ++ i) {
     const char *joyName = SDL_JoystickName(i);
     if (!strcmp(joyName, name)) {
-      return i;
+      if (subId == 0) {        
+        return i;
+      } else {
+        subId --;
+      }
     }
   }
   return -1;
 }
+
+void
+ioBindJoystickButton(const char *key, int joyStick, int button)
+{
+  if (key == NULL) {
+    return;
+  }
+  
+  OObuttonhandler *keyHandler = hashtable_lookup(gIoButtonHandlers, key);
+  if (keyHandler == NULL) {
+    return;
+  }
+  
+  if (joyStick >= gJoyButtons.joyCount || joyStick < 0) {
+    ooLogWarn("attempted to bind '%s' to invalid joystick id '%d'", key, joyStick);
+    return;
+  }
+
+  if (button >= gJoyButtons.joy[joyStick]->buttonCount || button < 0) {
+    ooLogWarn("attempted to bind '%s' to invalid joystick '%d' button '%d'",
+              key, joyStick, button);
+    return;
+  }
+  
+  // TODO: We should unmap the old entry properly, not just replace it
+  gJoyButtons.joy[joyStick]->down[button] = *keyHandler;
+  gJoyButtons.joy[joyStick]->down[button].data = NULL;
+  //gJoyButtons.joy[joyStick]->up[button] = *keyHandler;
+  
+}
+
+void
+ioBindButtonToAxis(const char *axisKey, int joystick, int button, float val)
+{
+  assert(axisKey != NULL);
+  assert(joystick >= 0);
+  assert(button >= 0);
+  
+  OOaxishandler *handler = hashtable_lookup(gIoAxisHandlers, axisKey);
+
+  if (!handler) {
+    handler = malloc(sizeof(OOaxishandler));
+    handler->joyId = NULL;
+    
+    handler->axisId = -1;
+    handler->nullZone = 0.1;
+    handler->trim = 0.0;
+    handler->buttonDown = false;
+    handler->val = 0.0;
+    hashtable_insert(gIoAxisHandlers, axisKey, handler);
+  }
+  
+  gJoyButtons.joy[joystick]->down[button].isScript = false;
+  gJoyButtons.joy[joystick]->down[button].cHandler = ooAxisEmulation;
+  gJoyButtons.joy[joystick]->up[button].isScript = false;
+  gJoyButtons.joy[joystick]->up[button].cHandler = ooAxisEmulation;
+        
+  IOaxisemudata *ad = malloc(sizeof(IOaxisemudata));
+  ad->axisKey = strdup(axisKey);
+  ad->val = val;
+  
+  gJoyButtons.joy[joystick]->down[button].data = ad;
+  gJoyButtons.joy[joystick]->up[button].data = ad;
+}
+
+
 
 void
 ooIoBindAxis(const char *key, int joyStick, int axis)
@@ -669,7 +777,7 @@ ooIoBindAxis(const char *key, int joyStick, int axis)
 }
 
 void
-ioBindVirtualAxis(const char *key, const char *button, float val)
+ioBindKeyToAxis(const char *key, const char *button, float val)
 {
   uintptr_t key_id = (uintptr_t) hashtable_lookup(gIoReverseKeySymMap, button);
   OOaxishandler *handler = hashtable_lookup(gIoAxisHandlers, key);
@@ -685,6 +793,8 @@ ioBindVirtualAxis(const char *key, const char *button, float val)
     ad->val = val;
     
     gIoKeyData[key_id].up[OO_None].data = ad;
+    gIoKeyData[key_id].down[OO_None].data = ad;
+
   } else {
     handler = malloc(sizeof(OOaxishandler));
     handler->joyId = NULL;
@@ -707,7 +817,8 @@ ioBindVirtualAxis(const char *key, const char *button, float val)
     ad->val = val;
 
     gIoKeyData[key_id].up[OO_None].data = ad;
-    
+    gIoKeyData[key_id].down[OO_None].data = ad;
+
     hashtable_insert(gIoAxisHandlers, key, handler);
   }
 }

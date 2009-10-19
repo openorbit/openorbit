@@ -48,7 +48,7 @@ extern "C" {
   void ioInit(void);
   void ioDispatchKeyUp(int key, uint16_t mask);
   void ioDispatchKeyDown(int key, uint16_t mask);
-  void ioBindVirtualAxis(const char *key, const char *button, float val);
+  void ioBindKeyToAxis(const char *key, const char *button, float val);
   void ioDispatchButtonDown(int dev, int button);
   void ioDispatchButtonUp(int dev, int button);
 

@@ -895,7 +895,7 @@ InsertAttribute(ParseState *parser, const char *name, Token tok)
     attr->val.alen = 0;
     attr->val.typ = HRMLInt;
     attr->val.u.integer = getInteger(tok);
-  } else if (tok.kind_ == tk_int) {
+  } else if (tok.kind_ == tk_real) {
     attr->val.alen = 0;
     attr->val.typ = HRMLFloat;
     attr->val.u.real = getReal(tok);
@@ -1029,7 +1029,9 @@ ParseAttributes(ParseState *parser)
 
       if (!Optional(parser, tk_ident)) {
         if (!Optional(parser, tk_int)) {
-          Require(parser, tk_str);
+          if (!Optional(parser, tk_real)) {
+            Require(parser, tk_str);
+          }
         }
       }
       Token valueTok = lexGetCurrentTok(parser->lexer);
