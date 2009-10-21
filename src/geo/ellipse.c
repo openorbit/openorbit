@@ -27,9 +27,9 @@ void
 ooGeoEllipseDraw(OOellipse *e)
 {
   glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 4*sizeof(float), e->vec.elems);
+  glVertexPointer(3, GL_FLOAT, sizeof(float3), e->vec.elems);
   glColor3f(1.0, 0.0, 0.0);
-  glDrawArrays(GL_LINE_STRIP, 0,  e->vec.length);
+  glDrawArrays(GL_LINE_LOOP, 0,  e->vec.length);
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
@@ -39,7 +39,7 @@ ooVecArrayInit(OOvecarray *vec)
 {
     vec->asize = 16;
     vec->length = 0;
-    vec->elems = calloc(vec->asize, sizeof(v4f_t));
+    vec->elems = calloc(vec->asize, sizeof(float3));
 }
 
 void
@@ -111,7 +111,7 @@ OOellipse* ooGeoEllipseAreaSeg(size_t segs, float semiMajor, float semiMinor)
   double sweep = area / (double)segs;
 
   ooVecArrayPushC(&e->vec,
-                  semiMajor * cos(0.0), semiMinor * sin(0.0), 0.0f, 0.0f);
+                  semiMajor * cos(0.0) - e->ecc * semiMajor, semiMinor * sin(0.0), 0.0f, 0.0f);
   double segArea, tol;
   double prevAngle = 0.0f;
   double newAngle = prevAngle + 1.0*DEG_TO_RAD(360.0/(double)segs);
@@ -219,7 +219,6 @@ ooGeoEllipseSegPoint(OOellipse *e, double t)
 
   double frac = pos - floor(pos);
 
-  // TODO: Vectors should not use unions anymore
   float3 av, bv;
   av = a;
   bv = b;

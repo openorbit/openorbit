@@ -21,22 +21,6 @@
 #define SCENEGRAPH_PRIVATE_H_8YHHHPCN
 
 
-struct OOdrawable {
-  const char *name;
-  float3 p;
-  float3 dp;
-
-  float3 dr;
-
-  quaternion_t q;
-  float s;
-
-  OOobject *obj;
-  OOdrawfunc draw;
-  
-  OOscene *scene;
-};
-
 struct OOscene {
   struct OOscene *parent;
   char *name;

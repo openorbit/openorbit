@@ -300,10 +300,11 @@ plCreateOrbit(PLworld *world, const char *name,
   char orbitName[strlen(name) + strlen(" Orbit") + 1];
   strcpy(orbitName, name); // safe as size is checked in allocation
   strcat(orbitName, " Orbit");
-  // TODO: Simplify ellipsis, we do not actually want to draw the generated
-  //       ellipsis, except in the case when we want to draw the segments
-  sys->orbitDrawable = ooSgNewDrawable(orbitName, sys->orbitalPath,
-                                       (OOdrawfunc)ooGeoEllipseDraw);
+
+  sys->orbitDrawable = sgNewEllipsis(orbitName,
+                                     semiMaj, semiMin,
+                                     0.0, 1.0, 1.0, 256);
+
   ooSgSceneAddObj(sys->world->scene,
                   sys->orbitDrawable);
 

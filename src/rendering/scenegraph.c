@@ -39,18 +39,19 @@ typedef struct {
     float vert[3];
 } OOvertex;
 
-
 typedef struct {
-    size_t vSize;
-    size_t vCount;
-    OOvertex *vertices;
-    uint64_t texId;
+  OOdrawable super;
+  size_t vSize;
+  size_t vCount;
+  OOvertex *vertices;
+  uint64_t texId;
 } OOmesh;
 
 typedef struct {
-    GLuint texId;
-    GLUquadricObj *quadratic;
-    GLfloat radius;
+  OOdrawable super;
+  GLuint texId;
+  GLUquadricObj *quadratic;
+  GLfloat radius;
 } OOsphere;
 
 OOscene*
@@ -145,12 +146,12 @@ ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz)
 }
 
 OOdrawable*
-ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df)
+ooSgNewDrawable(OOdrawable *drawable, const char *name, OOdrawfunc df)
 {
-  assert(obj != NULL);
   assert(df != NULL);
+  assert(drawable != NULL);
 
-  OOdrawable *drawable = malloc(sizeof(OOdrawable));
+  //  OOdrawable *drawable = malloc(sizeof(OOdrawable));
   drawable->name = strdup(name);
   drawable->p = vf3_set(0.0f, 0.0f, 0.0f);
   drawable->q = q_rot(1.0f, 0.0f, 0.0f, 0.0f);
@@ -159,10 +160,9 @@ ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df)
   drawable->dp = vf3_set(0.0f, 0.0f, 0.0f);
 
   drawable->draw = df;
-  drawable->obj = obj;
-  
+
   drawable->scene = NULL;
-  
+
   return drawable;
 }
 
@@ -172,7 +172,7 @@ ooSgNewSceneGraph()
   OOscenegraph *sg = malloc(sizeof(OOscenegraph));
   sg->root = ooSgNewScene(NULL, "root");
   sg->root->sg = sg;
-  
+
   ooObjVecInit(&sg->cams);
   ooObjVecInit(&sg->overlays);
   return sg;
@@ -354,7 +354,7 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
     glMultMatrixf((GLfloat*)&m);
     //glScalef(obj->s, obj->s, obj->s);
 
-    obj->draw(obj->obj);
+    obj->draw(obj);
     glPopMatrix();
   }
 
@@ -405,7 +405,7 @@ ooSgPaint(OOscenegraph *sg)
   glPushMatrix();
   ooSgCamRotate(sg->currentCam);
   // Draw the sky
-  sg->sky->draw(sg->sky->obj);
+  sg->sky->draw(sg->sky);
   glPopMatrix();
 
   // Then the overlays
@@ -549,7 +549,7 @@ ooSgDrawSphere(OOsphere *sp)
   glColor3f(1.0f, 1.0f, 1.0f);
   gluSphere(sp->quadratic, sp->radius, 128, 128);
 
-  glMatrixMode(GL_MODELVIEW);
+  //  glMatrixMode(GL_MODELVIEW);
 
 }
 
@@ -565,7 +565,58 @@ ooSgNewSphere(const char *name, float radius, const char *tex)
   gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
   gluQuadricTexture(sp->quadratic, GL_TRUE);
   gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
-  return ooSgNewDrawable(name, sp, (OOdrawfunc) ooSgDrawSphere);
+  return ooSgNewDrawable((OOdrawable*)sp, name, (OOdrawfunc) ooSgDrawSphere);
+}
+
+typedef struct SGellipsis {
+  OOdrawable super;
+  float semiMajor;
+  float semiMinor;
+  float ecc;
+  float colour[3];
+  size_t vertCount;
+  float verts[];
+} SGellipsis;
+
+void
+sgDrawEllipsis(SGellipsis *el)
+{
+  glPushMatrix();
+
+  glLineWidth(1.0);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, el->verts);
+  glColor3f(el->colour[0], el->colour[1], el->colour[2]);
+  glDrawArrays(GL_LINE_LOOP, 0, el->vertCount);
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glPopMatrix();
+}
+
+OOdrawable*
+sgNewEllipsis(const char *name,
+              float semiMajor, float semiMinor,
+              float r, float g, float b,
+              size_t vertCount)
+{
+  SGellipsis *el = malloc(sizeof(SGellipsis) + vertCount * 2 * sizeof(float));
+  el->semiMajor = semiMajor;
+  el->semiMinor = semiMinor;
+  el->ecc = sqrt((semiMajor * semiMajor - semiMinor * semiMinor)
+                 / (semiMajor * semiMajor));
+  el->colour[0] = r;
+  el->colour[1] = g;
+  el->colour[2] = b;
+  el->vertCount = vertCount;
+  ooLogInfo("new ellipses '%s' %f %f %f", name, semiMajor, semiMinor, el->ecc);
+
+  // Build an ellipse with the requested number of vertices
+  float w = 2.0 * M_PI / (float)vertCount;
+  for (int i = 0 ; i < vertCount ; ++ i) {
+    el->verts[2*i] = semiMajor * cos(w * (float)i) - el->semiMajor*el->ecc;
+    el->verts[2*i+1] = semiMinor * sin(w * (float)i);
+  }
+
+  return ooSgNewDrawable((OOdrawable*)el, name, (OOdrawfunc)sgDrawEllipsis);
 }
 
 

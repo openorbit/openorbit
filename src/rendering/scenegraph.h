@@ -23,6 +23,7 @@
 #include <ode/ode.h>
 
 #include <vmath/vmath.h>
+#include "geo/geo.h"
 
 #include <openorbit/openorbit.h>
 //#include "physics/orbit.h"
@@ -36,10 +37,24 @@
 
 #include "camera.h"
 
-//typedef void OOobject;
 typedef void (*OOdrawfunc)(OOobject*);
 
-OOdrawable* ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df);
+struct OOdrawable {
+  const char *name;
+  OOscene *scene;
+
+  float3 p;  // Position
+  float3 dp; // delta pos per time step
+  float3 dr; // delta rot per time step
+  quaternion_t q; // Quaternion
+  float s; // Scale
+
+  OOdrawfunc draw; // Draw function for this object
+};
+
+
+
+OOdrawable* ooSgNewDrawable(OOdrawable *drawable, const char *name, OOdrawfunc df);
 
 void ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w);
 void ooSgSetObjectPosLW(OOdrawable *obj, const OOlwcoord *lw);
@@ -96,8 +111,11 @@ void ooSgSceneAddChild(OOscene *parent, OOscene *child);
 void ooSgSceneAddObj(OOscene *sc, OOdrawable *object);
 
 
-
 OOdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
+OOdrawable* sgNewEllipsis(const char *name,
+                          float semiMajor, float semiMinor,
+                          float r, float g, float b,
+                          size_t vertCount);
 
 
 #endif /* SCENEGRAPH_H_ */

@@ -38,9 +38,10 @@ typedef struct {
 } OOstar;
 
 typedef struct {
-    size_t n_stars; //!< Number of stars loaded
-    size_t a_len; //!< Length of data
-    OOstar *data;
+  OOdrawable super;
+  size_t n_stars; //!< Number of stars loaded
+  size_t a_len; //!< Length of data
+  OOstar *data;
 } OOstars;
 
 
