@@ -35,9 +35,9 @@ typedef struct {
 typedef struct {
     GLuint texid;
     GLUquadricObj *quadratic;
-    scalar_t radius;
-    vector_t pos; // original position (this is should be in a plane)
-    scalar_t mass;
+    float radius;
+    float3 pos; // original position (this is should be in a plane)
+    float mass;
     quaternion_t rot_orig;
     quaternion_t rot_ax;
 } planet_t;

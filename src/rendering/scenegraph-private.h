@@ -23,10 +23,10 @@
 
 struct OOdrawable {
   const char *name;
-  vector_t p;
-  vector_t dp;
+  float3 p;
+  float3 dp;
 
-  vector_t dr;
+  float3 dr;
 
   quaternion_t q;
   float s;
@@ -41,7 +41,7 @@ struct OOscene {
   struct OOscene *parent;
   char *name;
 
-  vector_t t;
+  float3 t;
 //  quaternion_t q;
 //  scalar_t s; // scale with respect to parent s
 //  scalar_t si; // inverse of s

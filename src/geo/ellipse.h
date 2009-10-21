@@ -26,7 +26,7 @@
 typedef struct {
     size_t asize; //!< Size of elems array in objects
     size_t length; //!< Usage of elems array in objects
-    v4f_t *elems;
+    float3 *elems;
 } OOvecarray;
 
 typedef struct {
@@ -62,7 +62,7 @@ double ooGeoEllipseArea(OOellipse *e);
 double ooGeoEllipseTrueAnomality(OOellipse *e, double fi);
 double ooGeoEllipseSegmentArea(OOellipse *e, double fi0, double fi1);
 double ooGeoEllipseEcc(OOellipse *e);
-v4f_t ooGeoEllipseSegPoint(OOellipse *e, double t);
+float3 ooGeoEllipseSegPoint(OOellipse *e, double t);
 
 static inline double ooGeoComputeSemiMinor(double semiMajor, double ecc)
 {

@@ -30,16 +30,13 @@
 #include <stdlib.h>
 #include "scenegraph-private.h"
 
-vector_t
-ooEquToCart(angle_t ra, angle_t dec)
+float3
+ooEquToCart(float ra, float dec)
 {
-    vector_t cart;
-    scalar_t cosdec = cos(dec);
-    cart.x = cosdec * cos(ra);
-    cart.y = cosdec * sin(ra);
-    cart.z = sin(dec);
-    cart.w = 1.0;
-    return cart;
+  float3 cart;
+  float cosdec = cos(dec);
+  cart = vf3_set(cosdec * cos(ra), cosdec * sin(ra), sin(dec));
+  return cart;
 }
 
 // the minimum and maximum magnetude values that correspond to alpha 255 and 0
@@ -62,7 +59,7 @@ ooVmagToAlpha(double vmag)
 void
 ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
 {
-    vector_t cart;
+    float3 cart;
     cart = ooEquToCart(ra, dec);
     
     // star list full, then extend block?
@@ -78,9 +75,9 @@ ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
     if (temp > 40000.0) temp = 40000.0;
     uint8_t *tempRGB = get_temp_colour((int)temp);
     
-    stars->data[stars->n_stars].x = cart.x;
-    stars->data[stars->n_stars].y = cart.y;
-    stars->data[stars->n_stars].z = cart.z;
+    stars->data[stars->n_stars].x = vf3_x(cart);
+    stars->data[stars->n_stars].y = vf3_y(cart);
+    stars->data[stars->n_stars].z = vf3_z(cart);
     stars->data[stars->n_stars].r = *tempRGB;
     stars->data[stars->n_stars].g = *(tempRGB+1);
     stars->data[stars->n_stars].b = *(tempRGB+2);
@@ -114,7 +111,7 @@ OOstars*
 ooSkyRandomStars(void)
 {
   assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
-  vector_t cart;
+  float3 cart;
   float ra, dec;
 
   OOstars *stars = malloc(sizeof(OOstars) +  STAR_CNT*sizeof(OOstar));
@@ -123,9 +120,9 @@ ooSkyRandomStars(void)
     ra = deg2rad(random() % 360-180);
     dec = deg2rad(random() % 180-90);
     cart = ooEquToCart(ra, dec);
-    stars->data[i].x = cart.x;
-    stars->data[i].y = cart.y;
-    stars->data[i].z = cart.z;
+    stars->data[i].x = vf3_x(cart);
+    stars->data[i].y = vf3_y(cart);
+    stars->data[i].z = vf3_z(cart);
     stars->data[i].r = 255;
     stars->data[i].g = 255;
     stars->data[i].b = 255;

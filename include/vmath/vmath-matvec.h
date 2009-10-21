@@ -36,61 +36,153 @@ extern "C" {
 #include <stdbool.h>
 #include <math.h>
 #include <vmath/vmath-types.h>
-#include <vmath/vmath-matvec.inl>
+  //#include <vmath/vmath-matvec.inl>
 
+static inline float
+vf3_x(float3 v)
+{
+#if __has_feature(attribute_ext_vector_type)
+  return v.x;
+#else
+  float3_u vu = {.v = v};
+  return vu.s.x;
+#endif
+}
+
+static inline float
+vf3_y(float3 v)
+{
+#if __has_feature(attribute_ext_vector_type)
+  return v.y;
+#else
+  float3_u vu = {.v = v};
+  return vu.s.y;
+#endif
+}
+
+static inline float
+vf3_z(float3 v)
+{
+#if __has_feature(attribute_ext_vector_type)
+  return v.z;
+#else
+  float3_u vu = {.v = v};
+  return vu.s.z;
+#endif
+}
+
+static inline void
+vf3_set_x(float3 *v, float x)
+{
+  float *fp = (float*)v;
+  fp[0] = x;
+}
+  
+static inline void
+vf3_set_y(float3 *v, float y)
+{
+  float *fp = (float*)v;
+  fp[1] = y;
+}
+  
+static inline void
+vf3_set_z(float3 *v, float z)
+{
+  float *fp = (float*)v;
+  fp[2] = z;
+}
+  
+  
+  
 static inline float3
 vf3_set(float x, float y, float z)
 {
+#if __has_feature(attribute_ext_vector_type)
+  float3 v = {x, y, z};
+  return v;
+#else
   float3_u uc = {.a = {x,y,z,0.0}};
   return uc.v;
+#endif
 }
 static inline float4
 vf4_set(float x, float y, float z, float w)
 {
+#if __has_feature(attribute_ext_vector_type)
+  float4 v = {x, y, z, w};
+  return v;
+#else
   float4_u uc = {.a = {x,y,z,w}};
   return uc.v;
+#endif
 }
 
 static inline float
 vf3_get(float3 v, short i)
 {
+#if __has_feature(attribute_ext_vector_type)
+  return v[i];
+#else
   float3_u uc = {.v = v};
   return uc.a[i];
+#endif
 }
 
 static inline float
 vf4_get(float4 v, short i)
 {
+#if __has_feature(attribute_ext_vector_type)
+  return v[i];
+#else
   float4_u uc = {.v = v};
   return uc.a[i];
+#endif
 }
 
 
 static inline double
 vd3_get(double3 v, short i)
 {
+#if __has_feature(attribute_ext_vector_type)
+  return v[i];
+#else  
   double3_u uc = {.v = v};
   return uc.a[i];
+#endif
 }
 static inline double
 vd4_get(double4 v, short i)
 {
+#if __has_feature(attribute_ext_vector_type)
+  return v[i];
+#else  
   double4_u uc = {.v = v};
   return uc.a[i];
+#endif
 }
 
 
 static inline double3
 vd3_set(double x, double y, double z)
 {
+#if __has_feature(attribute_ext_vector_type)
+  double3 v = {x, y, z};
+  return v;
+#else
   double3_u uc = {.a = {x,y,z,0.0}};
   return uc.v;
+#endif
 }
 static inline double4
 vd4_set(double x, double y, double z, double w)
 {
+#if __has_feature(attribute_ext_vector_type)
+  double4 v = {x, y, z, w};
+  return v;
+#else
   double4_u uc = {.a = {x,y,z,w}};
   return uc.v;
+#endif
 }
 
 static inline float
@@ -99,6 +191,15 @@ vf3_abs(float3 v)
   float3 res = v * v;
   return sqrt(vf3_get(res, 0) + vf3_get(res, 1) + vf3_get(res, 2));
 }
+
+static inline float
+vf4_abs(float4 v)
+{
+  float4 res = v * v;
+  return sqrt(vf4_get(res, 0) + vf4_get(res, 1) + vf4_get(res, 2) + vf4_get(res, 3));
+}
+  
+
 static inline double
 vd3_abs(double3 v)
 {
@@ -145,7 +246,7 @@ vd4_neg(double4 v)
 }
 
 
-vector_t v_neg(vector_t v) __attribute__((__pure__));
+float4 v_neg(float4 v) __attribute__((__pure__));
 
 static inline float
 vf3_dot(float3 a, float3 b)
@@ -187,13 +288,13 @@ vd4_dot(double3 a, double3 b)
 
 
 
-scalar_t v_dot(const vector_t a, const vector_t b)
+float vf3_dot(float3 a, float3 b)
     __attribute__ ((__pure__));
 
 
-vector_t m_v_mul(const matrix_t *a, const vector_t v);
+float4 m_v_mul(const matrix_t *a, float4 v);
+float3 m_v3_mulf(const matrix_t *a, float3 v);
 
-    
 void m_transpose(matrix_t *mt, const matrix_t *m) __attribute__ ((__nonnull__));
 
 
@@ -203,28 +304,28 @@ void m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
 void m_add(matrix_t *res, matrix_t *a, matrix_t *b)
     __attribute__ ((__nonnull__));
 
-vector_t v_s_add(vector_t a, scalar_t b);
+float4 v_s_add(float4 a, float b);
 
-vector_t v_add(vector_t a, const vector_t b)
+float4 v_add(float4 a, float4 b)
     __attribute__ ((__pure__));
 
 
-vector_t v_sub(vector_t a, const vector_t b)
+float4 v_sub(float4 a, float4 b)
     __attribute__ ((__pure__));
 
 
-vector_t v_s_mul(vector_t a, scalar_t s)
+float4 v_s_mul(float4 a, float s)
     __attribute__ ((__pure__));
 
 
-vector_t v_s_div(vector_t a, scalar_t s)
+float4 v_s_div(float4 a, float s)
     __attribute__ ((__pure__));
 
 
 static inline float3
 vf3_s_add(float3 a, float b)
 {
-  float4 bv = vf4_set(b,b,b,0.0f);
+  float3 bv = vf3_set(b,b,b);
   return a + bv;
 }
 
@@ -300,16 +401,23 @@ vd3_sub(double3 a, double3 b)
 }
 
 static inline float3
+vf3_mul(float3 a, float3 b)
+{
+  return a * b;
+}
+  
+  
+static inline float3
 vf3_s_mul(float3 a, float b)
 {
-  float4 bv = vf4_set(b,b,b,1.0f);
+  float3 bv = vf3_set(b,b,b);
   return a * bv;
 }
 
 static inline double3
 vd3_s_mul(double3 a, double b)
 {
-  double4 bv = vd3_set(b,b,b);
+  double3 bv = vd3_set(b,b,b);
   return a * bv;
 }
 
@@ -324,14 +432,14 @@ vf4_s_mul(float4 a, float b)
 static inline float3
 vf3_s_div(float3 a, float b)
 {
-  float4 bv = vf4_set(b,b,b,1.0f);
+  float3 bv = vf3_set(b,b,b);
   return a / bv;
 }
 
 static inline double3
 vd3_s_div(double3 a, double b)
 {
-  double4 bv = vd4_set(b,b,b,1.0f);
+  double3 bv = vd3_set(b,b,b);
   return a / bv;
 }
 
@@ -354,31 +462,30 @@ vd3_abs_c(double3 a)
 
 /* This is really a 3d x product */
     
-vector_t v_cross(vector_t a, vector_t b)
+float3 v_cross(float3 a, float3 b)
     __attribute__ ((__pure__));
     
-vector_t v_normalise(vector_t v) __attribute__ ((__pure__));
+float4 v_normalise(float4 v) __attribute__ ((__pure__));
     
- scalar_t v_abs(const vector_t v)
+ float v_abs(const float4 v)
     __attribute__ ((__pure__));
 
 /*! Compute determinant of 4x4 matrix M */
-scalar_t m_det(const matrix_t *M);
+float m_det(const matrix_t *M);
 /*! Compute subdet with respect to position k, l */
-scalar_t m_subdet3(const matrix_t *M, int k, int l);
+float m_subdet3(const matrix_t *M, int k, int l);
 
 /*! Compute inverse of 4x4 matrix M */
 matrix_t m_inv(const matrix_t *M);
 
-
 /* creates rotation matrices, these are untested and might not work */
-void m_axis_rot_x(matrix_t *m, scalar_t a) __attribute__ ((__nonnull__));
-void m_axis_rot_y(matrix_t *m, scalar_t a) __attribute__ ((__nonnull__));
-void m_axis_rot_z(matrix_t *m, scalar_t a) __attribute__ ((__nonnull__));
+void m_axis_rot_x(matrix_t *m, float a) __attribute__ ((__nonnull__));
+void m_axis_rot_y(matrix_t *m, float a) __attribute__ ((__nonnull__));
+void m_axis_rot_z(matrix_t *m, float a) __attribute__ ((__nonnull__));
 
-void m_vec_rot_x(matrix_t *m, scalar_t a) __attribute__ ((__nonnull__));
-void m_vec_rot_y(matrix_t *m, scalar_t a) __attribute__ ((__nonnull__));
-void m_vec_rot_z(matrix_t *m, scalar_t a) __attribute__ ((__nonnull__));
+void m_vec_rot_x(matrix_t *m, float a) __attribute__ ((__nonnull__));
+void m_vec_rot_y(matrix_t *m, float a) __attribute__ ((__nonnull__));
+void m_vec_rot_z(matrix_t *m, float a) __attribute__ ((__nonnull__));
 
 
 
@@ -393,25 +500,21 @@ void m_zero(matrix_t *m) __attribute__ ((__nonnull__));
 /* copying functions for duplicating matrices and vectors */    
 void m_cpy(matrix_t * restrict dst, matrix_t * restrict src) __attribute__ ((__nonnull__));
 
-vector_t
-v_set(scalar_t v0, scalar_t v1, scalar_t v2, scalar_t v3)
-    __attribute__ ((__pure__));
-
 
 /* Comparative functions */
 /*! Compares two vectors for elementvise equality, with a given absolute
  *  tolerance */
      
-bool v_eq(vector_t a, vector_t b, scalar_t tol)
+bool v_eq(float4 a, float4 b, float tol)
     __attribute__ ((__pure__));
 
 /*! Compares two matrices for elementvise equality, with a given absolute
  *  tolerance */
-bool m_eq(const matrix_t *a, const matrix_t *b, scalar_t tol)
+bool m_eq(const matrix_t *a, const matrix_t *b, float tol)
     __attribute__ ((__pure__, __nonnull__));
 
 
-void m_translate(matrix_t *m, scalar_t x, scalar_t y, scalar_t z, scalar_t w);
+void m_translate(matrix_t *m, float x, float y, float z, float w);
 
 static inline float3
 vf3_normalise(float3 v)

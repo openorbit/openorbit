@@ -65,10 +65,9 @@ planet_add(float x, float y, float z, float radius, float mass, const char *tex_
     gluQuadricNormals(gPlanets[planet_count].quadratic, GLU_SMOOTH);
     gluQuadricTexture(gPlanets[planet_count].quadratic, GL_TRUE);
     // Assume this will work...
-    gPlanets[planet_count].pos.x = x;
-    gPlanets[planet_count].pos.y = y;
-    gPlanets[planet_count].pos.z = z;
-    gPlanets[planet_count].pos.w = 1.0;
+    vf3_set_x(&gPlanets[planet_count].pos, x);
+    vf3_set_y(&gPlanets[planet_count].pos, y);
+    vf3_set_z(&gPlanets[planet_count].pos, z);
 
     Q_ROT_X(gPlanets[planet_count].rot_ax, DEG_TO_RAD(-90.0f));
     Q_ROT_X(gPlanets[planet_count].rot_orig, DEG_TO_RAD(0.0f));
@@ -119,7 +118,7 @@ planet_draw(planet_t *planet)
     q_m_convert(&rot_ax, planet->rot_ax);
     
     glMultMatrixf((GLfloat*)rot_orig.a);
-    glTranslatef(planet->pos.x, planet->pos.y, planet->pos.z );
+    glTranslatef(vf3_x(planet->pos), vf3_y(planet->pos), vf3_z(planet->pos) );
     glMultMatrixf((GLfloat*)rot_ax.a);
     
     gluSphere(planet->quadratic, planet->radius, 64, 64);

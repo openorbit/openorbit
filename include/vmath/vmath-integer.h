@@ -5,7 +5,7 @@ static inline int16_t
 v3s_get(short3 s, int i)
 {
   union {
-    int16_t a[4];
+    int16_t a[3];
     short3 v;
   } u;
   u.v = s;
@@ -16,7 +16,7 @@ static inline int32_t
 v3i_get(int3 s, int i)
 {
   union {
-    int32_t a[4];
+    int32_t a[3];
     int3 v;
   } u;
   u.v = s;
@@ -27,7 +27,7 @@ static inline int64_t
 v3l_get(long3 s, int i)
 {
   union {
-    int64_t a[4];
+    int64_t a[3];
     long3 v;
   } u;
   u.v = s;

@@ -163,10 +163,10 @@ ooScStageStep(OOspacecraft *sc, OOstage *stage) {
         engine->state == OO_Engine_Fault_Open)
     {
       dBodyAddRelForceAtRelPos(sc->body,
-                               engine->dir.x * engine->forceMag,
-                               engine->dir.y * engine->forceMag,
-                               engine->dir.z * engine->forceMag,
-                               engine->p.x, engine->p.y, engine->p.z);
+                               vf3_x(engine->dir) * engine->forceMag,
+                               vf3_y(engine->dir) * engine->forceMag,
+                               vf3_z(engine->dir) * engine->forceMag,
+                               vf3_x(engine->p), vf3_y(engine->p), vf3_z(engine->p));
     }
   }
 }
@@ -186,8 +186,8 @@ ooScNewEngine(OOspacecraft *sc,
   engine->sc = sc;
   engine->state = OO_Engine_Disabled;
   engine->forceMag = f;
-  engine->p.v = v3f_make(x, y, z);
-  engine->dir.v = v3f_make(dx, dy, dz);
+  engine->p = vf3_set(x, y, z);
+  engine->dir = vf3_set(dx, dy, dz);
 
   return engine;
 }

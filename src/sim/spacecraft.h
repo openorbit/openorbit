@@ -87,10 +87,10 @@ typedef struct OOengine {
   OOenginetype kind;
   OOspacecraft *sc;
   OOenginestate state;
-  vector_t p;
+  float3 p;
   float forceMag; //!< Newton
   float throttle; //!< Percentage of force magnitude to apply
-  vector_t dir; //!< Unit vector with direction of thruster
+  float3 dir; //!< Unit vector with direction of thruster
 } OOengine;
 
 typedef OOengine OOthruster;
@@ -103,7 +103,7 @@ typedef struct OOtorquer {
   OOspacecraft *sc;
   OOtorquerstate state;
   float torque; //!< Nm
-  vector_t torqueAxis; //!< Unit vector around which the torque is to be applied
+  float3 torqueAxis; //!< Unit vector around which the torque is to be applied
 } OOtorquer;
 
 void ooScDetatchStage(OOspacecraft *sc);

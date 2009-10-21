@@ -24,12 +24,25 @@
 #include "common/lwcoord.h"
 #include "rendering/scenegraph.h"
 
+#ifndef __has_feature
+#define __has_feature(x) 0  // Compatibility with non-clang compilers.
+#endif
+
+
+#if __has_feature(attribute_ext_vector_type)
+typedef float __attribute__((ext_vector_type (4))) PLfloat3;
+typedef double __attribute__((ext_vector_type (4))) PLdouble3;
+typedef int64_t __attribute__((ext_vector_type (4))) PLlong3;
+typedef int32_t __attribute__((ext_vector_type (4))) PLint3;
+typedef int16_t __attribute__((ext_vector_type (4))) PLshort3;
+#else
 typedef float __attribute__((vector_size (16))) PLfloat3;
 typedef double __attribute__((vector_size (32))) PLdouble3;
 typedef int64_t __attribute__((vector_size (32))) PLlong3;
 typedef int32_t __attribute__((vector_size (16))) PLint3;
 typedef int16_t __attribute__((vector_size (8))) PLshort3;
 
+#endif
 
 // We cannot cope with the precision issues without subdividing the universe
 // If we take 1.0 Tm side boxes, we can maintain decent double precision units and still

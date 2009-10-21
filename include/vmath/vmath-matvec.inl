@@ -24,25 +24,13 @@ might be more architectural specialised files further down from here
 #ifndef VM_V4_NEG
 #define VM_V4_NEG
 
-static inline vector_t
-v_neg(vector_t v)
+static inline float3
+v_neg(float3 v)
 {
-  vector_t nv = {.v = -v.v};
-    return nv;
+  float3 nv = -v;
+  return nv;
 }
 #endif /* VM_V4_NEG */
-
-#ifndef VM_V4_DOT
-#define VM_V4_DOT
-
-static inline scalar_t
-v_dot(vector_t a, vector_t b) {
-	vector_t vres;
-    vres.v = a.v * b.v;
-    return vres.x + vres.y + vres.z + vres.w;
-}
-
-#endif /* VM_V4_DOT */
 
 
 #ifndef VM_M4_MUL
@@ -55,7 +43,7 @@ m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
     m_transpose(&bT, b);
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0; j < 4 ; j ++) {
-            tmp_res.a[i][j] = v_dot((vector_t)a->v[i], (vector_t)bT.v[j]);
+            tmp_res.a[i][j] = vf4_dot(a->v[i], bT.v[j]);
         }
     }
     *res = tmp_res;
@@ -65,20 +53,20 @@ m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
 #ifndef VM_M4_V4_MUL
 #define VM_M4_V4_MUL
 
-static inline vector_t
-m_v_mul(const matrix_t *a, const vector_t v)
+static inline float3
+m_v_mul(const matrix_t *a, float3 v)
 {
-	vector_t vr;
+	float3 vr;
 	matrix_t p;
-    p.v[0] = a->v[0] * v.v;
-    p.v[1] = a->v[1] * v.v;
-    p.v[2] = a->v[2] * v.v;
-    p.v[3] = a->v[3] * v.v;
+  p.v[0] = a->v[0] * v;
+  p.v[1] = a->v[1] * v;
+  p.v[2] = a->v[2] * v;
+  p.v[3] = a->v[3] * v;
     
-    vr.x = p.a[0][0] + p.a[0][1] + p.a[0][2] + p.a[0][3];
-    vr.y = p.a[1][0] + p.a[1][1] + p.a[1][2] + p.a[1][3];
-    vr.z = p.a[2][0] + p.a[2][1] + p.a[2][2] + p.a[2][3];
-    vr.w = p.a[3][0] + p.a[3][1] + p.a[3][2] + p.a[3][3];
+  vr.x = p.a[0][0] + p.a[0][1] + p.a[0][2] + p.a[0][3];
+  vr.y = p.a[1][0] + p.a[1][1] + p.a[1][2] + p.a[1][3];
+  vr.z = p.a[2][0] + p.a[2][1] + p.a[2][2] + p.a[2][3];
+  vr.w = p.a[3][0] + p.a[3][1] + p.a[3][2] + p.a[3][3];
 
 	return vr;
 }

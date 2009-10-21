@@ -42,12 +42,12 @@ extern "C" {
 #define QUAT_W(q) (q)[Q_W]
 
     
- scalar_t q_scalar(const quaternion_t q)
+ float q_scalar(const quaternion_t q)
     __attribute__ ((__pure__));
 
 
-vector_t q_vector(const quaternion_t q);
-vector_t v_q_rot(vector_t v, quaternion_t q);
+float3 q_vector(const quaternion_t q);
+float3 v_q_rot(float3 v, quaternion_t q);
 
 
 /*!
@@ -76,8 +76,7 @@ void q_m_convert(matrix_t *m, const quaternion_t q)
  * \param m The rotational matrix.
  */
 
-void m_q_convert(quaternion_t q, matrix_t *m) __attribute__ ((__nonnull__));
-
+quaternion_t m_q_convert(matrix_t *m) __attribute__ ((__nonnull__));
     
  quaternion_t q_add(const quaternion_t a, const quaternion_t b);
 
@@ -86,17 +85,17 @@ quaternion_t
 q_mul(const quaternion_t a, const quaternion_t b);
     
     
-quaternion_t q_s_div(const quaternion_t q, const scalar_t d);
+quaternion_t q_s_div(const quaternion_t q, float d);
 
 
- scalar_t q_dot(const quaternion_t a, const quaternion_t b)
+ float q_dot(quaternion_t a, quaternion_t b)
     __attribute__ ((__pure__));
 
     
- vector_t q_cross(const quaternion_t a, const quaternion_t b);
+ float3 q_cross(const quaternion_t a, const quaternion_t b);
 
     
- scalar_t q_abs(const quaternion_t q);
+ float q_abs(const quaternion_t q);
 
     
 quaternion_t
@@ -118,30 +117,30 @@ quaternion_t q_div(const quaternion_t a, const quaternion_t b);
  * \param axis  A unit vector describing the axis of rotation 
  * \param alpha Rotation in radians.
 */
-quaternion_t q_rotv(const quaternion_t axis, const angle_t alpha);
+quaternion_t q_rotv(float3 axis, float alpha);
 
 quaternion_t
-q_rot(scalar_t x, scalar_t y, scalar_t z, scalar_t alpha);
+q_rot(float x, float y, float z, float alpha);
 
 #define Q_ROT_X(q, r)                                           \
     do {                                                        \
-        vector_t _v = {.a = {S_CONST(1.0), S_CONST(0.0),        \
-                             S_CONST(0.0), S_CONST(1.0)}};      \
+        float3 _v = {S_CONST(1.0), S_CONST(0.0),        \
+                     S_CONST(0.0)};      \
         (q) = q_rotv(_v, r);                                    \
     } while (0)
 
 #define Q_ROT_Y(q, r)                                           \
     do {                                                        \
-        vector_t _v = {.a = {S_CONST(0.0), S_CONST(1.0),        \
-                             S_CONST(0.0), S_CONST(1.0)}};      \
+        float3 _v = {S_CONST(0.0), S_CONST(1.0),        \
+                    S_CONST(0.0)};      \
         (q) = q_rotv(_v, r);                                    \
     } while (0)
 
 
 #define Q_ROT_Z(q, r)                                           \
     do {                                                        \
-        vector_t _v = {.a = {S_CONST(0.0), S_CONST(0.0),        \
-                             S_CONST(1.0), S_CONST(1.0)}};      \
+        float3 _v = {S_CONST(0.0), S_CONST(0.0),        \
+                    S_CONST(1.0)};      \
         (q) = q_rotv(_v, r);                                    \
     } while (0)
 

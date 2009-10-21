@@ -94,7 +94,7 @@ ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
 //  ((OOfreecam*)cam->camData)->p = v_set(x,y,z,1.0f);
   ((OOfreecam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
 
-  ((OOfreecam*)cam->camData)->dp = v_set(0.0,0.0,0.0,1.0f);
+  ((OOfreecam*)cam->camData)->dp = vf3_set(0.0,0.0,0.0);
   ((OOfreecam*)cam->camData)->dq = q_rot(rx,ry,rz, 0.0f);
 
   ooLwcSet(&((OOfreecam*)cam->camData)->lwc, x, y, z);
@@ -113,7 +113,7 @@ ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
 
     cam->scene = sc;
     ((OOfixedcam*)cam->camData)->body = body;
-    ((OOfixedcam*)cam->camData)->r = v_set(dx,dy,dz,1.0f);
+    ((OOfixedcam*)cam->camData)->r = vf3_set(dx,dy,dz);
     ((OOfixedcam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
 
     ooObjVecPush(&sg->cams, cam);
@@ -129,7 +129,7 @@ ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body, float dx, float dy,
 
     cam->scene = sc;
     ((OOorbitcam*)cam->camData)->body = body;
-    ((OOorbitcam*)cam->camData)->r = v_set(dx,dy,dz,1.0f);
+    ((OOorbitcam*)cam->camData)->r = vf3_set(dx,dy,dz);
 
     ooObjVecPush(&sg->cams, cam);
     return cam;
@@ -147,9 +147,9 @@ ooSgCamRotate(OOcam *cam)
     {
       const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
       //const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
-      gluLookAt(  ((OOorbitcam*)cam->camData)->r.x + pos[0],
-                ((OOorbitcam*)cam->camData)->r.y + pos[1],
-                ((OOorbitcam*)cam->camData)->r.x + pos[2],
+      gluLookAt(  vf3_x(((OOorbitcam*)cam->camData)->r) + pos[0],
+                vf3_y(((OOorbitcam*)cam->camData)->r) + pos[1],
+                vf3_z(((OOorbitcam*)cam->camData)->r) + pos[2],
                 pos[0], pos[1], pos[2], // center
                   0.0, 1.0, 0.0); // up
     }
@@ -158,7 +158,7 @@ ooSgCamRotate(OOcam *cam)
     {
       OOfixedcam* fix = cam->camData;
       const dReal *quat = dBodyGetQuaternion(fix->body);
-      quaternion_t q = v_set(quat[1], quat[2], quat[3], quat[0]);
+      quaternion_t q = vf4_set(quat[1], quat[2], quat[3], quat[0]);
       q = q_mul(q, fix->q);
       matrix_t m;
       q_m_convert(&m, q);
@@ -193,7 +193,7 @@ ooSgCamStep(OOcam *cam, float dt)
     {
       ooSgCamAxisUpdate(cam);
 
-      ooLwcTranslate(&((OOfreecam*)cam->camData)->lwc, ((OOfreecam*)cam->camData)->dp.v);
+      ooLwcTranslate(&((OOfreecam*)cam->camData)->lwc, ((OOfreecam*)cam->camData)->dp);
       ((OOfreecam*)cam->camData)->q = q_mul(((OOfreecam*)cam->camData)->q,
                                             ((OOfreecam*)cam->camData)->dq);
     }
@@ -220,14 +220,14 @@ ooSgCamMove(OOcam *cam)
       OOfixedcam* fix = cam->camData;
       const dReal *pos = dBodyGetPosition(fix->body);
       const dReal *quat = dBodyGetQuaternion(fix->body);
-      vector_t p = v_set(pos[0], pos[1], pos[2], 0.0);
-      p = v_add(p, fix->r);
-      quaternion_t q = v_set(quat[1], quat[2], quat[3], quat[0]);
+      float3 p = vf3_set(pos[0], pos[1], pos[2]);
+      p = vf3_add(p, fix->r);
+      quaternion_t q = vf4_set(quat[1], quat[2], quat[3], quat[0]);
       q = q_mul(q, fix->q);
       matrix_t m;
       q_m_convert(&m, q);
       glMultMatrixf((GLfloat*)&m);
-      glTranslatef(-p.x, -p.y, -p.z);
+      glTranslatef(-vf3_x(p), -vf3_y(p), -vf3_z(p));
     }
     break;
   case OOCam_Free:
@@ -268,7 +268,7 @@ ooSgCamAxisUpdate(OOcam *cam)
 
     //fprintf(stderr, "%f %f %f: %f %f\n", yaw, pitch, roll, horizontal, vertical);
     //if (horizontal != 0.0 || vertical != 0.0) {
-      vector_t v = v_set(10000.0 * horizontal, -10000.0 * vertical, 0.0, 0.0);
+      float3 v = vf3_set(10000.0 * horizontal, -10000.0 * vertical, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
     //}
     //if (yaw != 0.0 || roll != 0.0 || roll != 0.0) {
@@ -286,9 +286,9 @@ ooSgCamFwd(bool up, void *data)
   if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
     OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
     if (up) {
-      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     } else {
-      vector_t v = v_set(0.0, 0.0, -10000.0, 0.0);
+      float3 v = vf3_set(0.0, 0.0, -10000.0);
       fcam->dp = v_q_rot(v, fcam->q);
     }
   }
@@ -300,9 +300,9 @@ ooSgCamBack(bool up, void *data)
   if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
     OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
     if (up) {
-      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     } else {
-      vector_t v = v_set(0.0, 0.0, 10000.0, 0.0);
+      float3 v = vf3_set(0.0, 0.0, 10000.0);
       fcam->dp = v_q_rot(v, fcam->q);
     }
   }
@@ -313,9 +313,9 @@ ooSgCamLeft(bool up, void *data)
   if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
     OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
     if (up) {
-      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     } else {
-      vector_t v = v_set(-10000.0, 0.0, 0.0, 0.0);
+      float3 v = vf3_set(-10000.0, 0.0, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
     }
   }
@@ -326,9 +326,9 @@ ooSgCamRight(bool up, void *data)
   if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
     OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
     if (up) {
-      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     } else {
-      vector_t v = v_set(10000.0, 0.0, 0.0, 0.0);
+      float3 v = vf3_set(10000.0, 0.0, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
     }
   }
@@ -339,9 +339,9 @@ ooSgCamUp(bool up, void *data)
   if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
     OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
     if (up) {
-      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     } else {
-      vector_t v = v_set(0.0, 10000.0, 0.0, 0.0);
+      float3 v = vf3_set(0.0, 10000.0, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
     }
   }
@@ -352,9 +352,9 @@ ooSgCamDown(bool up, void *data)
   if (gSIM_state.sg->currentCam->kind == OOCam_Free) {
     OOfreecam *fcam = gSIM_state.sg->currentCam->camData;
     if (up) {
-      fcam->dp = v_set(0.0, 0.0, 0.0, 0.0);
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     } else {
-      vector_t v = v_set(0.0, -10000.0, 0.0, 0.0);
+      float3 v = vf3_set(0.0, -10000.0, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
     }
   }

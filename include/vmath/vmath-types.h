@@ -30,29 +30,98 @@ extern "C" {
 #endif 
 #include <stdint.h>
 
+#ifndef __has_feature
+#define __has_feature(x) 0  // Compatibility with non-clang compilers.
+#endif
+
 /* SIMD-friendly 4 element-vectors */
 /* all functions take restricted pointers as arguments */
 
 /*************** Basic types ****************/
-typedef float scalar_t;
 
 typedef float vec_arr_t[4];
 
-typedef float __attribute__((vector_size (16))) float3;
-typedef float __attribute__((vector_size (16))) float4;
-typedef float __attribute__((vector_size (64))) float16;
+#if __has_feature(attribute_ext_vector_type)
+  typedef float __attribute__((ext_vector_type (4))) float3;
+  typedef float __attribute__((ext_vector_type (4))) float4;
+  typedef float __attribute__((ext_vector_type (16))) float16;
+  
+  typedef float3 float3x3[4];
+  typedef float4 float4x4[4];
+  typedef double __attribute__((ext_vector_type (4))) double3;
+  typedef double __attribute__((ext_vector_type (4))) double4;
+  typedef double __attribute__((ext_vector_type (16))) double16;
+  
+  typedef int16_t __attribute__((ext_vector_type (4))) short3;
+  typedef int16_t __attribute__((ext_vector_type (4))) short4;
+  typedef uint16_t __attribute__((ext_vector_type (4))) ushort3;
+  typedef uint16_t __attribute__((ext_vector_type (4))) ushort4;
+  typedef int32_t __attribute__((ext_vector_type (4))) int3;
+  typedef int32_t __attribute__((ext_vector_type (4))) int4;
+  typedef uint32_t __attribute__((ext_vector_type (4))) uint3;
+  typedef uint32_t __attribute__((ext_vector_type (4))) uint4;
+  typedef int64_t __attribute__((ext_vector_type (4))) long3;
+  typedef int64_t __attribute__((ext_vector_type (4))) long4;
+  typedef uint64_t __attribute__((ext_vector_type (4))) ulong3;
+  typedef uint64_t __attribute__((ext_vector_type (4))) ulong4;
+  
+  typedef double3 double3x3[3];
+  typedef double4 double4x4[4];
+  
+  typedef float __attribute__((ext_vector_type (4))) v4f_t;
+  typedef float __attribute__((ext_vector_type (16))) m4f_t;
+  
+  
+  typedef float __attribute__((ext_vector_type (4))) quaternion_t;
 
-typedef float3 float3x3[4];
-typedef float4 float4x4[4];
+  
+#else
+  typedef float __attribute__((vector_size (16))) float3;
+  typedef float __attribute__((vector_size (16))) float4;
+  typedef float __attribute__((vector_size (64))) float16;
+  
+  typedef float3 float3x3[4];
+  typedef float4 float4x4[4];
+  typedef double __attribute__((vector_size (32))) double3;
+  typedef double __attribute__((vector_size (32))) double4;
+  typedef double __attribute__((vector_size (128))) double16;
+  
+  typedef int16_t __attribute__((vector_size (8))) short3;
+  typedef int16_t __attribute__((vector_size (8))) short4;
+  typedef uint16_t __attribute__((vector_size (8))) ushort3;
+  typedef uint16_t __attribute__((vector_size (8))) ushort4;
+  typedef int32_t __attribute__((vector_size (16))) int3;
+  typedef int32_t __attribute__((vector_size (16))) int4;
+  typedef uint32_t __attribute__((vector_size (16))) uint3;
+  typedef uint32_t __attribute__((vector_size (16))) uint4;
+  typedef int64_t __attribute__((vector_size (32))) long3;
+  typedef int64_t __attribute__((vector_size (32))) long4;
+  typedef uint64_t __attribute__((vector_size (32))) ulong3;
+  typedef uint64_t __attribute__((vector_size (32))) ulong4;
+  
+  typedef double3 double3x3[4];
+  typedef double4 double4x4[4];
+  
+  typedef float __attribute__((vector_size (16))) v4f_t;
+  typedef float __attribute__((vector_size (64))) m4f_t;
+  typedef float __attribute__((vector_size (16))) quaternion_t;
+
+#endif
 
 typedef union float3_u {
   float3 v;
   float a[4];
+  struct {
+    float x, y, z;
+  } s;
 } float3_u;
 
 typedef union float4_u {
   float4 v;
   float a[4];
+  struct {
+    float x, y, z, w;
+  } s;
 } float4_u;
 
 typedef union float4x4_u {
@@ -65,26 +134,6 @@ typedef union float16_u {
   float a[16];
 } float16_u;
 
-
-typedef double __attribute__((vector_size (32))) double3;
-typedef double __attribute__((vector_size (32))) double4;
-typedef double __attribute__((vector_size (128))) double16;
-
-typedef int16_t __attribute__((vector_size (8))) short3;
-typedef int16_t __attribute__((vector_size (8))) short4;
-typedef uint16_t __attribute__((vector_size (8))) ushort3;
-typedef uint16_t __attribute__((vector_size (8))) ushort4;
-typedef int32_t __attribute__((vector_size (16))) int3;
-typedef int32_t __attribute__((vector_size (16))) int4;
-typedef uint32_t __attribute__((vector_size (16))) uint3;
-typedef uint32_t __attribute__((vector_size (16))) uint4;
-typedef int64_t __attribute__((vector_size (32))) long3;
-typedef int64_t __attribute__((vector_size (32))) long4;
-typedef uint64_t __attribute__((vector_size (32))) ulong3;
-typedef uint64_t __attribute__((vector_size (32))) ulong4;
-
-typedef double3 double3x3[4];
-typedef double4 double4x4[4];
 
 typedef union double3_u {
   double3 v;
@@ -108,20 +157,7 @@ typedef union double16_u {
 } double16_u;
 
 
-typedef float __attribute__((vector_size (16))) v4f_t;
-typedef float __attribute__((vector_size (64))) m4f_t;
-
 typedef float ma4_t[4][4];
-
-
-
-typedef union {
-    vec_arr_t a;
-    struct {
-        scalar_t x, y, z, w;
-    };
-    v4f_t v;
-} vector_t;
 
 typedef float mat_arr_t[4][4];
 
@@ -134,43 +170,35 @@ typedef union {
 
 #define MAT_ELEM(M, i, j) ((M).a[i][j])
 
-/************** Derived types ****************/
-/*!
- * \brief A quaternion
- * 
- * The quaternion_t type is an overlay of the vector type. It is to be
- * compatible with the vector_t type in most situations. The layout of the
- * quaternion_t type is an array of either floats or doubles (depending on
- * build settings), named x, y, z and w where [x, y, z] is the vectorial part
- * and w the scalar part of the quaternion.
- */
-
-typedef vector_t quaternion_t;
-
-typedef vec_arr_t axis_arr_t;
-typedef vector_t axis_t;
-typedef scalar_t angle_t;
-
 static inline float4
 v4f_make(float x, float y, float z, float w)
 {
-  vector_t v;
-  v.x = x;
-  v.y = y;
-  v.z = z;
-  v.w = w;
+#if __has_feature(attribute_ext_vector_type)
+  float4 v = { x, y, z, w };
+  return v;
+#else
+  float4_u v;
+  v.a[0] = x;
+  v.a[1] = y;
+  v.a[2] = z;
+  v.a[3] = 0.0;
   return v.v;
+#endif
 }
 
 static inline float3
 v3f_make(float x, float y, float z)
 {
-  vector_t v;
-  v.x = x;
-  v.y = y;
-  v.z = z;
-  v.w = 0.0;
+#if __has_feature(attribute_ext_vector_type)
+  float3 v = { x, y, z };
+  return v;
+#else
+  float3_u v;
+  v.a[0] = x;
+  v.a[1] = y;
+  v.a[2] = z;
   return v.v;
+#endif
 }
 
 static inline int3

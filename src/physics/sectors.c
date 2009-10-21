@@ -19,22 +19,6 @@
 
 #include "physics.h"
 #include "common/lwcoord.h"
-#define OFFS_X(c) (((float*)&(c)->offs)[0])
-#define OFFS_Y(c) (((float*)&(c)->offs)[1])
-#define OFFS_Z(c) (((float*)&(c)->offs)[2])
-
-#define SEG_X(c) (((int32_t*)&(c)->seg)[0])
-#define SEG_Y(c) (((int32_t*)&(c)->seg)[1])
-#define SEG_Z(c) (((int32_t*)&(c)->seg)[2])
-
-
-#define OFFS_X64(c) (((double*)&(c)->offs)[0])
-#define OFFS_Y64(c) (((double*)&(c)->offs)[1])
-#define OFFS_Z64(c) (((double*)&(c)->offs)[2])
-
-#define SEG_X64(c) (((int64_t*)&(c)->seg)[0])
-#define SEG_Y64(c) (((int64_t*)&(c)->seg)[1])
-#define SEG_Z64(c) (((int64_t*)&(c)->seg)[2])
 
 void
 plUpdateDrawable(PLobject2 *obj)

@@ -26,51 +26,83 @@
 #include <vmath/vmath-quaternions.h>
 #include <assert.h>
 
-scalar_t
-q_scalar(const quaternion_t q)
+float
+q_scalar(quaternion_t q)
 {
-    return q.w;
+#if __has_feature(attribute_ext_vector_type)
+  return q.w;
+#else
+  float4_u qu = {.v = q};
+  return qu.s.w;
+#endif
 }
 
-vector_t
-v_q_rot(vector_t v, quaternion_t q)
+float3
+v_q_rot(float3 v, quaternion_t q)
 {
   matrix_t m;
   q_m_convert(&m, q);
 
-  vector_t res = m_v_mul(&m, v);
+  float3 res = m_v3_mulf(&m, v);
   return res;
 }
 
-vector_t
-q_vector(const quaternion_t q)
+float3
+q_vector(quaternion_t q)
 {
-    vector_t r = {.a = {q.x, q.y, q.z, 0.0f}};
-    return r;
+#if __has_feature(attribute_ext_vector_type)
+  float3 r = {q.x, q.y, q.z};
+  return r;
+#else
+  float4_u qu = {.v = q};
+  float3_u ru = {.s.x = qu.s.x, .s.y = qu.s.y, .s.z = qu.s.z};
+  return ru.v;
+#endif
+  
 }
 
 void
-q_m_convert(matrix_t *m, const quaternion_t q)
+q_m_convert(matrix_t *m, quaternion_t q)
 {
-    scalar_t n = q_dot(q, q);
-    scalar_t a = (n > 0.0f) ? S_TWO / n : 0.0f;
+    float n = q_dot(q, q);
+    float a = (n > 0.0f) ? S_TWO / n : 0.0f;
     
-    scalar_t xa = q.x*a;
-    scalar_t ya = q.y*a;
-    scalar_t za = q.z*a;
+#if __has_feature(attribute_ext_vector_type)
+    float xa = q.x*a;
+    float ya = q.y*a;
+    float za = q.z*a;
     
-    scalar_t xy = q.x*ya;
-    scalar_t xz = q.x*za;
-    scalar_t yz = q.y*za;
+    float xy = q.x*ya;
+    float xz = q.x*za;
+    float yz = q.y*za;
 
-    scalar_t wx = q.w*xa;
-    scalar_t wy = q.w*ya;
-    scalar_t wz = q.w*za;
+    float wx = q.w*xa;
+    float wy = q.w*ya;
+    float wz = q.w*za;
 
-    scalar_t xx = q.x*xa;
-    scalar_t yy = q.y*ya;
-    scalar_t zz = q.z*za;
-    
+    float xx = q.x*xa;
+    float yy = q.y*ya;
+    float zz = q.z*za;
+#else
+  float4_u qu = { .v = q };
+  float xa = qu.s.x*a;
+  float ya = qu.s.y*a;
+  float za = qu.s.z*a;
+  
+  float xy = qu.s.x*ya;
+  float xz = qu.s.x*za;
+  float yz = qu.s.y*za;
+  
+  float wx = qu.s.w*xa;
+  float wy = qu.s.w*ya;
+  float wz = qu.s.w*za;
+  
+  float xx = qu.s.x*xa;
+  float yy = qu.s.y*ya;
+  float zz = qu.s.z*za;
+  
+#endif
+  
     m->a[0][0] = 1.0f-(yy+zz); m->a[0][1] =        xy-wz;
     m->a[0][2] =        xz+wy;  m->a[0][3] = 0.0f;
     
@@ -116,141 +148,199 @@ q_m_convert(mat_arr_t m, const quat_arr_t q)
 #endif
 
 
-void
-m_q_convert(quaternion_t q, matrix_t *m)
+quaternion_t
+m_q_convert(matrix_t *m)
 {
-    scalar_t tr, s;
-    tr = m->a[0][0] + m->a[1][1] + m->a[2][2];
-    if (tr >= 0.0f) {
-        s = sqrt(tr+m->a[3][3]);
-        q.w = s*S_POINT_FIVE;
-        s = S_POINT_FIVE / s;
-        q.x = (m->a[2][1] - m->a[1][2]) * s;
-        q.y = (m->a[0][2] - m->a[2][0]) * s;
-        q.z = (m->a[1][0] - m->a[0][1]) * s;
-    } else {
-        int h = 0;
-        if (m->a[1][1] > m->a[0][0]) h = 1;
-        if (m->a[2][2] > m->a[h][h]) h = 2;
-        switch (h) {
+#if __has_feature(attribute_ext_vector_type)
+  quaternion_t q;
+#define QX(q) q.x
+#define QY(q) q.y
+#define QZ(q) q.z
+#define QW(q) q.w
+
+#define QIDX(q, i) q[i]
+
+#else
+  float4_u q;
+
+#define QX(q) q.s.x
+#define QY(q) q.s.y
+#define QZ(q) q.s.z
+#define QW(q) q.s.w
+
+#define QIDX(q, i) q.a[i]
+  
+#endif
+
+  float tr, s;
+  tr = m->a[0][0] + m->a[1][1] + m->a[2][2];
+  if (tr >= 0.0f) {
+    s = sqrt(tr+m->a[3][3]);
+    QW(q) = s*S_POINT_FIVE;
+    s = S_POINT_FIVE / s;
+    QX(q) = (m->a[2][1] - m->a[1][2]) * s;
+    QY(q) = (m->a[0][2] - m->a[2][0]) * s;
+    QZ(q) = (m->a[1][0] - m->a[0][1]) * s;
+  } else {
+    int h = 0;
+    if (m->a[1][1] > m->a[0][0]) h = 1;
+    if (m->a[2][2] > m->a[h][h]) h = 2;
+    switch (h) {
 #define CASE_MACRO(i,j,k,I,J,K)                                     \
-        case I:                                                     \
-            s = sqrt( (m->a[I][I] - (m->a[J][J]+m->a[K][K])) + m->a[3][3] );  \
-            q.a[i] = s*0.5f;                                  \
-            q.a[j] = (m->a[I][J] + m->a[J][I]) * s;                         \
-            q.a[k] = (m->a[K][I] + m->a[I][K]) * s;                         \
-            q.w = (m->a[K][J] - m->a[J][K]) * s;                       \
-            break
-        CASE_MACRO(Q_X, Q_Y, Q_Z, 0, 1, 2);
-        CASE_MACRO(Q_Y, Q_Z, Q_X, 1, 2, 0);
-        CASE_MACRO(Q_Z, Q_X, Q_Y, 2, 0, 1);
+    case I:                                                     \
+      s = sqrt( (m->a[I][I] - (m->a[J][J]+m->a[K][K])) + m->a[3][3] );  \
+      QIDX(q, i) = s*0.5f;                                  \
+      QIDX(q, j) = (m->a[I][J] + m->a[J][I]) * s;                         \
+      QIDX(q, k) = (m->a[K][I] + m->a[I][K]) * s;                         \
+      QW(q) = (m->a[K][J] - m->a[J][K]) * s;                       \
+      break
+    CASE_MACRO(Q_X, Q_Y, Q_Z, 0, 1, 2);
+    CASE_MACRO(Q_Y, Q_Z, Q_X, 1, 2, 0);
+    CASE_MACRO(Q_Z, Q_X, Q_Y, 2, 0, 1);
 #undef CASE_MACRO
-        default:
-            assert(0);
-        }
+    default:
+      assert(0);
     }
+  }
     
-    // QUERY: Is the last ref to z correct? 
-    if (m->a[3][3] != 0.0f) {
-        s = 1.0f / sqrt(m->a[3][3]);
-        q.x *= s; q.y *= s; q.z *= s; q.z *= s;
-    }
+  // QUERY: Is the last ref to z correct? 
+  if (m->a[3][3] != 0.0f) {
+    s = 1.0f / sqrt(m->a[3][3]);
+    QX(q) *= s; QY(q) *= s; QZ(q) *= s; //QZ(q) *= s;
+  }
+  
+#undef QX
+#undef QY
+#undef QZ
+#undef QW
+#undef QIDX
 }
 
 
 quaternion_t
 q_add(const quaternion_t a, const quaternion_t b)
 {
- 	return v_add(a, b);
+ 	return vf4_add(a, b);
 }
 
 quaternion_t
 q_mul(const quaternion_t a, const quaternion_t b)
 {
+#if __has_feature(attribute_ext_vector_type)
 	quaternion_t r;
-    r.x = a.x*b.w + a.w*b.x	+ a.y*b.z - a.z*b.y;
-    r.y = a.y*b.w + a.w*b.y	+ a.z*b.x - a.x*b.z;
-    r.z = a.z*b.w + a.w*b.z	+ a.x*b.y - a.y*b.x;
-    r.w = a.w*b.w - a.x*b.x	- a.y*b.y - a.z*b.z;
-    
-    return r;
+  r.x = a.x*b.w + a.w*b.x	+ a.y*b.z - a.z*b.y;
+  r.y = a.y*b.w + a.w*b.y	+ a.z*b.x - a.x*b.z;
+  r.z = a.z*b.w + a.w*b.z	+ a.x*b.y - a.y*b.x;
+  r.w = a.w*b.w - a.x*b.x	- a.y*b.y - a.z*b.z;
+  return r;
+#else
+  float4_u r;
+  float4_u au = {.v = a}, bu = {.v = b};
+  r.s.x = au.s.x*bu.s.w + au.s.w*bu.s.x	+ au.s.y*bu.s.z - au.s.z*bu.s.y;
+  r.s.y = au.s.y*bu.s.w + au.s.w*bu.s.y	+ au.s.z*bu.s.x - au.s.x*bu.s.z;
+  r.s.z = au.s.z*bu.s.w + au.s.w*bu.s.z	+ au.s.x*bu.s.y - au.s.y*bu.s.x;
+  r.s.w = au.s.w*bu.s.w - au.s.x*bu.s.x	- au.s.y*bu.s.y - au.s.z*bu.s.z;
+  return r.v;
+#endif
 }
 
 quaternion_t
-q_s_div(const quaternion_t q, const scalar_t d)
+q_s_div(quaternion_t q, float d)
 {
+#if __has_feature(attribute_ext_vector_type)
 	quaternion_t r;
-    r.x = q.x / d;
-    r.y = q.y / d;
-    r.z = q.z / d;
-    r.w = q.w / d;
-    return r;
+  r.x = q.x / d;
+  r.y = q.y / d;
+  r.z = q.z / d;
+  r.w = q.w / d;
+  return r;
+#else
+  float di = 1.0f / d;
+  float4_u dvi = {.s.x = di, .s.y = di, .s.z = di, .s.w = di};
+  quaternion_t r = q * dvi.v;
+  return r;  
+#endif
 }
 
- scalar_t
-q_dot(const quaternion_t a, const quaternion_t b)
+float
+q_dot(quaternion_t a, quaternion_t b)
 {
-    return v_dot(a, b);
+    return vf4_dot(a, b);
 }
 
-vector_t
+float3
 q_cross(const quaternion_t a, const quaternion_t b)
 {
-    return v_cross(a, b);
+    return v_cross(q_vector(a), q_vector(b));
 }
 
-scalar_t
-q_abs(const quaternion_t q)
+float
+q_abs(quaternion_t q)
 {
-    return v_abs(q);
+  return v_abs(q);
 }
 
 quaternion_t
 q_conj(const quaternion_t q)
 {
-	quaternion_t qp = {.a = {-q.x, -q.y, -q.z, q.w}};
-    return qp;
+#if __has_feature(attribute_ext_vector_type)
+	quaternion_t qp = {-q.x, -q.y, -q.z, q.w};
+  return qp;
+#else
+  float4_u qu = {.v = q};
+	float4_u qp = {.s.x = -qu.s.x, .s.y = -qu.s.y, .s.z = -qu.s.z, .s.w = qu.s.w};
+  return qp.v;  
+#endif
 }
 
 quaternion_t
 q_repr(const quaternion_t q)
 {
 	quaternion_t res;
-    quaternion_t qp;
-    qp = q_conj(q);
-    scalar_t d = q_dot(q, q);
-    res = q_s_div(qp, d);
+  quaternion_t qp;
+  qp = q_conj(q);
+  float d = q_dot(q, q);
+  res = q_s_div(qp, d);
 	return res;
 }
 
 quaternion_t
-q_div(const quaternion_t a, const quaternion_t b)
+q_div(quaternion_t a, quaternion_t b)
 {
 	quaternion_t res;
-    quaternion_t br;
-    br = q_repr(b);
+  quaternion_t br;
+  br = q_repr(b);
     
 	res = q_mul(a, br);
 	return res;
 }
 
 quaternion_t
-q_rotv(const vector_t axis, const angle_t alpha)
+q_rotv(float3 axis, float alpha)
 {
 	quaternion_t q;
-    scalar_t Omega = alpha * S_POINT_FIVE;
-    scalar_t sin_Omega = sin(Omega);
-    q.x = axis.x * sin_Omega;
-    q.y = axis.y * sin_Omega;
-    q.z = axis.z * sin_Omega;
-    q.w = cos(Omega);
-
+  float Omega = alpha * S_POINT_FIVE;
+  float sin_Omega = sin(Omega);
+#if __has_feature(attribute_ext_vector_type)
+  q.x = axis.x * sin_Omega;
+  q.y = axis.y * sin_Omega;
+  q.z = axis.z * sin_Omega;
+  q.w = cos(Omega);
+#else
+  float4_u qu;
+  float3_u axisu = { .v = axis };
+  qu.s.x = axisu.s.x * sin_Omega;
+  qu.s.y = axisu.s.y * sin_Omega;
+  qu.s.z = axisu.s.z * sin_Omega;
+  qu.s.w = cos(Omega);
+  q = qu.v;
+#endif
 	return q;
 }
 quaternion_t
-q_rot(scalar_t x, scalar_t y, scalar_t z, scalar_t alpha)
+q_rot(float x, float y, float z, float alpha)
 {
-	vector_t axis = {.a = {x, y, z, 1.0f}};
+	float3 axis = {x, y, z};
 	return q_rotv(axis, alpha);
 }
 quaternion_t

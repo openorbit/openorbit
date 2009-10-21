@@ -17,7 +17,35 @@
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <vmath/vmath.h>
+
 #include "lwcoord.h"
+
+
+#ifndef __has_feature
+#define __has_feature(x) 0  // Compatibility with non-clang compilers.
+#endif
+
+
+#if __has_feature(attribute_ext_vector_type)
+#define OFFS_X(c) ((c)->offs.x)
+#define OFFS_Y(c) ((c)->offs.y)
+#define OFFS_Z(c) ((c)->offs.z)
+
+#define SEG_X(c) ((c)->seg.x)
+#define SEG_Y(c) ((c)->seg.y)
+#define SEG_Z(c) ((c)->seg.z)
+
+#define OFFS_X64(c) ((c)->offs.x)
+#define OFFS_Y64(c) ((c)->offs.y)
+#define OFFS_Z64(c) ((c)->offs.z)
+
+#define SEG_X64(c) ((c)->seg.x)
+#define SEG_Y64(c) ((c)->seg.y)
+#define SEG_Z64(c) ((c)->seg.z)
+
+#else
+
 #define OFFS_X(c) (((float*)&(c)->offs)[0])
 #define OFFS_Y(c) (((float*)&(c)->offs)[1])
 #define OFFS_Z(c) (((float*)&(c)->offs)[2])
@@ -34,7 +62,7 @@
 #define SEG_X64(c) (((int64_t*)&(c)->seg)[0])
 #define SEG_Y64(c) (((int64_t*)&(c)->seg)[1])
 #define SEG_Z64(c) (((int64_t*)&(c)->seg)[2])
-
+#endif
 void
 ooLwcSet(OOlwcoord *coord, float x, float y, float z)
 {

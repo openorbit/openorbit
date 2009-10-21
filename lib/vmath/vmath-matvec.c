@@ -29,11 +29,11 @@
 #ifndef VM_V4_NEG
 #define VM_V4_NEG
 
-vector_t
-v_neg(vector_t v)
+float4
+v_neg(float4 v)
 {
-    vector_t res = {.a = {-v.x, -v.y, -v.z, -v.w}};
-    return res;
+  float4 res = -v;
+  return res;
 }
 
 #endif /* VM_V4_NEG */
@@ -41,17 +41,46 @@ v_neg(vector_t v)
 #ifndef VM_M4_V4_MUL
 #define VM_M4_V4_MUL
 
-vector_t
-m_v_mul(matrix_t *a, const vector_t v) {
-	vector_t res;
+float4
+m_v_mul(const matrix_t *a, float4 v) {
+	float4 res;
+#if __has_feature(attribute_ext_vector_type)
 	for (int i = 0 ; i < 4 ; i ++) {
-        res.a[i] = a->a[i][0] * v.a[0] + a->a[i][1] * v.a[1]
-                 + a->a[i][2] * v.a[2] + a->a[i][3] * v.a[3];
-    }
+    res[i] = a->a[i][0] * v.x + a->a[i][1] * v.y
+           + a->a[i][2] * v.z + a->a[i][3] * v.w;
+  }
+#else
+  float4_u vu = { .v = v };
+  float4_u resu;
+  for (int i = 0 ; i < 4 ; i ++) {
+    resu.a[i] = a->a[i][0] * vu.s.x + a->a[i][1] * vu.s.y
+    + a->a[i][2] * vu.s.z + a->a[i][3] * vu.s.w;
+  }
+  res = resu.v;
+#endif
 	return res;
 }
 #endif /*VM_M4_V4_MUL*/
 
+float3
+m_v3_mulf(const matrix_t *a, float3 v) {
+	float3 res;
+#if __has_feature(attribute_ext_vector_type)
+	for (int i = 0 ; i < 3 ; i ++) {
+    res[i] = a->a[i][0] * v.x + a->a[i][1] * v.y
+    + a->a[i][2] * v.z;
+  }
+#else
+  float3_u vu = { .v = v };
+  float3_u resu;
+  for (int i = 0 ; i < 3 ; i ++) {
+    resu.a[i] = a->a[i][0] * vu.s.x + a->a[i][1] * vu.s.y
+    + a->a[i][2] * vu.s.z;
+  }
+  res = resu.v;
+#endif  
+	return res;
+}
 
 
 #ifndef VM_M4_MUL
@@ -80,77 +109,99 @@ m_add(matrix_t *res, matrix_t *a, matrix_t *b)
     }
 }
 
-vector_t
-v_s_add(vector_t a, scalar_t b)
+float4
+v_s_add(float4 a, float b)
 {
-	vector_t c = {.a = {b,b,b,b}};
-	vector_t r;
-	r = v_add(a, c);
+	float4 c = {b,b,b,b};
+	float4 r;
+	r = vf4_add(a, c);
 	return r;
 }
 
-vector_t
-v_add(vector_t a, const vector_t b)
+float4
+v_add(float4 a, float4 b)
 {
-	vector_t res;
-    for (int i = 0 ; i < 4 ; i ++) {
-        res.a[i] = a.a[i] + b.a[i];
-    }
+	float4 res;
+  res = a + b;
 	return res;
 }
 
-vector_t
-v_sub(vector_t a, const vector_t b)
+float4
+v_sub(float4 a, float4 b)
 {
-	vector_t res;
-    for (int i = 0 ; i < 4 ; i ++) {
-        res.a[i] = a.a[i] - b.a[i];
-    }
+	float4 res;
+  res = a - b;
 	return res;
 }
 
 
-vector_t
-v_cross(vector_t a, vector_t b)
+float3
+v_cross(float3 a, float3 b)
 {
-    vector_t res;
-    res.a[0] = a.a[1]*b.a[2]-a.a[2]*b.a[1];
-    res.a[1] = a.a[2]*b.a[0]-a.a[0]*b.a[2];
-    res.a[2] = a.a[0]*b.a[1]-a.a[1]*b.a[0];
-    return res;
+#if __has_feature(attribute_ext_vector_type)
+  // TODO: Use shuffle vectors intrinsic
+  float3 res;
+  res[0] = a[1]*b[2]-a[2]*b[1];
+  res[1] = a[2]*b[0]-a[0]*b[2];
+  res[2] = a[0]*b[1]-a[1]*b[0];
+  return res;
+#else
+  float3_u au = {.v = a}, bu = {.v = b};
+  float3_u res;
+  res.s.x = au.s.y*bu.s.z-au.s.z*bu.s.y;
+  res.s.y = au.s.z*bu.s.x-au.s.x*bu.s.z;
+  res.s.z = au.s.x*bu.s.y-au.s.y*bu.s.x;
+  return res.v;
+#endif
 }
 
 #ifndef VM_V4_DOT
 #define VM_V4_DOT
 
-scalar_t
-v_dot(const vector_t a, const vector_t b)
+float
+v_dot(float4 a, float4 b)
 {
-    return a.a[0]*b.a[0] + a.a[1]*b.a[1] + a.a[2]*b.a[2] + a.a[3]*b.a[3];
+#if __has_feature(attribute_ext_vector_type)
+  float4 c = a * b;
+  return c.x + c.y + c.z + c.w;
+#else
+  float4_u c = { .v = a + b };
+  return c.s.x + c.s.y + c.s.z + c.s.w;
+  //return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];  
+#endif
 }
 
 #endif /* VM_V4_DOT */
 
-vector_t
-v_s_mul(vector_t a, scalar_t s)
+float4
+v_s_mul(float4 a, float s)
 {
-	vector_t res;
-    res.a[0] = a.a[0] * s;
-    res.a[1] = a.a[1] * s;
-    res.a[2] = a.a[2] * s;
-    res.a[3] = a.a[3] * s;
+#if __has_feature(attribute_ext_vector_type)
+	float4 res;
+  res = a * s;
+  return res;
+#else
+  float4_u sv = { .s.x = s, .s.y = s, .s.z = s, .s.w = s };
+  return a * sv.v;
+#endif
 }
 
-vector_t
-v_s_div(vector_t a, scalar_t s)
+float4
+v_s_div(float4 a, float s)
 {
-    vector_t res;
-    scalar_t d = S_CONST(1.0) / s;
-    res.a[0] = a.a[0] * d;
-    res.a[1] = a.a[1] * d;
-    res.a[2] = a.a[2] * d;
-    res.a[3] = a.a[3] * d;
-    return res;
+#if __has_feature(attribute_ext_vector_type)
+  float4 res;
+  float d = 1.0f / s;
+  res[0] = a[0] * d;
+  res[1] = a[1] * d;
+  res[2] = a[2] * d;
+  res[3] = a[3] * d;
+  return res;
+#else
+  float d = 1.0f / s;
+  float4_u dv = { .s.x = d, .s.y = d, .s.z = d, .s.w = d };
+  return a * dv.v;
+#endif
 }
 
 void
@@ -168,20 +219,20 @@ m_lu(const matrix_t *a, matrix_t *l, matrix_t *u)
     return;
 }
 
-vector_t
-v_normalise(vector_t v)
+float4
+v_normalise(float4 v)
 {
-    scalar_t norm = v_abs(v);
-    return v_s_mul(v, 1.0f/norm);
+    float norm = vf4_abs(v);
+    return vf4_s_mul(v, 1.0f/norm);
 }
 
-scalar_t
+float
 m_det(const matrix_t *m)
 {
     // compute the four subdeterminants (Saurrus)
     // note, this version has been written to work, not to be efficient in any
     // way
-    scalar_t sub_det[4];
+    float sub_det[4];
     
     sub_det[0] =  MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 3);
     sub_det[0] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 1); 
@@ -211,7 +262,7 @@ m_det(const matrix_t *m)
     sub_det[3] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 0); 
     sub_det[3] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 1); 
     
-    scalar_t det = MAT_ELEM(*m, 0, 0) * sub_det[0]
+    float det = MAT_ELEM(*m, 0, 0) * sub_det[0]
                  - MAT_ELEM(*m, 0, 1) * sub_det[1]
                  + MAT_ELEM(*m, 0, 2) * sub_det[2]
                  - MAT_ELEM(*m, 0, 3) * sub_det[3];
@@ -219,10 +270,10 @@ m_det(const matrix_t *m)
     return det;
 }
 
-scalar_t
+float
 m_subdet3(const matrix_t *m, int k, int l)
 {
-    scalar_t acc = S_CONST(0.0);
+    float acc = S_CONST(0.0);
     matrix_t m_prim;
     // copy the relevant matrix elements
     for (int i0 = 0, i1 = 0 ; i0 < 4 ; i0 ++) {
@@ -252,7 +303,7 @@ matrix_t
 m_adj(const matrix_t *m)
 {
     matrix_t M_adj;
-    scalar_t sign = S_CONST(1.0);
+    float sign = S_CONST(1.0);
     for (int i = 0 ; i < 4 ; i ++) {
         for(int j = 0; j < 4 ; j ++) {
             MAT_ELEM(M_adj, j, i) = sign * m_subdet3(m, i, j);
@@ -268,12 +319,12 @@ matrix_t
 m_inv(const matrix_t *M)
 {
     // Very brute force, there are more efficient ways to do this
-    scalar_t det = m_det(M);
+    float det = m_det(M);
     matrix_t M_adj = m_adj(M);
     matrix_t M_inv;
     
     if (det != S_CONST(0.0)) {
-        scalar_t sign = S_CONST(1.0);
+        float sign = S_CONST(1.0);
         for (int i = 0 ; i < 4 ; i ++) {
             for (int j = 0 ; j < 4 ; j ++) {
                 MAT_ELEM(M_inv, i, j) = MAT_ELEM(M_adj, i, j) / det;
@@ -293,10 +344,15 @@ m_inv(const matrix_t *M)
 }
 
 
-scalar_t
-v_abs(const vector_t v)
+float
+v_abs(float4 v)
 {
-    return sqrt(v.x*v.x + v.y*v.y + v.z*v.z + v.w*v.w);
+#if __has_feature(attribute_ext_vector_type)
+  return sqrt(v.x*v.x + v.y*v.y + v.z*v.z + v.w*v.w);
+#else
+  float4_u vu = { .v = v };
+  return sqrt(vu.s.x*vu.s.x + vu.s.y*vu.s.y + vu.s.z*vu.s.z + vu.s.w*vu.s.w);
+#endif
 }
 
 void
@@ -310,10 +366,10 @@ m_transpose(matrix_t *mt, const matrix_t *m)
 }
 
 void
-m_axis_rot_x(matrix_t *m, const angle_t a)
+m_axis_rot_x(matrix_t *m, float a)
 {
-    scalar_t sin_a = sin(a);
-    scalar_t cos_a = cos(a);
+    float sin_a = sin(a);
+    float cos_a = cos(a);
     memset(m, 0, sizeof(matrix_t));
     m->a[0][0] = S_ONE;
     m->a[1][1] = cos_a; m->a[1][1] = sin_a; 
@@ -322,10 +378,10 @@ m_axis_rot_x(matrix_t *m, const angle_t a)
 }
 
 void
-m_axis_rot_y(matrix_t *m, scalar_t a)
+m_axis_rot_y(matrix_t *m, float a)
 {
-    scalar_t sin_a = sin(a);
-    scalar_t cos_a = cos(a);
+    float sin_a = sin(a);
+    float cos_a = cos(a);
     memset(m, 0, sizeof(matrix_t));
     m->a[0][0] = cos_a; m->a[0][2] = -sin_a;
     m->a[1][1] = S_ONE;
@@ -334,10 +390,10 @@ m_axis_rot_y(matrix_t *m, scalar_t a)
 }
 
 void
-m_axis_rot_z(matrix_t *m, scalar_t a)
+m_axis_rot_z(matrix_t *m, float a)
 {
-    scalar_t sin_a = sin(a);
-    scalar_t cos_a = cos(a);
+    float sin_a = sin(a);
+    float cos_a = cos(a);
     memset(m, 0, sizeof(matrix_t));
     m->a[0][0] = cos_a; m->a[0][1] = sin_a;
     m->a[1][0] = -sin_a; m->a[1][1] = cos_a;
@@ -347,10 +403,10 @@ m_axis_rot_z(matrix_t *m, scalar_t a)
 
 
 void
-m_vec_rot_x(matrix_t *m, scalar_t a)
+m_vec_rot_x(matrix_t *m, float a)
 {
-    scalar_t sin_a = sin(a);
-    scalar_t cos_a = cos(a);
+    float sin_a = sin(a);
+    float cos_a = cos(a);
     memset(m, 0, sizeof(matrix_t));
     m->a[0][0] = S_ONE;
     m->a[1][1] = cos_a; m->a[1][1] = -sin_a; 
@@ -359,10 +415,10 @@ m_vec_rot_x(matrix_t *m, scalar_t a)
 }
 
 void
-m_vec_rot_y(matrix_t *m, scalar_t a)
+m_vec_rot_y(matrix_t *m, float a)
 {
-    scalar_t sin_a = sin(a);
-    scalar_t cos_a = cos(a);
+    float sin_a = sin(a);
+    float cos_a = cos(a);
     memset(m, 0, sizeof(matrix_t));
     m->a[0][0] = cos_a; m->a[0][2] = sin_a;
     m->a[1][1] = 1.0f;
@@ -371,10 +427,10 @@ m_vec_rot_y(matrix_t *m, scalar_t a)
 }
 
 void
-m_vec_rot_z(matrix_t *m, scalar_t a)
+m_vec_rot_z(matrix_t *m, float a)
 {
-    scalar_t sin_a = sin(a);
-    scalar_t cos_a = cos(a);
+    float sin_a = sin(a);
+    float cos_a = cos(a);
     memset(m, 0, sizeof(matrix_t));
     m->a[0][0] = cos_a; m->a[0][1] = -sin_a;
     m->a[1][0] = sin_a; m->a[1][1] = cos_a;
@@ -410,28 +466,28 @@ m_cpy(matrix_t * restrict dst, matrix_t * restrict src)
     }
 }
 
-
-vector_t
-v_set(scalar_t v0, scalar_t v1, scalar_t v2, scalar_t v3)
-{
-	vector_t v = {.a = {v0,v1,v2,v3}};
-	return v;
-}
-
 bool
-v_eq(vector_t a, vector_t  b, scalar_t tol)
+v_eq(float4 a, float4  b, float tol)
 {
-    for (int i = 0 ; i < 4 ; i ++) {
-        if (!((a.a[i] <= b.a[i]+tol) && (a.a[i] >= b.a[i]-tol))) {
-            return false;
-        }
+#if __has_feature(attribute_ext_vector_type)
+  for (int i = 0 ; i < 4 ; i ++) {
+    if (!((a[i] <= b[i]+tol) && (a[i] >= b[i]-tol))) {
+      return false;
     }
-    
+  }
+#else
+  float4_u au = {.v = a}, bu = {.v = b};
+  for (int i = 0 ; i < 4 ; i ++) {
+    if (!((au.a[i] <= bu.a[i]+tol) && (au.a[i] >= bu.a[i]-tol))) {
+      return false;
+    }
+  }  
+#endif    
     return true;
 }
 
 bool
-m_eq(const matrix_t *a, const matrix_t *b, scalar_t tol)
+m_eq(const matrix_t *a, const matrix_t *b, float tol)
 {
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
@@ -446,7 +502,7 @@ m_eq(const matrix_t *a, const matrix_t *b, scalar_t tol)
 
 
 void
-m_translate(matrix_t *m, scalar_t x, scalar_t y, scalar_t z, scalar_t w)
+m_translate(matrix_t *m, float x, float y, float z, float w)
 {
     memset(m, 0, sizeof(mat_arr_t));    
     

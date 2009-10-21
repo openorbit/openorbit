@@ -43,11 +43,11 @@ ooVecArrayInit(OOvecarray *vec)
 }
 
 void
-ooVecArrayPushV(OOvecarray *vec, v4f_t obj)
+ooVecArrayPushV(OOvecarray *vec, float3 obj)
 {
     if (vec->length >= vec->asize) {
-        v4f_t *newVec = realloc(vec->elems,
-                                vec->asize * sizeof(v4f_t) * 2);
+        float3 *newVec = realloc(vec->elems,
+                                 vec->asize * sizeof(float3) * 2);
         if (newVec == NULL) ooLogFatal("realloc of vector failed");
         vec->asize *= 2;
         vec->elems = newVec;
@@ -58,10 +58,10 @@ ooVecArrayPushV(OOvecarray *vec, v4f_t obj)
 void
 ooVecArrayPushC(OOvecarray *vec, float x, float y, float z, float w)
 {
-  v4f_t obj = v4f_make(x,y,z,w);
+  float3 obj = v3f_make(x,y,z);
   if (vec->length >= vec->asize) {
-    v4f_t *newVec = realloc(vec->elems,
-                            vec->asize * sizeof(v4f_t) * 2);
+    float3 *newVec = realloc(vec->elems,
+                             vec->asize * sizeof(float3) * 2);
     if (newVec == NULL) ooLogFatal("realloc of vector failed");
     vec->asize *= 2;
     vec->elems = newVec;
@@ -71,13 +71,13 @@ ooVecArrayPushC(OOvecarray *vec, float x, float y, float z, float w)
 
 
 
-v4f_t
+float3
 ooVecArrayPop(OOvecarray *vec)
 {
     return vec->elems[vec->length --];
 }
 
-v4f_t
+float3
 ooVecArrayGet(OOvecarray *vec, size_t i)
 {
   if (vec->length <= i)
@@ -87,7 +87,7 @@ ooVecArrayGet(OOvecarray *vec, size_t i)
 }
 
 void
-ooVecArraySet(OOvecarray *vec, size_t i, v4f_t obj)
+ooVecArraySet(OOvecarray *vec, size_t i, float3 obj)
 {
   if (vec->length <= i)
     ooLogFatal("vector out of bounds length = %d idx = %d", vec->length, i);
@@ -208,29 +208,29 @@ ooGeoEllipseEcc(OOellipse *e)
   return sqrt(1.0-(e->semiMinor/e->semiMajor)*(e->semiMinor/e->semiMajor));
 }
 
-v4f_t
+float3
 ooGeoEllipseSegPoint(OOellipse *e, double t)
 {
   double pos = fmod(t, (double)(e->vec.length));
   size_t i = (size_t) pos;
 
-  v4f_t a = e->vec.elems[(i + 1) % e->vec.length];  
-  v4f_t b = e->vec.elems[i % e->vec.length];
+  float3 a = (float3) e->vec.elems[(i + 1) % e->vec.length];  
+  float3 b = (float3) e->vec.elems[i % e->vec.length];
 
   double frac = pos - floor(pos);
 
   // TODO: Vectors should not use unions anymore
-  vector_t av, bv;
-  av.v = a;
-  bv.v = b;
+  float3 av, bv;
+  av = a;
+  bv = b;
 
   // Lineraly interpolate between point b and a
-  vector_t abdiff = v_sub(av, bv);
-  vector_t tmp = v_set(frac, frac, frac, 0.0);
-  vector_t fv = {.v = abdiff.v * tmp.v};//v_s_mul(abdiff, (float)frac); BUG IN v_s_mul???
-  vector_t res = v_add(bv, fv);
+  float3 abdiff = vf3_sub(av, bv);
+  float3 tmp = vf3_set(frac, frac, frac);
+  float3 fv = vf3_mul(abdiff, tmp);//v_s_mul(abdiff, (float)frac); BUG IN v_s_mul???
+  float3 res = vf3_add(bv, fv);
 
-  return res.v;
+  return res;
 }
 
 void

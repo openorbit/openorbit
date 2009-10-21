@@ -43,7 +43,7 @@ extern "C" {
 
   struct OOfreecam {
     OOlwcoord lwc;
-    vector_t dp;
+    float3 dp;
     quaternion_t q;
     quaternion_t dq;
   };
@@ -51,14 +51,14 @@ extern "C" {
   struct OOfixedcam {
     dBodyID body; // Camera fixed to this body
 
-    vector_t r; // With this offset
+    float3 r; // With this offset
     quaternion_t q; // and this rotation (rotate before translation)
   };
 
   struct OOorbitcam {
     dBodyID body; // Camera orbiting this body
 
-    vector_t r; // Placed on this position (will always look at the body)
+    float3 r; // Placed on this position (will always look at the body)
   };
 
   struct OOcam {

@@ -85,10 +85,7 @@ ooSgSetScenePos(OOscene *sc, float x, float y, float z)
   assert(sc != NULL);
 
   ooLogTrace("setting scene %s pos to [%f, %f, %f]", sc->name, x, y, z);
-  sc->t.x = x;
-  sc->t.y = y;
-  sc->t.z = z;
-  sc->t.w = 0.0;
+  sc->t = vf3_set(x, y, z);
 }
 
 //void
@@ -109,21 +106,21 @@ ooSgSetObjectPosLW(OOdrawable *obj, const OOlwcoord *lw)
   
   if (cam->kind == OOCam_Free) {
     float3 relPos = ooLwcRelVec(lw, ((OOfreecam*)cam->camData)->lwc.seg);
-    obj->p.v = relPos;
+    obj->p = relPos;
   }
 }
 void
 ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z)
 {
   assert(obj != NULL);
-  obj->p = v_set(x, y, z, 0.0);
+  obj->p = vf3_set(x, y, z);
 }
 
 void
 ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w)
 {
   assert(obj != NULL);
-  obj->q = v_set(x, y, z, w);
+  obj->q = vf4_set(x, y, z, w);
 }
 
 void
@@ -137,14 +134,14 @@ void
 ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz)
 {
   assert(obj != NULL);
-  obj->dp = v_set(dx, dy, dz, 0.0);
+  obj->dp = vf3_set(dx, dy, dz);
 }
 
 void
 ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz)
 {
   assert(obj != NULL);
-  obj->dr = v_set(drx, dry, drz, 0.0);
+  obj->dr = vf3_set(drx, dry, drz);
 }
 
 OOdrawable*
@@ -155,11 +152,11 @@ ooSgNewDrawable(const char *name, OOobject *obj, OOdrawfunc df)
 
   OOdrawable *drawable = malloc(sizeof(OOdrawable));
   drawable->name = strdup(name);
-  drawable->p = v_set(0.0f, 0.0f, 0.0f, 0.0f);
+  drawable->p = vf3_set(0.0f, 0.0f, 0.0f);
   drawable->q = q_rot(1.0f, 0.0f, 0.0f, 0.0f);
   drawable->s = 1.0;
-  drawable->dr = v_set(0.0f, 0.0f, 0.0f, 0.0f);
-  drawable->dp = v_set(0.0f, 0.0f, 0.0f, 0.0f);
+  drawable->dr = vf3_set(0.0f, 0.0f, 0.0f);
+  drawable->dp = vf3_set(0.0f, 0.0f, 0.0f);
 
   drawable->draw = df;
   drawable->obj = obj;
@@ -207,7 +204,7 @@ ooSgNewScene(OOscene *parent, const char *name)
   sc->parent = parent;
   sc->name = strdup(name);
 
-  sc->t = v_set(0.0, 0.0, 0.0, 0.0);
+  sc->t = vf3_set(0.0, 0.0, 0.0);
   //sc->s = 1.0;
   //sc->si = 1.0;
   
@@ -339,7 +336,7 @@ void
 ooSgSceneDraw(OOscene *sc, bool recurse)
 {
   assert(sc != NULL);
-  ooLogTrace("drawing scene %s at %vf", sc->name, sc->t.v);
+  ooLogTrace("drawing scene %s at %vf", sc->name, sc->t);
 
   glDepthFunc(GL_LEQUAL);
 
@@ -351,7 +348,7 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
     OOdrawable *obj = sc->objs.elems[i];
     ooLogTrace("drawing object %s", obj->name);
     glPushMatrix();
-    glTranslatef(obj->p.x, obj->p.y, obj->p.z);
+    glTranslatef(vf3_x(obj->p), vf3_y(obj->p), vf3_z(obj->p));
     matrix_t m;
     q_m_convert(&m, obj->q);
     glMultMatrixf((GLfloat*)&m);
@@ -368,7 +365,7 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
 
       glPushMatrix();
       //glScalef(subScene->si, subScene->si, subScene->si);
-      glTranslatef(subScene->t.x, subScene->t.y, subScene->t.z);
+      glTranslatef(vf3_x(subScene->t), vf3_y(subScene->t), vf3_z(subScene->t));
       
       ooSgSceneDraw(subScene, true);
       glPopMatrix();
@@ -435,8 +432,8 @@ ooSgPaint(OOscenegraph *sg)
   while (sc) {
     //glScalef(prev->s, prev->s, prev->s);
      // Invert translation as we are going up in hierarchy
-    glTranslatef(-prev->t.x, -prev->t.y, -prev->t.z);
-    
+    glTranslatef(-vf3_x(prev->t), -vf3_y(prev->t), -vf3_z(prev->t));
+
     // Note that for each step we do here we must adjust the scales
     // appropriatelly
     for (size_t i = 0; i < sc->scenes.length ; i ++) {
@@ -444,7 +441,8 @@ ooSgPaint(OOscenegraph *sg)
         glPushMatrix();
         OOscene *subScene = sc->scenes.elems[i];
         //glScalef(subScene->si, subScene->si, subScene->si);
-        glTranslatef(subScene->t.x, subScene->t.y, subScene->t.z);
+        glTranslatef(vf3_x(subScene->t), vf3_y(subScene->t), vf3_z(subScene->t));
+
         ooSgSceneDraw(subScene, true);
         glPopMatrix();
       }

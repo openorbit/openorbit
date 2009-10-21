@@ -53,7 +53,7 @@ typedef struct {
     @param      ra Right ascension in radians
     @param      dec Declination in radians
 */
-vector_t ooEquToCart(angle_t ra, angle_t dec);
+float3 ooEquToCart(float ra, float dec);
 OOstars* ooSkyInitStars(int starCount);
 OOstars *ooSkyRandomStars(void);
     
