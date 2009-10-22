@@ -19,41 +19,41 @@ spacecraft (name: Mercury-Capsule) {
     stage (name: Command-Module) {
       detach-order: 0; // No other stages at the moment
       mass: 1354.0 kg;
-     inertial-tensor: [1.0, 1.0, 1.0];
-     propulsion {
-       // Nice example, if multiple engines are used, they may either be fired in sequence
-       // or in parallel, this distinction is handled by the spacecraft plugin.
-       engine (name: retro) {
-         // Should burn 10 s per rocket, solid fuel
-         thrust: 4.5 kN;
-         fire-once: true; // Solid rocket engine
-         pos: [1.0, 1.0, 1.0];
-         dir: [1.0, 1.0, 1.0];
-       }
-       engine (name: posigrade) {
-         thrust: 1.8 kN;
-         fire-once: true; // Solid rocket engine
-         pos: [1.0, 1.0, 1.0];
-         dir: [1.0, 1.0, 1.0];
-       }
-     }
-//     attitude {
-//       engine (name: rcs-high) {
-//         thrust: 108.0 N;
-//         fire-once: false; // Liquid fueled thruster
-//         pos: [1.0, 1.0, 1.0];
-//         dir: [1.0, 1.0, 1.0];
-//       }
-//       engine (name: rcs-low) {
-//         thrust: 48.0 N;
-//         fire-once: false; // Liquid fueled thruster
-//         pos: [1.0, 1.0, 1.0];
-//         dir: [1.0, 1.0, 1.0];
-//       }
-//     }
-   }
- }
-  //model {
-    
-  //}
+      inertial-tensor: [1.0, 1.0, 1.0];
+      propulsion {
+        // Nice example, if multiple engines are used, they may either be fired
+        // in sequence or in parallel, this distinction is handled by the
+        // spacecraft plugin.
+        engine (name: retro) {
+          // Should burn 10 s per rocket, solid fuel
+          thrust: 4.5 kN;
+          fire-once: true; // Solid rocket engine
+          pos: [1.0, 1.0, 1.0];
+          dir: [1.0, 1.0, 1.0];
+        }
+        engine (name: posigrade) {
+          thrust: 1.8 kN;
+          fire-once: true; // Solid rocket engine
+          pos: [1.0, 1.0, 1.0];
+          dir: [1.0, 1.0, 1.0];
+        }
+      }
+//      attitude {
+//        engine (name: rcs-high) {
+//          thrust: 108.0 N;
+//          fire-once: false; // Liquid fueled thruster
+//          pos: [1.0, 1.0, 1.0];
+//          dir: [1.0, 1.0, 1.0];
+//        }
+//        engine (name: rcs-low) {
+//          thrust: 48.0 N;
+//          fire-once: false; // Liquid fueled thruster
+//          pos: [1.0, 1.0, 1.0];
+//          dir: [1.0, 1.0, 1.0];
+//        }
+//      }
+    }
+  }
+ //model(): "mercury.ac";
+ //plugin(): "plugins/mercury.so";
 }
