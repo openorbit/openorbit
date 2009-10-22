@@ -98,6 +98,7 @@
 		EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BDBE107B2C900011B76E /* libvmath.a */; };
 		EC3CD7AA108457BD00C1B458 /* ooscript.pyx in Resources */ = {isa = PBXBuildFile; fileRef = EC34BC411079EE080011B76E /* ooscript.pyx */; };
 		EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CDA2C108677C000C1B458 /* ac3d.c */; };
+		EC3F258B10905FE100E0B0C7 /* simenvironment.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3F258A10905FE100E0B0C7 /* simenvironment.c */; };
 		EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC4485680CCD250C001C88AD /* hash-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485390CCD247E001C88AD /* hash-test.c */; };
 		EC4485690CCD251E001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
@@ -203,7 +204,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = ECBF1744108C565600D3E412 /* imgload */;
+			remoteGlobalIDString = ECBF1744108C565600D3E412;
 			remoteInfo = imgload;
 		};
 /* End PBXContainerItemProxy section */
@@ -376,6 +377,8 @@
 		EC34BDBE107B2C900011B76E /* libvmath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libvmath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC3CDA2B108677C000C1B458 /* ac3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ac3d.h; sourceTree = "<group>"; };
 		EC3CDA2C108677C000C1B458 /* ac3d.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ac3d.c; sourceTree = "<group>"; };
+		EC3F258910905FE100E0B0C7 /* simenvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simenvironment.h; sourceTree = "<group>"; };
+		EC3F258A10905FE100E0B0C7 /* simenvironment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simenvironment.c; sourceTree = "<group>"; };
 		EC4476970CCBFF73001C88AD /* t000_hashtable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t000_hashtable; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC44769E0CCBFF95001C88AD /* t001_heap */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t001_heap; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4476A30CCBFFB1001C88AD /* t002_tga */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t002_tga; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -768,6 +771,8 @@
 				EC34BC501079EE080011B76E /* spacecraft-control.c */,
 				EC34BC511079EE080011B76E /* spacecraft.c */,
 				EC34BC521079EE080011B76E /* spacecraft.h */,
+				EC3F258910905FE100E0B0C7 /* simenvironment.h */,
+				EC3F258A10905FE100E0B0C7 /* simenvironment.c */,
 			);
 			path = sim;
 			sourceTree = "<group>";
@@ -1419,6 +1424,7 @@
 				EC34BCA91079EE080011B76E /* sim.c in Sources */,
 				EC34BCAA1079EE080011B76E /* control.c in Sources */,
 				EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */,
+				EC3F258B10905FE100E0B0C7 /* simenvironment.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1494,7 +1500,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = include;
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
@@ -1511,7 +1517,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = include;
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
@@ -1906,7 +1912,7 @@
 					WITH_PYTHON,
 					USE_ALTIVEC,
 				);
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					src/,
 					"$(ORBIT_INCPATH)",
@@ -1952,7 +1958,7 @@
 					WITH_PYTHON,
 					USE_ALTIVEC,
 				);
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					src/,
 					"$(ORBIT_INCPATH)",
