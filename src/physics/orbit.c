@@ -303,7 +303,7 @@ plCreateOrbit(PLworld *world, const char *name,
 
   sys->orbitDrawable = sgNewEllipsis(orbitName,
                                      semiMaj, semiMin,
-                                     0.0, 1.0, 1.0, 256);
+                                     0.0, 0.0, 1.0, 256);
 
   ooSgSceneAddObj(sys->world->scene,
                   sys->orbitDrawable);
