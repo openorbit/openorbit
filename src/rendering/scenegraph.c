@@ -332,11 +332,26 @@ ooSgDrawOverlay(OOoverlay *overlay)
 //  sc->s = s;
 //  sc->si = 1.0f / s;
 //}
+
+int
+compareDistances(OOdrawable const **o0, OOdrawable const **o1)
+{
+  bool gt = vf3_gt((*o0)->p, (*o1)->p);
+
+  if (gt) return -1;
+  else return 1;
+}
+
 void
 ooSgSceneDraw(OOscene *sc, bool recurse)
 {
   assert(sc != NULL);
   ooLogTrace("drawing scene %s at %vf", sc->name, sc->t);
+
+  // Sort objects based on distance from camera, since we are moving
+  // objects and not the camera, this is trivial.
+  //  qsort(sc->objs.elems, sc->objs.length, sizeof(OOdrawable*),
+  //        (int (*)(void const *, void const *))compareDistances);
 
   glDepthFunc(GL_LEQUAL);
 
@@ -581,8 +596,19 @@ typedef struct SGellipsis {
 void
 sgDrawEllipsis(SGellipsis *el)
 {
-  glPushMatrix();
+  // Rest may be needed later...
+  //glDisable (GL_BLEND);
+  //glDisable (GL_DITHER);
+  //glDisable (GL_FOG);
+  //glDisable (GL_LIGHTING);
+  //glDisable (GL_TEXTURE_1D);
+  //glDisable (GL_TEXTURE_3D);
+  //glShadeModel (GL_FLAT);
 
+  glDisable(GL_TEXTURE_2D); // Lines are not textured...
+  // glDisable(GL_DEPTH_TEST);
+
+  glPushMatrix();
   glLineWidth(1.0);
   glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(2, GL_FLOAT, 0, el->verts);

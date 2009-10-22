@@ -508,6 +508,25 @@ void m_cpy(matrix_t * restrict dst, matrix_t * restrict src) __attribute__ ((__n
 bool v_eq(float4 a, float4 b, float tol)
     __attribute__ ((__pure__));
 
+static inline bool
+vf3_lt(float3 a, float3 b)
+{
+  return vf3_abs(a) < vf3_abs(b);
+}
+
+static inline bool
+vf3_lte(float3 a, float3 b)
+{
+  return vf3_abs(a) <= vf3_abs(b);
+}
+
+static inline bool
+vf3_gt(float3 a, float3 b)
+{
+  return vf3_abs(a) > vf3_abs(b);
+}
+
+
 /*! Compares two matrices for elementvise equality, with a given absolute
  *  tolerance */
 bool m_eq(const matrix_t *a, const matrix_t *b, float tol)
