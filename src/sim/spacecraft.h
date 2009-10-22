@@ -24,7 +24,7 @@
 
 #include <openorbit/openorbit.h>
 #include <vmath/vmath.h>
-
+#include "simenvironment.h"
 /*!
     Spacecraft system simulation header
 
@@ -56,44 +56,94 @@ typedef enum OOstagestate {
 typedef struct OOstage {
   OOstagestate state;
   int detachOrder; // How and when to detach the stage
-  float mass;
-  float inertia[3];
+  float mass; // Mass of stage in kg
+  float inertia[3]; // Inertial tensor
   OOobjvector engines; // Main orbital engines
   OOobjvector torquers;
-  dBodyID id;
+  dBodyID id; // ID if detatched
 } OOstage;
 
 typedef struct OOspacecraft OOspacecraft;
 typedef void (*OOscstepfunc)(OOspacecraft*, double dt);
+typedef void (*OOscdetatchfunc)(OOspacecraft*); // Detatch stages
+
+// Wing for lifting design
+typedef struct OOwing OOwing;
+typedef void (*OOwingstep)(OOwing *, const OOsimenv *env);
+struct OOwing {
+  OOstage *stage;
+};
+
+/*
+  Some notes that should be elsewhere:
+    When detatching a stage, the spaccrafts cog and inertia tensors need
+    to be recompuded from the remaining stages.
+
+    Even though cog may vary due to fuel tanks in the wrong place, we do not
+    simulate cog movement or mutation of the inertial tensor due to shape
+    difference. The inertia tensor of the sc may however be updated due to
+    mass difference caused by fuel consumption and so on.
+ */
 
 struct OOspacecraft {
   OOobjvector stages;
   int activeStageIdx; // index in stage vector of active stage, this point out where
                       // detachment happens
   dBodyID body;
+  float mass; // Mass of sc in kg
+  float inertia[3]; // Inertial tensor
   
   OOscstepfunc prestep;
   OOscstepfunc poststep;
+  OOscdetatchfunc detatchStage;
 };
 
 // Note engine structure is for both engines and RCS thrusters
-typedef enum OOenginetype {
-  OO_Engine_Solid,
-  OO_Engine_Liquid,
-  OO_Engine_Jet
-} OOenginetype;
 
-typedef struct OOengine {
-  OOenginetype kind;
+
+typedef struct OOengine OOengine;
+
+typedef void (*OOenginetoggle)(OOengine *);
+typedef void (*OOenginestep)(OOengine *, float dt);
+
+// Base engine class, do not instanciate directly
+struct OOengine {
   OOspacecraft *sc;
+  const char *name; //!< Engine name, e.g. "Orbital Maneuvering Engine"
   OOenginestate state;
   float3 p;
   float forceMag; //!< Newton
   float throttle; //!< Percentage of force magnitude to apply
   float3 dir; //!< Unit vector with direction of thruster
-} OOengine;
 
-typedef OOengine OOthruster;
+  OOenginetoggle toggleOn;
+  OOenginetoggle toggleOff;
+
+  OOenginetoggle throttleUp;
+  OOenginetoggle throttleDown;
+
+  OOenginestep step;
+};
+
+// Liquid oxygen engine
+struct OOlox_engine {
+  OOengine super;
+};
+
+// Solid rocket booster engine
+struct OOsrb_engine {
+  OOengine super;
+};
+
+// In atmosphere jet engine
+struct OOjet_engine {
+  OOengine super;
+};
+
+// Maneuvering thruster
+struct OOthruster {
+  OOengine super;
+};
 
 
 // The torquer structure is for more general torquers (that are not mass expelling
@@ -115,6 +165,28 @@ OOengine* ooScNewEngine(OOspacecraft *sc,
                         float f,
                         float x, float y, float z,
                         float dx, float dy, float dz);
+
+OOengine* ooScNewSrb(OOspacecraft *sc,
+                     float f,
+                     float x, float y, float z,
+                     float dx, float dy, float dz);
+
+OOengine* ooScNewLoxEngine(OOspacecraft *sc,
+                           float f,
+                           float x, float y, float z,
+                           float dx, float dy, float dz,
+                           float fuelPerNmPerS);
+
+OOengine* ooScNewJetEngine(OOspacecraft *sc,
+                           float f,
+                           float x, float y, float z,
+                           float dx, float dy, float dz);
+
+OOengine* ooScNewThruster(OOspacecraft *sc,
+                          float f,
+                          float x, float y, float z,
+                          float dx, float dy, float dz);
+
 
 OOstage* ooScNewStage(void);
 void ooScStageAddEngine(OOstage *stage, OOengine *engine);
