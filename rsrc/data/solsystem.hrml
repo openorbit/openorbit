@@ -75,7 +75,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "textures/venus.jpg";
+          texture: "textures/venus.tga";
         }
       }
       planet (name: Earth) {
@@ -120,7 +120,7 @@ openorbit {
               axial-tilt: 1.5424 deg; // To ecliptic, 6.687 to orbital plane
             }
             orbit {
-              semimajor-axis: 1384399000.0 m;
+              semimajor-axis: 384399.0e3 m; //1384399000.0 m;
               eccentricity: 0.0549;
               inclination: 5.145 deg; // 18.29 - 28.58 to earth equator
               longitude-ascending-node: -11.26064 deg;
