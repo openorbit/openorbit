@@ -57,8 +57,8 @@ ooInitSdlScreen(int width, int height, bool fullscreen)
   // Create window
   gScreen = SDL_SetVideoMode(width, height, 32, flags);
   if (gScreen == NULL) {
-    fprintf(stderr, "Couldn't set %dx%d OpenGL video mode: %s\n",
-            width, height, SDL_GetError());
+    ooLogError("Couldn't set %dx%d OpenGL video mode: %s\n",
+               width, height, SDL_GetError());
     SDL_Quit();
     exit(2);
   }
@@ -88,7 +88,7 @@ ooResizeScreen(int width, int height, bool fullscreen)
   float fovy;
   ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
 
-  ooInitSdlScreen(width, height, fullscreen);
+  //  ooInitSdlScreen(width, height, fullscreen);
   ooSetPerspective(fovy, width, height);
 }
 
@@ -96,15 +96,32 @@ ooResizeScreen(int width, int height, bool fullscreen)
 void
 ooSetPerspective(float fovy, int width, int height)
 {
+  SDL_Surface *window = SDL_GetVideoSurface();
+
+  int lowx = 0, lowy = 0;
+
+  if (window->w < width) width = window->w;
+  if (window->h < height) height = window->h;
+
+  // lowx = window->w - width;
+  // lowy = window->h - height;
+  // width += lowx;
+  // height += lowy;
+
+  ooLogInfo("resize to %f (%d %d) %d %d", fovy, lowx, lowy, width, height);
+  glViewport(lowx, lowy, width, height);
+
   glMatrixMode(GL_PROJECTION);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glLoadIdentity();
-
   // Near clipping 1 cm away, far clipping 20 au away
   gluPerspective(fovy, (double)width / (double)height,
-                /*near*/0.1, /*far*/149598000000.0*20.0);
+                 /*near*/0.1, /*far*/149598000000.0*20.0);
 
-  glViewport(0, 0, width, height);
+  ooLogInfo("\tperspective %f", (double)width / (double)height);
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
 }
 
 void
@@ -115,8 +132,6 @@ ooInitGlAttributes(void)
   ooConfGetIntDef("openorbit/video/depth-bits", &depthSize, 16);
   ooConfGetIntDef("openorbit/video/stencil-bits", &stencilSize, 1);
   ooConfGetIntDef("openorbit/video/colour-bits", &colourSize, 32);
-
-  int value;
 
   // Don't set color bit sizes (SDL_GL_RED_SIZE, etc)
   //    Mac OS X will always use 8-8-8-8 ARGB for 32-bit screens and
