@@ -21,8 +21,16 @@
 #define MODEL_H
 
 #include <stdint.h>
+#include <stdlib.h>
+
 
 typedef struct model_t {
+  float trans[3];
+  float quat[4];
+
+  size_t childCount;
+  struct model_t **children;
+
   uint32_t vertexCount;
   float *vertices;
   float *texCoords;
@@ -32,6 +40,7 @@ typedef struct model_t {
 
 model_t * model_load(const char * restrict fileName);
 int model_dispose(model_t * restrict model);
+
 
 #endif /* end of include guard: MODEL_H */
 

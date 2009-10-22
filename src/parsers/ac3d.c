@@ -78,7 +78,7 @@ struct ac3d_file_t {
   size_t mat_count, mat_alen;
   struct ac3d_material_t *materials;
   size_t obj_count, obj_alen;
-  struct ac3d_object_t *objs;
+  struct ac3d_object_t **objs;
 };
 
 int
@@ -106,20 +106,35 @@ int
 push_object(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj)
 {
   if (ac3d->obj_alen <= ac3d->obj_count) {
-    struct ac3d_object_t *objs = realloc(ac3d->objs,
-                                         sizeof(struct ac3d_object_t) * (ac3d->obj_count+1) * 2);
+    struct ac3d_object_t **objs = realloc(ac3d->objs,
+                                          sizeof(struct ac3d_object_t*) * (ac3d->obj_count+1) * 2);
     if (objs) {
       ac3d->objs = objs;
-      ac3d->obj_alen = (ac3d->obj_count + 1)* 2;
-      ac3d->objs[ac3d->obj_count ++] = *obj;
+      ac3d->obj_alen = (ac3d->obj_count + 1) * 2;
+      ac3d->objs[ac3d->obj_count ++] = obj;
       return 0;
     }
     return -1;
   } else {
-    ac3d->objs[ac3d->obj_count ++] = *obj;
+    ac3d->objs[ac3d->obj_count ++] = obj;
     return 0;
   }  
 }
+
+struct ac3d_file_t*
+make_file(void)
+{
+  struct ac3d_file_t *ac3d = malloc(sizeof(struct ac3d_file_t));
+  ac3d->mat_alen = 8;
+  ac3d->mat_count = 0;
+  ac3d->materials = calloc(8, sizeof(struct ac3d_material_t));
+  ac3d->obj_alen = 8;
+  ac3d->obj_count = 0;
+  ac3d->objs = calloc(8, sizeof(struct ac3d_object_t*));
+
+  return ac3d;
+}
+
 #define PUSH_OBJ(ac, ob) if (push_object((ac), (ob))) goto error;
 
 #define FORCE_GETS(bf, sz, fp)        \
@@ -151,7 +166,7 @@ make_object(void)
       NULL, // children
       NULL // parent
     };      
-  
+
   struct ac3d_object_t *newObj = malloc(sizeof(struct ac3d_object_t));
   *newObj = obj;
   return newObj;
@@ -164,9 +179,36 @@ ac3d_delete(struct ac3d_file_t *ac3d)
 }
 
 model_t*
+ac3d_obj_to_model(struct ac3d_object_t *obj)
+{
+  model_t *model = malloc(sizeof(model_t));
+  model->childCount = obj->num_childs;
+  model->children = calloc(obj->num_childs, sizeof(model_t*));
+
+  for (int i = 0 ; i < obj->num_childs ; ++ i) {
+    model->children[i] = ac3d_obj_to_model(obj->children[i]);
+  }
+
+  return model;
+}
+
+model_t*
+ac3d_to_model(struct ac3d_file_t *ac3d)
+{
+  model_t *model = malloc(sizeof(model_t));
+  model->childCount = ac3d->obj_count;
+  model->children = calloc(ac3d->obj_count, sizeof(model_t*));
+
+  for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
+    model->children[i] = ac3d_obj_to_model(ac3d->objs[i]);
+  }
+
+  return model;
+}
+
+model_t*
 ac3d_load(const char *path)
 {
-  model_t *model = NULL;
   FILE *fp = fopen(path, "r");
   if (!fp) {
     return NULL;
@@ -176,15 +218,15 @@ ac3d_load(const char *path)
   if (fscanf(fp, "AC3D%x\n", &vers) != 1) {
     goto error;
   }
-  
+
   if (vers > 0xb) {
     fprintf(stderr,
             "ac3d versions greater than 0xb not supported, file vers is 0x%x\n",
             vers);
     goto error;
   }
-  
-  struct ac3d_file_t ac3d = { 0, 0, NULL, 0, 0, NULL };
+
+  struct ac3d_file_t *ac3d = make_file();
   struct ac3d_object_t *obj = NULL;
   char buff[BUFF_SIZE];
   while (!feof(fp)) {
@@ -203,14 +245,14 @@ ac3d_load(const char *path)
                  &mat.emis_r, &mat.emis_g, &mat.emis_b,
                  &mat.spec_r, &mat.spec_g, &mat.spec_b,
                  &mat.shi, &mat.trans);
-      
+
       mat.name = strdup(nameBuff);
-      
-      PUSH_MAT(&ac3d, &mat);
+
+      PUSH_MAT(ac3d, &mat);
     } else if (!memcmp(buff, "OBJECT", 6)) {
       char nameBuff[BUFF_SIZE]; nameBuff[0] = '\0';
       SCAN_CHECK(buff, "OBJECT %s", 1, nameBuff);
-      
+
       if (obj && obj->parent && obj->parent->read_childs < obj->parent->num_childs) {
         obj->parent->children[obj->parent->read_childs] = make_object();
         obj->parent->children[obj->parent->read_childs]->parent = obj->parent;
@@ -222,7 +264,7 @@ ac3d_load(const char *path)
         obj = make_object();// TODO: Fix
       }
       obj->kind = strdup(nameBuff);
-      
+
       while (!feof(fp)) {
         FORCE_GETS(buff, BUFF_SIZE, fp);
         if (!memcmp(buff, "*name", 5)) {
@@ -252,12 +294,11 @@ ac3d_load(const char *path)
             FORCE_GETS(buff, BUFF_SIZE, fp);
             SCAN_CHECK(buff, "%f %f %f", 3,
                        &obj->verts[i*3], &obj->verts[i*3+1], &obj->verts[i*3+2]);
-            
           }
         } else if (!memcmp(buff, "*numsurf", 8)) {
           SCAN_CHECK(buff, "*numsurf %d", 1, &obj->num_surfs);
           obj->surfs = calloc(obj->num_surfs, sizeof(struct ac3d_surface_t));
-          
+
           for (size_t i = 0 ; i < obj->num_surfs ; ++ i) {
             FORCE_GETS(buff, BUFF_SIZE, fp);
 
@@ -268,7 +309,7 @@ ac3d_load(const char *path)
             FORCE_GETS(buff, BUFF_SIZE, fp);
             SCAN_CHECK(buff, "refs %d", 1, &obj->surfs[i].refs);
             obj->surfs[i].ref_lines = calloc(obj->surfs[i].refs, sizeof(struct ac3d_refline));
-                                
+
             for (int j = 0 ; j < obj->surfs[i].refs ; ++ j) {
               FORCE_GETS(buff, BUFF_SIZE, fp);
               SCAN_CHECK(buff, "%d %f %f", 3,
@@ -279,32 +320,34 @@ ac3d_load(const char *path)
           }
         } else if (!memcmp(buff, "kids", 4)) {
           SCAN_CHECK(buff, "kids %d", 1, &obj->num_childs);
-          
+
           if (obj->num_childs > 0) {
             obj->children = calloc(obj->num_childs, sizeof(struct ac3d_object_t*));            
             // parent = obj;
           } else {
             //parent = obj.parent;
           }
-          
+
           break; // We should exit the current object, we are done
         }
-        
       }
       if (obj->parent = NULL) {
-        PUSH_OBJ(&ac3d, obj); // TODO: only push when first level        
+        PUSH_OBJ(ac3d, obj);
       } else {
         obj->parent->read_childs ++;
       }
     }
   }
 
-  return NULL; // TODO: fix
+  // TODO: Convert ac3d to model
+  model_t *model = ac3d_to_model(ac3d);
+  ac3d_delete(ac3d);
+
+  return model; // TODO: fix
 error:
   fclose(fp);
-  ac3d_delete(&ac3d);
-  if (model) {
-    free(model);
-  }
+  ac3d_delete(ac3d);
+
   return NULL;
 }
+
