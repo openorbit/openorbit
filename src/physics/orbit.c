@@ -34,6 +34,30 @@
 
 #define PL_GRAVITATIONAL_CONST 6.67428e-11
 
+/*
+ NOTE: Coordinate system are specified in the normal convention used for mission
+       analysis. This means that x is positive towards you, y is positvie to the
+       right and z positive going upwards. This is a right handed coordinate
+       system. Positive y, in our case points towards the reference point of
+       ares on the ecliptic.
+ */
+
+struct keplerian_elements {
+  double a, b, c, d, e, f;
+};
+
+struct state_vectors {
+  double vx, vy, vz, rx, ry, rz;
+};
+
+
+void
+euler_to_pos(void)
+{
+//  double x, y, z;
+//  x = sqrt(u/p) * ();
+}
+
 PLobject__*
 plGetObject(PLworld *world, const char *name)
 {
@@ -281,7 +305,9 @@ plNewWorld(const char *name, OOscene *sc,
 PLorbsys*
 plCreateOrbit(PLworld *world, const char *name,
               double m,
-              double orbitPeriod, double semiMaj, double semiMin)
+              double orbitPeriod,
+              double semiMaj, double semiMin,
+              double inc, double ascendingNode, double argOfPeriapsis)
 {
   assert(world);
 
@@ -305,6 +331,25 @@ plCreateOrbit(PLworld *world, const char *name,
                                      semiMaj, semiMin,
                                      0.0, 0.0, 1.0, 256);
 
+  // compute orbit quaternion based on inc, asc, and periapsis,
+  // TODO: This is not correct at the moment
+  quaternion_t qasc = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(ascendingNode));
+  float3 vinc = vf3_set(0.0, 1.0, 0.0);
+  //matrix_t tmp;
+  //q_m_convert(&tmp, qasc);
+  //vinc = m_v3_mulf(&tmp, vinc);
+  //quaternion_t qinc = q_rotv(vinc, DEG_TO_RAD(inc));
+  //quaternion_t q = q_mul(qasc, qinc);
+ // q_m_convert(&tmp, q);
+
+ // float3 vperi = vf3_set(1.0, 0.0, 0.0);
+  //vperi = m_v3_mulf(&tmp, vperi);
+  //quaternion_t qperi = q_rotv(vperi, DEG_TO_RAD(argOfPeriapsis));
+  //q = q_mul(q, qperi);
+  quaternion_t q = q_rotv(vinc, DEG_TO_RAD(inc));
+  //q = q_mul(qasc, q);
+  sgSetObjectQuatv(sys->orbitDrawable, q);
+
   ooSgSceneAddObj(sys->world->scene,
                   sys->orbitDrawable);
 
@@ -319,10 +364,12 @@ plCreateOrbit(PLworld *world, const char *name,
 PLorbsys*
 plNewOrbit(PLworld *world, const char *name,
            double m,
-           double orbitPeriod, double semiMaj, double semiMin)
+           double orbitPeriod, double semiMaj, double semiMin,
+           double inc, double ascendingNode, double argOfPeriapsis)
 {
   assert(world);
-  PLorbsys * sys = plCreateOrbit(world, name, m, orbitPeriod, semiMaj, semiMin);
+  PLorbsys * sys = plCreateOrbit(world, name, m, orbitPeriod, semiMaj, semiMin,
+                                 inc, ascendingNode, argOfPeriapsis);
   ooObjVecPush(&world->orbits, sys);
   plSysSetCurrentPos(sys);
 
@@ -331,13 +378,15 @@ plNewOrbit(PLworld *world, const char *name,
 PLorbsys*
 plNewSubOrbit(PLorbsys *parent, const char *name,
               double m,
-              double orbitPeriod, double semiMaj, double semiMin)
+              double orbitPeriod, double semiMaj, double semiMin,
+              double inc, double ascendingNode, double argOfPeriapsis)
 {
   assert(parent);
   assert(parent->world);
 
   PLorbsys * sys = plCreateOrbit(parent->world,
-                                   name, m, orbitPeriod, semiMaj, semiMin);
+                                 name, m, orbitPeriod, semiMaj, semiMin,
+                                 inc, ascendingNode, argOfPeriapsis);
   sys->parent = parent;
   ooObjVecPush(&parent->orbits, sys);
   plSysSetCurrentPos(sys);
@@ -575,8 +624,9 @@ ooLoadMoon__(PLorbsys *sys, HRMLobject *obj, OOscenegraph *sg)
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
  
   PLorbsys *moonSys = plNewSubOrbit(sys, moonName.u.str, mass,
-                                      period, // orbital period
-                                      semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc));
+                                    period, // orbital period
+                                    semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc),
+                                    inc, longAscNode, longPerihel);
   
   plSetDrawable(moonSys->orbitalBody, drawable);
 }
@@ -589,7 +639,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
 
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
-  double mass, radius, siderealPeriod;
+  double mass, radius, siderealPeriod, axialTilt = 0.0;
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong, rightAsc,
          declin;
   const char *tex = NULL;
@@ -604,6 +654,8 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
           radius = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "sidereal-rotational-period")) {
           siderealPeriod = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "axial-tilt")) {
+          axialTilt = hrmlGetReal(phys);
         }
       }
     } else if (!strcmp(child->name, "orbit")) {
@@ -647,12 +699,14 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
   OOdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   PLorbsys *sys = plNewOrbit(world, planetName.u.str,
-                               mass,
-                               comp_orbital_period_for_planet(semiMajor),
-                               plAuToMetres(semiMajor),
-                               plAuToMetres(ooGeoComputeSemiMinor(semiMajor, ecc)));  
+                             mass,
+                             comp_orbital_period_for_planet(semiMajor),
+                             plAuToMetres(semiMajor),
+                             plAuToMetres(ooGeoComputeSemiMinor(semiMajor, ecc)),
+                             inc, longAscNode, longPerihel);  
   plSetDrawable(sys->orbitalBody, drawable);
-
+  quaternion_t q = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(axialTilt));
+  sgSetObjectQuatv(drawable, q);
   if (sats) {
     for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {
       if (!strcmp(sat->name, "moon")) {

@@ -125,6 +125,13 @@ ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w)
 }
 
 void
+sgSetObjectQuatv(OOdrawable *obj, quaternion_t q)
+{
+  assert(obj != NULL);
+  obj->q = q;
+}
+
+void
 ooSgSetObjectScale(OOdrawable *obj, float s)
 {
   assert(obj != NULL);
@@ -616,6 +623,13 @@ sgDrawEllipsis(SGellipsis *el)
   glDrawArrays(GL_LINE_LOOP, 0, el->vertCount);
   glDisableClientState(GL_VERTEX_ARRAY);
   glPopMatrix();
+  
+  // Place dot at periapsis
+  glPointSize(10.0);
+  glBegin(GL_POINTS);
+  glColor3f(1.0-el->colour[0], 1.0-el->colour[1], 1.0-el->colour[2]);
+  glVertex2f(el->verts[0], el->verts[1]);
+  glEnd();
 }
 
 OOdrawable*

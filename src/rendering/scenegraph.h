@@ -57,6 +57,8 @@ struct OOdrawable {
 OOdrawable* ooSgNewDrawable(OOdrawable *drawable, const char *name, OOdrawfunc df);
 
 void ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w);
+void sgSetObjectQuatv(OOdrawable *obj, quaternion_t q);
+
 void ooSgSetObjectPosLW(OOdrawable *obj, const OOlwcoord *lw);
 void ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z);
 //void ooSgSetObjectScale(OOdrawable *obj, float s);
