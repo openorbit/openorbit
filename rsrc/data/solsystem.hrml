@@ -2,6 +2,7 @@ openorbit {
   star (name: Sol) {
     physical {
       mass: 1.991e30 kg;
+      gm: 1.327e20;
       radius: 6.96e8 m;
       sidereal-rotational-period: 25.38 days;
       axial-tilt: 7.25 deg; // Note, obliquity is relative to ecliptic
@@ -14,6 +15,7 @@ openorbit {
       planet (name: Mercury) {
         physical {
           mass: 3.18e23 kg;
+          gm: 2.203e13; // m^3/s^2
           radius: 2.43e6 m;
           sidereal-rotational-period: 58.646 days;
           axial-tilt: 0.0351666667 deg; // 2.11' according to wikipedia
@@ -48,6 +50,7 @@ openorbit {
       planet (name: Venus) {
         physical {
           mass: 4.88e24 kg;
+          gm: 3.249e14;
           radius: 6.06e6 m;
           sidereal-rotational-period: 243.0185 days;
           axial-tilt: 177.3 deg; // Reverse rotation compared to other planets
@@ -81,6 +84,7 @@ openorbit {
       planet (name: Earth) {
         physical {
           mass: 5.98e24 kg;
+          gm: 3.986e14;
           radius: 6.37e6 m;
           sidereal-rotational-period: 0.99726968;
           axial-tilt: 23.439281 deg;
@@ -139,6 +143,7 @@ openorbit {
       planet (name: Mars) {
         physical {
           mass: 0.64185e24 kg;
+          gm: 4.283e13;
           radius: 3.3962e6 m;
           sidereal-rotational-period: 1.0259541666666667; // Days
           axial-tilt: 25.19 deg; // Also known as obliquity
@@ -162,6 +167,7 @@ openorbit {
       planet (name: Jupiter) {
         physical {
           mass: 1898.6e24 kg;
+          gm: 1.267e17;
           radius: 71.492e6 m;
           sidereal-rotational-period: 0.4135416666666667; // Days
           axial-tilt: 3.13 deg; // Also known as obliquity
