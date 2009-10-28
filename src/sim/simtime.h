@@ -35,11 +35,11 @@ ooSimTimeTick(OOsimtime *self, double dt)
   self->currentTime = (((double)(self->timeStamp)) * dt) / (24.0 * 3600.0);
 }
 
-float ooTimeGetJD(OOsimtime *self);
-time_t ooTimeGetTime(OOsimtime *self);
+double ooTimeGetJD(void);
+time_t ooTimeGetTime(void);
 
-time_t ooTimeGetEpoch(OOsimtime *self);
-void ooTimeSetEpoch(OOsimtime *self, time_t epoch);
+time_t ooTimeGetEpoch(void);
+void ooTimeSetEpoch(time_t epoch);
 
 #endif /* end of include guard: SIMTIME_H_STPF70AM */
  

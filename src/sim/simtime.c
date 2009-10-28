@@ -24,37 +24,47 @@
 OOsimtime*
 ooSimTimeInit(time_t epoch)
 {
+  //  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
+  //float wc_period = 1.0 / freq; // Period in s
+  //Uint32 interv = (Uint32) (wc_period * 1000.0); // SDL wants time in ms
+  //float sim_period;
+  //ooConfGetFloatDef("openorbit/sim/period", &sim_period, wc_period);
+
+
   OOsimtime *timeState = malloc(sizeof(OOsimtime));
   timeState->epoch = epoch;
   timeState->currentTime = 0.0;
   timeState->timeStamp = 0;
   timeState->timeStampLength = 0.05; // 20 Hz default
-  
+
   return timeState;
 }
 
 
-float
-ooTimeGetJD(OOsimtime *self)
+double
+ooTimeGetJD(void)
 {
-  return self->currentTime;
+  OOsimtime *ts = ooSimTimeState();
+  return ts->currentTime;
 }
 
 time_t
-ooTimeGetTime(OOsimtime *self)
+ooTimeGetTime(void)
 {
-  return self->epoch + (time_t)self->timeStamp * (time_t)(1.0/self->timeStampLength);
+  OOsimtime *ts = ooSimTimeState();
+  return ts->epoch + (time_t)ts->timeStamp * (time_t)(1.0/ts->timeStampLength);
 }
 
-
 time_t
-ooTimeGetEpoch(OOsimtime *self)
+ooTimeGetEpoch(void)
 {
-  return self->epoch;
+  OOsimtime *ts = ooSimTimeState();
+  return ts->epoch;
 }
 
 void
-ooTimeSetEpoch(OOsimtime *self, time_t epoch)
+ooTimeSetEpoch(time_t epoch)
 {
-  self->epoch = epoch;
+  OOsimtime *ts = ooSimTimeState();
+  ts->epoch = epoch;
 }
