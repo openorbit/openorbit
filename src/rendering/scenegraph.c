@@ -54,6 +54,18 @@ typedef struct {
   GLfloat radius;
 } OOsphere;
 
+
+typedef struct SGcylinder {
+  OOdrawable super;
+  //  GLuint texId;
+  GLbyte col[3];
+  GLUquadricObj *quadratic;
+  GLfloat bottonRadius;
+  GLfloat topRadius;
+  GLfloat height;
+} SGcylinder;
+
+
 OOscene*
 ooSgGetRoot(OOscenegraph *sg)
 {
@@ -652,8 +664,8 @@ sgNewEllipsis(const char *name,
   // Build an ellipse with the requested number of vertices
   float w = 2.0 * M_PI / (float)vertCount;
   for (int i = 0 ; i < vertCount ; ++ i) {
-    el->verts[2*i] = semiMajor * cos(w * (float)i) - el->semiMajor*el->ecc;
-    el->verts[2*i+1] = semiMinor * sin(w * (float)i);
+    el->verts[2*i] = semiMinor * sin(w * (float)i);
+    el->verts[2*i+1] = semiMajor * cos(w * (float)i) - el->semiMajor*el->ecc;
   }
 
   return ooSgNewDrawable((OOdrawable*)el, name, (OOdrawfunc)sgDrawEllipsis);
@@ -683,6 +695,35 @@ ooSgSetRoot(OOscenegraph *sg, OOscene *sc)
     setSgRec(sg, sc->scenes.elems[i]);
   }
 }
+
+void
+sgDrawCylinder(SGcylinder *cyl)
+{
+  glDisable(GL_TEXTURE_2D);
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CCW);
+  glColor3bv(cyl->col);
+  gluCylinder(cyl->quadratic,
+              cyl->bottonRadius, cyl->topRadius, cyl->height,
+              4, 2);
+}
+
+OOdrawable*
+sgNewCylinder(const char *name,
+              float top, float bottom, float height)
+{
+  SGcylinder *cyl = malloc(sizeof(SGcylinder));
+  cyl->height = height;
+  cyl->bottonRadius = bottom;
+  cyl->topRadius = top;
+
+  cyl->col[0] = 255;
+  cyl->col[1] = 255;
+  cyl->col[2] = 255;
+
+  return ooSgNewDrawable((OOdrawable*)cyl, name, (OOdrawfunc)sgDrawCylinder);
+}
+
 
 #if 0
 
