@@ -272,9 +272,9 @@ ooSgCamAxisUpdate(OOcam *cam)
                        -100000000.0 * thrust);
     fcam->dp = v_q_rot(v, fcam->q);
 
-    fcam->dq = q_rot(0.0f,1.0f,0.0f, -0.01f * yaw);
-    fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.01f * pitch));
-    fcam->dq = q_mul(fcam->dq, q_rot(0.0f,0.0f,1.0f, -0.01f * roll));
+    fcam->dq = q_rot(0.0f,1.0f,0.0f, -0.02f * yaw);
+    fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.02f * pitch));
+    fcam->dq = q_mul(fcam->dq, q_rot(0.0f,0.0f,1.0f, -0.02f * roll));
   }
 }
 
