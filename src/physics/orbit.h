@@ -47,6 +47,16 @@ typedef struct PLworld__ PLworld;
 typedef struct PLorbsys__ PLorbsys;
 typedef struct PLobject__ PLobject__;
 
+typedef struct PL_keplerian_elements {
+  double ecc;
+  double a; // Semi-major
+  double b; // Auxillary semi-minor
+  double inc;
+  double longAsc;
+  double argPeri;
+  double meanAnomalyOfEpoch;
+} PL_keplerian_elements ;
+
 struct PLobject__ {
   char *name;
   PLworld *world;
@@ -54,6 +64,8 @@ struct PLobject__ {
   dBodyID id; // Using ODE at the moment, but this is not really necisary
   PLlwcoord p; // Large world coordinates
   double m;
+  double GM;
+  PL_keplerian_elements *kepler;
   OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
 };
@@ -84,14 +96,16 @@ struct PLworld__ {
 };
 
 PLworld* plNewWorld(const char *name, OOscene *sc,
-                      double m, double radius, double siderealPeriod);
+                      double m, double gm, double radius, double siderealPeriod);
 
-PLorbsys* plNewOrbit(PLworld *world, const char *name, double m,
+PLorbsys* plNewOrbit(PLworld *world, const char *name, double m, double gm,
                      double orbitPeriod, double semiMaj, double semiMin,
-                     double inc, double ascendingNode, double argOfPeriapsis);
-PLorbsys* plNewSubOrbit(PLorbsys *orb, const char *name, double m,
+                     double inc, double ascendingNode, double argOfPeriapsis,
+                     double meanAnomaly);
+PLorbsys* plNewSubOrbit(PLorbsys *orb, const char *name, double m, double gm,
                         double orbitPeriod, double semiMaj, double semiMin,
-                        double inc, double ascendingNode, double argOfPeriapsis);
+                        double inc, double ascendingNode, double argOfPeriapsis,
+                        double meanAnomaly);
 
 PLobject__* plGetObject(PLworld *world, const char *name);
 float3 plGetPos(const PLobject__ *obj);

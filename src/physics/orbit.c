@@ -32,24 +32,164 @@
 #include "rendering/scenegraph.h"
 #include "common/lwcoord.h"
 
+/// Gravitational constant in m^3/kg/s^2
 #define PL_GRAVITATIONAL_CONST 6.67428e-11
-
+#define PL_SEC_PER_DAY (3600.0 * 24.0)
 /*
  NOTE: Coordinate system are specified in the normal convention used for mission
        analysis. This means that x is positive towards you, y is positvie to the
        right and z positive going upwards. This is a right handed coordinate
-       system. Positive y, in our case points towards the reference point of
+       system. Positive x, in our case points towards the reference point of
        ares on the ecliptic.
  */
 
-struct keplerian_elements {
-  double a, b, c, d, e, f;
-};
 
 struct state_vectors {
   double vx, vy, vz, rx, ry, rz;
 };
 
+double
+plGm(double m0, double m1)
+{
+  return PL_GRAVITATIONAL_CONST * (m0 + m1);
+}
+
+double
+comp_orbital_period(double semimajor, double g, double m1, double m2)
+{
+  return 2.0 * M_PI * sqrt(pow(semimajor, 3.0)/(g*(m1 + m2)));
+}
+
+double
+comp_orbital_period_for_planet(double semimajor)
+{
+  return sqrt(pow(semimajor, 3.0));
+}
+
+
+/*! Computes the orbital period when there is a dominating object in the system
+  \param a Semi-major axis of orbit
+  \param GM Gravitational parameter (GM) of orbited body
+ */
+double
+plOrbitalPeriod(double a, double GM)
+{
+  return 2.0 * M_PI * sqrt((a*a*a) / GM);
+}
+
+double
+plMeanMotionFromPeriod(double tau)
+{
+  return (2.0 * M_PI) / tau;
+}
+
+/*! Computes the mean motion when there is a dominating object in the system
+ \param a Semi-major axis of orbit
+ \param u Gravitational parameter (GM) of orbited body
+ */
+double
+plMeanMotion(double u, double a)
+{
+  return sqrt(u/(a*a*a));
+}
+
+/*!
+  Computes the estimate of the next eccentric anomaly
+ \param E_i Eccentric anomaly of previous step, initialise to n*t.
+ \param ecc Eccentricity of orbital ellipse
+ \param m Mean anomaly
+ */
+double
+plEccAnomalityStep(double E_i, double ecc, double m)
+{
+  return E_i - ( (E_i-ecc*sin(E_i)-m) / (1-ecc*cos(E_i)) );
+}
+
+/*!
+  Computes the eccentric anomaly for time t, t = 0 is assumed to be when the
+  object pass through its periapsis.
+
+  The method solves this by making a few iterations with newton-rapson, for
+  equations, see celestial mechanics chapter in Fortescue, Stark and Swinerd's
+  Spacecraft Systems Engineering.
+
+  The eccentric anomaly can be used to solve the position of an orbiting object.
+
+  Note on units: n and t should be compatible, n is composed of the GM and a, GM
+  in terms is defined in distance / time, and a is the orbits semi-major axis.
+  Thus good units for usage are for example: time = earth days or years, and
+  distance = m, km or au.
+
+  \param ecc Eccentricity of orbit
+  \param n Mean motion around object
+  \param t Absolute time for which we want the eccentric anomaly.
+ */
+double
+plEccAnomaly(double ecc, double n, double t)
+{
+  // 7.37 mm accuracy for an object at the distance of the dwarf-planet Pluto
+#define ERR_LIMIT 0.000000000000001
+  double meanAnomaly = n * t;
+
+  double E_1 = plEccAnomalityStep(meanAnomaly, ecc, meanAnomaly);
+  double E_2 = plEccAnomalityStep(E_1, ecc, meanAnomaly);
+
+  double E_i = E_1;
+  double E_i1 = E_2;
+  int i = 0;
+
+  while (fabs(E_i1-E_i) > ERR_LIMIT) {
+    E_i = E_i1;
+    E_i1 = plEccAnomalityStep(E_i, ecc, meanAnomaly);
+    i ++;
+
+    if (i > 10) {
+      ooLogWarn("ecc anomaly did not converge in %d iters, err = %f", i, fabs(E_i1-E_i));
+      break;
+    }
+  }
+
+  ooLogTrace("ecc anomaly solved in %d iters", i);
+  return E_i1;
+
+#undef ERR_LIMIT
+}
+
+/*!
+ \param a Semi-major axis
+ \param b Semi-minor axis
+ \param ecc Eccentricity of orbit
+ \param GM Gravitational parameter of orbited object GM
+ \param t Absolute time.
+ */
+float3
+plOrbitPosAtTime(PL_keplerian_elements *orbit, double GM, double t)
+{
+  double meanMotion = plMeanMotion(GM, orbit->a);
+  double eccAnomaly = plEccAnomaly(orbit->ecc, meanMotion, t);
+
+  /* Compute x, y from anomaly, y is pointing in the direction of the
+     periapsis */
+  double y = orbit->a * cos(eccAnomaly) - orbit->a * orbit->ecc; // NOTE: on the plane we usually do x = a cos t
+  double x = orbit->b * sin(eccAnomaly);
+
+  return vf3_set(x, y, 0.0);
+}
+
+PL_keplerian_elements*
+plNewKeplerElements(double ecc, double a, double inc, double longAsc,
+                    double argOfPeriapsis, double meanAnomalyOfEpoch)
+{
+  PL_keplerian_elements *elems = malloc(sizeof(PL_keplerian_elements));
+  elems->ecc = ecc;
+  elems->a = a; // Semi-major
+  elems->b = ooGeoComputeSemiMinor(a, ecc); // Auxillary semi-minor
+  elems->inc = inc;
+  elems->longAsc = longAsc;
+  elems->argPeri = argOfPeriapsis;
+  elems->meanAnomalyOfEpoch = meanAnomalyOfEpoch;
+  return elems;
+}
 
 void
 euler_to_pos(void)
@@ -195,15 +335,16 @@ plUpdateObject(dBodyID body)
 void
 plSysSetCurrentPos(PLorbsys *sys)
 {
-  float3 newPos = ooGeoEllipseSegPoint(sys->orbitalPath,
-                                      (ooTimeGetJD(ooSimTimeState()) /
-                                       sys->orbitalPeriod)*
-                                      (double)sys->orbitalPath->vec.length);
-
   if (sys->parent) {
+    float3 newPos= plOrbitPosAtTime(sys->orbitalBody->kepler,
+                                    sys->parent->orbitalBody->GM + sys->orbitalBody->GM,
+                                    ooTimeGetJD()*PL_SEC_PER_DAY);
     sys->orbitalBody->p = sys->parent->orbitalBody->p;
     ooLwcTranslate(&sys->orbitalBody->p, newPos);
   } else {
+    float3 newPos= plOrbitPosAtTime(sys->orbitalBody->kepler,
+                                    sys->world->centralBody->GM + sys->orbitalBody->GM,
+                                    ooTimeGetJD()*PL_SEC_PER_DAY);
     sys->orbitalBody->p = sys->world->centralBody->p;
     ooLwcTranslate(&sys->orbitalBody->p, newPos);
   }
@@ -216,7 +357,7 @@ plDeleteSys(PLorbsys *sys)
     plDeleteSys(sys->orbits.elems[i]);
   }
 
-  ooGeoEllipseFree(sys->orbitalPath);
+  //ooGeoEllipseFree(sys->orbitalPath);
   free((char*)sys->name);
   free(sys);
 }
@@ -238,9 +379,21 @@ plSetDrawable(PLobject__ *obj, OOdrawable *drawable)
   obj->drawable = drawable;
 }
 
+/*!
+  Creates a new object
+  All objects, even the small ones have a GM value
 
+  \param world The world in which the object is placed
+  \param name Name of object
+  \param m Mass of object in kg
+  \param gm Standard gravitational parameter for object (GM), if set to NAN, the
+            value will be calculated from m. This allow you to enter more exact
+            values, that will not be subject to innacurate floating point
+            calculations.
+  \param coord The large world coordinate of the object
+ */
 PLobject__*
-plNewObj(PLworld*world, const char *name, double m, OOlwcoord *coord)
+plNewObj(PLworld*world, const char *name, double m, double gm, OOlwcoord * coord)
 {
   PLobject__ *obj = malloc(sizeof(PLobject__));
   obj->p = *coord;
@@ -255,6 +408,14 @@ plNewObj(PLworld*world, const char *name, double m, OOlwcoord *coord)
   //dBodySetQuaternion(obj->id, quat);
   //dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
   obj->drawable = NULL;
+  obj->m = m;
+
+  if (isnormal(gm)) {
+    obj->GM = gm;
+  } else {
+    obj->GM = m * PL_GRAVITATIONAL_CONST;
+  }
+  obj->kepler = NULL;
   return obj;
 }
 
@@ -265,18 +426,18 @@ plNewObj(PLworld*world, const char *name, double m, OOlwcoord *coord)
 //}
 
 PLobject__*
-plNewObjInWorld(PLworld*world, const char *name, double m, OOlwcoord *coord)
+plNewObjInWorld(PLworld*world, const char *name, double m, double gm, OOlwcoord *coord)
 {
-  PLobject__ *obj = plNewObj(world, name, m, coord);
+  PLobject__ *obj = plNewObj(world, name, m, gm, coord);
 
   ooObjVecPush(&world->objs, obj);
   return obj;
 }
 
 PLobject__*
-plNewObjInSys(PLorbsys *sys, const char *name, double m, OOlwcoord *coord)
+plNewObjInSys(PLorbsys *sys, const char *name, double m, double gm, OOlwcoord *coord)
 {
-  PLobject__ *obj = plNewObj(sys->world, name, m, coord);
+  PLobject__ *obj = plNewObj(sys->world, name, m, gm, coord);
   obj->sys = sys;
 
   ooObjVecPush(&sys->objs, obj);
@@ -286,7 +447,7 @@ plNewObjInSys(PLorbsys *sys, const char *name, double m, OOlwcoord *coord)
 
 PLworld*
 plNewWorld(const char *name, OOscene *sc,
-           double m, double radius, double siderealPeriod)
+           double m, double gm, double radius, double siderealPeriod)
 {
   PLworld *world = malloc(sizeof(PLworld));
   ooObjVecInit(&world->orbits);
@@ -297,17 +458,18 @@ plNewWorld(const char *name, OOscene *sc,
 
   OOlwcoord p;
   ooLwcSet(&p, 0.0, 0.0, 0.0);
-  world->centralBody = plNewObj(world, name, m, &p);
+  world->centralBody = plNewObj(world, name, m, gm, &p);
 
   return world;
 }
 
 PLorbsys*
 plCreateOrbit(PLworld *world, const char *name,
-              double m,
+              double m, double gm,
               double orbitPeriod,
               double semiMaj, double semiMin,
-              double inc, double ascendingNode, double argOfPeriapsis)
+              double inc, double ascendingNode, double argOfPeriapsis,
+              double meanAnomaly)
 {
   assert(world);
 
@@ -320,7 +482,7 @@ plCreateOrbit(PLworld *world, const char *name,
   sys->parent = NULL;
 
   sys->orbitalPeriod = orbitPeriod;
-  sys->orbitalPath = ooGeoEllipseAreaSeg(500, semiMaj, semiMin);
+  //sys->orbitalPath = ooGeoEllipseAreaSeg(500, semiMaj, semiMin);
 
   // TODO: Stack allocation based on untrusted length should not be here
   char orbitName[strlen(name) + strlen(" Orbit") + 1];
@@ -355,7 +517,10 @@ plCreateOrbit(PLworld *world, const char *name,
 
   OOlwcoord p;
   ooLwcSet(&p, 0.0, 0.0, 0.0);
-  sys->orbitalBody = plNewObj(world, name, m, &p);
+  sys->orbitalBody = plNewObj(world, name, m, gm, &p);
+  sys->orbitalBody->kepler = plNewKeplerElements(sqrt((semiMaj*semiMaj-semiMin*semiMin)/(semiMaj*semiMaj)),
+                                                 semiMaj, inc, ascendingNode,
+                                                 argOfPeriapsis, meanAnomaly);
 
   return sys;
 }
@@ -363,13 +528,13 @@ plCreateOrbit(PLworld *world, const char *name,
 
 PLorbsys*
 plNewOrbit(PLworld *world, const char *name,
-           double m,
+           double m, double gm,
            double orbitPeriod, double semiMaj, double semiMin,
-           double inc, double ascendingNode, double argOfPeriapsis)
+           double inc, double ascendingNode, double argOfPeriapsis, double meanAnomaly)
 {
   assert(world);
-  PLorbsys * sys = plCreateOrbit(world, name, m, orbitPeriod, semiMaj, semiMin,
-                                 inc, ascendingNode, argOfPeriapsis);
+  PLorbsys * sys = plCreateOrbit(world, name, m, gm, orbitPeriod, semiMaj, semiMin,
+                                 inc, ascendingNode, argOfPeriapsis, meanAnomaly);
   ooObjVecPush(&world->orbits, sys);
   plSysSetCurrentPos(sys);
 
@@ -377,16 +542,16 @@ plNewOrbit(PLworld *world, const char *name,
 }
 PLorbsys*
 plNewSubOrbit(PLorbsys *parent, const char *name,
-              double m,
+              double m, double gm,
               double orbitPeriod, double semiMaj, double semiMin,
-              double inc, double ascendingNode, double argOfPeriapsis)
+              double inc, double ascendingNode, double argOfPeriapsis, double meanAnomaly)
 {
   assert(parent);
   assert(parent->world);
 
   PLorbsys * sys = plCreateOrbit(parent->world,
-                                 name, m, orbitPeriod, semiMaj, semiMin,
-                                 inc, ascendingNode, argOfPeriapsis);
+                                 name, m, gm, orbitPeriod, semiMaj, semiMin,
+                                 inc, ascendingNode, argOfPeriapsis, meanAnomaly);
   sys->parent = parent;
   ooObjVecPush(&parent->orbits, sys);
   plSysSetCurrentPos(sys);
@@ -526,18 +691,6 @@ ooUpdateObject(dBodyID body)
   ooSgSetObjectAngularSpeed(obj->drawable, angVel[0], angVel[1], angVel[2]);
 }
 
-double
-comp_orbital_period(double semimajor, double g, double m1, double m2)
-{
-  return 2.0 * M_PI * sqrt(pow(semimajor, 3.0)/(g*(m1 + m2)));
-}
-
-double
-comp_orbital_period_for_planet(double semimajor)
-{
-  return sqrt(pow(semimajor, 3.0));
-}
-
 #if 0
 v4f_t ooOrbitDist(PLobject * restrict a, PLobject * restrict b)
 {
@@ -564,7 +717,7 @@ ooLoadMoon__(PLorbsys *sys, HRMLobject *obj, OOscenegraph *sg)
 
   HRMLvalue moonName = hrmlGetAttrForName(obj, "name");
 
-  double mass, radius, siderealPeriod;
+  double mass, radius, siderealPeriod, gm = NAN;
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong, rightAsc,
          declin;
   const char *tex = NULL;
@@ -579,6 +732,8 @@ ooLoadMoon__(PLorbsys *sys, HRMLobject *obj, OOscenegraph *sg)
           radius = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "sidereal-rotational-period")) {
           siderealPeriod = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "gm")) {
+          gm = hrmlGetReal(phys);
         }
       }
     } else if (!strcmp(child->name, "orbit")) {
@@ -616,17 +771,21 @@ ooLoadMoon__(PLorbsys *sys, HRMLobject *obj, OOscenegraph *sg)
     }
   }
 
-
+  if (isnan(gm)) {
+    gm = mass*PL_GRAVITATIONAL_CONST;
+  }
   // Period will be in years assuming that semiMajor is in au
-  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
+  double period = plOrbitalPeriod(semiMajor, sys->orbitalBody->GM * gm) / PL_SEC_PER_DAY;
+
+  //  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
   OOscene *sc = ooSgGetRoot(sg);
   OOdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
  
-  PLorbsys *moonSys = plNewSubOrbit(sys, moonName.u.str, mass,
+  PLorbsys *moonSys = plNewSubOrbit(sys, moonName.u.str, mass, gm,
                                     period, // orbital period
                                     semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc),
-                                    inc, longAscNode, longPerihel);
+                                    inc, longAscNode, longPerihel, meanLong);
   
   plSetDrawable(moonSys->orbitalBody, drawable);
 }
@@ -639,7 +798,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
 
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
-  double mass, radius, siderealPeriod, axialTilt = 0.0;
+  double mass, radius, siderealPeriod, axialTilt = 0.0, gm = NAN;
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong, rightAsc,
          declin;
   const char *tex = NULL;
@@ -656,6 +815,8 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
           siderealPeriod = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "axial-tilt")) {
           axialTilt = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "gm")) {
+          gm = hrmlGetReal(phys);
         }
       }
     } else if (!strcmp(child->name, "orbit")) {
@@ -695,15 +856,19 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
     }
   }
 
+  if (isnan(gm)) {
+    gm = mass*PL_GRAVITATIONAL_CONST;
+  }
+  double period = plOrbitalPeriod(plAuToMetres(semiMajor), world->centralBody->GM+gm) / PL_SEC_PER_DAY;
   OOscene *sc = ooSgGetRoot(sg);
   OOdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   PLorbsys *sys = plNewOrbit(world, planetName.u.str,
-                             mass,
+                             mass, gm,
                              comp_orbital_period_for_planet(semiMajor),
                              plAuToMetres(semiMajor),
                              plAuToMetres(ooGeoComputeSemiMinor(semiMajor, ecc)),
-                             inc, longAscNode, longPerihel);  
+                             inc, longAscNode, longPerihel, meanLong);
   plSetDrawable(sys->orbitalBody, drawable);
   quaternion_t q = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);
@@ -723,7 +888,7 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
   assert(obj);
   assert(obj->val.typ == HRMLNode);
   HRMLvalue starName = hrmlGetAttrForName(obj, "name");
-  double mass = 0.0;
+  double mass = 0.0, gm = NAN;
   double radius, siderealPeriod;
   const char *tex = NULL;
 
@@ -740,6 +905,8 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
           radius = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "sidereal-rotational-period")) {
           siderealPeriod = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "gm")) {
+          gm = hrmlGetReal(phys);
         }
       }
     } else if (!strcmp(child->name, "rendering")) {
@@ -753,10 +920,14 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
     }
   }
 
+  if (isnan(gm)) {
+    gm = mass*PL_GRAVITATIONAL_CONST;
+  }
+
   OOscene *sc = ooSgGetRoot(sg);
   OOdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
-  PLworld *world = plNewWorld(starName.u.str, sc, mass, radius, siderealPeriod);
+  PLworld *world = plNewWorld(starName.u.str, sc, mass, gm, radius, siderealPeriod);
   plSetDrawable(world->centralBody, drawable);
 
   assert(sats != NULL);
