@@ -66,10 +66,9 @@ float3
 m_v3_mulf(const matrix_t *a, float3 v) {
 	float3 res;
 #if __has_feature(attribute_ext_vector_type)
-	for (int i = 0 ; i < 3 ; i ++) {
-    res[i] = a->a[i][0] * v.x + a->a[i][1] * v.y
-    + a->a[i][2] * v.z;
-  }
+	res.x = vf3_dot(a->v[0], v);
+	res.y = vf3_dot(a->v[1], v);
+	res.z = vf3_dot(a->v[2], v);
 #else
   float3_u vu = { .v = v };
   float3_u resu;
