@@ -146,8 +146,9 @@ sgSetObjectQuatv(OOdrawable *obj, quaternion_t q)
 void
 ooSgSetObjectScale(OOdrawable *obj, float s)
 {
+  assert(0);
   assert(obj != NULL);
-  obj->s = s;
+  //  obj->s = s;
 }
 
 void
@@ -174,7 +175,7 @@ ooSgNewDrawable(OOdrawable *drawable, const char *name, OOdrawfunc df)
   drawable->name = strdup(name);
   drawable->p = vf3_set(0.0f, 0.0f, 0.0f);
   drawable->q = q_rot(1.0f, 0.0f, 0.0f, 0.0f);
-  drawable->s = 1.0;
+  //drawable->s = 1.0;
   drawable->dr = vf3_set(0.0f, 0.0f, 0.0f);
   drawable->dp = vf3_set(0.0f, 0.0f, 0.0f);
 
@@ -575,16 +576,25 @@ void
 ooSgDrawSphere(OOsphere *sp)
 {
   glEnable(GL_TEXTURE_2D);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
+
   glBindTexture(GL_TEXTURE_2D, sp->texId);    
-    
-//  glMatrixMode(GL_MODELVIEW);
+
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
   glColor3f(1.0f, 1.0f, 1.0f);
   gluSphere(sp->quadratic, sp->radius, 128, 128);
 
-  //  glMatrixMode(GL_MODELVIEW);
-
+  // Draw point on the sphere in solid colour and size
+  glDisable (GL_BLEND);
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_DEPTH_TEST);
+  glBegin(GL_POINTS);
+  glPointSize(5.0);
+  glColor3f(1.0, 0.0, 0.0);
+  glVertex3f(0.0, 0.0, 0.0);
+  glEnd();
 }
 
 OOdrawable*
@@ -602,15 +612,6 @@ ooSgNewSphere(const char *name, float radius, const char *tex)
   return ooSgNewDrawable((OOdrawable*)sp, name, (OOdrawfunc) ooSgDrawSphere);
 }
 
-typedef struct SGellipsis {
-  OOdrawable super;
-  float semiMajor;
-  float semiMinor;
-  float ecc;
-  float colour[3];
-  size_t vertCount;
-  float verts[];
-} SGellipsis;
 
 void
 sgDrawEllipsis(SGellipsis *el)
@@ -625,8 +626,8 @@ sgDrawEllipsis(SGellipsis *el)
   //glShadeModel (GL_FLAT);
 
   glDisable(GL_TEXTURE_2D); // Lines are not textured...
-  // glDisable(GL_DEPTH_TEST);
-
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
   glPushMatrix();
   glLineWidth(1.0);
   glEnableClientState(GL_VERTEX_ARRAY);
@@ -646,7 +647,7 @@ sgDrawEllipsis(SGellipsis *el)
 
 OOdrawable*
 sgNewEllipsis(const char *name,
-              float semiMajor, float semiMinor,
+              double semiMajor, double semiMinor,
               float r, float g, float b,
               size_t vertCount)
 {
@@ -662,10 +663,13 @@ sgNewEllipsis(const char *name,
   ooLogInfo("new ellipses '%s' %f %f %f", name, semiMajor, semiMinor, el->ecc);
 
   // Build an ellipse with the requested number of vertices
-  float w = 2.0 * M_PI / (float)vertCount;
+  double w = 2.0 * M_PI / (double)vertCount;
   for (int i = 0 ; i < vertCount ; ++ i) {
-    el->verts[2*i] = semiMinor * sin(w * (float)i);
-    el->verts[2*i+1] = semiMajor * cos(w * (float)i) - el->semiMajor*el->ecc;
+    double x = semiMinor * sin(w * (double)i);
+    double y = semiMajor * cos(w * (double)i) - el->semiMajor*el->ecc;
+
+    el->verts[2*i] = x;
+    el->verts[2*i+1] = y;
   }
 
   return ooSgNewDrawable((OOdrawable*)el, name, (OOdrawfunc)sgDrawEllipsis);

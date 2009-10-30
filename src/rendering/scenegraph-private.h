@@ -51,4 +51,14 @@ struct OOscenegraph {
   OOobjvector overlays;
 };
 
+typedef struct SGellipsis {
+  OOdrawable super;
+  double semiMajor;
+  double semiMinor;
+  double ecc;
+  float colour[3];
+  size_t vertCount;
+  float verts[];
+} SGellipsis;
+
 #endif /* end of include guard: SCENEGRAPH_PRIVATE_H_8YHHHPCN */

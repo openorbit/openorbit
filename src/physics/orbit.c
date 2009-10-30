@@ -30,6 +30,8 @@
 #include "parsers/hrml.h"
 #include "res-manager.h"
 #include "rendering/scenegraph.h"
+#include "rendering/scenegraph-private.h"
+
 #include "common/lwcoord.h"
 
 /// Gravitational constant in m^3/kg/s^2
@@ -151,8 +153,18 @@ plEccAnomaly(double ecc, double n, double t)
 
   ooLogTrace("ecc anomaly solved in %d iters", i);
   return E_i1;
-
 #undef ERR_LIMIT
+}
+quaternion_t
+plOrbitalQuaternion(PL_keplerian_elements *kepler)
+{
+  quaternion_t qasc = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(kepler->longAsc));
+  quaternion_t qinc = q_rot(0.0, 1.0, 0.0, DEG_TO_RAD(kepler->inc));
+  quaternion_t qaps = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(kepler->argPeri));
+
+  quaternion_t q = q_mul(qasc, qinc);
+  q = q_mul(q, qaps);
+  return q;
 }
 
 /*!
@@ -173,7 +185,13 @@ plOrbitPosAtTime(PL_keplerian_elements *orbit, double GM, double t)
   double y = orbit->a * cos(eccAnomaly) - orbit->a * orbit->ecc; // NOTE: on the plane we usually do x = a cos t
   double x = orbit->b * sin(eccAnomaly);
 
-  return vf3_set(x, y, 0.0);
+  quaternion_t q = plOrbitalQuaternion(orbit);
+  matrix_t m;
+  q_m_convert(&m, q);
+  float3 v = vf3_set(x, y, 0.0);
+  v = m_v3_mulf(&m, v);
+
+  return v;
 }
 
 PL_keplerian_elements*
@@ -189,13 +207,6 @@ plNewKeplerElements(double ecc, double a, double inc, double longAsc,
   elems->argPeri = argOfPeriapsis;
   elems->meanAnomalyOfEpoch = meanAnomalyOfEpoch;
   return elems;
-}
-
-void
-euler_to_pos(void)
-{
-//  double x, y, z;
-//  x = sqrt(u/p) * ();
 }
 
 PLobject__*
@@ -331,7 +342,6 @@ plUpdateObject(dBodyID body)
   // ooSgSetObjectAngularSpeed(obj->drawable, angVel[0], angVel[1], angVel[2]);
 }
 
-
 void
 plSysSetCurrentPos(PLorbsys *sys)
 {
@@ -345,8 +355,27 @@ plSysSetCurrentPos(PLorbsys *sys)
     float3 newPos= plOrbitPosAtTime(sys->orbitalBody->kepler,
                                     sys->world->centralBody->GM + sys->orbitalBody->GM,
                                     ooTimeGetJD()*PL_SEC_PER_DAY);
+
+    double meanMotion = plMeanMotion(sys->world->centralBody->GM + sys->orbitalBody->GM,
+                                     sys->orbitalBody->kepler->a);
+    double eccAnomaly = plEccAnomaly(sys->orbitalBody->kepler->ecc, meanMotion, ooTimeGetJD()*PL_SEC_PER_DAY);
+    double eccDeg = RAD_TO_DEG(eccAnomaly);
+
+    int idx = eccDeg / (360.0/((SGellipsis*)(sys->orbitDrawable))->vertCount);
+    /* Compute x, y from anomaly, y is pointing in the direction of the
+     periapsis */
+    double y = sys->orbitalBody->kepler->a * cos(eccAnomaly) - sys->orbitalBody->kepler->a * sys->orbitalBody->kepler->ecc; // NOTE: on the plane we usually do x = a cos t
+    double x = sys->orbitalBody->kepler->b * sin(eccAnomaly);
+
+
     sys->orbitalBody->p = sys->world->centralBody->p;
     ooLwcTranslate(&sys->orbitalBody->p, newPos);
+
+    if (sys->orbitDrawable) {
+      fprintf(stderr, "el: %f %f\n",
+              ((SGellipsis*)(sys->orbitDrawable))->verts[0],
+              ((SGellipsis*)(sys->orbitDrawable))->verts[1]);
+    }
   }
 }
 
@@ -494,22 +523,12 @@ plCreateOrbit(PLworld *world, const char *name,
                                      0.0, 0.0, 1.0, 256);
 
   // compute orbit quaternion based on inc, asc, and periapsis,
-  // TODO: This is not correct at the moment
   quaternion_t qasc = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(ascendingNode));
-  float3 vinc = vf3_set(0.0, 1.0, 0.0);
-  //matrix_t tmp;
-  //q_m_convert(&tmp, qasc);
-  //vinc = m_v3_mulf(&tmp, vinc);
-  //quaternion_t qinc = q_rotv(vinc, DEG_TO_RAD(inc));
-  //quaternion_t q = q_mul(qasc, qinc);
- // q_m_convert(&tmp, q);
+  quaternion_t qinc = q_rot(0.0, 1.0, 0.0, DEG_TO_RAD(inc));
+  quaternion_t qaps = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(argOfPeriapsis));
 
- // float3 vperi = vf3_set(1.0, 0.0, 0.0);
-  //vperi = m_v3_mulf(&tmp, vperi);
-  //quaternion_t qperi = q_rotv(vperi, DEG_TO_RAD(argOfPeriapsis));
-  //q = q_mul(q, qperi);
-  quaternion_t q = q_rotv(vinc, DEG_TO_RAD(inc));
-  //q = q_mul(qasc, q);
+  quaternion_t q = q_mul(qasc, qinc);
+  q = q_mul(q, qaps);
   sgSetObjectQuatv(sys->orbitDrawable, q);
 
   ooSgSceneAddObj(sys->world->scene,
@@ -756,6 +775,9 @@ ooLoadMoon__(PLorbsys *sys, HRMLobject *obj, OOscenegraph *sg)
           declin = hrmlGetReal(orbit);
         } else if (!strcmp(orbit->name, "reference-date")) {
 
+        } else {
+          fprintf(stderr, "load, invalid orbit token: %s\n", orbit->name);
+          assert(0);
         }
       }
     } else if (!strcmp(child->name, "atmosphere")) {
@@ -839,6 +861,9 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
           declin = hrmlGetReal(orbit);
         } else if (!strcmp(orbit->name, "reference-date")) {
 
+        } else {
+          fprintf(stderr, "load, invalid orbit token: %s\n", orbit->name);
+          assert(0);
         }
       }
     } else if (!strcmp(child->name, "atmosphere")) {

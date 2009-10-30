@@ -47,7 +47,7 @@ struct OOdrawable {
   float3 dp; // delta pos per time step
   float3 dr; // delta rot per time step
   quaternion_t q; // Quaternion
-  float s; // Scale
+                  //float s; // Scale
 
   OOdrawfunc draw; // Draw function for this object
 };
@@ -115,7 +115,7 @@ void ooSgSceneAddObj(OOscene *sc, OOdrawable *object);
 
 OOdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
 OOdrawable* sgNewEllipsis(const char *name,
-                          float semiMajor, float semiMinor,
+                          double semiMajor, double semiMinor,
                           float r, float g, float b,
                           size_t vertCount);
 
