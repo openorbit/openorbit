@@ -64,25 +64,14 @@ q_vector(quaternion_t q)
 void
 q_m_convert(matrix_t *m, quaternion_t q)
 {
-    float n = q_dot(q, q);
-    float a = (n > 0.0f) ? S_TWO / n : 0.0f;
+  float n = q_dot(q, q);
+  float a = (n > 0.0f) ? S_TWO / n : 0.0f;
     
 #if __has_feature(attribute_ext_vector_type)
-    float xa = q.x*a;
-    float ya = q.y*a;
-    float za = q.z*a;
-    
-    float xy = q.x*ya;
-    float xz = q.x*za;
-    float yz = q.y*za;
-
-    float wx = q.w*xa;
-    float wy = q.w*ya;
-    float wz = q.w*za;
-
-    float xx = q.x*xa;
-    float yy = q.y*ya;
-    float zz = q.z*za;
+  float xa = q.x*a, ya = q.y*a, za = q.z*a;
+  float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
+  float yy = q.y*ya, yz = q.y*za, zz = q.z*za;
+  float wx = q.w*xa, wy = q.w*ya, wz = q.w*za;
 #else
   float4_u qu = { .v = q };
   float xa = qu.s.x*a;
@@ -103,49 +92,18 @@ q_m_convert(matrix_t *m, quaternion_t q)
   
 #endif
   
-    m->a[0][0] = 1.0f-(yy+zz); m->a[0][1] =        xy-wz;
-    m->a[0][2] =        xz+wy;  m->a[0][3] = 0.0f;
+  m->a[0][0] = 1.0f-(yy+zz); m->a[0][1] =        xy-wz;
+  m->a[0][2] =        xz+wy; m->a[0][3] = 0.0f;
     
-    m->a[1][0] =        xy+wz;  m->a[1][1] = 1.0f-(xx+zz);
-    m->a[1][2] =        yz-wx;  m->a[1][3] = 0.0f;
+  m->a[1][0] =        xy+wz; m->a[1][1] = 1.0f-(xx+zz);
+  m->a[1][2] =        yz-wx; m->a[1][3] = 0.0f;
     
-    m->a[2][0] =        xz-wy;  m->a[2][1] =        yz+wx;
-    m->a[2][2] = 1.0f-(xx+yy); m->a[2][3] = 0.0f;
+  m->a[2][0] =        xz-wy; m->a[2][1] =        yz+wx;
+  m->a[2][2] = 1.0f-(xx+yy); m->a[2][3] = 0.0f;
     
-    m->a[3][0] = 0.0f;        m->a[3][1] = 0.0f;
-    m->a[3][2] = 0.0f;        m->a[3][3] = 1.0f;
+  m->a[3][0] = 0.0f;         m->a[3][1] = 0.0f;
+  m->a[3][2] = 0.0f;         m->a[3][3] = 1.0f;
 }
-#if 0
-void
-q_m_convert(mat_arr_t m, const quat_arr_t q)
-{
-    scalar_t xy = QUAT_X(q)*QUAT_Y(q);
-    scalar_t xz = QUAT_X(q)*QUAT_Z(q);
-    scalar_t yz = QUAT_Y(q)*QUAT_Z(q);
-    
-    scalar_t wx = QUAT_W(q)*QUAT_X(q);
-    scalar_t wy = QUAT_W(q)*QUAT_Y(q);
-    scalar_t wz = QUAT_W(q)*QUAT_Z(q);
-    
-    scalar_t xx = QUAT_X(q)*QUAT_X(q);
-    scalar_t yy = QUAT_Y(q)*QUAT_Y(q);
-    scalar_t zz = QUAT_Z(q)*QUAT_Z(q);
-    scalar_t ww = QUAT_W(q)*QUAT_W(q);
-
-    
-    m[0][0] = ww+xx-yy-zz;  m[0][1] = 2.0*(xy-wz);
-    m[0][2] = 2.0*(xz+wy);  m[0][3] = 0.0;
-    
-    m[1][0] = 2.0*(xy+wz);  m[1][1] = ww-xx+yy-zz;
-    m[1][2] = 2.0*(yz-wx);  m[1][3] = 0.0;
-    
-    m[2][0] = 2.0*(xz-wy);  m[2][1] = 2.0*(yz+wx);
-    m[2][2] = ww-xx-yy+zz;  m[2][3] = 0.0;
-    
-    m[3][0] = 0.0;        m[3][1] = 0.0;
-    m[3][2] = 0.0;        m[3][3] = ww+xx+yy+zz;
-}
-#endif
 
 
 quaternion_t
