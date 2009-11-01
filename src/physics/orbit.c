@@ -183,7 +183,7 @@ plOrbitPosAtTime(PL_keplerian_elements *orbit, double GM, double t)
   /* Compute x, y from anomaly, y is pointing in the direction of the
      periapsis */
   double y = orbit->a * cos(eccAnomaly) - orbit->a * orbit->ecc; // NOTE: on the plane we usually do x = a cos t
-  double x = orbit->b * sin(eccAnomaly);
+  double x = -orbit->b * sin(eccAnomaly); // Since we use y as primary axis, x points downwards
 
   quaternion_t q = plOrbitalQuaternion(orbit);
   matrix_t m;
@@ -361,11 +361,10 @@ plSysSetCurrentPos(PLorbsys *sys)
     double eccAnomaly = plEccAnomaly(sys->orbitalBody->kepler->ecc, meanMotion, ooTimeGetJD()*PL_SEC_PER_DAY);
     double eccDeg = RAD_TO_DEG(eccAnomaly);
 
-    int idx = eccDeg / (360.0/((SGellipsis*)(sys->orbitDrawable))->vertCount);
     /* Compute x, y from anomaly, y is pointing in the direction of the
-     periapsis */
+     periapsis, x is pointing downwards */
     double y = sys->orbitalBody->kepler->a * cos(eccAnomaly) - sys->orbitalBody->kepler->a * sys->orbitalBody->kepler->ecc; // NOTE: on the plane we usually do x = a cos t
-    double x = sys->orbitalBody->kepler->b * sin(eccAnomaly);
+    double x = -sys->orbitalBody->kepler->b * sin(eccAnomaly);
 
 
     sys->orbitalBody->p = sys->world->centralBody->p;
@@ -511,28 +510,11 @@ plCreateOrbit(PLworld *world, const char *name,
   sys->parent = NULL;
 
   sys->orbitalPeriod = orbitPeriod;
-  //sys->orbitalPath = ooGeoEllipseAreaSeg(500, semiMaj, semiMin);
 
   // TODO: Stack allocation based on untrusted length should not be here
   char orbitName[strlen(name) + strlen(" Orbit") + 1];
   strcpy(orbitName, name); // safe as size is checked in allocation
   strcat(orbitName, " Orbit");
-
-  sys->orbitDrawable = sgNewEllipsis(orbitName,
-                                     semiMaj, semiMin,
-                                     0.0, 0.0, 1.0, 256);
-
-  // compute orbit quaternion based on inc, asc, and periapsis,
-  quaternion_t qasc = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(ascendingNode));
-  quaternion_t qinc = q_rot(0.0, 1.0, 0.0, DEG_TO_RAD(inc));
-  quaternion_t qaps = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(argOfPeriapsis));
-
-  quaternion_t q = q_mul(qasc, qinc);
-  q = q_mul(q, qaps);
-  sgSetObjectQuatv(sys->orbitDrawable, q);
-
-  ooSgSceneAddObj(sys->world->scene,
-                  sys->orbitDrawable);
 
   OOlwcoord p;
   ooLwcSet(&p, 0.0, 0.0, 0.0);
@@ -540,6 +522,13 @@ plCreateOrbit(PLworld *world, const char *name,
   sys->orbitalBody->kepler = plNewKeplerElements(sqrt((semiMaj*semiMaj-semiMin*semiMin)/(semiMaj*semiMaj)),
                                                  semiMaj, inc, ascendingNode,
                                                  argOfPeriapsis, meanAnomaly);
+
+  sys->orbitDrawable = sgNewEllipsis(orbitName, semiMaj, semiMin,
+                                     ascendingNode, inc, argOfPeriapsis,
+                                     0.0, 0.0, 1.0,
+                                     256);
+  ooSgSceneAddObj(sys->world->scene,
+                  sys->orbitDrawable);
 
   return sys;
 }
@@ -643,7 +632,7 @@ plSysUpateSg(PLorbsys *sys)
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysUpateSg(sys->orbits.elems[i]);
   }
-  
+
 }
 
 
@@ -664,10 +653,10 @@ plWorldStep(PLworld *world, double dt)
   for (size_t i = 0; i < world->orbits.length ; i ++) {
     plSysStep(world->orbits.elems[i], dt);
   }
-  
+
   // Update SG
   // First move the camera object
-  
+
   //
   const dReal *quat = dBodyGetQuaternion(world->centralBody->id);
   ooSgSetObjectQuat(world->centralBody->drawable,
@@ -678,7 +667,7 @@ plWorldStep(PLworld *world, double dt)
   for (size_t i = 0; i < world->orbits.length ; i ++) {
     plSysUpateSg(world->orbits.elems[i]);
   }
-  
+
 }
 /*
     NOTE: G is defined as 6.67428 e-11 (m^3)/kg/(s^2), let's call that G_m. In AU,
@@ -803,12 +792,12 @@ ooLoadMoon__(PLorbsys *sys, HRMLobject *obj, OOscenegraph *sg)
   OOscene *sc = ooSgGetRoot(sg);
   OOdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
- 
+
   PLorbsys *moonSys = plNewSubOrbit(sys, moonName.u.str, mass, gm,
                                     period, // orbital period
                                     semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc),
                                     inc, longAscNode, longPerihel, meanLong);
-  
+
   plSetDrawable(moonSys->orbitalBody, drawable);
 }
 
@@ -821,7 +810,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
   double mass, radius, siderealPeriod, axialTilt = 0.0, gm = NAN;
-  double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong, rightAsc,
+  double semiMajor, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong, rightAsc,
          declin;
   const char *tex = NULL;
   HRMLobject *sats = NULL;

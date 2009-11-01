@@ -386,8 +386,8 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
     glTranslatef(vf3_x(obj->p), vf3_y(obj->p), vf3_z(obj->p));
     matrix_t m;
     q_m_convert(&m, obj->q);
+
     glMultMatrixf((GLfloat*)&m);
-    //glScalef(obj->s, obj->s, obj->s);
 
     obj->draw(obj);
     glPopMatrix();
@@ -631,27 +631,28 @@ sgDrawEllipsis(SGellipsis *el)
   glPushMatrix();
   glLineWidth(1.0);
   glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(2, GL_FLOAT, 0, el->verts);
+  glVertexPointer(3, GL_FLOAT, 0, el->verts);
   glColor3f(el->colour[0], el->colour[1], el->colour[2]);
   glDrawArrays(GL_LINE_LOOP, 0, el->vertCount);
   glDisableClientState(GL_VERTEX_ARRAY);
   glPopMatrix();
-  
+
   // Place dot at periapsis
   glPointSize(10.0);
   glBegin(GL_POINTS);
   glColor3f(1.0-el->colour[0], 1.0-el->colour[1], 1.0-el->colour[2]);
-  glVertex2f(el->verts[0], el->verts[1]);
+  glVertex3f(el->verts[0], el->verts[1], el->verts[2]);
   glEnd();
 }
 
 OOdrawable*
 sgNewEllipsis(const char *name,
               double semiMajor, double semiMinor,
+              double longAsc, double inc, double argPeri,
               float r, float g, float b,
               size_t vertCount)
 {
-  SGellipsis *el = malloc(sizeof(SGellipsis) + vertCount * 2 * sizeof(float));
+  SGellipsis *el = malloc(sizeof(SGellipsis) + vertCount * 3 * sizeof(float));
   el->semiMajor = semiMajor;
   el->semiMinor = semiMinor;
   el->ecc = sqrt((semiMajor * semiMajor - semiMinor * semiMinor)
@@ -665,11 +666,27 @@ sgNewEllipsis(const char *name,
   // Build an ellipse with the requested number of vertices
   double w = 2.0 * M_PI / (double)vertCount;
   for (int i = 0 ; i < vertCount ; ++ i) {
-    double x = semiMinor * sin(w * (double)i);
+    double x = -semiMinor * sin(w * (double)i); // Note, when y is semi major axis, then x is pointing downwards
     double y = semiMajor * cos(w * (double)i) - el->semiMajor*el->ecc;
+    double z = 0.0;
 
-    el->verts[2*i] = x;
-    el->verts[2*i+1] = y;
+    float3 v = vf3_set(x, y, z);
+    quaternion_t qasc = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(longAsc));
+    quaternion_t qinc = q_rot(0.0, 1.0, 0.0, DEG_TO_RAD(inc));
+    quaternion_t qaps = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(argPeri));
+
+    quaternion_t q = q_mul(qasc, qinc);
+    q = q_mul(q, qaps);
+
+    matrix_t m;
+    q_m_convert(&m, q);
+
+    // rotate our point
+    v = m_v3_mulf(&m, v);
+
+    el->verts[3*i] = vf3_x(v);
+    el->verts[3*i+1] = vf3_y(v);
+    el->verts[3*i+2] = vf3_z(v);
   }
 
   return ooSgNewDrawable((OOdrawable*)el, name, (OOdrawfunc)sgDrawEllipsis);

@@ -116,8 +116,8 @@ void ooSgSceneAddObj(OOscene *sc, OOdrawable *object);
 OOdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
 OOdrawable* sgNewEllipsis(const char *name,
                           double semiMajor, double semiMinor,
+                          double longAsc, double inc, double argPeri,
                           float r, float g, float b,
                           size_t vertCount);
-
 
 #endif /* SCENEGRAPH_H_ */
