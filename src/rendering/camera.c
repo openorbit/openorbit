@@ -72,7 +72,7 @@ ooSgCamInit(void)
 
   // Register camera actions
   for (int i = 0 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
-    ooIoRegCKeyHandler(keyBindings[i].ioKey, keyBindings[i].action);        
+    ooIoRegCKeyHandler(keyBindings[i].ioKey, keyBindings[i].action);
     ooConfGetStrDef(keyBindings[i].confKey, &key, NULL);
     if (key) {
       ooIoBindKeyHandler(key, keyBindings[i].ioKey, 0, 0);
@@ -141,13 +141,14 @@ void
 ooSgCamRotate(OOcam *cam)
 {
   assert(cam != NULL && "cam not set");
+  glMatrixMode(GL_MODELVIEW);
   switch (cam->kind) {
   case OOCam_Orbit:
     assert(0 && "not supported yet");
     {
       const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
       //const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
-      gluLookAt(  vf3_x(((OOorbitcam*)cam->camData)->r) + pos[0],
+      gluLookAt(vf3_x(((OOorbitcam*)cam->camData)->r) + pos[0],
                 vf3_y(((OOorbitcam*)cam->camData)->r) + pos[1],
                 vf3_z(((OOorbitcam*)cam->camData)->r) + pos[2],
                 pos[0], pos[1], pos[2], // center
@@ -162,7 +163,9 @@ ooSgCamRotate(OOcam *cam)
       q = q_mul(q, fix->q);
       matrix_t m;
       q_m_convert(&m, q);
-      glMultMatrixf((GLfloat*)&m);
+      matrix_t mt;
+      m_transpose(&mt, &m);
+      glMultMatrixf((GLfloat*)&mt);
     }
     break;
   case OOCam_Free:
@@ -170,6 +173,9 @@ ooSgCamRotate(OOcam *cam)
       quaternion_t q = ((OOfreecam*)(cam->camData))->q;
       matrix_t m;
       q_m_convert(&m, q);
+      //      matrix_t mt;
+      //m_transpose(&mt, &m);
+
       glMultMatrixf((GLfloat*)&m);
     }
     break;
@@ -208,7 +214,7 @@ ooSgCamMove(OOcam *cam)
 {
   assert(cam != NULL && "cam not set");
 //    glPushMatrix();
-
+  glMatrixMode(GL_MODELVIEW);
   switch (cam->kind) {
   case OOCam_Orbit:
     {
@@ -226,22 +232,18 @@ ooSgCamMove(OOcam *cam)
       q = q_mul(q, fix->q);
       matrix_t m;
       q_m_convert(&m, q);
+      //      matrix_t mt;
+      //      m_transpose(&mt, &m);
+
       glMultMatrixf((GLfloat*)&m);
       glTranslatef(-vf3_x(p), -vf3_y(p), -vf3_z(p));
     }
     break;
   case OOCam_Free:
     {
-      quaternion_t q = ((OOfreecam*)(cam->camData))->q;
-      matrix_t m;
-      q_m_convert(&m, q);
-      glMultMatrixf((GLfloat*)&m);
-      glTranslatef(-vf3_get(((OOfreecam*)cam->camData)->lwc.offs, 0),
-                   -vf3_get(((OOfreecam*)cam->camData)->lwc.offs, 1),
-                   -vf3_get(((OOfreecam*)cam->camData)->lwc.offs, 2));
-      //glTranslatef(-((OOfreecam*)cam->camData)->p.x,
-      //             -((OOfreecam*)cam->camData)->p.y,
-      //             -((OOfreecam*)cam->camData)->p.z);
+      glTranslatef(-vf3_x(((OOfreecam*)cam->camData)->lwc.offs),
+                   -vf3_y(((OOfreecam*)cam->camData)->lwc.offs),
+                   -vf3_z(((OOfreecam*)cam->camData)->lwc.offs));
     }
     break;
   default:
@@ -267,14 +269,14 @@ ooSgCamAxisUpdate(OOcam *cam)
     float vertical = ooIoGetAxis("vertical");
     float thrust = ooIoGetAxis("thrust");
 
-    float3 v = vf3_set(100000000.0 * horizontal,
-                       -100000000.0 * vertical,
-                       -100000000.0 * thrust);
+    float3 v = vf3_set(1000000.0 * horizontal,
+                       1000000.0 * vertical,
+                       1000000.0 * thrust);
     fcam->dp = v_q_rot(v, fcam->q);
 
-    fcam->dq = q_rot(0.0f,1.0f,0.0f, -0.02f * yaw);
+    fcam->dq = q_rot(0.0f,0.0f,1.0f, -0.02f * roll);
     fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.02f * pitch));
-    fcam->dq = q_mul(fcam->dq, q_rot(0.0f,0.0f,1.0f, -0.02f * roll));
+    fcam->dq = q_mul(fcam->dq, q_rot(0.0f,1.0f,0.0f, -0.02f * yaw));
   }
 }
 

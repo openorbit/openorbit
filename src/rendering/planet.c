@@ -112,11 +112,16 @@ planet_draw(planet_t *planet)
   matrix_t rot_orig;
   matrix_t rot_ax;
   q_m_convert(&rot_orig, planet->rot_orig);
-  q_m_convert(&rot_ax, planet->rot_ax);
+  matrix_t rot_orig_t;
+  m_transpose(&rot_orig_t, &rot_orig);
 
-  glMultMatrixf((GLfloat*)rot_orig.a);
+  q_m_convert(&rot_ax, planet->rot_ax);
+  matrix_t rot_ax_t;
+  m_transpose(&rot_ax_t, &rot_ax);
+
+  glMultMatrixf((GLfloat*)rot_orig_t.a);
   glTranslatef(vf3_x(planet->pos), vf3_y(planet->pos), vf3_z(planet->pos) );
-  glMultMatrixf((GLfloat*)rot_ax.a);
+  glMultMatrixf((GLfloat*)rot_ax_t.a);
 
   gluSphere(planet->quadratic, planet->radius, 64, 64);
 

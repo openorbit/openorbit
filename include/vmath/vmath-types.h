@@ -162,8 +162,8 @@ typedef float ma4_t[4][4];
 typedef float mat_arr_t[4][4];
 
 typedef union {
-    mat_arr_t a;
-    v4f_t v[4];
+  float a[4][4];
+  float4x4 v;
 } matrix_t;
 
 

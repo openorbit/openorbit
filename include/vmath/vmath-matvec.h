@@ -21,7 +21,7 @@
 /*!
  * \file vmath-matvec.h
  * \brief Declarations of the linear algebra routines.
- * 
+ *
  * In Open Orbit, there is a lot of linear algebra going on. Especially in the
  * graphics and physict engines. This file stores the declarations of common
  * useful linear algebra routines.
@@ -31,7 +31,7 @@
 #define __MATH_VEC_H__
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 #include <stdbool.h>
 #include <math.h>
@@ -71,29 +71,76 @@ vf3_z(float3 v)
 #endif
 }
 
+
+static inline float
+vf4_x(float4 v)
+{
+#if __has_feature(attribute_ext_vector_type)
+  return v.x;
+#else
+  float4_u vu = {.v = v};
+  return vu.s.x;
+#endif
+}
+
+static inline float
+vf4_y(float4 v)
+{
+#if __has_feature(attribute_ext_vector_type)
+  return v.y;
+#else
+  float4_u vu = {.v = v};
+  return vu.s.y;
+#endif
+}
+
+static inline float
+vf4_z(float4 v)
+{
+#if __has_feature(attribute_ext_vector_type)
+  return v.z;
+#else
+  float4_u vu = {.v = v};
+  return vu.s.z;
+#endif
+}
+
+
+static inline float
+vf4_w(float4 v)
+{
+#if __has_feature(attribute_ext_vector_type)
+  return v.w;
+#else
+  float4_u vu = {.v = v};
+  return vu.s.w;
+#endif
+}
+
+
 static inline void
 vf3_set_x(float3 *v, float x)
 {
   float *fp = (float*)v;
   fp[0] = x;
 }
-  
+
 static inline void
 vf3_set_y(float3 *v, float y)
 {
   float *fp = (float*)v;
   fp[1] = y;
 }
-  
+
 static inline void
 vf3_set_z(float3 *v, float z)
 {
   float *fp = (float*)v;
   fp[2] = z;
 }
-  
-  
-  
+
+
+
 static inline float3
 vf3_set(float x, float y, float z)
 {
@@ -145,7 +192,7 @@ vd3_get(double3 v, short i)
 {
 #if __has_feature(attribute_ext_vector_type)
   return v[i];
-#else  
+#else
   double3_u uc = {.v = v};
   return uc.a[i];
 #endif
@@ -155,7 +202,7 @@ vd4_get(double4 v, short i)
 {
 #if __has_feature(attribute_ext_vector_type)
   return v[i];
-#else  
+#else
   double4_u uc = {.v = v};
   return uc.a[i];
 #endif
@@ -198,7 +245,7 @@ vf4_abs(float4 v)
   float4 res = v * v;
   return sqrt(vf4_get(res, 0) + vf4_get(res, 1) + vf4_get(res, 2) + vf4_get(res, 3));
 }
-  
+
 
 static inline double
 vd3_abs(double3 v)
@@ -253,7 +300,7 @@ vf3_dot(float3 a, float3 b)
 {
   float3 c = a * b;
   float3_u uc = {.v = c};
-  
+
   return uc.a[0] + uc.a[1] + uc.a[2];
 }
 
@@ -262,7 +309,7 @@ vf4_dot(float4 a, float4 b)
 {
   float4 c = a * b;
   float4_u uc = {.v = c};
-  
+
   return uc.a[0] + uc.a[1] + uc.a[2] + uc.a[3];
 }
 
@@ -272,7 +319,7 @@ vd3_dot(double3 a, double3 b)
 {
   double3 c = a * b;
   double3_u uc = {.v = c};
-  
+
   return uc.a[0] + uc.a[1] + uc.a[2];
 }
 
@@ -281,7 +328,7 @@ vd4_dot(double3 a, double3 b)
 {
   double3 c = a * b;
   double3_u uc = {.v = c};
-  
+
   return uc.a[0] + uc.a[1] + uc.a[2] + uc.a[3];
 }
 
@@ -299,8 +346,8 @@ void m_transpose(matrix_t *mt, const matrix_t *m) __attribute__ ((__nonnull__));
 
 
 void m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
-    __attribute__ ((__nonnull__));    
-    
+    __attribute__ ((__nonnull__));
+
 void m_add(matrix_t *res, matrix_t *a, matrix_t *b)
     __attribute__ ((__nonnull__));
 
@@ -358,11 +405,11 @@ vd3_s_mod(double3 a, double b)
 {
   double3_u uc = {.v = a};
   double3_u res;
-  
+
   res.a[0] = fmod(uc.a[0], b);
   res.a[1] = fmod(uc.a[1], b);
   res.a[2] = fmod(uc.a[2], b);
-  
+
   return res.v;
 }
 
@@ -405,8 +452,8 @@ vf3_mul(float3 a, float3 b)
 {
   return a * b;
 }
-  
-  
+
+
 static inline float3
 vf3_s_mul(float3 a, float b)
 {
@@ -455,18 +502,18 @@ static inline double3
 vd3_abs_c(double3 a)
 {
   double3_u ua = {.v = a};
-  
+
   double3 absa = vd3_set(fabs(ua.a[0]), fabs(ua.a[1]), fabs(ua.a[2]));
   return absa;
 }
 
 /* This is really a 3d x product */
-    
+
 float3 v_cross(float3 a, float3 b)
     __attribute__ ((__pure__));
-    
+
 float4 v_normalise(float4 v) __attribute__ ((__pure__));
-    
+
  float v_abs(const float4 v)
     __attribute__ ((__pure__));
 
@@ -494,17 +541,17 @@ void m_vec_rot_z(matrix_t *m, float a) __attribute__ ((__nonnull__));
 void m_unit(matrix_t *m) __attribute__ ((__nonnull__));
 
 /* creates zero matrix */
-    
+
 void m_zero(matrix_t *m) __attribute__ ((__nonnull__));
 
-/* copying functions for duplicating matrices and vectors */    
+/* copying functions for duplicating matrices and vectors */
 void m_cpy(matrix_t * restrict dst, matrix_t * restrict src) __attribute__ ((__nonnull__));
 
 
 /* Comparative functions */
 /*! Compares two vectors for elementvise equality, with a given absolute
  *  tolerance */
-     
+
 bool v_eq(float4 a, float4 b, float tol)
     __attribute__ ((__pure__));
 
@@ -552,6 +599,6 @@ vd3_normalise(double3 v)
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif

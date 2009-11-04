@@ -25,10 +25,8 @@ openorbit {
           eccentricity: 0.20563069;
           inclination: 7.00487 deg;
           longitude-ascending-node: 48.33167 deg;
-          longitude-perihelion: 77.45645 deg;
+          longitude-periapsis: 77.45645 deg;
           mean-longitude: 252.25084 deg;
-          right-ascension: 281.01 deg; # - 0.003T
-          declination:  61.45 deg; # - 0.005T
           //reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
         }
         atmosphere {
@@ -60,10 +58,8 @@ openorbit {
           eccentricity: 0.00677323;
           inclination: 3.39471 deg;
           longitude-ascending-node: 76.68069 deg;
-          longitude-perihelion: 131.53298 deg;
+          longitude-periapsis: 131.53298 deg;
           mean-longitude: 181.97973 deg;
-          right-ascension: 272.76 deg;
-          declination: 67.16 deg;
           //reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
         }
         atmosphere {
@@ -88,16 +84,15 @@ openorbit {
           radius: 6.37e6 m;
           sidereal-rotational-period: 0.99726968;
           axial-tilt: 23.439281 deg;
+          albedo: 0.367;
         }
         orbit {
           semimajor-axis: 1.00000011 au;
           eccentricity: 0.01671022;
           inclination: 0.00005 deg;
-          longitude-ascending-node: -11.26064 deg;
-          longitude-perihelion: 102.94719 deg;
+          longitude-ascending-node: 348.73936 deg;
+          longitude-periapsis: 102.94719 deg;
           mean-longitude: 100.46435 deg;
-          right-ascension:  0.00 deg; #- 0.641T
-          declination    : 90.00 deg; #- 0.557T
           //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
         }
         atmosphere {
@@ -128,10 +123,8 @@ openorbit {
               eccentricity: 0.0549;
               inclination: 5.145 deg; // 18.29 - 28.58 to earth equator
               longitude-ascending-node: -11.26064 deg;
-              longitude-perihelion: 0.0 deg; //TODO: unknown
+              longitude-periapsis: 0.0 deg; //TODO: unknown
               mean-longitude: 0.0 deg;//TODO: unknown
-              right-ascension:  0.00 deg; //TODO: unknown
-              declination    : 90.00 deg; //TODO: unknown
             }
             rendering {
               model: "sphere";
@@ -153,10 +146,8 @@ openorbit {
           eccentricity: 0.09341233;
           inclination: 1.85061 deg;
           longitude-ascending-node: 49.57854 deg;
-          longitude-perihelion: 336.04084 deg;
+          longitude-periapsis: 336.04084 deg;
           mean-longitude: 355.45332 deg;
-          right-ascension:  317.681 deg; #- 0.106T
-          declination    : 52.887 deg; #- 0.061T
           //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
         }
         rendering {
@@ -177,10 +168,8 @@ openorbit {
           eccentricity: 0.04839266;
           inclination: 1.30530 deg;
           longitude-ascending-node: 100.55615 deg;
-          longitude-perihelion: 14.75385 deg;
+          longitude-periapsis: 14.75385 deg;
           mean-longitude: 34.40438 deg;
-          right-ascension:  268.05 deg; #- 0.009T
-          declination    : 64.49 deg; #+ 0.003T
           //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
         }
         rendering {
@@ -200,10 +189,8 @@ openorbit {
               eccentricity: 0.004;
               inclination: 0.04 deg; // 18.29 - 28.58 to earth equator
               longitude-ascending-node: 0.0 deg; // unknown
-              longitude-perihelion: 0.0 deg; //TODO: unknown
+              longitude-periapsis: 0.0 deg; //TODO: unknown
               mean-longitude: 0.0 deg;//TODO: unknown
-              right-ascension:  0.00 deg; //TODO: unknown
-              declination    : 90.00 deg; //TODO: unknown
             }
             rendering {
               model: "sphere";
@@ -223,10 +210,8 @@ openorbit {
               eccentricity: 0.0101;
               inclination: 0.47 deg; // 18.29 - 28.58 to earth equator
               longitude-ascending-node: 0.0 deg; // unknown
-              longitude-perihelion: 0.0 deg; //TODO: unknown
+              longitude-periapsis: 0.0 deg; //TODO: unknown
               mean-longitude: 0.0 deg;//TODO: unknown
-              right-ascension:  0.00 deg; //TODO: unknown
-              declination    : 90.00 deg; //TODO: unknown
             }
             rendering {
               model: "sphere";
@@ -246,10 +231,8 @@ openorbit {
               eccentricity: 0.0015;
               inclination: 0.21 deg; // 18.29 - 28.58 to earth equator
               longitude-ascending-node: 0.0 deg; // unknown
-              longitude-perihelion: 0.0 deg; //TODO: unknown
+              longitude-periapsis: 0.0 deg; //TODO: unknown
               mean-longitude: 0.0 deg;//TODO: unknown
-              right-ascension:  0.00 deg; //TODO: unknown
-              declination    : 90.00 deg; //TODO: unknown
             }
             rendering {
               model: "sphere";
@@ -269,10 +252,8 @@ openorbit {
               eccentricity: 0.007;
               inclination: 0.51 deg; // 18.29 - 28.58 to earth equator
               longitude-ascending-node: 0.0 deg; // unknown
-              longitude-perihelion: 0.0 deg; //TODO: unknown
+              longitude-periapsis: 0.0 deg; //TODO: unknown
               mean-longitude: 0.0 deg;//TODO: unknown
-              right-ascension:  0.00 deg; //TODO: unknown
-              declination    : 90.00 deg; //TODO: unknown
             }
             rendering {
               model: "sphere";

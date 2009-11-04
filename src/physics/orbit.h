@@ -96,14 +96,17 @@ struct PLworld__ {
 };
 
 PLworld* plNewWorld(const char *name, OOscene *sc,
-                      double m, double gm, double radius, double siderealPeriod);
+                    double m, double gm, double radius,
+                    double siderealPeriod, double obliquity);
 
 PLorbsys* plNewOrbit(PLworld *world, const char *name, double m, double gm,
-                     double orbitPeriod, double semiMaj, double semiMin,
+                     double orbitPeriod, double obliquity,
+                     double semiMaj, double semiMin,
                      double inc, double ascendingNode, double argOfPeriapsis,
                      double meanAnomaly);
 PLorbsys* plNewSubOrbit(PLorbsys *orb, const char *name, double m, double gm,
-                        double orbitPeriod, double semiMaj, double semiMin,
+                        double orbitPeriod, double obliquity,
+                        double semiMaj, double semiMin,
                         double inc, double ascendingNode, double argOfPeriapsis,
                         double meanAnomaly);
 

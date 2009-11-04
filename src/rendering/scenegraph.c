@@ -70,7 +70,7 @@ OOscene*
 ooSgGetRoot(OOscenegraph *sg)
 {
   assert(sg != NULL);
-  
+
   return sg->root;
 }
 
@@ -78,7 +78,7 @@ OOcam*
 ooSgGetCam(OOscenegraph *sg)
 {
   assert(sg != NULL);
-  
+
   return sg->currentCam;
 }
 
@@ -116,7 +116,7 @@ ooSgSetObjectPosLW(OOdrawable *obj, const OOlwcoord *lw)
   OOscene *sc = obj->scene;
   OOscenegraph *sg = sc->sg;
   OOcam *cam = sg->currentCam;
-  
+
   if (cam->kind == OOCam_Free) {
     float3 relPos = ooLwcRelVec(lw, ((OOfreecam*)cam->camData)->lwc.seg);
     obj->p = relPos;
@@ -227,9 +227,9 @@ ooSgNewScene(OOscene *parent, const char *name)
   sc->t = vf3_set(0.0, 0.0, 0.0);
   //sc->s = 1.0;
   //sc->si = 1.0;
-  
+
   sc->sg = NULL;
-  
+
   ooObjVecInit(&sc->scenes);
   ooObjVecInit(&sc->objs);
 
@@ -386,8 +386,9 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
     glTranslatef(vf3_x(obj->p), vf3_y(obj->p), vf3_z(obj->p));
     matrix_t m;
     q_m_convert(&m, obj->q);
-
-    glMultMatrixf((GLfloat*)&m);
+    matrix_t mt;
+    m_transpose(&mt, &m);
+    glMultMatrixf((GLfloat*)&mt);
 
     obj->draw(obj);
     glPopMatrix();
@@ -401,7 +402,7 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
       glPushMatrix();
       //glScalef(subScene->si, subScene->si, subScene->si);
       glTranslatef(vf3_x(subScene->t), vf3_y(subScene->t), vf3_z(subScene->t));
-      
+
       ooSgSceneDraw(subScene, true);
       glPopMatrix();
     }
@@ -453,6 +454,7 @@ ooSgPaint(OOscenegraph *sg)
   // camera (this will recursivly draw it's child scenes)
   glPushMatrix();
 
+  ooSgCamRotate(sg->currentCam);
   ooSgCamMove(sg->currentCam);
   ooSgSceneDraw(sg->currentCam->scene, true);
 
@@ -544,7 +546,7 @@ ooObjVecPush(OOobjvector *vec, OOobject *obj)
 
 OOobject*
 ooObjVecPop(OOobjvector *vec)
-{    
+{
     return vec->elems[vec->length --];
 }
 
@@ -563,7 +565,7 @@ ooObjVecSet(OOobjvector *vec, size_t i, OOobject *obj)
   if (vec->length <= i)
     ooLogFatal("vector out of bounds length = %d idx = %d", vec->length, i);
   else
-    vec->elems[i] = obj;  
+    vec->elems[i] = obj;
 }
 
 void
@@ -579,7 +581,7 @@ ooSgDrawSphere(OOsphere *sp)
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
 
-  glBindTexture(GL_TEXTURE_2D, sp->texId);    
+  glBindTexture(GL_TEXTURE_2D, sp->texId);
 
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
@@ -594,6 +596,15 @@ ooSgDrawSphere(OOsphere *sp)
   glPointSize(5.0);
   glColor3f(1.0, 0.0, 0.0);
   glVertex3f(0.0, 0.0, 0.0);
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D); // Lines are not textured...
+  glBegin(GL_LINES);
+
+  glColor3f(1.0, 1.0, 0.0);
+  glVertex3f(0.0, 0.0, -2.0*sp->radius);
+  glVertex3f(0.0, 0.0, +2.0*sp->radius);
+
   glEnd();
 }
 
@@ -763,14 +774,14 @@ ooSgNewMesh(OOtexture *tex)
 {
     OOmesh *mesh = malloc(sizeof(OOmesh));
     if (mesh == NULL) {return NULL;}
-    
+
     OOnode *node = ooSgNewNode(mesh, (OOdrawfunc)ooSgDrawMesh, NULL);
     mesh->vCount = 0;
     mesh->texId = tex->texId;
-    
+
     mesh->vertices = calloc(32, sizeof(OOvertex));
     mesh->vSize = 32;
-    
+
     return node;
 }
 
@@ -778,16 +789,16 @@ void
 ooSgMeshPushVert(OOnode *node, const OOvertex *v)
 {
     OOmesh *mesh = node->obj;
-    
+
     if (mesh->vCount = mesh->vSize) {
         OOvertex *newVerts = realloc(mesh->vertices,
                                      mesh->vSize * 2 * sizeof(OOvertex));
-        
+
         if (!newVerts) ooLogFatal("vertex buffer expansion failed");
         mesh->vSize = mesh->vSize * 2;
         mesh->vertices = newVerts;
     }
-    
+
     mesh->vertices[mesh->vCount] = *v;
     mesh->vCount ++;
 }

@@ -89,6 +89,9 @@ cdef extern from "res-manager.h":
 cdef extern from "stdlib.h":
     void free(void*)
 
+cdef extern from "parsers/model.h":
+  ctypedef struct model_t
+  model_t * model_load(char * fileName)
 
 cdef extern from "plugin-handler.h":
     int ooPluginLoadAll()
@@ -120,6 +123,13 @@ cdef class OdeBody:
 #def UnloadPlugin(key):
 #    ooPluginUnload(key)
 
+cdef class Model:
+  cdef model_t * model
+  def __init__(self, char *key):
+    cdef char *path
+    path = ooResGetPath(key)
+    self.model = model_load(path)
+    free(path)
 
 cdef class Texture:
     cdef OOtexture *tex
