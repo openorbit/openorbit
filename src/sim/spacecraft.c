@@ -20,7 +20,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <ode/ode.h>
-#include "log.h" 
+#include "log.h"
 #include "sim.h"
 #include "sim/spacecraft.h"
 #include "res-manager.h"
@@ -28,6 +28,29 @@
 #include <vmath/vmath.h>
 
 extern SIMstate gSIM_state;
+
+/*
+  Compute the wing lift for a simple wing
+
+  The simple wing relies of having precomputed lift coefficients. We allow one
+  per 5 deg angle of attack. We actually intepolate between two angles to
+  produce a little bit better results.
+ */
+void
+ooSimpleWingLift(OOsimplewing *wing, const OOsimenv *env)
+{
+  double p = env->airDensity;  // air density
+  double v = 0.0; // Velocity
+  double a = wing->area;  // Wing area
+
+  unsigned idx = (((unsigned)RAD_TO_DEG(env->aoa)) % 360) / 5;
+
+  double cl0 = wing->liftCoeffs[idx]; // lift coefficient
+  double cl1 = wing->liftCoeffs[(idx+1)%72]; // lift coefficient
+
+  double cl = cl0 + (cl1 - cl0) * fmod(RAD_TO_DEG(env->aoa), 5.0);
+  double L = 0.5 * p * v * v * a * cl;
+}
 
 
 OOspacecraft* ooScGetCurrent(void)
@@ -65,7 +88,7 @@ dMassSetConeTotal(dMass *m, dReal total_mass,
 
 
   dMassSetParameters(m, total_mass,
-                     cogx, cogy, cogz, // TODO: fix, COG 
+                     cogx, cogy, cogz, // TODO: fix, COG
                      i11, i22, i33,
                      0.0, 0.0, 0.0);
 }
@@ -299,6 +322,9 @@ ooScLoad(const char *fileName)
             }
             ooScAddStage(sc, newStage);
           }
+        } else if (!strcmp(child->name, "model")) {
+          const char *modelName = hrmlGetStr(child);
+
         }
       }
     }

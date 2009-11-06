@@ -72,7 +72,16 @@ typedef struct OOwing OOwing;
 typedef void (*OOwingstep)(OOwing *, const OOsimenv *env);
 struct OOwing {
   OOstage *stage;
+  OOwingstep step;
 };
+
+typedef struct OOsimplewing OOsimplewing;
+struct OOsimplewing {
+  OOwing super;
+  double area;
+  double liftCoeffs[72]; // one per 5 degree aoa
+};
+
 
 /*
   Some notes that should be elsewhere:
