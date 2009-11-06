@@ -31,6 +31,7 @@
 #include "physics/orbit.h"
 #include "texture.h"
 #include "common/lwcoord.h"
+#include "parsers/model.h"
 
 typedef struct {
     float uv[2];
@@ -757,6 +758,61 @@ sgNewCylinder(const char *name,
 }
 
 
+typedef struct SGmodel {
+  OOdrawable super;
+  model_t *modelData;
+} SGmodel;
+
+void
+drawModel(model_t *model)
+{
+  glPushMatrix();
+
+  glTranslatef(model->trans[0], model->trans[1], model->trans[2]);
+  glMultMatrixf((GLfloat*)model->rot);
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glEnableClientState(GL_NORMAL_ARRAY);
+
+  glVertexPointer(3, GL_FLOAT, 0, model->vertices);
+  glTexCoordPointer(2, GL_FLOAT, 0, model->texCoords);
+  glNormalPointer(GL_FLOAT, 0, model->normals);
+
+  //glFogCoordPointer(GL_FLOAT, 0, model->fogCoords);
+
+  // Not there yet
+  glColor3f(1.0, 1.0, 1.0);
+  glDrawArrays(GL_POINTS, 0, model->vertexCount);
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  glDisableClientState(GL_NORMAL_ARRAY);
+
+
+  for (int i = 0 ; i < model->childCount ; ++ i) {
+    drawModel(model->children[i]);
+  }
+
+  glPopMatrix();
+}
+
+void
+sgDrawModel(SGmodel *model)
+{
+  drawModel(model->modelData);
+}
+
+OOdrawable*
+sgLoadModel(const char *file)
+{
+  SGmodel *model = malloc(sizeof(SGmodel));
+  model->modelData = model_load(file);
+  return ooSgNewDrawable((OOdrawable*)model, "unnamed",
+                         (OOdrawfunc)sgDrawModel);
+}
+
+
 #if 0
 
 
@@ -802,7 +858,6 @@ ooSgMeshPushVert(OOnode *node, const OOvertex *v)
     mesh->vertices[mesh->vCount] = *v;
     mesh->vCount ++;
 }
-
 
 
 #endif

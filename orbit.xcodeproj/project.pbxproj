@@ -115,6 +115,8 @@
 		EC4485740CCD259D001C88AD /* om-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854A0CCD247E001C88AD /* om-test.c */; };
 		EC4485750CCD25AB001C88AD /* list-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854D0CCD247E001C88AD /* list-test.c */; };
 		EC4FCC1410748AC900EB6DDF /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC1310748AC900EB6DDF /* libode.a */; };
+		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
+		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
 		ECBF1748108C566E00D3E412 /* image.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1734108C55ED00D3E412 /* image.c */; };
 		ECBF1749108C566E00D3E412 /* jpg.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1735108C55ED00D3E412 /* jpg.c */; };
@@ -405,7 +407,11 @@
 		EC4FCC6010748ECA00EB6DDF /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = /opt/local/lib/libjpeg.a; sourceTree = "<absolute>"; };
 		EC4FCC6210748F4B00EB6DDF /* libpng.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng.dylib; path = /usr/X11/lib/libpng.dylib; sourceTree = "<absolute>"; };
 		EC768C4E1060D651009B558C /* openorbit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = openorbit.xcconfig; sourceTree = "<group>"; };
+		EC88CF8E10A2B1D700A11B1D /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
+		EC88CF8F10A2B1D700A11B1D /* collada.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = collada.c; sourceTree = "<group>"; };
+		EC88CFC010A2B8F100A11B1D /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
+		ECA5F8B1109D8FE7004278EC /* Hrml Manual */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Hrml Manual"; sourceTree = "<group>"; };
 		ECBF1734108C55ED00D3E412 /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
 		ECBF1735108C55ED00D3E412 /* jpg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jpg.c; sourceTree = "<group>"; };
 		ECBF1736108C55ED00D3E412 /* jpg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jpg.h; sourceTree = "<group>"; };
@@ -494,6 +500,7 @@
 				ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */,
 				EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */,
 				ECBF1754108C56CF00D3E412 /* libimgload.a in Frameworks */,
+				EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -635,6 +642,8 @@
 				EC34BC071079EE080011B76E /* model.h */,
 				EC3CDA2B108677C000C1B458 /* ac3d.h */,
 				EC3CDA2C108677C000C1B458 /* ac3d.c */,
+				EC88CF8E10A2B1D700A11B1D /* collada.h */,
+				EC88CF8F10A2B1D700A11B1D /* collada.c */,
 			);
 			path = parsers;
 			sourceTree = "<group>";
@@ -871,6 +880,8 @@
 		EC4476740CCBFEDB001C88AD = {
 			isa = PBXGroup;
 			children = (
+				EC88CFC010A2B8F100A11B1D /* libxml2.dylib */,
+				ECA5F8AF109D8FB3004278EC /* docs */,
 				EC34BDB1107B2C480011B76E /* lib */,
 				EC34BD2A1079EF5A0011B76E /* scripts */,
 				EC34BCB11079EEA80011B76E /* rsrc */,
@@ -1005,6 +1016,14 @@
 				EC4485500CCD247E001C88AD /* test-case.c */,
 			);
 			path = template;
+			sourceTree = "<group>";
+		};
+		ECA5F8AF109D8FB3004278EC /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				ECA5F8B1109D8FE7004278EC /* Hrml Manual */,
+			);
+			path = docs;
 			sourceTree = "<group>";
 		};
 		ECBF1731108C547800D3E412 /* imgload */ = {
@@ -1425,6 +1444,7 @@
 				EC34BCAA1079EE080011B76E /* control.c in Sources */,
 				EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */,
 				EC3F258B10905FE100E0B0C7 /* simenvironment.c in Sources */,
+				EC88CF9010A2B1D700A11B1D /* collada.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

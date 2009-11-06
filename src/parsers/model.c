@@ -21,6 +21,7 @@
 #include <string.h>
 #include <assert.h>
 #include "ac3d.h"
+#include "collada.h"
 
 model_t*
 model_load(const char * restrict fileName)
@@ -40,7 +41,7 @@ model_load(const char * restrict fileName)
     } else if (!strcmp(dot, ".3ds")) {
       
     } else if (!strcmp(dot, ".dae")) {
-      
+      model = collada_load(fileName);
     } else if (!strcmp(dot, ".ac")) {
       model = ac3d_load(fileName);
     }

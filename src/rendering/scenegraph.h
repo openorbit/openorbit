@@ -120,4 +120,6 @@ OOdrawable* sgNewEllipsis(const char *name,
                           float r, float g, float b,
                           size_t vertCount);
 
+OOdrawable* sgLoadModel(const char *file);
+
 #endif /* SCENEGRAPH_H_ */

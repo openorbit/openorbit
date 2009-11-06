@@ -182,11 +182,45 @@ ac3d_delete(struct ac3d_file_t *ac3d)
 
 }
 
+// This is maybe not the most efficient way, since it makes copys of all the
+// data, the imgload lib steals the buffers and transfers their ownership
+// instead
 model_t*
 ac3d_obj_to_model(struct ac3d_object_t *obj)
 {
   assert(obj != NULL);
   model_t *model = malloc(sizeof(model_t));
+  memset(model, 0, sizeof(model_t));
+
+  if (obj->num_verts > 0) {
+    model->vertexCount = obj->num_verts;
+    model->vertices = calloc(obj->num_verts, sizeof(float)*3);
+    model->texCoords =
+    model->normals = calloc(obj->num_verts, sizeof(float)*3); // Will be computed
+    memcpy(model->vertices, obj->verts, obj->num_verts * sizeof(float) * 3);
+  }
+
+  // Transfer rotation matrix, but ensure it is transposed for GL
+  memset(model->rot, 0, sizeof(float)*16);
+  model->rot[3][3] = 1.0;
+
+  for (int i = 0 ; i < 3 ; ++ i) {
+    for (int j = 0 ; j < 3 ; ++ j) {
+      model->rot[j][i] = obj->rot[i][j];
+    }
+  }
+  memcpy(model->trans, obj->pos, 3*sizeof(float));
+
+  for (int i = 0 ; i < obj->num_surfs ; ++ i) {
+    //obj->surfs[i].tag;
+    //obj->surfs[i].material_idx;
+
+    for (int j = 0 ; j < obj->surfs[i].refs ; ++ j) {
+      //obj->surfs[i].ref_lines[j].tex_x;
+      //obj->surfs[i].ref_lines[j].tex_y;
+      //obj->surfs[i].ref_lines[j].vert_idx;
+    }
+  }
 
   if (obj->num_childs > 10000) {
     fprintf(stderr, "really huge number of objects\n");
@@ -210,6 +244,7 @@ model_t*
 ac3d_to_model(struct ac3d_file_t *ac3d)
 {
   model_t *model = malloc(sizeof(model_t));
+
   model->childCount = ac3d->obj_count;
   model->children = calloc(ac3d->obj_count, sizeof(model_t*));
 
@@ -314,6 +349,7 @@ ac3d_read_obj(FILE *fp, const char *name)
   }
 
 error:
+  free(obj);
   return NULL;
 }
 

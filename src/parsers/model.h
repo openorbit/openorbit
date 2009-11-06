@@ -26,7 +26,7 @@
 
 typedef struct model_t {
   float trans[3];
-  float quat[4];
+  float rot[4][4];
 
   size_t childCount;
   struct model_t **children;
@@ -35,6 +35,7 @@ typedef struct model_t {
   float *vertices;
   float *texCoords;
   float *normals;
+  float *colours;
   uint32_t *faces;
 } model_t;
 
