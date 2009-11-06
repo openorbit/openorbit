@@ -25,6 +25,8 @@ typedef struct OOsimenv OOsimenv;
 
 struct OOsimenv {
   float airPressure; // Pa
+  float airDensity;
+  float aoa; // angle of attack
 };
 
 void ooSimComputeEnvForSc(OOsimenv *env, void *sc);
