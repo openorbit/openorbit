@@ -22,26 +22,46 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <gencds/array.h>
 
+typedef struct model_t model_t;
+typedef struct material_t material_t;
+typedef struct model_object_t model_object_t;
 
-typedef struct model_t {
+struct material_t {
+  float ambient[4];
+  float diffuse[4];
+  float specular[4];
+  float emission[4];
+  float shininess;
+};
+
+struct model_object_t {
+  model_t *model;
+  int materialId;
   float trans[3];
   float rot[4][4];
 
-  size_t childCount;
-  struct model_t **children;
+  obj_array_t children;
 
   uint32_t vertexCount;
-  float *vertices;
-  float *texCoords;
-  float *normals;
-  float *colours;
-  uint32_t *faces;
-} model_t;
+  float_array_t vertices;
+  float_array_t texCoords;
+  float_array_t normals;
+  float_array_t colours;
+};
+
+struct model_t {
+  obj_array_t objs;
+  size_t materialCount;
+  material_t **materials;
+};
+
 
 model_t * model_load(const char * restrict fileName);
 int model_dispose(model_t * restrict model);
-
+material_t* material_create(void);
+model_object_t* model_object_new(void);
 
 #endif /* end of include guard: MODEL_H */
 

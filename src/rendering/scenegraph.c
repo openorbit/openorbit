@@ -763,9 +763,27 @@ typedef struct SGmodel {
   model_t *modelData;
 } SGmodel;
 
-void
-drawModel(model_t *model)
+
+static void
+setMaterial(material_t *mat)
 {
+  glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat->ambient);
+  glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+  glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat->emission);
+  glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess);
+}
+
+void
+drawModel(model_object_t *model)
+{
+  glColor4f(1.0, 1.0, 1.0, 1.0);
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CCW);
+  //glShadeModel(GL_SMOOTH);
+  //glDisable(GL_COLOR_MATERIAL);
+  setMaterial(model->model->materials[model->materialId]);
+
   glPushMatrix();
 
   glTranslatef(model->trans[0], model->trans[1], model->trans[2]);
@@ -774,25 +792,29 @@ drawModel(model_t *model)
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
 
-  glVertexPointer(3, GL_FLOAT, 0, model->vertices);
-  glTexCoordPointer(2, GL_FLOAT, 0, model->texCoords);
-  glNormalPointer(GL_FLOAT, 0, model->normals);
+  glVertexPointer(3, GL_FLOAT, 0, model->vertices.elems);
+  glTexCoordPointer(2, GL_FLOAT, 0, model->texCoords.elems);
+  glNormalPointer(GL_FLOAT, 0, model->normals.elems);
+  glColorPointer(3, GL_FLOAT, 0, model->colours.elems);
 
   //glFogCoordPointer(GL_FLOAT, 0, model->fogCoords);
 
   // Not there yet
-  glColor3f(1.0, 1.0, 1.0);
-  glDrawArrays(GL_POINTS, 0, model->vertexCount);
+  //glColor3f(1.0, 1.0, 1.0);
+  glDrawArrays(GL_TRIANGLES, 0, model->vertexCount);
 
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
 
-
-  for (int i = 0 ; i < model->childCount ; ++ i) {
-    drawModel(model->children[i]);
+  for (int i = 0 ; i < model->children.length ; ++ i) {
+    drawModel(model->children.elems[i]);
   }
+
+  glColor4f(1.0, 1.0, 1.0, 1.0);
 
   glPopMatrix();
 }
@@ -800,7 +822,7 @@ drawModel(model_t *model)
 void
 sgDrawModel(SGmodel *model)
 {
-  drawModel(model->modelData);
+  drawModel(model->modelData->objs.elems[0]);
 }
 
 OOdrawable*
@@ -810,6 +832,22 @@ sgLoadModel(const char *file)
   model->modelData = model_load(file);
   return ooSgNewDrawable((OOdrawable*)model, "unnamed",
                          (OOdrawfunc)sgDrawModel);
+}
+
+SGlight*
+sgNewSpotlight(OOscenegraph *sg, float3 p, float3 dir)
+{
+  SGspotlight *light = malloc(sizeof(SGspotlight));
+
+  return (SGlight*)light;
+}
+
+SGlight*
+sgNewPointlight(OOscenegraph *sg, float3 p)
+{
+  SGpointlight *light = malloc(sizeof(SGpointlight));
+
+  return (SGlight*)light;
 }
 
 

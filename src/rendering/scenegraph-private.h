@@ -20,11 +20,26 @@
 #ifndef SCENEGRAPH_PRIVATE_H_8YHHHPCN
 #define SCENEGRAPH_PRIVATE_H_8YHHHPCN
 
+typedef struct SGlight {
+  float3 pos;
+  int lightId;
+  float colour[4];
+} SGlight;
+
+typedef struct SGspotlight {
+  SGlight super;
+  float dir[3];
+} SGspotlight;
+
+typedef struct SGpointlight {
+  SGlight super;
+} SGpointlight;
+
 
 struct OOscene {
   struct OOscene *parent;
   char *name;
-
+  SGlight *lights[SG_MAX_LIGHTS];
   float3 t;
 //  quaternion_t q;
 //  scalar_t s; // scale with respect to parent s
@@ -60,5 +75,7 @@ typedef struct SGellipsis {
   size_t vertCount;
   float verts[];
 } SGellipsis;
+
+
 
 #endif /* end of include guard: SCENEGRAPH_PRIVATE_H_8YHHHPCN */

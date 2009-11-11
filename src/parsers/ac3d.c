@@ -20,11 +20,14 @@
 
 #include "ac3d.h"
 #include "model.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
+
 #define BUFF_SIZE 1024
 
 #define SCAN_CHECK(bf, cnt, str, ...)                 \
@@ -43,7 +46,7 @@ struct ac3d_material_t {
   float emis_r, emis_g, emis_b;
   float spec_r, spec_g, spec_b;
   float trans;
-  int shi;
+  float shi;
 };
 
 struct ac3d_refline {
@@ -177,28 +180,43 @@ make_object(void)
 }
 
 void
+ac3d_obj_delete(struct ac3d_object_t *obj)
+{
+  for (int i = 0 ; i < obj->num_childs ; ++ i) {
+    ac3d_obj_delete(obj->children[i]);
+  }
+
+  free(obj->kind);
+  free(obj->name);
+  free(obj->texture);
+  free(obj->data);
+  free(obj->url);
+  free(obj->verts);
+  free(obj->surfs);
+  free(obj->children);
+  free(obj);
+}
+
+void
 ac3d_delete(struct ac3d_file_t *ac3d)
 {
+  for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
+    ac3d_obj_delete(ac3d->objs[i]);
+  }
 
+  free(ac3d->objs);
+  free(ac3d->materials);
+  free(ac3d);
 }
 
 // This is maybe not the most efficient way, since it makes copys of all the
 // data, the imgload lib steals the buffers and transfers their ownership
 // instead
-model_t*
-ac3d_obj_to_model(struct ac3d_object_t *obj)
+model_object_t*
+ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *obj)
 {
   assert(obj != NULL);
-  model_t *model = malloc(sizeof(model_t));
-  memset(model, 0, sizeof(model_t));
-
-  if (obj->num_verts > 0) {
-    model->vertexCount = obj->num_verts;
-    model->vertices = calloc(obj->num_verts, sizeof(float)*3);
-    model->texCoords =
-    model->normals = calloc(obj->num_verts, sizeof(float)*3); // Will be computed
-    memcpy(model->vertices, obj->verts, obj->num_verts * sizeof(float) * 3);
-  }
+  model_object_t *model = model_object_new();
 
   // Transfer rotation matrix, but ensure it is transposed for GL
   memset(model->rot, 0, sizeof(float)*16);
@@ -211,32 +229,75 @@ ac3d_obj_to_model(struct ac3d_object_t *obj)
   }
   memcpy(model->trans, obj->pos, 3*sizeof(float));
 
+  // BUG: assume this object has the same material for all faces, this is not
+  //      correct, and we should ensure that a face with its own material
+  //      is placed in its own vertex array, for now this is most likelly OK
+  //      but we should address it ASAP.
+
+  if (obj->num_surfs > 0) {
+    model->materialId = obj->surfs[0].material_idx;
+  }
   for (int i = 0 ; i < obj->num_surfs ; ++ i) {
+
     //obj->surfs[i].tag;
     //obj->surfs[i].material_idx;
 
-    for (int j = 0 ; j < obj->surfs[i].refs ; ++ j) {
-      //obj->surfs[i].ref_lines[j].tex_x;
-      //obj->surfs[i].ref_lines[j].tex_y;
-      //obj->surfs[i].ref_lines[j].vert_idx;
+    if (obj->surfs[i].refs < 3) {
+      fprintf(stderr, "trying to load primitive that is not a polygon, "
+                      "not supported (refs = %d)\n", obj->surfs[i].refs);
+    }
+
+    // Cross product to get face normal
+    // TODO: Verify that the normals are in the correct direction
+    // TODO: We should actually keep track of all faces that use a vertex
+    //       and compute the average normal for the given vertex instead
+    //       the current approach gives us a very flat shading model, which
+    //       is not what we want
+    float *va = &obj->verts[obj->surfs[i].ref_lines[0].vert_idx*3];
+    float *vb = &obj->verts[obj->surfs[i].ref_lines[1].vert_idx*3];
+    float vc[3];
+    vc[0] = va[1]*vb[2]-va[2]*vb[1];
+    vc[1] = va[2]*vb[0]-va[0]*vb[2];
+    vc[2] = va[0]*vb[1]-va[1]*vb[0];
+    // Normalise normal
+    float absvc = sqrtf(vc[0]*vc[0] + vc[1]*vc[1] + vc[2]*vc[2]);
+    vc[0] /= absvc;
+    vc[1] /= absvc;
+    vc[2] /= absvc;
+
+    // Build up an index vector for on the fly triangulation of the polygon
+    int triangles = 1 + (obj->surfs[i].refs - 3);
+    int idx_seq_len = triangles * 3;
+    int idxseq[idx_seq_len];
+    for (int j = 0, k = 0 ; j < triangles ; ++ j) {
+      idxseq[j*3+0] = 0;
+      idxseq[j*3+1] = j + 1;
+      idxseq[j*3+2] = j + 2;
+    }
+
+    for (int j = 0 ; j < idx_seq_len ; ++ j) {
+      float_array_push(&model->vertices, obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+0]);
+      float_array_push(&model->vertices, obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+1]);
+      float_array_push(&model->vertices, obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+2]);
+      float_array_push(&model->normals, vc[0]);
+      float_array_push(&model->normals, vc[1]);
+      float_array_push(&model->normals, vc[2]);
+      float_array_push(&model->texCoords, obj->surfs[i].ref_lines[idxseq[j]].tex_x);
+      float_array_push(&model->texCoords, obj->surfs[i].ref_lines[idxseq[j]].tex_y);
+
+      float_array_push(&model->colours, ac3d->materials[obj->surfs[i].material_idx].r);
+      float_array_push(&model->colours, ac3d->materials[obj->surfs[i].material_idx].g);
+      float_array_push(&model->colours, ac3d->materials[obj->surfs[i].material_idx].b);
     }
   }
-
-  if (obj->num_childs > 10000) {
-    fprintf(stderr, "really huge number of objects\n");
-  }
-  model->childCount = obj->num_childs;
-
-  if (model->childCount > 0) {
-    model->children = calloc(obj->num_childs, sizeof(model_t*));
-  } else {
-    model->children = NULL;
-  }
+  model->vertexCount = model->vertices.length / 3;
 
   for (int i = 0 ; i < obj->num_childs ; ++ i) {
-    model->children[i] = ac3d_obj_to_model(obj->children[i]);
+    obj_array_push(&model->children,
+                   ac3d_obj_to_model(mod, ac3d, obj->children[i]));
   }
 
+  model->model = mod;
   return model;
 }
 
@@ -244,12 +305,41 @@ model_t*
 ac3d_to_model(struct ac3d_file_t *ac3d)
 {
   model_t *model = malloc(sizeof(model_t));
+  memset(model, 0, sizeof(model_t));
+  obj_array_init(&model->objs);
 
-  model->childCount = ac3d->obj_count;
-  model->children = calloc(ac3d->obj_count, sizeof(model_t*));
+  model->materialCount = ac3d->mat_count;
+  model->materials = calloc(ac3d->mat_count, sizeof(material_t*));
+
+  for (int i = 0 ; i < ac3d->mat_count ; ++ i) {
+    model->materials[i] = material_create();
+
+    model->materials[i]->diffuse[0] = ac3d->materials[i].r;
+    model->materials[i]->diffuse[1] = ac3d->materials[i].g;
+    model->materials[i]->diffuse[2] = ac3d->materials[i].b;
+    model->materials[i]->diffuse[3] = 1.0 - ac3d->materials[i].trans;
+
+    model->materials[i]->ambient[0] = ac3d->materials[i].amb_r;
+    model->materials[i]->ambient[1] = ac3d->materials[i].amb_g;
+    model->materials[i]->ambient[2] = ac3d->materials[i].amb_b;
+    model->materials[i]->ambient[3] = 1.0 - ac3d->materials[i].trans;
+
+    model->materials[i]->emission[0] = ac3d->materials[i].emis_r;
+    model->materials[i]->emission[1] = ac3d->materials[i].emis_g;
+    model->materials[i]->emission[2] = ac3d->materials[i].emis_b;
+    model->materials[i]->emission[3] = 1.0;
+
+    model->materials[i]->specular[0] = ac3d->materials[i].spec_r;
+    model->materials[i]->specular[1] = ac3d->materials[i].spec_g;
+    model->materials[i]->specular[2] = ac3d->materials[i].spec_b;
+    model->materials[i]->specular[3] = 1.0;
+
+    model->materials[i]->shininess = ac3d->materials[i].shi;
+
+  }
 
   for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
-    model->children[i] = ac3d_obj_to_model(ac3d->objs[i]);
+    obj_array_push(&model->objs, ac3d_obj_to_model(model, ac3d, ac3d->objs[i]));
   }
 
   return model;
@@ -344,7 +434,7 @@ ac3d_read_obj(FILE *fp, const char *name)
 
       return obj;
     } else {
-      fprintf(stderr, "invalid line '%s'\n", buff);
+      fprintf(stderr, "invalid line '%s' ignored\n", buff);
     }
   }
 
@@ -384,7 +474,7 @@ ac3d_load(const char *path)
       SCAN_CHECK(buff, 15,
                  "MATERIAL %s rgb %f %f %f  "
                  "amb %f %f %f  emis %f %f %f  "
-                 "spec %f %f %f  shi %d  trans %f",
+                 "spec %f %f %f  shi %f  trans %f",
                  nameBuff,
                  &mat.r, &mat.g, &mat.b,
                  &mat.amb_r, &mat.amb_g, &mat.amb_b,
@@ -410,11 +500,10 @@ ac3d_load(const char *path)
     return NULL;
   }
 
-  // TODO: Convert ac3d to model
   model_t *model = ac3d_to_model(ac3d);
   ac3d_delete(ac3d);
 
-  return model; // TODO: fix
+  return model;
 error:
   fclose(fp);
   ac3d_delete(ac3d);

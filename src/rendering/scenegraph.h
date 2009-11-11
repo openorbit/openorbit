@@ -30,6 +30,8 @@
 #include "sim/simtime.h"
 #include "common/lwcoord.h"
 
+#define SG_MAX_LIGHTS 8
+
   typedef struct OOdrawable OOdrawable;
   typedef struct OOscene OOscene;
   typedef struct OOoverlay OOoverlay;
