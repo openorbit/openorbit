@@ -685,6 +685,7 @@ plWorldStep(PLworld *world, double dt)
   ooSgSetObjectQuat(world->centralBody->drawable,
                     quat[1], quat[2], quat[3], quat[0]);
   ooSgSetObjectPosLW(world->centralBody->drawable, &world->centralBody->p);
+  sgSetLightPosLW(world->centralLightSource, &world->centralBody->p);
   //ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);
   //ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz);
   for (size_t i = 0; i < world->orbits.length ; i ++) {
@@ -811,6 +812,8 @@ ooLoadMoon__(PLorbsys *sys, HRMLobject *obj, OOscenegraph *sg)
   //  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
   OOscene *sc = ooSgGetRoot(sg);
   OOdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
+
+
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
 
   PLorbsys *moonSys = plNewSubOrbit(sys, moonName.u.str, mass, gm,
@@ -959,10 +962,25 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
   }
 
   OOscene *sc = ooSgGetRoot(sg);
+  sgSetSceneAmb4f(sc, 0.2, 0.2, 0.2, 1.0);
   OOdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
+  SGmaterial *mat = sgSphereGetMaterial((OOsphere*)drawable);
+  sgSetMaterialEmiss4f(mat, 1.0, 1.0, 1.0, 0.0);
+
+  //char *path = ooResGetPath("spacecrafts/mercury/enterprise.ac");
+  //OOdrawable *drawable = sgLoadModel(path);
+  //free(path);
+
+
+  float3 p = vf3_set(0.0, 0.0, 0.0);
+  SGlight *starLightSource = sgNewPointlight(sc, p);
+
+
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   PLworld *world = plNewWorld(starName.u.str, sc, mass, gm, radius,
                               siderealPeriod, axialTilt);
+  world->centralLightSource = starLightSource;
+
   plSetDrawable(world->centralBody, drawable);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);

@@ -30,12 +30,29 @@
 #include "sim/simtime.h"
 #include "common/lwcoord.h"
 
-#define SG_MAX_LIGHTS 8
+#define SG_MAX_LIGHTS GL_MAX_LIGHTS
 
-  typedef struct OOdrawable OOdrawable;
-  typedef struct OOscene OOscene;
-  typedef struct OOoverlay OOoverlay;
-  typedef struct OOscenegraph OOscenegraph;
+typedef struct OOdrawable OOdrawable;
+typedef struct OOscene OOscene;
+typedef struct OOoverlay OOoverlay;
+typedef struct OOscenegraph OOscenegraph;
+typedef struct SGmaterial SGmaterial;
+
+typedef struct SGlight SGlight;
+typedef struct SGspotlight SGspotlight;
+typedef struct SGpointlight SGpointlight;
+
+typedef struct OOsphere OOsphere;
+typedef struct SGcylinder SGcylinder;
+
+struct SGmaterial {
+  float ambient[4];
+  float diffuse[4];
+  float specular[4];
+  float emission[4];
+  float shininess;
+};
+
 
 #include "camera.h"
 
@@ -93,13 +110,15 @@ void ooSgSetCam(OOscenegraph *sg, OOcam *cam);
  * in a valid pointer to it.
  */
 OOscene* ooSgNewScene(OOscene *parent, const char *name);
+void sgSetSceneAmb4f(OOscene *sc, float r, float g, float b, float a);
+
 void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj);
 
 /*!
   Finds the root scene from the a given scene. Note that in most cases you want
   to use the OOscenegraph member root for getting the scene, since member
   access is O(1) and locating the root for a given scene is O(treeHeight).
-  \param sc Scene from which to find the root scene 
+  \param sc Scene from which to find the root scene
   \result The root of sc
   \pre sc != NULL
 */
@@ -114,6 +133,8 @@ OOscene* ooSgGetScene(OOscenegraph *sg, const char *sceneName);
 void ooSgSceneAddChild(OOscene *parent, OOscene *child);
 void ooSgSceneAddObj(OOscene *sc, OOdrawable *object);
 
+SGmaterial* sgSphereGetMaterial(OOsphere *sphere);
+
 
 OOdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
 OOdrawable* sgNewEllipsis(const char *name,
@@ -123,5 +144,19 @@ OOdrawable* sgNewEllipsis(const char *name,
                           size_t vertCount);
 
 OOdrawable* sgLoadModel(const char *file);
+void sgSceneAddLight(OOscene *sc, SGlight *light);
+SGlight* sgNewPointlight(OOscene *sc, float3 p);
+void sgSetLightPos3f(SGlight *light, float x, float y, float z);
+void sgSetLightPosv(SGlight *light, float3 v);
+void sgSetLightPosLW(SGlight *light, OOlwcoord *lwc);
+
+
+
+void sgSetMaterialAmb4f(SGmaterial *mat, float r, float g, float b, float a);
+void sgSetMaterialDiff4f(SGmaterial *mat, float r, float g, float b, float a);
+void sgSetMaterialSpec4f(SGmaterial *mat, float r, float g, float b, float a);
+void sgSetMaterialEmiss4f(SGmaterial *mat, float r, float g, float b, float a);
+void sgSetMaterialShininess(SGmaterial *mat, float s);
+
 
 #endif /* SCENEGRAPH_H_ */

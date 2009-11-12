@@ -33,30 +33,16 @@
 #include "common/lwcoord.h"
 #include "parsers/model.h"
 
-typedef struct {
-    float uv[2];
-    float rgba[4];
-    float norm[3];
-    float vert[3];
-} OOvertex;
-
-typedef struct {
+struct OOsphere {
   OOdrawable super;
-  size_t vSize;
-  size_t vCount;
-  OOvertex *vertices;
-  uint64_t texId;
-} OOmesh;
-
-typedef struct {
-  OOdrawable super;
+  SGmaterial mat;
   GLuint texId;
   GLUquadricObj *quadratic;
   GLfloat radius;
-} OOsphere;
+};
 
 
-typedef struct SGcylinder {
+struct SGcylinder {
   OOdrawable super;
   //  GLuint texId;
   GLbyte col[3];
@@ -64,8 +50,86 @@ typedef struct SGcylinder {
   GLfloat bottonRadius;
   GLfloat topRadius;
   GLfloat height;
-} SGcylinder;
+};
 
+
+void
+sgBindMaterial(SGmaterial *mat)
+{
+  glMaterialfv(GL_FRONT, GL_AMBIENT, mat->ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat->diffuse);
+  glMaterialfv(GL_FRONT, GL_SPECULAR, mat->specular);
+  glMaterialfv(GL_FRONT, GL_EMISSION, mat->emission);
+  glMaterialf(GL_FRONT, GL_SHININESS, mat->shininess);
+}
+
+void
+sgInitMaterial(SGmaterial *mat)
+{
+  mat->ambient[0] = 0.2;
+  mat->ambient[1] = 0.2;
+  mat->ambient[2] = 0.2;
+  mat->ambient[3] = 1.0;
+
+  mat->diffuse[0] = 0.8;
+  mat->diffuse[1] = 0.8;
+  mat->diffuse[2] = 0.8;
+  mat->diffuse[3] = 1.0;
+
+  mat->specular[0] = 0.0;
+  mat->specular[1] = 0.0;
+  mat->specular[2] = 0.0;
+  mat->specular[3] = 1.0;
+
+  mat->emission[0] = 0.0;
+  mat->emission[1] = 0.0;
+  mat->emission[2] = 0.0;
+  mat->emission[3] = 1.0;
+
+  mat->shininess = 0.0;
+}
+
+void
+sgSetMaterialAmb4f(SGmaterial *mat, float r, float g, float b, float a)
+{
+  mat->ambient[0] = r;
+  mat->ambient[1] = g;
+  mat->ambient[2] = b;
+  mat->ambient[3] = a;
+}
+
+void
+sgSetMaterialDiff4f(SGmaterial *mat, float r, float g, float b, float a)
+{
+  mat->diffuse[0] = r;
+  mat->diffuse[1] = g;
+  mat->diffuse[2] = b;
+  mat->diffuse[3] = a;
+}
+
+void
+sgSetMaterialSpec4f(SGmaterial *mat, float r, float g, float b, float a)
+{
+  mat->specular[0] = r;
+  mat->specular[1] = g;
+  mat->specular[2] = b;
+  mat->specular[3] = a;
+}
+
+void
+sgSetMaterialEmiss4f(SGmaterial *mat, float r, float g, float b, float a)
+{
+  mat->emission[0] = r;
+  mat->emission[1] = g;
+  mat->emission[2] = b;
+  mat->emission[3] = a;
+}
+
+void
+sgSetMaterialShininess(SGmaterial *mat, float s)
+{
+  mat->shininess = s;
+}
 
 OOscene*
 ooSgGetRoot(OOscenegraph *sg)
@@ -172,11 +236,9 @@ ooSgNewDrawable(OOdrawable *drawable, const char *name, OOdrawfunc df)
   assert(df != NULL);
   assert(drawable != NULL);
 
-  //  OOdrawable *drawable = malloc(sizeof(OOdrawable));
   drawable->name = strdup(name);
   drawable->p = vf3_set(0.0f, 0.0f, 0.0f);
   drawable->q = q_rot(1.0f, 0.0f, 0.0f, 0.0f);
-  //drawable->s = 1.0;
   drawable->dr = vf3_set(0.0f, 0.0f, 0.0f);
   drawable->dp = vf3_set(0.0f, 0.0f, 0.0f);
 
@@ -193,7 +255,7 @@ ooSgNewSceneGraph()
   OOscenegraph *sg = malloc(sizeof(OOscenegraph));
   sg->root = ooSgNewScene(NULL, "root");
   sg->root->sg = sg;
-
+  sg->usedLights = 0;
   ooObjVecInit(&sg->cams);
   ooObjVecInit(&sg->overlays);
   return sg;
@@ -224,11 +286,15 @@ ooSgNewScene(OOscene *parent, const char *name)
   OOscene *sc = malloc(sizeof(OOscene));
   sc->parent = parent;
   sc->name = strdup(name);
-
   sc->t = vf3_set(0.0, 0.0, 0.0);
   //sc->s = 1.0;
   //sc->si = 1.0;
+  sc->amb[0] = 0.2;
+  sc->amb[1] = 0.2;
+  sc->amb[2] = 0.2;
+  sc->amb[3] = 1.0;
 
+  memset(sc->lights, 0, SG_MAX_LIGHTS * sizeof(SGlight*));
   sc->sg = NULL;
 
   ooObjVecInit(&sc->scenes);
@@ -241,6 +307,17 @@ ooSgNewScene(OOscene *parent, const char *name)
 
   return sc;
 }
+
+
+void
+sgSetSceneAmb4f(OOscene *sc, float r, float g, float b, float a)
+{
+  sc->amb[0] = r;
+  sc->amb[1] = g;
+  sc->amb[2] = b;
+  sc->amb[3] = a;
+}
+
 
 void
 ooSgSceneAddChild(OOscene * restrict parent, OOscene * restrict child)
@@ -364,7 +441,7 @@ compareDistances(OOdrawable const **o0, OOdrawable const **o1)
 }
 
 void
-ooSgSceneDraw(OOscene *sc, bool recurse)
+sgSceneDraw(OOscene *sc, bool recurse)
 {
   assert(sc != NULL);
   ooLogTrace("drawing scene %s at %vf", sc->name, sc->t);
@@ -374,10 +451,29 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
   //  qsort(sc->objs.elems, sc->objs.length, sizeof(OOdrawable*),
   //        (int (*)(void const *, void const *))compareDistances);
 
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, sc->amb);
+
   glDepthFunc(GL_LEQUAL);
 
   // Apply scene transforms
   glPushMatrix();
+  int localLights = 0;
+  for (int i = 0 ; i < SG_MAX_LIGHTS ; ++ i) {
+    if (sc->lights[i] != NULL) {
+     if (sc->sg->usedLights < SG_MAX_LIGHTS) {
+       GLenum lightId = sgLightNumberMap[sc->sg->usedLights];
+       SGlight *light = sc->lights[i];
+
+       light->enable(light, lightId);
+
+       sc->sg->usedLights ++;
+       localLights ++;
+     } else {
+       ooLogWarn("to many light sources in scene hierarchy, current scene = '%s'",
+                 sc->name);
+     }
+    }
+  }
 
   // Render objects
   for (size_t i = 0 ; i < sc->objs.length ; i ++) {
@@ -404,12 +500,24 @@ ooSgSceneDraw(OOscene *sc, bool recurse)
       //glScalef(subScene->si, subScene->si, subScene->si);
       glTranslatef(vf3_x(subScene->t), vf3_y(subScene->t), vf3_z(subScene->t));
 
-      ooSgSceneDraw(subScene, true);
+      sgSceneDraw(subScene, true);
       glPopMatrix();
     }
   }
   // Pop scene transform
   glPopMatrix();
+
+
+  for (int i = 0 ; i < localLights ; ++ i) {
+    if (sc->lights[i] != NULL) {
+      SGlight *light = sc->lights[i];
+      light->disable(light);
+    } else {
+      ooLogWarn("null found in light vector");
+    }
+  }
+
+  sc->sg->usedLights -= localLights;
 }
 
 
@@ -457,7 +565,7 @@ ooSgPaint(OOscenegraph *sg)
 
   ooSgCamRotate(sg->currentCam);
   ooSgCamMove(sg->currentCam);
-  ooSgSceneDraw(sg->currentCam->scene, true);
+  sgSceneDraw(sg->currentCam->scene, true);
 
   // At this point we have not drawn the parent scene, so we start go upwards
   // in the scenegraph now and apply the scales. Note that the SG is a tree
@@ -481,12 +589,12 @@ ooSgPaint(OOscenegraph *sg)
         //glScalef(subScene->si, subScene->si, subScene->si);
         glTranslatef(vf3_x(subScene->t), vf3_y(subScene->t), vf3_z(subScene->t));
 
-        ooSgSceneDraw(subScene, true);
+        sgSceneDraw(subScene, true);
         glPopMatrix();
       }
     }
 
-    ooSgSceneDraw(sc, false);
+    sgSceneDraw(sc, false);
     // go up in the tree
     prev = sc;
     sc = sc->parent;
@@ -581,6 +689,9 @@ ooSgDrawSphere(OOsphere *sp)
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
+  glEnable(GL_LIGHTING);
+
+  sgBindMaterial(&sp->mat);
 
   glBindTexture(GL_TEXTURE_2D, sp->texId);
 
@@ -592,7 +703,10 @@ ooSgDrawSphere(OOsphere *sp)
   // Draw point on the sphere in solid colour and size
   glDisable (GL_BLEND);
   glDisable(GL_TEXTURE_2D);
-  glDisable(GL_DEPTH_TEST);
+  //glDisable(GL_DEPTH_TEST);
+  glDisable(GL_LIGHTING);
+  glDepthFunc(GL_LEQUAL);
+
   glBegin(GL_POINTS);
   glPointSize(5.0);
   glColor3f(1.0, 0.0, 0.0);
@@ -613,6 +727,8 @@ OOdrawable*
 ooSgNewSphere(const char *name, float radius, const char *tex)
 {
   OOsphere *sp = malloc(sizeof(OOsphere));
+  sgInitMaterial(&sp->mat);
+
   sp->radius = radius;
   ooTexLoad(tex, tex);
   sp->texId = ooTexNum(tex);
@@ -622,6 +738,13 @@ ooSgNewSphere(const char *name, float radius, const char *tex)
   gluQuadricTexture(sp->quadratic, GL_TRUE);
   gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
   return ooSgNewDrawable((OOdrawable*)sp, name, (OOdrawfunc) ooSgDrawSphere);
+}
+
+
+SGmaterial*
+sgSphereGetMaterial(OOsphere *sphere)
+{
+  return &sphere->mat;
 }
 
 
@@ -638,6 +761,7 @@ sgDrawEllipsis(SGellipsis *el)
   //glShadeModel (GL_FLAT);
 
   glDisable(GL_TEXTURE_2D); // Lines are not textured...
+  glDisable(GL_LIGHTING); // Lines are not lit, just colored
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
   glPushMatrix();
@@ -777,11 +901,14 @@ setMaterial(material_t *mat)
 void
 drawModel(model_object_t *model)
 {
-  glColor4f(1.0, 1.0, 1.0, 1.0);
+  glColor3f(1.0, 1.0, 1.0);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
-  //glShadeModel(GL_SMOOTH);
-  //glDisable(GL_COLOR_MATERIAL);
+  glShadeModel(GL_SMOOTH);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  //glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
   setMaterial(model->model->materials[model->materialId]);
 
   glPushMatrix();
@@ -792,29 +919,23 @@ drawModel(model_object_t *model)
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
+  //glEnableClientState(GL_COLOR_ARRAY);
 
   glVertexPointer(3, GL_FLOAT, 0, model->vertices.elems);
   glTexCoordPointer(2, GL_FLOAT, 0, model->texCoords.elems);
   glNormalPointer(GL_FLOAT, 0, model->normals.elems);
-  glColorPointer(3, GL_FLOAT, 0, model->colours.elems);
+  //glColorPointer(3, GL_FLOAT, 0, model->colours.elems);
 
-  //glFogCoordPointer(GL_FLOAT, 0, model->fogCoords);
-
-  // Not there yet
-  //glColor3f(1.0, 1.0, 1.0);
   glDrawArrays(GL_TRIANGLES, 0, model->vertexCount);
 
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
+  //glDisableClientState(GL_COLOR_ARRAY);
 
   for (int i = 0 ; i < model->children.length ; ++ i) {
     drawModel(model->children.elems[i]);
   }
-
-  glColor4f(1.0, 1.0, 1.0, 1.0);
 
   glPopMatrix();
 }
@@ -822,6 +943,7 @@ drawModel(model_object_t *model)
 void
 sgDrawModel(SGmodel *model)
 {
+  glEnable(GL_LIGHTING);
   drawModel(model->modelData->objs.elems[0]);
 }
 
@@ -834,6 +956,42 @@ sgLoadModel(const char *file)
                          (OOdrawfunc)sgDrawModel);
 }
 
+void
+sgSetLightPos3f(SGlight *light, float x, float y, float z)
+{
+  light->pos[0] = vf3_x(x);
+  light->pos[1] = vf3_y(y);
+  light->pos[2] = vf3_z(z);
+  light->pos[3] = 1.0;
+}
+
+void
+sgSetLightPosv(SGlight *light, float3 v)
+{
+  light->pos[0] = vf3_x(v);
+  light->pos[1] = vf3_y(v);
+  light->pos[2] = vf3_z(v);
+  light->pos[3] = 1.0;
+}
+
+void
+sgSetLightPosLW(SGlight *light, OOlwcoord *lwc)
+{
+  OOscene *sc = light->scene;
+  OOscenegraph *sg = sc->sg;
+  OOcam *cam = sg->currentCam;
+
+  if (cam->kind == OOCam_Free) {
+    float3 relPos = ooLwcRelVec(lwc, ((OOfreecam*)cam->camData)->lwc.seg);
+
+    light->pos[0] = vf3_x(relPos);
+    light->pos[1] = vf3_y(relPos);
+    light->pos[2] = vf3_z(relPos);
+    light->pos[3] = 1.0;
+  }
+}
+
+
 SGlight*
 sgNewSpotlight(OOscenegraph *sg, float3 p, float3 dir)
 {
@@ -842,60 +1000,100 @@ sgNewSpotlight(OOscenegraph *sg, float3 p, float3 dir)
   return (SGlight*)light;
 }
 
+void
+sgEnablePointLight(SGpointlight *light, GLenum lightId)
+{
+  glEnable(GL_LIGHTING);
+  glEnable(lightId);
+  light->super.lightId = lightId;
+
+  glLightfv(lightId, GL_POSITION, light->super.pos);
+  glLightfv(lightId, GL_AMBIENT, light->super.ambient);
+  glLightfv(lightId, GL_DIFFUSE, light->super.diffuse);
+  glLightfv(lightId, GL_SPECULAR, light->super.specular);
+  //  glLightf(light->super.lightId, GL_CONSTANT_ATTENUATION, 1.0f);
+  //  glLightf(light->super.lightId, GL_LINEAR_ATTENUATION, 0.2f);
+  //  glLightf(light->super.lightId, GL_QUADRATIC_ATTENUATION, 0.08f);
+
+}
+
+void
+sgDisablePointLight(SGpointlight *light)
+{
+  glDisable(light->super.lightId);
+}
+
+void
+sgLightSetAmbient4f(SGlight *light, float r, float g, float b, float a)
+{
+  light->ambient[0] = r;
+  light->ambient[1] = g;
+  light->ambient[2] = b;
+  light->ambient[3] = a;
+
+}
+void
+sgLightSetSpecular4f(SGlight *light, float r, float g, float b, float a)
+{
+  light->specular[0] = r;
+  light->specular[1] = g;
+  light->specular[2] = b;
+  light->specular[3] = a;
+
+}
+
+void
+sgLightSetDiffuse4f(SGlight *light, float r, float g, float b, float a)
+{
+  light->diffuse[0] = r;
+  light->diffuse[1] = g;
+  light->diffuse[2] = b;
+  light->diffuse[3] = a;
+
+}
+
 SGlight*
-sgNewPointlight(OOscenegraph *sg, float3 p)
+sgNewPointlight(OOscene *sc, float3 p)
 {
   SGpointlight *light = malloc(sizeof(SGpointlight));
+  light->super.enable = (SGenable_light_func)sgEnablePointLight;
+  light->super.disable = (SGdisable_light_func)sgDisablePointLight;
+  light->super.scene = sc;
+
+  light->super.pos[0] = vf3_x(p);
+  light->super.pos[1] = vf3_y(p);
+  light->super.pos[2] = vf3_z(p);
+  light->super.pos[3] = 1.0;
+
+  light->super.ambient[0] = 0.0;
+  light->super.ambient[1] = 0.0;
+  light->super.ambient[2] = 0.0;
+  light->super.ambient[3] = 1.0;
+
+  light->super.specular[0] = 1.0;
+  light->super.specular[1] = 1.0;
+  light->super.specular[2] = 1.0;
+  light->super.specular[3] = 1.0;
+
+  light->super.diffuse[0] = 1.0;
+  light->super.diffuse[1] = 1.0;
+  light->super.diffuse[2] = 1.0;
+  light->super.diffuse[3] = 1.0;
+
+  sgSceneAddLight(sc, &light->super);
 
   return (SGlight*)light;
 }
 
-
-#if 0
-
-
 void
-ooSgDrawMesh(OOmesh *mesh)
+sgSceneAddLight(OOscene *sc, SGlight *light)
 {
-    assert(mesh != NULL);
-    glBindTexture(GL_TEXTURE_2D, mesh->texId);
-    glInterleavedArrays(GL_T2F_C4F_N3F_V3F, 0, mesh->vertices);
-    glDrawArrays(GL_TRIANGLES, 0, mesh->vCount);
-}
-
-OOnode*
-ooSgNewMesh(OOtexture *tex)
-{
-    OOmesh *mesh = malloc(sizeof(OOmesh));
-    if (mesh == NULL) {return NULL;}
-
-    OOnode *node = ooSgNewNode(mesh, (OOdrawfunc)ooSgDrawMesh, NULL);
-    mesh->vCount = 0;
-    mesh->texId = tex->texId;
-
-    mesh->vertices = calloc(32, sizeof(OOvertex));
-    mesh->vSize = 32;
-
-    return node;
-}
-
-void
-ooSgMeshPushVert(OOnode *node, const OOvertex *v)
-{
-    OOmesh *mesh = node->obj;
-
-    if (mesh->vCount = mesh->vSize) {
-        OOvertex *newVerts = realloc(mesh->vertices,
-                                     mesh->vSize * 2 * sizeof(OOvertex));
-
-        if (!newVerts) ooLogFatal("vertex buffer expansion failed");
-        mesh->vSize = mesh->vSize * 2;
-        mesh->vertices = newVerts;
+  for (int i = 0 ; i < SG_MAX_LIGHTS ; ++ i) {
+    if (sc->lights[i] == NULL) {
+      sc->lights[i] = light;
+      return;
     }
+  }
 
-    mesh->vertices[mesh->vCount] = *v;
-    mesh->vCount ++;
+  ooLogWarn("to many lights added to scenes '%s'", sc->name);
 }
-
-
-#endif

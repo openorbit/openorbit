@@ -20,30 +20,22 @@
 #ifndef SCENEGRAPH_PRIVATE_H_8YHHHPCN
 #define SCENEGRAPH_PRIVATE_H_8YHHHPCN
 
-typedef struct SGlight {
-  float3 pos;
-  int lightId;
-  float colour[4];
-} SGlight;
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <gl/gl.h>
+#endif
 
-typedef struct SGspotlight {
-  SGlight super;
-  float dir[3];
-} SGspotlight;
-
-typedef struct SGpointlight {
-  SGlight super;
-} SGpointlight;
-
-
+static GLenum sgLightNumberMap[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3,
+                                    GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
 struct OOscene {
   struct OOscene *parent;
   char *name;
+
+  float amb[4]; ///< Ambient light for this scene, initially [0.2,0.2,0.2,1.0]
+
   SGlight *lights[SG_MAX_LIGHTS];
   float3 t;
-//  quaternion_t q;
-//  scalar_t s; // scale with respect to parent s
-//  scalar_t si; // inverse of s
 
   OOscenegraph *sg;
 
@@ -62,8 +54,10 @@ struct OOscenegraph {
   OOcam *currentCam;
   OOobjvector cams;
 
+  int usedLights;
+
   OOdrawable *sky;
-  OOobjvector overlays;
+  OOobjvector overlays; // TODO: Consolidate OOobjvector and obj_array_t
 };
 
 typedef struct SGellipsis {
@@ -76,6 +70,32 @@ typedef struct SGellipsis {
   float verts[];
 } SGellipsis;
 
+
+typedef void (*SGenable_light_func)(SGlight *light, GLenum lightId);
+typedef void (*SGdisable_light_func)(SGlight *light);
+
+struct SGlight {
+  struct OOscene *scene;
+  int lightId;
+
+  float pos[4];
+
+  float ambient[4];
+  float specular[4];
+  float diffuse[4];
+
+  SGenable_light_func enable;
+  SGdisable_light_func disable;
+};
+
+struct SGspotlight {
+  SGlight super;
+  float dir[3];
+};
+
+struct SGpointlight {
+  SGlight super;
+};
 
 
 #endif /* end of include guard: SCENEGRAPH_PRIVATE_H_8YHHHPCN */

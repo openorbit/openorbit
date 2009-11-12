@@ -93,6 +93,7 @@ struct PLworld__ {
   OOobjvector orbits;
   OOobjvector objs;
   PLobject__ *centralBody;
+  SGlight *centralLightSource;
 };
 
 PLworld* plNewWorld(const char *name, OOscene *sc,
