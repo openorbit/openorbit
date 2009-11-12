@@ -327,12 +327,12 @@ ac3d_to_model(struct ac3d_file_t *ac3d)
     model->materials[i]->emission[0] = ac3d->materials[i].emis_r;
     model->materials[i]->emission[1] = ac3d->materials[i].emis_g;
     model->materials[i]->emission[2] = ac3d->materials[i].emis_b;
-    model->materials[i]->emission[3] = 1.0;
+    model->materials[i]->emission[3] = 1.0 - ac3d->materials[i].trans;
 
     model->materials[i]->specular[0] = ac3d->materials[i].spec_r;
     model->materials[i]->specular[1] = ac3d->materials[i].spec_g;
     model->materials[i]->specular[2] = ac3d->materials[i].spec_b;
-    model->materials[i]->specular[3] = 1.0;
+    model->materials[i]->specular[3] = 1.0 - ac3d->materials[i].trans;
 
     model->materials[i]->shininess = ac3d->materials[i].shi;
 
@@ -341,7 +341,6 @@ ac3d_to_model(struct ac3d_file_t *ac3d)
   for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
     obj_array_push(&model->objs, ac3d_obj_to_model(model, ac3d, ac3d->objs[i]));
   }
-
   return model;
 }
 

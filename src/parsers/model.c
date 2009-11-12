@@ -65,7 +65,15 @@ material_create(void)
   m->specular[2] = 0.0;
   m->specular[3] = 1.0;
 
+  m->emission[0] = 0.0;
+  m->emission[1] = 0.0;
+  m->emission[2] = 0.0;
+  m->emission[3] = 1.0;
+
   m->shininess = 0.0;
+
+
+  return m;
 }
 model_t*
 model_load(const char * restrict fileName)
