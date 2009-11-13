@@ -253,8 +253,13 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
     //       and compute the average normal for the given vertex instead
     //       the current approach gives us a very flat shading model, which
     //       is not what we want
-    float *va = &obj->verts[obj->surfs[i].ref_lines[0].vert_idx*3];
-    float *vb = &obj->verts[obj->surfs[i].ref_lines[1].vert_idx*3];
+    float *p0 = &obj->verts[obj->surfs[i].ref_lines[0].vert_idx*3];
+    float *p1 = &obj->verts[obj->surfs[i].ref_lines[1].vert_idx*3];
+    float *p2 = &obj->verts[obj->surfs[i].ref_lines[2].vert_idx*3];
+
+    float va[3] = {p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]};
+    float vb[3] = {p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]};
+
     float vc[3];
     vc[0] = va[1]*vb[2]-va[2]*vb[1];
     vc[1] = va[2]*vb[0]-va[0]*vb[2];
