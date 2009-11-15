@@ -209,6 +209,20 @@ ac3d_delete(struct ac3d_file_t *ac3d)
   free(ac3d);
 }
 
+#define DEG_TO_RAD(d) ((d) * M_PI/180.0f)
+#define RAD_TO_DEG(d) ((d) * 180.0f/M_PI)
+
+float vecangle(float a[3], float b[3])
+{
+  float dotprod = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  float anorm = sqrtf(a[0]*a[0] + a[1]*a[1]+a[2]*a[2]);
+  float bnorm = sqrtf(b[0]*b[0] + b[1]*b[1]+b[2]*b[2]);
+
+  float cosang = dotprod/(anorm*bnorm);
+  float acos = acosf(cosang);
+  return fabsf(acos);
+}
+
 // This is maybe not the most efficient way, since it makes copys of all the
 // data, the imgload lib steals the buffers and transfers their ownership
 // instead
@@ -237,65 +251,139 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
   if (obj->num_surfs > 0) {
     model->materialId = obj->surfs[0].material_idx;
   }
+
+  float_array_t face_normals;
+  float_array_init(&face_normals);
+
+  // 1. Compute face normals
+  // 2. Compute shared vertices
+  // 3. Compute vertex normals, compensating for the crease angle
+  int_array_t vertex_sharing[obj->num_verts];
+  for (int i = 0 ; i < obj->num_verts ; ++ i) {
+    int_array_init(&vertex_sharing[i]);
+  }
+
+  // Tag vertex as being shared by the one here, and compute the face normals
   for (int i = 0 ; i < obj->num_surfs ; ++ i) {
+    for (int j = 0 ; j < obj->surfs[i].refs ; ++ j) {
+      int_array_push(&vertex_sharing[obj->surfs[i].ref_lines[j].vert_idx], i);
+    }
 
-    //obj->surfs[i].tag;
-    //obj->surfs[i].material_idx;
+    float *p0 = &obj->verts[obj->surfs[i].ref_lines[0].vert_idx*3];
+    float *p1 = &obj->verts[obj->surfs[i].ref_lines[1].vert_idx*3];
+    float *p2 = &obj->verts[obj->surfs[i].ref_lines[2].vert_idx*3];
 
+    float vb[3] = {p0[0] - p1[0], p0[1] - p1[1], p0[2] - p1[2]};
+    float va[3] = {p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]};
+
+    float vc[3];
+    vc[0] = va[1]*vb[2]-va[2]*vb[1];
+    vc[1] = va[2]*vb[0]-va[0]*vb[2];
+    vc[2] = va[0]*vb[1]-va[1]*vb[0];
+    // Normalise face normal
+    float absvc = sqrtf(vc[0]*vc[0] + vc[1]*vc[1] + vc[2]*vc[2]);
+    vc[0] /= absvc;
+    vc[1] /= absvc;
+    vc[2] /= absvc;
+
+    float_array_push(&face_normals, vc[0]);
+    float_array_push(&face_normals, vc[1]);
+    float_array_push(&face_normals, vc[2]);
+  }
+
+  // Go through each face again and add the vertices
+  for (int i = 0 ; i < obj->num_surfs ; ++ i) {
     if (obj->surfs[i].refs < 3) {
       fprintf(stderr, "trying to load primitive that is not a polygon, "
                       "not supported (refs = %d)\n", obj->surfs[i].refs);
     }
 
     // Cross product to get face normal
-    // TODO: Verify that the normals are in the correct direction
-    // TODO: We should actually keep track of all faces that use a vertex
-    //       and compute the average normal for the given vertex instead
-    //       the current approach gives us a very flat shading model, which
-    //       is not what we want
-    float *p0 = &obj->verts[obj->surfs[i].ref_lines[0].vert_idx*3];
-    float *p1 = &obj->verts[obj->surfs[i].ref_lines[1].vert_idx*3];
-    float *p2 = &obj->verts[obj->surfs[i].ref_lines[2].vert_idx*3];
-
-    float va[3] = {p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]};
-    float vb[3] = {p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]};
-
-    float vc[3];
-    vc[0] = va[1]*vb[2]-va[2]*vb[1];
-    vc[1] = va[2]*vb[0]-va[0]*vb[2];
-    vc[2] = va[0]*vb[1]-va[1]*vb[0];
-    // Normalise normal
-    float absvc = sqrtf(vc[0]*vc[0] + vc[1]*vc[1] + vc[2]*vc[2]);
-    vc[0] /= absvc;
-    vc[1] /= absvc;
-    vc[2] /= absvc;
+    // TODO: We should keep a reference list of all face normals and then
+    //       only average out the normals if they are no more than a certain
+    //       angle from each other. Though, the current approach does give nice
+    //       shaded polygons, it is not really what we want, especially when
+    //       dealing with sharp angles
 
     // Build up an index vector for on the fly triangulation of the polygon
     int triangles = 1 + (obj->surfs[i].refs - 3);
     int idx_seq_len = triangles * 3;
     int idxseq[idx_seq_len];
-    for (int j = 0, k = 0 ; j < triangles ; ++ j) {
+    for (int j = 0 ; j < triangles ; ++ j) {
       idxseq[j*3+0] = 0;
       idxseq[j*3+1] = j + 1;
       idxseq[j*3+2] = j + 2;
     }
 
     for (int j = 0 ; j < idx_seq_len ; ++ j) {
-      float_array_push(&model->vertices, obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+0]);
-      float_array_push(&model->vertices, obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+1]);
-      float_array_push(&model->vertices, obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+2]);
-      float_array_push(&model->normals, vc[0]);
-      float_array_push(&model->normals, vc[1]);
-      float_array_push(&model->normals, vc[2]);
-      float_array_push(&model->texCoords, obj->surfs[i].ref_lines[idxseq[j]].tex_x);
-      float_array_push(&model->texCoords, obj->surfs[i].ref_lines[idxseq[j]].tex_y);
+      float normal[3];
+      float faceNormal[3];
+      faceNormal[0] = face_normals.elems[i*3+0];
+      faceNormal[1] = face_normals.elems[i*3+1];
+      faceNormal[2] = face_normals.elems[i*3+2];
 
-      float_array_push(&model->colours, ac3d->materials[obj->surfs[i].material_idx].r);
-      float_array_push(&model->colours, ac3d->materials[obj->surfs[i].material_idx].g);
-      float_array_push(&model->colours, ac3d->materials[obj->surfs[i].material_idx].b);
+      normal[0] = faceNormal[0];
+      normal[1] = faceNormal[1];
+      normal[2] = faceNormal[2];
+
+      int vertexId = obj->surfs[i].ref_lines[idxseq[j]].vert_idx;
+
+      for (int k = 0 ; k < vertex_sharing[vertexId].length ; ++ k) {
+        int faceId = vertex_sharing[vertexId].elems[k];
+
+        if (faceId != i) {
+          float nextFaceNormal[3];
+          nextFaceNormal[0] = face_normals.elems[faceId*3+0];
+          nextFaceNormal[1] = face_normals.elems[faceId*3+1];
+          nextFaceNormal[2] = face_normals.elems[faceId*3+2];
+
+          if (vecangle(faceNormal, nextFaceNormal) < DEG_TO_RAD(45.0f)) {
+            normal[0] += nextFaceNormal[0];
+            normal[1] += nextFaceNormal[1];
+            normal[2] += nextFaceNormal[2];
+          }
+        }
+      }
+
+      float absn = sqrtf(normal[0]*normal[0] +
+                         normal[1]*normal[1] +
+                         normal[2]*normal[2]);
+      normal[0] /= absn;
+      normal[1] /= absn;
+      normal[2] /= absn;
+
+      float_array_push(&model->normals, normal[0]);
+      float_array_push(&model->normals, normal[1]);
+      float_array_push(&model->normals, normal[2]);
+
+      float_array_push(&model->vertices,
+                       obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+0]);
+      float_array_push(&model->vertices,
+                       obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+1]);
+      float_array_push(&model->vertices,
+                       obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+2]);
+
+      float_array_push(&model->texCoords,
+                       obj->surfs[i].ref_lines[idxseq[j]].tex_x);
+      float_array_push(&model->texCoords,
+                       obj->surfs[i].ref_lines[idxseq[j]].tex_y);
+
+      float_array_push(&model->colours,
+                       ac3d->materials[obj->surfs[i].material_idx].r);
+      float_array_push(&model->colours,
+                       ac3d->materials[obj->surfs[i].material_idx].g);
+      float_array_push(&model->colours,
+                       ac3d->materials[obj->surfs[i].material_idx].b);
     }
   }
   model->vertexCount = model->vertices.length / 3;
+
+
+
+  free(face_normals.elems);
+  for (int i = 0 ; i < obj->num_verts ; ++ i) {
+    free(vertex_sharing[i].elems);
+  }
 
   for (int i = 0 ; i < obj->num_childs ; ++ i) {
     obj_array_push(&model->children,
@@ -346,6 +434,8 @@ ac3d_to_model(struct ac3d_file_t *ac3d)
   for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
     obj_array_push(&model->objs, ac3d_obj_to_model(model, ac3d, ac3d->objs[i]));
   }
+
+  //((model_object_t*)model->objs.elems[0])->trans[0] = 5.0;
   return model;
 }
 

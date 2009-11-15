@@ -919,19 +919,43 @@ drawModel(model_object_t *model)
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
-  //glEnableClientState(GL_COLOR_ARRAY);
 
   glVertexPointer(3, GL_FLOAT, 0, model->vertices.elems);
   glTexCoordPointer(2, GL_FLOAT, 0, model->texCoords.elems);
   glNormalPointer(GL_FLOAT, 0, model->normals.elems);
-  //glColorPointer(3, GL_FLOAT, 0, model->colours.elems);
 
   glDrawArrays(GL_TRIANGLES, 0, model->vertexCount);
 
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
-  //glDisableClientState(GL_COLOR_ARRAY);
+
+#if 1
+  // DEBUG: Draw normals
+  glDisable(GL_BLEND);
+  glDisable(GL_LIGHTING);
+  glBegin(GL_LINES);
+  glColor3f(1.0, 0.0, 0.0);
+  int vertices = model->vertexCount;
+  for (int i = 0 ; i < vertices ; ++ i) {
+    glVertex3fv(&model->vertices.elems[i*3]);
+    glVertex3f(model->vertices.elems[i*3 + 0] + model->normals.elems[i*3 + 0],
+               model->vertices.elems[i*3 + 1] + model->normals.elems[i*3 + 1],
+               model->vertices.elems[i*3 + 2] + model->normals.elems[i*3 + 2]);
+  }
+  glEnd();
+
+  glPointSize(2.0);
+  glBegin(GL_POINTS);
+  glColor3f(1.0, 1.0, 0.0);
+  for (int i = 0 ; i < vertices ; ++ i) {
+    glVertex3fv(&model->vertices.elems[i*3]);
+  }
+  glEnd();
+
+  glEnable(GL_BLEND);
+  glEnable(GL_LIGHTING);
+#endif
 
   for (int i = 0 ; i < model->children.length ; ++ i) {
     drawModel(model->children.elems[i]);
