@@ -920,18 +920,18 @@ InsertValueInNode(ParseState *parser, HRMLvalue val)
 }
 
 
-static void ParseErr(const char *str, ...)
+static void ParseErr(ParseState *parser, const char *str, ...)
 {
-  char msg[strlen(str)+sizeof("error: ")+2];
-  strncpy(msg, "error: ", 8);
-  strncat(msg, str, strlen(str));
-  strncat(msg, "\n", 1);
+  char *msg;
+  asprintf(&msg, "error:%d:%d: %s\n", parser->lexer->line_, parser->lexer->col_,
+           str);
   va_list args;
   va_start(args, str);
 
   vfprintf(stderr, msg, args);
   va_end(args);
   
+  free(msg);
   longjmp(gParseError, 1);
 }
 
@@ -969,7 +969,7 @@ static void Require(ParseState *parser, TokenKind kind)
 //    fprintf(stderr, "%s\n", strs[i]);
 //  }
   
-  ParseErr("token '%s' expected", toks[kind]);
+  ParseErr(parser, "token '%s' expected", toks[kind]);
 }
 
 // Checks if next token is of the given kind, if so consume token and return true
@@ -1011,7 +1011,7 @@ static bool Peek(ParseState *parser, TokenKind kind)
   }
 
   if (lexPeekTok(parser->lexer).kind_ == tk_eof) {
-    ParseErr("premature eof");
+    ParseErr(parser, "premature eof");
   }
   return false;
 }
@@ -1103,13 +1103,13 @@ void ParseVal(ParseState *parser)
         HRMLvalue val = makeRealArray(realArr, realIdx);
         InsertValueInNode(parser, val);
       } else {
-        ParseErr("array of non supported type");
+        ParseErr(parser, "array of non supported type");
       }
     }
 
     Require(parser, tk_semi);
   } else {
-    ParseErr("object missing data");
+    ParseErr(parser, "object missing data");
   }
 
   GotoParentNode(parser);
@@ -1399,7 +1399,7 @@ hrmlParsePrimitiveValue(FILE *f, const char *sym)
       }
     } else {
       // Parse error
-      ParseError("after int %llx\n", INTEGER(firstTok));
+      ParseError(parser, "after int %llx\n", INTEGER(firstTok));
     }
   } else if (IS_REAL(firstTok)) {
     HRMLtoken unitOrSemi = hrmlLex(f);
@@ -1411,7 +1411,7 @@ hrmlParsePrimitiveValue(FILE *f, const char *sym)
       //                REAL(firstTok), SYM(unitOrSemi));
       HRMLtoken semi = hrmlLex(f);
       if (!IS_CHAR(semi, ';')) {
-        ParseError("expected ';'");
+        ParseError(parser, "expected ';'");
         return NULL;
       }
       fprintf(stderr, "WARNING: Units not supported, returning float\n");
@@ -1430,7 +1430,7 @@ hrmlParsePrimitiveValue(FILE *f, const char *sym)
   } else if (IS_CHAR(firstTok, '[')) {
     // Parse primitive value array (only bools, reals and integers)
   } else {
-    ParseError("unknown token detected\n");
+    ParseError(paser, "unknown token detected\n");
   }
 
 
