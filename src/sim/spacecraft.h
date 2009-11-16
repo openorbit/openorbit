@@ -23,6 +23,8 @@
 #include <ode/ode.h>
 
 #include <openorbit/openorbit.h>
+#include <gencds/array.h>
+
 #include <vmath/vmath.h>
 #include "simenvironment.h"
 /*!
@@ -58,8 +60,8 @@ typedef struct OOstage {
   int detachOrder; // How and when to detach the stage
   float mass; // Mass of stage in kg
   float inertia[3]; // Inertial tensor
-  OOobjvector engines; // Main orbital engines
-  OOobjvector torquers;
+  obj_array_t engines; // Main orbital engines
+  obj_array_t torquers;
   dBodyID id; // ID if detatched
 } OOstage;
 
@@ -95,7 +97,7 @@ struct OOsimplewing {
  */
 
 struct OOspacecraft {
-  OOobjvector stages;
+  obj_array_t stages;
   int activeStageIdx; // index in stage vector of active stage, this point out where
                       // detachment happens
   dBodyID body;

@@ -229,7 +229,7 @@ plGetObject(PLworld *world, const char *name)
   }
 
   int idx = 0;
-  OOobjvector *vec = &world->orbits;
+  obj_array_t *vec = &world->orbits;
 
   if (vec->length == 0) {
     return NULL;
@@ -463,7 +463,7 @@ plNewObjInWorld(PLworld*world, const char *name, double m, double gm,
 {
   PLobject__ *obj = plNewObj(world, name, m, gm, coord, q);
 
-  ooObjVecPush(&world->objs, obj);
+  obj_array_push(&world->objs, obj);
   return obj;
 }
 
@@ -474,7 +474,7 @@ plNewObjInSys(PLorbsys *sys, const char *name, double m, double gm,
   PLobject__ *obj = plNewObj(sys->world, name, m, gm, coord, q);
   obj->sys = sys;
 
-  ooObjVecPush(&sys->objs, obj);
+  obj_array_push(&sys->objs, obj);
   return obj;
 }
 
@@ -485,8 +485,8 @@ plNewWorld(const char *name, OOscene *sc,
            double obliquity)
 {
   PLworld *world = malloc(sizeof(PLworld));
-  ooObjVecInit(&world->orbits);
-  ooObjVecInit(&world->objs);
+  obj_array_init(&world->orbits);
+  obj_array_init(&world->objs);
   world->scene = sc;
   world->name = strdup(name);
   world->world = dWorldCreate();
@@ -513,8 +513,8 @@ plCreateOrbit(PLworld *world, const char *name,
   assert(world);
 
   PLorbsys *sys = malloc(sizeof(PLorbsys));
-  ooObjVecInit(&sys->orbits);
-  ooObjVecInit(&sys->objs);
+  obj_array_init(&sys->orbits);
+  obj_array_init(&sys->objs);
 
   sys->name = strdup(name);
   sys->world = world;
@@ -563,7 +563,7 @@ plNewOrbit(PLworld *world, const char *name,
                                  semiMaj, semiMin,
                                  inc, ascendingNode, argOfPeriapsis,
                                  meanAnomaly);
-  ooObjVecPush(&world->orbits, sys);
+  obj_array_push(&world->orbits, sys);
   plSysSetCurrentPos(sys);
 
   return sys;
@@ -584,7 +584,7 @@ plNewSubOrbit(PLorbsys *parent, const char *name,
                                  semiMaj, semiMin,
                                  inc, ascendingNode, argOfPeriapsis, meanAnomaly);
   sys->parent = parent;
-  ooObjVecPush(&parent->orbits, sys);
+  obj_array_push(&parent->orbits, sys);
   plSysSetCurrentPos(sys);
 
   return sys;

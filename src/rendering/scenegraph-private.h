@@ -39,8 +39,8 @@ struct OOscene {
 
   OOscenegraph *sg;
 
-  OOobjvector scenes; // Subscenes
-  OOobjvector objs;   // Objects in this scene
+  obj_array_t scenes; // Subscenes
+  obj_array_t objs;   // Objects in this scene
 };
 
 struct OOoverlay {
@@ -52,12 +52,12 @@ struct OOoverlay {
 struct OOscenegraph {
   OOscene *root;
   OOcam *currentCam;
-  OOobjvector cams;
+  obj_array_t cams;
 
   int usedLights;
 
   OOdrawable *sky;
-  OOobjvector overlays; // TODO: Consolidate OOobjvector and obj_array_t
+  obj_array_t overlays; // TODO: Consolidate OOobjvector and obj_array_t
 };
 
 typedef struct SGellipsis {

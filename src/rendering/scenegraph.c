@@ -256,8 +256,8 @@ ooSgNewSceneGraph()
   sg->root = ooSgNewScene(NULL, "root");
   sg->root->sg = sg;
   sg->usedLights = 0;
-  ooObjVecInit(&sg->cams);
-  ooObjVecInit(&sg->overlays);
+  obj_array_init(&sg->cams);
+  obj_array_init(&sg->overlays);
   return sg;
 }
 
@@ -297,12 +297,12 @@ ooSgNewScene(OOscene *parent, const char *name)
   memset(sc->lights, 0, SG_MAX_LIGHTS * sizeof(SGlight*));
   sc->sg = NULL;
 
-  ooObjVecInit(&sc->scenes);
-  ooObjVecInit(&sc->objs);
+  obj_array_init(&sc->scenes);
+  obj_array_init(&sc->objs);
 
   if (parent) {
     sc->sg = parent->sg;
-    ooObjVecPush(&parent->scenes, sc);
+    obj_array_push(&parent->scenes, sc);
   }
 
   return sc;
@@ -324,7 +324,7 @@ ooSgSceneAddChild(OOscene * restrict parent, OOscene * restrict child)
 {
   assert(parent != NULL);
   assert(child != NULL);
-  ooObjVecPush(&parent->scenes, child);
+  obj_array_push(&parent->scenes, child);
   child->parent = parent;
   child->sg = parent->sg;
 }
@@ -336,7 +336,7 @@ ooSgSceneAddObj(OOscene *sc, OOdrawable *object)
   assert(object != NULL);
 
   object->scene = sc;
-  ooObjVecPush(&sc->objs, object);
+  obj_array_push(&sc->objs, object);
 }
 
 OOscene*
@@ -361,7 +361,7 @@ ooSgGetScene(OOscenegraph *sg, const char *sceneName)
   char *strp = str;
   char *strTok = strsep(&strp, "/");
   int idx = 0;
-  OOobjvector *vec = NULL;
+  obj_array_t *vec = NULL;
 
   while (scene) {
     fprintf(stderr, "%s == %s\n", scene->name, strTok);
@@ -602,7 +602,7 @@ ooSgPaint(OOscenegraph *sg)
   glPopMatrix();
 }
 
-
+#if 0
 void
 ooObjVecInit(OOobjvector *vec)
 {
@@ -676,6 +676,7 @@ ooObjVecSet(OOobjvector *vec, size_t i, OOobject *obj)
   else
     vec->elems[i] = obj;
 }
+#endif
 
 void
 ooSgDrawFuncGnd(OOobject*obj)
@@ -930,8 +931,8 @@ drawModel(model_object_t *model)
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
 
-#if 1
-  // DEBUG: Draw normals
+#if 0
+  // DEBUG: Draw normals, do not delete
   glDisable(GL_BLEND);
   glDisable(GL_LIGHTING);
   glBegin(GL_LINES);

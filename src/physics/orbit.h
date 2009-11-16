@@ -77,8 +77,8 @@ struct PLorbsys__ {
 
   const char *name;
 
-  OOobjvector orbits; // suborbits
-  OOobjvector objs; // objects in this system
+  obj_array_t orbits; // suborbits
+  obj_array_t objs; // objects in this system
 
   PLobject__ *orbitalBody; // The body actually orbiting at this point, note that it is
   double orbitalPeriod;
@@ -90,8 +90,8 @@ struct PLworld__ {
   dWorldID world;
   const char *name;
   OOscene *scene; // Scene in the sg
-  OOobjvector orbits;
-  OOobjvector objs;
+  obj_array_t orbits;
+  obj_array_t objs;
   PLobject__ *centralBody;
   SGlight *centralLightSource;
 };

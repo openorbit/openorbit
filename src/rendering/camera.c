@@ -99,7 +99,7 @@ ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
 
   ooLwcSet(&((OOfreecam*)cam->camData)->lwc, x, y, z);
 
-  ooObjVecPush(&sg->cams, cam);
+  obj_array_push(&sg->cams, cam);
   return cam;
 }
 
@@ -116,7 +116,7 @@ ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
     ((OOfixedcam*)cam->camData)->r = vf3_set(dx,dy,dz);
     ((OOfixedcam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
 
-    ooObjVecPush(&sg->cams, cam);
+    obj_array_push(&sg->cams, cam);
     return cam;
 }
 
@@ -131,7 +131,7 @@ ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body, float dx, float dy,
     ((OOorbitcam*)cam->camData)->body = body;
     ((OOorbitcam*)cam->camData)->r = vf3_set(dx,dy,dz);
 
-    ooObjVecPush(&sg->cams, cam);
+    obj_array_push(&sg->cams, cam);
     return cam;
 }
 

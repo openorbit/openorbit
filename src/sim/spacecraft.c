@@ -66,7 +66,7 @@ ooScNew(void)
   //sc->mainEngine = NULL;
   //sc->body = dBodyCreate(world);
   sc->activeStageIdx = 0;
-  ooObjVecInit(&sc->stages);
+  obj_array_init(&sc->stages);
 
   return sc;
 }
@@ -96,7 +96,7 @@ dMassSetConeTotal(dMass *m, dReal total_mass,
 void
 ooScAddStage(OOspacecraft *sc, OOstage *stage)
 {
-  ooObjVecPush(&sc->stages, stage);
+  obj_array_push(&sc->stages, stage);
 }
 
 void
@@ -220,8 +220,8 @@ ooScNewStage(void)
 {
   OOstage *stage = malloc(sizeof(OOstage));
   stage->state = OO_Stage_Idle;
-  ooObjVecInit(&stage->engines);
-  ooObjVecInit(&stage->torquers);
+  obj_array_init(&stage->engines);
+  obj_array_init(&stage->torquers);
   //stage->id = dBodyNew(...) // In which dWorld?;
   stage->detachOrder = 0;
 
@@ -238,7 +238,7 @@ ooScNewStage(void)
 void
 ooScStageAddEngine(OOstage *stage, OOengine *engine)
 {
-  ooObjVecPush(&stage->engines, engine);
+  obj_array_push(&stage->engines, engine);
 }
 
 
@@ -247,10 +247,11 @@ ooScLoad(const char *fileName)
 {
   char *path = ooResGetPath(fileName);
   HRMLdocument *spaceCraftDoc = hrmlParse(path);
-  free(path);
+
 
   if (spaceCraftDoc == NULL) {
     // Parser is responsible for pestering the users with errors for now.
+    free(path);
     return NULL;
   }
 
@@ -324,7 +325,17 @@ ooScLoad(const char *fileName)
           }
         } else if (!strcmp(child->name, "model")) {
           const char *modelName = hrmlGetStr(child);
+          char *pathCopy = strdup(path);
+          char *lastSlash = strrchr(pathCopy, '/');
+          lastSlash[1] = '\0'; // terminate string here and append model
+                               // filename
+          char *modelPath;
+          asprintf(&modelPath, "%s/%s", pathCopy, modelName);
 
+
+
+          free(modelPath);
+          free(pathCopy);
         }
       }
     }
@@ -337,6 +348,6 @@ ooScLoad(const char *fileName)
   // Ensure that stage vector is sorted by detachOrder
   qsort(&sc->stages.elems[0], sc->stages.length, sizeof(void*),
         (qsort_compar_t)compar_stages);
-
+  free(path);
   return sc;
 }
