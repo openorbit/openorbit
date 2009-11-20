@@ -26,7 +26,7 @@
 #include "res-manager.h"
 #include "parsers/hrml.h"
 #include <vmath/vmath.h>
-
+#include "engine.h"
 extern SIMstate gSIM_state;
 
 /*
@@ -68,6 +68,15 @@ ooScNew(void)
   sc->activeStageIdx = 0;
   obj_array_init(&sc->stages);
 
+  sc->prestep = NULL;
+  sc->poststep = NULL;
+  sc->detatchStage = NULL;
+
+  sc->mass = 0.0; // Note set when adding stages
+  sc->inertia[0] = 0.0;
+  sc->inertia[1] = 0.0;
+  sc->inertia[2] = 0.0;
+
   return sc;
 }
 
@@ -97,6 +106,7 @@ void
 ooScAddStage(OOspacecraft *sc, OOstage *stage)
 {
   obj_array_push(&sc->stages, stage);
+  sc->mass += stage->mass;
 }
 
 void
@@ -115,14 +125,29 @@ ooScDetachStage(OOspacecraft *sc)
 //  dBodyEnable(stage->id);
 }
 
+
+void
+ooGetAxises(OOaxises *axises)
+{
+  axises->yaw = ooIoGetAxis("yaw");
+  axises->pitch = ooIoGetAxis("pitch");
+  axises->roll = ooIoGetAxis("roll");
+  axises->horizontal = ooIoGetAxis("horizontal");
+  axises->vertical = ooIoGetAxis("vertical");
+  axises->thrust = ooIoGetAxis("thrust");
+}
 void
 ooScStep(OOspacecraft *sc)
 {
   assert(sc != NULL);
+
+  OOaxises axises;
+  ooGetAxises(&axises);
+
   for (size_t i = sc->activeStageIdx ; i < sc->stages.length ; ++ i) {
     OOstage *stage = sc->stages.elems[i];
     if (stage->state == OO_Stage_Enabled) {
-      ooScStageStep(sc, stage);
+      ooScStageStep(sc, stage, &axises);
     }
   }
 }
@@ -133,55 +158,17 @@ ooScForce(OOspacecraft *sc, float rx, float ry, float rz)
 //    dBodyAddRelForceAtRelPos(sc->body, rx, ry, rz, sc->);
 }
 
-void
-ooScFireOrbital(OOspacecraft *sc)
-{
-
-}
-
-void
-ooScFireVertical(OOspacecraft *sc, float dv)
-{
-
-}
-void
-ooScFireHorizontal(OOspacecraft *sc, float dh)
-{
-
-}
-
-void
-ooScFireForward(OOspacecraft *sc)
-{
-
-}
-
-void
-ooScEngageYaw(OOspacecraft *sc, float dy)
-{
-
-}
-
-void
-ooScEngagePitch(OOspacecraft *sc, float dp)
-{
-
-}
-
-void
-ooScEngageRoll(OOspacecraft *sc, float dr)
-{
-
-}
 
 
 void
-ooScStageStep(OOspacecraft *sc, OOstage *stage) {
+ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises) {
   assert(sc != NULL);
   assert(stage != NULL);
+  assert(axises != NULL);
 
   for (size_t i = 0 ; i < stage->engines.length; ++ i) {
     OOengine *engine = stage->engines.elems[i];
+
     if (engine->state == OO_Engine_Burning ||
         engine->state == OO_Engine_Fault_Open)
     {
@@ -199,21 +186,6 @@ static int compar_stages(const OOstage **s0, const OOstage **s1) {
   return (*s1)->detachOrder - (*s0)->detachOrder;
 }
 
-OOengine*
-ooScNewEngine(OOspacecraft *sc,
-              float f,
-              float x, float y, float z,
-              float dx, float dy, float dz)
-{
-  OOengine *engine = malloc(sizeof(OOengine));
-  engine->sc = sc;
-  engine->state = OO_Engine_Disabled;
-  engine->forceMag = f;
-  engine->p = vf3_set(x, y, z);
-  engine->dir = vf3_set(dx, dy, dz);
-
-  return engine;
-}
 
 OOstage*
 ooScNewStage(void)
