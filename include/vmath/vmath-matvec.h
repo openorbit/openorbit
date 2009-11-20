@@ -38,6 +38,8 @@ extern "C" {
 #include <vmath/vmath-types.h>
   //#include <vmath/vmath-matvec.inl>
 
+void vf3_outprod(matrix_t *m, float3 a, float3 b);
+
 static inline float
 vf3_x(float3 v)
 {
@@ -351,6 +353,9 @@ void m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
 void m_add(matrix_t *res, matrix_t *a, matrix_t *b)
     __attribute__ ((__nonnull__));
 
+void m_sub(matrix_t *res, matrix_t *a, matrix_t *b)
+    __attribute__ ((__nonnull__));
+
 float4 v_s_add(float4 a, float b);
 
 float4 v_add(float4 a, float4 b)
@@ -596,6 +601,15 @@ vd3_normalise(double3 v)
   return vd3_s_mul(v, 1.0/norm);
 }
 
+static inline void
+m_s_mul(matrix_t *res, const matrix_t *a, float s)
+{
+  float4 vs = vf4_set(s, s, s, s);
+  res->v[0] = vf3_mul(a->v[0], vs);
+  res->v[1] = vf3_mul(a->v[1], vs);
+  res->v[2] = vf3_mul(a->v[2], vs);
+  res->v[3] = vf3_mul(a->v[3], vs);
+}
 
 #ifdef __cplusplus
 }

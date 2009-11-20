@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2009 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -17,12 +17,23 @@
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
- 
+
 #include <tgmath.h>
 #include <string.h>
 
 #include <vmath/vmath-matvec.h>
 #include <vmath/vmath-constants.h>
+
+void
+vf3_outprod(matrix_t *m, float3 a, float3 b) {
+  m->v[0] = vf3_set(vf3_x(a), vf3_x(a), vf3_x(a));
+  m->v[1] = vf3_set(vf3_y(a), vf3_y(a), vf3_y(a));
+  m->v[2] = vf3_set(vf3_z(a), vf3_z(a), vf3_z(a));
+
+  m->v[0] = vf3_mul(m->v[0], b);
+  m->v[1] = vf3_mul(m->v[1], b);
+  m->v[2] = vf3_mul(m->v[2], b);
+}
 
 /* standard non vectorised routines */
 
@@ -77,7 +88,7 @@ m_v3_mulf(const matrix_t *a, float3 v) {
     + a->a[i][2] * vu.s.z;
   }
   res = resu.v;
-#endif  
+#endif
 	return res;
 }
 
@@ -106,6 +117,16 @@ m_add(matrix_t *res, matrix_t *a, matrix_t *b)
             res->a[i][j] = a->a[i][j] + b->a[i][j];
         }
     }
+}
+
+void
+m_sub(matrix_t *res, matrix_t *a, matrix_t *b)
+{
+  for (int i = 0 ; i < 4 ; i ++) {
+    for (int j = 0 ; j < 4 ; j ++) {
+      res->a[i][j] = a->a[i][j] - b->a[i][j];
+    }
+  }
 }
 
 float4
@@ -166,7 +187,7 @@ v_dot(float4 a, float4 b)
 #else
   float4_u c = { .v = a + b };
   return c.s.x + c.s.y + c.s.z + c.s.w;
-  //return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];  
+  //return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
 #endif
 }
 
@@ -213,7 +234,7 @@ m_lu(const matrix_t *a, matrix_t *l, matrix_t *u)
 //        vector_t v;
 //        v_s_div(&v, u.a[i], u.a[i][i]);
 //        v_s_mul(&v, &v, u.a[i+1][j]);
-        
+
 //    }
     return;
 }
@@ -232,40 +253,40 @@ m_det(const matrix_t *m)
     // note, this version has been written to work, not to be efficient in any
     // way
     float sub_det[4];
-    
-    sub_det[0] =  MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 3);
-    sub_det[0] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 1); 
-    sub_det[0] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 2); 
-    sub_det[0] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 3); 
-    sub_det[0] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 1); 
-    sub_det[0] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 2); 
 
-    sub_det[1] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 3); 
-    sub_det[1] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 0); 
-    sub_det[1] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 2); 
-    sub_det[1] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 3); 
-    sub_det[1] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 0); 
-    sub_det[1] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 2); 
-    
-    sub_det[2] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 3); 
-    sub_det[2] += MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 0); 
-    sub_det[2] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 1); 
-    sub_det[2] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 3); 
-    sub_det[2] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 0); 
-    sub_det[2] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 1); 
-    
-    sub_det[3] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 2); 
-    sub_det[3] += MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 0); 
-    sub_det[3] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 1); 
-    sub_det[3] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 2); 
-    sub_det[3] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 0); 
-    sub_det[3] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 1); 
-    
+    sub_det[0] =  MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 3);
+    sub_det[0] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 1);
+    sub_det[0] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 2);
+    sub_det[0] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 3);
+    sub_det[0] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 1);
+    sub_det[0] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 2);
+
+    sub_det[1] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 3);
+    sub_det[1] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 0);
+    sub_det[1] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 2);
+    sub_det[1] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 3);
+    sub_det[1] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 0);
+    sub_det[1] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 2);
+
+    sub_det[2] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 3);
+    sub_det[2] += MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 0);
+    sub_det[2] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 1);
+    sub_det[2] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 3);
+    sub_det[2] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 0);
+    sub_det[2] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 1);
+
+    sub_det[3] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 2);
+    sub_det[3] += MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 0);
+    sub_det[3] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 1);
+    sub_det[3] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 2);
+    sub_det[3] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 0);
+    sub_det[3] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 1);
+
     float det = MAT_ELEM(*m, 0, 0) * sub_det[0]
                  - MAT_ELEM(*m, 0, 1) * sub_det[1]
                  + MAT_ELEM(*m, 0, 2) * sub_det[2]
                  - MAT_ELEM(*m, 0, 3) * sub_det[3];
-    
+
     return det;
 }
 
@@ -285,12 +306,12 @@ m_subdet3(const matrix_t *m, int k, int l)
         i1 ++;
     }
 
-    
+
     // Apply Sarrus
     for (int i = 0 ; i < 3 ; i ++) {
         acc += MAT_ELEM(m_prim, 0, (0+i) % 3) * MAT_ELEM(m_prim, 1, (1+i) % 3)
              * MAT_ELEM(m_prim, 2, (2+i) % 3);
-        
+
         acc -= MAT_ELEM(m_prim, 2, (0+i) % 3) * MAT_ELEM(m_prim, 1, (1+i) % 3)
              * MAT_ELEM(m_prim, 0, (2+i) % 3);
     }
@@ -310,7 +331,7 @@ m_adj(const matrix_t *m)
         }
         sign *= S_CONST(-1.0);
     }
-    
+
     return M_adj;
 }
 
@@ -321,7 +342,7 @@ m_inv(const matrix_t *M)
     float det = m_det(M);
     matrix_t M_adj = m_adj(M);
     matrix_t M_inv;
-    
+
     if (det != S_CONST(0.0)) {
         float sign = S_CONST(1.0);
         for (int i = 0 ; i < 4 ; i ++) {
@@ -371,7 +392,7 @@ m_axis_rot_x(matrix_t *m, float a)
     float cos_a = cos(a);
     memset(m, 0, sizeof(matrix_t));
     m->a[0][0] = S_ONE;
-    m->a[1][1] = cos_a; m->a[1][1] = sin_a; 
+    m->a[1][1] = cos_a; m->a[1][1] = sin_a;
     m->a[2][1] = -sin_a; m->a[2][1] = cos_a;
     m->a[3][3] = S_ONE;
 }
@@ -408,7 +429,7 @@ m_vec_rot_x(matrix_t *m, float a)
     float cos_a = cos(a);
     memset(m, 0, sizeof(matrix_t));
     m->a[0][0] = S_ONE;
-    m->a[1][1] = cos_a; m->a[1][1] = -sin_a; 
+    m->a[1][1] = cos_a; m->a[1][1] = -sin_a;
     m->a[2][1] = sin_a; m->a[2][1] = cos_a;
     m->a[3][3] = S_ONE;
 }
@@ -480,8 +501,8 @@ v_eq(float4 a, float4  b, float tol)
     if (!((au.a[i] <= bu.a[i]+tol) && (au.a[i] >= bu.a[i]-tol))) {
       return false;
     }
-  }  
-#endif    
+  }
+#endif
     return true;
 }
 
@@ -495,16 +516,16 @@ m_eq(const matrix_t *a, const matrix_t *b, float tol)
             }
         }
     }
-    
-    return true;    
+
+    return true;
 }
 
 
 void
 m_translate(matrix_t *m, float x, float y, float z, float w)
 {
-    memset(m, 0, sizeof(mat_arr_t));    
-    
+    memset(m, 0, sizeof(mat_arr_t));
+
     m->a[0][0] = x;
     m->a[1][1] = y;
     m->a[2][2] = z;
