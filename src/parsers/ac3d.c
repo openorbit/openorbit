@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <limits.h>
 #include <string.h>
 #include <assert.h>
@@ -229,6 +230,7 @@ float vecangle(float a[3], float b[3])
 model_object_t*
 ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *obj)
 {
+  bool has_warned_for_materials = false;
   assert(obj != NULL);
   model_object_t *model = model_object_new();
 
@@ -255,31 +257,31 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
   float_array_t face_normals;
   float_array_init(&face_normals);
 
-  // 1. Compute face normals
-  // 2. Compute shared vertices
-  // 3. Compute vertex normals, compensating for the crease angle
   int_array_t vertex_sharing[obj->num_verts];
   for (int i = 0 ; i < obj->num_verts ; ++ i) {
     int_array_init(&vertex_sharing[i]);
   }
 
+  // Compute face normals and shared vertices
   // Tag vertex as being shared by the one here, and compute the face normals
   for (int i = 0 ; i < obj->num_surfs ; ++ i) {
+    // First the vertex sharing
     for (int j = 0 ; j < obj->surfs[i].refs ; ++ j) {
       int_array_push(&vertex_sharing[obj->surfs[i].ref_lines[j].vert_idx], i);
     }
 
+    // Cross product to get face normal
     float *p0 = &obj->verts[obj->surfs[i].ref_lines[0].vert_idx*3];
     float *p1 = &obj->verts[obj->surfs[i].ref_lines[1].vert_idx*3];
     float *p2 = &obj->verts[obj->surfs[i].ref_lines[2].vert_idx*3];
 
     float vb[3] = {p0[0] - p1[0], p0[1] - p1[1], p0[2] - p1[2]};
     float va[3] = {p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]};
-
     float vc[3];
     vc[0] = va[1]*vb[2]-va[2]*vb[1];
     vc[1] = va[2]*vb[0]-va[0]*vb[2];
     vc[2] = va[0]*vb[1]-va[1]*vb[0];
+
     // Normalise face normal
     float absvc = sqrtf(vc[0]*vc[0] + vc[1]*vc[1] + vc[2]*vc[2]);
     vc[0] /= absvc;
@@ -289,6 +291,15 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
     float_array_push(&face_normals, vc[0]);
     float_array_push(&face_normals, vc[1]);
     float_array_push(&face_normals, vc[2]);
+
+    if (i > 0 && has_warned_for_materials == false) {
+      if (obj->surfs[0].material_idx != obj->surfs[i].material_idx) {
+        has_warned_for_materials = true;
+        fprintf(stderr,
+                "different materials not supported for the same object, "
+                "material forced\n");
+      }
+    }
   }
 
   // Go through each face again and add the vertices
@@ -297,13 +308,6 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
       fprintf(stderr, "trying to load primitive that is not a polygon, "
                       "not supported (refs = %d)\n", obj->surfs[i].refs);
     }
-
-    // Cross product to get face normal
-    // TODO: We should keep a reference list of all face normals and then
-    //       only average out the normals if they are no more than a certain
-    //       angle from each other. Though, the current approach does give nice
-    //       shaded polygons, it is not really what we want, especially when
-    //       dealing with sharp angles
 
     // Build up an index vector for on the fly triangulation of the polygon
     int triangles = 1 + (obj->surfs[i].refs - 3);
@@ -328,6 +332,8 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
 
       int vertexId = obj->surfs[i].ref_lines[idxseq[j]].vert_idx;
 
+      // Compute vertex normals, compensating for the crease angle
+      // TODO: Read crease angle from file, currently fixed to 45.0 deg
       for (int k = 0 ; k < vertex_sharing[vertexId].length ; ++ k) {
         int faceId = vertex_sharing[vertexId].elems[k];
 
