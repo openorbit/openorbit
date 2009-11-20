@@ -21,9 +21,96 @@
 #include "physics.h"
 #include "common/lwcoord.h"
 #include <assert.h>
+
+
+void
+plMassSet(PLmass *mo, float m,
+          float ixx, float iyy, float izz,
+          float ixy, float ixz, float iyz)
+{
+  memset(mo, 0, sizeof(PLmass));
+
+  mo->m = m;
+  mo->moInert[0][0] = ixx;
+  mo->moInert[1][1] = iyy;
+  mo->moInert[2][2] = izz;
+  mo->moInert[0][1] = ixy;
+  mo->moInert[1][0] = ixy;
+  mo->moInert[0][2] = ixz;
+  mo->moInert[2][0] = ixz;
+  mo->moInert[1][2] = iyz;
+  mo->moInert[2][1] = iyz;
+}
+
+void
+plMassTranslate(PLmass *m, float dx, float dy, float dz)
+{
+  matrix_t re;
+  m_unit(&re);
+  float3 r = vf3_set(dx, dy, dz);
+  float rdot = vf3_dot(r, r);
+  re.a[0][0] = rdot;
+  re.a[1][1] = rdot;
+  re.a[2][2] = rdot;
+  matrix_t rout;
+  vf3_outprod(&rout, r, r);
+  matrix_t madj;
+  m_sub(&madj, &re, &rout);
+  matrix_t mres;
+  m_s_mul(&mres, &madj, m->m);
+
+  for (int i = 0 ; i < 3 ; ++ i) {
+    for (int j = 0 ; j < 3 ; ++ j) {
+      m->moInert[i][j] += mres.a[i][j];
+    }
+  }
+}
+
+void
+plMassRotateM(PLmass *m, const PLfloat3x3 *mat)
+{
+  // We want to rotate the inertia tensor with
+  // Ir = M * I0 * M^-1
+  // Please verify
+}
+
+void
+plMassRotateQ(PLmass *m, quaternion_t q)
+{
+
+}
+
+
+void
+plMassAdd(PLmass * restrict md, const PLmass * restrict ms)
+{
+  md->m += ms->m;
+
+  for (int i = 0 ; i < 3 ; ++ i) {
+    for (int j = 0 ; j < 3 ; ++ j) {
+      md->moInert[i][j] += ms->moInert[i][j];
+    }
+  }
+}
+
+void
+plMassMod(PLmass *m, float newMass)
+{
+  float s = newMass / m->m;
+  m->m = newMass;
+
+  for (int i = 0 ; i < 3 ; ++ i) {
+    for (int j = 0 ; j < 3 ; ++ j) {
+      m->moInert[i][j] *= s;
+    }
+  }
+}
+
+
+
 /*
   One of the problems with space is that it is big
-  
+
   For our physics system, this unfortunatelly means that we need to reset the position
   based on the local segmented position after every step. This is OK in general, but
   will cause big problems for collission detection. Though, since the data needs to be
@@ -71,7 +158,7 @@ plForce3d(PLobject *obj, double x, double y, double z)
 void
 plForce3dv(PLobject *obj, PLdouble3 f)
 {
-  dBodyAddForce(obj->id, ((double*)&f)[0], ((double*)&f)[1], ((double*)&f)[2]);  
+  dBodyAddForce(obj->id, ((double*)&f)[0], ((double*)&f)[1], ((double*)&f)[2]);
 }
 
 void
@@ -139,7 +226,7 @@ plNormaliseObject(PLobject *obj)
   // Since we are using non safe casts here, we must ensure this in case someone upgrades
   // to 64 bit positions
   assert(sizeof(obj->p.offs) == sizeof(PLfloat3));
-  
+
   const dReal *pos = dBodyGetPosition(obj->id);
   ((float*)&obj->p.offs)[0] = pos[0];
   ((float*)&obj->p.offs)[1] = pos[1];

@@ -21,7 +21,7 @@
 #define __CAMERA_H__
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 #include <stdbool.h>
 #include <vmath/vmath.h>
@@ -32,13 +32,18 @@ extern "C" {
   typedef struct OOfixedcam OOfixedcam;
   typedef struct OOorbitcam OOorbitcam;
   typedef struct OOcam OOcam;
-  
-#include "scenegraph.h"
 
+#include "scenegraph.h"
   enum OOcamtype {
     OOCam_Free,
     OOCam_Fixed,
     OOCam_Orbit
+  };
+
+  struct OOcam {
+    OOcamtype kind;
+    OOscene *scene;
+    OOobject *camData;
   };
 
   struct OOfreecam {
@@ -56,30 +61,26 @@ extern "C" {
   };
 
   struct OOorbitcam {
-    dBodyID body; // Camera orbiting this body
-
-    float3 r; // Placed on this position (will always look at the body)
+    OOlwcoord lwc; // Camera orbiting this point
+    float3 r; // Placed on this position relative to lwc (will always look at
+              // the body)
   };
 
-  struct OOcam {
-    OOcamtype kind;
-    OOscene *scene;
-    OOobject *camData;
-  };
 
   void ooSgCamInit(void);
 
   OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
-                        float x, float y, float z, 
+                        float x, float y, float z,
                         float rx, float ry, float rz);
 
   OOcam* ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
-                         float dx, float dy, float dz, 
+                         float dx, float dy, float dz,
                          float rx, float ry, float rz);
 
-  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
+  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc,
                          float dx, float dy, float dz);
 
+  void sgCamSetLwc(OOcam *cam, OOlwcoord *lwc);
   void ooSgCamMove(OOcam *cam);
   void ooSgCamRotate(OOcam *cam);
   void ooSgCamStep(OOcam *cam, float dt);
@@ -87,6 +88,6 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif

@@ -114,7 +114,7 @@ ooSetPerspective(float fovy, int width, int height)
   glMatrixMode(GL_PROJECTION);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glLoadIdentity();
-  // Near clipping 1 cm away, far clipping 20 au away
+  // Near clipping 1 dm away, far clipping 20 au away
   gluPerspective(fovy, (double)width / (double)height,
                  /*near*/0.1, /*far*/149598000000.0*20.0);
 

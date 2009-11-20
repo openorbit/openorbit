@@ -35,6 +35,7 @@ typedef double __attribute__((ext_vector_type (4))) PLdouble3;
 typedef int64_t __attribute__((ext_vector_type (4))) PLlong3;
 typedef int32_t __attribute__((ext_vector_type (4))) PLint3;
 typedef int16_t __attribute__((ext_vector_type (4))) PLshort3;
+typedef PLfloat3 __attribute__((ext_vector_type (4))) PLfloat3x3;
 #else
 typedef float __attribute__((vector_size (16))) PLfloat3;
 typedef double __attribute__((vector_size (32))) PLdouble3;
@@ -97,6 +98,18 @@ typedef struct OOlwcoord64 PLlwcoord64;
 //PLdouble3 plLwcRelVec64(const PLlwcoord64 *coord, PLlong3 seg);
 //PLdouble3 plLwcDist64(const PLlwcoord64 *a, const PLlwcoord64 * b);
 
+struct PLmass {
+  float m; //!< Mass in kg
+  float moInert[3][3]; //!< Moment of inertia
+};
+
+typedef struct PLmass PLmass;
+
+void plMassSet(PLmass *mo, float m,
+               float ixx, float iyy, float izz,
+               float ixy, float ixz, float iyz);
+void plMassTranslate(PLmass *m, float dx, float dy, float dz);
+void plMassAdd(PLmass * restrict md, const PLmass * restrict ms);
 
 typedef struct PLobject {
   char *name;

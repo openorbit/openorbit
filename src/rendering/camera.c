@@ -91,7 +91,6 @@ ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
   cam->kind = OOCam_Free;
 
   cam->scene = sc;
-//  ((OOfreecam*)cam->camData)->p = v_set(x,y,z,1.0f);
   ((OOfreecam*)cam->camData)->q = q_rot(rx,ry,rz, 0.0f);
 
   ((OOfreecam*)cam->camData)->dp = vf3_set(0.0,0.0,0.0);
@@ -121,18 +120,19 @@ ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
 }
 
 OOcam*
-ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body, float dx, float dy, float dz)
+ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, float dx, float dy, float dz)
 {
-    OOcam *cam = malloc(sizeof(OOcam));
-    cam->camData = malloc(sizeof(OOorbitcam));
-    cam->kind = OOCam_Orbit;
+  OOcam *cam = malloc(sizeof(OOcam));
+  cam->camData = malloc(sizeof(OOorbitcam));
+  cam->kind = OOCam_Orbit;
 
-    cam->scene = sc;
-    ((OOorbitcam*)cam->camData)->body = body;
-    ((OOorbitcam*)cam->camData)->r = vf3_set(dx,dy,dz);
+  cam->scene = sc;
 
-    obj_array_push(&sg->cams, cam);
-    return cam;
+  ooLwcSet(&((OOorbitcam*)cam->camData)->lwc, 0.0, 0.0, 0.0);
+  ((OOorbitcam*)cam->camData)->r = vf3_set(dx,dy,dz);
+
+  obj_array_push(&sg->cams, cam);
+  return cam;
 }
 
 // Only rotate, used for things like sky painting that requires camera rotation but not
@@ -146,13 +146,13 @@ ooSgCamRotate(OOcam *cam)
   case OOCam_Orbit:
     assert(0 && "not supported yet");
     {
-      const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
+      //      const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
       //const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
-      gluLookAt(vf3_x(((OOorbitcam*)cam->camData)->r) + pos[0],
-                vf3_y(((OOorbitcam*)cam->camData)->r) + pos[1],
-                vf3_z(((OOorbitcam*)cam->camData)->r) + pos[2],
-                pos[0], pos[1], pos[2], // center
-                  0.0, 1.0, 0.0); // up
+      //gluLookAt(vf3_x(((OOorbitcam*)cam->camData)->r) + pos[0],
+      //          vf3_y(((OOorbitcam*)cam->camData)->r) + pos[1],
+      //          vf3_z(((OOorbitcam*)cam->camData)->r) + pos[2],
+      //          pos[0], pos[1], pos[2], // center
+      //            0.0, 1.0, 0.0); // up
     }
     break;
   case OOCam_Fixed:
@@ -269,14 +269,23 @@ ooSgCamAxisUpdate(OOcam *cam)
     float vertical = ooIoGetAxis("vertical");
     float thrust = ooIoGetAxis("thrust");
 
-    float3 v = vf3_set(1000000.0 * horizontal,
-                       1000000.0 * vertical,
-                       1000000.0 * thrust);
+    float3 v = vf3_set(1.0 * horizontal,
+                       1.0 * vertical,
+                       1.0 * thrust);
     fcam->dp = v_q_rot(v, fcam->q);
 
     fcam->dq = q_rot(0.0f,0.0f,1.0f, -0.02f * roll);
     fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.02f * pitch));
     fcam->dq = q_mul(fcam->dq, q_rot(0.0f,1.0f,0.0f, -0.02f * yaw));
+  }
+}
+
+void
+sgCamSetLwc(OOcam *cam, OOlwcoord *lwc)
+{
+  if (cam->kind == OOCam_Orbit) {
+    OOorbitcam *ocam = cam->camData;
+    ocam->lwc = *lwc;
   }
 }
 

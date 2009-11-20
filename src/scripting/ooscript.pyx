@@ -43,9 +43,9 @@ cdef extern from "rendering/scenegraph.h":
                          float dx, float dy, float dz, 
                          float rx, float ry, float rz)
 
-  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
+  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc,
                          float dx, float dy, float dz)
-
+  OOdrawable* sgLoadModel(char *file)
 
 
 cdef extern from "rendering/sky.h":
@@ -197,8 +197,8 @@ cdef class FixedCam(Cam):
     self.cam = ooSgNewFixedCam(sg.sg, sc.sc, body.body, dx, dy, dz, rx, ry, rz)
 
 cdef class OrbitCam(Cam):
-  def __cinit__(self, Scenegraph sg, Scene sc, OdeBody body, dx, dy, dz):
-    self.cam = ooSgNewOrbitCam(sg.sg, sc.sc, body.body, dx, dy, dz)
+  def __cinit__(self, Scenegraph sg, Scene sc, dx, dy, dz):
+    self.cam = ooSgNewOrbitCam(sg.sg, sc.sc, dx, dy, dz)
 
 cdef class OrbitWorld:
   cdef PLworld *world
