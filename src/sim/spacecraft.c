@@ -29,6 +29,9 @@
 #include "engine.h"
 extern SIMstate gSIM_state;
 
+DEF_ARRAY(OOdetatchinstr,detatchprog)
+
+
 /*
   Compute the wing lift for a simple wing
 
@@ -36,7 +39,7 @@ extern SIMstate gSIM_state;
   per 5 deg angle of attack. We actually intepolate between two angles to
   produce a little bit better results.
  */
-void
+double
 ooSimpleWingLift(OOsimplewing *wing, const OOsimenv *env)
 {
   double p = env->airDensity;  // air density
@@ -50,6 +53,8 @@ ooSimpleWingLift(OOsimplewing *wing, const OOsimenv *env)
 
   double cl = cl0 + (cl1 - cl0) * fmod(RAD_TO_DEG(env->aoa), 5.0);
   double L = 0.5 * p * v * v * a * cl;
+
+  return L;
 }
 
 
@@ -72,10 +77,10 @@ ooScNew(void)
   sc->poststep = NULL;
   sc->detatchStage = NULL;
 
-  sc->mass = 0.0; // Note set when adding stages
-  sc->inertia[0] = 0.0;
-  sc->inertia[1] = 0.0;
-  sc->inertia[2] = 0.0;
+  sc->detatchProg.pc = 0;
+  detatchprog_array_init(&sc->detatchProg.instrs);
+
+  plMassSet(&sc->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   return sc;
 }
@@ -106,7 +111,38 @@ void
 ooScAddStage(OOspacecraft *sc, OOstage *stage)
 {
   obj_array_push(&sc->stages, stage);
-  sc->mass += stage->mass;
+  PLmass m = stage->m;
+  plMassTranslate(&m, 0.0, 0.0, 0.0);
+  plMassAdd(&sc->m, &m);
+}
+
+void
+ooScReevaluateMass(OOspacecraft *sc)
+{
+  memset(&sc->m, 0, sizeof(PLmass));
+
+  for (int i = 0 ; i < sc->stages.length ; ++ i) {
+    OOstage *stage = sc->stages.elems[i];
+    if (stage->state != OO_Stage_Detatched) {
+      plMassAdd(&sc->m, &stage->m);
+    }
+  }
+}
+
+void
+ooScDetatch2(OOspacecraft *sc)
+{
+  if (sc->detatchProg.pc < sc->detatchProg.instrs.length) {
+    OOdetatchinstr instr = sc->detatchProg.instrs.elems[sc->detatchProg.pc];
+
+    for (int i = 0 ; i < instr.numStages ; ++ i) {
+      instr.detatch(sc->stages.elems[instr.stageIdx+i]);
+      ((OOstage*)sc->stages.elems[instr.stageIdx+i])->state = OO_Stage_Detatched;
+    }
+    sc->detatchProg.pc ++;
+
+    ooScReevaluateMass(sc);
+  }
 }
 
 void
@@ -150,6 +186,9 @@ ooScStep(OOspacecraft *sc)
       ooScStageStep(sc, stage, &axises);
     }
   }
+
+  float expendedFuel = 0.0f;
+  plMassMod(&sc->m, sc->m.m - expendedFuel);
 }
 
 void // for scripts and events
@@ -172,13 +211,16 @@ ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises) {
     if (engine->state == OO_Engine_Burning ||
         engine->state == OO_Engine_Fault_Open)
     {
-      dBodyAddRelForceAtRelPos(sc->body,
-                               vf3_x(engine->dir) * engine->forceMag,
-                               vf3_y(engine->dir) * engine->forceMag,
-                               vf3_z(engine->dir) * engine->forceMag,
-                               vf3_x(engine->p), vf3_y(engine->p), vf3_z(engine->p));
+      //      dBodyAddRelForceAtRelPos(sc->body,
+      //                         vf3_x(engine->dir) * engine->forceMag,
+      //                         vf3_y(engine->dir) * engine->forceMag,
+      //                         vf3_z(engine->dir) * engine->forceMag,
+      //                         vf3_x(engine->p), vf3_y(engine->p), vf3_z(engine->p));
     }
   }
+
+  float expendedFuel = 0.0f;
+  plMassMod(&stage->m, stage->m.m - expendedFuel);
 }
 
 typedef int (*qsort_compar_t)(const void *, const void *);
@@ -231,6 +273,9 @@ ooScLoad(const char *fileName)
   HRMLvalue scName = hrmlGetAttrForName(root, "name");
   OOspacecraft *sc = ooScNew();
 
+  const double *inertia;
+  double mass;
+
   for (HRMLobject *node = root; node != NULL; node = node->next) {
     if (!strcmp(node->name, "spacecraft")) {
       for (HRMLobject *child = node->children; child != NULL ; child = child->next) {
@@ -242,14 +287,11 @@ ooScLoad(const char *fileName)
               if (!strcmp(stageEntry->name, "detach-order")) {
                 newStage->detachOrder = hrmlGetInt(stageEntry);
               } else if (!strcmp(stageEntry->name, "mass")) {
-                newStage->mass = hrmlGetReal(stageEntry);
+                mass = hrmlGetReal(stageEntry);
               } else if (!strcmp(stageEntry->name, "inertial-tensor")) {
-                const double *arr = hrmlGetRealArray(stageEntry);
+                inertia = hrmlGetRealArray(stageEntry);
                 size_t len = hrmlGetRealArrayLen(stageEntry);
                 assert(len == 3 && "inertia tensor must be a 3 component real vector");
-                newStage->inertia[0] = arr[0];
-                newStage->inertia[1] = arr[1];
-                newStage->inertia[2] = arr[2];
               } else if (!strcmp(stageEntry->name, "propulsion")) {
                 for (HRMLobject *prop = stageEntry->children; prop != NULL ; prop = prop->next) {
                   if (!strcmp(prop->name, "engine")) {
@@ -293,6 +335,12 @@ ooScLoad(const char *fileName)
                 }
               }
             }
+
+            plMassSet(&newStage->m, mass,
+                      0.0, 0.0, 0.0,
+                      inertia[0], inertia[1], inertia[2],
+                      0.0, 0.0, 0.0);
+
             ooScAddStage(sc, newStage);
           }
         } else if (!strcmp(child->name, "model")) {
