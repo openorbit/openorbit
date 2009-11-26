@@ -58,7 +58,7 @@ q_vector(quaternion_t q)
   float3_u ru = {.s.x = qu.s.x, .s.y = qu.s.y, .s.z = qu.s.z};
   return ru.v;
 #endif
-  
+
 }
 
 void
@@ -66,7 +66,7 @@ q_m_convert(matrix_t *m, quaternion_t q)
 {
   float n = q_dot(q, q);
   float a = (n > 0.0f) ? S_TWO / n : 0.0f;
-    
+
 #if __has_feature(attribute_ext_vector_type)
   float xa = q.x*a, ya = q.y*a, za = q.z*a;
   float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
@@ -77,33 +77,78 @@ q_m_convert(matrix_t *m, quaternion_t q)
   float xa = qu.s.x*a;
   float ya = qu.s.y*a;
   float za = qu.s.z*a;
-  
+
   float xy = qu.s.x*ya;
   float xz = qu.s.x*za;
   float yz = qu.s.y*za;
-  
+
   float wx = qu.s.w*xa;
   float wy = qu.s.w*ya;
   float wz = qu.s.w*za;
-  
+
   float xx = qu.s.x*xa;
   float yy = qu.s.y*ya;
   float zz = qu.s.z*za;
-  
+
 #endif
-  
+
   m->a[0][0] = 1.0f-(yy+zz); m->a[0][1] =        xy-wz;
   m->a[0][2] =        xz+wy; m->a[0][3] = 0.0f;
-    
+
   m->a[1][0] =        xy+wz; m->a[1][1] = 1.0f-(xx+zz);
   m->a[1][2] =        yz-wx; m->a[1][3] = 0.0f;
-    
+
   m->a[2][0] =        xz-wy; m->a[2][1] =        yz+wx;
   m->a[2][2] = 1.0f-(xx+yy); m->a[2][3] = 0.0f;
-    
+
   m->a[3][0] = 0.0f;         m->a[3][1] = 0.0f;
   m->a[3][2] = 0.0f;         m->a[3][3] = 1.0f;
 }
+
+void
+q_mf3_convert(float3x3 m, quaternion_t q)
+{
+  float n = q_dot(q, q);
+  float a = (n > 0.0f) ? 2.0f / n : 0.0f;
+
+#if __has_feature(attribute_ext_vector_type)
+  float xa = q.x*a, ya = q.y*a, za = q.z*a;
+  float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
+  float yy = q.y*ya, yz = q.y*za, zz = q.z*za;
+  float wx = q.w*xa, wy = q.w*ya, wz = q.w*za;
+#else
+  float4_u qu = { .v = q };
+  float xa = qu.s.x*a;
+  float ya = qu.s.y*a;
+  float za = qu.s.z*a;
+
+  float xy = qu.s.x*ya;
+  float xz = qu.s.x*za;
+  float yz = qu.s.y*za;
+
+  float wx = qu.s.w*xa;
+  float wy = qu.s.w*ya;
+  float wz = qu.s.w*za;
+
+  float xx = qu.s.x*xa;
+  float yy = qu.s.y*ya;
+  float zz = qu.s.z*za;
+
+#endif
+
+  m[0][0] = 1.0f-(yy+zz); m[0][1] =        xy-wz;
+  m[0][2] =        xz+wy; m[0][3] = 0.0f;
+
+  m[1][0] =        xy+wz; m[1][1] = 1.0f-(xx+zz);
+  m[1][2] =        yz-wx; m[1][3] = 0.0f;
+
+  m[2][0] =        xz-wy; m[2][1] =        yz+wx;
+  m[2][2] = 1.0f-(xx+yy); m[2][3] = 0.0f;
+
+  m[3][0] = 0.0f;         m[3][1] = 0.0f;
+  m[3][2] = 0.0f;         m[3][3] = 1.0f;
+}
+
 
 
 quaternion_t
@@ -127,7 +172,7 @@ m_q_convert(matrix_t *m)
 #define QW(q) q.s.w
 
 #define QIDX(q, i) q.a[i]
-  
+
 #endif
 
   float tr, s;
@@ -160,13 +205,13 @@ m_q_convert(matrix_t *m)
       assert(0);
     }
   }
-    
-  // QUERY: Is the last ref to z correct? 
+
+  // QUERY: Is the last ref to z correct?
   if (m->a[3][3] != 0.0f) {
     s = 1.0f / sqrt(m->a[3][3]);
     QX(q) *= s; QY(q) *= s; QZ(q) *= s; //QZ(q) *= s;
   }
-  
+
 #undef QX
 #undef QY
 #undef QZ
@@ -216,7 +261,7 @@ q_s_div(quaternion_t q, float d)
   float di = 1.0f / d;
   float4_u dvi = {.s.x = di, .s.y = di, .s.z = di, .s.w = di};
   quaternion_t r = q * dvi.v;
-  return r;  
+  return r;
 #endif
 }
 
@@ -247,7 +292,7 @@ q_conj(const quaternion_t q)
 #else
   float4_u qu = {.v = q};
 	float4_u qp = {.s.x = -qu.s.x, .s.y = -qu.s.y, .s.z = -qu.s.z, .s.w = qu.s.w};
-  return qp.v;  
+  return qp.v;
 #endif
 }
 
@@ -268,7 +313,7 @@ q_div(quaternion_t a, quaternion_t b)
 	quaternion_t res;
   quaternion_t br;
   br = q_repr(b);
-    
+
 	res = q_mul(a, br);
 	return res;
 }

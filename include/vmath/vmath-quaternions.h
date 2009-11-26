@@ -64,6 +64,8 @@ float3 v_q_rot(float3 v, quaternion_t q);
 void q_m_convert(matrix_t *m, const quaternion_t q)
     __attribute__ ((__nonnull__));
 
+void q_mf3_convert(float3x3 m, quaternion_t q);
+
 /*!
  * \brief Converts a rotation matrix to a quaternion.
  * 

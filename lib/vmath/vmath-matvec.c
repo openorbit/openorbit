@@ -25,14 +25,14 @@
 #include <vmath/vmath-constants.h>
 
 void
-vf3_outprod(matrix_t *m, float3 a, float3 b) {
-  m->v[0] = vf3_set(vf3_x(a), vf3_x(a), vf3_x(a));
-  m->v[1] = vf3_set(vf3_y(a), vf3_y(a), vf3_y(a));
-  m->v[2] = vf3_set(vf3_z(a), vf3_z(a), vf3_z(a));
+vf3_outprod(float3x3 m, float3 a, float3 b) {
+  m[0] = vf3_set(vf3_x(a), vf3_x(a), vf3_x(a));
+  m[1] = vf3_set(vf3_y(a), vf3_y(a), vf3_y(a));
+  m[2] = vf3_set(vf3_z(a), vf3_z(a), vf3_z(a));
 
-  m->v[0] = vf3_mul(m->v[0], b);
-  m->v[1] = vf3_mul(m->v[1], b);
-  m->v[2] = vf3_mul(m->v[2], b);
+  m[0] = vf3_mul(m[0], b);
+  m[1] = vf3_mul(m[1], b);
+  m[2] = vf3_mul(m[2], b);
 }
 
 /* standard non vectorised routines */
@@ -90,6 +90,59 @@ m_v3_mulf(const matrix_t *a, float3 v) {
   res = resu.v;
 #endif
 	return res;
+}
+
+float3
+mf3_v_mul(const float3x3 a, float3 v) {
+	float3 res;
+#if __has_feature(attribute_ext_vector_type)
+	res.x = vf3_dot(a[0], v);
+	res.y = vf3_dot(a[1], v);
+	res.z = vf3_dot(a[2], v);
+#else
+  float3_u vu = { .v = v };
+  float3_u resu;
+  for (int i = 0 ; i < 3 ; i ++) {
+    resu.a[i] = a[i].x * vu.s.x + a[i].y * vu.s.y
+    + a->a[i].z * vu.s.z;
+  }
+  res = resu.v;
+#endif
+	return res;
+}
+
+void
+mf3_add(float3x3 a, const float3x3 b, const float3x3 c)
+{
+  a[0] = b[0] + c[0];
+  a[1] = b[1] + c[1];
+  a[2] = b[2] + c[2];
+}
+
+void
+mf3_add2(float3x3 a, const float3x3 b)
+{
+  a[0] += b[0];
+  a[1] += b[1];
+  a[2] += b[2];
+}
+
+
+void
+mf3_sub(float3x3 a, const float3x3 b, const float3x3 c)
+{
+  a[0] = b[0] - c[0];
+  a[1] = b[1] - c[1];
+  a[2] = b[2] - c[2];
+}
+
+void
+mf3_s_mul(float3x3 res, const float3x3 m, float s)
+{
+  float3 v = vf3_set(s, s, s);
+  res[0] = m[0] * v;
+  res[1] = m[1] * v;
+  res[2] = m[2] * v;
 }
 
 
@@ -476,7 +529,7 @@ m_zero(matrix_t *m)
 
 
 void
-m_cpy(matrix_t * restrict dst, matrix_t * restrict src)
+m_cpy(matrix_t * restrict dst, const matrix_t * restrict src)
 {
     for (int i = 0 ; i < 4 ; i ++) {
         dst->a[i][0] = src->a[i][0];
@@ -504,6 +557,184 @@ v_eq(float4 a, float4  b, float tol)
   }
 #endif
     return true;
+}
+
+void
+m_rot(matrix_t *m, float x, float y, float z, float alpha)
+{
+  float c = cosf(alpha);
+  float s = sinf(alpha);
+
+  m->v[0] = vf4_set(x*x+(1-x*x)*c, x*y*(1-c)-z*s, x*z*(1-c)+y*s, 0.0);
+  m->v[1] = vf4_set(x*y*(1-c)+z*s, y*y+(1-y*y)*c, y*z*(1-c)-x*s, 0.0);
+  m->v[2] = vf4_set(x*z*(1-c)-y*s, y*z*(1-c)+x*s, z*z+(1-z*z)*c, 0.0);
+  m->v[3] = vf4_set(0.0, 0.0, 0.0, 1.0);
+}
+
+void
+mf3_rot(float3x3 m, float x, float y, float z, float alpha)
+{
+  float c = cosf(alpha);
+  float s = sinf(alpha);
+
+  m[0] = vf3_set(x*x+(1-x*x)*c, x*y*(1-c)-z*s, x*z*(1-c)+y*s);
+  m[1] = vf3_set(x*y*(1-c)+z*s, y*y+(1-y*y)*c, y*z*(1-c)-x*s);
+  m[2] = vf3_set(x*z*(1-c)-y*s, y*z*(1-c)+x*s, z*z+(1-z*z)*c);
+  m[3] = vf3_set(0.0, 0.0, 0.0);
+}
+
+void
+md3_rot(double3x3 m, double x, double y, double z, double alpha)
+{
+  double c = cos(alpha);
+  double s = sin(alpha);
+
+  m[0] = vd3_set(x*x+(1-x*x)*c, x*y*(1-c)-z*s, x*z*(1-c)+y*s);
+  m[1] = vd3_set(x*y*(1-c)+z*s, y*y+(1-y*y)*c, y*z*(1-c)-x*s);
+  m[2] = vd3_set(x*z*(1-c)-y*s, y*z*(1-c)+x*s, z*z+(1-z*z)*c);
+  m[3] = vd3_set(0.0, 0.0, 0.0);
+}
+
+void
+mf3_cpy(float3x3 dst, const float3x3 src)
+{
+  dst[0] = src[0];
+  dst[1] = src[1];
+  dst[2] = src[2];
+}
+
+void
+mf3_transpose2(float3x3 a, const float3x3 b)
+{
+  for (int i = 0 ; i < 3 ; ++ i) {
+    for (int j = 0 ; j < 3 ; ++ j) {
+#if __has_feature(attribute_ext_vector_type)
+      a[i][j] = b[j][i];
+#else
+      vf3_seti(&a[i], j, b[j][i]);
+#endif
+    }
+  }
+}
+
+void
+mf3_mul2(float3x3 a, const float3x3 b)
+{
+  float3x3 atmp;
+  float3x3 btransp;
+
+  mf3_cpy(atmp, a);
+  mf3_transpose2(btransp, b);
+
+  for (int i = 0 ; i < 3 ; ++ i) {
+    for (int j = 0 ; j < 3 ; ++ j) {
+#if __has_feature(attribute_ext_vector_type)
+      a[i][j] = vf3_dot(atmp[i], b[j]);
+#else
+#error "Please fix for non clang compiler"
+#endif
+    }
+  }
+}
+
+void
+mf3_mul3(float3x3 a, const float3x3 b, const float3x3 c)
+{
+  float3x3 ctransp;
+  mf3_transpose2(ctransp, c);
+
+  for (int i = 0 ; i < 3 ; ++ i) {
+    for (int j = 0 ; j < 3 ; ++ j) {
+#if __has_feature(attribute_ext_vector_type)
+      a[i][j] = vf3_dot(b[i], ctransp[j]);
+#else
+#error "Please fix for non clang compiler"
+#endif
+    }
+  }
+}
+
+float
+mf3_det(const float3x3 m)
+{
+  return m[0][0]*m[1][1]*m[2][2] +
+         m[0][1]*m[1][2]*m[2][0] +
+         m[0][2]*m[1][0]*m[2][1] -
+         m[2][0]*m[1][1]*m[0][2] -
+         m[2][1]*m[1][2]*m[0][0] -
+         m[2][2]*m[1][0]*m[0][1];
+}
+
+
+void
+mf3_adj(float3x3 adjMat, const float3x3 m)
+{
+  // TODO: Can we vectorise this?
+  adjMat[0][0] = m[1][1]*m[2][2] - m[1][2]*m[2][1];
+  adjMat[0][1] = -(m[0][1]*m[2][2] - m[0][2]*m[2][1]);
+  adjMat[0][2] = m[0][1]*m[1][2] - m[0][2]*m[1][1];
+
+  adjMat[1][0] = -(m[1][0]*m[2][2] - m[1][2]*m[2][0]);
+  adjMat[1][1] = m[0][0]*m[2][2] - m[0][2]*m[2][0];
+  adjMat[1][2] = -(m[0][0]*m[1][2] - m[0][2]*m[1][0]);
+
+  adjMat[2][0] = m[1][0]*m[2][1] - m[1][1]*m[2][0];
+  adjMat[2][1] = -(m[0][0]*m[2][1] - m[0][1]*m[2][0]);
+  adjMat[2][2] = m[0][0]*m[1][1] - m[0][1]*m[1][0];
+}
+
+void
+mf3_inv2(float3x3 invmat, const float3x3 mat)
+{
+  // Very brute force, there are more efficient ways to do this
+  float det = mf3_det(mat);
+  float3 reprDetVec = vf3_repr(vf3_set(det, det, det));
+  float3x3 M_adj;
+  mf3_adj(M_adj, mat);
+
+  if (det != 0.0f) {
+    for (int i = 0 ; i < 3 ; i ++) {
+      invmat[i] = vf3_mul(M_adj[i], reprDetVec);
+    }
+  } else {
+    // If the determinant is zero, then the matrix is not invertible
+    // thus, return NANs in all positions
+    for (int i = 0; i < 3; i ++) {
+      invmat[i] = vf3_set(NAN, NAN, NAN);
+    }
+  }
+}
+
+void
+mf3_inv1(float3x3 mat)
+{
+  // Very brute force, there are more efficient ways to do this
+  float det = mf3_det(mat);
+  float3 reprDetVec = vf3_repr(vf3_set(det, det, det));
+  float3x3 M_adj;
+  float3x3 M_inv;
+
+  mf3_adj(M_adj, mat);
+
+  if (det != 0.0f) {
+    for (int i = 0 ; i < 3 ; i ++) {
+      mat[i] = vf3_mul(M_adj[i], reprDetVec);
+    }
+  } else {
+    // If the determinant is zero, then the matrix is not invertible
+    // thus, return NANs in all positions
+    for (int i = 0; i < 3; i ++) {
+      mat[i] = vf3_set(NAN, NAN, NAN);
+    }
+  }
+}
+void
+mf3_ident(float3x3 m)
+{
+  memset(m, 0, sizeof(float3x3));
+  m[0][0] = 1.0f;
+  m[1][1] = 1.0f;
+  m[2][2] = 1.0f;
 }
 
 bool

@@ -38,7 +38,7 @@ extern "C" {
 #include <vmath/vmath-types.h>
   //#include <vmath/vmath-matvec.inl>
 
-void vf3_outprod(matrix_t *m, float3 a, float3 b);
+void vf3_outprod(float3x3 m, float3 a, float3 b);
 
 static inline float
 vf3_x(float3 v)
@@ -154,6 +154,18 @@ vf3_set(float x, float y, float z)
   return uc.v;
 #endif
 }
+
+static inline void
+vf3_seti(float3 *v, int i, float val)
+{
+#if __has_feature(attribute_ext_vector_type)
+  v[i] = val;
+#else
+  ((float*)v)[i] = val;
+#endif
+}
+
+
 static inline float4
 vf4_set(float x, float y, float z, float w)
 {
@@ -343,6 +355,7 @@ float vf3_dot(float3 a, float3 b)
 
 float4 m_v_mul(const matrix_t *a, float4 v);
 float3 m_v3_mulf(const matrix_t *a, float3 v);
+float3 mf3_v_mul(const float3x3 a, float3 v);
 
 void m_transpose(matrix_t *mt, const matrix_t *m) __attribute__ ((__nonnull__));
 
@@ -439,6 +452,12 @@ vf3_sub(float3 a, float3 b)
   return a - b;
 }
 
+static inline float3
+vf3_repr(float3 a)
+{
+  float3 ones = vf3_set(1.0f, 1.0f, 1.0f);
+  return ones / a;
+}
 
 static inline float4
 vf4_sub(float4 a, float4 b)
@@ -539,6 +558,7 @@ void m_vec_rot_x(matrix_t *m, float a) __attribute__ ((__nonnull__));
 void m_vec_rot_y(matrix_t *m, float a) __attribute__ ((__nonnull__));
 void m_vec_rot_z(matrix_t *m, float a) __attribute__ ((__nonnull__));
 
+void m_rot(matrix_t *m, float x, float y, float z, float alpha);
 
 
 /* creates unit matrix */
@@ -550,7 +570,8 @@ void m_unit(matrix_t *m) __attribute__ ((__nonnull__));
 void m_zero(matrix_t *m) __attribute__ ((__nonnull__));
 
 /* copying functions for duplicating matrices and vectors */
-void m_cpy(matrix_t * restrict dst, matrix_t * restrict src) __attribute__ ((__nonnull__));
+void m_cpy(matrix_t * restrict dst, const matrix_t * restrict src)
+  __attribute__ ((__nonnull__));
 
 
 /* Comparative functions */
@@ -610,6 +631,21 @@ m_s_mul(matrix_t *res, const matrix_t *a, float s)
   res->v[2] = vf3_mul(a->v[2], vs);
   res->v[3] = vf3_mul(a->v[3], vs);
 }
+
+void mf3_ident(float3x3 m);
+void mf3_add2(float3x3 a, const float3x3 b);
+void mf3_add(float3x3 a, const float3x3 b, const float3x3 c);
+
+void mf3_cpy(float3x3 dst, const float3x3 src);
+void mf3_rot(float3x3 m, float x, float y, float z, float alpha);
+void md3_rot(double3x3 m, double x, double y, double z, double alpha);
+void mf3_transpose2(float3x3 a, const float3x3 b);
+void mf3_mul2(float3x3 a, const float3x3 b);
+void mf3_mul3(float3x3 a, const float3x3 b, const float3x3 c);
+void mf3_inv2(float3x3 invmat, const float3x3 mat);
+void mf3_inv1(float3x3 mat);
+void mf3_sub(float3x3 a, const float3x3 b, const float3x3 c);
+void mf3_s_mul(float3x3 res, const float3x3 m, float s);
 
 #ifdef __cplusplus
 }
