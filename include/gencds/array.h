@@ -21,6 +21,9 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <err.h>
+#include <sysexits.h>
+
 typedef struct {
     size_t asize; //!< Size of elems array in objects
     size_t length; //!< Usage of elems array in objects
@@ -46,7 +49,42 @@ void array_compress(array_t *vec);
   void name##_array_push(name##_array_t *vec, typ obj);           \
   typ name##_array_pop(name##_array_t *vec);                      \
   typ name##_array_get(name##_array_t *vec, size_t i);            \
-  void name##_array_set(name##_array_t *vec, size_t i, typ obj)
+  void name##_array_set(name##_array_t *vec, size_t i, typ obj);
+
+
+
+#define DEF_ARRAY(typ,name)                                                         \
+  void name##_array_init(name##_array_t *vec) {                                     \
+    vec->asize = 16;                                                                \
+    vec->length = 0;                                                                \
+    vec->elems = calloc(vec->asize, sizeof(void*));                                 \
+  }                                                                                 \
+  void name##_array_push(name##_array_t *vec, typ obj) {                            \
+    if (vec->length >= vec->asize) {                                                \
+      void *newVec = realloc(vec->elems,                                            \
+                              vec->asize * sizeof(void*) * 2);                      \
+      if (newVec == NULL) errx(EX_SOFTWARE, "realloc of vector failed");            \
+      vec->asize *= 2;                                                              \
+      vec->elems = newVec;                                                          \
+    }                                                                               \
+    vec->elems[vec->length ++] = obj;                                               \
+  }                                                                                 \
+typ name##_array_pop(name##_array_t *vec) {                                         \
+  return vec->elems[vec->length --];                                                \
+}                                                                                   \
+typ name##_array_get(name##_array_t *vec, size_t i) {                               \
+  if (vec->length <= i)                                                             \
+    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
+  else                                                                              \
+    return vec->elems[i];                                                           \
+}                                                                                   \
+void name##_array_set(name##_array_t *vec, size_t i, typ obj) {                     \
+  if (vec->length <= i)                                                             \
+    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
+  else                                                                              \
+    vec->elems[i] = obj;                                                            \
+}
+
 
 DECL_ARRAY(int,int);
 DECL_ARRAY(uint64_t,u64);

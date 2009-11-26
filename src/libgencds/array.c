@@ -60,40 +60,6 @@ array_compress(array_t *vec)
 }
 
 
-
-#define DEF_ARRAY(typ,name)                                                           \
-  void name##_array_init(name##_array_t *vec) {                                       \
-    vec->asize = 16;                                                                  \
-    vec->length = 0;                                                                  \
-    vec->elems = calloc(vec->asize, sizeof(void*));                                   \
-  }                                                                                   \
-  void name##_array_push(name##_array_t *vec, typ obj) {                              \
-    if (vec->length >= vec->asize) {                                                  \
-        void *newVec = realloc(vec->elems,                                            \
-                                vec->asize * sizeof(void*) * 2);                      \
-        if (newVec == NULL) errx(EX_SOFTWARE, "realloc of vector failed");            \
-        vec->asize *= 2;                                                              \
-        vec->elems = newVec;                                                          \
-    }                                                                                 \
-    vec->elems[vec->length ++] = obj;                                                 \
-  }                                                                                   \
-  typ name##_array_pop(name##_array_t *vec) {                                         \
-    return vec->elems[vec->length --];                                                \
-  }                                                                                   \
-  typ name##_array_get(name##_array_t *vec, size_t i) {                               \
-    if (vec->length <= i)                                                             \
-      errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
-    else                                                                              \
-      return vec->elems[i];                                                           \
-    }                                                                                 \
-  void name##_array_set(name##_array_t *vec, size_t i, typ obj) {                     \
-    if (vec->length <= i)                                                             \
-      errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
-    else                                                                              \
-      vec->elems[i] = obj;                                                            \
-  }
-
-
 DEF_ARRAY(int,int);
 DEF_ARRAY(uint64_t,u64);
 DEF_ARRAY(float,float);
