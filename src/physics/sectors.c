@@ -19,7 +19,7 @@
 
 #include "physics.h"
 #include "common/lwcoord.h"
-
+#if 0
 void
 plUpdateDrawable(PLobject2 *obj)
 {
@@ -27,7 +27,7 @@ plUpdateDrawable(PLobject2 *obj)
   // Update drawable position, in this case we must know in which sector the camera is
   PLfloat3 newPos = ooLwcRelVec(&obj->p, camSect);
 }
-
+#endif
 PLocttree*
 plOcttree(double width, int levels)
 {
@@ -198,9 +198,9 @@ plLwcIntersectionPoint(const PLlwcoord * restrict a, PLfloat3 da, float wa,
                        const PLlwcoord * restrict b, PLfloat3 db, float wb)
 {
   // Transform b to a's segment and compute the intersection point
-  PLfloat3 bPosInASeg = ooLwcRelVec(b, a->seg);
-  PLfloat3 bNext = vf3_add(bPosInASeg, db);
-  PLfloat3 aNext = vf3_add(a->offs, da);
+  //  PLfloat3 bPosInASeg = ooLwcRelVec(b, a->seg);
+  //PLfloat3 bNext = vf3_add(bPosInASeg, db);
+  //PLfloat3 aNext = vf3_add(a->offs, da);
   
   
 }

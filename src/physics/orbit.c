@@ -330,9 +330,9 @@ plUpdateObject(dBodyID body)
   ooLogTrace("updating body %s", obj->name);
 
   //const dReal *rot = dBodyGetRotation(body);
-  const dReal *quat = dBodyGetQuaternion(body);
-  const dReal *linVel = dBodyGetLinearVel(body);
-  const dReal *angVel = dBodyGetAngularVel(body);
+  //const dReal *quat = dBodyGetQuaternion(body);
+  //const dReal *linVel = dBodyGetLinearVel(body);
+  //const dReal *angVel = dBodyGetAngularVel(body);
 
   plNormaliseObject__(obj);
 
@@ -356,15 +356,15 @@ plSysSetCurrentPos(PLorbsys *sys)
                                     sys->world->centralBody->GM + sys->orbitalBody->GM,
                                     ooTimeGetJD()*PL_SEC_PER_DAY);
 
-    double meanMotion = plMeanMotion(sys->world->centralBody->GM + sys->orbitalBody->GM,
-                                     sys->orbitalBody->kepler->a);
-    double eccAnomaly = plEccAnomaly(sys->orbitalBody->kepler->ecc, meanMotion, ooTimeGetJD()*PL_SEC_PER_DAY);
-    double eccDeg = RAD_TO_DEG(eccAnomaly);
+    //double meanMotion = plMeanMotion(sys->world->centralBody->GM + sys->orbitalBody->GM,
+    //                                 sys->orbitalBody->kepler->a);
+    //double eccAnomaly = plEccAnomaly(sys->orbitalBody->kepler->ecc, meanMotion, ooTimeGetJD()*PL_SEC_PER_DAY);
+    //double eccDeg = RAD_TO_DEG(eccAnomaly);
 
     /* Compute x, y from anomaly, y is pointing in the direction of the
      periapsis, x is pointing downwards */
-    double y = sys->orbitalBody->kepler->a * cos(eccAnomaly) - sys->orbitalBody->kepler->a * sys->orbitalBody->kepler->ecc; // NOTE: on the plane we usually do x = a cos t
-    double x = -sys->orbitalBody->kepler->b * sin(eccAnomaly);
+    //double y = sys->orbitalBody->kepler->a * cos(eccAnomaly) - sys->orbitalBody->kepler->a * sys->orbitalBody->kepler->ecc; // NOTE: on the plane we usually do x = a cos t
+    //double x = -sys->orbitalBody->kepler->b * sin(eccAnomaly);
 
 
     sys->orbitalBody->p = sys->world->centralBody->p;
@@ -963,13 +963,13 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
 
   OOscene *sc = ooSgGetRoot(sg);
   sgSetSceneAmb4f(sc, 0.2, 0.2, 0.2, 1.0);
-  OOdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
-  SGmaterial *mat = sgSphereGetMaterial((OOsphere*)drawable);
-  sgSetMaterialEmiss4f(mat, 1.0, 1.0, 1.0, 0.0);
+  //OOdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
+  //SGmaterial *mat = sgSphereGetMaterial((OOsphere*)drawable);
+  //sgSetMaterialEmiss4f(mat, 1.0, 1.0, 1.0, 0.0);
 
-  //char *path = ooResGetPath("spacecrafts/mercury/enterprise.ac");
-  //OOdrawable *drawable = sgLoadModel(path);
-  //free(path);
+  char *path = ooResGetPath("spacecrafts/mercury/enterprise.ac");
+  OOdrawable *drawable = sgLoadModel(path);
+  free(path);
 
 
   float3 p = vf3_set(0.0, 0.0, 0.0);
