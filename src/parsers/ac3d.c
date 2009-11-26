@@ -553,14 +553,16 @@ ac3d_load(const char *path)
   unsigned int vers = INT_MAX;
   /* Read header */
   if (fscanf(fp, "AC3D%x\n", &vers) != 1) {
-    goto error;
+    fclose(fp);
+    return NULL;
   }
 
   if (vers > 0xb) {
     fprintf(stderr,
             "ac3d versions greater than 0xb not supported, file vers is 0x%x\n",
             vers);
-    goto error;
+    fclose(fp);
+    return NULL;
   }
 
   struct ac3d_file_t *ac3d = make_file();
