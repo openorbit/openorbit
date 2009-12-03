@@ -28,7 +28,7 @@
 #include <vmath/vmath.h>
 #include "physics/physics.h"
 #include "simenvironment.h"
-
+#include "rendering/scenegraph.h"
 #include "simtypes.h"
 
 /*! Spacecraft system simulation header
@@ -61,6 +61,7 @@ typedef enum OOstagestate {
 
 struct OOstage {
   OOstagestate state;
+  OOdrawable *mesh; // Used for synchronising with the rendering
   int detachOrder; // How and when to detach the stage
   PLmass m; // Mass and inertia tensor of stage, unit is kg
   obj_array_t engines; // Main orbital engines
@@ -127,7 +128,7 @@ struct OOspacecraft {
 };
 
 
-
+void ooScSetStageMesh(OOstage *stage, OOdrawable *mesh);
 void ooScDetatchStage(OOspacecraft *sc);
 void ooScStep(OOspacecraft *sc);
 void ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises);

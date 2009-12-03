@@ -198,6 +198,21 @@ ooScForce(OOspacecraft *sc, float rx, float ry, float rz)
 }
 
 
+void
+ooScSetStageMesh(OOstage *stage, OOdrawable *mesh)
+{
+  assert(stage != NULL);
+  assert(mesh != NULL);
+
+  stage->mesh = mesh;
+}
+
+void
+ooScSyncStage(OOstage *stage)
+{
+  //  stage->mesh->p;
+  //  stage->mesh->q;
+}
 
 void
 ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises) {
