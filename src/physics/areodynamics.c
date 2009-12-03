@@ -19,6 +19,9 @@
 
 #include "physics.h"
 
+// For Earth
+#define PL_G0 9.80665
+
 PLdouble3
 plGetAirspeed(PLobject *obj)
 {
@@ -29,4 +32,31 @@ PLdouble3
 plGetAirpressure(PLobject *obj)
 {
   
+}
+
+/*!
+ Computes the air preasure at a given altitude, note that for simplicitys sake,
+ you can call the methods with 0 for the hb value and use standard ground level
+ parameters for Pb and Tb.
+ \param Pb Static preasure (reference)
+ \param Tb Standard temperature
+ \param g0 Gravitational accelleration
+ \param M Molar mass of atmosphere
+ \param h Height above sea level
+ \param hb height of reference point (for Pb / Tb)
+ \param Lb Lapse rate in kelvin per metre
+ */
+double
+plPreasureAtAltitudeWithLapse(double Pb, double Tb, double g0, double M,
+                              double h, double hb, double Lb)
+{
+  return Pb * pow(Tb/(Tb+Lb*(h-hb)), g0*M / (PL_UGC*Lb));
+}
+
+
+double
+plPreasureAtAltitude(double Pb, double Tb, double g0, double M, double h,
+                     double hb)
+{
+  return Pb * exp((-g0 * M * (h-hb)) / (PL_UGC * Tb));
 }

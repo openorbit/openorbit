@@ -30,6 +30,23 @@
 
 #include "mass.h"
 
+// Speed of light
+#define PL_C 299792458.0
+// Universial gravitation
+#define PL_G 6.67428e-11
+// Planck constant
+#define PL_H 6.62606896e-34
+// Universal gas constant
+#define PL_UGC 8.31432
+// Magnetic permeability
+#define PL_U0 1.256637061e-6
+// Electric permittivity
+#define PL_E0 8.854187817e-12
+// Avogrados Number
+#define PL_NA 6.0221415e23
+// Boltzmann
+#define PL_KB 1.3806504e-23
+
 
 #if __has_feature(attribute_ext_vector_type)
 typedef float __attribute__((ext_vector_type (4))) PLfloat3;
@@ -308,5 +325,11 @@ plKToC(double t)
 {
   return t - 273.16;
 }
+
+typedef struct PLatmosphere PLatmosphere;
+
+struct PLatmosphere {
+  float density;
+};
 
 #endif /* end of include guard: PHYSICS_H_MW8CHG7V */
