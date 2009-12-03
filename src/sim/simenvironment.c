@@ -19,6 +19,11 @@
 
 #include "simenvironment.h"
 
+/*!
+ For computing the simulation environment (air preasure et.c.).
+ For this we need to know the object we are computing the data for and which
+ planet or moon the object is closest to.
+ */
 void
 ooSimComputeEnvForSc(OOsimenv *env, void *sc)
 {
