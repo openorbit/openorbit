@@ -19,7 +19,9 @@ spacecraft (name: Mercury-Capsule) {
     stage (name: Command-Module) {
       detach-order: 0; // No other stages at the moment
       mass: 1354.0 kg;
-      inertial-tensor: [1.0, 1.0, 1.0];
+      inertial-tensor: [1.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0,
+                        0.0, 0.0, 1.0];
       propulsion {
         // Nice example, if multiple engines are used, they may either be fired
         // in sequence or in parallel, this distinction is handled by the
@@ -54,6 +56,6 @@ spacecraft (name: Mercury-Capsule) {
 //      }
     }
   }
- //model(): "mercury.ac";
+ model(): "mercury.ac";
  //plugin(): "plugins/mercury.so";
 }
