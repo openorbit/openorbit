@@ -60,6 +60,7 @@ typedef enum OOstagestate {
 } OOstagestate;
 
 struct OOstage {
+  float pos[3];
   OOstagestate state;
   OOdrawable *mesh; // Used for synchronising with the rendering
   int detachOrder; // How and when to detach the stage

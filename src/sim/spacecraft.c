@@ -121,10 +121,21 @@ ooScReevaluateMass(OOspacecraft *sc)
 {
   memset(&sc->m, 0, sizeof(PLmass));
 
+  plMassSet(&sc->m, 0.0,
+            0.0, 0.0, 0.0,
+            1.0, 1.0, 1.0,
+            0.0, 0.0, 0.0);
+
   for (int i = 0 ; i < sc->stages.length ; ++ i) {
     OOstage *stage = sc->stages.elems[i];
     if (stage->state != OO_Stage_Detatched) {
-      plMassAdd(&sc->m, &stage->m);
+      PLmass tmp = stage->m;
+      plMassTranslate(&tmp,
+                      stage->pos[0],
+                      stage->pos[1],
+                      stage->pos[2]);
+
+      plMassAdd(&sc->m, &tmp);
     }
   }
 }
@@ -288,8 +299,10 @@ ooScLoad(const char *fileName)
   HRMLvalue scName = hrmlGetAttrForName(root, "name");
   OOspacecraft *sc = ooScNew();
 
-  const double *inertia;
+  const double *inertia = NULL;
   double mass;
+  const double *stagePos = NULL;
+  const double *stageCog = NULL;
 
   for (HRMLobject *node = root; node != NULL; node = node->next) {
     if (!strcmp(node->name, "spacecraft")) {
@@ -306,7 +319,15 @@ ooScLoad(const char *fileName)
               } else if (!strcmp(stageEntry->name, "inertial-tensor")) {
                 inertia = hrmlGetRealArray(stageEntry);
                 size_t len = hrmlGetRealArrayLen(stageEntry);
-                assert(len == 3 && "inertia tensor must be a 3 component real vector");
+                assert(len == 9 && "inertia tensor must be a 9 component real vector");
+              } else if (!strcmp(stageEntry->name, "pos")) {
+                stagePos = hrmlGetRealArray(stageEntry);
+                size_t len = hrmlGetRealArrayLen(stageEntry);
+                assert(len == 3 && "pos vector must be a 3 component real vector");
+              } else if (!strcmp(stageEntry->name, "cog")) {
+                stageCog = hrmlGetRealArray(stageEntry);
+                size_t len = hrmlGetRealArrayLen(stageEntry);
+                assert(len == 3 && "cog vector must be a 3 component real vector");
               } else if (!strcmp(stageEntry->name, "propulsion")) {
                 for (HRMLobject *prop = stageEntry->children; prop != NULL ; prop = prop->next) {
                   if (!strcmp(prop->name, "engine")) {
@@ -339,7 +360,7 @@ ooScLoad(const char *fileName)
                       fprintf(stderr, "no pos or direction of engine found\n");
                     }
                   }
-                }
+                } // Propulsion for loop
               } else if (!strcmp(stageEntry->name, "attitude")) {
                 for (HRMLobject *att = stageEntry->children; att != NULL ; att = att->next) {
                   if (!strcmp(att->name, "engine")) {
@@ -347,30 +368,36 @@ ooScLoad(const char *fileName)
                   } else if (!strcmp(att->name, "torquer")) {
                     assert(0 && "not implemented");
                   }
-                }
-              }
-            }
+                } // Attitude for loop
+              } else if (!strcmp(stageEntry->name, "model")) {
+                const char *modelName = hrmlGetStr(stageEntry);
+                char *pathCopy = strdup(path);
+                char *lastSlash = strrchr(pathCopy, '/');
+                lastSlash[1] = '\0'; // terminate string here and append model
+                                     // filename
+                char *modelPath;
+                asprintf(&modelPath, "%s/%s", pathCopy, modelName);
 
+                OOdrawable *drawable = sgLoadModel(modelPath);
+                ooScSetStageMesh(newStage, drawable);
+
+                free(modelPath);
+                free(pathCopy);
+              }
+            } // For all properties in stage
+
+            assert(stageCog && inertia && stagePos);
             plMassSet(&newStage->m, mass,
-                      0.0, 0.0, 0.0,
-                      inertia[0], inertia[1], inertia[2],
-                      0.0, 0.0, 0.0);
+                      stageCog[0], stageCog[1], stageCog[2],
+                      inertia[0], inertia[4], inertia[8],
+                      inertia[1], inertia[2], inertia[5]);
+
+            newStage->pos[0] = stagePos[0];
+            newStage->pos[1] = stagePos[1];
+            newStage->pos[2] = stagePos[2];
 
             ooScAddStage(sc, newStage);
-          }
-        } else if (!strcmp(child->name, "model")) {
-          const char *modelName = hrmlGetStr(child);
-          char *pathCopy = strdup(path);
-          char *lastSlash = strrchr(pathCopy, '/');
-          lastSlash[1] = '\0'; // terminate string here and append model
-                               // filename
-          char *modelPath;
-          asprintf(&modelPath, "%s/%s", pathCopy, modelName);
-
-
-
-          free(modelPath);
-          free(pathCopy);
+          } // For all stages
         }
       }
     }
@@ -384,5 +411,7 @@ ooScLoad(const char *fileName)
   qsort(&sc->stages.elems[0], sc->stages.length, sizeof(void*),
         (qsort_compar_t)compar_stages);
   free(path);
+
+  ooScReevaluateMass(sc);
   return sc;
 }
