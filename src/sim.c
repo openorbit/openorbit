@@ -98,9 +98,8 @@ ooSimStep(float dt)
 
   gettimeofday(&end, NULL);
 
-  ooLogInfo("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
-                                    (start.tv_sec*1000000 + start.tv_usec)));
-
+  ooLogTrace("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
+                                     (start.tv_sec*1000000 + start.tv_usec)));
 
     // do system simulation
     // sys_step(gSIM_state->systems, dt);
