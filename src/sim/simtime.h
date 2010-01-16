@@ -19,6 +19,10 @@
 #ifndef SIMTIME_H_STPF70AM
 #define SIMTIME_H_STPF70AM
 
+#include <stdlib.h>
+#include <stdint.h>
+#include <time.h>
+
 typedef struct OOsimtime {
   time_t epoch; // UNIX time
   double currentTime; //!< Current time in earth days relative to epoch
