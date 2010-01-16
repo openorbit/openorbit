@@ -1001,17 +1001,19 @@ sgLightSetDiffuse4f(SGlight *light, float r, float g, float b, float a)
 
 }
 
+
+
 SGlight*
-sgNewPointlight(OOscene *sc, float3 p)
+sgNewPointlight3f(OOscene *sc, float x, float y, float z)
 {
   SGpointlight *light = malloc(sizeof(SGpointlight));
   light->super.enable = (SGenable_light_func)sgEnablePointLight;
   light->super.disable = (SGdisable_light_func)sgDisablePointLight;
   light->super.scene = sc;
 
-  light->super.pos[0] = vf3_x(p);
-  light->super.pos[1] = vf3_y(p);
-  light->super.pos[2] = vf3_z(p);
+  light->super.pos[0] = x;
+  light->super.pos[1] = y;
+  light->super.pos[2] = z;
   light->super.pos[3] = 1.0;
 
   light->super.ambient[0] = 0.0;
@@ -1033,6 +1035,13 @@ sgNewPointlight(OOscene *sc, float3 p)
 
   return (SGlight*)light;
 }
+
+SGlight*
+sgNewPointlight(OOscene *sc, float3 p)
+{
+  return sgNewPointlight3f(sc, vf3_x(p), vf3_y(p), vf3_z(p));
+}
+
 
 void
 sgSceneAddLight(OOscene *sc, SGlight *light)

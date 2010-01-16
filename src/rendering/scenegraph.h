@@ -146,6 +146,7 @@ OOdrawable* sgNewEllipsis(const char *name,
 OOdrawable* sgLoadModel(const char *file);
 void sgSceneAddLight(OOscene *sc, SGlight *light);
 SGlight* sgNewPointlight(OOscene *sc, float3 p);
+SGlight* sgNewPointlight3f(OOscene *sc, float x, float y, float z);
 void sgSetLightPos3f(SGlight *light, float x, float y, float z);
 void sgSetLightPosv(SGlight *light, float3 v);
 void sgSetLightPosLW(SGlight *light, OOlwcoord *lwc);
