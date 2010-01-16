@@ -1,5 +1,5 @@
 /*
-  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -16,6 +16,29 @@
   You should have received a copy of the GNU Lesser General Public License
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+/*!
+  Physics simulation system
+
+  The physics library of open orbit is used to simulate astronomnical systems of
+  large objects orbiting eachother and smaller objects (like spacecrafts)
+  scattered around in the world.
+
+  The physics library has five major object types that need to be known of.
+  1. PLworld that encapsulate all the state of the simulation, including a root
+     system.
+  2. PLsystem that identify a system of astronomical bodies with one body
+     associated with the system.
+  3. PLastrobody that represents a large astronomical body, like the sun, a
+     planet or a moon.
+  4. PLobject that represent a small object.
+  5. PLmass that represent mass and inertia parameters.
+
+  A feature with the physics library is that it is integrated with the
+  scenegraph, that means that the objects keep track of their respective model
+  and potential lights associated with the system (e.g. point light for a star,
+  and reflective light from a planet / moon).
+ */
 
 #ifndef PHYSICS_H_MW8CHG7V
 #define PHYSICS_H_MW8CHG7V

@@ -1,5 +1,5 @@
 /*
-  Copyright 2008, 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2008, 2009, 2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -64,6 +64,7 @@ struct PLastrobody {
   PL_keplerian_elements *kepler;
   OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
+  SGlight *lightSource; //!< Light source if the object emits light
 };
 
 
@@ -72,6 +73,13 @@ struct PLsystem {
   PLsystem *parent;
 
   const char *name;
+  double effectiveRadius; //!< Radius of the entire system, i.e how far away
+                          //!< objects will still be considered to be under its
+                          //!< influence. This is set to two times the radius of
+                          //!< the largest orbit in the system (in case the
+                          //!< system has sattelites), or to the distance it
+                          //!< takes for the gravitational influence to diminish
+                          //!< to XXX, which ever is greater.
 
   obj_array_t orbits; // suborbits
   obj_array_t objs; // objects in this system
@@ -86,15 +94,15 @@ struct PLworld {
   dWorldID world;
   const char *name;
   OOscene *scene; // Scene in the sg
-  obj_array_t orbits;
-  obj_array_t objs;
-  PLastrobody *centralBody;
-  SGlight *centralLightSource;
+  PLsystem *rootSys;
 };
 
 PLworld* plNewWorld(const char *name, OOscene *sc,
                     double m, double gm, double radius,
                     double siderealPeriod, double obliquity);
+
+PLsystem* plNewRootSystem(PLworld *world, const char *name, double m, double gm, double obliquity);
+
 
 PLsystem* plNewOrbit(PLworld *world, const char *name, double m, double gm,
                      double orbitPeriod, double obliquity,

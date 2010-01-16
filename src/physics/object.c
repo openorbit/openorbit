@@ -62,6 +62,19 @@ plObject3f(PLsystem *sys, float x, float y, float z)
 
   PLobject *obj = malloc(sizeof(PLobject));
   obj->id = dBodyCreate(sys->world->world);
+
+  dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
+  dBodySetData(obj->id, NULL);
+  //dBodySetMovedCallback(obj->id, plUpdateObject);
+
+  //dQuaternion quat = {vf4_w(q), vf4_x(q), vf4_y(q), vf4_z(q)};
+  // TODO: Ensure quaternion is set for orbit
+  //       asc * inc * obl ?
+
+  //dBodySetQuaternion(obj->id, quat);
+  dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
+
+
   ooLwcSet(&obj->p, x, y, z);
   obj->sys = sys;
   obj_array_push(&sys->objs, obj);
