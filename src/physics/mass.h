@@ -24,6 +24,7 @@
 
 struct PLmass {
   float m; //!< Mass in kg
+  float minMass; //!< Minimum mass
   float3x3 I; //!< Moment of inertia
   float3 cog; //!< Center of gravity
 };
@@ -43,6 +44,22 @@ void plMassAdd(PLmass * restrict ma, const PLmass * restrict mb);
     function will take care of updating the inertia tensor as well as the mass. 
  */
 void plMassMod(PLmass *m, float newMass);
+
+/*! Reduce mass with delta mass
+
+ The MassRed function offers a quick way to reduce the mass of an object. It
+ will respect the minMass property for the mass object.
+
+ \param m mass object
+ \param deltaMass the mass in kg to subtract
+ \result The amount of mass removed (may be less than the delta)
+ */
+float plMassRed(PLmass *m, float deltaMass);
+
+/*!
+  Set the minimum mass
+ */
+void plMassSetMin(PLmass *m, float minMass);
 
 
 /*! Rotate mass m by rotation matrix rm

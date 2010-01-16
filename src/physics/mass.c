@@ -119,6 +119,7 @@ plMassSet(PLmass *mo, float m,
   mo->I[2][1] = iyz;
   
   mo->cog = vf3_set(cox, coy, coz);
+  mo->minMass = 0.0f;
 }
 
 void
@@ -263,4 +264,23 @@ plMassMod(PLmass *m, float newMass)
   for (int i = 0 ; i < 3 ; ++ i) {
     m->I[i] = vf3_s_mul(m->I[i], s);
   }
+}
+
+float
+plMassRed(PLmass *m, float deltaMass)
+{
+  float oldMass = m->m;
+  float newMass = oldMass - deltaMass;
+  if (newMass < m->minMass) {
+    newMass = m->minMass;
+  }
+
+  plMassMod(m, newMass);
+  return oldMass - newMass;
+}
+
+void
+plMassSetMin(PLmass *m, float minMass)
+{
+  m->minMass = minMass;
 }
