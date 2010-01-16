@@ -65,8 +65,6 @@
 		EC34BCA01079EE080011B76E /* __init__.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BC431079EE080011B76E /* __init__.py */; };
 		EC34BCA11079EE080011B76E /* scripting.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC441079EE080011B76E /* scripting.c */; };
 		EC34BCA21079EE080011B76E /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC461079EE080011B76E /* settings.c */; };
-		EC34BCA31079EE080011B76E /* test.fs in Resources */ = {isa = PBXBuildFile; fileRef = EC34BC491079EE080011B76E /* test.fs */; };
-		EC34BCA41079EE080011B76E /* test.vs in Resources */ = {isa = PBXBuildFile; fileRef = EC34BC4A1079EE080011B76E /* test.vs */; };
 		EC34BCA51079EE080011B76E /* simevent.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC4C1079EE080011B76E /* simevent.c */; };
 		EC34BCA61079EE080011B76E /* simtime.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC4E1079EE080011B76E /* simtime.c */; };
 		EC34BCA71079EE080011B76E /* spacecraft-control.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC501079EE080011B76E /* spacecraft-control.c */; };
@@ -118,9 +116,11 @@
 		EC4A893910B152C9002C6513 /* engine.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4A893810B152C9002C6513 /* engine.c */; };
 		EC4FCC1410748AC900EB6DDF /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC1310748AC900EB6DDF /* libode.a */; };
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
+		EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7D093410EE160700D9D28E /* flightrecorder.c */; };
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
+		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
 		ECBF1748108C566E00D3E412 /* image.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1734108C55ED00D3E412 /* image.c */; };
 		ECBF1749108C566E00D3E412 /* jpg.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1735108C55ED00D3E412 /* jpg.c */; };
 		ECBF174B108C566E00D3E412 /* pngfile.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1737108C55ED00D3E412 /* pngfile.c */; };
@@ -346,8 +346,6 @@
 		EC34BC451079EE080011B76E /* scripting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scripting.h; sourceTree = "<group>"; };
 		EC34BC461079EE080011B76E /* settings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = settings.c; sourceTree = "<group>"; };
 		EC34BC471079EE080011B76E /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
-		EC34BC491079EE080011B76E /* test.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.fs; sourceTree = "<group>"; };
-		EC34BC4A1079EE080011B76E /* test.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.vs; sourceTree = "<group>"; };
 		EC34BC4C1079EE080011B76E /* simevent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simevent.c; sourceTree = "<group>"; };
 		EC34BC4D1079EE080011B76E /* simevent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simevent.h; sourceTree = "<group>"; };
 		EC34BC4E1079EE080011B76E /* simtime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simtime.c; sourceTree = "<group>"; };
@@ -418,10 +416,14 @@
 		EC51E6E110BBE766009FA70D /* mass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mass.h; sourceTree = "<group>"; };
 		EC51E6E210BBE766009FA70D /* mass.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mass.c; sourceTree = "<group>"; };
 		EC768C4E1060D651009B558C /* openorbit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = openorbit.xcconfig; sourceTree = "<group>"; };
+		EC7D093310EE160700D9D28E /* flightrecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightrecorder.h; sourceTree = "<group>"; };
+		EC7D093410EE160700D9D28E /* flightrecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightrecorder.c; sourceTree = "<group>"; };
 		EC88CF8E10A2B1D700A11B1D /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
 		EC88CF8F10A2B1D700A11B1D /* collada.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = collada.c; sourceTree = "<group>"; };
 		EC88CFC010A2B8F100A11B1D /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
+		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
+		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
 		ECA5F8B1109D8FE7004278EC /* Hrml Manual */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Hrml Manual"; sourceTree = "<group>"; };
 		ECBF1734108C55ED00D3E412 /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
 		ECBF1735108C55ED00D3E412 /* jpg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jpg.c; sourceTree = "<group>"; };
@@ -582,6 +584,7 @@
 		EC34BBDE1079EE080011B76E /* src */ = {
 			isa = PBXGroup;
 			children = (
+				EC7D093210EE15C100D9D28E /* avionics */,
 				EC34BBE01079EE080011B76E /* common */,
 				EC34BBE31079EE080011B76E /* config.h.in */,
 				EC34BBE41079EE080011B76E /* geo */,
@@ -681,6 +684,7 @@
 				EC34BC161079EE080011B76E /* sectors.c */,
 				EC51E6E110BBE766009FA70D /* mass.h */,
 				EC51E6E210BBE766009FA70D /* mass.c */,
+				EC91C41E1101C28B00011177 /* object.h */,
 			);
 			path = physics;
 			sourceTree = "<group>";
@@ -787,8 +791,6 @@
 		EC34BC481079EE080011B76E /* shaders */ = {
 			isa = PBXGroup;
 			children = (
-				EC34BC491079EE080011B76E /* test.fs */,
-				EC34BC4A1079EE080011B76E /* test.vs */,
 			);
 			path = shaders;
 			sourceTree = "<group>";
@@ -863,6 +865,7 @@
 				EC34BDAE107B2C2B0011B76E /* vmath-quaternions.inl */,
 				EC34BDAF107B2C2B0011B76E /* vmath-types.h */,
 				EC34BDB0107B2C2B0011B76E /* vmath.h */,
+				EC91C3DA1100628F00011177 /* vmath-convert.c */,
 			);
 			path = vmath;
 			sourceTree = "<group>";
@@ -1043,6 +1046,15 @@
 				EC4485500CCD247E001C88AD /* test-case.c */,
 			);
 			path = template;
+			sourceTree = "<group>";
+		};
+		EC7D093210EE15C100D9D28E /* avionics */ = {
+			isa = PBXGroup;
+			children = (
+				EC7D093310EE160700D9D28E /* flightrecorder.h */,
+				EC7D093410EE160700D9D28E /* flightrecorder.c */,
+			);
+			path = avionics;
 			sourceTree = "<group>";
 		};
 		ECA5F8AF109D8FB3004278EC /* docs */ = {
@@ -1329,8 +1341,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC34BCA01079EE080011B76E /* __init__.py in Resources */,
-				EC34BCA31079EE080011B76E /* test.fs in Resources */,
-				EC34BCA41079EE080011B76E /* test.vs in Resources */,
 				EC34BCBA1079EECB0011B76E /* data in Resources */,
 				EC34BCD11079EEE00011B76E /* textures in Resources */,
 				EC34BD291079EEF60011B76E /* spacecrafts in Resources */,
@@ -1475,6 +1485,8 @@
 				EC4A893910B152C9002C6513 /* engine.c in Sources */,
 				EC51E6E310BBE766009FA70D /* mass.c in Sources */,
 				EC204D5410CAFA2300F0A450 /* palloc.c in Sources */,
+				EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */,
+				EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
