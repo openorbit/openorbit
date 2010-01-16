@@ -167,6 +167,6 @@ OOstage* ooScNewStage(void);
 void ooScStageAddEngine(OOstage *stage, OOengine *engine);
 
 
-OOspacecraft* ooScLoad(const char *file);
+OOspacecraft* ooScLoad(PLworld *world, const char *fileName);
 
 #endif /* end of include guard: SPACECRAFT_H_7SCB1CH8 */

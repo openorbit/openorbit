@@ -2,13 +2,6 @@ cdef extern from "ode/ode.h":
     ctypedef struct dxBody
     ctypedef dxBody *dBodyID
 
-cdef extern from "sim/spacecraft.h":
-  ctypedef struct OOspacecraft
-  OOspacecraft* ooScLoad(char *fileName)
-  void ooScSetPos(OOspacecraft *sc, double x, double y, double z)
-  void ooScSetSystemAndPos(OOspacecraft *sc, char *sysName, double x, double y, double z)
-
-
 cdef extern from "rendering/scenegraph.h":
   ctypedef void OOobject
   ctypedef void (*OOdrawfunc)(OOobject*)
@@ -66,6 +59,11 @@ cdef extern from "physics/orbit.h":
   void plGetPosForName3f(PLworld *world, char *name,
                          float *x, float *y, float *z)
 
+cdef extern from "sim/spacecraft.h":
+  ctypedef struct OOspacecraft
+  OOspacecraft* ooScLoad(PLworld *world, char *fileName)
+  void ooScSetPos(OOspacecraft *sc, double x, double y, double z)
+  void ooScSetSystemAndPos(OOspacecraft *sc, char *sysName, double x, double y, double z)
 
 cdef extern from "rendering/texture.h":
     ctypedef struct OOtexture:
@@ -220,8 +218,8 @@ cdef class OrbitWorld:
 
 cdef class Spacecraft:
   cdef OOspacecraft *sc
-  def __init__(self, path):
-    self.sc = ooScLoad(path)
+  def __init__(self, OrbitWorld world, path):
+    self.sc = ooScLoad(world.world, path)
   def setPos(self, double x, double y, double z):
     ooScSetPos(self.sc, x, y, z)
   def setSysAndPos(self, char *sysPath, double x, double y, double z):

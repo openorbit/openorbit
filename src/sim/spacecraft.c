@@ -291,7 +291,7 @@ ooScStageAddEngine(OOstage *stage, OOengine *engine)
 
 
 OOspacecraft*
-ooScLoad(const char *fileName)
+ooScLoad(PLworld *world, const char *fileName)
 {
   char *path = ooResGetPath(fileName);
   HRMLdocument *spaceCraftDoc = hrmlParse(path);
@@ -421,7 +421,7 @@ ooScLoad(const char *fileName)
   free(path);
 
   ooScReevaluateMass(sc);
-  sc->obj = plObject3f(NULL, 0.0, 0.0, 0.0);
+  sc->obj = plObject3f(world->rootSys, 0.0, 0.0, 0.0);
   return sc;
 }
 
