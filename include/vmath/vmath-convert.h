@@ -1,5 +1,5 @@
 /*
-  Copyright 2007 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2007,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -46,5 +46,19 @@ v3l_to_v3d(long3 lv)
   return res;
 }
 
+
+float3 equ2cart_f(float ra, float dec);
+double3 equ2cart_d(double ra, double dec);
+void
+cart2geodetic_f(float3 p, float a, float e,
+           float * restrict latitude,
+           float * restrict longitude,
+           float * restrict altitude);
+
+float3
+geodetic2cart_f(float a, float e,
+                float latitude,
+                float longitude,
+                float altitude);
 
 #endif /* ! MATH_CONVERT_H__ */
