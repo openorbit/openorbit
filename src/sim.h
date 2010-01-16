@@ -37,7 +37,7 @@ typedef struct {
 
   float stepSize;     //!< Step size for simulation in seconds
   OOspacecraft *currentSc; //!< Current active spacecraft
-  PLorbsys *orbSys;   //!< Root orbit system, this will be the sun initially
+  PLsystem *orbSys;   //!< Root orbit system, this will be the sun initially
   PLworld *orbWorld;
   //OOcam *cam;         //!< Current camera
   OOscenegraph *sg;   //!< Scenegraph of the world
@@ -55,7 +55,7 @@ static inline OOsimtime* ooSimTimeState(void)
 
 void ooSimSetSg(OOscenegraph *sg);
 
-void ooSimSetOrbSys(PLorbsys *osys);
+void ooSimSetOrbSys(PLsystem *osys);
 void ooSimSetOrbWorld(PLworld *world);
 
 void ooSimStep(float dt);

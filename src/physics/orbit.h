@@ -43,10 +43,6 @@ ode2v3(const dReal *vec)
   return v4f_make(vec[0], vec[1], vec[2], 1.0f);
 }
 
-typedef struct PLworld__ PLworld;
-typedef struct PLorbsys__ PLorbsys;
-typedef struct PLobject__ PLobject__;
-
 typedef struct PL_keplerian_elements {
   double ecc;
   double a; // Semi-major
@@ -57,10 +53,10 @@ typedef struct PL_keplerian_elements {
   double meanAnomalyOfEpoch;
 } PL_keplerian_elements ;
 
-struct PLobject__ {
+struct PLastrobody {
   char *name;
   PLworld *world;
-  PLorbsys *sys;
+  PLsystem *sys;
   dBodyID id; // Using ODE at the moment, but this is not really necisary
   PLlwcoord p; // Large world coordinates
   double m;
@@ -71,28 +67,28 @@ struct PLobject__ {
 };
 
 
-struct PLorbsys__ {
+struct PLsystem {
   PLworld *world;
-  PLorbsys *parent;
+  PLsystem *parent;
 
   const char *name;
 
   obj_array_t orbits; // suborbits
   obj_array_t objs; // objects in this system
 
-  PLobject__ *orbitalBody; // The body actually orbiting at this point, note that it is
+  PLastrobody *orbitalBody; // The body actually orbiting at this point, note that it is
   double orbitalPeriod;
   OOellipse *orbitalPath; // Contains the actual ellipsis for the orbit
   OOdrawable *orbitDrawable; // Pointer to the drawable representing the ellipsis
 };
 
-struct PLworld__ {
+struct PLworld {
   dWorldID world;
   const char *name;
   OOscene *scene; // Scene in the sg
   obj_array_t orbits;
   obj_array_t objs;
-  PLobject__ *centralBody;
+  PLastrobody *centralBody;
   SGlight *centralLightSource;
 };
 
@@ -100,19 +96,19 @@ PLworld* plNewWorld(const char *name, OOscene *sc,
                     double m, double gm, double radius,
                     double siderealPeriod, double obliquity);
 
-PLorbsys* plNewOrbit(PLworld *world, const char *name, double m, double gm,
+PLsystem* plNewOrbit(PLworld *world, const char *name, double m, double gm,
                      double orbitPeriod, double obliquity,
                      double semiMaj, double semiMin,
                      double inc, double ascendingNode, double argOfPeriapsis,
                      double meanAnomaly);
-PLorbsys* plNewSubOrbit(PLorbsys *orb, const char *name, double m, double gm,
+PLsystem* plNewSubOrbit(PLsystem *orb, const char *name, double m, double gm,
                         double orbitPeriod, double obliquity,
                         double semiMaj, double semiMin,
                         double inc, double ascendingNode, double argOfPeriapsis,
                         double meanAnomaly);
 
-PLobject__* plGetObject(PLworld *world, const char *name);
-float3 plGetPos(const PLobject__ *obj);
+PLastrobody* plGetObject(PLworld *world, const char *name);
+float3 plGetPos(const PLastrobody *obj);
 float3 plGetPosForName(const PLworld *world, const char *name);
 void plGetPosForName3f(const PLworld *world, const char *name,
                        float *x, float *y, float *z);

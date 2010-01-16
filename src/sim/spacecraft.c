@@ -226,6 +226,14 @@ ooScSyncStage(OOstage *stage)
 }
 
 void
+ooScSyncSpacecraft(OOspacecraft *sc)
+{
+  for (size_t i = 0 ; i < sc->stages.length; ++ i) {
+    ooScSyncStage(sc->stages.elems[i]);
+  }
+}
+
+void
 ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises) {
   assert(sc != NULL);
   assert(stage != NULL);
@@ -413,5 +421,32 @@ ooScLoad(const char *fileName)
   free(path);
 
   ooScReevaluateMass(sc);
+  sc->obj = plObject3f(NULL, 0.0, 0.0, 0.0);
   return sc;
+}
+
+
+void
+ooScSetPos(OOspacecraft *sc, double x, double y, double z)
+{
+  plSetObjectPos3d(sc->obj, x, y, z);
+}
+
+void
+ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName,
+                    double x, double y, double z)
+{
+
+}
+
+void
+ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName,
+                    double longitude, double latitude, double altitude)
+{
+  // Find planetoid object
+
+  // Compute position relative to planet centre, this requires the equatorial
+  // radius and the eccentricity of the spheroid.
+  //float3 p = geodetic2cart_f(float a, float e, latitude, longitude, altitude);
+  // Translate local coordinates to solar system centric ones and place object
 }

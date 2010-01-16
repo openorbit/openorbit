@@ -19,6 +19,7 @@
 
 #include <ode/ode.h>
 #include "physics.h"
+#include "object.h"
 #include "common/lwcoord.h"
 #include <assert.h>
 
@@ -55,11 +56,24 @@ void dMassTranslate (dMass *, dReal x, dReal y, dReal z);
 
 */
 PLobject*
-plObject3f(float x, float y, float z)
+plObject3f(PLsystem *sys, float x, float y, float z)
 {
+  assert(sys != NULL);
+
   PLobject *obj = malloc(sizeof(PLobject));
+  obj->id = dBodyCreate(sys->world->world);
+  ooLwcSet(&obj->p, x, y, z);
+  obj->sys = sys;
+  obj_array_push(&sys->objs, obj);
   return obj;
 }
+
+void
+plSetObjectPos3d(PLobject *obj, double x, double y, double z)
+{
+  ooLwcSet(&obj->p, x, y, z);
+}
+
 void
 plForce3f(PLobject *obj, float x, float y, float z)
 {

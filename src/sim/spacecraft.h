@@ -120,6 +120,7 @@ struct OOspacecraft {
   int activeStageIdx; // index in stage vector of active stage, this point out where
                       // detachment happens
   PLmass m;  //!< Mass of spacecraft, sum of stage masses
+  PLobject *obj;
 
   OOdetatchprog detatchProg;
 
@@ -135,6 +136,31 @@ void ooScStep(OOspacecraft *sc);
 void ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises);
 void ooScForce(OOspacecraft *sc, float rx, float ry, float rz);
 OOspacecraft* ooScGetCurrent(void);
+
+/*!
+  Set position of spacecraft in global coordinates
+ */
+void ooScSetPos(OOspacecraft *sc, double x, double y, double z);
+
+/*!
+ Set position of spacecraft relative to the named system's center
+ \param sc The spacecraft object
+ \param sysName Name of system with / to separate levels. Eg /Sol/Earth/Luna
+ \param x Position in x dimension with respect to system centre
+ \param y Position in y dimension with respect to system centre
+ \param z Position in z dimension with respect to system centre
+ */
+void ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName, double x, double y, double z);
+
+/*!
+ Set position of spacecraft relative to the system's central objects surface coordinates
+ \param sc The spacecraft object
+ \param sysName Name of system with / to separate levels. Eg /Sol/Earth/Luna
+ \param longitude Longitude
+ \param lattidue Latitude
+ \param altitude Altitude ASL
+ */
+void ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName, double longitude, double latitude, double altitude);
 
 
 OOstage* ooScNewStage(void);
