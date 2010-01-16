@@ -5,6 +5,8 @@ cdef extern from "ode/ode.h":
 cdef extern from "sim/spacecraft.h":
   ctypedef struct OOspacecraft
   OOspacecraft* ooScLoad(char *fileName)
+  void ooScSetPos(OOspacecraft *sc, double x, double y, double z)
+  void ooScSetSystemAndPos(OOspacecraft *sc, char *sysName, double x, double y, double z)
 
 
 cdef extern from "rendering/scenegraph.h":
@@ -220,7 +222,10 @@ cdef class Spacecraft:
   cdef OOspacecraft *sc
   def __init__(self, path):
     self.sc = ooScLoad(path)
-
+  def setPos(self, double x, double y, double z):
+    ooScSetPos(self.sc, x, y, z)
+  def setSysAndPos(self, char *sysPath, double x, double y, double z):
+    ooScSetSystemAndPos(self.sc, sysPath, x, y, z)
 
 def setSg(Scenegraph scg):
     ooSimSetSg(scg.sg)
