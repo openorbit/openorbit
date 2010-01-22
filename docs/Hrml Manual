@@ -1,0 +1,90 @@
+Human Readable Markup Language Manual
+=====================================
+
+The HRML language is made to be human readable and editable. It is to some
+extent similar to XML, but is obviously missing the networking effect of
+everyone using it.
+
+The language is suitable for application fileformats where the data will most
+likelly not be communicated to others.
+
+
+
+Syntax
+======
+
+Formal syntax
+
+root: tag (attribute-list) { element-list }
+attribute-list: key: value (, key: value)*
+element-list: element*
+element: value | tagged-element
+value: int | real | string | real-with-unit
+tagged-element: tag (attribute-list) : value;
+              | tag (attribute-list { elements }
+
+ident: [a-zA-Z_][a-zA-Z0-9_]*
+
+array: [ val (, val)* ]
+
+int: 0x[0-9a-fA-F]+
+   | 0b[01]+
+   | [0-9]+
+   
+real: [+-]?[0-9]+.[0-9]+
+    | [+-]?[0-9]+.[0-9]+e[+-]?[0-9]+
+
+real-with-unit: real ident
+
+
+
+Informal syntax:
+
+root (attr0: val0, attr1: val1) {
+  child {
+    childofchild: 0;
+    0
+    3
+    "foo"
+  }
+  childwithattrs (foo: bar): "baz";
+}
+
+
+Reals with Units
+================
+A feature of HRML is reals with units. Although the reference parser only
+handles a small subset of the valid units.
+
+
+double hrmlGetRealWithUnit(HRMLnode *node, const char *unit);
+
+Supported units:
+  Length: nm, um, mm, m, km, au, ly, pc
+  Mass: kg
+  Preasure: Pa, kPa, bar
+  Angle: deg, rad
+  Temperature: C, K
+  Speed: m/s, km/h
+
+Translation to XML
+==================
+The syntax of HRML is intended to be easy to parse and read, it is unambiguous
+and is supposed to be compatible with xml.
+
+Translation to xml can be accomplished by very simple means. The main issue in
+the xml format is that there are no real types to distinguish between strings
+and integers.
+
+tag (attribute: value) {
+  "Foo"
+  0 1 2
+}
+
+<tag attribute: "value">
+  Foo
+  0 1 2
+</tag>
+
+So while you can easily transcribe HRML to XML, the reverse is not necissarily
+true.
