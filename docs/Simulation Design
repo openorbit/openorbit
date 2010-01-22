@@ -1,0 +1,40 @@
+Simulation Design
+=================
+
+Each spacecraft consist of separate stage-objects. Stages have actuators. Stages
+also have actuator groups, which are connected to the I/O system. A couple of
+groups exsits that are default and usually bound by the user's keymap.
+
+Group#  Name
+------  ----
+0       orbital
+1       vertical
+2       horisontal
+3       forward
+4       pitch
+5       roll
+6       yaw
+8       flaps
+8-127   RESERVED
+
+When you design your spacecraft you usually add an actuator to one of these
+groups. Additional groups can be created for special purpose systems.
+
+Actuators can be of various types:
+  OOrocket:     liquid fuel rockets
+  OOsrb:        solid fuel rockets
+  OOjetengine:  jet engines
+  OOmagtorquer: magneto torquers
+  OOwing:       wings
+  OOflap:       flaps
+
+These are all inheriting the base actuator class. The rocket and srb class are
+typically used for creating both thrusters and orbital engines, there is nothing
+inherently different about those two type of actuators, only the size.
+
+When the system time step is carried out, all the actuators attached to active
+stages in the different groups will be told to update their states (they then
+request for example joystick axis data), after this update, all actuators in the
+entire spacecraft (even for desabled stages, but not detached ones) are told to
+do their time step, this timestep is used in order to update force and torque
+data for the spacecraft.

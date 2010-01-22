@@ -1,5 +1,5 @@
 /*
-  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -240,10 +240,10 @@ ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises) {
   assert(axises != NULL);
 
   for (size_t i = 0 ; i < stage->engines.length; ++ i) {
-    OOengine *engine = stage->engines.elems[i];
+    OOactuator *act = stage->engines.elems[i];
 
-    if (engine->state == OO_Engine_Burning ||
-        engine->state == OO_Engine_Fault_Open)
+    if (act->state == OO_Act_Burning ||
+        act->state == OO_Act_Fault_Open)
     {
       //      dBodyAddRelForceAtRelPos(sc->body,
       //                         vf3_x(engine->dir) * engine->forceMag,
@@ -336,7 +336,7 @@ ooScLoad(PLworld *world, const char *fileName)
                 stageCog = hrmlGetRealArray(stageEntry);
                 size_t len = hrmlGetRealArrayLen(stageEntry);
                 assert(len == 3 && "cog vector must be a 3 component real vector");
-              } else if (!strcmp(stageEntry->name, "propulsion")) {
+              } else if (!strcmp(stageEntry->name, "actuators")) {
                 for (HRMLobject *prop = stageEntry->children; prop != NULL ; prop = prop->next) {
                   if (!strcmp(prop->name, "engine")) {
                     HRMLvalue engineName = hrmlGetAttrForName(prop, "name");

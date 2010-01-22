@@ -1,5 +1,5 @@
 /*
-  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -65,6 +65,8 @@ struct OOstage {
   OOdrawable *mesh; // Used for synchronising with the rendering
   int detachOrder; // How and when to detach the stage
   PLmass m; // Mass and inertia tensor of stage, unit is kg
+  obj_array_t actuators;
+  obj_array_t actuatorGroups;
   obj_array_t engines; // Main orbital engines
   obj_array_t torquers;
 };
