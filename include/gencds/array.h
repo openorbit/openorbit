@@ -49,7 +49,9 @@ void array_compress(array_t *vec);
   void name##_array_push(name##_array_t *vec, typ obj);           \
   typ name##_array_pop(name##_array_t *vec);                      \
   typ name##_array_get(name##_array_t *vec, size_t i);            \
-  void name##_array_set(name##_array_t *vec, size_t i, typ obj);
+  void name##_array_set(name##_array_t *vec, size_t i, typ obj);  \
+  typ name##_array_remove(name##_array_t *vec, size_t i);
+
 
 
 
@@ -70,7 +72,7 @@ void array_compress(array_t *vec);
     vec->elems[vec->length ++] = obj;                                               \
   }                                                                                 \
 typ name##_array_pop(name##_array_t *vec) {                                         \
-  return vec->elems[vec->length --];                                                \
+  return vec->elems[--vec->length];                                                 \
 }                                                                                   \
 typ name##_array_get(name##_array_t *vec, size_t i) {                               \
   if (vec->length <= i)                                                             \
@@ -83,7 +85,17 @@ void name##_array_set(name##_array_t *vec, size_t i, typ obj) {                 
     errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
   else                                                                              \
     vec->elems[i] = obj;                                                            \
+}                                                                                   \
+typ name##_array_remove(name##_array_t *vec, size_t i) {                            \
+  if (vec->length <= i)                                                             \
+    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
+  else {                                                                            \
+    typ tmp = vec->elems[i];                                                        \
+    vec->elems[i] = vec->elems[--vec->length];                                      \
+    return tmp;                                                                     \
+  }                                                                                 \
 }
+
 
 
 DECL_ARRAY(int,int);
