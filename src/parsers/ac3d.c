@@ -87,6 +87,7 @@ struct ac3d_file_t {
   struct ac3d_object_t **objs;
 };
 
+static char *gLastError = NULL;
 int
 push_material(struct ac3d_file_t *ac3d, struct ac3d_material_t *mat)
 {
@@ -518,7 +519,7 @@ ac3d_read_obj(FILE *fp, const char *name)
         }
 
         for (size_t i = 0 ; i < obj->num_childs ; ++ i) {
-          fprintf(stderr, "%p: %d/%d\n", (void*)obj, i, obj->num_childs);
+          //fprintf(stderr, "%p: %d/%d\n", (void*)obj, i, obj->num_childs);
           nameBuff[0] = '\0';
           FORCE_GETS(buff, BUFF_SIZE, fp);
           SCAN_CHECK(buff, 1, "OBJECT %s", nameBuff);
@@ -534,7 +535,14 @@ ac3d_read_obj(FILE *fp, const char *name)
 
       return obj;
     } else {
-      fprintf(stderr, "invalid line '%s' ignored\n", buff);
+      if (gLastError && strcmp(gLastError, buff)) {
+        free(gLastError);
+        gLastError = strdup(buff);
+        fprintf(stderr, "invalid line '%s' ignored\n", buff);
+      } else if (gLastError == NULL) {
+        gLastError = strdup(buff);
+        fprintf(stderr, "invalid line '%s' ignored\n", buff);
+      } // Otherwise ignore and do not print error message
     }
   }
 
