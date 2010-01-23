@@ -68,9 +68,9 @@ typedef void (*OOenginetoggle)(OOengine *);
 typedef void (*OOenginethrottle)(OOengine *, float throttle);
 typedef void (*OOenginestep)(OOengine *, float dt);
 
-typedef void (*OOactuatortoggle)(OOengine *);
-typedef void (*OOactuatorthrottle)(OOengine *, float throttle);
-typedef void (*OOactuatorstep)(OOengine *, float dt);
+typedef void (*OOactuatortoggle)(OOactuator *);
+typedef void (*OOactuatoraxisupdate)(OOactuator *, float axis);
+typedef void (*OOactuatorstep)(OOactuator *, float dt);
 
 
 // Base actuator class, do not instantiate directly
@@ -81,6 +81,7 @@ struct OOactuator {
   OOactuatortoggle toggleOn;
   OOactuatortoggle toggleOff;
   OOactuatorstep step;
+  OOactuatoraxisupdate axisUpdate;
 };
 // Base engine class, do not instantiate directly
 struct OOengine {
@@ -137,6 +138,7 @@ typedef struct OOtorquer {
 } OOtorquer;
 
 OOengine* ooScNewEngine(OOspacecraft *sc,
+                        const char *name,
                         float f,
                         float x, float y, float z,
                         float dx, float dy, float dz);
@@ -162,7 +164,7 @@ OOengine* ooScNewThruster(OOspacecraft *sc,
                           float x, float y, float z,
                           float dx, float dy, float dz);
 
-OOactuatorgroup* ooScNewActuatorGroup(OOspacecraft *sc, const char *name);
+OOactuatorgroup* ooScNewActuatorGroup(const char *name);
 void ooScRegisterInGroup(OOactuatorgroup *eg, OOactuator *actuator);
 
 // Standard engine groups are:
@@ -178,5 +180,9 @@ void ooScFireReverse(OOspacecraft *sc);
 void ooScEngageYaw(OOspacecraft *sc, float dy);
 void ooScEngagePitch(OOspacecraft *sc, float dp);
 void ooScEngageRoll(OOspacecraft *sc, float dr);
+
+int ooGetActuatorGroupId(const char *groupName);
+const char * ooGetActuatorGroupName(int groupId);
+
 
 #endif /* ! OO_SIM_ENGINE_H__ */

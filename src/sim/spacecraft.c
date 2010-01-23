@@ -239,12 +239,29 @@ ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises) {
   assert(stage != NULL);
   assert(axises != NULL);
 
-  for (size_t i = 0 ; i < stage->engines.length; ++ i) {
-    OOactuator *act = stage->engines.elems[i];
+  // Handle for all actuators call actuator handlers
+  const static char * axisKeys[] = {
+    "orbital", "vertical", "horizontal", "thrust", "pitch", "roll", "yaw"
+  };
+  for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
+    OOactuatorgroup *actGroup = (OOactuatorgroup*)stage->actuatorGroups.elems[i];
+    double axisVal = ooIoGetAxis(axisKeys[i]);
+    for (int j = 0 ; j < actGroup->actuators.length ; ++j) {
+      OOactuator *act = actGroup->actuators.elems[j];
+      // TODO: Will not really work, we need more parameters if an actuator is
+      //       used for multiple functions.
+      act->axisUpdate(act, axisVal);
+    }
+  }
+
+
+  for (size_t i = 0 ; i < stage->actuators.length; ++ i) {
+    OOactuator *act = stage->actuators.elems[i];
 
     if (act->state == OO_Act_Burning ||
         act->state == OO_Act_Fault_Open)
     {
+      
       //      dBodyAddRelForceAtRelPos(sc->body,
       //                         vf3_x(engine->dir) * engine->forceMag,
       //                         vf3_y(engine->dir) * engine->forceMag,
@@ -268,8 +285,14 @@ ooScNewStage(void)
 {
   OOstage *stage = malloc(sizeof(OOstage));
   stage->state = OO_Stage_Idle;
-  obj_array_init(&stage->engines);
-  obj_array_init(&stage->torquers);
+
+  // Actuator arrays
+  obj_array_init(&stage->actuators);
+  obj_array_init(&stage->actuatorGroups);
+  for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
+    OOactuatorgroup *actGroup = ooScNewActuatorGroup(ooGetActuatorGroupName(i));
+    obj_array_push(&stage->actuatorGroups, actGroup);
+  }
   //stage->id = dBodyNew(...) // In which dWorld?;
   stage->detachOrder = 0;
 
@@ -284,9 +307,9 @@ ooScNewStage(void)
 }
 
 void
-ooScStageAddEngine(OOstage *stage, OOengine *engine)
+ooScStageAddActuator(OOstage *stage, OOactuator *actuator)
 {
-  obj_array_push(&stage->engines, engine);
+  obj_array_push(&stage->actuators, actuator);
 }
 
 
@@ -302,7 +325,7 @@ ooScLoad(PLworld *world, const char *fileName)
     free(path);
     return NULL;
   }
-
+  HRMLobject *actGroups = NULL;
   HRMLobject *root = hrmlGetRoot(spaceCraftDoc);
   HRMLvalue scName = hrmlGetAttrForName(root, "name");
   OOspacecraft *sc = ooScNew();
@@ -340,6 +363,7 @@ ooScLoad(PLworld *world, const char *fileName)
                 for (HRMLobject *prop = stageEntry->children; prop != NULL ; prop = prop->next) {
                   if (!strcmp(prop->name, "engine")) {
                     HRMLvalue engineName = hrmlGetAttrForName(prop, "name");
+                    assert(engineName.typ == HRMLStr);
                     const double *pos = NULL;
                     const double *dir = NULL;
                     double thrust;
@@ -360,23 +384,30 @@ ooScLoad(PLworld *world, const char *fileName)
                     }
 
                     if (pos && dir) {
-                      OOengine *engine = ooScNewEngine(sc, thrust,
-                                                      pos[0], pos[1], pos[2],
-                                                      dir[0], dir[1], dir[2]);
-                      ooScStageAddEngine(newStage, engine);
+                      OOengine *engine = ooScNewEngine(sc,
+                                                       engineName.u.str,
+                                                       thrust,
+                                                       pos[0], pos[1], pos[2],
+                                                       dir[0], dir[1], dir[2]);
+                      ooScStageAddActuator(newStage, (OOactuator*)engine);
                     } else {
                       fprintf(stderr, "no pos or direction of engine found\n");
                     }
+                  } else if (!strcmp(stageEntry->name, "attitude")) {
+                    for (HRMLobject *att = stageEntry->children; att != NULL ;
+                         att = att->next)
+                    {
+                      if (!strcmp(att->name, "engine")) {
+                        assert(0 && "not implemented");
+                      } else if (!strcmp(att->name, "torquer")) {
+                        assert(0 && "not implemented");
+                      }
+                    } // Attitude for loop
+                  } else if (!strcmp(prop->name, "actuator-groups")) {
+                    actGroups = prop;
                   }
                 } // Propulsion for loop
-              } else if (!strcmp(stageEntry->name, "attitude")) {
-                for (HRMLobject *att = stageEntry->children; att != NULL ; att = att->next) {
-                  if (!strcmp(att->name, "engine")) {
-                    assert(0 && "not implemented");
-                  } else if (!strcmp(att->name, "torquer")) {
-                    assert(0 && "not implemented");
-                  }
-                } // Attitude for loop
+                  // End actuators
               } else if (!strcmp(stageEntry->name, "model")) {
                 const char *modelName = hrmlGetStr(stageEntry);
                 char *pathCopy = strdup(path);
@@ -403,6 +434,44 @@ ooScLoad(PLworld *world, const char *fileName)
             newStage->pos[0] = stagePos[0];
             newStage->pos[1] = stagePos[1];
             newStage->pos[2] = stagePos[2];
+
+            for (HRMLobject *actGroup = actGroups->children;
+                 actGroup != NULL ; actGroup = actGroup->next)
+            {
+              if (!strcmp(actGroup->name, "group")) {
+                HRMLvalue nameAttr = hrmlGetAttrForName(actGroup, "name");
+
+                for (HRMLobject *groupEntry = actGroup->children;
+                     groupEntry != NULL ; groupEntry = groupEntry->next)
+                {
+                  if (!strcmp(groupEntry->name, "group-entry")) {
+                    const char *actuatorName = hrmlGetStr(groupEntry);
+                    // TODO: Register actuator in named group
+                    if (nameAttr.typ == HRMLStr) {
+                      OOactuator * act = NULL;
+                      for (int i = 0 ; i < newStage->actuators.length ; ++ i) {
+                        OOactuator *tmp = newStage->actuators.elems[i];
+                        if (!strcmp(tmp->name, actuatorName)) {
+                          act = tmp;
+                        }
+                      }
+                      assert(act && "unknown actuator");
+                      int actuatorGroupId = ooGetActuatorGroupId(nameAttr.u.str);
+
+                      if (actuatorGroupId != -1) {
+                        ooScRegisterInGroup(newStage->actuatorGroups.elems[actuatorGroupId], act);
+                      }
+                    } else if (nameAttr.typ == HRMLInt) {
+                      assert(0 && "custom actuator groups not yet supported");
+                    } else {
+                      assert(0 && "invalid type for group name");
+                    }
+                  }
+                }
+              } else {
+                assert(0 && "only 'group' children allowed under 'actuator-groups'");
+              }
+            } // Attitude for loop
 
             ooScAddStage(sc, newStage);
           } // For all stages

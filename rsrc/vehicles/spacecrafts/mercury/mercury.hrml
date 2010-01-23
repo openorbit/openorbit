@@ -13,8 +13,16 @@
 //        Launch mass: 1934 kg
 //        Landing mass: 1130 kg
 //
+//    Standard coordinate system used is y being positive along the direction of the
+//    nose, x is the wing direction if this was an aircraft, and z is positive up with
+//    respect to the cockpit.
+//    You can ofcourse do the coordinates however you want, but then make sure that the
+//    forward direction vector is set appropriatelly.
 spacecraft (name: Mercury-Capsule) {
   mass: 1354.0 kg;
+  nose-vector: [0.0, 1.0, 0.0];
+  up-vector: [0.0, 0.0, 1.0];
+
   stages {
     stage (name: Command-Module) {
       model(): "mercury.ac";
@@ -23,9 +31,9 @@ spacecraft (name: Mercury-Capsule) {
       inertial-tensor: [1.0, 0.0, 0.0,
                         0.0, 1.0, 0.0,
                         0.0, 0.0, 1.0];
-      cog: [0.0, 0.0, 0.0]; // Center of gravity (local for stage)
+      cog: [0.0, 0.0, 0.0]; // Center of gravity (stage local), normally 0,0,0
       pos: [0.0, 0.0, 0.0]; // Position relative to whole spacecraft
-      propulsion {
+      actuators {
         // Nice example, if multiple engines are used, they may either be fired
         // in sequence or in parallel, this distinction is handled by the
         // spacecraft plugin.
@@ -33,14 +41,35 @@ spacecraft (name: Mercury-Capsule) {
           // Should burn 10 s per rocket, solid fuel
           thrust: 4.5 kN;
           fire-once: true; // Solid rocket engine
-          pos: [1.0, 1.0, 1.0];
-          dir: [1.0, 1.0, 1.0];
+          pos: [1.0, 1.0, 1.0]; // Relative to stage
+          dir: [1.0, 0.0, 0.0]; // Unit vector
         }
         engine (name: posigrade) {
           thrust: 1.8 kN;
           fire-once: true; // Solid rocket engine
           pos: [1.0, 1.0, 1.0];
           dir: [1.0, 1.0, 1.0];
+
+          flame-length: 1.0 m;
+          flame-base-radius: 0.25 m;
+          flame-colour: [0, 0, 255];
+        }
+        actuator-groups {
+          group (name: orbital) {
+            group-entry: "retro";
+          }
+//          group (name: roll){
+//            group-entry: "rcs-high";
+//            group-entry: "rcs-low";
+//          }
+//          group (name: yaw) {
+//            group-entry: "rcs-high";
+//            group-entry: "rcs-low";
+//          }
+//          group (name: pitch) {
+//            group-entry: "rcs-high";
+//            group-entry: "rcs-low";
+//          }
         }
       }
 //      attitude {

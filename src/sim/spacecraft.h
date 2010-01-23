@@ -67,8 +67,6 @@ struct OOstage {
   PLmass m; // Mass and inertia tensor of stage, unit is kg
   obj_array_t actuators;
   obj_array_t actuatorGroups;
-  obj_array_t engines; // Main orbital engines
-  obj_array_t torquers;
 };
 
 typedef void (*OOscstepfunc)(OOspacecraft*, double dt);
@@ -166,7 +164,7 @@ void ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName, double longitude
 
 
 OOstage* ooScNewStage(void);
-void ooScStageAddEngine(OOstage *stage, OOengine *engine);
+void ooScStageAddActuator(OOstage *stage, OOactuator *actuator);
 
 
 OOspacecraft* ooScLoad(PLworld *world, const char *fileName);

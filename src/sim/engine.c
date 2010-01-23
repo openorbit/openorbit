@@ -33,7 +33,7 @@ static const char *actuatorNames[OO_Act_Group_Count] = {
 };
 
 int
-getDefaultGroupId(const char *groupName)
+ooGetActuatorGroupId(const char *groupName)
 {
   for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
     if (!strcmp(actuatorNames[i], groupName)) {
@@ -44,7 +44,7 @@ getDefaultGroupId(const char *groupName)
 }
 
 const char*
-getDefaultGroupName(int groupId)
+ooGetActuatorGroupName(int groupId)
 {
   assert(groupId < OO_Act_Group_Count);
   return actuatorNames[groupId];
@@ -92,8 +92,10 @@ ooScEngageRoll(OOspacecraft *sc, float dr)
   
 }
 
+
 OOengine*
 ooScNewEngine(OOspacecraft *sc,
+              const char *name,
               float f,
               float x, float y, float z,
               float dx, float dy, float dz)
@@ -101,15 +103,15 @@ ooScNewEngine(OOspacecraft *sc,
   OOengine *engine = malloc(sizeof(OOengine));
   engine->super.sc = sc;
   engine->super.state = OO_Act_Disabled;
+  engine->super.name = strdup(name);
   engine->forceMag = f;
   engine->p = vf3_set(x, y, z);
   engine->dir = vf3_set(dx, dy, dz);
-  
   return engine;
 }
 
 OOactuatorgroup*
-ooScNewEngineGroup(OOspacecraft *sc, const char *name)
+ooScNewActuatorGroup(const char *name)
 {
   OOactuatorgroup *eg = malloc(sizeof(OOactuatorgroup));
   obj_array_init(&eg->actuators);
