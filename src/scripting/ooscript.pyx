@@ -13,13 +13,13 @@ cdef extern from "rendering/scenegraph.h":
 
   ctypedef struct OOscenegraph
 
-  ctypedef struct OOdrawable:
+  ctypedef struct SGdrawable:
     OOobject *obj
     OOdrawfunc draw
 
   OOscene* ooSgGetRoot(OOscenegraph *sg)
 
-  void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj)
+  void ooSgSetSky(OOscenegraph *sg, SGdrawable *obj)
   void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
 
   OOscenegraph* ooSgNewSceneGraph()
@@ -40,7 +40,7 @@ cdef extern from "rendering/scenegraph.h":
 
   OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc,
                          float dx, float dy, float dz)
-  OOdrawable* sgLoadModel(char *file)
+  SGdrawable* sgLoadModel(char *file)
 
 
 cdef extern from "rendering/sky.h":
@@ -48,7 +48,7 @@ cdef extern from "rendering/sky.h":
     void ooSkyAddStar(OOstars *obj, double ra, double dec, double mag, double bv)
     OOstars* ooSkyInitStars(int starCount)
     OOstars *ooSkyRandomStars()
-    OOdrawable *ooSkyNewDrawable(char *fileName)
+    SGdrawable *ooSkyNewDrawable(char *fileName)
     OOstars* ooSkyLoadStars(char *fileName)
 
 
@@ -137,7 +137,7 @@ cdef class Texture:
         self.tex = ooTexGet(key)
 
 cdef class SkyDrawable:
-    cdef OOdrawable *sky
+    cdef SGdrawable *sky
     def __cinit__(self, char *fileName):
       self.sky = ooSkyNewDrawable(fileName)
 

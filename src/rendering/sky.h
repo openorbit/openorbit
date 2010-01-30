@@ -38,7 +38,7 @@ typedef struct {
 } OOstar;
 
 typedef struct {
-  OOdrawable super;
+  SGdrawable super;
   size_t n_stars; //!< Number of stars loaded
   size_t a_len; //!< Length of data
   OOstar *data;
@@ -63,7 +63,7 @@ void ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv);
 void ooSkyDrawStars(OOstars *stars);
 OOstars* ooSkyLoadStars(const char *file);
 
-OOdrawable *ooSkyNewDrawable(const char *file);
+SGdrawable *ooSkyNewDrawable(const char *file);
 
 
 #ifdef __cplusplus

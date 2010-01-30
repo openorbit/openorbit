@@ -62,7 +62,7 @@ struct PLastrobody {
   double m;
   double GM;
   PL_keplerian_elements *kepler;
-  OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
+  SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
   SGlight *lightSource; //!< Light source if the object emits light
 };
@@ -87,7 +87,7 @@ struct PLsystem {
   PLastrobody *orbitalBody; // The body actually orbiting at this point, note that it is
   double orbitalPeriod;
   OOellipse *orbitalPath; // Contains the actual ellipsis for the orbit
-  OOdrawable *orbitDrawable; // Pointer to the drawable representing the ellipsis
+  SGdrawable *orbitDrawable; // Pointer to the drawable representing the ellipsis
 };
 
 struct PLworld {

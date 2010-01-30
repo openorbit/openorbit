@@ -405,7 +405,7 @@ plDeleteWorld(PLworld *world)
 }
 
 void
-plSetDrawable(PLastrobody *obj, OOdrawable *drawable)
+plSetDrawable(PLastrobody *obj, SGdrawable *drawable)
 {
   obj->drawable = drawable;
 }
@@ -794,7 +794,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscenegraph *sg)
 
   //  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
   OOscene *sc = ooSgGetRoot(sg);
-  OOdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
+  SGdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
 
 
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
@@ -879,7 +879,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
   }
   double period = plOrbitalPeriod(plAuToMetres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
   OOscene *sc = ooSgGetRoot(sg);
-  OOdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
+  SGdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   PLsystem *sys = plNewOrbit(world, planetName.u.str,
                              mass, gm,
@@ -946,7 +946,7 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
 
   OOscene *sc = ooSgGetRoot(sg);
   sgSetSceneAmb4f(sc, 0.2, 0.2, 0.2, 1.0);
-  OOdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
+  SGdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
   SGmaterial *mat = sgSphereGetMaterial((OOsphere*)drawable);
   sgSetMaterialEmiss4f(mat, 1.0, 1.0, 1.0, 0.0);
 

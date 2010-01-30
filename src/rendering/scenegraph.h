@@ -32,7 +32,7 @@
 
 #define SG_MAX_LIGHTS GL_MAX_LIGHTS
 
-typedef struct OOdrawable OOdrawable;
+typedef struct SGdrawable SGdrawable;
 typedef struct OOscene OOscene;
 typedef struct OOoverlay OOoverlay;
 typedef struct OOscenegraph OOscenegraph;
@@ -58,7 +58,7 @@ struct SGmaterial {
 
 typedef void (*OOdrawfunc)(OOobject*);
 
-struct OOdrawable {
+struct SGdrawable {
   const char *name;
   OOscene *scene;
   bool enabled;
@@ -74,16 +74,16 @@ struct OOdrawable {
 #include "particles.h"
 
 
-OOdrawable* ooSgNewDrawable(OOdrawable *drawable, const char *name, OOdrawfunc df);
+SGdrawable* ooSgNewDrawable(SGdrawable *drawable, const char *name, OOdrawfunc df);
 
-void ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w);
-void sgSetObjectQuatv(OOdrawable *obj, quaternion_t q);
+void ooSgSetObjectQuat(SGdrawable *obj, float x, float y, float z, float w);
+void sgSetObjectQuatv(SGdrawable *obj, quaternion_t q);
 
-void ooSgSetObjectPosLW(OOdrawable *obj, const OOlwcoord *lw);
-void ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z);
+void ooSgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw);
+void ooSgSetObjectPos(SGdrawable *obj, float x, float y, float z);
 //void ooSgSetObjectScale(OOdrawable *obj, float s);
-void ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);
-void ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz);
+void ooSgSetObjectSpeed(SGdrawable *obj, float dx, float dy, float dz);
+void ooSgSetObjectAngularSpeed(SGdrawable *obj, float drx, float dry, float drz);
 
 void ooSgSetScenePos(OOscene *sc, float x, float y, float z);
 void ooSgSetSceneScale(OOscene *sc, float scale);
@@ -113,7 +113,7 @@ void ooSgSetCam(OOscenegraph *sg, OOcam *cam);
 OOscene* ooSgNewScene(OOscene *parent, const char *name);
 void sgSetSceneAmb4f(OOscene *sc, float r, float g, float b, float a);
 
-void ooSgSetSky(OOscenegraph *sg, OOdrawable *obj);
+void ooSgSetSky(OOscenegraph *sg, SGdrawable *obj);
 
 /*!
   Finds the root scene from the a given scene. Note that in most cases you want
@@ -132,19 +132,19 @@ OOscene* ooSgSceneGetParent(OOscene *sc);
 
 OOscene* ooSgGetScene(OOscenegraph *sg, const char *sceneName);
 void ooSgSceneAddChild(OOscene *parent, OOscene *child);
-void ooSgSceneAddObj(OOscene *sc, OOdrawable *object);
+void ooSgSceneAddObj(OOscene *sc, SGdrawable *object);
 
 SGmaterial* sgSphereGetMaterial(OOsphere *sphere);
 
 
-OOdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
-OOdrawable* sgNewEllipsis(const char *name,
+SGdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
+SGdrawable* sgNewEllipsis(const char *name,
                           double semiMajor, double semiMinor,
                           double longAsc, double inc, double argPeri,
                           float r, float g, float b,
                           size_t vertCount);
 
-OOdrawable* sgLoadModel(const char *file);
+SGdrawable* sgLoadModel(const char *file);
 void sgSceneAddLight(OOscene *sc, SGlight *light);
 SGlight* sgNewPointlight(OOscene *sc, float3 p);
 SGlight* sgNewPointlight3f(OOscene *sc, float x, float y, float z);

@@ -28,7 +28,7 @@ typedef struct PLobject {
   dBodyID id; // Using ODE at the moment, but this is not really necisary
   PLlwcoord p; // Large world coordinates
   PLmass m;
-  OOdrawable *drawable; //!< Link to scenegraph drawable object representing this
+  SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
   //!< object.
   //  PLorbsys *sys;
 } PLobject;

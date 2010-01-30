@@ -210,7 +210,7 @@ ooScForce(OOspacecraft *sc, float rx, float ry, float rz)
 
 
 void
-ooScSetStageMesh(OOstage *stage, OOdrawable *mesh)
+ooScSetStageMesh(OOstage *stage, SGdrawable *mesh)
 {
   assert(stage != NULL);
   assert(mesh != NULL);
@@ -417,7 +417,7 @@ ooScLoad(PLworld *world, const char *fileName)
                 char *modelPath;
                 asprintf(&modelPath, "%s/%s", pathCopy, modelName);
 
-                OOdrawable *drawable = sgLoadModel(modelPath);
+                SGdrawable *drawable = sgLoadModel(modelPath);
                 ooScSetStageMesh(newStage, drawable);
 
                 free(modelPath);

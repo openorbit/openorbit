@@ -37,7 +37,7 @@ typedef struct SGparticle {
 } SGparticle;
 
 typedef struct SGparticles {
-  OOdrawable super;
+  SGdrawable super;
   float slowdown;
   size_t particleCount;
   
@@ -50,6 +50,6 @@ typedef struct SGparticles {
   SGparticle *particles;
 } SGparticles;
 
-OOdrawable* sgNewParticleSystem(const char *name, size_t particleCount);
+SGdrawable* sgNewParticleSystem(const char *name, size_t particleCount);
 
 #endif /* !SG_PARTICLES_H */

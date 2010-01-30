@@ -25,7 +25,7 @@ sgDrawParticles(SGparticles *sp)
   
 }
 
-OOdrawable*
+SGdrawable*
 sgNewParticleSystem(const char *name, size_t particleCount)
 {
   SGparticles *ps = malloc(sizeof(SGparticles));
@@ -57,7 +57,7 @@ sgNewParticleSystem(const char *name, size_t particleCount)
     ps->particles[i].zg = 0.0f;
   }
 
-  return ooSgNewDrawable((OOdrawable*)ps, name, (OOdrawfunc)sgDrawParticles);
+  return ooSgNewDrawable((SGdrawable*)ps, name, (OOdrawfunc)sgDrawParticles);
 }
 
 void

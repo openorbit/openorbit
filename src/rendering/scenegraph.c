@@ -34,7 +34,7 @@
 #include "parsers/model.h"
 
 struct OOsphere {
-  OOdrawable super;
+  SGdrawable super;
   SGmaterial mat;
   GLuint texId;
   GLUquadricObj *quadratic;
@@ -43,7 +43,7 @@ struct OOsphere {
 
 
 struct SGcylinder {
-  OOdrawable super;
+  SGdrawable super;
   //  GLuint texId;
   GLbyte col[3];
   GLUquadricObj *quadratic;
@@ -175,7 +175,7 @@ ooSgSetScenePos(OOscene *sc, float x, float y, float z)
 //}
 
 void
-ooSgSetObjectPosLW(OOdrawable *obj, const OOlwcoord *lw)
+ooSgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
 {
   // Get camera position and translate the lw coord with respect to the camera
   OOscene *sc = obj->scene;
@@ -188,28 +188,28 @@ ooSgSetObjectPosLW(OOdrawable *obj, const OOlwcoord *lw)
   }
 }
 void
-ooSgSetObjectPos(OOdrawable *obj, float x, float y, float z)
+ooSgSetObjectPos(SGdrawable *obj, float x, float y, float z)
 {
   assert(obj != NULL);
   obj->p = vf3_set(x, y, z);
 }
 
 void
-ooSgSetObjectQuat(OOdrawable *obj, float x, float y, float z, float w)
+ooSgSetObjectQuat(SGdrawable *obj, float x, float y, float z, float w)
 {
   assert(obj != NULL);
   obj->q = vf4_set(x, y, z, w);
 }
 
 void
-sgSetObjectQuatv(OOdrawable *obj, quaternion_t q)
+sgSetObjectQuatv(SGdrawable *obj, quaternion_t q)
 {
   assert(obj != NULL);
   obj->q = q;
 }
 
 void
-ooSgSetObjectScale(OOdrawable *obj, float s)
+ooSgSetObjectScale(SGdrawable *obj, float s)
 {
   assert(0);
   assert(obj != NULL);
@@ -217,21 +217,21 @@ ooSgSetObjectScale(OOdrawable *obj, float s)
 }
 
 void
-ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz)
+ooSgSetObjectSpeed(SGdrawable *obj, float dx, float dy, float dz)
 {
   assert(obj != NULL);
   obj->dp = vf3_set(dx, dy, dz);
 }
 
 void
-ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz)
+ooSgSetObjectAngularSpeed(SGdrawable *obj, float drx, float dry, float drz)
 {
   assert(obj != NULL);
   obj->dr = vf3_set(drx, dry, drz);
 }
 
-OOdrawable*
-ooSgNewDrawable(OOdrawable *drawable, const char *name, OOdrawfunc df)
+SGdrawable*
+ooSgNewDrawable(SGdrawable *drawable, const char *name, OOdrawfunc df)
 {
   assert(df != NULL);
   assert(drawable != NULL);
@@ -331,7 +331,7 @@ ooSgSceneAddChild(OOscene * restrict parent, OOscene * restrict child)
 }
 
 void
-ooSgSceneAddObj(OOscene *sc, OOdrawable *object)
+ooSgSceneAddObj(OOscene *sc, SGdrawable *object)
 {
   assert(sc != NULL);
   assert(object != NULL);
@@ -433,7 +433,7 @@ ooSgDrawOverlay(OOoverlay *overlay)
 //}
 
 int
-compareDistances(OOdrawable const **o0, OOdrawable const **o1)
+compareDistances(SGdrawable const **o0, SGdrawable const **o1)
 {
   bool gt = vf3_gt((*o0)->p, (*o1)->p);
 
@@ -478,7 +478,7 @@ sgSceneDraw(OOscene *sc, bool recurse)
 
   // Render objects
   for (size_t i = 0 ; i < sc->objs.length ; i ++) {
-    OOdrawable *obj = sc->objs.elems[i];
+    SGdrawable *obj = sc->objs.elems[i];
     ooLogTrace("drawing object %s", obj->name);
     glPushMatrix();
     glTranslatef(vf3_x(obj->p), vf3_y(obj->p), vf3_z(obj->p));
@@ -523,7 +523,7 @@ sgSceneDraw(OOscene *sc, bool recurse)
 
 
 void
-ooSgSetSky(OOscenegraph *sg, OOdrawable *obj)
+ooSgSetSky(OOscenegraph *sg, SGdrawable *obj)
 {
   assert(sg != NULL);
   assert(obj != NULL);
@@ -649,7 +649,7 @@ ooSgDrawSphere(OOsphere *sp)
   glEnd();
 }
 
-OOdrawable*
+SGdrawable*
 ooSgNewSphere(const char *name, float radius, const char *tex)
 {
   OOsphere *sp = malloc(sizeof(OOsphere));
@@ -663,7 +663,7 @@ ooSgNewSphere(const char *name, float radius, const char *tex)
   gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
   gluQuadricTexture(sp->quadratic, GL_TRUE);
   gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
-  return ooSgNewDrawable((OOdrawable*)sp, name, (OOdrawfunc) ooSgDrawSphere);
+  return ooSgNewDrawable((SGdrawable*)sp, name, (OOdrawfunc) ooSgDrawSphere);
 }
 
 
@@ -707,7 +707,7 @@ sgDrawEllipsis(SGellipsis *el)
   glEnd();
 }
 
-OOdrawable*
+SGdrawable*
 sgNewEllipsis(const char *name,
               double semiMajor, double semiMinor,
               double longAsc, double inc, double argPeri,
@@ -751,7 +751,7 @@ sgNewEllipsis(const char *name,
     el->verts[3*i+2] = vf3_z(v);
   }
 
-  return ooSgNewDrawable((OOdrawable*)el, name, (OOdrawfunc)sgDrawEllipsis);
+  return ooSgNewDrawable((SGdrawable*)el, name, (OOdrawfunc)sgDrawEllipsis);
 }
 
 
@@ -791,7 +791,7 @@ sgDrawCylinder(SGcylinder *cyl)
               4, 2);
 }
 
-OOdrawable*
+SGdrawable*
 sgNewCylinder(const char *name,
               float top, float bottom, float height)
 {
@@ -804,12 +804,12 @@ sgNewCylinder(const char *name,
   cyl->col[1] = 255;
   cyl->col[2] = 255;
 
-  return ooSgNewDrawable((OOdrawable*)cyl, name, (OOdrawfunc)sgDrawCylinder);
+  return ooSgNewDrawable((SGdrawable*)cyl, name, (OOdrawfunc)sgDrawCylinder);
 }
 
 
 typedef struct SGmodel {
-  OOdrawable super;
+  SGdrawable super;
   model_t *modelData;
 } SGmodel;
 
@@ -897,12 +897,12 @@ sgDrawModel(SGmodel *model)
   drawModel(model->modelData->objs.elems[0]);
 }
 
-OOdrawable*
+SGdrawable*
 sgLoadModel(const char *file)
 {
   SGmodel *model = malloc(sizeof(SGmodel));
   model->modelData = model_load(file);
-  return ooSgNewDrawable((OOdrawable*)model, "unnamed",
+  return ooSgNewDrawable((SGdrawable*)model, "unnamed",
                          (OOdrawfunc)sgDrawModel);
 }
 

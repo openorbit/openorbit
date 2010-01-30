@@ -56,12 +56,12 @@ struct OOscenegraph {
 
   int usedLights;
 
-  OOdrawable *sky;
+  SGdrawable *sky;
   obj_array_t overlays; // TODO: Consolidate OOobjvector and obj_array_t
 };
 
 typedef struct SGellipsis {
-  OOdrawable super;
+  SGdrawable super;
   double semiMajor;
   double semiMinor;
   double ecc;

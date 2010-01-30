@@ -62,7 +62,7 @@ typedef enum OOstagestate {
 struct OOstage {
   float pos[3];
   OOstagestate state;
-  OOdrawable *mesh; // Used for synchronising with the rendering
+  SGdrawable *mesh; // Used for synchronising with the rendering
   int detachOrder; // How and when to detach the stage
   PLmass m; // Mass and inertia tensor of stage, unit is kg
   obj_array_t actuators;
@@ -73,7 +73,6 @@ typedef void (*OOscstepfunc)(OOspacecraft*, double dt);
 typedef void (*OOscdetatchfunc)(OOspacecraft*); // Detatch stages
 
 // Wing for lifting design
-typedef struct OOwing OOwing;
 typedef void (*OOwingstep)(OOwing *, const OOsimenv *env);
 struct OOwing {
   OOstage *stage;
@@ -130,7 +129,7 @@ struct OOspacecraft {
 };
 
 
-void ooScSetStageMesh(OOstage *stage, OOdrawable *mesh);
+void ooScSetStageMesh(OOstage *stage, SGdrawable *mesh);
 void ooScDetatchStage(OOspacecraft *sc);
 void ooScStep(OOspacecraft *sc);
 void ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises);
