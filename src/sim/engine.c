@@ -93,14 +93,14 @@ ooScEngageRoll(OOspacecraft *sc, float dr)
 }
 
 
-OOengine*
+OOrocket*
 ooScNewEngine(OOspacecraft *sc,
               const char *name,
               float f,
               float x, float y, float z,
               float dx, float dy, float dz)
 {
-  OOengine *engine = malloc(sizeof(OOengine));
+  OOrocket *engine = malloc(sizeof(OOrocket));
   engine->super.sc = sc;
   engine->super.state = OO_Act_Disabled;
   engine->super.name = strdup(name);

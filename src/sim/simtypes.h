@@ -23,9 +23,15 @@
 #define OO_SIM_SIMTYPES_H__
 
 typedef struct OOspacecraft OOspacecraft;
-typedef struct OOengine OOengine;
 typedef struct OOstage OOstage;
 typedef struct OOactuatorgroup OOactuatorgroup;
 typedef struct OOactuator OOactuator;
+
+typedef struct OOrocket OOrocket;
+typedef struct OOsrb OOsrb;
+typedef struct OOjetengine OOjetengine;
+typedef struct OOmagtorquer OOmagtorquer;
+typedef struct OOwing OOwing;
+typedef struct OOflap OOflap;
 
 #endif /* ! OO_SIM_SIMTYPES_H__ */

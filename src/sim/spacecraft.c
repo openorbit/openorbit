@@ -384,7 +384,7 @@ ooScLoad(PLworld *world, const char *fileName)
                     }
 
                     if (pos && dir) {
-                      OOengine *engine = ooScNewEngine(sc,
+                      OOrocket *engine = ooScNewEngine(sc,
                                                        engineName.u.str,
                                                        thrust,
                                                        pos[0], pos[1], pos[2],

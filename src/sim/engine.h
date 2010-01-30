@@ -46,27 +46,6 @@ typedef enum OOactuatorstate {
   OO_Act_Spinning
 } OOactuatorstate;
 
-typedef enum OOenginestate {
-  OO_Engine_Disabled,
-  OO_Engine_Idle,
-  OO_Engine_Burning,
-  OO_Engine_Fault_Closed,
-  OO_Engine_Fault_Open
-} OOenginestate;
-
-typedef enum OOtorquerstate {
-  OO_Torquer_Disabled,
-  OO_Torquer_Idle,
-  OO_Torquer_Spinning,
-  OO_Torquer_Fault_Stuck,
-  OO_Torquer_Fault_Spinning
-} OOtorquerstate;
-
-// Note engine structure is for both engines and RCS thrusters
-
-typedef void (*OOenginetoggle)(OOengine *);
-typedef void (*OOenginethrottle)(OOengine *, float throttle);
-typedef void (*OOenginestep)(OOengine *, float dt);
 
 typedef void (*OOactuatortoggle)(OOactuator *);
 typedef void (*OOactuatoraxisupdate)(OOactuator *, float axis);
@@ -81,41 +60,31 @@ struct OOactuator {
   OOactuatortoggle toggleOn;
   OOactuatortoggle toggleOff;
   OOactuatorstep step;
-  OOactuatoraxisupdate axisUpdate;
+  OOactuatoraxisupdate axisUpdate; // Actuator should use this to update the
+                                   // io input, usually an axis
 };
+
+
 // Base engine class, do not instantiate directly
-struct OOengine {
+struct OOrocket {
   OOactuator super;
   float3 p; //!< Local position relative to stage center
   float forceMag; //!< Newton
   float throttle; //!< Percentage of force magnitude to apply
   float3 dir; //!< Unit vector with direction of thruster
-  OOenginethrottle adjustThrottle;
 };
 // Liquid oxygen engine
-struct OOlox_engine {
-  OOengine super;
+struct OOsrb {
+  OOactuator super;
   float forceMag; //!< Newton
   float throttle; //!< Percentage of force magnitude to apply
-  OOenginethrottle adjustThrottle;
-};
-
-// Solid rocket booster engine
-struct OOsrb_engine {
-  OOengine super;
-  float forceMag; //!< Newton
 };
 
 // In atmosphere jet engine
-struct OOjet_engine {
-  OOengine super;
+struct OOjetengine {
+  OOactuator super;
   float forceMag; //!< Newton
   float throttle; //!< Percentage of force magnitude to apply
-};
-
-// Maneuvering thruster
-struct OOthruster {
-  OOengine super;
 };
 
 // Used for grouping actuators that are activated by the same command, for
@@ -129,37 +98,36 @@ struct OOactuatorgroup {
 // The torquer structure is for more general torquers (that are not mass expelling
 // thrusters). These include magnetotorquers and anything else that include rotating
 // bodies.
-typedef struct OOtorquer {
+struct OOmagtorquer {
   OOactuator super;
   OOspacecraft *sc;
-  OOtorquerstate state;
   float torque; //!< Nm
   float3 torqueAxis; //!< Unit vector around which the torque is to be applied
-} OOtorquer;
+};
 
-OOengine* ooScNewEngine(OOspacecraft *sc,
+OOrocket* ooScNewEngine(OOspacecraft *sc,
                         const char *name,
                         float f,
                         float x, float y, float z,
                         float dx, float dy, float dz);
 
-OOengine* ooScNewSrb(OOspacecraft *sc,
+OOsrb* ooScNewSrb(OOspacecraft *sc,
                      float f,
                      float x, float y, float z,
                      float dx, float dy, float dz);
 
-OOengine* ooScNewLoxEngine(OOspacecraft *sc,
+OOrocket* ooScNewLoxEngine(OOspacecraft *sc,
                            float f,
                            float x, float y, float z,
                            float dx, float dy, float dz,
                            float fuelPerNmPerS);
 
-OOengine* ooScNewJetEngine(OOspacecraft *sc,
+OOjetengine* ooScNewJetEngine(OOspacecraft *sc,
                            float f,
                            float x, float y, float z,
                            float dx, float dy, float dz);
 
-OOengine* ooScNewThruster(OOspacecraft *sc,
+OOrocket* ooScNewThruster(OOspacecraft *sc,
                           float f,
                           float x, float y, float z,
                           float dx, float dy, float dz);
