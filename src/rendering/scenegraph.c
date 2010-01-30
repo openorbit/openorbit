@@ -245,6 +245,7 @@ ooSgNewDrawable(OOdrawable *drawable, const char *name, OOdrawfunc df)
   drawable->draw = df;
 
   drawable->scene = NULL;
+  drawable->enabled = true;
 
   return drawable;
 }

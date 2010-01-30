@@ -61,7 +61,7 @@ typedef void (*OOdrawfunc)(OOobject*);
 struct OOdrawable {
   const char *name;
   OOscene *scene;
-
+  bool enabled;
   float3 p;  // Position
   float3 dp; // delta pos per time step
   float3 dr; // delta rot per time step
@@ -71,6 +71,7 @@ struct OOdrawable {
   OOdrawfunc draw; // Draw function for this object
 };
 
+#include "particles.h"
 
 
 OOdrawable* ooSgNewDrawable(OOdrawable *drawable, const char *name, OOdrawfunc df);

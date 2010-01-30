@@ -130,6 +130,7 @@
 		ECBF1751108C569F00D3E412 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6010748ECA00EB6DDF /* libjpeg.a */; };
 		ECBF1754108C56CF00D3E412 /* libimgload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECBF1745108C565600D3E412 /* libimgload.a */; };
 		ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
+		ECDC29FD111498100066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC29FC111498100066AF2D /* particles.c */; };
 		ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
 		ECE17AB31079E043006B6A37 /* ooscript.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE17AB21079E043006B6A37 /* ooscript.c */; };
 /* End PBXBuildFile section */
@@ -435,6 +436,8 @@
 		ECBF173A108C55ED00D3E412 /* tga.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tga.h; sourceTree = "<group>"; };
 		ECBF173B108C563800D3E412 /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
 		ECBF1745108C565600D3E412 /* libimgload.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libimgload.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		ECDC29FB111498100066AF2D /* particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particles.h; sourceTree = "<group>"; };
+		ECDC29FC111498100066AF2D /* particles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = particles.c; sourceTree = "<group>"; };
 		ECE17A871079DE71006B6A37 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		ECE17AB21079E043006B6A37 /* ooscript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ooscript.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -766,6 +769,8 @@
 				EC34BC3A1079EE080011B76E /* text.h */,
 				EC34BC3B1079EE080011B76E /* texture.c */,
 				EC34BC3C1079EE080011B76E /* texture.h */,
+				ECDC29FB111498100066AF2D /* particles.h */,
+				ECDC29FC111498100066AF2D /* particles.c */,
 			);
 			path = rendering;
 			sourceTree = "<group>";
@@ -1489,6 +1494,7 @@
 				EC204D5410CAFA2300F0A450 /* palloc.c in Sources */,
 				EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */,
 				EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */,
+				ECDC29FD111498100066AF2D /* particles.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
