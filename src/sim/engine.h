@@ -65,7 +65,6 @@ struct OOactuator {
 };
 
 
-// Base engine class, do not instantiate directly
 struct OOrocket {
   OOactuator super;
   float3 p; //!< Local position relative to stage center
@@ -73,11 +72,11 @@ struct OOrocket {
   float throttle; //!< Percentage of force magnitude to apply
   float3 dir; //!< Unit vector with direction of thruster
 };
-// Liquid oxygen engine
 struct OOsrb {
   OOactuator super;
   float forceMag; //!< Newton
-  float throttle; //!< Percentage of force magnitude to apply
+  float3 p; //!< Local position relative to stage center
+  float3 dir; //!< Unit vector with direction of srb
 };
 
 // In atmosphere jet engine
@@ -90,8 +89,15 @@ struct OOjetengine {
 // Used for grouping actuators that are activated by the same command, for
 // example roll thrusters would typically fire on two sides of the spacecraft to
 // prevent translational movement.
+typedef enum OOactsequencetype {
+  OO_Act_Parallel,
+  OO_Act_Serial,
+  OO_Act_Ripple // Special case of serial
+} OOactsequencetype;
 struct OOactuatorgroup {
   const char *groupName;
+  OOactsequencetype seqType;
+  float seqParam0; // Sequence parameters
   obj_array_t actuators;
 };
 
@@ -112,22 +118,26 @@ OOrocket* ooScNewEngine(OOspacecraft *sc,
                         float dx, float dy, float dz);
 
 OOsrb* ooScNewSrb(OOspacecraft *sc,
-                     float f,
-                     float x, float y, float z,
-                     float dx, float dy, float dz);
+                  const char *name,
+                  float f,
+                  float x, float y, float z,
+                  float dx, float dy, float dz);
 
 OOrocket* ooScNewLoxEngine(OOspacecraft *sc,
+                           const char *name,
                            float f,
                            float x, float y, float z,
                            float dx, float dy, float dz,
                            float fuelPerNmPerS);
 
 OOjetengine* ooScNewJetEngine(OOspacecraft *sc,
-                           float f,
-                           float x, float y, float z,
-                           float dx, float dy, float dz);
+                              const char *name,
+                              float f,
+                              float x, float y, float z,
+                              float dx, float dy, float dz);
 
 OOrocket* ooScNewThruster(OOspacecraft *sc,
+                          const char *name,
                           float f,
                           float x, float y, float z,
                           float dx, float dy, float dz);

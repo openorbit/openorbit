@@ -124,3 +124,45 @@ ooScRegisterInGroup(OOactuatorgroup *eg, OOactuator *actuator)
 {
   obj_array_push(&eg->actuators, actuator);
 }
+
+OOsrb* ooScNewSrb(OOspacecraft *sc,
+                  const char *name,
+                  float f,
+                  float x, float y, float z,
+                  float dx, float dy, float dz)
+{
+  OOsrb *engine = malloc(sizeof(OOsrb));
+  engine->super.sc = sc;
+  engine->super.state = OO_Act_Disabled;
+  engine->super.name = strdup(name);
+  engine->forceMag = f;
+  engine->p = vf3_set(x, y, z);
+  engine->dir = vf3_set(dx, dy, dz);
+  return engine;
+}
+
+OOrocket* ooScNewLoxEngine(OOspacecraft *sc,
+                           const char *name,
+                           float f,
+                           float x, float y, float z,
+                           float dx, float dy, float dz,
+                           float fuelPerNmPerS)
+{
+
+}
+
+OOrocket* ooScNewThruster(OOspacecraft *sc,
+                          const char *name,
+                          float f,
+                          float x, float y, float z,
+                          float dx, float dy, float dz)
+{
+  OOrocket *engine = malloc(sizeof(OOrocket));
+  engine->super.sc = sc;
+  engine->super.state = OO_Act_Disabled;
+  engine->super.name = strdup(name);
+  engine->forceMag = f;
+  engine->p = vf3_set(x, y, z);
+  engine->dir = vf3_set(dx, dy, dz);
+  return engine;
+}

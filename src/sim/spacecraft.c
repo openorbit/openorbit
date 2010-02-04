@@ -313,6 +313,115 @@ ooScStageAddActuator(OOstage *stage, OOactuator *actuator)
 }
 
 
+static void
+loadActuatorGroups(HRMLobject *actGroups, OOstage *newStage)
+{
+  for (HRMLobject *actGroup = actGroups->children;
+       actGroup != NULL ; actGroup = actGroup->next)
+  {
+    if (!strcmp(actGroup->name, "group")) {
+      HRMLvalue nameAttr = hrmlGetAttrForName(actGroup, "name");
+
+      for (HRMLobject *groupEntry = actGroup->children;
+           groupEntry != NULL ; groupEntry = groupEntry->next)
+      {
+        if (!strcmp(groupEntry->name, "group-entry")) {
+          const char *actuatorName = hrmlGetStr(groupEntry);
+          // TODO: Register actuator in named group
+          if (nameAttr.typ == HRMLStr) {
+            OOactuator * act = NULL;
+            for (int i = 0 ; i < newStage->actuators.length ; ++ i) {
+              OOactuator *tmp = newStage->actuators.elems[i];
+              if (!strcmp(tmp->name, actuatorName)) {
+                act = tmp;
+              }
+            }
+            assert(act && "unknown actuator");
+            int actuatorGroupId = ooGetActuatorGroupId(nameAttr.u.str);
+
+            if (actuatorGroupId != -1) {
+              ooScRegisterInGroup(newStage->actuatorGroups.elems[actuatorGroupId], act);
+            }
+          } else if (nameAttr.typ == HRMLInt) {
+            assert(0 && "custom actuator groups not yet supported");
+          } else {
+            assert(0 && "invalid type for group name");
+          }
+        }
+      }
+    } else {
+      assert(0 && "only 'group' children allowed under 'actuator-groups'");
+    }
+  } // Attitude for loop
+}
+
+static void
+loadThruster(HRMLobject *thruster, OOstage *newStage)
+{
+  HRMLvalue thrusterName = hrmlGetAttrForName(thruster, "name");
+  assert(thrusterName.typ == HRMLStr);
+  const double *pos = NULL;
+  const double *dir = NULL;
+  double thrust = 0.0;
+  for (HRMLobject *thrAttr = thruster->children; thrAttr != NULL ; thrAttr = thrAttr->next) {
+    if (!strcmp(thrAttr->name, "thrust")) {
+      thrust = hrmlGetReal(thrAttr);
+    } else if (!strcmp(thrAttr->name, "pos")) {
+      pos = hrmlGetRealArray(thrAttr);
+      size_t len = hrmlGetRealArrayLen(thrAttr);
+      assert(len == 3 && "pos must be a 3 component real vector");
+    } else if (!strcmp(thrAttr->name, "dir")) {
+      dir = hrmlGetRealArray(thrAttr);
+      size_t len = hrmlGetRealArrayLen(thrAttr);
+      assert(len == 3 && "dir must be a 3 component real vector");
+    }
+  }
+  if (pos && dir) {
+    OOrocket *engine = ooScNewThruster(NULL /*sc*/,
+                                       thrusterName.u.str,
+                                       thrust,
+                                       pos[0], pos[1], pos[2],
+                                       dir[0], dir[1], dir[2]);
+    ooScStageAddActuator(newStage, (OOactuator*)engine);
+  } else {
+    fprintf(stderr, "no pos or direction of engine found\n");
+  }
+}
+
+static void
+loadSolidRocket(HRMLobject *solidRocket, OOstage *newStage)
+{
+    HRMLvalue engineName = hrmlGetAttrForName(solidRocket, "name");
+    assert(engineName.typ == HRMLStr);
+    const double *pos = NULL;
+    const double *dir = NULL;
+    double thrust = 0.0;
+    for (HRMLobject *srAttribute = solidRocket->children; srAttribute != NULL ; srAttribute = srAttribute->next) {
+      if (!strcmp(srAttribute->name, "thrust")) {
+        thrust = hrmlGetReal(srAttribute);
+      } else if (!strcmp(srAttribute->name, "pos")) {
+        pos = hrmlGetRealArray(srAttribute);
+        size_t len = hrmlGetRealArrayLen(srAttribute);
+        assert(len == 3 && "pos must be a 3 component real vector");
+      } else if (!strcmp(srAttribute->name, "dir")) {
+        dir = hrmlGetRealArray(srAttribute);
+        size_t len = hrmlGetRealArrayLen(srAttribute);
+        assert(len == 3 && "dir must be a 3 component real vector");
+      }
+    }
+    if (pos && dir) {
+      OOsrb *engine = ooScNewSrb(NULL /*sc*/,
+                                 engineName.u.str,
+                                 thrust,
+                                 pos[0], pos[1], pos[2],
+                                 dir[0], dir[1], dir[2]);
+      ooScStageAddActuator(newStage, (OOactuator*)engine);
+    } else {
+      fprintf(stderr, "no pos or direction of engine found\n");
+    }
+}
+
+
 OOspacecraft*
 ooScLoad(PLworld *world, const char *fileName)
 {
@@ -361,48 +470,10 @@ ooScLoad(PLworld *world, const char *fileName)
                 assert(len == 3 && "cog vector must be a 3 component real vector");
               } else if (!strcmp(stageEntry->name, "actuators")) {
                 for (HRMLobject *prop = stageEntry->children; prop != NULL ; prop = prop->next) {
-                  if (!strcmp(prop->name, "engine")) {
-                    HRMLvalue engineName = hrmlGetAttrForName(prop, "name");
-                    assert(engineName.typ == HRMLStr);
-                    const double *pos = NULL;
-                    const double *dir = NULL;
-                    double thrust;
-                    for (HRMLobject *engine = prop->children; engine != NULL ; engine = engine->next) {
-                      if (!strcmp(engine->name, "thrust")) {
-                        thrust = hrmlGetReal(engine);
-                      } else if (!strcmp(engine->name, "fire-once")) {
-                        // TODO: Ignored for now
-                      } else if (!strcmp(engine->name, "pos")) {
-                        pos = hrmlGetRealArray(engine);
-                        size_t len = hrmlGetRealArrayLen(engine);
-                        assert(len == 3 && "pos must be a 3 component real vector");
-                      } else if (!strcmp(engine->name, "dir")) {
-                        dir = hrmlGetRealArray(engine);
-                        size_t len = hrmlGetRealArrayLen(engine);
-                        assert(len == 3 && "dir must be a 3 component real vector");
-                      }
-                    }
-
-                    if (pos && dir) {
-                      OOrocket *engine = ooScNewEngine(sc,
-                                                       engineName.u.str,
-                                                       thrust,
-                                                       pos[0], pos[1], pos[2],
-                                                       dir[0], dir[1], dir[2]);
-                      ooScStageAddActuator(newStage, (OOactuator*)engine);
-                    } else {
-                      fprintf(stderr, "no pos or direction of engine found\n");
-                    }
-                  } else if (!strcmp(stageEntry->name, "attitude")) {
-                    for (HRMLobject *att = stageEntry->children; att != NULL ;
-                         att = att->next)
-                    {
-                      if (!strcmp(att->name, "engine")) {
-                        assert(0 && "not implemented");
-                      } else if (!strcmp(att->name, "torquer")) {
-                        assert(0 && "not implemented");
-                      }
-                    } // Attitude for loop
+                  if (!strcmp(prop->name, "solid-rocket")) {
+                    loadSolidRocket(prop, newStage);
+                  } else if (!strcmp(prop->name, "thruster")) {
+                    loadThruster(prop, newStage);
                   } else if (!strcmp(prop->name, "actuator-groups")) {
                     actGroups = prop;
                   }
@@ -435,43 +506,7 @@ ooScLoad(PLworld *world, const char *fileName)
             newStage->pos[1] = stagePos[1];
             newStage->pos[2] = stagePos[2];
 
-            for (HRMLobject *actGroup = actGroups->children;
-                 actGroup != NULL ; actGroup = actGroup->next)
-            {
-              if (!strcmp(actGroup->name, "group")) {
-                HRMLvalue nameAttr = hrmlGetAttrForName(actGroup, "name");
-
-                for (HRMLobject *groupEntry = actGroup->children;
-                     groupEntry != NULL ; groupEntry = groupEntry->next)
-                {
-                  if (!strcmp(groupEntry->name, "group-entry")) {
-                    const char *actuatorName = hrmlGetStr(groupEntry);
-                    // TODO: Register actuator in named group
-                    if (nameAttr.typ == HRMLStr) {
-                      OOactuator * act = NULL;
-                      for (int i = 0 ; i < newStage->actuators.length ; ++ i) {
-                        OOactuator *tmp = newStage->actuators.elems[i];
-                        if (!strcmp(tmp->name, actuatorName)) {
-                          act = tmp;
-                        }
-                      }
-                      assert(act && "unknown actuator");
-                      int actuatorGroupId = ooGetActuatorGroupId(nameAttr.u.str);
-
-                      if (actuatorGroupId != -1) {
-                        ooScRegisterInGroup(newStage->actuatorGroups.elems[actuatorGroupId], act);
-                      }
-                    } else if (nameAttr.typ == HRMLInt) {
-                      assert(0 && "custom actuator groups not yet supported");
-                    } else {
-                      assert(0 && "invalid type for group name");
-                    }
-                  }
-                }
-              } else {
-                assert(0 && "only 'group' children allowed under 'actuator-groups'");
-              }
-            } // Attitude for loop
+            loadActuatorGroups(actGroups, newStage);
 
             ooScAddStage(sc, newStage);
           } // For all stages
