@@ -99,7 +99,8 @@ png_read_file(png_image_t *img, FILE *file)
   }
 
   png_bytepp row_pointers = NULL;
-  if ((row_pointers = (png_bytepp)alloca(height*sizeof(png_bytep))) == NULL) {
+  row_pointers = (png_bytepp)alloca(height*sizeof(png_bytep));
+  if (row_pointers == NULL) {
        png_destroy_read_struct(&png_struct, &png_info, NULL);
        //free(image_data);
        //image_data = NULL;
@@ -107,7 +108,7 @@ png_read_file(png_image_t *img, FILE *file)
   }
 
   for (int i = 0;  i < height;  ++i) {
-    row_pointers[i] = data + i*rowbytes;
+    row_pointers[i] = data + ((height-1) - i)*rowbytes;
   }
   png_read_image(png_struct, row_pointers);
   //free(row_pointers);
