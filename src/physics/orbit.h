@@ -59,6 +59,8 @@ struct PLastrobody {
   PLsystem *sys;
   dBodyID id; // Using ODE at the moment, but this is not really necisary
   PLlwcoord p; // Large world coordinates
+  quaternion_t q; // Current quaternion
+  quaternion_t dq; // Rotational speed quaternion
   double m;
   double GM;
   PL_keplerian_elements *kepler;
@@ -81,12 +83,12 @@ struct PLsystem {
                           //!< takes for the gravitational influence to diminish
                           //!< to XXX, which ever is greater.
 
+  // TODO: These should be in some kind of oct-tree type structure
   obj_array_t orbits; // suborbits
   obj_array_t objs; // objects in this system
 
   PLastrobody *orbitalBody; // The body actually orbiting at this point, note that it is
   double orbitalPeriod;
-  OOellipse *orbitalPath; // Contains the actual ellipsis for the orbit
   SGdrawable *orbitDrawable; // Pointer to the drawable representing the ellipsis
 };
 
