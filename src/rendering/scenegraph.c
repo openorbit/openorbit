@@ -183,7 +183,7 @@ ooSgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
   OOcam *cam = sg->currentCam;
 
   if (cam->kind == OOCam_Free) {
-    float3 relPos = ooLwcRelVec(lw, ((OOfreecam*)cam->camData)->lwc.seg);
+    float3 relPos = ooLwcRelVec(lw, ((OOfreecam*)cam)->lwc.seg);
     obj->p = relPos;
   }
 }
@@ -932,7 +932,7 @@ sgSetLightPosLW(SGlight *light, OOlwcoord *lwc)
   OOcam *cam = sg->currentCam;
 
   if (cam->kind == OOCam_Free) {
-    float3 relPos = ooLwcRelVec(lwc, ((OOfreecam*)cam->camData)->lwc.seg);
+    float3 relPos = ooLwcRelVec(lwc, ((OOfreecam*)cam)->lwc.seg);
 
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);

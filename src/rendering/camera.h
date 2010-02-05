@@ -43,10 +43,10 @@ extern "C" {
   struct OOcam {
     OOcamtype kind;
     OOscene *scene;
-    OOobject *camData;
   };
 
   struct OOfreecam {
+    OOcam super;
     OOlwcoord lwc;
     float3 dp;
     quaternion_t q;
@@ -54,6 +54,7 @@ extern "C" {
   };
 
   struct OOfixedcam {
+    OOcam super;
     dBodyID body; // Camera fixed to this body
 
     float3 r; // With this offset
@@ -61,6 +62,7 @@ extern "C" {
   };
 
   struct OOorbitcam {
+    OOcam super;
     OOlwcoord lwc; // Camera orbiting this point
     float3 r; // Placed on this position relative to lwc (will always look at
               // the body)
