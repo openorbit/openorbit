@@ -25,31 +25,17 @@
 #include <stdbool.h>
 
 #include "scenegraph.h"
-
-typedef struct SGparticle {
-  bool active;
-  float	lifeTime;
-	float	fadeFactor;
-  uint8_t r, g, b;
-  float x, y, z;
-  float xd, yd, zd;
-  float xg, yg, zg;
-} SGparticle;
+#include "SDL_opengl.h"
+#include "physics/particles.h"
 
 typedef struct SGparticles {
   SGdrawable super;
-  float slowdown;
-  size_t particleCount;
-  
-  //float *pos;
-  //float *colour;
-  //float *dir;
-  //float *lifeTime;
-  //float *fadeFactors;
-  
-  SGparticle *particles;
+  GLuint texture;
+  PLparticles *ps;
 } SGparticles;
 
-SGdrawable* sgNewParticleSystem(const char *name, size_t particleCount);
+SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
+                                PLparticles *ps);
+
 
 #endif /* !SG_PARTICLES_H */

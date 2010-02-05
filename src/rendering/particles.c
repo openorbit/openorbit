@@ -18,55 +18,28 @@
  */
 
 #include "particles.h"
+#include "SDL_opengl.h"
+#include "texture.h"
+#include <vmath/vmath.h>
 
 void
 sgDrawParticles(SGparticles *sp)
 {
-  
+  // Draw particle system, each particle is a textured quad.
+  glBindTexture(GL_TEXTURE_2D, sp->texture);
+  glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
 }
 
-SGdrawable*
-sgNewParticleSystem(const char *name, size_t particleCount)
+SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
+                                PLparticles *ps)
 {
-  SGparticles *ps = malloc(sizeof(SGparticles));
-  ps->particles = calloc(particleCount, sizeof(SGparticle));
+  SGparticles *drawable = malloc(sizeof(SGparticles));
+  drawable->ps = ps;
   
-  //float *data = calloc(particleCount*(3+3+3+1+1), sizeof(float));
-  //ps->pos = data;
-  //ps->colour = ps->pos + particleCount * 3;
-  //ps->dir = ps->colour + particleCount * 3;
-  //ps->lifeTime = ps->dir + particleCount * 3;
-  //ps->fadeFactors = ps->lifeTime + particleCount * 1;
-  
-  ps->slowdown = 2.0f;
-  for (size_t i = 0 ; i < particleCount ; ++ i) {
-    ps->particles[i].active = true;					// Make All The Particles Active
-		ps->particles[i].lifeTime = 1.0f;
-    ps->particles[i].fadeFactor = (float)(rand()%100)/1000.0f+0.003f;
-    
-    ps->particles[i].x = 0.0f;
-    ps->particles[i].y = 0.0f;
-    ps->particles[i].z = 0.0f;    
-    
-    ps->particles[i].xd = (float)((rand()%50)-26.0f)*10.0f;
-    ps->particles[i].yd = (float)((rand()%50)-25.0f)*10.0f;
-    ps->particles[i].zd = (float)((rand()%50)-25.0f)*10.0f;
-    
-    ps->particles[i].xg = 0.0f;
-    ps->particles[i].yg = 0.0f;
-    ps->particles[i].zg = 0.0f;
+  if (ooTexGet(tex) == NULL) {
+    ooTexLoad(tex, tex);    
   }
+  drawable->texture = ooTexNum(tex);
 
-  return ooSgNewDrawable((SGdrawable*)ps, name, (OOdrawfunc)sgDrawParticles);
-}
-
-void
-sgStepParticleSystem(SGparticles *ps, float dt)
-{
-  for (size_t i = 0 ; i < ps->particleCount ; ++i) {
-    ps->particles[i].x += ps->particles[i].xd/(ps->slowdown*1000);
-    ps->particles[i].y += ps->particles[i].yd/(ps->slowdown*1000);
-    ps->particles[i].z += ps->particles[i].zd/(ps->slowdown*1000);
-    ps->particles[i].lifeTime -= ps->particles[i].fadeFactor * dt;
-  }
+  return ooSgNewDrawable((SGdrawable*)drawable, name, (OOdrawfunc)sgDrawParticles);
 }
