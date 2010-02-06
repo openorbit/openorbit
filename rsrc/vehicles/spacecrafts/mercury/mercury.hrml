@@ -26,7 +26,7 @@ spacecraft (name: Mercury-Capsule) {
   stages {
     stage (name: Command-Module) {
       model(): "mercury.ac";
-      detach-order: 0; // No other stages at the moment
+      detach-order: 1;
       mass: 1354.0 kg;
       inertial-tensor: [1.0, 0.0, 0.0,
                         0.0, 1.0, 0.0,
@@ -36,7 +36,7 @@ spacecraft (name: Mercury-Capsule) {
                              // reasonable when seeing the shape of the mercury
                              // capsule, someone with more knowledge on the
                              // topic should check it out
-      pos: [0.0, 0.0, 0.0]; // Position relative to whole spacecraft
+      pos: [0.0, 20.0, 0.0]; // Position relative to whole spacecraft
       actuators {
         // Nice example, if multiple engines are used, they may either be fired
         // in sequence or in parallel, this distinction is handled by the
@@ -47,7 +47,7 @@ spacecraft (name: Mercury-Capsule) {
         solid-rocket (name: retro0) {
           // Should burn 10 s per rocket, solid fuel
           thrust: 4.5 kN;
-          burn-time: 10 s;
+          burn-time: 10.0 s;
           fire-once: true; // Solid rocket engine
           pos: [1.0, 1.0, 1.0]; // Relative to stage
           dir: [0.0, -1.0, 0.0];
@@ -55,7 +55,7 @@ spacecraft (name: Mercury-Capsule) {
         solid-rocket (name: retro1) {
           // Should burn 10 s per rocket, solid fuel
           thrust: 4.5 kN;
-          burn-time: 10 s;
+          burn-time: 10.0 s;
           fire-once: true; // Solid rocket engine
           pos: [1.0, 1.0, 1.0]; // Relative to stage
           dir: [0.0, -1.0, 0.0];
@@ -63,7 +63,7 @@ spacecraft (name: Mercury-Capsule) {
         solid-rocket (name: retro2) {
           // Should burn 10 s per rocket, solid fuel
           thrust: 4.5 kN;
-          burn-time: 10 s;
+          burn-time: 10.0 s;
           fire-once: true; // Solid rocket engine
           pos: [1.0, 1.0, 1.0]; // Relative to stage
           dir: [0.0, -1.0, 0.0];
@@ -73,7 +73,7 @@ spacecraft (name: Mercury-Capsule) {
         solid-rocket (name: posigrade) {
           thrust: 1.8 kN;
           fire-once: true; // Solid rocket engine
-          burn-time: 1 s;
+          burn-time: 1.0 s;
           pos: [1.0, 1.0, 1.0];
           dir: [0.0, -1.0, 0.0];
 
@@ -83,37 +83,37 @@ spacecraft (name: Mercury-Capsule) {
         }
 
         thruster (name: manualroll0) {
-          thrust: 108 N;
+          thrust: 108.0 N;
           pos: [0.82, 0.55, 0.0];
           dir: [0.0, 0.0, -1.0];
         }
 
         thruster (name: manualroll1) {
-          thrust: 108 N;
+          thrust: 108.0 N;
           pos: [-0.82, 0.55, 0.0];
           dir: [0.0, 0.0, -1.0];
         }
 
         thruster (name: manualpitch0) {
-          thrust: 108 N;
+          thrust: 108.0 N;
           pos: [0.0, 2.2, 0.41];
           dir: [0.0, 0.0, 1.0];
         }
 
         thruster (name: manualpitch1) {
-          thrust: 108 N;
+          thrust: 108.0 N;
           pos: [0.0, 2.2, -0.41];
           dir: [0.0, 0.0, -1.0];
         }
 
         thruster (name: manualyaw0) {
-          thrust: 108 N;
+          thrust: 108.0 N;
           pos: [0.41, 2.2, 0.0];
           dir: [1.0, 0.0, 0.0];
         }
 
         thruster (name: manualyaw1) {
-          thrust: 108 N;
+          thrust: 108.0 N;
           pos: [-0.41, 2.2, 0.0];
           dir: [-1.0, 0.0, 0.0];
         }
@@ -138,21 +138,35 @@ spacecraft (name: Mercury-Capsule) {
           }
         }
       }
-//      attitude {
-//        engine (name: rcs-high) {
-//          thrust: 108.0 N;
-//          fire-once: false; // Liquid fueled thruster
-//          pos: [1.0, 1.0, 1.0];
-//          dir: [1.0, 1.0, 1.0];
-//        }
-//        engine (name: rcs-low) {
-//          thrust: 48.0 N;
-//          fire-once: false; // Liquid fueled thruster
-//          pos: [1.0, 1.0, 1.0];
-//          dir: [1.0, 1.0, 1.0];
-//        }
-//      }
     }
+    stage (name: Redstone) {
+      model(): "redstone.ac";
+      detach-order: 0;
+      mass: 30000.0 kg;
+      inertial-tensor: [1.0, 0.0, 0.0,
+                        0.0, 1.0, 0.0,
+                        0.0, 0.0, 1.0];
+      cog: [0.0, 10.0, 0.0]; // Center of gravity (stage local)
+      pos: [0.0, 0.0, 0.0]; // Position relative to whole spacecraft
+      actuators {
+        rocket (name: rocketdyne_a7) {
+          fuel: "LOX/ethyl alcohol";
+          thrust: 350.0 kN;
+          specific-impulse: 215.0 s;
+          burn-time: 143.5 s;
+          fire-once: true; // Solid rocket engine
+          pos: [0.0, 0.0, 0.0]; // Relative to stage
+          dir: [0.0, -1.0, 0.0];
+        }
+
+        actuator-groups {
+          group (name: orbital) {
+            group-entry (high: 1.0, low: -1.0): "rocketdyne_a7";
+          }
+        }
+      }
+    }
+
   }
  //plugin(): "plugins/mercury.so";
 }
