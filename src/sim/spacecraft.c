@@ -422,6 +422,41 @@ loadSolidRocket(HRMLobject *solidRocket, OOstage *newStage)
 }
 
 
+static void
+loadRocket(HRMLobject *rocket, OOstage *newStage)
+{
+  HRMLvalue engineName = hrmlGetAttrForName(rocket, "name");
+  assert(engineName.typ == HRMLStr);
+  const double *pos = NULL;
+  const double *dir = NULL;
+  double thrust = 0.0;
+  for (HRMLobject *attr = rocket->children; attr != NULL ; attr = attr->next) {
+    if (!strcmp(attr->name, "thrust")) {
+      thrust = hrmlGetReal(attr);
+    } else if (!strcmp(attr->name, "pos")) {
+      pos = hrmlGetRealArray(attr);
+      size_t len = hrmlGetRealArrayLen(attr);
+      assert(len == 3 && "pos must be a 3 component real vector");
+    } else if (!strcmp(attr->name, "dir")) {
+      dir = hrmlGetRealArray(attr);
+      size_t len = hrmlGetRealArrayLen(attr);
+      assert(len == 3 && "dir must be a 3 component real vector");
+    }
+  }
+  if (pos && dir) {
+    OOrocket *engine = ooScNewLoxEngine(NULL /*sc*/,
+                                        engineName.u.str,
+                                        thrust,
+                                        pos[0], pos[1], pos[2],
+                                        dir[0], dir[1], dir[2],
+                                        0.0f);
+    ooScStageAddActuator(newStage, (OOactuator*)engine);
+  } else {
+    fprintf(stderr, "no pos or direction of engine found\n");
+  }
+}
+
+
 OOspacecraft*
 ooScLoad(PLworld *world, const char *fileName)
 {
@@ -474,6 +509,8 @@ ooScLoad(PLworld *world, const char *fileName)
                     loadSolidRocket(prop, newStage);
                   } else if (!strcmp(prop->name, "thruster")) {
                     loadThruster(prop, newStage);
+                  } else if (!strcmp(prop->name, "rocket")) {
+                    loadRocket(prop, newStage);
                   } else if (!strcmp(prop->name, "actuator-groups")) {
                     actGroups = prop;
                   }

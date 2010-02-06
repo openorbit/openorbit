@@ -148,7 +148,14 @@ OOrocket* ooScNewLoxEngine(OOspacecraft *sc,
                            float dx, float dy, float dz,
                            float fuelPerNmPerS)
 {
-
+  OOrocket *engine = malloc(sizeof(OOrocket));
+  engine->super.sc = sc;
+  engine->super.state = OO_Act_Disabled;
+  engine->super.name = strdup(name);
+  engine->forceMag = f;
+  engine->p = vf3_set(x, y, z);
+  engine->dir = vf3_set(dx, dy, dz);
+  return engine;
 }
 
 OOrocket* ooScNewThruster(OOspacecraft *sc,
