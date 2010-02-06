@@ -1103,19 +1103,19 @@
 			isa = PBXGroup;
 			children = (
 				ECE17B1A1079E6E9006B6A37 /* release */,
-				ECE17B191079E6DE006B6A37 /* debug */,
+				ECE17B191079E6DE006B6A37 /* DerivedSources */,
 			);
 			name = derived;
 			sourceTree = "<group>";
 		};
-		ECE17B191079E6DE006B6A37 /* debug */ = {
+		ECE17B191079E6DE006B6A37 /* DerivedSources */ = {
 			isa = PBXGroup;
 			children = (
 				ECE17AB21079E043006B6A37 /* ooscript.c */,
 			);
-			name = debug;
-			path = "build/orbit.build/Debug/Open Orbit.build/DerivedSources";
-			sourceTree = "<group>";
+			name = DerivedSources;
+			path = "../orbit.build/Debug/Open Orbit.build/DerivedSources";
+			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		ECE17B1A1079E6E9006B6A37 /* release */ = {
 			isa = PBXGroup;
