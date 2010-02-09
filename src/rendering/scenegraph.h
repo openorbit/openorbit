@@ -23,9 +23,11 @@
 #include <ode/ode.h>
 
 #include <vmath/vmath.h>
+#include <gencds/array.h>
+
 #include "geo/geo.h"
 
-#include <openorbit/openorbit.h>
+//#include <openorbit/openorbit.h>
 //#include "physics/orbit.h"
 #include "sim/simtime.h"
 #include "common/lwcoord.h"
@@ -56,7 +58,7 @@ struct SGmaterial {
 
 #include "camera.h"
 
-typedef void (*OOdrawfunc)(OOobject*);
+typedef void (*SGdrawfunc)(SGdrawable*);
 
 struct SGdrawable {
   const char *name;
@@ -68,13 +70,13 @@ struct SGdrawable {
   quaternion_t q; // Quaternion
                   //float s; // Scale
 
-  OOdrawfunc draw; // Draw function for this object
+  SGdrawfunc draw; // Draw function for this object
 };
 
 #include "particles.h"
 
 
-SGdrawable* ooSgNewDrawable(SGdrawable *drawable, const char *name, OOdrawfunc df);
+SGdrawable* ooSgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df);
 
 void ooSgSetObjectQuat(SGdrawable *obj, float x, float y, float z, float w);
 void sgSetObjectQuatv(SGdrawable *obj, quaternion_t q);

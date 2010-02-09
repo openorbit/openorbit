@@ -41,5 +41,5 @@ SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
   }
   drawable->texture = ooTexNum(tex);
 
-  return ooSgNewDrawable((SGdrawable*)drawable, name, (OOdrawfunc)sgDrawParticles);
+  return ooSgNewDrawable((SGdrawable*)drawable, name, (SGdrawfunc)sgDrawParticles);
 }

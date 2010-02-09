@@ -25,8 +25,8 @@
 // intersects at some point. This can be used for implementing a sweeping collission
 // detection system in a large world
 void
-plLwcIntersectionPoint(const PLlwcoord * restrict a, PLfloat3 da, float wa,
-                       const PLlwcoord * restrict b, PLfloat3 db, float wb)
+plLwcIntersectionPoint(const OOlwcoord * restrict a, PLfloat3 da, float wa,
+                       const OOlwcoord * restrict b, PLfloat3 db, float wb)
 {
   // Transform b to a's segment and compute the intersection point
   //  PLfloat3 bPosInASeg = ooLwcRelVec(b, a->seg);

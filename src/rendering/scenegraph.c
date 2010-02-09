@@ -231,7 +231,7 @@ ooSgSetObjectAngularSpeed(SGdrawable *obj, float drx, float dry, float drz)
 }
 
 SGdrawable*
-ooSgNewDrawable(SGdrawable *drawable, const char *name, OOdrawfunc df)
+ooSgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df)
 {
   assert(df != NULL);
   assert(drawable != NULL);
@@ -604,7 +604,7 @@ ooSgPaint(OOscenegraph *sg)
 }
 
 void
-ooSgDrawFuncGnd(OOobject*obj)
+ooSgDrawFuncGnd(SGdrawable *obj)
 {
 
 }
@@ -663,7 +663,7 @@ ooSgNewSphere(const char *name, float radius, const char *tex)
   gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
   gluQuadricTexture(sp->quadratic, GL_TRUE);
   gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
-  return ooSgNewDrawable((SGdrawable*)sp, name, (OOdrawfunc) ooSgDrawSphere);
+  return ooSgNewDrawable((SGdrawable*)sp, name, (SGdrawfunc) ooSgDrawSphere);
 }
 
 
@@ -751,7 +751,7 @@ sgNewEllipsis(const char *name,
     el->verts[3*i+2] = vf3_z(v);
   }
 
-  return ooSgNewDrawable((SGdrawable*)el, name, (OOdrawfunc)sgDrawEllipsis);
+  return ooSgNewDrawable((SGdrawable*)el, name, (SGdrawfunc)sgDrawEllipsis);
 }
 
 
@@ -804,7 +804,7 @@ sgNewCylinder(const char *name,
   cyl->col[1] = 255;
   cyl->col[2] = 255;
 
-  return ooSgNewDrawable((SGdrawable*)cyl, name, (OOdrawfunc)sgDrawCylinder);
+  return ooSgNewDrawable((SGdrawable*)cyl, name, (SGdrawfunc)sgDrawCylinder);
 }
 
 
@@ -903,7 +903,7 @@ sgLoadModel(const char *file)
   SGmodel *model = malloc(sizeof(SGmodel));
   model->modelData = model_load(file);
   return ooSgNewDrawable((SGdrawable*)model, "unnamed",
-                         (OOdrawfunc)sgDrawModel);
+                         (SGdrawfunc)sgDrawModel);
 }
 
 void

@@ -51,14 +51,7 @@
 #define __has_feature(x) 0  // Compatibility with non-clang compilers.
 #endif
 
-typedef struct OOlwcoord PLlwcoord;
-typedef struct OOlwcoord64 PLlwcoord64;
-
 typedef struct PLatmosphere PLatmosphere;
-
-typedef struct PLworld PLworld;
-typedef struct PLsystem PLsystem;
-typedef struct PLastrobody PLastrobody;
 
 #if __has_feature(attribute_ext_vector_type)
 typedef float __attribute__((ext_vector_type (4))) PLfloat3;
@@ -94,10 +87,9 @@ typedef int16_t __attribute__((vector_size (8))) PLshort3;
 #define PL_KB 1.3806504e-23
 
 
-#include "mass.h"
 #include "object.h"
 #include "orbit.h"
-
+#include "mass.h"
 
 // We cannot cope with the precision issues without subdividing the universe
 // If we take 1.0 Tm side boxes, we can maintain decent double precision units and still

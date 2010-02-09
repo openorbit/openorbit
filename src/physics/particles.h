@@ -22,8 +22,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+typedef struct PLparticle PLparticle;
+typedef struct PLparticles PLparticles;
+
 #include <vmath/vmath.h>
-typedef struct PLparticle {
+#include "physics/object.h"
+
+struct PLparticle {
   bool active;
   float	age; // Age of particles
   float	lifeTime; // lifetime
@@ -32,9 +37,10 @@ typedef struct PLparticle {
   float3 p; // Position
   float3 v; // Velocity
   float3 s; // Size
-} PLparticle;
+};
 
-typedef struct PLparticles {
+struct PLparticles {
+  PLobject *obj; // Object the particle generator is attached to
   //GLuint texture;
   float directionLimit;
   float3 rgb; // Default colour
@@ -54,7 +60,7 @@ typedef struct PLparticles {
   //float *fadeFactors;
   
   PLparticle *particles;
-} PLparticles;
+};
 
 
 PLparticles* plNewParticleSystem(const char *name, size_t particleCount);

@@ -23,12 +23,17 @@
 #ifndef _ORBIT_H_
 #define _ORBIT_H_
 
+typedef struct PLworld PLworld;
+typedef struct PLsystem PLsystem;
+typedef struct PLastrobody PLastrobody;
+
 #include <ode/ode.h>
-#include <openorbit/openorbit.h>
+
 #include <vmath/vmath.h>
-#include "physics.h"
+
 #include "geo/geo.h"
 #include "rendering/scenegraph.h"
+#include "common/lwcoord.h"
 
 
 static inline v4f_t
@@ -58,7 +63,7 @@ struct PLastrobody {
   PLworld *world;
   PLsystem *sys;
   dBodyID id; // Using ODE at the moment, but this is not really necisary
-  PLlwcoord p; // Large world coordinates
+  OOlwcoord p; // Large world coordinates
   quaternion_t q; // Current quaternion
   quaternion_t dq; // Rotational speed quaternion
   double m;

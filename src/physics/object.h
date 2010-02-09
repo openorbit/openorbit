@@ -20,27 +20,38 @@
 #ifndef PHYSICS_OBJECT_H
 #define PHYSICS_OBJECT_H
 
-#include "physics.h"
+typedef struct PLobject PLobject;
 
-typedef struct PLobject {
+#include <vmath/vmath.h>
+
+#include "physics/orbit.h"
+#include "physics/mass.h"
+#include "common/lwcoord.h"
+
+struct PLobject {
   PLsystem *sys;
+  struct PLobject *parent;
   char *name;
   dBodyID id; // Using ODE at the moment, but this is not really necisary
-  PLlwcoord p; // Large world coordinates
+  OOlwcoord p; // Large world coordinates
   PLmass m;
   SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
-  //!< object.
-  //  PLorbsys *sys;
-} PLobject;
+                        //!< object.
+};
 
 PLobject* plObject3f(PLsystem *sys, float x, float y, float z);
+PLobject* plSubObject3f(PLobject *obj, float x, float y, float z);
+void plDetachObject(PLobject *obj);
+
+void plSetDrawableForObject(PLobject *obj, SGdrawable *drawable);
+
 void plForce3f(PLobject *obj, float x, float y, float z);
 void plForce3d(PLobject *obj, double x, double y, double z);
-void plForce3dv(PLobject *obj, PLdouble3 f);
+void plForce3dv(PLobject *obj, double3 f);
 
 void plForceRelative3f(PLobject *obj, float x, float y, float z);
 void plForceRelative3d(PLobject *obj, double x, double y, double z);
-void plForceRelative3dv(PLobject *obj, PLdouble3 f);
+void plForceRelative3dv(PLobject *obj, double3 f);
 
 void plStepObjectf(PLobject *obj, float dt);
 void plStepObjectd(PLobject *obj, double dt);

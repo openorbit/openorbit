@@ -684,6 +684,7 @@
 			children = (
 				EC34BC0F1079EE080011B76E /* areodynamics.c */,
 				EC34BC111079EE080011B76E /* object.c */,
+				EC91C41E1101C28B00011177 /* object.h */,
 				EC34BC121079EE080011B76E /* orbit.c */,
 				EC34BC131079EE080011B76E /* orbit.h */,
 				EC34BC141079EE080011B76E /* physics.h */,
@@ -691,7 +692,6 @@
 				EC34BC161079EE080011B76E /* sectors.c */,
 				EC51E6E110BBE766009FA70D /* mass.h */,
 				EC51E6E210BBE766009FA70D /* mass.c */,
-				EC91C41E1101C28B00011177 /* object.h */,
 				ECDC2BA2111ACD900066AF2D /* particles.h */,
 				ECDC2BA3111ACD900066AF2D /* particles.c */,
 			);

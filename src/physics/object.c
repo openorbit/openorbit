@@ -62,7 +62,6 @@ plObject3f(PLsystem *sys, float x, float y, float z)
 
   PLobject *obj = malloc(sizeof(PLobject));
   obj->id = dBodyCreate(sys->world->world);
-
   dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
   dBodySetData(obj->id, NULL);
   //dBodySetMovedCallback(obj->id, plUpdateObject);
@@ -74,11 +73,64 @@ plObject3f(PLsystem *sys, float x, float y, float z)
   //dBodySetQuaternion(obj->id, quat);
   dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
 
-
+  plMassSet(&obj->m, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f);
+  
   ooLwcSet(&obj->p, x, y, z);
   obj->sys = sys;
+  obj->parent = NULL;
   obj_array_push(&sys->objs, obj);
   return obj;
+}
+
+PLobject*
+plSubObject3f(PLobject *parent, float x, float y, float z)
+{
+  assert(parent != NULL);
+  
+  PLobject *obj = malloc(sizeof(PLobject));
+  obj->id = dBodyCreate(parent->sys->world->world);
+  
+  dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
+  dBodySetData(obj->id, NULL);
+  //dBodySetMovedCallback(obj->id, plUpdateObject);
+  
+  //dQuaternion quat = {vf4_w(q), vf4_x(q), vf4_y(q), vf4_z(q)};
+  // TODO: Ensure quaternion is set for orbit
+  //       asc * inc * obl ?
+  
+  //dBodySetQuaternion(obj->id, quat);
+  dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
+  
+  plMassSet(&obj->m, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f);
+  ooLwcSet(&obj->p, x, y, z);
+  obj->sys = parent->sys;
+  obj->parent = parent;
+
+  return obj;
+}
+
+void
+plDetatchObject(PLobject *obj)
+{
+  assert(obj != NULL);
+  assert(obj->parent != NULL);
+
+  obj_array_push(&obj->parent->sys->objs, obj);
+  obj->parent = NULL;
+}
+
+void
+plSetDrawableForObject(PLobject *obj, SGdrawable *drawable)
+{
+  assert(obj != NULL);
+
+  obj->drawable = drawable;
 }
 
 void
