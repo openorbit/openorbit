@@ -17,28 +17,16 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SG_PARTICLES_H
-#define SG_PARTICLES_H
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
+#ifndef PL_REFTYPES_H
+#define PL_REFTYPES_H
 
-#include "SDL_opengl.h"
-#include "physics/particles.h"
+typedef struct PLworld PLworld;
+typedef struct PLsystem PLsystem;
+typedef struct PLastrobody PLastrobody;
+typedef struct PLobject PLobject;
+typedef struct PLcompound_object PLcompound_object;
+typedef struct PLparticle PLparticle;
+typedef struct PLparticles PLparticles;
 
-#include "physics/reftypes.h"
-#include "rendering/reftypes.h"
-#include "rendering/drawable.h"
-
-struct SGparticles {
-  SGdrawable super;
-  GLuint texture;
-  PLparticles *ps;
-};
-
-SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
-                                PLparticles *ps);
-
-
-#endif /* !SG_PARTICLES_H */
+#endif /* !PL_REFTYPES_H */

@@ -19,7 +19,6 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <ode/ode.h>
 #include "log.h"
 #include "sim.h"
 #include "sim/spacecraft.h"
@@ -86,26 +85,26 @@ ooScNew(void)
 }
 
 
-void
-dMassSetConeTotal(dMass *m, dReal total_mass,
-                  dReal radius, dReal height)
-{
-  float i11 = 3.0/5.0 * total_mass * height * height +
-    3.0/20.0 * total_mass * radius * radius;
-  float i22 = i11;
-  float i33 = 3.0/10.0 * total_mass * radius * radius;
-  float cogx, cogy, cogz;
+//void
+//dMassSetConeTotal(dMass *m, dReal total_mass,
+//                  dReal radius, dReal height)
+//{
+//  float i11 = 3.0/5.0 * total_mass * height * height +
+//    3.0/20.0 * total_mass * radius * radius;
+//  float i22 = i11;
+//  float i33 = 3.0/10.0 * total_mass * radius * radius;
+//  float cogx, cogy, cogz;
 
-  cogx = 0.0;
-  cogy = 0.25 * height; // 1/4 from base, see wikipedia entry on Cone_(geometry)
-  cogz = 0.0;
+//  cogx = 0.0;
+//  cogy = 0.25 * height; // 1/4 from base, see wikipedia entry on Cone_(geometry)
+//  cogz = 0.0;
 
 
-  dMassSetParameters(m, total_mass,
-                     cogx, cogy, cogz, // TODO: fix, COG
-                     i11, i22, i33,
-                     0.0, 0.0, 0.0);
-}
+//  dMassSetParameters(m, total_mass,
+//                     cogx, cogy, cogz, // TODO: fix, COG
+//                     i11, i22, i33,
+//                    0.0, 0.0, 0.0);
+//}
 
 void
 ooScAddStage(OOspacecraft *sc, OOstage *stage)
@@ -534,10 +533,12 @@ ooScLoad(PLworld *world, const char *fileName)
             } // For all properties in stage
 
             assert(stageCog && inertia && stagePos);
-            plMassSet(&newStage->m, mass,
-                      stageCog[0], stageCog[1], stageCog[2],
+            plMassSet(&newStage->m, 1.0f, // Default to 1.0 kg
+                      0.0f, 0.0f, 0.0f,
                       inertia[0], inertia[4], inertia[8],
                       inertia[1], inertia[2], inertia[5]);
+            plMassMod(&newStage->m, mass);
+            plMassTranslate(&newStage->m, -stageCog[0], -stageCog[1], -stageCog[2]);
 
             newStage->pos[0] = stagePos[0];
             newStage->pos[1] = stagePos[1];

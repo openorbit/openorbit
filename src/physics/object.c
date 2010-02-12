@@ -17,11 +17,12 @@
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <ode/ode.h>
 #include "physics.h"
 #include "object.h"
 #include "common/lwcoord.h"
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 /*
@@ -33,37 +34,44 @@
   converted to a single segment for rendering, it may be possible to use that data for
   colission detection.
 */
-/*
-void dBodyAddForce            (dBodyID, dReal fx, dReal fy, dReal fz);
-void dBodyAddTorque           (dBodyID, dReal fx, dReal fy, dReal fz);
-void dBodyAddRelForce         (dBodyID, dReal fx, dReal fy, dReal fz);
-void dBodyAddRelTorque        (dBodyID, dReal fx, dReal fy, dReal fz);
-void dBodyAddForceAtPos       (dBodyID, dReal fx, dReal fy, dReal fz, dReal px, dReal py, dReal pz);
-void dBodyAddForceAtRelPos    (dBodyID, dReal fx, dReal fy, dReal fz, dReal px, dReal py, dReal pz);
-void dBodyAddRelForceAtPos    (dBodyID, dReal fx, dReal fy, dReal fz, dReal px, dReal py, dReal pz);
-void dBodyAddRelForceAtRelPos (dBodyID, dReal fx, dReal fy, dReal fz, dReal px, dReal py, dReal pz);
-typedef struct dMass {
-    dReal mass; // total mass of the rigid body
-    dVector3 c; // center of gravity position in body frame (x,y,z)
-    dMatrix3 I; // 3x3 inertia tensor in body frame, about POR
-} dMass;
-void dMassSetParameters (dMass *, dReal themass,
-                         dReal cgx, dReal cgy, dReal cgz,
-                         dReal I11, dReal I22, dReal I33,
-                         dReal I12, dReal I13, dReal I23);
-void dMassAdd (dMass *a, const dMass *b);
-void dMassTranslate (dMass *, dReal x, dReal y, dReal z);
+void
+plComputeDerived(PLobject *obj)
+{
+  q_mf3_convert(obj->R, obj->q); // Convert our quaternion to rotation matrix
+  mf3_basis(obj->I_inv_world, obj->m.I_inv, obj->R);
+}
+void
+plInitObject(PLobject *obj)
+{
+  plMassSet(&obj->m, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 1.0f,
+            0.0f, 0.0f, 0.0f);
+  
+  ooLwcSet(&obj->p, 0.0, 0.0, 0.0);
+  obj->sys = NULL;
+  obj->parent = NULL;  
+  
+  obj->f_ack = vf3_set(0.0, 0.0, 0.0);
+  obj->t_ack = vf3_set(0.0, 0.0, 0.0);
 
-*/
+  obj->v = vf3_set(0.0, 0.0, 0.0);
+  plSetAngularVel3f(obj, 0.0f, 0.0f, 0.0f);
+
+  obj->q = q_rot(1.0, 0.0, 0.0, 0.0); // Rotation quaternion  
+  
+  plComputeDerived(obj);
+}
+
 PLobject*
 plObject3f(PLsystem *sys, float x, float y, float z)
 {
   assert(sys != NULL);
 
   PLobject *obj = malloc(sizeof(PLobject));
-  obj->id = dBodyCreate(sys->world->world);
-  dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
-  dBodySetData(obj->id, NULL);
+  //  obj->id = dBodyCreate(sys->world->world);
+  //dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
+  //dBodySetData(obj->id, NULL);
   //dBodySetMovedCallback(obj->id, plUpdateObject);
 
   //dQuaternion quat = {vf4_w(q), vf4_x(q), vf4_y(q), vf4_z(q)};
@@ -71,8 +79,10 @@ plObject3f(PLsystem *sys, float x, float y, float z)
   //       asc * inc * obl ?
 
   //dBodySetQuaternion(obj->id, quat);
-  dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
+  //dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
+  plInitObject(obj);
 
+  plSetAngularVel3f(obj, 0.0f, 0.0f, 0.05f);
   plMassSet(&obj->m, 0.0f,
             0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f,
@@ -82,19 +92,21 @@ plObject3f(PLsystem *sys, float x, float y, float z)
   obj->sys = sys;
   obj->parent = NULL;
   obj_array_push(&sys->objs, obj);
+
+  plComputeDerived(obj);
+
   return obj;
 }
 
-PLobject*
-plSubObject3f(PLobject *parent, float x, float y, float z)
+PLcompound_object*
+plCompoundObject3f(PLsystem *sys, float x, float y, float z)
 {
-  assert(parent != NULL);
+  assert(sys != NULL);
   
-  PLobject *obj = malloc(sizeof(PLobject));
-  obj->id = dBodyCreate(parent->sys->world->world);
-  
-  dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
-  dBodySetData(obj->id, NULL);
+  PLcompound_object *obj = malloc(sizeof(PLcompound_object));
+  //obj->super.id = dBodyCreate(sys->world->world);
+  //dBodySetGravityMode(obj->super.id, 0); // Ignore standard ode gravity effects
+  //dBodySetData(obj->super.id, NULL);
   //dBodySetMovedCallback(obj->id, plUpdateObject);
   
   //dQuaternion quat = {vf4_w(q), vf4_x(q), vf4_y(q), vf4_z(q)};
@@ -102,16 +114,40 @@ plSubObject3f(PLobject *parent, float x, float y, float z)
   //       asc * inc * obl ?
   
   //dBodySetQuaternion(obj->id, quat);
-  dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
-  
-  plMassSet(&obj->m, 0.0f,
+  //dBodySetAngularVel(obj->super.id, 0.0, 0.0, 0.05);
+  plInitObject(&obj->super);
+
+  plSetAngularVel3f(&obj->super, 0.0f, 0.0f, 0.05f);
+
+  plMassSet(&obj->super.m, 0.0f,
             0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f);
-  ooLwcSet(&obj->p, x, y, z);
-  obj->sys = parent->sys;
-  obj->parent = parent;
+  
+  ooLwcSet(&obj->super.p, x, y, z);
+  obj->super.sys = sys;
+  obj->super.parent = NULL;
+  obj_array_push(&sys->objs, obj);
+  obj_array_init(&obj->children);
+  plComputeDerived(&obj->super);
 
+  return obj;
+  
+}
+PLobject*
+plSubObject3f(PLcompound_object *parent, float x, float y, float z)
+{
+  assert(parent != NULL);
+  
+  PLobject *obj = malloc(sizeof(PLobject));
+  plMassSet(&obj->m, 0.0f,
+            0.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 1.0f,
+            0.0f, 0.0f, 0.0f);
+  ooLwcSet(&obj->p, x, y, z);
+  obj->sys = parent->super.sys;
+  obj->parent = parent;
+  obj_array_push(&parent->children, obj);
   return obj;
 }
 
@@ -121,9 +157,32 @@ plDetatchObject(PLobject *obj)
   assert(obj != NULL);
   assert(obj->parent != NULL);
 
-  obj_array_push(&obj->parent->sys->objs, obj);
+  obj_array_push(&obj->parent->super.sys->objs, obj);
   obj->parent = NULL;
 }
+
+void
+plUpdateMass(PLcompound_object *obj)
+{
+  memset(&obj->super.m, 0, sizeof(PLmass));
+  
+  plMassSet(&obj->super.m, 0.0,
+            0.0, 0.0, 0.0,
+            1.0, 1.0, 1.0,
+            0.0, 0.0, 0.0);
+  
+  for (int i = 0 ; i < obj->children.length ; ++ i) {
+    PLobject *child = obj->children.elems[i];
+    PLmass tmp = child->m;
+    plMassTranslate(&tmp,
+                    -child->m.cog[0],
+                    -child->m.cog[1],
+                    -child->m.cog[2]);
+      
+    plMassAdd(&obj->super.m, &tmp);
+  }
+}
+
 
 void
 plSetDrawableForObject(PLobject *obj, SGdrawable *drawable)
@@ -139,37 +198,52 @@ plSetObjectPos3d(PLobject *obj, double x, double y, double z)
   ooLwcSet(&obj->p, x, y, z);
 }
 
+
+void
+plSetObjectPosExt3f(PLobject *obj,
+                    int32_t i, int32_t j, int32_t k,
+                    float x, float y, float z)
+{
+  obj->p.seg = vi3_set(i, j, k);
+  obj->p.offs = vf3_set(x, y, z);
+  ooLwcNormalise(&obj->p);
+}
+
+void
+plSetObjectPosRel3d(PLobject * restrict obj, const PLobject * restrict otherObj,
+                    double x, double y, double z)
+{
+  obj->p = otherObj->p;
+  ooLwcTranslate3f(&obj->p, x, y, z);
+}
+
 void
 plForce3f(PLobject *obj, float x, float y, float z)
 {
-  dBodyAddForce(obj->id, x, y, z);
+  obj->f_ack.x += x;
+  obj->f_ack.y += y;
+  obj->f_ack.z += z;  
 }
 void
-plForce3d(PLobject *obj, double x, double y, double z)
+plForce3fv(PLobject *obj, float3 f)
 {
-  dBodyAddForce(obj->id, x, y, z);
+  obj->f_ack += f;
 }
-void
-plForce3dv(PLobject *obj, PLdouble3 f)
-{
-  dBodyAddForce(obj->id, ((double*)&f)[0], ((double*)&f)[1], ((double*)&f)[2]);
-}
+
 
 void
 plForceRelative3f(PLobject *obj, float fx, float fy, float fz)
 {
-  dBodyAddRelForce(obj->id, fx, fy, fz);
+  float3 f = { fx, fy, fz, 0.0f };
+  float3 f_rot = mf3_v_mul(obj->R, f);
+  obj->f_ack += f_rot;
 }
 
 void
-plForceRelative3d(PLobject *obj, double fx, double fy, double fz)
+plForceRelative3fv(PLobject *obj, float3 f)
 {
-  dBodyAddRelForce(obj->id, fx, fy, fz);
-}
-void plForceRelative3dv(PLobject *obj, PLdouble3 f)
-{
-  dBodyAddRelForce(obj->id,
-                      ((double*)&f)[0], ((double*)&f)[1], ((double*)&f)[2]);
+  float3 f_rot = mf3_v_mul(obj->R, f);
+  obj->f_ack += f_rot;
 }
 
 void
@@ -177,41 +251,33 @@ plForceRelativePos3f(PLobject *obj,
                      float fx, float fy, float fz,
                      float px, float py, float pz)
 {
-  dBodyAddRelForceAtRelPos(obj->id, fx, fy, fz, px, py, pz);
+  float3 f = { fx, fy, fz, 0.0f };
+  float3 p = { px, py, pz, 0.0f };
+  float3 f_rot = mf3_v_mul(obj->R, f);
+  float3 t_rot = vf3_cross(p, f_rot);
+  obj->f_ack += f_rot;
+  obj->t_ack += t_rot;
 }
 
-void
-plForceRelativePos3d(PLobject *obj,
-                     double fx, double fy, double fz,
-                     double px, double py, double pz)
-{
-  dBodyAddRelForceAtRelPos(obj->id, fx, fy, fz, px, py, pz);
-}
 
 void
-plForceRelativePos3dv(PLobject *obj, PLdouble3 f, PLdouble3 p)
+plForceRelativePos3fv(PLobject *obj, float3 f, float3 p)
 {
-  dBodyAddRelForceAtRelPos(obj->id,
-                           ((double*)&f)[0], ((double*)&f)[1], ((double*)&f)[2],
-                           ((double*)&p)[0], ((double*)&p)[1], ((double*)&p)[2]);
+  float3 f_rot = mf3_v_mul(obj->R, f);
+  float3 t_rot = vf3_cross(p, f_rot);
+  obj->f_ack += f_rot;
+  obj->t_ack += t_rot;
 }
 
 
 void plStepObjectf(PLobject *obj, float dt)
 {
-  /*
-  const dReal * dBodyGetPosition (dBodyID);
-  const dReal * dBodyGetRotation (dBodyID);
-  const dReal * dBodyGetQuaternion (dBodyID);
-  const dReal * dBodyGetLinearVel (dBodyID);
-  const dReal * dBodyGetAngularVel (dBodyID);
-  */
-}
+  obj->v += (obj->f_ack / obj->m.m) * dt;
+  ooLwcTranslate(&obj->p, vf3_s_mul(obj->v, dt));
 
-void
-plStepObjectd(PLobject *obj, double dt)
-{
-
+  obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt;
+  obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt));
+  plComputeDerived(obj);
 }
 
 void
@@ -219,28 +285,34 @@ plNormaliseObject(PLobject *obj)
 {
   // Since we are using non safe casts here, we must ensure this in case someone upgrades
   // to 64 bit positions
-  assert(sizeof(obj->p.offs) == sizeof(PLfloat3));
+  assert(sizeof(obj->p.offs) == sizeof(float3));
 
-  const dReal *pos = dBodyGetPosition(obj->id);
-  ((float*)&obj->p.offs)[0] = pos[0];
-  ((float*)&obj->p.offs)[1] = pos[1];
-  ((float*)&obj->p.offs)[2] = pos[2];
+  obj->q = q_normalise(obj->q);
+  q_mf3_convert(obj->R, obj->q);
 
   ooLwcNormalise(&obj->p);
-
-  dBodySetPosition(obj->id,
-                  ((float*)&obj->p.offs)[0],
-                  ((float*)&obj->p.offs)[1],
-                  ((float*)&obj->p.offs)[2]);
 }
 
 void
 plClearObject(PLobject *obj)
+{  
+  obj->f_ack = vf3_set(0.0f, 0.0f, 0.0f);
+  obj->t_ack = vf3_set(0.0f, 0.0f, 0.0f);
+}
+
+void
+plSetAngularVel3f(PLobject *obj, float rx, float ry, float rz)
 {
-  dBodySetPosition(obj->id,
-                  ((float*)&obj->p.offs)[0],
-                  ((float*)&obj->p.offs)[1],
-                  ((float*)&obj->p.offs)[2]);
-  dBodySetForce(obj->id, 0.0, 0.0, 0.0);
-  dBodySetTorque (obj->id, 0.0, 0.0, 0.0);
+  obj->angVel = vf3_set(rx, ry, rz);
+}
+
+void
+plSetAngularVel3fv(PLobject *obj, float3 r)
+{
+  obj->angVel = r;
+}
+
+quaternion_t plGetQuat(PLobject *obj)
+{
+  return obj->q;
 }

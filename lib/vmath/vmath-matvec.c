@@ -209,7 +209,7 @@ v_sub(float4 a, float4 b)
 
 
 float3
-v_cross(float3 a, float3 b)
+vf3_cross(float3 a, float3 b)
 {
 #if __has_feature(attribute_ext_vector_type)
   // TODO: Use shuffle vectors intrinsic
@@ -415,7 +415,6 @@ m_inv(const matrix_t *M)
 
     return M_inv;
 }
-
 
 float
 v_abs(float4 v)
@@ -761,4 +760,15 @@ m_translate(matrix_t *m, float x, float y, float z, float w)
     m->a[1][1] = y;
     m->a[2][2] = z;
     m->a[3][3] = w;
+}
+
+
+void
+mf3_basis(float3x3 res, const float3x3 m, const float3x3 b)
+{
+  //res = b * m * inv(b)
+  float3x3 binv;
+  mf3_transpose2(binv, b); // Inverse is the transpose for a rotation matrix
+  mf3_mul3(res, b, m);
+  mf3_mul2(res, binv);
 }

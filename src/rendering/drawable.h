@@ -17,28 +17,24 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SG_PARTICLES_H
-#define SG_PARTICLES_H
+#ifndef SG_DRAWABLE_H
+#define SG_DRAWABLE_H
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 
-#include "SDL_opengl.h"
-#include "physics/particles.h"
-
-#include "physics/reftypes.h"
 #include "rendering/reftypes.h"
-#include "rendering/drawable.h"
 
-struct SGparticles {
-  SGdrawable super;
-  GLuint texture;
-  PLparticles *ps;
+struct SGdrawable {
+  const char *name;
+  OOscene *scene;
+  bool enabled;
+  float3 p;  // Position
+  float3 dp; // delta pos per time step
+  float3 dr; // delta rot per time step
+  quaternion_t q; // Quaternion
+                  //float s; // Scale
+  
+  SGdrawfunc draw; // Draw function for this object
 };
 
-SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
-                                PLparticles *ps);
 
-
-#endif /* !SG_PARTICLES_H */
+#endif /* !SG_DRAWABLE_H */

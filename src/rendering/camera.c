@@ -101,7 +101,7 @@ ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
 }
 
 OOcam*
-ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
+ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
                 float dx, float dy, float dz, float rx, float ry, float rz)
 {
     OOfixedcam *cam = malloc(sizeof(OOfixedcam));
@@ -153,8 +153,8 @@ ooSgCamRotate(OOcam *cam)
   case OOCam_Fixed:
     {
       OOfixedcam* fix = (OOfixedcam*)cam;
-      const dReal *quat = dBodyGetQuaternion(fix->body);
-      quaternion_t q = vf4_set(quat[1], quat[2], quat[3], quat[0]);
+      //const dReal *quat = dBodyGetQuaternion(fix->body);
+      quaternion_t q = fix->body->q;
       q = q_mul(q, fix->q);
       matrix_t m;
       q_m_convert(&m, q);
@@ -220,11 +220,10 @@ ooSgCamMove(OOcam *cam)
   case OOCam_Fixed:
     {
       OOfixedcam* fix = (OOfixedcam*)cam;
-      const dReal *pos = dBodyGetPosition(fix->body);
-      const dReal *quat = dBodyGetQuaternion(fix->body);
-      float3 p = vf3_set(pos[0], pos[1], pos[2]);
+      
+      float3 p = fix->body->p.offs;
       p = vf3_add(p, fix->r);
-      quaternion_t q = vf4_set(quat[1], quat[2], quat[3], quat[0]);
+      quaternion_t q = fix->body->q;
       q = q_mul(q, fix->q);
       matrix_t m;
       q_m_convert(&m, q);

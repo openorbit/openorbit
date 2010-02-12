@@ -53,7 +53,6 @@
 #include "scripting/scripting.h"
 #include "rendering/texture.h"
 
-#include <ode/ode.h>
 #include "SDL.h"
 //#include "SDL_ttf.h"
 
@@ -203,8 +202,7 @@ main(int argc, char*argv[])
     ooLogFatal("script/init.py missing");
   }
 
-  // Initialise ODE, SDL, GL and AL
-  dInitODE();
+  // Initialise SDL, GL and AL
 
   // Init SDL video subsystem
   if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {

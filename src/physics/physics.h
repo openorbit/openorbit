@@ -42,9 +42,12 @@
 
 #ifndef PHYSICS_H_MW8CHG7V
 #define PHYSICS_H_MW8CHG7V
-#include <ode/ode.h>
+
 #include <vmath/vmath.h>
+
 #include "common/lwcoord.h"
+#include "physics/reftypes.h"
+
 #include "rendering/scenegraph.h"
 
 #ifndef __has_feature

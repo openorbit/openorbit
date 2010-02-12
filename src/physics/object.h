@@ -20,44 +20,82 @@
 #ifndef PHYSICS_OBJECT_H
 #define PHYSICS_OBJECT_H
 
-typedef struct PLobject PLobject;
-
 #include <vmath/vmath.h>
+#include <gencds/array.h>
 
-#include "physics/orbit.h"
 #include "physics/mass.h"
+#include "physics/reftypes.h"
+
 #include "common/lwcoord.h"
 
 struct PLobject {
   PLsystem *sys;
-  struct PLobject *parent;
+  PLcompound_object *parent;
   char *name;
-  dBodyID id; // Using ODE at the moment, but this is not really necisary
-  OOlwcoord p; // Large world coordinates
   PLmass m;
   SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
+  
+  OOlwcoord p; // Large world coordinates
+  quaternion_t q; // Rotation quaternion
+  
+  float3x3 R; // Rotation wrt frame of reference
+  float3x3 I_inv_world; // Inverse of inertia in world coordinates
+
+  float3 v; // Velocity
+  float3 angVel; // Angular velocity
+  float3 f_ack; // Force accumulator
+  float3 t_ack; // Torque accumulator  
 };
 
+struct PLcompound_object {
+  PLobject super;
+  obj_array_t children;
+};
+
+// Create standard object
 PLobject* plObject3f(PLsystem *sys, float x, float y, float z);
-PLobject* plSubObject3f(PLobject *obj, float x, float y, float z);
+
+// Create standard object
+PLcompound_object* plCompoundObject3f(PLsystem *sys, float x, float y, float z);
+
+// Init standard object (useful if allocated with malloc or explicitly in structure)
+void plInitObject(PLobject *obj);
+void plComputeDerived(PLobject *obj);
+
+
+// Create subobject
+PLobject* plSubObject3f(PLcompound_object *parent, float x, float y, float z);
 void plDetachObject(PLobject *obj);
+void plUpdateMass(PLcompound_object *obj);
 
 void plSetDrawableForObject(PLobject *obj, SGdrawable *drawable);
 
 void plForce3f(PLobject *obj, float x, float y, float z);
-void plForce3d(PLobject *obj, double x, double y, double z);
-void plForce3dv(PLobject *obj, double3 f);
+void plForce3fv(PLobject *obj, float3 f);
 
 void plForceRelative3f(PLobject *obj, float x, float y, float z);
-void plForceRelative3d(PLobject *obj, double x, double y, double z);
-void plForceRelative3dv(PLobject *obj, double3 f);
+void plForceRelative3fv(PLobject *obj, float3 f);
+void plForceRelativePos3f(PLobject *obj,
+                          float fx, float fy, float fz,
+                          float px, float py, float pz);
+void plForceRelativePos3fv(PLobject *obj, float3 f, float3 p);
+
+
+void plSetObjectPos3d(PLobject *obj, double x, double y, double z);
+void plSetObjectPosRel3d(PLobject * restrict obj,
+                         const PLobject * restrict otherObj,
+                         double x, double y, double z);
+void plSetObjectPosExt3f(PLobject *obj,
+                         int32_t i, int32_t j, int32_t k,
+                         float x, float y, float z);
 
 void plStepObjectf(PLobject *obj, float dt);
-void plStepObjectd(PLobject *obj, double dt);
-void plSetObjectPos3d(PLobject *obj, double x, double y, double z);
 void plNormaliseObject(PLobject *obj);
 void plClearObject(PLobject *obj);
 
+void plSetAngularVel3f(PLobject *obj, float rx, float ry, float rz);
+void plSetAngularVel3fv(PLobject *obj, float3 r);
 
+quaternion_t plGetQuat(PLobject *obj);
 #endif /* !PHYSICS_OBJECT_H */

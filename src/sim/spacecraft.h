@@ -20,8 +20,6 @@
 #ifndef SPACECRAFT_H_7SCB1CH8
 #define SPACECRAFT_H_7SCB1CH8
 
-#include <ode/ode.h>
-
 #include <openorbit/openorbit.h>
 #include <gencds/array.h>
 

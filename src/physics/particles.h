@@ -22,9 +22,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-typedef struct PLparticle PLparticle;
-typedef struct PLparticles PLparticles;
-
+#include "rendering/scenegraph.h"
+#include "physics/reftypes.h"
 #include <vmath/vmath.h>
 #include "physics/object.h"
 

@@ -17,28 +17,31 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SG_PARTICLES_H
-#define SG_PARTICLES_H
+#ifndef SG_REFTYPES_H
+#define SG_REFTYPES_H
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
+typedef struct SGdrawable SGdrawable;
+typedef struct OOscene OOscene;
+typedef struct OOoverlay OOoverlay;
+typedef struct OOscenegraph OOscenegraph;
+typedef struct SGmaterial SGmaterial;
 
-#include "SDL_opengl.h"
-#include "physics/particles.h"
+typedef struct SGlight SGlight;
+typedef struct SGspotlight SGspotlight;
+typedef struct SGpointlight SGpointlight;
 
-#include "physics/reftypes.h"
-#include "rendering/reftypes.h"
-#include "rendering/drawable.h"
+typedef struct OOsphere OOsphere;
+typedef struct SGcylinder SGcylinder;
 
-struct SGparticles {
-  SGdrawable super;
-  GLuint texture;
-  PLparticles *ps;
-};
+typedef struct SGparticles SGparticles;
 
-SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
-                                PLparticles *ps);
+typedef void (*SGdrawfunc)(SGdrawable*);
 
 
-#endif /* !SG_PARTICLES_H */
+typedef enum OOcamtype OOcamtype;
+typedef struct OOfreecam OOfreecam;
+typedef struct OOfixedcam OOfixedcam;
+typedef struct OOorbitcam OOorbitcam;
+typedef struct OOcam OOcam;
+
+#endif /* !SG_REFTYPES_H */

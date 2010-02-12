@@ -26,6 +26,7 @@ struct PLmass {
   float m; //!< Mass in kg
   float minMass; //!< Minimum mass
   float3x3 I; //!< Moment of inertia
+  float3x3 I_inv; //!< Inverse of moment of inertia
   float3 cog; //!< Center of gravity
 };
 

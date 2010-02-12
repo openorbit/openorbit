@@ -17,9 +17,12 @@
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "orbit.h"
-#include <ode/ode.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "orbit.h"
+
 #include "physics.h"
 
 #include <vmath/vmath.h>
@@ -265,7 +268,7 @@ plGetObject(PLworld *world, const char *name)
 float3
 plGetPos(const PLastrobody *obj)
 {
-  return ooLwcGlobal(&obj->p);
+  return ooLwcGlobal(&obj->obj.p);
 }
 
 float3
@@ -294,53 +297,17 @@ plGetPosForName3f(const PLworld *world, const char *name,
 void
 plNormaliseObject__(PLastrobody *obj)
 {
-  // Since we are using non safe casts here, we must ensure this in case someone upgrades
-  // to 64 bit positions
-  assert(sizeof(obj->p.offs) == sizeof(PLfloat3));
-
-  const dReal *pos = dBodyGetPosition(obj->id);
-  ((float*)&obj->p.offs)[0] = pos[0];
-  ((float*)&obj->p.offs)[1] = pos[1];
-  ((float*)&obj->p.offs)[2] = pos[2];
-
-  ooLwcNormalise(&obj->p);
-
-  dBodySetPosition(obj->id,
-                  ((float*)&obj->p.offs)[0],
-                  ((float*)&obj->p.offs)[1],
-                  ((float*)&obj->p.offs)[2]);
+  ooLwcNormalise(&obj->obj.p);
 }
 
 void
 plClearObject__(PLobject *obj)
 {
-  dBodySetPosition(obj->id,
-                  ((float*)&obj->p.offs)[0],
-                  ((float*)&obj->p.offs)[1],
-                  ((float*)&obj->p.offs)[2]);
-  dBodySetForce(obj->id, 0.0, 0.0, 0.0);
-  dBodySetTorque (obj->id, 0.0, 0.0, 0.0);
+  obj->f_ack = vf3_set(0.0f, 0.0f, 0.0f);
+  obj->t_ack = vf3_set(0.0f, 0.0f, 0.0f);
 }
 
 
-void
-plUpdateObject(dBodyID body)
-{
-  PLastrobody *obj = dBodyGetData(body);
-  ooLogTrace("updating body %s", obj->name);
-
-  //const dReal *rot = dBodyGetRotation(body);
-  //const dReal *quat = dBodyGetQuaternion(body);
-  //const dReal *linVel = dBodyGetLinearVel(body);
-  //const dReal *angVel = dBodyGetAngularVel(body);
-
-  plNormaliseObject__(obj);
-
-  // ooSgSetObjectPosLW(obj->drawable, &obj->p);
-  // ooSgSetObjectQuat(obj->drawable, quat[1], quat[2], quat[3], quat[0]);
-  // ooSgSetObjectSpeed(obj->drawable, linVel[0], linVel[1], linVel[2]);
-  // ooSgSetObjectAngularSpeed(obj->drawable, angVel[0], angVel[1], angVel[2]);
-}
 
 // Note that the position can only be changed for an object that is not the root
 // root is by def not orbiting anything
@@ -351,36 +318,9 @@ plSysSetCurrentPos(PLsystem *sys)
     float3 newPos= plOrbitPosAtTime(sys->orbitalBody->kepler,
                                     sys->parent->orbitalBody->GM + sys->orbitalBody->GM,
                                     ooTimeGetJD()*PL_SEC_PER_DAY);
-    sys->orbitalBody->p = sys->parent->orbitalBody->p;
-    ooLwcTranslate(&sys->orbitalBody->p, newPos);
+    sys->orbitalBody->obj.p = sys->parent->orbitalBody->obj.p;
+    ooLwcTranslate(&sys->orbitalBody->obj.p, newPos);
   }
-#if 0
-  else {
-    float3 newPos= plOrbitPosAtTime(sys->orbitalBody->kepler,
-                                    sys->world->rootSys->orbitalBody->GM + sys->orbitalBody->GM,
-                                    ooTimeGetJD()*PL_SEC_PER_DAY);
-
-    //double meanMotion = plMeanMotion(sys->world->centralBody->GM + sys->orbitalBody->GM,
-    //                                 sys->orbitalBody->kepler->a);
-    //double eccAnomaly = plEccAnomaly(sys->orbitalBody->kepler->ecc, meanMotion, ooTimeGetJD()*PL_SEC_PER_DAY);
-    //double eccDeg = RAD_TO_DEG(eccAnomaly);
-
-    /* Compute x, y from anomaly, y is pointing in the direction of the
-     periapsis, x is pointing downwards */
-    //double y = sys->orbitalBody->kepler->a * cos(eccAnomaly) - sys->orbitalBody->kepler->a * sys->orbitalBody->kepler->ecc; // NOTE: on the plane we usually do x = a cos t
-    //double x = -sys->orbitalBody->kepler->b * sin(eccAnomaly);
-
-
-    sys->orbitalBody->p = sys->world->centralBody->p;
-    ooLwcTranslate(&sys->orbitalBody->p, newPos);
-
-    //  if (sys->orbitDrawable) {
-    //  fprintf(stderr, "el: %f %f\n",
-    //         ((SGellipsis*)(sys->orbitDrawable))->verts[0],
-    //          ((SGellipsis*)(sys->orbitDrawable))->verts[1]);
-    //}
-  }
-#endif
 }
 
 void
@@ -428,23 +368,20 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
          OOlwcoord * coord, quaternion_t q)
 {
   PLastrobody *obj = malloc(sizeof(PLastrobody));
-  obj->p = *coord;
+  
+  plInitObject(&obj->obj);
+  obj->obj.p = *coord;
+  obj->obj.q = q;
   obj->name = strdup(name);
   obj->sys = NULL;
   obj->world = world;
-  obj->id = dBodyCreate(world->world);
   obj->lightSource = NULL;
-  dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
-  dBodySetData(obj->id, obj);
-  dBodySetMovedCallback(obj->id, plUpdateObject);
-  dQuaternion quat = {vf4_w(q), vf4_x(q), vf4_y(q), vf4_z(q)};
   // TODO: Ensure quaternion is set for orbit
   //       asc * inc * obl ?
 
-  dBodySetQuaternion(obj->id, quat);
-  dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
+  plSetAngularVel3f(&obj->obj, 0.0, 0.0, 0.05);
   obj->drawable = NULL;
-  obj->m = m;
+  obj->obj.m.m = m;
 
   if (isnormal(gm)) {
     obj->GM = gm;
@@ -454,13 +391,6 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
   obj->kepler = NULL;
   return obj;
 }
-
-//void
-//plObjSetSceneObj(PLobject__ *obj, OOdrawable *drawable)
-//{
-// obj->drawable = drawable;
-//}
-
 
 PLastrobody*
 plNewObjInSys(PLsystem *sys, const char *name, double m, double gm,
@@ -483,8 +413,6 @@ plNewWorld(const char *name, OOscene *sc,
 
   world->scene = sc;
   world->name = strdup(name);
-  world->world = dWorldCreate();
-
   world->rootSys = plNewRootSystem(world, name, m, gm, obliquity);
 
   return world;
@@ -626,17 +554,20 @@ void
 plSysStep(PLsystem *sys, double dt)
 {
   plSysSetCurrentPos(sys);
-
+  
   // Add gravitational forces
   for (size_t i = 0; i < sys->objs.length ; i ++) {
     PLobject *obj = sys->objs.elems[i];
-    float3 dist = ooLwcDist(&sys->orbitalBody->p, &obj->p);
+    float3 dist = ooLwcDist(&sys->orbitalBody->obj.p, &obj->p);
     double r12 = vf3_abs_square(dist);
     float3 f12 = vf3_s_mul(vf3_normalise(dist),
-                          -PL_GRAVITATIONAL_CONST * sys->orbitalBody->m * obj->m.m / r12);
-    dBodyAddForce(obj->id, vf3_get(f12, 0), vf3_get(f12, 1), vf3_get(f12, 2));
+                          -PL_GRAVITATIONAL_CONST * sys->orbitalBody->obj.m.m * obj->m.m / r12);
+    plForce3fv(obj, f12);
+    plStepObjectf(obj, dt);
   }
 
+  plStepObjectf(&sys->orbitalBody->obj, dt);
+  
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysStep(sys->orbits.elems[i], dt);
   }
@@ -646,16 +577,16 @@ void
 plSysUpateSg(PLsystem *sys)
 {
   if (sys->orbitalBody->lightSource)
-    sgSetLightPosLW(sys->orbitalBody->lightSource, &sys->orbitalBody->p);
+    sgSetLightPosLW(sys->orbitalBody->lightSource, &sys->orbitalBody->obj.p);
 
-  const dReal *quat = dBodyGetQuaternion(sys->orbitalBody->id);
+  quaternion_t q = plGetQuat(&sys->orbitalBody->obj);
   ooSgSetObjectQuat(sys->orbitalBody->drawable,
-                    quat[1], quat[2], quat[3], quat[0]);
-  ooSgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->p);
+                    q.x, q.y, q.z, q.w);
+  ooSgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
 
   // Update orbital path base
   if (sys->parent) {
-    ooSgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->p);
+    ooSgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->obj.p);
   }
 
   //ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);
@@ -671,9 +602,7 @@ plSysUpateSg(PLsystem *sys)
 void
 plWorldStep(PLworld *world, double dt)
 {
-  dWorldStep(world->world, dt); // TODO: Add callbacks for updating object positions
   plSysStep(world->rootSys, dt);
-
   plSysUpateSg(world->rootSys);
 }
 /*
@@ -686,44 +615,7 @@ plWorldStep(PLworld *world, double dt)
       1 au = 149 597 870 000 m
 
 */
-// Conforms to dBodySetMovedCallback registered callbacks
-void
-ooUpdateObject(dBodyID body)
-{
-  PLobject *obj = dBodyGetData(body);
-  ooLogTrace("updating body %s", obj->name);
 
-  //const dReal *rot = dBodyGetRotation(body);
-  const dReal *quat = dBodyGetQuaternion(body);
-  const dReal *linVel = dBodyGetLinearVel(body);
-  const dReal *angVel = dBodyGetAngularVel(body);
-
-  plNormaliseObject(obj);
-
-  ooSgSetObjectPosLW(obj->drawable, &obj->p);
-  ooSgSetObjectQuat(obj->drawable, quat[1], quat[2], quat[3], quat[0]);
-  ooSgSetObjectSpeed(obj->drawable, linVel[0], linVel[1], linVel[2]);
-  ooSgSetObjectAngularSpeed(obj->drawable, angVel[0], angVel[1], angVel[2]);
-}
-
-#if 0
-v4f_t ooOrbitDist(PLobject * restrict a, PLobject * restrict b)
-{
-  assert(a != NULL);
-  assert(b != NULL);
-
-  const dReal *pa = dBodyGetPosition(a->id);
-  const dReal *pb = dBodyGetPosition(b->id);
-
-  if (a->sys == b->sys) {
-    v4f_t dist = ode2v3(pa) - ode2v3(pb);
-    return dist;
-  } else {
-    assert(0 && "distances between diffrent systems not yet supported");
-    return v4f_make(0.0, 0.0, 0.0, 0.0);
-  }
-}
-#endif
 void
 ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscenegraph *sg)
 {
@@ -949,10 +841,6 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
   SGdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
   SGmaterial *mat = sgSphereGetMaterial((OOsphere*)drawable);
   sgSetMaterialEmiss4f(mat, 1.0, 1.0, 1.0, 0.0);
-
-  //char *path = ooResGetPath("spacecrafts/mercury/enterprise.ac");
-  //OOdrawable *drawable = sgLoadModel(path);
-  //free(path);
 
   SGlight *starLightSource = sgNewPointlight3f(sc, 0.0f, 0.0f, 0.0f);
 

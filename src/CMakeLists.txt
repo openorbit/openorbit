@@ -1,6 +1,5 @@
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${PYTHON_INCLUDE_PATH})
-include_directories(${ODE_INC})
 if (${SDLTTF_FOUND})
   include_directories(${SDLTTF_INCLUDE_DIR})
 endif (${SDLTTF_FOUND})
@@ -108,7 +107,7 @@ set_target_properties(openorbit
 target_link_libraries(openorbit
                       vmath scripting parsers imgload
                       dl ph
-                      ${ODE_LIB} ${PNG_LIBRARIES} ${JPEG_LIBRARIES}
+                      ${PNG_LIBRARIES} ${JPEG_LIBRARIES}
                       ${OPENGL_LIBRARIES} ${SDL_LIBRARY}
                       ${GLUT_LIBRARIES})
 

@@ -20,8 +20,6 @@
 #ifndef SCENEGRAPH_H_
 #define SCENEGRAPH_H_
 
-#include <ode/ode.h>
-
 #include <vmath/vmath.h>
 #include <gencds/array.h>
 
@@ -31,21 +29,13 @@
 //#include "physics/orbit.h"
 #include "sim/simtime.h"
 #include "common/lwcoord.h"
+#include "rendering/reftypes.h"
+#include "rendering/drawable.h"
+
+#include "camera.h"
+#include "particles.h"
 
 #define SG_MAX_LIGHTS GL_MAX_LIGHTS
-
-typedef struct SGdrawable SGdrawable;
-typedef struct OOscene OOscene;
-typedef struct OOoverlay OOoverlay;
-typedef struct OOscenegraph OOscenegraph;
-typedef struct SGmaterial SGmaterial;
-
-typedef struct SGlight SGlight;
-typedef struct SGspotlight SGspotlight;
-typedef struct SGpointlight SGpointlight;
-
-typedef struct OOsphere OOsphere;
-typedef struct SGcylinder SGcylinder;
 
 struct SGmaterial {
   float ambient[4];
@@ -55,25 +45,6 @@ struct SGmaterial {
   float shininess;
 };
 
-
-#include "camera.h"
-
-typedef void (*SGdrawfunc)(SGdrawable*);
-
-struct SGdrawable {
-  const char *name;
-  OOscene *scene;
-  bool enabled;
-  float3 p;  // Position
-  float3 dp; // delta pos per time step
-  float3 dr; // delta rot per time step
-  quaternion_t q; // Quaternion
-                  //float s; // Scale
-
-  SGdrawfunc draw; // Draw function for this object
-};
-
-#include "particles.h"
 
 
 SGdrawable* ooSgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df);

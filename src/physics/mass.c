@@ -17,12 +17,9 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <string.h>
 #include "mass.h"
-
-// TODO: Eliminate ODE
-#include <ode/ode.h>
-
+#if 0
 void
 testMassFuncs(void)
 {
@@ -98,7 +95,7 @@ testMassFuncs(void)
          dm.c[0], dm.c[1], dm.c[2]);
   
 }
-
+#endif
 void
 plMassSet(PLmass *mo, float m,
           float cox, float coy, float coz,
@@ -119,6 +116,9 @@ plMassSet(PLmass *mo, float m,
   mo->I[2][1] = iyz;
   
   mo->cog = vf3_set(cox, coy, coz);
+
+  mf3_inv2(mo->I_inv, mo->I);
+
   mo->minMass = 0.0f;
 }
 
@@ -207,6 +207,7 @@ plMassTranslate(PLmass *m, float dx, float dy, float dz)
   mf3_add2(m->I, mtmp);
   
   m->cog = vf3_add(m->cog, r);
+  mf3_inv2(m->I_inv, m->I);
 }
 
 void
@@ -226,6 +227,7 @@ plMassRotateM(PLmass *m, const float3x3 rm)
   mf3_mul3(m->I, rm, mtmp);
   
   m->cog = mf3_v_mul(rm, m->cog);
+  mf3_inv2(m->I_inv, m->I);
 }
 
 void
@@ -253,6 +255,7 @@ plMassAdd(PLmass * restrict md, const PLmass * restrict ms)
   for (int i = 0 ; i < 3 ; ++ i) {
     md->I[i] = vf3_add(md->I[i], ms->I[i]);
   }
+  mf3_inv2(md->I_inv, md->I);
 }
 
 void
@@ -263,6 +266,7 @@ plMassMod(PLmass *m, float newMass)
 
   for (int i = 0 ; i < 3 ; ++ i) {
     m->I[i] = vf3_s_mul(m->I[i], s);
+    m->I_inv[i] = vf3_s_mul(m->I_inv[i], 1.0f/s);
   }
 }
 

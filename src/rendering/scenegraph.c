@@ -154,9 +154,6 @@ ooSgSceneGetParent(OOscene *sc)
   return sc->parent;
 }
 
-/*!
-    Updates a drawable object with ode-data.
-*/
 void
 ooSgSetScenePos(OOscene *sc, float x, float y, float z)
 {
@@ -166,13 +163,6 @@ ooSgSetScenePos(OOscene *sc, float x, float y, float z)
   sc->t = vf3_set(x, y, z);
 }
 
-//void
-//ooSgSetSceneScale(OOscene *sc, float scale)
-//{
-//  assert(sc != NULL);
-//  sc->s = scale;
-//  sc->si = 1.0f/scale;
-//}
 
 void
 ooSgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)

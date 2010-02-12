@@ -265,6 +265,21 @@ q_s_div(quaternion_t q, float d)
 #endif
 }
 
+quaternion_t
+q_s_mul(quaternion_t q, float d)
+{
+#if __has_feature(attribute_ext_vector_type)
+	quaternion_t r;
+  r = q * d;
+  return r;
+#else
+  float4_u dvi = {.s.x = d, .s.y = d, .s.z = d, .s.w = d};
+  quaternion_t r = q * dvi.v;
+  return r;
+#endif
+}
+
+
 float
 q_dot(quaternion_t a, quaternion_t b)
 {
@@ -274,7 +289,7 @@ q_dot(quaternion_t a, quaternion_t b)
 float3
 q_cross(const quaternion_t a, const quaternion_t b)
 {
-    return v_cross(q_vector(a), q_vector(b));
+    return vf3_cross(q_vector(a), q_vector(b));
 }
 
 float

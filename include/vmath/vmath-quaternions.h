@@ -49,7 +49,6 @@ extern "C" {
 float3 q_vector(const quaternion_t q);
 float3 v_q_rot(float3 v, quaternion_t q);
 
-
 /*!
  * \brief Converts a quaternion to a rotation matrix.
  * 
@@ -80,13 +79,14 @@ void q_mf3_convert(float3x3 m, quaternion_t q);
 
 quaternion_t m_q_convert(matrix_t *m) __attribute__ ((__nonnull__));
     
- quaternion_t q_add(const quaternion_t a, const quaternion_t b);
+quaternion_t q_add(const quaternion_t a, const quaternion_t b);
 
 
 quaternion_t
 q_mul(const quaternion_t a, const quaternion_t b);
     
-    
+quaternion_t q_s_mul(quaternion_t q, float d);
+
 quaternion_t q_s_div(const quaternion_t q, float d);
 
 
@@ -149,6 +149,13 @@ q_rot(float x, float y, float z, float alpha);
 
 quaternion_t q_normalise(quaternion_t q);
 
+static inline quaternion_t
+q_vf3_rot(quaternion_t q, float3 v, float dt)
+{
+  quaternion_t qv = {v.x, v.y, v.z, 0.0f};
+  quaternion_t qp = q_add(q, q_s_mul(q_mul(qv, q), dt/2.0));
+  return qp;
+}
 
 #ifdef __cplusplus
 }

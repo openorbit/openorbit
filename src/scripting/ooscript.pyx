@@ -1,6 +1,3 @@
-cdef extern from "ode/ode.h":
-    ctypedef struct dxBody
-    ctypedef dxBody *dBodyID
 
 cdef extern from "rendering/scenegraph.h":
   ctypedef void OOobject
@@ -13,6 +10,8 @@ cdef extern from "rendering/scenegraph.h":
 
   ctypedef struct OOscenegraph
 
+
+cdef extern from "rendering/drawable.h":
   ctypedef struct SGdrawable:
     OOobject *obj
     OOdrawfunc draw
@@ -34,9 +33,6 @@ cdef extern from "rendering/scenegraph.h":
   OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
                        float x, float y, float z,
                        float rx, float ry, float rz)
-  OOcam* ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
-                         float dx, float dy, float dz, 
-                         float rx, float ry, float rz)
 
   OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc,
                          float dx, float dy, float dz)
@@ -109,10 +105,6 @@ cdef extern from "settings.h":
   int ooConfSetStr(char *key, char *val)
   char* ooConfGetStr(char *key)
 
-cdef class OdeBody:
-  cdef dBodyID body
-  def __cinit__(self):
-    self.body = <dBodyID>0 
 
 #def LoadAllPlugins():
 #   ooPluginLoadAll()
@@ -191,10 +183,6 @@ cdef class FreeCam(Cam):
     pass
   def setParams(self, Scenegraph sg, Scene sc, x, y, z, rx, ry, rz):
     self.cam = ooSgNewFreeCam(sg.sg, sc.sc, x, y, z, rx, ry, rz)
-
-cdef class FixedCam(Cam):
-  def __cinit__(self, Scenegraph sg, Scene sc, OdeBody body, dx, dy, dz, rx, ry, rz):
-    self.cam = ooSgNewFixedCam(sg.sg, sc.sc, body.body, dx, dy, dz, rx, ry, rz)
 
 cdef class OrbitCam(Cam):
   def __cinit__(self, Scenegraph sg, Scene sc, dx, dy, dz):

@@ -533,7 +533,7 @@ vd3_abs_c(double3 a)
 
 /* This is really a 3d x product */
 
-float3 v_cross(float3 a, float3 b)
+float3 vf3_cross(float3 a, float3 b)
     __attribute__ ((__pure__));
 
 float4 v_normalise(float4 v) __attribute__ ((__pure__));
@@ -548,6 +548,7 @@ float m_subdet3(const matrix_t *M, int k, int l);
 
 /*! Compute inverse of 4x4 matrix M */
 matrix_t m_inv(const matrix_t *M);
+
 
 /* creates rotation matrices, these are untested and might not work */
 void m_axis_rot_x(matrix_t *m, float a) __attribute__ ((__nonnull__));
@@ -646,6 +647,9 @@ void mf3_inv2(float3x3 invmat, const float3x3 mat);
 void mf3_inv1(float3x3 mat);
 void mf3_sub(float3x3 a, const float3x3 b, const float3x3 c);
 void mf3_s_mul(float3x3 res, const float3x3 m, float s);
+
+void mf3_basis(float3x3 res, const float3x3 m, const float3x3 b);
+
 
 #ifdef __cplusplus
 }

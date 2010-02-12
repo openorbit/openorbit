@@ -23,11 +23,9 @@
 #ifndef _ORBIT_H_
 #define _ORBIT_H_
 
-typedef struct PLworld PLworld;
-typedef struct PLsystem PLsystem;
-typedef struct PLastrobody PLastrobody;
+#include <stdlib.h>
+#include <string.h>
 
-#include <ode/ode.h>
 
 #include <vmath/vmath.h>
 
@@ -35,18 +33,8 @@ typedef struct PLastrobody PLastrobody;
 #include "rendering/scenegraph.h"
 #include "common/lwcoord.h"
 
+#include "physics/reftypes.h"
 
-static inline v4f_t
-ode2v4(const dReal *vec)
-{
-  return v4f_make(vec[0], vec[1], vec[2], vec[3]);
-}
-
-static inline v4f_t
-ode2v3(const dReal *vec)
-{
-  return v4f_make(vec[0], vec[1], vec[2], 1.0f);
-}
 
 typedef struct PL_keplerian_elements {
   double ecc;
@@ -62,11 +50,7 @@ struct PLastrobody {
   char *name;
   PLworld *world;
   PLsystem *sys;
-  dBodyID id; // Using ODE at the moment, but this is not really necisary
-  OOlwcoord p; // Large world coordinates
-  quaternion_t q; // Current quaternion
-  quaternion_t dq; // Rotational speed quaternion
-  double m;
+  PLobject obj;
   double GM;
   PL_keplerian_elements *kepler;
   SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
@@ -74,11 +58,10 @@ struct PLastrobody {
   SGlight *lightSource; //!< Light source if the object emits light
 };
 
-
 struct PLsystem {
   PLworld *world;
   PLsystem *parent;
-
+  
   const char *name;
   double effectiveRadius; //!< Radius of the entire system, i.e how far away
                           //!< objects will still be considered to be under its
@@ -87,18 +70,18 @@ struct PLsystem {
                           //!< system has sattelites), or to the distance it
                           //!< takes for the gravitational influence to diminish
                           //!< to XXX, which ever is greater.
-
+  
   // TODO: These should be in some kind of oct-tree type structure
   obj_array_t orbits; // suborbits
   obj_array_t objs; // objects in this system
-
+  
   PLastrobody *orbitalBody; // The body actually orbiting at this point, note that it is
   double orbitalPeriod;
   SGdrawable *orbitDrawable; // Pointer to the drawable representing the ellipsis
 };
 
+
 struct PLworld {
-  dWorldID world;
   const char *name;
   OOscene *scene; // Scene in the sg
   PLsystem *rootSys;

@@ -25,15 +25,10 @@ extern "C" {
 
 #include <stdbool.h>
 #include <vmath/vmath.h>
-#include <ode/ode.h>
+#include "physics/reftypes.h"
+#include "rendering/reftypes.h"
 #include "common/lwcoord.h"
-  typedef enum OOcamtype OOcamtype;
-  typedef struct OOfreecam OOfreecam;
-  typedef struct OOfixedcam OOfixedcam;
-  typedef struct OOorbitcam OOorbitcam;
-  typedef struct OOcam OOcam;
 
-#include "scenegraph.h"
   enum OOcamtype {
     OOCam_Free,
     OOCam_Fixed,
@@ -55,7 +50,8 @@ extern "C" {
 
   struct OOfixedcam {
     OOcam super;
-    dBodyID body; // Camera fixed to this body
+    PLobject *body;
+    //dBodyID body; // Camera fixed to this body
 
     float3 r; // With this offset
     quaternion_t q; // and this rotation (rotate before translation)
@@ -75,7 +71,7 @@ extern "C" {
                         float x, float y, float z,
                         float rx, float ry, float rz);
 
-  OOcam* ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, dBodyID body,
+  OOcam* ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
                          float dx, float dy, float dz,
                          float rx, float ry, float rz);
 

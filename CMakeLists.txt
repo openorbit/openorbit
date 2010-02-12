@@ -32,20 +32,9 @@ find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 
-find_library(ODE_LIB ode)
-find_path(ODE_INC "ode/ode.h")
 
 # TODO: Download missing packages, i.e. sdl, ode et.al.
 # file(DOWNLOAD url file [TIMEOUT timeout] [STATUS status] [LOG log])
-
-if (NOT ODE_LIB)
-    message(FATAL_ERROR "Could not find libode")
-endif (NOT ODE_LIB)
-
-if (NOT ODE_INC)
-    message(FATAL_ERROR "Could not find ode/ode.h")
-endif (NOT ODE_INC)
-
 
 # Enable later when sound system has been added
 # find_package(OpenAL REQUIRED)
