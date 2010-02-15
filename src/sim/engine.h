@@ -41,6 +41,7 @@ typedef enum OOactuatorstate {
   OO_Act_Disabled,
   OO_Act_Idle,
   OO_Act_Burning,
+  OO_Act_No_Fuel,
   OO_Act_Fault_Closed,
   OO_Act_Fault_Open,
   OO_Act_Spinning

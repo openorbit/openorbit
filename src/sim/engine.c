@@ -18,10 +18,14 @@
  */
 
 
-#include "engine.h"
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+#include "engine.h"
+#include "spacecraft.h"
+
+
 static const char *actuatorNames[OO_Act_Group_Count] = {
   [OO_Act_Orbital] = "orbital",
   [OO_Act_Vertical] = "vertical",
@@ -54,42 +58,78 @@ ooGetActuatorGroupName(int groupId)
 void
 ooScFireOrbital(OOspacecraft *sc)
 {
-  
+  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Orbital];
+
+  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+    OOactuator *act = grp->actuators.elems[i];
+    act->toggleOn(act);
+  }
 }
 
 void
 ooScFireVertical(OOspacecraft *sc, float dv)
 {
-  
+  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Vertical];
+  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+    OOactuator *act = grp->actuators.elems[i];
+    act->toggleOn(act);
+  }
 }
 void
 ooScFireHorizontal(OOspacecraft *sc, float dh)
 {
-  
+  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Horisontal];
+  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+    OOactuator *act = grp->actuators.elems[i];
+    act->toggleOn(act);
+  }
 }
 
 void
 ooScFireForward(OOspacecraft *sc)
 {
-  
+  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Forward];
+  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+    OOactuator *act = grp->actuators.elems[i];
+    act->toggleOn(act);
+  }
 }
 
 void
 ooScEngageYaw(OOspacecraft *sc, float dy)
 {
-  
+  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Yaw];
+  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+    OOactuator *act = grp->actuators.elems[i];
+    act->toggleOn(act);
+  }
 }
 
 void
 ooScEngagePitch(OOspacecraft *sc, float dp)
 {
-  
+  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Pitch];
+  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+    OOactuator *act = grp->actuators.elems[i];
+    act->toggleOn(act);
+  }
 }
 
 void
 ooScEngageRoll(OOspacecraft *sc, float dr)
 {
-  
+  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Roll];
+  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+    OOactuator *act = grp->actuators.elems[i];
+    act->toggleOn(act);
+  }
 }
 
 
@@ -125,6 +165,32 @@ ooScRegisterInGroup(OOactuatorgroup *eg, OOactuator *actuator)
   obj_array_push(&eg->actuators, actuator);
 }
 
+
+void
+ooSrbStep(OOsrb *srb, float dt)
+{
+  plForceRelativePos3fv(&srb->super.sc->obj->super,
+                        srb->dir * srb->forceMag, srb->p);
+}
+
+void
+ooRocketStep(OOrocket *rocket, float dt)
+{
+  plForceRelativePos3fv(&rocket->super.sc->obj->super,
+                        rocket->dir * rocket->forceMag * rocket->throttle,
+                        rocket->p);
+}
+
+void
+ooThrusterStep(OOrocket *thruster, float dt)
+{
+  plForceRelativePos3fv(&thruster->super.sc->obj->super,
+                        thruster->dir * thruster->forceMag * thruster->throttle,
+                        thruster->p);
+}
+
+
+
 OOsrb* ooScNewSrb(OOspacecraft *sc,
                   const char *name,
                   float f,
@@ -138,6 +204,7 @@ OOsrb* ooScNewSrb(OOspacecraft *sc,
   engine->forceMag = f;
   engine->p = vf3_set(x, y, z);
   engine->dir = vf3_set(dx, dy, dz);
+  engine->super.step = (OOactuatorstep) ooSrbStep;
   return engine;
 }
 
@@ -155,6 +222,9 @@ OOrocket* ooScNewLoxEngine(OOspacecraft *sc,
   engine->forceMag = f;
   engine->p = vf3_set(x, y, z);
   engine->dir = vf3_set(dx, dy, dz);
+
+  engine->super.step = (OOactuatorstep) ooRocketStep;
+
   return engine;
 }
 
@@ -171,5 +241,7 @@ OOrocket* ooScNewThruster(OOspacecraft *sc,
   engine->forceMag = f;
   engine->p = vf3_set(x, y, z);
   engine->dir = vf3_set(dx, dy, dz);
+  engine->super.step = (OOactuatorstep) ooThrusterStep;
   return engine;
 }
+
