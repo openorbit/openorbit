@@ -76,10 +76,12 @@ ooScNew(void)
   sc->poststep = NULL;
   sc->detatchStage = NULL;
 
+  sc->obj = plCompoundObject3f(NULL, 0.0, 0.0, 0.0);
+
   sc->detatchProg.pc = 0;
   detatchprog_array_init(&sc->detatchProg.instrs);
 
-  plMassSet(&sc->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  plMassSet(&sc->obj->super.m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   return sc;
 }
@@ -110,17 +112,14 @@ void
 ooScAddStage(OOspacecraft *sc, OOstage *stage)
 {
   obj_array_push(&sc->stages, stage);
-  PLmass m = stage->m;
-  plMassTranslate(&m, 0.0, 0.0, 0.0);
-  plMassAdd(&sc->m, &m);
 }
 
 void
 ooScReevaluateMass(OOspacecraft *sc)
 {
-  memset(&sc->m, 0, sizeof(PLmass));
+  memset(&sc->obj->super.m, 0, sizeof(PLmass));
 
-  plMassSet(&sc->m, 0.0,
+  plMassSet(&sc->obj->super.m, 0.0,
             0.0, 0.0, 0.0,
             1.0, 1.0, 1.0,
             0.0, 0.0, 0.0);
@@ -128,13 +127,13 @@ ooScReevaluateMass(OOspacecraft *sc)
   for (int i = 0 ; i < sc->stages.length ; ++ i) {
     OOstage *stage = sc->stages.elems[i];
     if (stage->state != OO_Stage_Detatched) {
-      PLmass tmp = stage->m;
+      PLmass tmp = stage->obj->m;
       plMassTranslate(&tmp,
                       stage->pos[0],
                       stage->pos[1],
                       stage->pos[2]);
 
-      plMassAdd(&sc->m, &tmp);
+      plMassAdd(&sc->obj->super.m, &tmp);
     }
   }
 }
@@ -198,7 +197,7 @@ ooScStep(OOspacecraft *sc)
   }
 
   float expendedFuel = 0.0f;
-  plMassMod(&sc->m, sc->m.m - expendedFuel);
+  plMassMod(&sc->obj->super.m, sc->obj->super.m.m - expendedFuel);
 }
 
 void // for scripts and events
@@ -270,7 +269,7 @@ ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises) {
   }
 
   float expendedFuel = 0.0f;
-  plMassMod(&stage->m, stage->m.m - expendedFuel);
+  plMassMod(&stage->obj->m, stage->obj->m.m - expendedFuel);
 }
 
 typedef int (*qsort_compar_t)(const void *, const void *);
@@ -294,7 +293,7 @@ ooScNewStage(void)
   }
   //stage->id = dBodyNew(...) // In which dWorld?;
   stage->detachOrder = 0;
-
+  stage->obj = plSubObject3f(NULL, 0.0, 0.0, 0.0);
 //  stage->id = dBodyCreate(world);
 
 //  dMass mass;
@@ -533,12 +532,12 @@ ooScLoad(PLworld *world, const char *fileName)
             } // For all properties in stage
 
             assert(stageCog && inertia && stagePos);
-            plMassSet(&newStage->m, 1.0f, // Default to 1.0 kg
+            plMassSet(&newStage->obj->m, 1.0f, // Default to 1.0 kg
                       0.0f, 0.0f, 0.0f,
                       inertia[0], inertia[4], inertia[8],
                       inertia[1], inertia[2], inertia[5]);
-            plMassMod(&newStage->m, mass);
-            plMassTranslate(&newStage->m, -stageCog[0], -stageCog[1], -stageCog[2]);
+            plMassMod(&newStage->obj->m, mass);
+            plMassTranslate(&newStage->obj->m, -stageCog[0], -stageCog[1], -stageCog[2]);
 
             newStage->pos[0] = stagePos[0];
             newStage->pos[1] = stagePos[1];
@@ -563,7 +562,7 @@ ooScLoad(PLworld *world, const char *fileName)
   free(path);
 
   ooScReevaluateMass(sc);
-  sc->obj = plObject3f(world->rootSys, 0.0, 0.0, 0.0);
+  //sc->obj = plCompoundObject3f(world->rootSys, 0.0, 0.0, 0.0);
   return sc;
 }
 
@@ -571,7 +570,7 @@ ooScLoad(PLworld *world, const char *fileName)
 void
 ooScSetPos(OOspacecraft *sc, double x, double y, double z)
 {
-  plSetObjectPos3d(sc->obj, x, y, z);
+  plSetObjectPos3d(&sc->obj->super, x, y, z);
 }
 
 void

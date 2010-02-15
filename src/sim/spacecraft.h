@@ -58,11 +58,11 @@ typedef enum OOstagestate {
 } OOstagestate;
 
 struct OOstage {
-  float pos[3];
+  float3 pos;
   OOstagestate state;
   SGdrawable *mesh; // Used for synchronising with the rendering
   int detachOrder; // How and when to detach the stage
-  PLmass m; // Mass and inertia tensor of stage, unit is kg
+  PLobject *obj; // Mass and inertia tensor of stage, unit is kg
   obj_array_t actuators;
   obj_array_t actuatorGroups;
 };
@@ -116,8 +116,7 @@ struct OOspacecraft {
   obj_array_t stages;
   int activeStageIdx; // index in stage vector of active stage, this point out where
                       // detachment happens
-  PLmass m;  //!< Mass of spacecraft, sum of stage masses
-  PLobject *obj;
+  PLcompound_object *obj;
 
   OOdetatchprog detatchProg;
 
