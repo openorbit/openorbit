@@ -272,12 +272,14 @@ plForceRelativePos3fv(PLobject *obj, float3 f, float3 p)
 
 void plStepObjectf(PLobject *obj, float dt)
 {
-  obj->v += (obj->f_ack / obj->m.m) * dt;
-  ooLwcTranslate(&obj->p, vf3_s_mul(obj->v, dt));
+  obj->v += (obj->f_ack / obj->m.m) * dt; // Update velocity from force
+  ooLwcTranslate(&obj->p, vf3_s_mul(obj->v, dt)); // Update position from velocity
 
-  obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt;
-  obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt));
-  plComputeDerived(obj);
+  obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
+  obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt)); // Update quaternion with rotational velocity
+
+  plComputeDerived(obj); // Compute derived data (world inverted inertia tensor etc)
+  plClearObject(obj); // Clear accums
 }
 
 void
