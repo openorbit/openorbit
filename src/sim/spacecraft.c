@@ -25,7 +25,7 @@
 #include "res-manager.h"
 #include "parsers/hrml.h"
 #include <vmath/vmath.h>
-#include "engine.h"
+#include "actuator.h"
 extern SIMstate gSIM_state;
 
 DEF_ARRAY(OOdetatchinstr,detatchprog)

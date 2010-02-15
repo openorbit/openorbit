@@ -113,7 +113,7 @@
 		EC4485730CCD258E001C88AD /* test-case.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485470CCD247E001C88AD /* test-case.c */; };
 		EC4485740CCD259D001C88AD /* om-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854A0CCD247E001C88AD /* om-test.c */; };
 		EC4485750CCD25AB001C88AD /* list-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854D0CCD247E001C88AD /* list-test.c */; };
-		EC4A893910B152C9002C6513 /* engine.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4A893810B152C9002C6513 /* engine.c */; };
+		EC4A893910B152C9002C6513 /* actuator.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4A893810B152C9002C6513 /* actuator.c */; };
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
 		EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7D093410EE160700D9D28E /* flightrecorder.c */; };
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
@@ -410,8 +410,8 @@
 		EC44854D0CCD247E001C88AD /* list-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "list-test.c"; sourceTree = "<group>"; };
 		EC4485500CCD247E001C88AD /* test-case.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-case.c"; sourceTree = "<group>"; };
 		EC4485600CCD24C6001C88AD /* Doxyfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
-		EC4A893710B152C9002C6513 /* engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = engine.h; sourceTree = "<group>"; };
-		EC4A893810B152C9002C6513 /* engine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = engine.c; sourceTree = "<group>"; };
+		EC4A893710B152C9002C6513 /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuator.h; sourceTree = "<group>"; };
+		EC4A893810B152C9002C6513 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuator.c; sourceTree = "<group>"; };
 		EC4A895310B1553A002C6513 /* simtypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simtypes.h; sourceTree = "<group>"; };
 		EC4FCC1310748AC900EB6DDF /* libode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libode.a; path = /opt/ode/0.11_float/lib/libode.a; sourceTree = "<absolute>"; };
 		EC4FCC6010748ECA00EB6DDF /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = /opt/local/lib/libjpeg.a; sourceTree = "<absolute>"; };
@@ -822,8 +822,8 @@
 				EC34BC521079EE080011B76E /* spacecraft.h */,
 				EC3F258910905FE100E0B0C7 /* simenvironment.h */,
 				EC3F258A10905FE100E0B0C7 /* simenvironment.c */,
-				EC4A893710B152C9002C6513 /* engine.h */,
-				EC4A893810B152C9002C6513 /* engine.c */,
+				EC4A893710B152C9002C6513 /* actuator.h */,
+				EC4A893810B152C9002C6513 /* actuator.c */,
 				EC4A895310B1553A002C6513 /* simtypes.h */,
 			);
 			path = sim;
@@ -1498,7 +1498,7 @@
 				EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */,
 				EC3F258B10905FE100E0B0C7 /* simenvironment.c in Sources */,
 				EC88CF9010A2B1D700A11B1D /* collada.c in Sources */,
-				EC4A893910B152C9002C6513 /* engine.c in Sources */,
+				EC4A893910B152C9002C6513 /* actuator.c in Sources */,
 				EC51E6E310BBE766009FA70D /* mass.c in Sources */,
 				EC204D5410CAFA2300F0A450 /* palloc.c in Sources */,
 				EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */,

@@ -22,7 +22,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "engine.h"
+#include "actuator.h"
 #include "spacecraft.h"
 
 
