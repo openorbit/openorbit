@@ -28,15 +28,19 @@ spacecraft (name: Mercury-Capsule) {
       model(): "mercury.ac";
       detach-order: 1;
       mass: 1354.0 kg;
-      inertial-tensor: [1.0, 0.0, 0.0,
-                        0.0, 1.0, 0.0,
-                        0.0, 0.0, 1.0];
-      cog: [0.0, 0.55, 0.0]; // Center of gravity (stage local), normally 0,0,0
+      // For now we assume a solid cylinder of height 3.5 m and radius 0.89 m,
+      // this is wrong but should at least not be a to crappy approximation.
+      // Someone with more insight in the mercury programme should check these
+      // numbers.
+      inertial-tensor: [1.2188583333, 0.0,     0.0,
+                        0.0,          0.39605, 0.0,
+                        0.0,          0.0,     1.2188583333];
+      cog: [0.0, 0.55, 0.0]; // Center of gravity (stage local),
                              // here we align it with the roll jets which seem
                              // reasonable when seeing the shape of the mercury
                              // capsule, someone with more knowledge on the
                              // topic should check it out
-      pos: [0.0, 20.0, 0.0]; // Position relative to whole spacecraft
+      pos: [0.0, 17.9832, 0.0]; // Position relative to whole spacecraft
       actuators {
         // Nice example, if multiple engines are used, they may either be fired
         // in sequence or in parallel, this distinction is handled by the
@@ -139,21 +143,30 @@ spacecraft (name: Mercury-Capsule) {
         }
       }
     }
-    stage (name: Redstone) {
+    stage (name: Mercury-Redstone) {
+      // Length 17.9832 m
+      // Radius: 0.89
+      // inertia tensor: 1/12 m 3rr + hh    1/2 mrr
       model(): "redstone.ac";
       detach-order: 0;
-      mass: 30000.0 kg;
-      inertial-tensor: [1.0, 0.0, 0.0,
-                        0.0, 1.0, 0.0,
-                        0.0, 0.0, 1.0];
-      cog: [0.0, 10.0, 0.0]; // Center of gravity (stage local)
+      fuel: 24000.0 kg;
+      mass: 4400.0 kg;
+
+      // inertia tensors are entered in the base form, assuming that the total mass = 1.0
+      // for the redstone mercury rocket we assume a solid cylinder for the form
+      // 1/2 mrr = 0.5 * 1.0 * 0.89 * 0.89 = 0.39605
+      // 1/12 m(3rr + hh) = 27.14764852
+      inertial-tensor: [27.14764852, 0.0,     0.0,
+                        0.0,         0.39605, 0.0, // y axis is the forward vector
+                        0.0,         0.0,     27.14764852];
+      cog: [0.0, 8.9916, 0.0]; // Center of gravity (stage local, assume perfect symmetry for now)
       pos: [0.0, 0.0, 0.0]; // Position relative to whole spacecraft
       actuators {
         rocket (name: rocketdyne_a7) {
           fuel: "LOX/ethyl alcohol";
-          thrust: 350.0 kN;
+          thrust: 370.0 kN; // TODO: Verify
           specific-impulse: 215.0 s;
-          burn-time: 143.5 s;
+          burn-time: 150.0 s; // TODO: get exact numbers
           fire-once: true; // Solid rocket engine
           pos: [0.0, 0.0, 0.0]; // Relative to stage
           dir: [0.0, -1.0, 0.0];
