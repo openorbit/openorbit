@@ -4,6 +4,7 @@ openorbit {
       mass: 1.991e30 kg;
       gm: 1.327e20;
       radius: 6.96e8 m;
+      flattening: 9.0e-6;
       sidereal-rotational-period: 25.38 days;
       axial-tilt: 7.25 deg; // Note, obliquity is relative to ecliptic
     }
@@ -17,6 +18,7 @@ openorbit {
           mass: 3.18e23 kg;
           gm: 2.203e13; // m^3/s^2
           radius: 2.43e6 m;
+          flattening: 0.0;
           sidereal-rotational-period: 58.646 days;
           axial-tilt: 0.0351666667 deg; // 2.11' according to wikipedia
         }
@@ -50,6 +52,7 @@ openorbit {
           mass: 4.88e24 kg;
           gm: 3.249e14;
           radius: 6.06e6 m;
+          flattening: 0.0;
           sidereal-rotational-period: 243.0185 days;
           axial-tilt: 177.3 deg; // Reverse rotation compared to other planets
         }
@@ -82,6 +85,7 @@ openorbit {
           mass: 5.98e24 kg;
           gm: 3.986e14;
           radius: 6.37e6 m;
+          flattening: 0.0033528;
           sidereal-rotational-period: 0.99726968;
           axial-tilt: 23.439281 deg;
           albedo: 0.367;
@@ -115,6 +119,7 @@ openorbit {
             physical {
               mass: 7.36e22 kg;
               radius: 1.74e6 m;
+              flattening: 0.00125;
               sidereal-rotational-period: 27.321582 days;
               axial-tilt: 1.5424 deg; // To ecliptic, 6.687 to orbital plane
             }
@@ -138,6 +143,7 @@ openorbit {
           mass: 0.64185e24 kg;
           gm: 4.283e13;
           radius: 3.3962e6 m;
+          flattening: 0.00589;
           sidereal-rotational-period: 1.0259541666666667; // Days
           axial-tilt: 25.19 deg; // Also known as obliquity
         }
@@ -160,6 +166,7 @@ openorbit {
           mass: 1898.6e24 kg;
           gm: 1.267e17;
           radius: 71.492e6 m;
+          flattening: 0.06487;
           sidereal-rotational-period: 0.4135416666666667; // Days
           axial-tilt: 3.13 deg; // Also known as obliquity
         }
@@ -261,7 +268,29 @@ openorbit {
               //albedo: 0.19;
             }
           }
-          
+        }
+      }
+      planet (name: Saturn) {
+        physical {
+          mass: 5.6846e26 kg;
+          radius: 60268.0e3 m;
+          flattening: 0.09796;
+          sidereal-rotational-period: 0.440416667; // Days
+          axial-tilt: 26.73 deg; // Also known as obliquity
+        }
+        orbit {
+          semimajor-axis: 9.58201720 au;
+          eccentricity: 0.055723219;
+          inclination: 2.485240 deg; // To ecliptic
+          longitude-ascending-node: 113.642811 deg;
+          longitude-periapsis: 336.013862 deg;
+          mean-longitude: 320.346750 deg;
+          //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
+        }
+        rendering {
+          model: "sphere";
+          texture: "textures/saturn.jpg";
+          // albedo: 0.342 bond, 0.47 geom
         }
       }
     }
