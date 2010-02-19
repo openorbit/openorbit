@@ -212,22 +212,22 @@ plNewKeplerElements(double ecc, double a, double inc, double longAsc,
   return elems;
 }
 
-PLastrobody*
-plGetObject(PLworld *world, const char *name)
+PLsystem*
+plGetSystem(PLworld *world, const char *name)
 {
   char str[strlen(name)+1];
   strcpy(str, name); // TODO: We do not trust the user, should probably
-                     //       check alloca result
+  //       check alloca result
   char *strp = str;
   char *strTok = strsep(&strp, "/");
 
   // One level name?
   if (strp == NULL) {
-    if (!strcmp(strTok, world->rootSys->orbitalBody->name)) {
-      return world->rootSys->orbitalBody;
+    if (!strcmp(strTok, world->rootSys->name)) {
+      return world->rootSys;
     }
     return NULL;
-  } else if (strcmp(strTok, world->rootSys->orbitalBody->name)) {
+  } else if (strcmp(strTok, world->rootSys->name)) {
     return NULL;
   }
 
@@ -245,7 +245,7 @@ plGetObject(PLworld *world, const char *name)
     if (!strcmp(sys->name, strTok)) {
       if (strp == NULL) {
         // At the end of the sys path
-        return sys->orbitalBody;
+        return sys;
       }
 
       // If this is not the lowest level, go one level down
@@ -264,6 +264,17 @@ plGetObject(PLworld *world, const char *name)
   }
   return NULL;
 }
+
+
+PLastrobody*
+plGetObject(PLworld *world, const char *name)
+{
+  PLsystem *sys = plGetSystem(world, name);
+  if (sys) return sys->orbitalBody;
+  return NULL;
+}
+
+
 
 float3
 plGetPos(const PLastrobody *obj)
@@ -319,7 +330,7 @@ plSysSetCurrentPos(PLsystem *sys)
                                     sys->parent->orbitalBody->GM + sys->orbitalBody->GM,
                                     ooTimeGetJD()*PL_SEC_PER_DAY);
     sys->orbitalBody->obj.p = sys->parent->orbitalBody->obj.p;
-    ooLwcTranslate(&sys->orbitalBody->obj.p, newPos);
+    ooLwcTranslate3fv(&sys->orbitalBody->obj.p, newPos);
   }
 }
 
@@ -365,7 +376,7 @@ plSetDrawable(PLastrobody *obj, SGdrawable *drawable)
  */
 PLastrobody*
 plNewObj(PLworld*world, const char *name, double m, double gm,
-         OOlwcoord * coord, quaternion_t q)
+         OOlwcoord * coord, quaternion_t q, double radius, double flattening)
 {
   PLastrobody *obj = malloc(sizeof(PLastrobody));
   
@@ -389,14 +400,18 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
     obj->GM = m * PL_GRAVITATIONAL_CONST;
   }
   obj->kepler = NULL;
+  obj->eqRad = radius;
+
+  // flattening = ver(angEcc) = 1 - cos(angEcc) => angEcc = acos(1 - flattening)
+  obj->angEcc = acos(1.0 - flattening);
   return obj;
 }
 
 PLastrobody*
 plNewObjInSys(PLsystem *sys, const char *name, double m, double gm,
-              OOlwcoord *coord, quaternion_t q)
+              OOlwcoord *coord, quaternion_t q, double radius, double flattening)
 {
-  PLastrobody *obj = plNewObj(sys->world, name, m, gm, coord, q);
+  PLastrobody *obj = plNewObj(sys->world, name, m, gm, coord, q, radius, flattening);
   obj->sys = sys;
 
   obj_array_push(&sys->objs, obj);
@@ -407,25 +422,26 @@ plNewObjInSys(PLsystem *sys, const char *name, double m, double gm,
 PLworld*
 plNewWorld(const char *name, OOscene *sc,
            double m, double gm, double radius, double siderealPeriod,
-           double obliquity)
+           double obliquity, double eqRadius, double flattening)
 {
   PLworld *world = malloc(sizeof(PLworld));
 
   world->scene = sc;
   world->name = strdup(name);
-  world->rootSys = plNewRootSystem(world, name, m, gm, obliquity);
-
+  world->rootSys = plNewRootSystem(world, name, m, gm, obliquity, eqRadius, flattening);
+  obj_array_init(&world->objs);
   return world;
 }
 
 PLsystem*
-plCreateOrbit(PLworld *world, const char *name,
-              double m, double gm,
-              double orbitPeriod,
-              double obliquity,
-              double semiMaj, double semiMin,
-              double inc, double ascendingNode, double argOfPeriapsis,
-              double meanAnomaly)
+plCreateOrbitalObject(PLworld *world, const char *name,
+                      double m, double gm,
+                      double orbitPeriod,
+                      double obliquity,
+                      double semiMaj, double semiMin,
+                      double inc, double ascendingNode, double argOfPeriapsis,
+                      double meanAnomaly,
+                      double eqRadius, double flattening)
 {
   assert(world);
 
@@ -451,7 +467,7 @@ plCreateOrbit(PLworld *world, const char *name,
   q = q_mul(q, q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(argOfPeriapsis)));
   q = q_mul(q, q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(obliquity)));
 
-  sys->orbitalBody = plNewObj(world, name, m, gm, &p, q);
+  sys->orbitalBody = plNewObj(world, name, m, gm, &p, q, eqRadius, flattening);
   sys->orbitalBody->kepler = plNewKeplerElements(sqrt((semiMaj*semiMaj-semiMin*semiMin)/(semiMaj*semiMaj)),
                                                  semiMaj, inc, ascendingNode,
                                                  argOfPeriapsis, meanAnomaly);
@@ -467,7 +483,8 @@ plCreateOrbit(PLworld *world, const char *name,
 }
 
 PLsystem*
-plNewRootSystem(PLworld *world, const char *name, double m, double gm, double obliquity)
+plNewRootSystem(PLworld *world, const char *name, double m, double gm, double obliquity,
+                double eqRadius, double flattening)
 {
   assert(world);
 
@@ -483,7 +500,7 @@ plNewRootSystem(PLworld *world, const char *name, double m, double gm, double ob
   ooLwcSet(&p, 0.0, 0.0, 0.0);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(obliquity));
 
-  sys->orbitalBody = plNewObj(world, name, m, gm, &p, q);
+  sys->orbitalBody = plNewObj(world, name, m, gm, &p, q, eqRadius, flattening);
   sys->orbitalBody->kepler = NULL;
   sys->orbitDrawable = NULL;
 //  ooSgSceneAddObj(sys->world->scene,
@@ -502,12 +519,12 @@ plNewOrbit(PLworld *world, const char *name,
            double orbitPeriod, double obliquity,
            double semiMaj, double semiMin,
            double inc, double ascendingNode, double argOfPeriapsis,
-           double meanAnomaly)
+           double meanAnomaly, double eqRadius, double flattening)
 {
   assert(world);
   return plNewSubOrbit(world->rootSys, name,
                        m, gm, orbitPeriod, obliquity, semiMaj, semiMin,
-                       inc, ascendingNode, argOfPeriapsis, meanAnomaly);
+                       inc, ascendingNode, argOfPeriapsis, meanAnomaly, eqRadius, flattening);
 }
 
 PLsystem*
@@ -516,15 +533,17 @@ plNewSubOrbit(PLsystem *parent, const char *name,
               double orbitPeriod, double obliquity,
               double semiMaj, double semiMin,
               double inc, double ascendingNode, double argOfPeriapsis,
-              double meanAnomaly)
+              double meanAnomaly,
+              double eqRadius, double flattening)
 {
   assert(parent);
   assert(parent->world);
 
-  PLsystem * sys = plCreateOrbit(parent->world,
-                                 name, m, gm, orbitPeriod, obliquity,
-                                 semiMaj, semiMin,
-                                 inc, ascendingNode, argOfPeriapsis, meanAnomaly);
+  PLsystem * sys = plCreateOrbitalObject(parent->world,
+                                         name, m, gm, orbitPeriod, obliquity,
+                                         semiMaj, semiMin,
+                                         inc, ascendingNode, argOfPeriapsis, meanAnomaly,
+                                         eqRadius, flattening);
   sys->parent = parent;
   obj_array_push(&parent->orbits, sys);
   plSysSetCurrentPos(sys);
@@ -627,6 +646,8 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscenegraph *sg)
   double mass, radius, siderealPeriod, gm = NAN, axialTilt = 0.0;
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong;
   const char *tex = NULL;
+
+  double flattening = 0.0;
   HRMLobject *sats = NULL;
 
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
@@ -642,6 +663,8 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscenegraph *sg)
           axialTilt = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "gm")) {
           gm = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "flattening")) {
+          flattening = hrmlGetReal(phys);
         }
       }
     } else if (!strcmp(child->name, "orbit")) {
@@ -694,7 +717,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscenegraph *sg)
   PLsystem *moonSys = plNewSubOrbit(sys, moonName.u.str, mass, gm,
                                     period, axialTilt,
                                     semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc),
-                                    inc, longAscNode, longPerihel, meanLong);
+                                    inc, longAscNode, longPerihel, meanLong, radius, flattening);
 
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);
@@ -714,6 +737,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
   double semiMajor, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
   const char *tex = NULL;
   HRMLobject *sats = NULL;
+  double flattening = 0.0;
 
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
     if (!strcmp(child->name, "physical")) {
@@ -728,6 +752,8 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
           axialTilt = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "gm")) {
           gm = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "flattening")) {
+          flattening = hrmlGetReal(phys);
         }
       }
     } else if (!strcmp(child->name, "orbit")) {
@@ -778,7 +804,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
                              comp_orbital_period_for_planet(semiMajor), axialTilt,
                              plAuToMetres(semiMajor),
                              plAuToMetres(ooGeoComputeSemiMinor(semiMajor, ecc)),
-                             inc, longAscNode, longPerihel, meanLong);
+                             inc, longAscNode, longPerihel, meanLong, radius, flattening);
   plSetDrawable(sys->orbitalBody, drawable);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);
@@ -801,7 +827,7 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
   double mass = 0.0, gm = NAN;
   double radius, siderealPeriod, axialTilt;
   const char *tex = NULL;
-
+  double flattening = 0.0;
 
   HRMLobject *sats = NULL;
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
@@ -819,6 +845,8 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
           axialTilt = hrmlGetReal(phys);
         } else if (!strcmp(phys->name, "gm")) {
           gm = hrmlGetReal(phys);
+        } else if (!strcmp(phys->name, "flattening")) {
+          flattening = hrmlGetReal(phys);
         }
       }
     } else if (!strcmp(child->name, "rendering")) {
@@ -847,7 +875,7 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
 
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   PLworld *world = plNewWorld(starName.u.str, sc, mass, gm, radius,
-                              siderealPeriod, axialTilt);
+                              siderealPeriod, axialTilt, radius, flattening);
   world->rootSys->orbitalBody->lightSource = starLightSource;
 
   plSetDrawable(world->rootSys->orbitalBody, drawable);

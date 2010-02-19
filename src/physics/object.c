@@ -64,22 +64,11 @@ plInitObject(PLobject *obj)
 }
 
 PLobject*
-plObject3f(PLsystem *sys, float x, float y, float z)
+plObject(PLworld *world)
 {
-  assert(sys != NULL);
+  assert(world != NULL);
 
   PLobject *obj = malloc(sizeof(PLobject));
-  //  obj->id = dBodyCreate(sys->world->world);
-  //dBodySetGravityMode(obj->id, 0); // Ignore standard ode gravity effects
-  //dBodySetData(obj->id, NULL);
-  //dBodySetMovedCallback(obj->id, plUpdateObject);
-
-  //dQuaternion quat = {vf4_w(q), vf4_x(q), vf4_y(q), vf4_z(q)};
-  // TODO: Ensure quaternion is set for orbit
-  //       asc * inc * obl ?
-
-  //dBodySetQuaternion(obj->id, quat);
-  //dBodySetAngularVel(obj->id, 0.0, 0.0, 0.05);
   plInitObject(obj);
 
   plSetAngularVel3f(obj, 0.0f, 0.0f, 0.05f);
@@ -87,11 +76,11 @@ plObject3f(PLsystem *sys, float x, float y, float z)
             0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f);
-  
-  ooLwcSet(&obj->p, x, y, z);
-  obj->sys = sys;
+
+  obj->sys = NULL;
   obj->parent = NULL;
-  obj_array_push(&sys->objs, obj);
+
+  obj_array_push(&world->objs, obj);
 
   plComputeDerived(obj);
 
@@ -99,22 +88,11 @@ plObject3f(PLsystem *sys, float x, float y, float z)
 }
 
 PLcompound_object*
-plCompoundObject3f(PLsystem *sys, float x, float y, float z)
+plCompoundObject(PLworld *world)
 {
-  assert(sys != NULL);
-  
+  assert(world != NULL);
+
   PLcompound_object *obj = malloc(sizeof(PLcompound_object));
-  //obj->super.id = dBodyCreate(sys->world->world);
-  //dBodySetGravityMode(obj->super.id, 0); // Ignore standard ode gravity effects
-  //dBodySetData(obj->super.id, NULL);
-  //dBodySetMovedCallback(obj->id, plUpdateObject);
-  
-  //dQuaternion quat = {vf4_w(q), vf4_x(q), vf4_y(q), vf4_z(q)};
-  // TODO: Ensure quaternion is set for orbit
-  //       asc * inc * obl ?
-  
-  //dBodySetQuaternion(obj->id, quat);
-  //dBodySetAngularVel(obj->super.id, 0.0, 0.0, 0.05);
   plInitObject(&obj->super);
 
   plSetAngularVel3f(&obj->super, 0.0f, 0.0f, 0.05f);
@@ -123,22 +101,23 @@ plCompoundObject3f(PLsystem *sys, float x, float y, float z)
             0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f);
-  
-  ooLwcSet(&obj->super.p, x, y, z);
-  obj->super.sys = sys;
+
+  obj->super.sys = NULL;
   obj->super.parent = NULL;
-  obj_array_push(&sys->objs, obj);
+
+  obj_array_push(&world->objs, obj);  
   obj_array_init(&obj->children);
+
   plComputeDerived(&obj->super);
 
   return obj;
-  
 }
+
 PLobject*
-plSubObject3f(PLcompound_object *parent, float x, float y, float z)
+plSubObject3f(PLworld *world, PLcompound_object *parent, float x, float y, float z)
 {
   assert(parent != NULL);
-  
+
   PLobject *obj = malloc(sizeof(PLobject));
   plMassSet(&obj->m, 0.0f,
             0.0f, 0.0f, 0.0f,
@@ -147,6 +126,8 @@ plSubObject3f(PLcompound_object *parent, float x, float y, float z)
   ooLwcSet(&obj->p, x, y, z);
   obj->sys = parent->super.sys;
   obj->parent = parent;
+
+  obj_array_push(&world->objs, obj);
   obj_array_push(&parent->children, obj);
   return obj;
 }
@@ -154,11 +135,18 @@ plSubObject3f(PLcompound_object *parent, float x, float y, float z)
 void
 plDetatchObject(PLobject *obj)
 {
+  // Should a detatched object be removed from the compound object completetlly
+  // or should it be kept around for future references? At the moment, the
+  // parent of the detatched object is set to NULL in order to indcate the
+  // detachement but the object pointer is still left in the parents child array
   assert(obj != NULL);
   assert(obj->parent != NULL);
 
   obj_array_push(&obj->parent->super.sys->objs, obj);
+  PLcompound_object *parent = obj->parent;
   obj->parent = NULL;
+
+  plUpdateMass(parent);
 }
 
 void
@@ -173,13 +161,15 @@ plUpdateMass(PLcompound_object *obj)
   
   for (int i = 0 ; i < obj->children.length ; ++ i) {
     PLobject *child = obj->children.elems[i];
-    PLmass tmp = child->m;
-    plMassTranslate(&tmp,
-                    -child->m.cog[0],
-                    -child->m.cog[1],
-                    -child->m.cog[2]);
+    if (child->parent) { // Only for attached objects
+      PLmass tmp = child->m;
+      plMassTranslate(&tmp,
+                      -child->m.cog[0],
+                      -child->m.cog[1],
+                      -child->m.cog[2]);
       
-    plMassAdd(&obj->super.m, &tmp);
+      plMassAdd(&obj->super.m, &tmp);
+    }
   }
 }
 
@@ -217,6 +207,14 @@ plSetObjectPosRel3d(PLobject * restrict obj, const PLobject * restrict otherObj,
   ooLwcTranslate3f(&obj->p, x, y, z);
 }
 
+void
+plSetObjectPosRel3fv(PLobject * restrict obj,
+                     const PLobject * restrict otherObj,
+                     float3 rp)
+{
+  obj->p = otherObj->p;
+  ooLwcTranslate3fv(&obj->p, rp);  
+}
 void
 plForce3f(PLobject *obj, float x, float y, float z)
 {
@@ -273,7 +271,7 @@ plForceRelativePos3fv(PLobject *obj, float3 f, float3 p)
 void plStepObjectf(PLobject *obj, float dt)
 {
   obj->v += (obj->f_ack / obj->m.m) * dt; // Update velocity from force
-  ooLwcTranslate(&obj->p, vf3_s_mul(obj->v, dt)); // Update position from velocity
+  ooLwcTranslate3fv(&obj->p, vf3_s_mul(obj->v, dt)); // Update position from velocity
 
   obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
   obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt)); // Update quaternion with rotational velocity
@@ -308,6 +306,26 @@ plSetAngularVel3f(PLobject *obj, float rx, float ry, float rz)
   obj->angVel = vf3_set(rx, ry, rz);
 }
 
+
+// Sets angular velocity by a given quaternion and rotational velocity
+// The quaternion should represent rotation around dec and ra of the main rot
+// vector and r should represent the rads per second that the rotation will be
+void
+plSetAngularVel4fq(PLobject *obj, quaternion_t q, float r)
+{
+  float3 v = vf3_set(1.0f, 0.0f, 0.0f);
+  quaternion_t qrx = q_rot(1.0f, 0.0f, 0.0f, r);
+  quaternion_t qr = q_mul(q, qrx);
+  
+  float3x3 m;
+  q_mf3_convert(m, qr);
+  
+  float3 ra = mf3_v_mul(m, v);
+  
+  obj->angVel = ra;
+}
+
+
 void
 plSetAngularVel3fv(PLobject *obj, float3 r)
 {
@@ -317,4 +335,21 @@ plSetAngularVel3fv(PLobject *obj, float3 r)
 quaternion_t plGetQuat(PLobject *obj)
 {
   return obj->q;
+}
+
+void
+plSetSystem(PLsystem *sys, PLobject *obj)
+{
+  if (obj->sys != NULL) {
+    // Not the most efficient way if there are several objects in the system,
+    // but should be fine for now
+    for (int i = 0 ; i < obj->sys->objs.length ; ++i) {
+      if (obj->sys->objs.elems[i] == obj) {
+        obj_array_remove(&obj->sys->objs, i);
+        break;
+      }
+    }
+  }
+  obj->sys = sys;
+  obj_array_push(&sys->objs, obj);
 }

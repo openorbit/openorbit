@@ -90,7 +90,7 @@ ooLwcNormalise(OOlwcoord *coord)
 }
 
 void
-ooLwcTranslate(OOlwcoord *coord, float3 offs)
+ooLwcTranslate3fv(OOlwcoord *coord, float3 offs)
 {
   coord->offs = vf3_add(coord->offs, offs);
   ooLwcNormalise(coord);

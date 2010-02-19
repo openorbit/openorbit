@@ -30,6 +30,17 @@ extern SIMstate gSIM_state;
 
 DEF_ARRAY(OOdetatchinstr,detatchprog)
 
+void
+ooGetAxises(OOaxises *axises)
+{
+  axises->yaw = ooIoGetAxis("yaw");
+  axises->pitch = ooIoGetAxis("pitch");
+  axises->roll = ooIoGetAxis("roll");
+  axises->horizontal = ooIoGetAxis("horizontal");
+  axises->vertical = ooIoGetAxis("vertical");
+  axises->thrust = ooIoGetAxis("thrust");
+}
+
 
 /*
   Compute the wing lift for a simple wing
@@ -63,7 +74,7 @@ OOspacecraft* ooScGetCurrent(void)
 }
 
 OOspacecraft*
-ooScNew(void)
+ooScNew(PLworld *world)
 {
   OOspacecraft *sc = malloc(sizeof(OOspacecraft));
   //ooObjVecInit(&sc->stages);
@@ -71,12 +82,12 @@ ooScNew(void)
   //sc->body = dBodyCreate(world);
   sc->activeStageIdx = 0;
   obj_array_init(&sc->stages);
-
+  sc->world = world;
   sc->prestep = NULL;
   sc->poststep = NULL;
   sc->detatchStage = NULL;
 
-  sc->obj = plCompoundObject3f(NULL, 0.0, 0.0, 0.0);
+  sc->obj = plCompoundObject(world);
 
   sc->detatchProg.pc = 0;
   detatchprog_array_init(&sc->detatchProg.instrs);
@@ -108,11 +119,6 @@ ooScNew(void)
 //                    0.0, 0.0, 0.0);
 //}
 
-void
-ooScAddStage(OOspacecraft *sc, OOstage *stage)
-{
-  obj_array_push(&sc->stages, stage);
-}
 
 void
 ooScReevaluateMass(OOspacecraft *sc)
@@ -172,17 +178,7 @@ ooScDetachStage(OOspacecraft *sc)
 
 
 void
-ooGetAxises(OOaxises *axises)
-{
-  axises->yaw = ooIoGetAxis("yaw");
-  axises->pitch = ooIoGetAxis("pitch");
-  axises->roll = ooIoGetAxis("roll");
-  axises->horizontal = ooIoGetAxis("horizontal");
-  axises->vertical = ooIoGetAxis("vertical");
-  axises->thrust = ooIoGetAxis("thrust");
-}
-void
-ooScStep(OOspacecraft *sc)
+ooScStep(OOspacecraft *sc, float dt)
 {
   assert(sc != NULL);
 
@@ -192,7 +188,7 @@ ooScStep(OOspacecraft *sc)
   for (size_t i = sc->activeStageIdx ; i < sc->stages.length ; ++ i) {
     OOstage *stage = sc->stages.elems[i];
     if (stage->state == OO_Stage_Enabled) {
-      ooScStageStep(sc, stage, &axises);
+      ooScStageStep(sc, stage, &axises, dt);
     }
   }
 
@@ -232,7 +228,7 @@ ooScSyncSpacecraft(OOspacecraft *sc)
 }
 
 void
-ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises) {
+ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises, float dt) {
   assert(sc != NULL);
   assert(stage != NULL);
   assert(axises != NULL);
@@ -259,12 +255,7 @@ ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises) {
     if (act->state == OO_Act_Burning ||
         act->state == OO_Act_Fault_Open)
     {
-      
-      //      dBodyAddRelForceAtRelPos(sc->body,
-      //                         vf3_x(engine->dir) * engine->forceMag,
-      //                         vf3_y(engine->dir) * engine->forceMag,
-      //                         vf3_z(engine->dir) * engine->forceMag,
-      //                         vf3_x(engine->p), vf3_y(engine->p), vf3_z(engine->p));
+      act->step(act, dt);
     }
   }
 
@@ -279,11 +270,11 @@ static int compar_stages(const OOstage **s0, const OOstage **s1) {
 
 
 OOstage*
-ooScNewStage(void)
+ooScNewStage(OOspacecraft *sc)
 {
   OOstage *stage = malloc(sizeof(OOstage));
   stage->state = OO_Stage_Idle;
-
+  stage->sc = sc;
   // Actuator arrays
   obj_array_init(&stage->actuators);
   obj_array_init(&stage->actuatorGroups);
@@ -291,15 +282,10 @@ ooScNewStage(void)
     OOactuatorgroup *actGroup = ooScNewActuatorGroup(ooGetActuatorGroupName(i));
     obj_array_push(&stage->actuatorGroups, actGroup);
   }
-  //stage->id = dBodyNew(...) // In which dWorld?;
   stage->detachOrder = 0;
-  stage->obj = plSubObject3f(NULL, 0.0, 0.0, 0.0);
-//  stage->id = dBodyCreate(world);
+  stage->obj = plSubObject3f(sc->world, sc->obj, 0.0, 0.0, 0.0);
 
-//  dMass mass;
-//  dMassSetZero(&mass);
-//  dBodySetMass(stage->id, &mass);
-//  dBodyDisable(stage->id);
+  obj_array_push(&sc->stages, stage);
 
   return stage;
 }
@@ -375,7 +361,7 @@ loadThruster(HRMLobject *thruster, OOstage *newStage)
     }
   }
   if (pos && dir) {
-    OOrocket *engine = ooScNewThruster(NULL /*sc*/,
+    OOrocket *engine = ooScNewThruster(newStage /*sc*/,
                                        thrusterName.u.str,
                                        thrust,
                                        pos[0], pos[1], pos[2],
@@ -408,7 +394,7 @@ loadSolidRocket(HRMLobject *solidRocket, OOstage *newStage)
       }
     }
     if (pos && dir) {
-      OOsrb *engine = ooScNewSrb(NULL /*sc*/,
+      OOsrb *engine = ooScNewSrb(newStage /*sc*/,
                                  engineName.u.str,
                                  thrust,
                                  pos[0], pos[1], pos[2],
@@ -442,7 +428,7 @@ loadRocket(HRMLobject *rocket, OOstage *newStage)
     }
   }
   if (pos && dir) {
-    OOrocket *engine = ooScNewLoxEngine(NULL /*sc*/,
+    OOrocket *engine = ooScNewLoxEngine(newStage /*sc*/,
                                         engineName.u.str,
                                         thrust,
                                         pos[0], pos[1], pos[2],
@@ -454,6 +440,83 @@ loadRocket(HRMLobject *rocket, OOstage *newStage)
   }
 }
 
+static void
+loadActuators(HRMLobject *stageEntry, OOstage *newStage)
+{
+  HRMLobject *actGroups = NULL;
+
+  for (HRMLobject *prop = stageEntry->children; prop != NULL ; prop = prop->next) {
+    if (!strcmp(prop->name, "solid-rocket")) {
+      loadSolidRocket(prop, newStage);
+    } else if (!strcmp(prop->name, "thruster")) {
+      loadThruster(prop, newStage);
+    } else if (!strcmp(prop->name, "rocket")) {
+      loadRocket(prop, newStage);
+    } else if (!strcmp(prop->name, "actuator-groups")) {
+      actGroups = prop;
+    } // Propulsion for loop
+  }
+  if (actGroups != NULL) loadActuatorGroups(actGroups, newStage);
+}
+static void
+loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
+{
+  const double *inertia = NULL;
+  double mass;
+  const double *stagePos = NULL;
+  const double *stageCog = NULL;
+
+  HRMLvalue stageName = hrmlGetAttrForName(stage, "name");
+  OOstage *newStage = ooScNewStage(sc);
+  for (HRMLobject *stageEntry = stage->children ; stageEntry != NULL; stageEntry = stageEntry->next) {
+    if (!strcmp(stageEntry->name, "detach-order")) {
+      newStage->detachOrder = hrmlGetInt(stageEntry);
+    } else if (!strcmp(stageEntry->name, "mass")) {
+      mass = hrmlGetReal(stageEntry);
+    } else if (!strcmp(stageEntry->name, "inertial-tensor")) {
+      inertia = hrmlGetRealArray(stageEntry);
+      size_t len = hrmlGetRealArrayLen(stageEntry);
+      assert(len == 9 && "inertia tensor must be a 9 component real vector");
+    } else if (!strcmp(stageEntry->name, "pos")) {
+      stagePos = hrmlGetRealArray(stageEntry);
+      size_t len = hrmlGetRealArrayLen(stageEntry);
+      assert(len == 3 && "pos vector must be a 3 component real vector");
+    } else if (!strcmp(stageEntry->name, "cog")) {
+      stageCog = hrmlGetRealArray(stageEntry);
+      size_t len = hrmlGetRealArrayLen(stageEntry);
+      assert(len == 3 && "cog vector must be a 3 component real vector");
+    } else if (!strcmp(stageEntry->name, "actuators")) {
+      loadActuators(stageEntry, newStage);
+        // End actuators
+    } else if (!strcmp(stageEntry->name, "model")) {
+      const char *modelName = hrmlGetStr(stageEntry);
+      char *pathCopy = strdup(filePath);
+      char *lastSlash = strrchr(pathCopy, '/');
+      lastSlash[1] = '\0'; // terminate string here and append model
+                           // filename
+      char *modelPath;
+      asprintf(&modelPath, "%s/%s", pathCopy, modelName);
+
+      SGdrawable *drawable = sgLoadModel(modelPath);
+      ooScSetStageMesh(newStage, drawable);
+
+      free(modelPath);
+      free(pathCopy);
+    }
+  } // For all properties in stage
+
+  assert(stageCog && inertia && stagePos);
+  plMassSet(&newStage->obj->m, 1.0f, // Default to 1.0 kg
+            0.0f, 0.0f, 0.0f,
+            inertia[0], inertia[4], inertia[8],
+            inertia[1], inertia[2], inertia[5]);
+  plMassMod(&newStage->obj->m, mass);
+  plMassTranslate(&newStage->obj->m, -stageCog[0], -stageCog[1], -stageCog[2]);
+
+  newStage->pos[0] = stagePos[0];
+  newStage->pos[1] = stagePos[1];
+  newStage->pos[2] = stagePos[2];
+}
 
 OOspacecraft*
 ooScLoad(PLworld *world, const char *fileName)
@@ -467,85 +530,16 @@ ooScLoad(PLworld *world, const char *fileName)
     free(path);
     return NULL;
   }
-  HRMLobject *actGroups = NULL;
   HRMLobject *root = hrmlGetRoot(spaceCraftDoc);
   HRMLvalue scName = hrmlGetAttrForName(root, "name");
-  OOspacecraft *sc = ooScNew();
-
-  const double *inertia = NULL;
-  double mass;
-  const double *stagePos = NULL;
-  const double *stageCog = NULL;
+  OOspacecraft *sc = ooScNew(world);
 
   for (HRMLobject *node = root; node != NULL; node = node->next) {
     if (!strcmp(node->name, "spacecraft")) {
       for (HRMLobject *child = node->children; child != NULL ; child = child->next) {
         if (!strcmp(child->name, "stages")) {
           for (HRMLobject *stage = child->children; stage != NULL ; stage = stage->next) {
-            HRMLvalue stageName = hrmlGetAttrForName(stage, "name");
-            OOstage *newStage = ooScNewStage();
-            for (HRMLobject *stageEntry = stage->children ; stageEntry != NULL; stageEntry = stageEntry->next) {
-              if (!strcmp(stageEntry->name, "detach-order")) {
-                newStage->detachOrder = hrmlGetInt(stageEntry);
-              } else if (!strcmp(stageEntry->name, "mass")) {
-                mass = hrmlGetReal(stageEntry);
-              } else if (!strcmp(stageEntry->name, "inertial-tensor")) {
-                inertia = hrmlGetRealArray(stageEntry);
-                size_t len = hrmlGetRealArrayLen(stageEntry);
-                assert(len == 9 && "inertia tensor must be a 9 component real vector");
-              } else if (!strcmp(stageEntry->name, "pos")) {
-                stagePos = hrmlGetRealArray(stageEntry);
-                size_t len = hrmlGetRealArrayLen(stageEntry);
-                assert(len == 3 && "pos vector must be a 3 component real vector");
-              } else if (!strcmp(stageEntry->name, "cog")) {
-                stageCog = hrmlGetRealArray(stageEntry);
-                size_t len = hrmlGetRealArrayLen(stageEntry);
-                assert(len == 3 && "cog vector must be a 3 component real vector");
-              } else if (!strcmp(stageEntry->name, "actuators")) {
-                for (HRMLobject *prop = stageEntry->children; prop != NULL ; prop = prop->next) {
-                  if (!strcmp(prop->name, "solid-rocket")) {
-                    loadSolidRocket(prop, newStage);
-                  } else if (!strcmp(prop->name, "thruster")) {
-                    loadThruster(prop, newStage);
-                  } else if (!strcmp(prop->name, "rocket")) {
-                    loadRocket(prop, newStage);
-                  } else if (!strcmp(prop->name, "actuator-groups")) {
-                    actGroups = prop;
-                  }
-                } // Propulsion for loop
-                  // End actuators
-              } else if (!strcmp(stageEntry->name, "model")) {
-                const char *modelName = hrmlGetStr(stageEntry);
-                char *pathCopy = strdup(path);
-                char *lastSlash = strrchr(pathCopy, '/');
-                lastSlash[1] = '\0'; // terminate string here and append model
-                                     // filename
-                char *modelPath;
-                asprintf(&modelPath, "%s/%s", pathCopy, modelName);
-
-                SGdrawable *drawable = sgLoadModel(modelPath);
-                ooScSetStageMesh(newStage, drawable);
-
-                free(modelPath);
-                free(pathCopy);
-              }
-            } // For all properties in stage
-
-            assert(stageCog && inertia && stagePos);
-            plMassSet(&newStage->obj->m, 1.0f, // Default to 1.0 kg
-                      0.0f, 0.0f, 0.0f,
-                      inertia[0], inertia[4], inertia[8],
-                      inertia[1], inertia[2], inertia[5]);
-            plMassMod(&newStage->obj->m, mass);
-            plMassTranslate(&newStage->obj->m, -stageCog[0], -stageCog[1], -stageCog[2]);
-
-            newStage->pos[0] = stagePos[0];
-            newStage->pos[1] = stagePos[1];
-            newStage->pos[2] = stagePos[2];
-
-            loadActuatorGroups(actGroups, newStage);
-
-            ooScAddStage(sc, newStage);
+            loadStage(stage, sc, path);
           } // For all stages
         }
       }
@@ -562,11 +556,36 @@ ooScLoad(PLworld *world, const char *fileName)
   free(path);
 
   ooScReevaluateMass(sc);
-  //sc->obj = plCompoundObject3f(world->rootSys, 0.0, 0.0, 0.0);
   return sc;
 }
 
+void
+ooScSetScene(OOspacecraft *spacecraft, OOscene *scene)
+{
+  for (int i = 0 ; i < spacecraft->stages.length ; ++i) {
+    OOstage *stage = spacecraft->stages.elems[i];
 
+    if (stage->state != OO_Stage_Detatched) {
+      ooSgSceneAddObj(scene, stage->mesh);
+    }
+  }
+}
+
+void
+ooScSetSystem(OOspacecraft *spacecraft, PLsystem *sys)
+{
+  PLsystem *oldSys = spacecraft->obj->super.sys;
+
+  if (oldSys != NULL) {
+    for (int i = 0 ; i < oldSys->objs.length ; ++i) {
+      if (oldSys->objs.elems[i] == spacecraft->obj) {
+        obj_array_remove(&oldSys->objs, i);
+      }
+    }
+  }
+  obj_array_push(&sys->objs, spacecraft->obj);
+  spacecraft->obj->super.sys = sys;
+}
 void
 ooScSetPos(OOspacecraft *sc, double x, double y, double z)
 {
@@ -577,7 +596,12 @@ void
 ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName,
                     double x, double y, double z)
 {
-
+  PLastrobody *astrobody = plGetObject(sc->world, sysName);
+  if (astrobody != NULL) {
+    plSetObjectPosRel3d(&sc->obj->super, &astrobody->obj, x, y, z);
+  } else {
+    ooLogWarn("astrobody '%s' not found", sysName);
+  }
 }
 
 void
@@ -585,9 +609,13 @@ ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName,
                     double longitude, double latitude, double altitude)
 {
   // Find planetoid object
+  PLastrobody *astrobody = plGetObject(sc->world, sysName);
+  if (astrobody != NULL) {
+      // Compute position relative to planet centre, this requires the equatorial
+      // radius and the eccentricity of the spheroid.
+    float3 p = geodetic2cart_f(astrobody->eqRad, astrobody->angEcc,
+                               latitude, longitude, altitude);
 
-  // Compute position relative to planet centre, this requires the equatorial
-  // radius and the eccentricity of the spheroid.
-  //float3 p = geodetic2cart_f(float a, float e, latitude, longitude, altitude);
-  // Translate local coordinates to solar system centric ones and place object
+    plSetObjectPosRel3fv(&sc->obj->super, &astrobody->obj, p);
+  }
 }

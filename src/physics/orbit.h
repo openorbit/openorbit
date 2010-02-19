@@ -56,6 +56,13 @@ struct PLastrobody {
   SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
   SGlight *lightSource; //!< Light source if the object emits light
+
+  // These parameters are used for positioning of objects, they assist
+  // calculations where astronomical bodies are assumed to be spheroids. These
+  // may also be used for irregular objects in order calculate an approximate
+  // gravity field or an approximate latitude, longitude position.
+  double eqRad; // Equatorial radius
+  double angEcc; // Angular eccentricity of spheroid due to flattening
 };
 
 struct PLsystem {
@@ -85,32 +92,39 @@ struct PLworld {
   const char *name;
   OOscene *scene; // Scene in the sg
   PLsystem *rootSys;
+  
+  obj_array_t objs; // All objects in world, even ones not placed in subsystems
 };
 
 PLworld* plNewWorld(const char *name, OOscene *sc,
                     double m, double gm, double radius,
-                    double siderealPeriod, double obliquity);
+                    double siderealPeriod, double obliquity,
+                    double eqRadius, double flattening);
 
-PLsystem* plNewRootSystem(PLworld *world, const char *name, double m, double gm, double obliquity);
+PLsystem* plNewRootSystem(PLworld *world, const char *name,
+                          double m, double gm, double obliquity,
+                          double eqRadius, double flattening);
 
 
 PLsystem* plNewOrbit(PLworld *world, const char *name, double m, double gm,
                      double orbitPeriod, double obliquity,
                      double semiMaj, double semiMin,
                      double inc, double ascendingNode, double argOfPeriapsis,
-                     double meanAnomaly);
+                     double meanAnomaly,
+                     double eqRadius, double flattening);
 PLsystem* plNewSubOrbit(PLsystem *orb, const char *name, double m, double gm,
                         double orbitPeriod, double obliquity,
                         double semiMaj, double semiMin,
                         double inc, double ascendingNode, double argOfPeriapsis,
-                        double meanAnomaly);
+                        double meanAnomaly,
+                        double eqRadius, double flattening);
 
+PLsystem* plGetSystem(PLworld *world, const char *name);
 PLastrobody* plGetObject(PLworld *world, const char *name);
 float3 plGetPos(const PLastrobody *obj);
 float3 plGetPosForName(const PLworld *world, const char *name);
 void plGetPosForName3f(const PLworld *world, const char *name,
                        float *x, float *y, float *z);
-
 
 /*!
  Loads an hrml description of a solar system and builds a solar system graph

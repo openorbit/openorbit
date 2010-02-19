@@ -232,6 +232,8 @@ hrmlGetReal(HRMLobject *obj)
   return obj->val.u.real;
 }
 
+double hrmlGetRealWithUnit(HRMLobject *obj, const char *unit);
+
 static inline const double*
 hrmlGetRealArray(HRMLobject *obj)
 {

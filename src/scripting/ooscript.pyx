@@ -60,6 +60,7 @@ cdef extern from "sim/spacecraft.h":
   OOspacecraft* ooScLoad(PLworld *world, char *fileName)
   void ooScSetPos(OOspacecraft *sc, double x, double y, double z)
   void ooScSetSystemAndPos(OOspacecraft *sc, char *sysName, double x, double y, double z)
+  void ooScSetSysAndCoords(OOspacecraft *sc, char *sysName, double longitude, double latitude, double altitude)
 
 cdef extern from "rendering/texture.h":
     ctypedef struct OOtexture:
@@ -212,6 +213,10 @@ cdef class Spacecraft:
     ooScSetPos(self.sc, x, y, z)
   def setSysAndPos(self, char *sysPath, double x, double y, double z):
     ooScSetSystemAndPos(self.sc, sysPath, x, y, z)
+  def setSysAndEqCoords(self, char *sysName, double longitude, double latitude, double altitude):
+    ooScSetSysAndCoords(self.sc, sysName, longitude, latitude, altitude)
+
+
 
 def setSg(Scenegraph scg):
     ooSimSetSg(scg.sg)

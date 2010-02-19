@@ -51,5 +51,5 @@ cam.setParams(sgr, sgr.getScene("root"),
 sgr.setCam(cam)
 
 sc = ooscript.Spacecraft(oworld, "spacecrafts/mercury/mercury.hrml")
-
+sc.setSysAndEqCoords("Sol/Earth", 1.0, 1.0, 1000.0e3)
 #model = ooscript.Model("spacecrafts/mercury/enterprise.ac")

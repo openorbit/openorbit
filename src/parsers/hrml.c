@@ -92,6 +92,32 @@ static double lengthFactors[length_count][length_count] = {
                  [length_pc] = 1.0},
 };
 
+double
+hrmlGetRealWithUnit(HRMLobject *obj, const char *unit)
+{
+  const char *unitEnd = strchr(unit, '\0');
+  
+  if (!strcmp(unitEnd - 2, "ly")) {
+    // Length
+  } else if (!strcmp(unitEnd - 2, "pc")) {
+    // Length
+  } else if (!strcmp(unitEnd - 2, "Pa")) {
+    // Preasure
+  } else if (!strcmp(unitEnd - 2, "Nm")) {
+    // Torque
+  }
+  
+  if (!strcmp(unitEnd - 1, "N")) {
+    // Force
+  } else if (!strcmp(unitEnd - 1, "g")) {
+    // Mass
+  } else if (!strcmp(unitEnd - 1, "m")) {
+    // Length
+  } 
+  
+  assert(obj->val.typ == HRMLFloat);
+  return obj->val.u.real;
+}
 
 static inline HRMLobject*
 makeInt(const char * restrict name, uint64_t i)

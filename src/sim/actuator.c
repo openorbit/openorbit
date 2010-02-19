@@ -55,6 +55,12 @@ ooGetActuatorGroupName(int groupId)
 }
 
 
+float
+ooGetThrottleForActuatorGroup(int groupId)
+{
+
+}
+
 void
 ooScFireOrbital(OOspacecraft *sc)
 {
@@ -134,14 +140,14 @@ ooScEngageRoll(OOspacecraft *sc, float dr)
 
 
 OOrocket*
-ooScNewEngine(OOspacecraft *sc,
+ooScNewEngine(OOstage *stage,
               const char *name,
               float f,
               float x, float y, float z,
               float dx, float dy, float dz)
 {
   OOrocket *engine = malloc(sizeof(OOrocket));
-  engine->super.sc = sc;
+  engine->super.stage = stage;
   engine->super.state = OO_Act_Disabled;
   engine->super.name = strdup(name);
   engine->forceMag = f;
@@ -169,14 +175,14 @@ ooScRegisterInGroup(OOactuatorgroup *eg, OOactuator *actuator)
 void
 ooSrbStep(OOsrb *srb, float dt)
 {
-  plForceRelativePos3fv(&srb->super.sc->obj->super,
+  plForceRelativePos3fv(&srb->super.stage->sc->obj->super,
                         srb->dir * srb->forceMag, srb->p);
 }
 
 void
 ooRocketStep(OOrocket *rocket, float dt)
 {
-  plForceRelativePos3fv(&rocket->super.sc->obj->super,
+  plForceRelativePos3fv(&rocket->super.stage->sc->obj->super,
                         rocket->dir * rocket->forceMag * rocket->throttle,
                         rocket->p);
 }
@@ -184,21 +190,21 @@ ooRocketStep(OOrocket *rocket, float dt)
 void
 ooThrusterStep(OOrocket *thruster, float dt)
 {
-  plForceRelativePos3fv(&thruster->super.sc->obj->super,
+  plForceRelativePos3fv(&thruster->super.stage->sc->obj->super,
                         thruster->dir * thruster->forceMag * thruster->throttle,
                         thruster->p);
 }
 
 
 
-OOsrb* ooScNewSrb(OOspacecraft *sc,
+OOsrb* ooScNewSrb(OOstage *stage,
                   const char *name,
                   float f,
                   float x, float y, float z,
                   float dx, float dy, float dz)
 {
   OOsrb *engine = malloc(sizeof(OOsrb));
-  engine->super.sc = sc;
+  engine->super.stage = stage;
   engine->super.state = OO_Act_Disabled;
   engine->super.name = strdup(name);
   engine->forceMag = f;
@@ -208,7 +214,7 @@ OOsrb* ooScNewSrb(OOspacecraft *sc,
   return engine;
 }
 
-OOrocket* ooScNewLoxEngine(OOspacecraft *sc,
+OOrocket* ooScNewLoxEngine(OOstage *stage,
                            const char *name,
                            float f,
                            float x, float y, float z,
@@ -216,7 +222,7 @@ OOrocket* ooScNewLoxEngine(OOspacecraft *sc,
                            float fuelPerNmPerS)
 {
   OOrocket *engine = malloc(sizeof(OOrocket));
-  engine->super.sc = sc;
+  engine->super.stage = stage;
   engine->super.state = OO_Act_Disabled;
   engine->super.name = strdup(name);
   engine->forceMag = f;
@@ -228,14 +234,14 @@ OOrocket* ooScNewLoxEngine(OOspacecraft *sc,
   return engine;
 }
 
-OOrocket* ooScNewThruster(OOspacecraft *sc,
+OOrocket* ooScNewThruster(OOstage *stage,
                           const char *name,
                           float f,
                           float x, float y, float z,
                           float dx, float dy, float dz)
 {
   OOrocket *engine = malloc(sizeof(OOrocket));
-  engine->super.sc = sc;
+  engine->super.stage = stage;
   engine->super.state = OO_Act_Disabled;
   engine->super.name = strdup(name);
   engine->forceMag = f;

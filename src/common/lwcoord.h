@@ -45,7 +45,7 @@ typedef struct OOlwcoord OOlwcoord;
 
 void ooLwcSet(OOlwcoord *coord, float x, float y, float z);
 void ooLwcNormalise(OOlwcoord *coord);
-void ooLwcTranslate(OOlwcoord *coord, float3 offs);
+void ooLwcTranslate3fv(OOlwcoord *coord, float3 offs);
 void ooLwcTranslate3f(OOlwcoord *coord, float dx, float dy, float dz);
 float3 ooLwcGlobal(const OOlwcoord *coord);
 float3 ooLwcRelVec(const OOlwcoord *coord, int3 seg);

@@ -55,7 +55,7 @@ typedef void (*OOactuatorstep)(OOactuator *, float dt);
 
 // Base actuator class, do not instantiate directly
 struct OOactuator {
-  OOspacecraft *sc;
+  OOstage *stage;
   const char *name; //!< Engine name, e.g. "Orbital Maneuvering Engine"
   OOactuatorstate state;
   OOactuatortoggle toggleOn;
@@ -112,32 +112,32 @@ struct OOmagtorquer {
   float3 torqueAxis; //!< Unit vector around which the torque is to be applied
 };
 
-OOrocket* ooScNewEngine(OOspacecraft *sc,
+OOrocket* ooScNewEngine(OOstage *stage,
                         const char *name,
                         float f,
                         float x, float y, float z,
                         float dx, float dy, float dz);
 
-OOsrb* ooScNewSrb(OOspacecraft *sc,
+OOsrb* ooScNewSrb(OOstage *stage,
                   const char *name,
                   float f,
                   float x, float y, float z,
                   float dx, float dy, float dz);
 
-OOrocket* ooScNewLoxEngine(OOspacecraft *sc,
+OOrocket* ooScNewLoxEngine(OOstage *stage,
                            const char *name,
                            float f,
                            float x, float y, float z,
                            float dx, float dy, float dz,
                            float fuelPerNmPerS);
 
-OOjetengine* ooScNewJetEngine(OOspacecraft *sc,
+OOjetengine* ooScNewJetEngine(OOstage *stage,
                               const char *name,
                               float f,
                               float x, float y, float z,
                               float dx, float dy, float dz);
 
-OOrocket* ooScNewThruster(OOspacecraft *sc,
+OOrocket* ooScNewThruster(OOstage *stage,
                           const char *name,
                           float f,
                           float x, float y, float z,

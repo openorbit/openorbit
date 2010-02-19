@@ -54,18 +54,19 @@ struct PLcompound_object {
 };
 
 // Create standard object
-PLobject* plObject3f(PLsystem *sys, float x, float y, float z);
-
+PLobject* plObject3f(PLworld *sys);
 // Create standard object
-PLcompound_object* plCompoundObject3f(PLsystem *sys, float x, float y, float z);
+PLcompound_object* plCompoundObject(PLworld *sys);
+// Create subobject
+PLobject* plSubObject3f(PLworld *world, PLcompound_object *parent,
+                        float x, float y, float z);
 
 // Init standard object (useful if allocated with malloc or explicitly in structure)
 void plInitObject(PLobject *obj);
 void plComputeDerived(PLobject *obj);
 
 
-// Create subobject
-PLobject* plSubObject3f(PLcompound_object *parent, float x, float y, float z);
+
 void plDetachObject(PLobject *obj);
 void plUpdateMass(PLcompound_object *obj);
 
@@ -89,6 +90,9 @@ void plSetObjectPosRel3d(PLobject * restrict obj,
 void plSetObjectPosExt3f(PLobject *obj,
                          int32_t i, int32_t j, int32_t k,
                          float x, float y, float z);
+void plSetObjectPosRel3fv(PLobject * restrict obj,
+                          const PLobject * restrict otherObj,
+                          float3 rp);
 
 void plStepObjectf(PLobject *obj, float dt);
 void plNormaliseObject(PLobject *obj);
@@ -98,4 +102,8 @@ void plSetAngularVel3f(PLobject *obj, float rx, float ry, float rz);
 void plSetAngularVel3fv(PLobject *obj, float3 r);
 
 quaternion_t plGetQuat(PLobject *obj);
+
+
+void plSetSystem(PLsystem *sys, PLobject *obj);
+
 #endif /* !PHYSICS_OBJECT_H */

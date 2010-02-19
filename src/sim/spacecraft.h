@@ -58,6 +58,7 @@ typedef enum OOstagestate {
 } OOstagestate;
 
 struct OOstage {
+  OOspacecraft *sc;
   float3 pos;
   OOstagestate state;
   SGdrawable *mesh; // Used for synchronising with the rendering
@@ -88,7 +89,7 @@ struct OOsimplewing {
 /*
   Some notes that should be elsewhere:
     When detatching a stage, the spaccrafts cog and inertia tensors need
-    to be recompuded from the remaining stages.
+    to be recomputed from the remaining stages.
 
     Even though cog may vary due to fuel tanks in the wrong place, we do not
     simulate cog movement or mutation of the inertial tensor due to shape
@@ -113,6 +114,7 @@ typedef struct OOdetatchprog {
 } OOdetatchprog;
 
 struct OOspacecraft {
+  PLworld *world;
   obj_array_t stages;
   int activeStageIdx; // index in stage vector of active stage, this point out where
                       // detachment happens
@@ -123,13 +125,16 @@ struct OOspacecraft {
   OOscstepfunc prestep;
   OOscstepfunc poststep;
   OOscdetatchfunc detatchStage;
+
+  OOscene *scene;
 };
 
+OOspacecraft* ooScNew(PLworld *world);
 
 void ooScSetStageMesh(OOstage *stage, SGdrawable *mesh);
 void ooScDetatchStage(OOspacecraft *sc);
-void ooScStep(OOspacecraft *sc);
-void ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises);
+void ooScStep(OOspacecraft *sc, float dt);
+void ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises, float dt);
 void ooScForce(OOspacecraft *sc, float rx, float ry, float rz);
 OOspacecraft* ooScGetCurrent(void);
 
@@ -159,7 +164,7 @@ void ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName, double x, double
 void ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName, double longitude, double latitude, double altitude);
 
 
-OOstage* ooScNewStage(void);
+OOstage* ooScNewStage(OOspacecraft *sc);
 void ooScStageAddActuator(OOstage *stage, OOactuator *actuator);
 
 

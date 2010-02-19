@@ -196,7 +196,7 @@ ooSgCamStep(OOcam *cam, float dt)
       OOfreecam *freecam = (OOfreecam*)cam;
       ooSgCamAxisUpdate(cam);
 
-      ooLwcTranslate(&freecam->lwc, freecam->dp);
+      ooLwcTranslate3fv(&freecam->lwc, freecam->dp);
       freecam->q = q_mul(freecam->q, freecam->dq);
     }
     break;
