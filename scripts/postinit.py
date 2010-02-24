@@ -34,22 +34,28 @@ ooscript.setSg(sgr)
 oworld = ooscript.OrbitWorld().new(sgr, "data/solsystem.hrml")
 ooscript.setOrbWorld(oworld)
 
-cam = ooscript.FreeCam()
-(x, y, z) = oworld.getPosForObjName("Sol/Earth") # TODO: Throw exception
+#cam = ooscript.FreeCam()
+#(x, y, z) = oworld.getPosForObjName("Sol/Earth") # TODO: Throw exception
                                                       #       if fail
 
-cam.setParams(sgr, sgr.getScene("root"),
+#cam.setParams(sgr, sgr.getScene("root"),
               #6.96e8 + 1500000.0,
-              x + 10000000.0,#1821.6e3 + 100000.0,
+#              x + 10000000.0,#1821.6e3 + 100000.0,
               #6.37e6 + 15000000.0,
               #1.74e6 + 100000.0,
               #- (1.74e6 + 100000.0),
-              y + 0.0,
+#              y + 0.0,
 #              + (1.74e6 + 100000.0),
-              z + 10.0,
-              0.0, 0.0, 1.0)
-sgr.setCam(cam)
+#              z + 10.0,
+#              0.0, 0.0, 1.0)
 
 sc = ooscript.Spacecraft(oworld, "spacecrafts/mercury/mercury.hrml")
-sc.setSysAndEqCoords("Sol/Earth", 1.0, 1.0, 1000.0e3)
+sc.setSysAndEqCoords("Sol/Earth", 0.0, 0.0, 500.0e3)
+
+ocam = ooscript.OrbitCam()
+#ocam.setParams(sgr, sgr.getRoot(), oworld.getPLObjForName("Sol/Earth"), 0.0, 0.0, 6.37e6 + 10000.0e3)
+ocam.setParams(sgr, sgr.getRoot(), sc.getPLObject(), 0.0, 0.0, 20.0)
+sgr.setCam(ocam)
+
+
 #model = ooscript.Model("spacecrafts/mercury/enterprise.ac")

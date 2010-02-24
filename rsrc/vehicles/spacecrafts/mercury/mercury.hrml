@@ -163,7 +163,7 @@ spacecraft (name: Mercury-Capsule) {
       pos: [0.0, 0.0, 0.0]; // Position relative to whole spacecraft
       actuators {
         rocket (name: rocketdyne_a7) {
-          fuel: "LOX/ethyl alcohol";
+          fuel-type: "LOX/ethyl alcohol";
           thrust: 370.0 kN; // TODO: Verify
           specific-impulse: 215.0 s;
           burn-time: 150.0 s; // TODO: get exact numbers

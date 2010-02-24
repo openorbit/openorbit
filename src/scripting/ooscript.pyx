@@ -10,6 +10,8 @@ cdef extern from "rendering/scenegraph.h":
 
   ctypedef struct OOscenegraph
 
+cdef extern from "physics/object.h":
+  ctypedef struct PLobject
 
 cdef extern from "rendering/drawable.h":
   ctypedef struct SGdrawable:
@@ -34,8 +36,8 @@ cdef extern from "rendering/drawable.h":
                        float x, float y, float z,
                        float rx, float ry, float rz)
 
-  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc,
-                         float dx, float dy, float dz)
+  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
+                         float ra, float dec, float dz)
   SGdrawable* sgLoadModel(char *file)
 
 
@@ -50,10 +52,16 @@ cdef extern from "rendering/sky.h":
 
 cdef extern from "physics/orbit.h":
   ctypedef struct PLworld
+  ctypedef struct PLsystem
+  ctypedef struct PLastrobody
+
 
   PLworld* ooOrbitLoad(OOscenegraph *sg, char *fileName)
   void plGetPosForName3f(PLworld *world, char *name,
                          float *x, float *y, float *z)
+  PLsystem* plGetSystem(PLworld *world, char *name)
+  PLastrobody* plGetObject(PLworld *world, char *name)
+  PLobject* plObjForAstroBody(PLastrobody *abody)
 
 cdef extern from "sim/spacecraft.h":
   ctypedef struct OOspacecraft
@@ -61,6 +69,7 @@ cdef extern from "sim/spacecraft.h":
   void ooScSetPos(OOspacecraft *sc, double x, double y, double z)
   void ooScSetSystemAndPos(OOspacecraft *sc, char *sysName, double x, double y, double z)
   void ooScSetSysAndCoords(OOspacecraft *sc, char *sysName, double longitude, double latitude, double altitude)
+  PLobject* ooScGetPLObjForSc(OOspacecraft *sc)
 
 cdef extern from "rendering/texture.h":
     ctypedef struct OOtexture:
@@ -179,6 +188,13 @@ cdef class Scenegraph:
   def setOverlay(self):
       pass
 
+cdef class PLObject:
+  cdef PLobject *obj
+  def __cinit__(self):
+    self.obj = <PLobject*>0
+  cdef setObj(self, PLobject *obj):
+    self.obj = obj
+
 cdef class FreeCam(Cam):
   def __cinit__(self):#, node, x, y, z, rx, ry, rz):
     pass
@@ -186,8 +202,10 @@ cdef class FreeCam(Cam):
     self.cam = ooSgNewFreeCam(sg.sg, sc.sc, x, y, z, rx, ry, rz)
 
 cdef class OrbitCam(Cam):
-  def __cinit__(self, Scenegraph sg, Scene sc, dx, dy, dz):
-    self.cam = ooSgNewOrbitCam(sg.sg, sc.sc, dx, dy, dz)
+  def __cinit__(self):
+    pass
+  def setParams(self, Scenegraph sg, Scene sc, PLObject plo, float dec, float ra, float r):
+    self.cam = ooSgNewOrbitCam(sg.sg, sc.sc, plo.obj, dec, ra, r)
 
 cdef class OrbitWorld:
   cdef PLworld *world
@@ -203,6 +221,13 @@ cdef class OrbitWorld:
     cdef float x, y, z
     plGetPosForName3f(self.world, name, &x, &y, &z)
     return (x, y, z)
+  def getPLObjForName(self, char *name):
+    cdef PLastrobody *abody
+    abody = plGetObject(self.world, name)
+    cdef PLObject plo
+    plo = PLObject()
+    plo.obj = plObjForAstroBody(abody)
+    return plo
 
 
 cdef class Spacecraft:
@@ -216,6 +241,11 @@ cdef class Spacecraft:
   def setSysAndEqCoords(self, char *sysName, double longitude, double latitude, double altitude):
     ooScSetSysAndCoords(self.sc, sysName, longitude, latitude, altitude)
 
+  def getPLObject(self):
+    cdef PLObject plo
+    plo = PLObject()
+    plo.obj = ooScGetPLObjForSc(self.sc)
+    return plo
 
 
 def setSg(Scenegraph scg):

@@ -155,6 +155,7 @@ ooSkyDrawStars(OOstars *stars)
   ooLogTrace("draw %d stars", stars->n_stars);
 
   glDisable(GL_TEXTURE_2D);
+  glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);

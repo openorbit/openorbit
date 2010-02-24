@@ -176,6 +176,12 @@ ooScDetachStage(OOspacecraft *sc)
 //  dBodyEnable(stage->id);
 }
 
+PLobject*
+ooScGetPLObjForSc(OOspacecraft *sc)
+{
+  return (PLobject*)sc->obj;
+}
+
 
 void
 ooScStep(OOspacecraft *sc, float dt)
@@ -208,7 +214,7 @@ ooScSetStageMesh(OOstage *stage, SGdrawable *mesh)
 {
   assert(stage != NULL);
   assert(mesh != NULL);
-
+  stage->obj->drawable = mesh;
   stage->mesh = mesh;
 }
 
@@ -499,6 +505,7 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
 
       SGdrawable *drawable = sgLoadModel(modelPath);
       ooScSetStageMesh(newStage, drawable);
+      ooSgSceneAddObj(sc->world->scene, drawable);
 
       free(modelPath);
       free(pathCopy);

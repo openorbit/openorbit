@@ -610,11 +610,14 @@ plSysUpateSg(PLsystem *sys)
 
   //ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);
   //ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz);
+  for (size_t i = 0; i < sys->objs.length ; i ++) {
+    PLobject *obj = sys->objs.elems[i];
+    ooSgSetObjectPosLW(obj->drawable, &obj->p);
+  }
 
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysUpateSg(sys->orbits.elems[i]);
   }
-
 }
 
 
@@ -926,4 +929,9 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
   return world;
 }
 
+PLobject*
+plObjForAstroBody(PLastrobody *abody)
+{
+  return &abody->obj;
+}
 

@@ -116,6 +116,7 @@
 		EC4A893910B152C9002C6513 /* actuator.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4A893810B152C9002C6513 /* actuator.c */; };
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
 		EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7D093410EE160700D9D28E /* flightrecorder.c */; };
+		EC823729113140E100A725B1 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
@@ -423,6 +424,8 @@
 		EC768C4E1060D651009B558C /* openorbit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = openorbit.xcconfig; sourceTree = "<group>"; };
 		EC7D093310EE160700D9D28E /* flightrecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightrecorder.h; sourceTree = "<group>"; };
 		EC7D093410EE160700D9D28E /* flightrecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightrecorder.c; sourceTree = "<group>"; };
+		EC823727113140E000A725B1 /* cmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmod.h; sourceTree = "<group>"; };
+		EC823728113140E000A725B1 /* cmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmod.c; sourceTree = "<group>"; };
 		EC88CF8E10A2B1D700A11B1D /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
 		EC88CF8F10A2B1D700A11B1D /* collada.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = collada.c; sourceTree = "<group>"; };
 		EC88CFC010A2B8F100A11B1D /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
@@ -676,6 +679,8 @@
 				EC3CDA2C108677C000C1B458 /* ac3d.c */,
 				EC88CF8E10A2B1D700A11B1D /* collada.h */,
 				EC88CF8F10A2B1D700A11B1D /* collada.c */,
+				EC823727113140E000A725B1 /* cmod.h */,
+				EC823728113140E000A725B1 /* cmod.c */,
 			);
 			path = parsers;
 			sourceTree = "<group>";
@@ -1505,6 +1510,7 @@
 				EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */,
 				ECDC29FD111498100066AF2D /* particles.c in Sources */,
 				ECDC2BA4111ACD900066AF2D /* particles.c in Sources */,
+				EC823729113140E100A725B1 /* cmod.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

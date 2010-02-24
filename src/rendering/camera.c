@@ -117,18 +117,41 @@ ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
 }
 
 OOcam*
-ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, float dx, float dy, float dz)
+ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
+                float ra, float dec, float r)
 {
   OOorbitcam *cam = malloc(sizeof(OOorbitcam));
   cam->super.kind = OOCam_Orbit;
   cam->super.scene = sc;
+  cam->body = body;
+  cam->ra = ra;
+  cam->dec = dec;
 
-  ooLwcSet(&cam->lwc, 0.0, 0.0, 0.0);
-  cam->r = vf3_set(dx,dy,dz);
+  cam->dr = 0.0;
+  cam->dra = 0.0;
+  cam->ddec = 0.0;
+
+  cam->r = r;
 
   obj_array_push(&sg->cams, cam);
   return (OOcam*)cam;
 }
+
+void
+sgSetCamTarget(OOcam *cam, PLobject *body)
+{
+  assert(cam != NULL);
+  assert(body != NULL);
+
+  if (cam->kind == OOCam_Fixed) {
+    OOfixedcam *fixCam = (OOfixedcam*)cam;
+    fixCam->body = body;
+  } else if (cam->kind == OOCam_Orbit) {
+    OOorbitcam *orbCam = (OOorbitcam*)cam;
+    orbCam->body = body;
+  }
+}
+
 
 // Only rotate, used for things like sky painting that requires camera rotation but not
 // translation
@@ -139,21 +162,16 @@ ooSgCamRotate(OOcam *cam)
   glMatrixMode(GL_MODELVIEW);
   switch (cam->kind) {
   case OOCam_Orbit:
-    assert(0 && "not supported yet");
     {
-      //      const dReal *pos = dBodyGetPosition(((OOorbitcam*)cam->camData)->body);
-      //const dReal *rot = dBodyGetRotation(((OOorbitcam*)cam->camData)->body);
-      //gluLookAt(vf3_x(((OOorbitcam*)cam->camData)->r) + pos[0],
-      //          vf3_y(((OOorbitcam*)cam->camData)->r) + pos[1],
-      //          vf3_z(((OOorbitcam*)cam->camData)->r) + pos[2],
-      //          pos[0], pos[1], pos[2], // center
-      //            0.0, 1.0, 0.0); // up
+      OOorbitcam* ocam = (OOorbitcam*)cam;
+      gluLookAt(0.0, 0.0, 0.0,
+                -cos(ocam->dec), -sin(ocam->dec), -sin(ocam->ra),
+                0.0, 0.0, 1.0);
     }
     break;
   case OOCam_Fixed:
     {
       OOfixedcam* fix = (OOfixedcam*)cam;
-      //const dReal *quat = dBodyGetQuaternion(fix->body);
       quaternion_t q = fix->body->q;
       q = q_mul(q, fix->q);
       matrix_t m;
@@ -186,7 +204,16 @@ ooSgCamStep(OOcam *cam, float dt)
   assert(cam != NULL && "cam not set");
   switch (cam->kind) {
   case OOCam_Orbit:
-    assert(0 && "not supported yet");
+    {
+      OOorbitcam *ocam = (OOorbitcam*)cam;
+      ooSgCamAxisUpdate(cam);
+
+      ocam->ra += ocam->dra;
+      ocam->ra = fmod(ocam->ra, 2.0*M_PI);
+      ocam->dec += ocam->ddec;
+      ocam->dec = fmod(ocam->dec, 2.0*M_PI);
+      ocam->r += ocam->dr; if (ocam->r < 0.0) ocam->r = 0.0;
+    }
     break;
   case OOCam_Fixed:
     assert(0 && "not supported yet");
@@ -214,13 +241,18 @@ ooSgCamMove(OOcam *cam)
   switch (cam->kind) {
   case OOCam_Orbit:
     {
+      OOorbitcam *ocam = (OOorbitcam*)cam;
+      float p[3] = {ocam->r*cos(ocam->dec),
+                    ocam->r*sin(ocam->dec),
+                    ocam->r*sin(ocam->ra)};
 
+      glTranslatef(-p[0], -p[1], -p[2]);
     }
     break;
   case OOCam_Fixed:
     {
       OOfixedcam* fix = (OOfixedcam*)cam;
-      
+
       float3 p = fix->body->p.offs;
       p = vf3_add(p, fix->r);
       quaternion_t q = fix->body->q;
@@ -274,17 +306,17 @@ ooSgCamAxisUpdate(OOcam *cam)
     fcam->dq = q_rot(0.0f,0.0f,1.0f, -0.02f * roll);
     fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.02f * pitch));
     fcam->dq = q_mul(fcam->dq, q_rot(0.0f,1.0f,0.0f, -0.02f * yaw));
+  } else if (cam->kind == OOCam_Orbit) {
+    float yaw = ooIoGetAxis("camyaw");
+    float pitch = ooIoGetAxis("campitch");
+    float zoom = ooIoGetAxis("camzoom");
+    OOorbitcam *ocam = (OOorbitcam*)cam;
+    ocam->dra = pitch * 0.02;
+    ocam->ddec = yaw * 0.02;
+    ocam->dr = zoom * 2.0; // TODO: exponential
   }
 }
 
-void
-sgCamSetLwc(OOcam *cam, OOlwcoord *lwc)
-{
-  if (cam->kind == OOCam_Orbit) {
-    OOorbitcam *ocam = (OOorbitcam*)cam;
-    ocam->lwc = *lwc;
-  }
-}
 
 /* Camera actions, registered as action handlers */
 void

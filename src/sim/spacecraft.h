@@ -138,6 +138,8 @@ void ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises, float dt)
 void ooScForce(OOspacecraft *sc, float rx, float ry, float rz);
 OOspacecraft* ooScGetCurrent(void);
 
+PLobject* ooScGetPLObjForSc(OOspacecraft *sc);
+
 /*!
   Set position of spacecraft in global coordinates
  */

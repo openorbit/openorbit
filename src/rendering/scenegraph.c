@@ -175,6 +175,14 @@ ooSgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
   if (cam->kind == OOCam_Free) {
     float3 relPos = ooLwcRelVec(lw, ((OOfreecam*)cam)->lwc.seg);
     obj->p = relPos;
+  } else if (cam->kind == OOCam_Fixed) {
+    OOfixedcam *fix = (OOfixedcam*)cam;
+    float3 relPos = ooLwcRelVec(lw, fix->body->p.seg) - (mf3_v_mul(fix->body->R, fix->r) + fix->body->p.offs);
+    obj->p = relPos;
+  } else if (cam->kind == OOCam_Orbit) {
+    OOorbitcam *orb = (OOorbitcam*)cam;
+    float3 relPos = ooLwcRelVec(lw, orb->body->p.seg);
+    obj->p = relPos;
   }
 }
 void
@@ -608,7 +616,6 @@ ooSgDrawSphere(OOsphere *sp)
   glEnable(GL_LIGHTING);
 
   sgBindMaterial(&sp->mat);
-
   glBindTexture(GL_TEXTURE_2D, sp->texId);
 
   glEnable(GL_CULL_FACE);
@@ -923,6 +930,13 @@ sgSetLightPosLW(SGlight *light, OOlwcoord *lwc)
 
   if (cam->kind == OOCam_Free) {
     float3 relPos = ooLwcRelVec(lwc, ((OOfreecam*)cam)->lwc.seg);
+
+    light->pos[0] = vf3_x(relPos);
+    light->pos[1] = vf3_y(relPos);
+    light->pos[2] = vf3_z(relPos);
+    light->pos[3] = 1.0;
+  } else if (cam->kind == OOCam_Orbit) {
+    float3 relPos = ooLwcRelVec(lwc, ((OOorbitcam*)cam)->body->p.seg);
 
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);

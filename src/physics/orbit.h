@@ -32,6 +32,7 @@
 #include "geo/geo.h"
 #include "rendering/scenegraph.h"
 #include "common/lwcoord.h"
+#include "rendering/reftypes.h"
 
 #include "physics/reftypes.h"
 
@@ -125,7 +126,7 @@ float3 plGetPos(const PLastrobody *obj);
 float3 plGetPosForName(const PLworld *world, const char *name);
 void plGetPosForName3f(const PLworld *world, const char *name,
                        float *x, float *y, float *z);
-
+PLobject* plObjForAstroBody(PLastrobody *abody);
 /*!
  Loads an hrml description of a solar system and builds a solar system graph
  it also connects the physics system to the graphics system.

@@ -51,17 +51,17 @@ extern "C" {
   struct OOfixedcam {
     OOcam super;
     PLobject *body;
-    //dBodyID body; // Camera fixed to this body
-
     float3 r; // With this offset
     quaternion_t q; // and this rotation (rotate before translation)
   };
 
   struct OOorbitcam {
     OOcam super;
-    OOlwcoord lwc; // Camera orbiting this point
-    float3 r; // Placed on this position relative to lwc (will always look at
-              // the body)
+    PLobject *body;
+
+    float ra, dec;
+    float dra, ddec, dr;
+    float r;
   };
 
 
@@ -75,10 +75,11 @@ extern "C" {
                          float dx, float dy, float dz,
                          float rx, float ry, float rz);
 
-  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc,
-                         float dx, float dy, float dz);
+  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
+                         float ra, float dec, float r);
 
-  void sgCamSetLwc(OOcam *cam, OOlwcoord *lwc);
+  void sgSetCamTarget(OOcam *cam, PLobject *body);
+
   void ooSgCamMove(OOcam *cam);
   void ooSgCamRotate(OOcam *cam);
   void ooSgCamStep(OOcam *cam, float dt);
