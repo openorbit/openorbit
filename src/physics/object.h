@@ -38,14 +38,15 @@ struct PLobject {
   
   OOlwcoord p; // Large world coordinates
   quaternion_t q; // Rotation quaternion
-  
+  float3 p_offset; // Only for use by subobjects
+
   float3x3 R; // Rotation wrt frame of reference
   float3x3 I_inv_world; // Inverse of inertia in world coordinates
 
   float3 v; // Velocity
   float3 angVel; // Angular velocity
   float3 f_ack; // Force accumulator
-  float3 t_ack; // Torque accumulator  
+  float3 t_ack; // Torque accumulator
 };
 
 struct PLcompound_object {

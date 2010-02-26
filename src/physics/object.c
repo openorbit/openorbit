@@ -79,6 +79,7 @@ plObject(PLworld *world)
 
   obj->sys = NULL;
   obj->parent = NULL;
+  obj->p_offset = vf3_set(0.0, 0.0, 0.0);
 
   obj_array_push(&world->objs, obj);
 
@@ -104,6 +105,7 @@ plCompoundObject(PLworld *world)
 
   obj->super.sys = NULL;
   obj->super.parent = NULL;
+  obj->super.p_offset = vf3_set(0.0, 0.0, 0.0);
 
   obj_array_push(&world->objs, obj);  
   obj_array_init(&obj->children);
@@ -126,7 +128,7 @@ plSubObject3f(PLworld *world, PLcompound_object *parent, float x, float y, float
   ooLwcSet(&obj->p, x, y, z);
   obj->sys = parent->super.sys;
   obj->parent = parent;
-
+  obj->p_offset = vf3_set(x, y, z);
   obj_array_push(&world->objs, obj);
   obj_array_push(&parent->children, obj);
   return obj;
@@ -167,7 +169,6 @@ plUpdateMass(PLcompound_object *obj)
                       -child->m.cog[0],
                       -child->m.cog[1],
                       -child->m.cog[2]);
-      
       plMassAdd(&obj->super.m, &tmp);
     }
   }
