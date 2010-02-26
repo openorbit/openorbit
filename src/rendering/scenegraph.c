@@ -899,6 +899,13 @@ sgLoadModel(const char *file)
 {
   SGmodel *model = malloc(sizeof(SGmodel));
   model->modelData = model_load(file);
+
+  if (model->modelData == NULL) {
+    ooLogError("loading model '%s', returned NULL model data", file);
+    free(model);
+    return NULL;
+  }
+
   return ooSgNewDrawable((SGdrawable*)model, "unnamed",
                          (SGdrawfunc)sgDrawModel);
 }
@@ -1003,7 +1010,6 @@ sgLightSetDiffuse4f(SGlight *light, float r, float g, float b, float a)
   light->diffuse[1] = g;
   light->diffuse[2] = b;
   light->diffuse[3] = a;
-
 }
 
 
