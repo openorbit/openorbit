@@ -23,6 +23,25 @@ v3i_get(int3 s, int i)
   return u.a[i];
 }
 
+static inline int32_t
+v3i_x(int3 s)
+{
+  return s.x;
+}
+
+static inline int32_t
+v3i_y(int3 s)
+{
+  return s.y;
+}
+
+static inline int32_t
+v3i_z(int3 s)
+{
+  return s.z;
+}
+
+
 static inline int64_t
 v3l_get(long3 s, int i)
 {
