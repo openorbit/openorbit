@@ -50,7 +50,7 @@ spacecraft (name: Mercury-Capsule) {
         // We do not supply a plugin for these, user needs to fire one by one
         solid-rocket (name: retro0) {
           // Should burn 10 s per rocket, solid fuel
-          thrust: 4.5 kN;
+          thrust: 4.5e3 N;
           burn-time: 10.0 s;
           fire-once: true; // Solid rocket engine
           pos: [1.0, 1.0, 1.0]; // Relative to stage
@@ -58,7 +58,7 @@ spacecraft (name: Mercury-Capsule) {
         }
         solid-rocket (name: retro1) {
           // Should burn 10 s per rocket, solid fuel
-          thrust: 4.5 kN;
+          thrust: 4.5e3 N;
           burn-time: 10.0 s;
           fire-once: true; // Solid rocket engine
           pos: [1.0, 1.0, 1.0]; // Relative to stage
@@ -66,7 +66,7 @@ spacecraft (name: Mercury-Capsule) {
         }
         solid-rocket (name: retro2) {
           // Should burn 10 s per rocket, solid fuel
-          thrust: 4.5 kN;
+          thrust: 4.5e3 N;
           burn-time: 10.0 s;
           fire-once: true; // Solid rocket engine
           pos: [1.0, 1.0, 1.0]; // Relative to stage
@@ -75,7 +75,7 @@ spacecraft (name: Mercury-Capsule) {
 
         // Posigrade are for separating from the launch vehicle, burn time is 1s
         solid-rocket (name: posigrade) {
-          thrust: 1.8 kN;
+          thrust: 1.8e3 N;
           fire-once: true; // Solid rocket engine
           burn-time: 1.0 s;
           pos: [1.0, 1.0, 1.0];
@@ -164,7 +164,7 @@ spacecraft (name: Mercury-Capsule) {
       actuators {
         rocket (name: rocketdyne_a7) {
           fuel-type: "LOX/ethyl alcohol";
-          thrust: 370.0 kN; // TODO: Verify
+          thrust: 370.0e3 N; // TODO: Verify
           specific-impulse: 215.0 s;
           burn-time: 150.0 s; // TODO: get exact numbers
           fire-once: true; // Solid rocket engine
