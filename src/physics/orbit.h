@@ -64,12 +64,16 @@ struct PLastrobody {
   // gravity field or an approximate latitude, longitude position.
   double eqRad; // Equatorial radius
   double angEcc; // Angular eccentricity of spheroid due to flattening
+
+  // Important parameters for computing rotation exact
+  double obliquity;
+  double siderealPeriod;
 };
 
 struct PLsystem {
   PLworld *world;
   PLsystem *parent;
-  
+
   const char *name;
   double effectiveRadius; //!< Radius of the entire system, i.e how far away
                           //!< objects will still be considered to be under its
@@ -78,11 +82,12 @@ struct PLsystem {
                           //!< system has sattelites), or to the distance it
                           //!< takes for the gravitational influence to diminish
                           //!< to XXX, which ever is greater.
-  
+
   // TODO: These should be in some kind of oct-tree type structure
   obj_array_t orbits; // suborbits
-  obj_array_t objs; // objects in this system
-  
+  obj_array_t astroObjs; // objects in this system
+  obj_array_t rigidObjs; // objects in this system
+
   PLastrobody *orbitalBody; // The body actually orbiting at this point, note that it is
   double orbitalPeriod;
   SGdrawable *orbitDrawable; // Pointer to the drawable representing the ellipsis
@@ -103,18 +108,18 @@ PLworld* plNewWorld(const char *name, OOscene *sc,
                     double eqRadius, double flattening);
 
 PLsystem* plNewRootSystem(PLworld *world, const char *name,
-                          double m, double gm, double obliquity,
+                          double m, double gm, double obliquity, double siderealPeriod,
                           double eqRadius, double flattening);
 
 
 PLsystem* plNewOrbit(PLworld *world, const char *name, double m, double gm,
-                     double orbitPeriod, double obliquity,
+                     double orbitPeriod, double obliquity, double siderealPeriod,
                      double semiMaj, double semiMin,
                      double inc, double ascendingNode, double argOfPeriapsis,
                      double meanAnomaly,
                      double eqRadius, double flattening);
 PLsystem* plNewSubOrbit(PLsystem *orb, const char *name, double m, double gm,
-                        double orbitPeriod, double obliquity,
+                        double orbitPeriod, double obliquity, double siderealPeriod,
                         double semiMaj, double semiMin,
                         double inc, double ascendingNode, double argOfPeriapsis,
                         double meanAnomaly,
@@ -135,6 +140,7 @@ PLobject* plObjForAstroBody(PLastrobody *abody);
  now beeing.
  */
 PLworld* ooOrbitLoad(OOscenegraph *sg, const char *fileName);
+float3 plComputeCurrentVelocity(PLastrobody *ab);
 
 void plWorldStep(PLworld *world, double dt);
 void plWorldClear(PLworld *world);

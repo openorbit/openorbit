@@ -163,6 +163,29 @@ ooSgSetScenePos(OOscene *sc, float x, float y, float z)
   sc->t = vf3_set(x, y, z);
 }
 
+void
+sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset)
+{
+  assert(obj != NULL);
+  assert(lw != NULL);
+  // Get camera position and translate the lw coord with respect to the camera
+  OOscene *sc = obj->scene;
+  OOscenegraph *sg = sc->sg;
+  OOcam *cam = sg->currentCam;
+
+  if (cam->kind == OOCam_Free) {
+    float3 relPos = ooLwcRelVec(lw, ((OOfreecam*)cam)->lwc.seg);
+    obj->p = relPos + offset;
+  } else if (cam->kind == OOCam_Fixed) {
+    OOfixedcam *fix = (OOfixedcam*)cam;
+    float3 relPos = ooLwcRelVec(lw, fix->body->p.seg) - (mf3_v_mul(fix->body->R, fix->r) + fix->body->p.offs);
+    obj->p = relPos + offset;
+  } else if (cam->kind == OOCam_Orbit) {
+    OOorbitcam *orb = (OOorbitcam*)cam;
+    float3 relPos = ooLwcRelVec(lw, orb->body->p.seg);
+    obj->p = relPos + offset;
+  }
+}
 
 void
 ooSgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
@@ -611,8 +634,8 @@ void
 ooSgDrawSphere(OOsphere *sp)
 {
   glEnable(GL_TEXTURE_2D);
-  glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
+  glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
 
   sgBindMaterial(&sp->mat);
@@ -626,23 +649,27 @@ ooSgDrawSphere(OOsphere *sp)
   // Draw point on the sphere in solid colour and size
   glDisable (GL_BLEND);
   glDisable(GL_TEXTURE_2D);
-  //glDisable(GL_DEPTH_TEST);
   glDisable(GL_LIGHTING);
   glDepthFunc(GL_LEQUAL);
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_TEXTURE_2D); // Lines are not textured...
+
+  glBegin(GL_LINES);
+  glColor3f(1.0, 1.0, 0.0);
+  glVertex3f(0.0, 0.0, -2.0*sp->radius);
+  glVertex3f(0.0, 0.0, -sp->radius);
+  glEnd();
+
+  glBegin(GL_LINES);
+  glColor3f(1.0, 1.0, 0.0);
+  glVertex3f(0.0, 0.0, +2.0*sp->radius);
+  glVertex3f(0.0, 0.0, sp->radius);
+  glEnd();
 
   glBegin(GL_POINTS);
   glPointSize(5.0);
   glColor3f(1.0, 0.0, 0.0);
   glVertex3f(0.0, 0.0, 0.0);
-  glEnd();
-
-  glDisable(GL_TEXTURE_2D); // Lines are not textured...
-  glBegin(GL_LINES);
-
-  glColor3f(1.0, 1.0, 0.0);
-  glVertex3f(0.0, 0.0, -2.0*sp->radius);
-  glVertex3f(0.0, 0.0, +2.0*sp->radius);
-
   glEnd();
 }
 

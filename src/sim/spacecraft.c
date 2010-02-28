@@ -215,7 +215,6 @@ ooScSetStageMesh(OOstage *stage, SGdrawable *mesh)
   assert(stage != NULL);
   assert(mesh != NULL);
   stage->obj->drawable = mesh;
-  stage->mesh = mesh;
 }
 
 void
@@ -295,6 +294,21 @@ ooScNewStage(OOspacecraft *sc)
 
   return stage;
 }
+
+void
+scStageSetOffset3f(OOstage *stage, float x, float y, float z)
+{
+  stage->pos = vf3_set(x, y, z);
+  stage->obj->p_offset = vf3_set(x, y, z);
+}
+
+void
+scStageSetOffset3fv(OOstage *stage, float3 p)
+{
+  stage->pos = p;
+  stage->obj->p_offset = p;
+}
+
 
 void
 ooScStageAddActuator(OOstage *stage, OOactuator *actuator)
@@ -518,11 +532,9 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
             inertia[0], inertia[4], inertia[8],
             inertia[1], inertia[2], inertia[5]);
   plMassMod(&newStage->obj->m, mass);
-  plMassTranslate(&newStage->obj->m, -stageCog[0], -stageCog[1], -stageCog[2]);
+  plMassTranslate(&newStage->obj->m, stageCog[0], stageCog[1], stageCog[2]);
 
-  newStage->pos[0] = stagePos[0];
-  newStage->pos[1] = stagePos[1];
-  newStage->pos[2] = stagePos[2];
+  scStageSetOffset3f(newStage, stagePos[0], stagePos[1], stagePos[2]);
 }
 
 OOspacecraft*
@@ -573,7 +585,7 @@ ooScSetScene(OOspacecraft *spacecraft, OOscene *scene)
     OOstage *stage = spacecraft->stages.elems[i];
 
     if (stage->state != OO_Stage_Detatched) {
-      ooSgSceneAddObj(scene, stage->mesh);
+      ooSgSceneAddObj(scene, stage->obj->drawable);
     }
   }
 }
@@ -584,13 +596,13 @@ ooScSetSystem(OOspacecraft *spacecraft, PLsystem *sys)
   PLsystem *oldSys = spacecraft->obj->super.sys;
 
   if (oldSys != NULL) {
-    for (int i = 0 ; i < oldSys->objs.length ; ++i) {
-      if (oldSys->objs.elems[i] == spacecraft->obj) {
-        obj_array_remove(&oldSys->objs, i);
+    for (int i = 0 ; i < oldSys->rigidObjs.length ; ++i) {
+      if (oldSys->rigidObjs.elems[i] == spacecraft->obj) {
+        obj_array_remove(&oldSys->rigidObjs, i);
       }
     }
   }
-  obj_array_push(&sys->objs, spacecraft->obj);
+  obj_array_push(&sys->rigidObjs, spacecraft->obj);
   spacecraft->obj->super.sys = sys;
 }
 void
@@ -606,6 +618,9 @@ ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName,
   PLastrobody *astrobody = plGetObject(sc->world, sysName);
   if (astrobody != NULL) {
     plSetObjectPosRel3d(&sc->obj->super, &astrobody->obj, x, y, z);
+    ooScSetSystem(sc, astrobody->sys);
+    float3 v = plComputeCurrentVelocity(astrobody);
+    plSetVel3fv(&sc->obj->super, v);
   } else {
     ooLogWarn("astrobody '%s' not found", sysName);
   }
@@ -618,11 +633,15 @@ ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName,
   // Find planetoid object
   PLastrobody *astrobody = plGetObject(sc->world, sysName);
   if (astrobody != NULL) {
-      // Compute position relative to planet centre, this requires the equatorial
-      // radius and the eccentricity of the spheroid.
+    // Compute position relative to planet centre, this requires the equatorial
+    // radius and the eccentricity of the spheroid, we shoudl also adjust for
+    // sideral rotation.
     float3 p = geodetic2cart_f(astrobody->eqRad, astrobody->angEcc,
                                latitude, longitude, altitude);
-
     plSetObjectPosRel3fv(&sc->obj->super, &astrobody->obj, p);
+    ooScSetSystem(sc, astrobody->sys);
+    float3 v = plComputeCurrentVelocity(astrobody);
+    ooLogInfo("initial velocity: %f, %f, %f", v.x, v.y, v.z);
+    plSetVel3fv(&sc->obj->super, v);
   }
 }

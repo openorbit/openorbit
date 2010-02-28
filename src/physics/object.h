@@ -67,6 +67,7 @@ void plInitObject(PLobject *obj);
 void plComputeDerived(PLobject *obj);
 
 
+void plDumpObject(PLobject *obj);
 
 void plDetachObject(PLobject *obj);
 void plUpdateMass(PLcompound_object *obj);
@@ -96,8 +97,12 @@ void plSetObjectPosRel3fv(PLobject * restrict obj,
                           float3 rp);
 
 void plStepObjectf(PLobject *obj, float dt);
+void plStepChildObjectf(PLobject *obj, float dt);
 void plNormaliseObject(PLobject *obj);
 void plClearObject(PLobject *obj);
+
+void plSetVel3f(PLobject *obj, float dx, float dy, float dz);
+void plSetVel3fv(PLobject *obj, float3 dp);
 
 void plSetAngularVel3f(PLobject *obj, float rx, float ry, float rz);
 void plSetAngularVel3fv(PLobject *obj, float3 r);

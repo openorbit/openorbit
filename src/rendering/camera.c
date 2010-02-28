@@ -120,21 +120,21 @@ OOcam*
 ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
                 float ra, float dec, float r)
 {
-  OOorbitcam *cam = malloc(sizeof(OOorbitcam));
-  cam->super.kind = OOCam_Orbit;
-  cam->super.scene = sc;
-  cam->body = body;
-  cam->ra = ra;
-  cam->dec = dec;
+  OOorbitcam *ocam = malloc(sizeof(OOorbitcam));
+  ocam->super.kind = OOCam_Orbit;
+  ocam->super.scene = sc;
+  ocam->body = body;
+  ocam->ra = ra;
+  ocam->dec = dec;
 
-  cam->dr = 0.0;
-  cam->dra = 0.0;
-  cam->ddec = 0.0;
+  ocam->dr = 0.0;
+  ocam->dra = 0.0;
+  ocam->ddec = 0.0;
 
-  cam->r = r;
-
-  obj_array_push(&sg->cams, cam);
-  return (OOcam*)cam;
+  ocam->zoom = r;
+  ocam->r = r;
+  obj_array_push(&sg->cams, ocam);
+  return (OOcam*)ocam;
 }
 
 void
@@ -164,8 +164,11 @@ ooSgCamRotate(OOcam *cam)
   case OOCam_Orbit:
     {
       OOorbitcam* ocam = (OOorbitcam*)cam;
+      float3 cogOffset = mf3_v_mul(ocam->body->R, ocam->body->m.cog);
       gluLookAt(0.0, 0.0, 0.0,
-                -cos(ocam->dec), -sin(ocam->dec), -sin(ocam->ra),
+                -ocam->r*cos(ocam->dec) + cogOffset.x,
+                -ocam->r*sin(ocam->dec) + cogOffset.y,
+                -ocam->r*sin(ocam->ra) + cogOffset.z,
                 0.0, 0.0, 1.0);
     }
     break;
@@ -212,7 +215,9 @@ ooSgCamStep(OOcam *cam, float dt)
       ocam->ra = fmod(ocam->ra, 2.0*M_PI);
       ocam->dec += ocam->ddec;
       ocam->dec = fmod(ocam->dec, 2.0*M_PI);
-      ocam->r += ocam->dr; if (ocam->r < 0.0) ocam->r = 0.0;
+
+      ocam->zoom += ocam->dr; if (ocam->zoom < 0.0) ocam->zoom = 0.0;
+      ocam->r = ocam->zoom;
     }
     break;
   case OOCam_Fixed:
@@ -245,8 +250,13 @@ ooSgCamMove(OOcam *cam)
       float p[3] = {ocam->r*cos(ocam->dec),
                     ocam->r*sin(ocam->dec),
                     ocam->r*sin(ocam->ra)};
-
-      glTranslatef(-p[0], -p[1], -p[2]);
+      float3 cogOffset = mf3_v_mul(ocam->body->R, ocam->body->m.cog);
+      float tmpx = cogOffset.x;
+      float tmpy = cogOffset.y;
+      float tmpz = cogOffset.z;
+      glTranslatef(-(p[0]+ocam->body->p.offs.x + cogOffset.x),
+                   -(p[1]+ocam->body->p.offs.y + cogOffset.y),
+                   -(p[2]+ocam->body->p.offs.z + cogOffset.z));
     }
     break;
   case OOCam_Fixed:

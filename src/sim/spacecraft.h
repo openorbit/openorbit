@@ -61,7 +61,6 @@ struct OOstage {
   OOspacecraft *sc;
   float3 pos;
   OOstagestate state;
-  SGdrawable *mesh; // Used for synchronising with the rendering
   int detachOrder; // How and when to detach the stage
   PLobject *obj; // Mass and inertia tensor of stage, unit is kg
   obj_array_t actuators;
@@ -171,5 +170,8 @@ void ooScStageAddActuator(OOstage *stage, OOactuator *actuator);
 
 
 OOspacecraft* ooScLoad(PLworld *world, const char *fileName);
+
+void scStageSetOffset3f(OOstage *stage, float x, float y, float z);
+void scStageSetOffset3fv(OOstage *stage, float3 p);
 
 #endif /* end of include guard: SPACECRAFT_H_7SCB1CH8 */

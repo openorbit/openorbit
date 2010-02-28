@@ -23,7 +23,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdio.h>
 
 /*
   One of the problems with space is that it is big
@@ -51,7 +51,7 @@ plInitObject(PLobject *obj)
   ooLwcSet(&obj->p, 0.0, 0.0, 0.0);
   obj->sys = NULL;
   obj->parent = NULL;  
-  
+  obj->drawable = NULL;
   obj->f_ack = vf3_set(0.0, 0.0, 0.0);
   obj->t_ack = vf3_set(0.0, 0.0, 0.0);
 
@@ -59,7 +59,8 @@ plInitObject(PLobject *obj)
   plSetAngularVel3f(obj, 0.0f, 0.0f, 0.0f);
 
   obj->q = q_rot(1.0, 0.0, 0.0, 0.0); // Rotation quaternion  
-  
+  obj->p_offset = vf3_set(0.0, 0.0, 0.0);
+
   plComputeDerived(obj);
 }
 
@@ -72,14 +73,6 @@ plObject(PLworld *world)
   plInitObject(obj);
 
   plSetAngularVel3f(obj, 0.0f, 0.0f, 0.05f);
-  plMassSet(&obj->m, 0.0f,
-            0.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0f);
-
-  obj->sys = NULL;
-  obj->parent = NULL;
-  obj->p_offset = vf3_set(0.0, 0.0, 0.0);
 
   obj_array_push(&world->objs, obj);
 
@@ -96,16 +89,7 @@ plCompoundObject(PLworld *world)
   PLcompound_object *obj = malloc(sizeof(PLcompound_object));
   plInitObject(&obj->super);
 
-  plSetAngularVel3f(&obj->super, 0.0f, 0.0f, 0.05f);
-
-  plMassSet(&obj->super.m, 0.0f,
-            0.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0f);
-
-  obj->super.sys = NULL;
-  obj->super.parent = NULL;
-  obj->super.p_offset = vf3_set(0.0, 0.0, 0.0);
+  //plSetAngularVel3f(&obj->super, 0.0f, 0.0f, 0.05f);
 
   obj_array_push(&world->objs, obj);  
   obj_array_init(&obj->children);
@@ -121,11 +105,9 @@ plSubObject3f(PLworld *world, PLcompound_object *parent, float x, float y, float
   assert(parent != NULL);
 
   PLobject *obj = malloc(sizeof(PLobject));
-  plMassSet(&obj->m, 0.0f,
-            0.0f, 0.0f, 0.0f,
-            1.0f, 1.0f, 1.0f,
-            0.0f, 0.0f, 0.0f);
-  ooLwcSet(&obj->p, x, y, z);
+  plInitObject(obj);
+
+//  ooLwcSet(&obj->p, x, y, z);
   obj->sys = parent->super.sys;
   obj->parent = parent;
   obj->p_offset = vf3_set(x, y, z);
@@ -144,7 +126,7 @@ plDetatchObject(PLobject *obj)
   assert(obj != NULL);
   assert(obj->parent != NULL);
 
-  obj_array_push(&obj->parent->super.sys->objs, obj);
+  obj_array_push(&obj->parent->super.sys->rigidObjs, obj);
   PLcompound_object *parent = obj->parent;
   obj->parent = NULL;
 
@@ -268,14 +250,41 @@ plForceRelativePos3fv(PLobject *obj, float3 f, float3 p)
   obj->t_ack += t_rot;
 }
 
-
-void plStepObjectf(PLobject *obj, float dt)
+void
+plDumpObject(PLobject *obj)
 {
-  obj->v += (obj->f_ack / obj->m.m) * dt; // Update velocity from force
+  fprintf(stderr, "obj: %p\n", (void*)obj);
+  fprintf(stderr, "mass: %f [%f, %f, %f]\n", obj->m.m, obj->m.I[0][0], obj->m.I[1][1], obj->m.I[2][2]);
+  fprintf(stderr, "v: %f %f %f\n", obj->v.x, obj->v.y, obj->v.z);
+  fprintf(stderr, "f_acc: %f %f %f\n", obj->f_ack.x, obj->f_ack.y, obj->f_ack.z);
+  fprintf(stderr, "t_acc: %f %f %f\n", obj->t_ack.x, obj->t_ack.y, obj->t_ack.z);
+}
+
+void
+plStepObjectf(PLobject *obj, float dt)
+{
+  float3 fm = (obj->f_ack / obj->m.m);
+  obj->v = obj->v + fm * dt; // Update velocity from force
   ooLwcTranslate3fv(&obj->p, vf3_s_mul(obj->v, dt)); // Update position from velocity
 
   obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
   obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt)); // Update quaternion with rotational velocity
+
+  plComputeDerived(obj); // Compute derived data (world inverted inertia tensor etc)
+
+  plClearObject(obj); // Clear accums
+}
+
+void
+plStepChildObjectf(PLobject *obj, float dt)
+{
+  obj->v = obj->parent->super.v; // Update velocity from force
+  obj->p = obj->parent->super.p;
+
+  float3 p_offset_rot = v_q_rot(obj->p_offset, obj->parent->super.q);
+  ooLwcTranslate3fv(&obj->p, p_offset_rot); // Update position from parent
+  obj->angVel = vf3_set(0.0f, 0.0f, 0.0f);
+  obj->q = obj->parent->super.q;
 
   plComputeDerived(obj); // Compute derived data (world inverted inertia tensor etc)
   plClearObject(obj); // Clear accums
@@ -305,6 +314,17 @@ void
 plSetAngularVel3f(PLobject *obj, float rx, float ry, float rz)
 {
   obj->angVel = vf3_set(rx, ry, rz);
+}
+
+void
+plSetVel3f(PLobject *obj, float dx, float dy, float dz)
+{
+  obj->v = vf3_set(dx, dy, dz);
+}
+void
+plSetVel3fv(PLobject *obj, float3 dp)
+{
+  obj->v = dp;
 }
 
 
@@ -344,13 +364,13 @@ plSetSystem(PLsystem *sys, PLobject *obj)
   if (obj->sys != NULL) {
     // Not the most efficient way if there are several objects in the system,
     // but should be fine for now
-    for (int i = 0 ; i < obj->sys->objs.length ; ++i) {
-      if (obj->sys->objs.elems[i] == obj) {
-        obj_array_remove(&obj->sys->objs, i);
+    for (int i = 0 ; i < obj->sys->rigidObjs.length ; ++i) {
+      if (obj->sys->rigidObjs.elems[i] == obj) {
+        obj_array_remove(&obj->sys->rigidObjs, i);
         break;
       }
     }
   }
   obj->sys = sys;
-  obj_array_push(&sys->objs, obj);
+  obj_array_push(&sys->rigidObjs, obj);
 }

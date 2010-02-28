@@ -91,7 +91,8 @@ typ name##_array_remove(name##_array_t *vec, size_t i) {                        
     errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
   else {                                                                            \
     typ tmp = vec->elems[i];                                                        \
-    vec->elems[i] = vec->elems[--vec->length];                                      \
+    vec->elems[i] = vec->elems[vec->length - 1];                                    \
+    vec->length --;                                                                 \
     return tmp;                                                                     \
   }                                                                                 \
 }

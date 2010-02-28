@@ -20,7 +20,7 @@
 #include <vmath/vmath.h>
 
 #include "lwcoord.h"
-
+#include <stdio.h>
 
 #ifndef __has_feature
 #define __has_feature(x) 0  // Compatibility with non-clang compilers.
@@ -90,6 +90,15 @@ ooLwcNormalise(OOlwcoord *coord)
 }
 
 void
+ooLwcDump(const OOlwcoord *lwc)
+{
+  fprintf(stderr, "lwc: [%d %d %d]/[%f %f %f]\n",
+          lwc->seg.x, lwc->seg.y, lwc->seg.z,
+          lwc->offs.x, lwc->offs.y, lwc->offs.z);
+}
+
+
+void
 ooLwcTranslate3fv(OOlwcoord *coord, float3 offs)
 {
   coord->offs = vf3_add(coord->offs, offs);
@@ -117,9 +126,9 @@ ooLwcRelVec(const OOlwcoord *coord, int3 seg)
 {
   float3 r = coord->offs;
   int3 segdiff = coord->seg - seg;
-  float3 segdiffr = vf3_set((float)v3i_get(segdiff, 0),
-                            (float)v3i_get(segdiff, 1),
-                            (float)v3i_get(segdiff, 2));
+  float3 segdiffr = vf3_set((float)v3i_x(segdiff),
+                            (float)v3i_y(segdiff),
+                            (float)v3i_z(segdiff));
   r = vf3_add(r, vf3_s_mul(segdiffr, OO_LW_SEGMENT_LEN));
   return r;
 }
@@ -129,9 +138,9 @@ ooLwcDist(const OOlwcoord *a, const OOlwcoord * b)
 {
   float3 diff = vf3_sub(a->offs, b->offs);
   int3 segdiff = a->seg - b->seg;
-  float3 segdiffr = vf3_set((float)v3i_get(segdiff, 0),
-                            (float)v3i_get(segdiff, 1),
-                            (float)v3i_get(segdiff, 2));
+  float3 segdiffr = vf3_set((float)v3i_x(segdiff),
+                            (float)v3i_y(segdiff),
+                            (float)v3i_z(segdiff));
 
   return vf3_add(diff, vf3_s_mul(segdiffr, OO_LW_SEGMENT_LEN));
 }

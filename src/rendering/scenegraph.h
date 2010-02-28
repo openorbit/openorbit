@@ -51,7 +51,7 @@ SGdrawable* ooSgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc d
 
 void ooSgSetObjectQuat(SGdrawable *obj, float x, float y, float z, float w);
 void sgSetObjectQuatv(SGdrawable *obj, quaternion_t q);
-
+void sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset);
 void ooSgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw);
 void ooSgSetObjectPos(SGdrawable *obj, float x, float y, float z);
 //void ooSgSetObjectScale(OOdrawable *obj, float s);

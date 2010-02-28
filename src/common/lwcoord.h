@@ -50,6 +50,7 @@ void ooLwcTranslate3f(OOlwcoord *coord, float dx, float dy, float dz);
 float3 ooLwcGlobal(const OOlwcoord *coord);
 float3 ooLwcRelVec(const OOlwcoord *coord, int3 seg);
 float3 ooLwcDist(const OOlwcoord *a, const OOlwcoord * b);
+void ooLwcDump(const OOlwcoord *lwc);
 
 struct OOlwcoord64 {
   double3 offs;

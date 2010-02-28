@@ -61,7 +61,7 @@ extern "C" {
 
     float ra, dec;
     float dra, ddec, dr;
-    float r;
+    float r, zoom;
   };
 
 
