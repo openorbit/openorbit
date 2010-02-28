@@ -201,7 +201,6 @@ main(int argc, char*argv[])
   if (!ooScriptingRunFile("script/init.py")) {
     ooLogFatal("script/init.py missing");
   }
-
   // Initialise SDL, GL and AL
 
   // Init SDL video subsystem
@@ -217,6 +216,7 @@ main(int argc, char*argv[])
 //  }
 
   // Init GL state
+
   ooSetVideoDefaults();
   ooSgCamInit();
 

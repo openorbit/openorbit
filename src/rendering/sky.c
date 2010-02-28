@@ -75,9 +75,9 @@ ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
     if (temp > 40000.0) temp = 40000.0;
     uint8_t *tempRGB = get_temp_colour((int)temp);
     
-    stars->data[stars->n_stars].x = vf3_x(cart);
-    stars->data[stars->n_stars].y = vf3_y(cart);
-    stars->data[stars->n_stars].z = vf3_z(cart);
+    stars->data[stars->n_stars].x = 100.0*vf3_x(cart);
+    stars->data[stars->n_stars].y = 100.0*vf3_y(cart);
+    stars->data[stars->n_stars].z = 100.0*vf3_z(cart);
     stars->data[stars->n_stars].r = *tempRGB;
     stars->data[stars->n_stars].g = *(tempRGB+1);
     stars->data[stars->n_stars].b = *(tempRGB+2);
@@ -120,9 +120,9 @@ ooSkyRandomStars(void)
     ra = deg2rad(random() % 360-180);
     dec = deg2rad(random() % 180-90);
     cart = ooEquToCart(ra, dec);
-    stars->data[i].x = vf3_x(cart);
-    stars->data[i].y = vf3_y(cart);
-    stars->data[i].z = vf3_z(cart);
+    stars->data[i].x = 100.0*vf3_x(cart);
+    stars->data[i].y = 100.0*vf3_y(cart);
+    stars->data[i].z = 100.0*vf3_z(cart);
     stars->data[i].r = 255;
     stars->data[i].g = 255;
     stars->data[i].b = 255;
@@ -153,6 +153,7 @@ void
 ooSkyDrawStars(OOstars *stars)
 {
   ooLogTrace("draw %d stars", stars->n_stars);
+  glMatrixMode(GL_MODELVIEW);
 
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_LIGHTING);
@@ -178,7 +179,7 @@ ooSkyNewDrawable(const char *file)
   //  OOdrawable *sky = malloc(sizeof(OOdrawable));
   OOstars *sky = ooSkyLoadStars(file);
   SGdrawable *drawable = ooSgNewDrawable((SGdrawable*)sky, "sky", (SGdrawfunc)ooSkyDrawStars);
-  
+
   return drawable;
 }
 

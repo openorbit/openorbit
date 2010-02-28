@@ -30,6 +30,7 @@ void ooInitGlAttributes(void);
 void ooSetPerspective(float fovy, int width, int height);
 void ooSetVideoDefaults(void);
 void ooResizeScreen(int width, int height, bool fullscreen);
+void ooPrintScreenAttributes(void);
 
 #ifdef __cplusplus
 }

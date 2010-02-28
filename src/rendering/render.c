@@ -38,7 +38,6 @@
 #include "texture.h"
 #include "planet.h"
 #include "log.h"
-static void ooPrintScreenAttributes(void);
 
 static SDL_Surface *gScreen = NULL;
 
@@ -62,6 +61,7 @@ ooInitSdlScreen(int width, int height, bool fullscreen)
     SDL_Quit();
     exit(2);
   }
+  ooPrintScreenAttributes();
 }
 
 void
@@ -114,9 +114,9 @@ ooSetPerspective(float fovy, int width, int height)
   glMatrixMode(GL_PROJECTION);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glLoadIdentity();
-  // Near clipping 1 dm away, far clipping 20 au away
+  // Near clipping 1 m away, far clipping 20 au away
   gluPerspective(fovy, (double)width / (double)height,
-                 /*near*/0.1, /*far*/149598000000.0*20.0);
+                 /*near*/1.0, /*far*/149598000000.0*20.0);
 
   ooLogInfo("\tperspective %f", (double)width / (double)height);
 
@@ -124,12 +124,25 @@ ooSetPerspective(float fovy, int width, int height)
   glLoadIdentity();
 }
 
+// TODO: Ensure that these tables are used for probing the depth and stencil
+//       buffer modes. If they are not explicitly set by the user, go with the
+//       highest value that works
+#define NUM_DEPTH_MODES 17
+static int sDepthModes[NUM_DEPTH_MODES] = {
+  128, 96, 64, 48, 32, 24, 16, 12, 10, 8, 6, 5, 4, 3, 2, 1, 0
+};
+
+#define NUM_STENCIL_MODES 17
+static int sStencilModes[NUM_STENCIL_MODES] = {
+  128, 96, 64, 48, 32, 24, 16, 12, 10, 8, 6, 5, 4, 3, 2, 1, 0
+};
+
+
 void
 ooInitGlAttributes(void)
 {
   // Setup attributes we want for the OpenGL context
-  int depthSize, stencilSize, colourSize;
-  ooConfGetIntDef("openorbit/video/depth-bits", &depthSize, 16);
+  int stencilSize, colourSize;
   ooConfGetIntDef("openorbit/video/stencil-bits", &stencilSize, 1);
   ooConfGetIntDef("openorbit/video/colour-bits", &colourSize, 32);
 
@@ -137,10 +150,31 @@ ooInitGlAttributes(void)
   //    Mac OS X will always use 8-8-8-8 ARGB for 32-bit screens and
   //    5-5-5 RGB for 16-bit screens
 
-  // Request a 16-bit depth buffer (without this, there is no depth buffer)
-  if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, depthSize)) {
-    ooLogFatal("could not set depth to size %d SDL: \"%s\"", depthSize, SDL_GetError());
+  bool depthSetFailed = true;
+  for (int i = 0 ; i < NUM_DEPTH_MODES ; ++ i) {
+    if (!SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, sDepthModes[i])) {
+      // Take largest allowed depth buffer
+      depthSetFailed = false;
+      break;
+    }
   }
+  if (depthSetFailed) {
+    ooLogFatal("could not set depth size SDL: \"%s\"", SDL_GetError());
+  }
+
+#if 0
+  bool stencilSetFailed = true;
+  for (int i = 0 ; i < NUM_STENCIL_MODES ; ++ i) {
+    if (!SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, sStencilModes[i])) {
+      // Take largest allowed depth buffer
+      stencilSetFailed = false;
+      break;
+    }
+  }
+  if (stencilSetFailed) {
+    ooLogFatal("could not set stencil size SDL: \"%s\"", SDL_GetError());
+  }
+#endif
   
   // Request double-buffered OpenGL
   //     The fact that windows are double-buffered on Mac OS X has no effect
@@ -150,7 +184,7 @@ ooInitGlAttributes(void)
   }
 }
 
-static void
+void
 ooPrintScreenAttributes(void)
 {
   // Print out attributes of the context we created
@@ -158,19 +192,21 @@ ooPrintScreenAttributes(void)
   int i;
 
   int  attr[] = { SDL_GL_RED_SIZE, SDL_GL_BLUE_SIZE, SDL_GL_GREEN_SIZE,
-                  SDL_GL_ALPHA_SIZE, SDL_GL_BUFFER_SIZE, SDL_GL_DEPTH_SIZE };
+                  SDL_GL_ALPHA_SIZE, SDL_GL_BUFFER_SIZE, SDL_GL_DEPTH_SIZE,
+                  SDL_GL_STENCIL_SIZE};
 
-  char *desc[] = { "Red size: %d bits\n", "Blue size: %d bits\n",
-                   "Green size: %d bits\n",
-                   "Alpha size: %d bits\n", "Color buffer size: %d bits\n", 
-                   "Depth bufer size: %d bits\n" };
+  char *desc[] = { "Red size: %d bits", "Blue size: %d bits",
+                   "Green size: %d bits", "Alpha size: %d bits",
+                   "Color buffer size: %d bits",
+                   "Depth buffer size: %d bits",
+                   "Stencil buffer size: %d bits"};
 
   nAttr = sizeof(attr) / sizeof(int);
 
   for (i = 0; i < nAttr; i++) {
     int value;
     SDL_GL_GetAttribute(attr[i], &value);
-    printf(desc[i], value);
+    ooLogInfo(desc[i], value);
   }
 }
 
