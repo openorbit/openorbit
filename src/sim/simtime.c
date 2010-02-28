@@ -33,7 +33,8 @@ ooSimTimeInit(time_t epoch)
 
   OOsimtime *timeState = malloc(sizeof(OOsimtime));
   timeState->epoch = epoch;
-  timeState->currentTime = 0.0;
+  timeState->jdBase = (double)(time(NULL)/86400) + 2440587.5;
+  timeState->currentTime = timeState->jdBase;
   timeState->timeStamp = 0;
   timeState->timeStampLength = 0.05; // 20 Hz default
 

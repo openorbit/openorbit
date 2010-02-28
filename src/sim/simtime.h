@@ -28,6 +28,7 @@ typedef struct OOsimtime {
   double currentTime; //!< Current time in earth days relative to epoch
   uint64_t timeStamp; //!< Time stamp (ticking up one every step)
   double timeStampLength;
+  double jdBase;
 } OOsimtime;
 
 OOsimtime* ooSimTimeInit(time_t epoch);
@@ -36,7 +37,7 @@ static inline void
 ooSimTimeTick(OOsimtime *self, double dt)
 {
   self->timeStamp ++;
-  self->currentTime = (((double)(self->timeStamp)) * dt) / (24.0 * 3600.0);
+  self->currentTime = self->jdBase + (((double)(self->timeStamp)) * dt) / (24.0 * 3600.0);
 }
 
 double ooTimeGetJD(void);
