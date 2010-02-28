@@ -92,10 +92,10 @@ plMeanMotionFromPeriod(double tau)
  \param a Semi-major axis of orbit
  \param u Gravitational parameter (GM) of orbited body
  */
-double
-plMeanMotion(double u, double a)
+long double
+plMeanMotion(long double u, long double a)
 {
-  return sqrt(u/(a*a*a));
+  return sqrtl(u/(a*a*a));
 }
 
 /*!
@@ -104,10 +104,10 @@ plMeanMotion(double u, double a)
  \param ecc Eccentricity of orbital ellipse
  \param m Mean anomaly
  */
-double
-plEccAnomalityStep(double E_i, double ecc, double m)
+long double
+plEccAnomalityStep(long double E_i, long double ecc, long double m)
 {
-  return E_i - ( (E_i-ecc*sin(E_i)-m) / (1-ecc*cos(E_i)) );
+  return E_i - ( (E_i-ecc*sinl(E_i)-m) / (1-ecc*cosl(E_i)) );
 }
 
 /*!
@@ -129,27 +129,27 @@ plEccAnomalityStep(double E_i, double ecc, double m)
   \param n Mean motion around object
   \param t Absolute time for which we want the eccentric anomaly.
  */
-double
-plEccAnomaly(double ecc, double n, double t)
+long double
+plEccAnomaly(long double ecc, long double n, long double t)
 {
   // 7.37 mm accuracy for an object at the distance of the dwarf-planet Pluto
-#define ERR_LIMIT 0.000000000000001
-  double meanAnomaly = n * t;
+#define ERR_LIMIT 0.000000000001l
+  long double meanAnomaly = n * t;
 
-  double E_1 = plEccAnomalityStep(meanAnomaly, ecc, meanAnomaly);
-  double E_2 = plEccAnomalityStep(E_1, ecc, meanAnomaly);
+  long double E_1 = plEccAnomalityStep(meanAnomaly, ecc, meanAnomaly);
+  long double E_2 = plEccAnomalityStep(E_1, ecc, meanAnomaly);
 
-  double E_i = E_1;
-  double E_i1 = E_2;
+  long double E_i = E_1;
+  long double E_i1 = E_2;
   int i = 0;
 
-  while (fabs(E_i1-E_i) > ERR_LIMIT) {
+  while (fabsl(E_i1-E_i) > ERR_LIMIT) {
     E_i = E_i1;
     E_i1 = plEccAnomalityStep(E_i, ecc, meanAnomaly);
     i ++;
 
     if (i > 10) {
-      ooLogWarn("ecc anomaly did not converge in %d iters, err = %f", i, fabs(E_i1-E_i));
+      ooLogWarn("ecc anomaly did not converge in %d iters, err = %.16f", i, fabs(E_i1-E_i));
       break;
     }
   }
@@ -180,8 +180,8 @@ plOrbitalQuaternion(PL_keplerian_elements *kepler)
 float3
 plOrbitPosAtTime(PL_keplerian_elements *orbit, double GM, double t)
 {
-  double meanMotion = plMeanMotion(GM, orbit->a);
-  double eccAnomaly = plEccAnomaly(orbit->ecc, meanMotion, t);
+  long double meanMotion = plMeanMotion(GM, orbit->a);
+  long double eccAnomaly = plEccAnomaly(orbit->ecc, meanMotion, t);
 
   /* Compute x, y from anomaly, y is pointing in the direction of the
      periapsis */
@@ -419,6 +419,7 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
   obj->angEcc = acos(1.0 - flattening);
   obj->obliquity = DEG_TO_RAD(obliquity);
   obj->siderealPeriod = siderealPeriod;
+
   return obj;
 }
 
@@ -621,11 +622,20 @@ plSysStep(PLsystem *sys, double dt)
   }
 
   plSysSetCurrentPos(sys);
-
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysStep(sys->orbits.elems[i], dt);
   }
 }
+
+void
+plSysInit(PLsystem *sys)
+{
+  plSysSetCurrentPos(sys);
+  for (size_t i = 0; i < sys->orbits.length ; i ++) {
+    plSysInit(sys->orbits.elems[i]);
+  }
+}
+
 
 void
 plSysUpateSg(PLsystem *sys)
@@ -976,6 +986,7 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 
   hrmlFreeDocument(solarSys);
 
+  plSysInit(world->rootSys);
   ooLogInfo("loaded solar system");
   return world;
 }
