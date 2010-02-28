@@ -639,9 +639,9 @@ ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName,
     float3 p = geodetic2cart_f(astrobody->eqRad, astrobody->angEcc,
                                latitude, longitude, altitude);
     plSetObjectPosRel3fv(&sc->obj->super, &astrobody->obj, p);
+
     ooScSetSystem(sc, astrobody->sys);
     float3 v = plComputeCurrentVelocity(astrobody);
-    ooLogInfo("initial velocity: %f, %f, %f", v.x, v.y, v.z);
     plSetVel3fv(&sc->obj->super, v);
   }
 }
