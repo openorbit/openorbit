@@ -1,7 +1,14 @@
+//    Attribution note: the mercury.ac, and redstone.ac models are derived from
+//    NASA 3d-models available for free from the NASA. The redstone model was
+//    modified from a Jupiter-C model, but the capsule and tower removed and
+//    length extended to be inline with the Mercury Redstone rocket. The mercury
+//    capsule was modified by removing all the bolts on the spacecraft, reducing
+//    the polygon count by about 90%.
+//
 //    The main idea is that the physical parameters are described in this HRML file, the file
 //    in term points out 3d-models and a plugin file that contain any necessary programatic
 //    behaviour.
-
+//
 //    This craft is modeled after the Mercury capsule, this in term means that it need to
 //    point out some plugin (Python or C), that handles things like for example ripple
 //    firing of the retro engines. The sim system does however support the distinction
@@ -149,7 +156,7 @@ spacecraft (name: Mercury-Capsule) {
       // inertia tensor: 1/12 m 3rr + hh    1/2 mrr
       model(): "redstone.ac";
       detach-order: 0;
-      fuel: 24000.0 kg;
+      fuel-mass: 24000.0 kg;
       mass: 4400.0 kg;
 
       // inertia tensors are entered in the base form, assuming that the total mass = 1.0

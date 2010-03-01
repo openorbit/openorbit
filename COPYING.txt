@@ -1,3 +1,8 @@
+Some texture maps and 3d models come originally from NASA, but may have been modified
+since retrieval. Guidelines for NASA images and models are available at
+http://www.nasa.gov/audience/formedia/features/MP_Photo_Guidelines.html
+In general, attribution is given in a file in the same directory as the models.
+
 Open Orbit is distributed under the LGPLv3 or later licence. The full license text is
 available in the "licences" directory.
 
