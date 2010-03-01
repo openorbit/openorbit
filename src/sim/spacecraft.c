@@ -482,7 +482,7 @@ static void
 loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
 {
   const double *inertia = NULL;
-  double mass;
+  double mass = NAN, fuelMass= NAN;
   const double *stagePos = NULL;
   const double *stageCog = NULL;
 
@@ -493,6 +493,8 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
       newStage->detachOrder = hrmlGetInt(stageEntry);
     } else if (!strcmp(stageEntry->name, "mass")) {
       mass = hrmlGetReal(stageEntry);
+    } else if (!strcmp(stageEntry->name, "fuel-mass")) {
+      fuelMass = hrmlGetReal(stageEntry);
     } else if (!strcmp(stageEntry->name, "inertial-tensor")) {
       inertia = hrmlGetRealArray(stageEntry);
       size_t len = hrmlGetRealArrayLen(stageEntry);
@@ -531,9 +533,11 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
             0.0f, 0.0f, 0.0f,
             inertia[0], inertia[4], inertia[8],
             inertia[1], inertia[2], inertia[5]);
+
+  plMassSetMin(&newStage->obj->m, mass);
+  if (isnormal(fuelMass)) mass += fuelMass;
   plMassMod(&newStage->obj->m, mass);
   plMassTranslate(&newStage->obj->m, stageCog[0], stageCog[1], stageCog[2]);
-
   scStageSetOffset3f(newStage, stagePos[0], stagePos[1], stagePos[2]);
 }
 

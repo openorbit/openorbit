@@ -188,7 +188,7 @@ sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset)
 }
 
 void
-ooSgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
+sgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
 {
   // Get camera position and translate the lw coord with respect to the camera
   OOscene *sc = obj->scene;

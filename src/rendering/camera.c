@@ -166,9 +166,9 @@ ooSgCamRotate(OOcam *cam)
       OOorbitcam* ocam = (OOorbitcam*)cam;
       float3 cogOffset = mf3_v_mul(ocam->body->R, ocam->body->m.cog);
       gluLookAt(0.0, 0.0, 0.0,
-                -ocam->r*cos(ocam->dec) + cogOffset.x,
-                -ocam->r*sin(ocam->dec) + cogOffset.y,
-                -ocam->r*sin(ocam->ra) + cogOffset.z,
+                -ocam->r*cos(ocam->dec),
+                -ocam->r*sin(ocam->dec),
+                -ocam->r*sin(ocam->ra),
                 0.0, 0.0, 1.0);
     }
     break;
@@ -251,9 +251,6 @@ ooSgCamMove(OOcam *cam)
                     ocam->r*sin(ocam->dec),
                     ocam->r*sin(ocam->ra)};
       float3 cogOffset = mf3_v_mul(ocam->body->R, ocam->body->m.cog);
-      float tmpx = cogOffset.x;
-      float tmpy = cogOffset.y;
-      float tmpz = cogOffset.z;
       glTranslatef(-(p[0]+ocam->body->p.offs.x + cogOffset.x),
                    -(p[1]+ocam->body->p.offs.y + cogOffset.y),
                    -(p[2]+ocam->body->p.offs.z + cogOffset.z));

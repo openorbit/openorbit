@@ -645,22 +645,24 @@ plSysUpateSg(PLsystem *sys)
 
   quaternion_t q = plGetQuat(&sys->orbitalBody->obj);
   sgSetObjectQuatv(sys->orbitalBody->drawable, q);
-  ooSgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
+  sgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
 
   // Update orbital path base
   if (sys->parent) {
-    ooSgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->obj.p);
+    sgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->obj.p);
   }
 
   //ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);
   //ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz);
-  for (size_t i = 0; i < sys->rigidObjs.length ; i ++) {
-    PLobject *obj = sys->rigidObjs.elems[i];
-    if (obj->drawable) {
-      sgSetObjectPosLWAndOffset(obj->drawable, &obj->p, v_q_rot(obj->p_offset, obj->q));
-      sgSetObjectQuatv(obj->drawable, obj->q);
-    }
-  }
+  //for (size_t i = 0; i < sys->rigidObjs.length ; i ++) {
+  //  PLobject *obj = sys->rigidObjs.elems[i];
+  //  if (obj->drawable) {
+      //sgSetObjectPosLWAndOffset(obj->drawable, &obj->p, v_q_rot(obj->p_offset, obj->q));
+      //    sgSetObjectPosLW(obj->drawable, &obj->p);
+      // ooLwcDump(&obj->p);
+      //sgSetObjectQuatv(obj->drawable, obj->q);
+      //}
+      //}
 
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysUpateSg(sys->orbits.elems[i]);
@@ -682,8 +684,8 @@ plWorldStep(PLworld *world, double dt)
 
   for (size_t i = 0; i < world->objs.length ; i ++) {
     PLobject *obj = world->objs.elems[i];
-    if (obj->parent && obj->drawable) {
-      sgSetObjectPosLWAndOffset(obj->drawable, &obj->p, v_q_rot(obj->p_offset, obj->q));
+    if (obj->drawable) {
+      sgSetObjectPosLW(obj->drawable, &obj->p);
       sgSetObjectQuatv(obj->drawable, obj->q);
     }
   }
