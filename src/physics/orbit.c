@@ -610,7 +610,6 @@ plSysStep(PLsystem *sys, double dt)
     float3 f12 = vf3_s_mul(vf3_normalise(dist),
                            -sys->orbitalBody->GM * obj->m.m / r12);
     plForce3fv(obj, -f12);
-
     if (sys->parent) {
       dist = ooLwcDist(&sys->parent->orbitalBody->obj.p, &obj->p);
       r12 = vf3_abs_square(dist);
@@ -1004,11 +1003,12 @@ float3
 plComputeCurrentVelocity(PLastrobody *ab)
 {
   double t = ooTimeGetJD();
-  float3 vp = vf3_set(-1.0, 0.0, 0.0);
+  float3 upVec = vf3_set(0.0, 0.0, 1.0);
+  upVec = v_q_rot(upVec, plOrbitalQuaternion(ab->kepler));
+  double velocity = (2.0*M_PI*ab->kepler->a)/(ab->sys->orbitalPeriod*PL_SEC_PER_DAY);
+  float3 currentPos = plOrbitPosAtTime(ab->kepler, ab->GM, t*PL_SEC_PER_DAY);
+  float3 dir = vf3_normalise(vf3_cross(upVec, currentPos));
 
-  // Unit vector for velocity
-  vp = v_q_rot(vp, plOrbitalQuaternion(ab->kepler));
-  vp = vf3_s_mul(vp, (2.0*M_PI*ab->kepler->a)/(ab->sys->orbitalPeriod*3600.0*24.0));
-  return vp;
+  return vf3_s_mul(dir, velocity);
 }
 
