@@ -35,7 +35,7 @@
 #include "rendering/reftypes.h"
 
 #include "physics/reftypes.h"
-
+#include "physics/areodynamics.h"
 
 typedef struct PL_keplerian_elements {
   double ecc;
@@ -45,6 +45,7 @@ typedef struct PL_keplerian_elements {
   double longAsc;
   double argPeri;
   double meanAnomalyOfEpoch;
+  quaternion_t qOrbit; // Orbital quaternion, this is derived information
 } PL_keplerian_elements ;
 
 struct PLastrobody {
@@ -53,6 +54,7 @@ struct PLastrobody {
   PLsystem *sys;
   PLobject obj;
   double GM;
+  PLatmosphere atm;
   PL_keplerian_elements *kepler;
   SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
@@ -68,6 +70,9 @@ struct PLastrobody {
   // Important parameters for computing rotation exact
   double obliquity;
   double siderealPeriod;
+
+  int tUpdate; // How many steps to next update
+  int orbitFixationPeriod; // How many steps between updates
 };
 
 struct PLsystem {
