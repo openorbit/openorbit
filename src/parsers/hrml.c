@@ -517,6 +517,22 @@ typedef struct ParseState {
   HRMLobject *obj; //!< Need to know where parser inserts the entries
 } ParseState;
 
+static void LexErr(LexState *lexer, const char *str, ...)
+{
+  char *msg;
+  asprintf(&msg, "error:%d:%d: %s\n", lexer->line_, lexer->col_,
+           str);
+  va_list args;
+  va_start(args, str);
+
+  vfprintf(stderr, msg, args);
+  va_end(args);
+
+  free(msg);
+  longjmp(gParseError, 1);
+}
+
+
 Token createNextToken(TokenKind kind, LexState *lex) {
   Token next = makeTok(kind, lex->nextTokPtr_,
                        (size_t)(lex->rdPtr_ - lex->nextTokPtr_));
@@ -862,8 +878,7 @@ Token lexToken(LexState *lex)
     fprintf(stderr, "eof\n");
     return createNextToken(tk_eof, lex);
   } else {
-    fprintf(stderr, "unknown character '"); fputwc(ch, stderr); fprintf(stderr, "'\n");
-    assert(0 && "unknown ch in stream");
+    LexErr(lex, "unknown character %lc", ch);
   }
 }
 
@@ -953,7 +968,6 @@ InsertValueInNode(ParseState *parser, HRMLvalue val)
 {
   parser->obj->val = val;
 }
-
 
 static void ParseErr(ParseState *parser, const char *str, ...)
 {
