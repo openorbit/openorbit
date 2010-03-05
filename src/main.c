@@ -52,6 +52,7 @@
 #include "rendering/sky.h"
 #include "scripting/scripting.h"
 #include "rendering/texture.h"
+#include "physics/physics.h"
 
 #include "SDL.h"
 //#include "SDL_ttf.h"
@@ -189,6 +190,7 @@ main(int argc, char*argv[])
   ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
   ooLogSetLevel(ooLogGetLevFromStr(levStr));
 
+  plInit();
   ooSimInit();
 
   ooPluginInit();

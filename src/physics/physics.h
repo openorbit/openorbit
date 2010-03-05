@@ -54,8 +54,6 @@
 #define __has_feature(x) 0  // Compatibility with non-clang compilers.
 #endif
 
-typedef struct PLatmosphere PLatmosphere;
-
 #if __has_feature(attribute_ext_vector_type)
 typedef float __attribute__((ext_vector_type (4))) PLfloat3;
 typedef double __attribute__((ext_vector_type (4))) PLdouble3;
@@ -88,7 +86,10 @@ typedef int16_t __attribute__((vector_size (8))) PLshort3;
 #define PL_NA 6.0221415e23
 // Boltzmann
 #define PL_KB 1.3806504e-23
-
+// Stefan (W/m2/K4)
+#define PL_ST 5.670400e-8
+// Molar Mass Constant
+#define PL_M0 1.99264654e-26;
 
 #include "object.h"
 #include "orbit.h"
@@ -104,6 +105,7 @@ typedef int16_t __attribute__((vector_size (8))) PLshort3;
 
 // Unit conversion macros
 
+void plInit(void);
 static inline double
 plMetresToAu(double m)
 {
@@ -181,9 +183,5 @@ plKToC(double t)
   return t - 273.16;
 }
 
-
-struct PLatmosphere {
-  float density;
-};
 
 #endif /* end of include guard: PHYSICS_H_MW8CHG7V */
