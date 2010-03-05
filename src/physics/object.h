@@ -47,6 +47,9 @@ struct PLobject {
   float3 angVel; // Angular velocity
   float3 f_ack; // Force accumulator
   float3 t_ack; // Torque accumulator
+
+  float dragCoef; // Drag coefficent
+  float area; // Average area used when calculating drag
 };
 
 struct PLcompound_object {

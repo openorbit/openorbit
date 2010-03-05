@@ -264,6 +264,7 @@
 /* Begin PBXFileReference section */
 		EC030D6911084749004F3AD8 /* Simulation Design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Simulation Design"; sourceTree = "<group>"; };
 		EC1217881125410A007DC66F /* reftypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reftypes.h; sourceTree = "<group>"; };
+		EC124713113CF6EF00A40CE1 /* areodynamics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = areodynamics.h; sourceTree = "<group>"; };
 		EC204D5210CAFA2300F0A450 /* palloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = palloc.h; sourceTree = "<group>"; };
 		EC204D5310CAFA2300F0A450 /* palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = palloc.c; sourceTree = "<group>"; };
 		EC204D5F10CB09D500F0A450 /* test-palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-palloc.c"; sourceTree = "<group>"; };
@@ -689,6 +690,7 @@
 			isa = PBXGroup;
 			children = (
 				EC34BC0F1079EE080011B76E /* areodynamics.c */,
+				EC124713113CF6EF00A40CE1 /* areodynamics.h */,
 				EC34BC111079EE080011B76E /* object.c */,
 				EC91C41E1101C28B00011177 /* object.h */,
 				EC34BC121079EE080011B76E /* orbit.c */,

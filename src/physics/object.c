@@ -61,6 +61,9 @@ plInitObject(PLobject *obj)
   obj->q = q_rot(1.0, 0.0, 0.0, 0.0); // Rotation quaternion  
   obj->p_offset = vf3_set(0.0, 0.0, 0.0);
 
+  obj->dragCoef = 0.0;
+  obj->area = 0.0;
+
   plComputeDerived(obj);
 }
 
