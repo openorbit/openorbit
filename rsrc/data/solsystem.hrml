@@ -7,6 +7,7 @@ openorbit {
       flattening: 9.0e-6;
       sidereal-rotational-period: 25.38 days;
       axial-tilt: 7.25 deg; // Note, obliquity is relative to ecliptic
+      luminosity: 3.839e26 W;
     }
     rendering {
        model: "sphere"; # Special keys are sphere
@@ -21,6 +22,8 @@ openorbit {
           flattening: 0.0;
           sidereal-rotational-period: 58.646 days;
           axial-tilt: 0.0351666667 deg; // 2.11' according to wikipedia
+          geom-albedo: 0.138;
+          bond-albedo: 0.119;
         }
         orbit {
           semimajor-axis: 0.38709893 au;
@@ -55,6 +58,8 @@ openorbit {
           flattening: 0.0;
           sidereal-rotational-period: 243.0185 days;
           axial-tilt: 177.3 deg; // Reverse rotation compared to other planets
+          geom-albedo: 0.65;
+          bond-albedo: 0.75;
         }
         orbit {
           semimajor-axis: 0.72333199  au;
@@ -88,7 +93,8 @@ openorbit {
           flattening: 0.0033528;
           sidereal-rotational-period: 0.99726968;
           axial-tilt: 23.439281 deg;
-          albedo: 0.367;
+          geom-albedo: 0.367;
+          bond-albedo: 0.29;
         }
         orbit {
           semimajor-axis: 1.00000011 au;
@@ -122,6 +128,8 @@ openorbit {
               flattening: 0.00125;
               sidereal-rotational-period: 27.321582 days;
               axial-tilt: 1.5424 deg; // To ecliptic, 6.687 to orbital plane
+              geom-albedo: 0.113;
+              bond-albedo: 0.123;
             }
             orbit {
               semimajor-axis: 384399.0e3 m; //1384399000.0 m;
@@ -146,6 +154,8 @@ openorbit {
           flattening: 0.00589;
           sidereal-rotational-period: 1.0259541666666667; // Days
           axial-tilt: 25.19 deg; // Also known as obliquity
+          geom-albedo: 0.15;
+          bond-albedo: 0.25;
         }
         orbit {
           semimajor-axis: 1.52366231 au;
@@ -169,6 +179,8 @@ openorbit {
           flattening: 0.06487;
           sidereal-rotational-period: 0.4135416666666667; // Days
           axial-tilt: 3.13 deg; // Also known as obliquity
+          geom-albedo: 0.52;
+          bond-albedo: 0.343;
         }
         orbit {
           semimajor-axis: 5.20336301 au;
@@ -277,6 +289,8 @@ openorbit {
           flattening: 0.09796;
           sidereal-rotational-period: 0.440416667; // Days
           axial-tilt: 26.73 deg; // Also known as obliquity
+          geom-albedo: 0.47;
+          bond-albedo: 0.342;
         }
         orbit {
           semimajor-axis: 9.58201720 au;
@@ -293,6 +307,55 @@ openorbit {
           // albedo: 0.342 bond, 0.47 geom
         }
       }
+      planet (name: Uranus) {
+        physical {
+          mass: 8.6810e25 kg;
+          radius: 25559.0e3 m;
+          flattening: 0.0229;
+          sidereal-rotational-period: -0.71833; // Days (reverse rot)
+          axial-tilt: 97.77 deg; // Also known as obliquity
+          geom-albedo: 0.51;
+          bond-albedo: 0.300;
+        }
+        orbit {
+          semimajor-axis: 19.22941195 au;
+          eccentricity: 0.044405586;
+          inclination: 0.772556 deg; // To ecliptic
+          longitude-ascending-node: 73.989821 deg;
+          longitude-periapsis: 96.541318 deg;
+          mean-longitude: 142.955717 deg;
+          //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
+        }
+        rendering {
+          model: "sphere";
+          texture: "textures/uranus.jpg";
+        }
+      }
+      planet (name: Neptune) {
+        physical {
+          mass: 1.0243e26 kg;
+          radius: 24764.0e3 m;
+          flattening: 0.0171;
+          sidereal-rotational-period: 0.6713; // Days
+          axial-tilt: 28.32 deg; // Also known as obliquity
+          geom-albedo: 0.41;
+          bond-albedo: 0.290;
+        }
+        orbit {
+          semimajor-axis: 30.10366151 au;
+          eccentricity: 0.011214269;
+          inclination: 1.767975 deg; // To ecliptic
+          longitude-ascending-node: 131.794310 deg;
+          longitude-periapsis: 265.646853 deg;
+          mean-longitude: 267.767281 deg;
+          //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
+        }
+        rendering {
+          model: "sphere";
+          texture: "textures/neptune.jpg";
+        }
+      }
+
     }
   }
 }
