@@ -78,6 +78,7 @@ struct PLastrobody {
 struct PLsystem {
   PLworld *world;
   PLsystem *parent;
+  OOscene *scene;
 
   const char *name;
   double effectiveRadius; //!< Radius of the entire system, i.e how far away
@@ -101,10 +102,10 @@ struct PLsystem {
 
 struct PLworld {
   const char *name;
-  OOscene *scene; // Scene in the sg
   PLsystem *rootSys;
   
   obj_array_t objs; // All objects in world, even ones not placed in subsystems
+  obj_array_t partSys; // All particle systems in world
 };
 
 PLworld* plNewWorld(const char *name, OOscene *sc,
@@ -112,18 +113,18 @@ PLworld* plNewWorld(const char *name, OOscene *sc,
                     double siderealPeriod, double obliquity,
                     double eqRadius, double flattening);
 
-PLsystem* plNewRootSystem(PLworld *world, const char *name,
+PLsystem* plNewRootSystem(PLworld *world, OOscene *sc, const char *name,
                           double m, double gm, double obliquity, double siderealPeriod,
                           double eqRadius, double flattening);
 
 
-PLsystem* plNewOrbit(PLworld *world, const char *name, double m, double gm,
+PLsystem* plNewOrbit(PLworld *world, OOscene *sc, const char *name, double m, double gm,
                      double orbitPeriod, double obliquity, double siderealPeriod,
                      double semiMaj, double semiMin,
                      double inc, double ascendingNode, double argOfPeriapsis,
                      double meanAnomaly,
                      double eqRadius, double flattening);
-PLsystem* plNewSubOrbit(PLsystem *orb, const char *name, double m, double gm,
+PLsystem* plNewSubOrbit(PLsystem *orb, OOscene *sc, const char *name, double m, double gm,
                         double orbitPeriod, double obliquity, double siderealPeriod,
                         double semiMaj, double semiMin,
                         double inc, double ascendingNode, double argOfPeriapsis,

@@ -24,7 +24,7 @@
 #include <gencds/array.h>
 
 #include "simtypes.h"
-
+#include "physics/reftypes.h"
 typedef enum OOdefault_actuator_groups {
   OO_Act_Orbital = 0,
   OO_Act_Vertical = 1,
@@ -68,6 +68,7 @@ struct OOactuator {
 
 struct OOrocket {
   OOactuator super;
+  PLparticles *ps;
   float3 p; //!< Local position relative to stage center
   float forceMag; //!< Newton
   float throttle; //!< Percentage of force magnitude to apply
@@ -75,6 +76,7 @@ struct OOrocket {
 };
 struct OOsrb {
   OOactuator super;
+  PLparticles *ps;
   float forceMag; //!< Newton
   float3 p; //!< Local position relative to stage center
   float3 dir; //!< Unit vector with direction of srb
@@ -83,6 +85,7 @@ struct OOsrb {
 // In atmosphere jet engine
 struct OOjetengine {
   OOactuator super;
+  PLparticles *ps;
   float forceMag; //!< Newton
   float throttle; //!< Percentage of force magnitude to apply
 };

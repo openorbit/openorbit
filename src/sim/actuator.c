@@ -211,6 +211,11 @@ OOsrb* ooScNewSrb(OOstage *stage,
   engine->p = vf3_set(x, y, z);
   engine->dir = vf3_set(dx, dy, dz);
   engine->super.step = (OOactuatorstep) ooSrbStep;
+
+  engine->ps = plNewParticleSystem(name, 100);
+  plAttachParticleSystem(engine->ps, stage->obj);
+  SGdrawable *dps = sgNewParticleSystem(name, "textures/particle-alpha.png", engine->ps);
+  ooSgSceneAddObj(stage->sc->scene, dps);
   return engine;
 }
 
@@ -231,6 +236,10 @@ OOrocket* ooScNewLoxEngine(OOstage *stage,
 
   engine->super.step = (OOactuatorstep) ooRocketStep;
 
+  engine->ps = plNewParticleSystem(name, 100);
+  plAttachParticleSystem(engine->ps, stage->obj);
+  SGdrawable *dps = sgNewParticleSystem(name, "textures/particle-alpha.png", engine->ps);
+  ooSgSceneAddObj(stage->sc->scene, dps);
   return engine;
 }
 
@@ -248,6 +257,12 @@ OOrocket* ooScNewThruster(OOstage *stage,
   engine->p = vf3_set(x, y, z);
   engine->dir = vf3_set(dx, dy, dz);
   engine->super.step = (OOactuatorstep) ooThrusterStep;
+
+  engine->ps = plNewParticleSystem(name, 100);
+  plAttachParticleSystem(engine->ps, stage->obj);
+  SGdrawable *dps = sgNewParticleSystem(name, "textures/particle-alpha.png", engine->ps);
+  ooSgSceneAddObj(stage->sc->scene, dps);
+
   return engine;
 }
 

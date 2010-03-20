@@ -73,8 +73,10 @@ OOspacecraft* ooScGetCurrent(void)
   return gSIM_state.currentSc;
 }
 
+// TODO: Pass on PLsystem instead of PLworld to ensure that object has valid
+//       systems at all times.
 OOspacecraft*
-ooScNew(PLworld *world)
+ooScNew(PLworld *world, OOscene *scene)
 {
   OOspacecraft *sc = malloc(sizeof(OOspacecraft));
   //ooObjVecInit(&sc->stages);
@@ -88,11 +90,12 @@ ooScNew(PLworld *world)
   sc->detatchStage = NULL;
 
   sc->obj = plCompoundObject(world);
-
+  sc->scene = scene;
   sc->detatchProg.pc = 0;
   detatchprog_array_init(&sc->detatchProg.instrs);
 
   plMassSet(&sc->obj->super.m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  plSetSystem(world->rootSys, &sc->obj->super);
 
   return sc;
 }
@@ -521,7 +524,7 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
 
       SGdrawable *drawable = sgLoadModel(modelPath);
       ooScSetStageMesh(newStage, drawable);
-      ooSgSceneAddObj(sc->world->scene, drawable);
+      ooSgSceneAddObj(sc->scene, drawable);
 
       free(modelPath);
       free(pathCopy);
@@ -542,7 +545,7 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
 }
 
 OOspacecraft*
-ooScLoad(PLworld *world, const char *fileName)
+ooScLoad(PLworld *world, OOscene *scene, const char *fileName)
 {
   char *path = ooResGetPath(fileName);
   HRMLdocument *spaceCraftDoc = hrmlParse(path);
@@ -555,7 +558,7 @@ ooScLoad(PLworld *world, const char *fileName)
   }
   HRMLobject *root = hrmlGetRoot(spaceCraftDoc);
   HRMLvalue scName = hrmlGetAttrForName(root, "name");
-  OOspacecraft *sc = ooScNew(world);
+  OOspacecraft *sc = ooScNew(world, scene);
 
   for (HRMLobject *node = root; node != NULL; node = node->next) {
     if (!strcmp(node->name, "spacecraft")) {

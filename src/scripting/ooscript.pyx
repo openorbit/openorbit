@@ -65,7 +65,7 @@ cdef extern from "physics/orbit.h":
 
 cdef extern from "sim/spacecraft.h":
   ctypedef struct OOspacecraft
-  OOspacecraft* ooScLoad(PLworld *world, char *fileName)
+  OOspacecraft* ooScLoad(PLworld *world, OOscene *scene, char *fileName)
   void ooScSetPos(OOspacecraft *sc, double x, double y, double z)
   void ooScSetSystemAndPos(OOspacecraft *sc, char *sysName, double x, double y, double z)
   void ooScSetSysAndCoords(OOspacecraft *sc, char *sysName, double longitude, double latitude, double altitude)
@@ -232,8 +232,8 @@ cdef class OrbitWorld:
 
 cdef class Spacecraft:
   cdef OOspacecraft *sc
-  def __init__(self, OrbitWorld world, path):
-    self.sc = ooScLoad(world.world, path)
+  def __init__(self, OrbitWorld world, Scene scene, path):
+    self.sc = ooScLoad(world.world, scene.sc, path)
   def setPos(self, double x, double y, double z):
     ooScSetPos(self.sc, x, y, z)
   def setSysAndPos(self, char *sysPath, double x, double y, double z):

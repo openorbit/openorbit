@@ -52,6 +52,7 @@ struct PLparticles {
                        // two
   size_t oldestParticleIdx;
   size_t newestParticleIdx;
+  bool enabled;
   //float *pos;
   //float *colour;
   //float *dir;
@@ -65,6 +66,10 @@ struct PLparticles {
 PLparticles* plNewParticleSystem(const char *name, size_t particleCount);
 void plDeleteParticleSystem(PLparticles *ps);
 void plStepParticleSystem(PLparticles *ps, float dt);
+void plAttachParticleSystem(PLparticles *ps, PLobject *obj);
+
+void plEnableParticleSystem(PLparticles *ps);
+void plDisableParticleSystem(PLparticles *ps);
 
 void plParticleSystemSetEmissionRate(PLparticles *ps, float er);
 
