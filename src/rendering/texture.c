@@ -22,7 +22,11 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <gencds/hashtable.h>
-#include "SDL_opengl.h"
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <gl/gl.h>
+#endif
 
 #include "log.h"
 #include "texture.h"

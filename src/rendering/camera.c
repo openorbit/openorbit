@@ -19,7 +19,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "SDL_opengl.h"
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <gl/gl.h>
+#endif
+
 #include <vmath/vmath.h>
 #include "log.h"
 #include "io-manager.h"

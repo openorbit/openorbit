@@ -20,6 +20,8 @@
 #ifndef SCENEGRAPH_H_
 #define SCENEGRAPH_H_
 
+#define SG_MAX_LIGHTS GL_MAX_LIGHTS
+
 #include <vmath/vmath.h>
 #include <gencds/array.h>
 
@@ -34,32 +36,14 @@
 
 #include "camera.h"
 #include "particles.h"
-
-#define SG_MAX_LIGHTS GL_MAX_LIGHTS
-
-struct SGmaterial {
-  float ambient[4];
-  float diffuse[4];
-  float specular[4];
-  float emission[4];
-  float shininess;
-};
-
-
-
-SGdrawable* ooSgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df);
-
-void ooSgSetObjectQuat(SGdrawable *obj, float x, float y, float z, float w);
-void sgSetObjectQuatv(SGdrawable *obj, quaternion_t q);
-void sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset);
-void sgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw);
-void ooSgSetObjectPos(SGdrawable *obj, float x, float y, float z);
-//void ooSgSetObjectScale(OOdrawable *obj, float s);
-void ooSgSetObjectSpeed(SGdrawable *obj, float dx, float dy, float dz);
-void ooSgSetObjectAngularSpeed(SGdrawable *obj, float drx, float dry, float drz);
+#include "material.h"
+#include "light.h"
+#include "drawable.h"
 
 void ooSgSetScenePos(OOscene *sc, float x, float y, float z);
 void ooSgSetSceneScale(OOscene *sc, float scale);
+
+void sgSetScenePos(OOscene *sc, const OOlwcoord *lwc);
 
 void ooSgDrawOverlay(OOoverlay *overlay);
 
@@ -107,31 +91,6 @@ OOscene* ooSgGetScene(OOscenegraph *sg, const char *sceneName);
 void ooSgSceneAddChild(OOscene *parent, OOscene *child);
 void ooSgSceneAddObj(OOscene *sc, SGdrawable *object);
 
-SGmaterial* sgSphereGetMaterial(OOsphere *sphere);
-
-
-SGdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
-SGdrawable* sgNewEllipsis(const char *name,
-                          double semiMajor, double semiMinor,
-                          double longAsc, double inc, double argPeri,
-                          float r, float g, float b,
-                          size_t vertCount);
-
-SGdrawable* sgLoadModel(const char *file);
 void sgSceneAddLight(OOscene *sc, SGlight *light);
-SGlight* sgNewPointlight(OOscene *sc, float3 p);
-SGlight* sgNewPointlight3f(OOscene *sc, float x, float y, float z);
-void sgSetLightPos3f(SGlight *light, float x, float y, float z);
-void sgSetLightPosv(SGlight *light, float3 v);
-void sgSetLightPosLW(SGlight *light, OOlwcoord *lwc);
-
-
-
-void sgSetMaterialAmb4f(SGmaterial *mat, float r, float g, float b, float a);
-void sgSetMaterialDiff4f(SGmaterial *mat, float r, float g, float b, float a);
-void sgSetMaterialSpec4f(SGmaterial *mat, float r, float g, float b, float a);
-void sgSetMaterialEmiss4f(SGmaterial *mat, float r, float g, float b, float a);
-void sgSetMaterialShininess(SGmaterial *mat, float s);
-
 
 #endif /* SCENEGRAPH_H_ */

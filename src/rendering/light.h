@@ -17,32 +17,50 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SG_PARTICLES_H
-#define SG_PARTICLES_H
-
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
+#ifndef SG_LIGHT_H__
+#define SG_LIGHT_H__
 
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
 #else
 #include <gl/gl.h>
 #endif
-#include "physics/particles.h"
 
-#include "physics/reftypes.h"
+#include <vmath/vmath.h>
 #include "rendering/reftypes.h"
-#include "rendering/drawable.h"
+#include "common/lwcoord.h"
 
-struct SGparticles {
-  SGdrawable super;
-  GLuint texture;
-  PLparticles *ps;
+typedef void (*SGenable_light_func)(SGlight *light, GLenum lightId);
+typedef void (*SGdisable_light_func)(SGlight *light);
+
+struct SGlight {
+  struct OOscene *scene;
+  int lightId;
+  
+  float pos[4];
+  
+  float ambient[4];
+  float specular[4];
+  float diffuse[4];
+  
+  SGenable_light_func enable;
+  SGdisable_light_func disable;
 };
 
-SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
-                                PLparticles *ps);
+struct SGspotlight {
+  SGlight super;
+  float dir[3];
+};
+
+struct SGpointlight {
+  SGlight super;
+};
+
+SGlight* sgNewPointlight(OOscene *sc, float3 p);
+SGlight* sgNewPointlight3f(OOscene *sc, float x, float y, float z);
+void sgSetLightPos3f(SGlight *light, float x, float y, float z);
+void sgSetLightPosv(SGlight *light, float3 v);
+void sgSetLightPosLW(SGlight *light, OOlwcoord *lwc);
 
 
-#endif /* !SG_PARTICLES_H */
+#endif /* !SG_LIGHT_H__ */

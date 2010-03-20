@@ -22,7 +22,11 @@
 #include <vmath/vmath.h>
 
 
-#include "SDL_opengl.h"
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <gl/gl.h>
+#endif
 
 void ooPlanetDraw(OOplanet *planet)
 {

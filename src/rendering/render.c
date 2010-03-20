@@ -24,7 +24,12 @@
 #include <math.h>
 #include <assert.h>
 #include "SDL.h"
-#include "SDL_opengl.h"
+
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <gl/gl.h>
+#endif
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>

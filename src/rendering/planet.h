@@ -19,7 +19,15 @@
 
 #ifndef PLANET_H__
 #define PLANET_H__
-#include "SDL_opengl.h"
+
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/glu.h>
+#else
+#include <gl/gl.h>
+#include <gl/glu.h>
+#endif
+
 #include <vmath/vmath.h>
 
 typedef struct {

@@ -115,6 +115,9 @@
 		EC4485750CCD25AB001C88AD /* list-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854D0CCD247E001C88AD /* list-test.c */; };
 		EC4A893910B152C9002C6513 /* actuator.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4A893810B152C9002C6513 /* actuator.c */; };
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
+		EC5F72531154E10D00FBE08B /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
+		EC5F725A1154E27400FBE08B /* light.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72591154E27400FBE08B /* light.c */; };
+		EC5F72881155240B00FBE08B /* drawable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72871155240B00FBE08B /* drawable.c */; };
 		EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7D093410EE160700D9D28E /* flightrecorder.c */; };
 		EC823729113140E100A725B1 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
@@ -420,6 +423,11 @@
 		EC4FCC6210748F4B00EB6DDF /* libpng.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng.dylib; path = /usr/X11/lib/libpng.dylib; sourceTree = "<absolute>"; };
 		EC51E6E110BBE766009FA70D /* mass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mass.h; sourceTree = "<group>"; };
 		EC51E6E210BBE766009FA70D /* mass.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mass.c; sourceTree = "<group>"; };
+		EC5F72511154E10D00FBE08B /* material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
+		EC5F72521154E10D00FBE08B /* material.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = material.c; sourceTree = "<group>"; };
+		EC5F72581154E27400FBE08B /* light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = light.h; sourceTree = "<group>"; };
+		EC5F72591154E27400FBE08B /* light.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = light.c; sourceTree = "<group>"; };
+		EC5F72871155240B00FBE08B /* drawable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = drawable.c; sourceTree = "<group>"; };
 		EC62624E1125545C001C0684 /* reftypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reftypes.h; sourceTree = "<group>"; };
 		EC6262571125556C001C0684 /* drawable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drawable.h; sourceTree = "<group>"; };
 		EC768C4E1060D651009B558C /* openorbit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = openorbit.xcconfig; sourceTree = "<group>"; };
@@ -787,6 +795,11 @@
 				ECDC29FC111498100066AF2D /* particles.c */,
 				EC62624E1125545C001C0684 /* reftypes.h */,
 				EC6262571125556C001C0684 /* drawable.h */,
+				EC5F72871155240B00FBE08B /* drawable.c */,
+				EC5F72511154E10D00FBE08B /* material.h */,
+				EC5F72521154E10D00FBE08B /* material.c */,
+				EC5F72581154E27400FBE08B /* light.h */,
+				EC5F72591154E27400FBE08B /* light.c */,
 			);
 			path = rendering;
 			sourceTree = "<group>";
@@ -1513,6 +1526,9 @@
 				ECDC29FD111498100066AF2D /* particles.c in Sources */,
 				ECDC2BA4111ACD900066AF2D /* particles.c in Sources */,
 				EC823729113140E100A725B1 /* cmod.c in Sources */,
+				EC5F72531154E10D00FBE08B /* material.c in Sources */,
+				EC5F725A1154E27400FBE08B /* light.c in Sources */,
+				EC5F72881155240B00FBE08B /* drawable.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

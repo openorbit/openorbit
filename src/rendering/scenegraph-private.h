@@ -25,6 +25,8 @@
 #else
 #include <gl/gl.h>
 #endif
+#include <gencds/array.h>
+#include "scenegraph.h"
 
 static GLenum sgLightNumberMap[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3,
                                     GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
@@ -36,12 +38,14 @@ struct OOscene {
 
   SGlight *lights[SG_MAX_LIGHTS];
   float3 t;
+  OOlwcoord p;
 
   OOscenegraph *sg;
 
   obj_array_t scenes; // Subscenes
   obj_array_t objs;   // Objects in this scene
 };
+
 
 struct OOoverlay {
 //  OOtexture *tex;
@@ -53,6 +57,7 @@ struct OOscenegraph {
   OOscene *root;
   OOcam *currentCam;
   obj_array_t cams;
+  obj_array_t scenes;   // All scenes in the scene graph
 
   int usedLights;
 
@@ -60,42 +65,6 @@ struct OOscenegraph {
   obj_array_t overlays; // TODO: Consolidate OOobjvector and obj_array_t
 };
 
-typedef struct SGellipsis {
-  SGdrawable super;
-  double semiMajor;
-  double semiMinor;
-  double ecc;
-  float colour[3];
-  size_t vertCount;
-  float verts[];
-} SGellipsis;
-
-
-typedef void (*SGenable_light_func)(SGlight *light, GLenum lightId);
-typedef void (*SGdisable_light_func)(SGlight *light);
-
-struct SGlight {
-  struct OOscene *scene;
-  int lightId;
-
-  float pos[4];
-
-  float ambient[4];
-  float specular[4];
-  float diffuse[4];
-
-  SGenable_light_func enable;
-  SGdisable_light_func disable;
-};
-
-struct SGspotlight {
-  SGlight super;
-  float dir[3];
-};
-
-struct SGpointlight {
-  SGlight super;
-};
 
 
 #endif /* end of include guard: SCENEGRAPH_PRIVATE_H_8YHHHPCN */

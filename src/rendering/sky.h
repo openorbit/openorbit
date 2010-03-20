@@ -28,8 +28,12 @@ extern "C" {
 
 #include "scenegraph.h"
 
-#include "SDL_opengl.h"
-
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <gl/gl.h>
+#endif
+  
 #define STAR_CNT 5000
     
 typedef struct {

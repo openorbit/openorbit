@@ -17,32 +17,28 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SG_PARTICLES_H
-#define SG_PARTICLES_H
+#ifndef SG_MATERIAL_H__
+#define SG_MATERIAL_H__
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
-
-#ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
-#else
-#include <gl/gl.h>
-#endif
-#include "physics/particles.h"
-
-#include "physics/reftypes.h"
 #include "rendering/reftypes.h"
-#include "rendering/drawable.h"
 
-struct SGparticles {
-  SGdrawable super;
-  GLuint texture;
-  PLparticles *ps;
+struct SGmaterial {
+  float ambient[4];
+  float diffuse[4];
+  float specular[4];
+  float emission[4];
+  float shininess;
 };
 
-SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
-                                PLparticles *ps);
+void sgInitMaterial(SGmaterial *mat);
+void sgBindMaterial(SGmaterial *mat);
+
+void sgSetMaterialAmb4f(SGmaterial *mat, float r, float g, float b, float a);
+void sgSetMaterialDiff4f(SGmaterial *mat, float r, float g, float b, float a);
+void sgSetMaterialSpec4f(SGmaterial *mat, float r, float g, float b, float a);
+void sgSetMaterialEmiss4f(SGmaterial *mat, float r, float g, float b, float a);
+void sgSetMaterialShininess(SGmaterial *mat, float s);
 
 
-#endif /* !SG_PARTICLES_H */
+
+#endif /* !SG_MATERIAL_H__ */
