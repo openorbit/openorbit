@@ -272,7 +272,7 @@ static inline float
 vf3_abs_square(float3 v)
 {
   float3 res = v * v;
-  return vf3_get(res, 0) + vf3_get(res, 1) + vf3_get(res, 2);
+  return vf3_x(res) + vf3_y(res) + vf3_z(res);
 }
 
 static inline double
@@ -585,19 +585,19 @@ bool v_eq(float4 a, float4 b, float tol)
 static inline bool
 vf3_lt(float3 a, float3 b)
 {
-  return vf3_abs(a) < vf3_abs(b);
+  return vf3_abs_square(a) < vf3_abs_square(b);
 }
 
 static inline bool
 vf3_lte(float3 a, float3 b)
 {
-  return vf3_abs(a) <= vf3_abs(b);
+  return vf3_abs_square(a) <= vf3_abs_square(b);
 }
 
 static inline bool
 vf3_gt(float3 a, float3 b)
 {
-  return vf3_abs(a) > vf3_abs(b);
+  return vf3_abs_square(a) > vf3_abs_square(b);
 }
 
 
