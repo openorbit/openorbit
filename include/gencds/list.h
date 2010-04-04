@@ -98,6 +98,39 @@ do {                                                    \
     }                                                   \
 } while (0)
 
+
+#define LIST_HEAD(TYPE) struct { struct TYPE *head; struct TYPE *tail; }
+#define LIST_FIRST(LIST) ((LIST).head)
+#define LIST_LAST(LIST) ((LIST).tail)
+
+#define LIST_ENTRY(TYPE) struct { struct TYPE *next; struct TYPE *prev; }
+
+#define LIST_CONCAT(LISTA, LISTB)               \
+do {                                            \
+  (LIST_LAST(LISTA))->next = LIST_FIRST(LISTB); \
+  LIST_FIRST(LISTB)->prev = LIST_LAST(LISTA);   \
+  LIST_LAST(LISTA) = LIST_LAST(LISTB);          \
+} while (0)
+
+#define LIST_APPEND(LIST,ELEM,ENTRY)    \
+do {                                    \
+  if (LIST_LAST(LIST)) {                \
+    LIST_LAST(LIST)->ENTRY.next = ELEM; \
+    ELEM->ENTRY.prev = LIST_LAST(LIST); \
+    LIST_LAST(LIST) = ELEM;             \
+  } else {                              \
+    LIST_FIRST(LIST) = ELEM;            \
+    LIST_LAST(LIST) = ELEM;             \
+    ELEM->ENTRY.next = NULL;            \
+    ELEM->ENTRY.prev = NULL;            \
+  }                                     \
+} while (0)
+#define LIST_EMPTY(head) ((head).head == NULL)
+#define LIST_NEXT(elem, field) ((elem)->field.next)
+
+#define LIST_FOREACH(typ, val, lhead, field) \
+for (struct typ* val = (lhead).head ; val != NULL ; val = LIST_NEXT(val, field))
+
 #ifdef __cplusplus
 }
 #endif
