@@ -148,7 +148,6 @@ ooSkyInitStars(int star_count)
   return stars;
 }
 
-#include "camera.h"
 void
 ooSkyDrawStars(OOstars *stars)
 {
