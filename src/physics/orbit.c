@@ -749,7 +749,7 @@ plWorldStep(PLworld *world, double dt)
 */
 
 void
-ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscenegraph *sg)
+ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscene *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -821,7 +821,6 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscenegraph *sg)
   double period = plOrbitalPeriod(semiMajor, sys->orbitalBody->GM * gm) / PL_SEC_PER_DAY;
 
   //  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
-  OOscene *sc = ooSgGetRoot(sg);
   SGdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
 
 
@@ -839,7 +838,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscenegraph *sg)
 }
 
 void
-ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
+ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscene *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -911,7 +910,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
 
   // NOTE: At present, all plantes must be specified with AUs as parameters
   double period = plOrbitalPeriod(plAuToMetres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
-  OOscene *sc = ooSgGetRoot(sg);
+
   SGdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
   ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
   PLsystem *sys = plNewOrbit(world, sc, planetName.u.str,
@@ -926,7 +925,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
   if (sats) {
     for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {
       if (!strcmp(sat->name, "moon")) {
-        ooLoadMoon__(sys, sat, sg);
+        ooLoadMoon__(sys, sat, sc);
       }
     }
   }
@@ -934,7 +933,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscenegraph *sg)
 
 
 PLworld*
-ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
+ooLoadStar__(HRMLobject *obj, OOscene *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -979,7 +978,6 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
     gm = mass*PL_GRAVITATIONAL_CONST;
   }
 
-  OOscene *sc = ooSgGetRoot(sg);
   sgSetSceneAmb4f(sc, 0.2, 0.2, 0.2, 1.0);
   SGdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
   SGmaterial *mat = sgSphereGetMaterial((OOsphere*)drawable);
@@ -1000,7 +998,7 @@ ooLoadStar__(HRMLobject *obj, OOscenegraph *sg)
   assert(sats != NULL);
   for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {
     if (!strcmp(sat->name, "planet")) {
-      ooLoadPlanet__(world, sat, sg);
+      ooLoadPlanet__(world, sat, sc);
     } else if (!strcmp(sat->name, "comet")) {
     }
   }
@@ -1022,12 +1020,12 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 
   PLworld *world = NULL;
   // Go through the document and handle each entry in the document
-
+  OOscene *sc = ooSgNewScene(sg, "main");
   for (HRMLobject *node = hrmlGetRoot(solarSys); node != NULL; node = node->next) {
     if (!strcmp(node->name, "openorbit")) {
       for (HRMLobject *star = node->children; star != NULL; star = star->next) {
         if (!strcmp(star->name, "star")) {
-          world = ooLoadStar__(star, sg);
+          world = ooLoadStar__(star, sc);
         }
       }
     }

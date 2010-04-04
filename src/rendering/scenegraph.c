@@ -39,28 +39,12 @@
 #include "parsers/model.h"
 
 
-
-OOscene*
-ooSgGetRoot(OOscenegraph *sg)
-{
-  assert(sg != NULL);
-
-  return sg->root;
-}
-
 OOcam*
 ooSgGetCam(OOscenegraph *sg)
 {
   assert(sg != NULL);
 
   return sg->currentCam;
-}
-
-OOscene*
-ooSgSceneGetParent(OOscene *sc)
-{
-  assert(sc != NULL);
-  return sc->parent;
 }
 
 void
@@ -77,8 +61,7 @@ OOscenegraph*
 ooSgNewSceneGraph()
 {
   OOscenegraph *sg = malloc(sizeof(OOscenegraph));
-  sg->root = ooSgNewScene(NULL, "root");
-  sg->root->sg = sg;
+
   sg->usedLights = 0;
   obj_array_init(&sg->cams);
   obj_array_init(&sg->overlays);
@@ -98,7 +81,7 @@ compareScenes(void *camPos, const void *a, const void *b)
   if (vf3_lte(da, db)) {
     return -1;
   }
-  
+
   return 1;
 }
 
@@ -128,7 +111,8 @@ sgSortScenes(OOscenegraph *sg)
   }
 }
 
-void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
+void
+ooSgSetCam(OOscenegraph *sg, OOcam *cam)
 {
   assert(sg != NULL);
   assert(cam != NULL);
@@ -153,31 +137,25 @@ sgSetScenePos(OOscene *sc, const OOlwcoord *lwc)
 
 
 OOscene*
-ooSgNewScene(OOscene *parent, const char *name)
+ooSgNewScene(OOscenegraph *sg, const char *name)
 {
   assert(name != NULL);
 
   OOscene *sc = malloc(sizeof(OOscene));
-  sc->parent = parent;
   sc->name = strdup(name);
   sc->t = vf3_set(0.0, 0.0, 0.0);
-  //sc->s = 1.0;
-  //sc->si = 1.0;
+
   sc->amb[0] = 0.2;
   sc->amb[1] = 0.2;
   sc->amb[2] = 0.2;
   sc->amb[3] = 1.0;
 
   memset(sc->lights, 0, SG_MAX_LIGHTS * sizeof(SGlight*));
-  sc->sg = NULL;
+  sc->sg = sg;
 
-  obj_array_init(&sc->scenes);
   obj_array_init(&sc->objs);
 
-  if (parent) {
-    sc->sg = parent->sg;
-    obj_array_push(&parent->scenes, sc);
-  }
+  obj_array_push(&sg->scenes, sc);
 
   return sc;
 }
@@ -194,16 +172,6 @@ sgSetSceneAmb4f(OOscene *sc, float r, float g, float b, float a)
 
 
 void
-ooSgSceneAddChild(OOscene * restrict parent, OOscene * restrict child)
-{
-  assert(parent != NULL);
-  assert(child != NULL);
-  obj_array_push(&parent->scenes, child);
-  child->parent = parent;
-  child->sg = parent->sg;
-}
-
-void
 ooSgSceneAddObj(OOscene *sc, SGdrawable *object)
 {
   assert(sc != NULL);
@@ -214,58 +182,13 @@ ooSgSceneAddObj(OOscene *sc, SGdrawable *object)
 }
 
 OOscene*
-ooSgSceneGetRoot(OOscene *sc)
-{
-  assert(sc != NULL);
-
-  while (sc->parent) sc = sc->parent;
-  return sc;
-}
-
-OOscene*
 ooSgGetScene(OOscenegraph *sg, const char *sceneName)
 {
   assert(sg != NULL);
 
-  char str[strlen(sceneName)+1];
-  strcpy(str, sceneName); // TODO: We do not trust the user, should probably
-                          // check alloca result
-
-  OOscene *scene = sg->root;
-  char *strp = str;
-  char *strTok = strsep(&strp, "/");
-  int idx = 0;
-  obj_array_t *vec = NULL;
-
-  while (scene) {
-    fprintf(stderr, "%s == %s\n", scene->name, strTok);
-    if (!strcmp(scene->name, strTok)) {
-      if (strp == NULL) {
-        // At the end of the sys path
-        return scene;
-      }
-
-      // If this is not the lowest level, go one level down
-      strTok = strsep(&strp, "/");
-
-      vec = &scene->scenes;
-      idx = 0;
-      if (vec->length <= 0) {
-        fprintf(stderr, "no subscenes found\n");
-        return NULL;
-      }
-      scene = vec->elems[idx];
-    } else {
-      if (vec == NULL) {
-        assert(0 && "not found");
-        return NULL;
-      }
-      idx ++;
-      if (vec->length <= idx) {
-        assert(0 && "index overflow");
-        return NULL;
-      }
-      scene = vec->elems[idx];
+  for (int i = 0 ; i < sg->scenes.length ; ++ i) {
+    if (!strcmp(sceneName, ((OOscene*)(sg->scenes.elems[i]))->name)) {
+      return (OOscene*)sg->scenes.elems[i];
     }
   }
 
@@ -298,13 +221,6 @@ ooSgDrawOverlay(OOoverlay *overlay)
   glPopMatrix();
 }
 
-//void
-//ooSgSceneSetScale(OOscene *sc, float s)
-//{
-//  sc->s = s;
-//  sc->si = 1.0f / s;
-//}
-
 int
 compareDistances(SGdrawable const **o0, SGdrawable const **o1)
 {
@@ -315,7 +231,7 @@ compareDistances(SGdrawable const **o0, SGdrawable const **o1)
 }
 
 void
-sgSceneDraw(OOscene *sc, bool recurse)
+sgSceneDraw(OOscene *sc)
 {
   assert(sc != NULL);
   ooLogTrace("drawing scene %s at %vf", sc->name, sc->t);
@@ -353,31 +269,9 @@ sgSceneDraw(OOscene *sc, bool recurse)
   for (size_t i = 0 ; i < sc->objs.length ; i ++) {
     SGdrawable *obj = sc->objs.elems[i];
     ooLogTrace("drawing object %s", obj->name);
-    glPushMatrix();
-    glTranslatef(vf3_x(obj->p), vf3_y(obj->p), vf3_z(obj->p));
-    matrix_t m;
-    q_m_convert(&m, obj->q);
-    matrix_t mt;
-    m_transpose(&mt, &m);
-    glMultMatrixf((GLfloat*)&mt);
-
-    obj->draw(obj);
-    glPopMatrix();
+    sgPaintDrawable(obj);
   }
 
-  if (recurse) {
-    // Render subscenes
-    for (size_t i = 0 ; i < sc->scenes.length ; i ++) {
-      OOscene *subScene = sc->scenes.elems[i];
-
-      glPushMatrix();
-      //glScalef(subScene->si, subScene->si, subScene->si);
-      glTranslatef(vf3_x(subScene->t), vf3_y(subScene->t), vf3_z(subScene->t));
-
-      sgSceneDraw(subScene, true);
-      glPopMatrix();
-    }
-  }
   // Pop scene transform
   glPopMatrix();
 
@@ -418,9 +312,6 @@ ooSgPaint(OOscenegraph *sg)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-
-  //OOscene *sc = sg->currentCam->scene->parent;
-
   glPushMatrix();
   ooSgCamRotate(sg->currentCam);
   // Draw the sky
@@ -433,46 +324,12 @@ ooSgPaint(OOscenegraph *sg)
     ooSgDrawOverlay(sg->overlays.elems[i]);
   }
 
-  // Now, in order to suport grand scales, we draw the scene with the current
-  // camera (this will recursivly draw it's child scenes)
   glPushMatrix();
 
   ooSgCamRotate(sg->currentCam);
   ooSgCamMove(sg->currentCam);
-  sgSceneDraw(sg->currentCam->scene, true);
+  sgSceneDraw(sg->currentCam->scene);
 
-  // At this point we have not drawn the parent scene, so we start go upwards
-  // in the scenegraph now and apply the scales. Note that the SG is a tree
-  // with respect to the scenes, so we only keep track of the leaf we came
-  // from in order to prevent us from recursing back into scenes that have
-  // already been drawn
-  OOscene *sc = sg->currentCam->scene->parent;
-  OOscene *prev = sg->currentCam->scene;
-
-  while (sc) {
-    //glScalef(prev->s, prev->s, prev->s);
-     // Invert translation as we are going up in hierarchy
-    glTranslatef(-vf3_x(prev->t), -vf3_y(prev->t), -vf3_z(prev->t));
-
-    // Note that for each step we do here we must adjust the scales
-    // appropriatelly
-    for (size_t i = 0; i < sc->scenes.length ; i ++) {
-      if (sc->scenes.elems[i] != prev) { // only draw non drawn scenes
-        glPushMatrix();
-        OOscene *subScene = sc->scenes.elems[i];
-        //glScalef(subScene->si, subScene->si, subScene->si);
-        glTranslatef(vf3_x(subScene->t), vf3_y(subScene->t), vf3_z(subScene->t));
-
-        sgSceneDraw(subScene, true);
-        glPopMatrix();
-      }
-    }
-
-    sgSceneDraw(sc, false);
-    // go up in the tree
-    prev = sc;
-    sc = sc->parent;
-  }
   glPopMatrix();
 }
 
@@ -480,31 +337,6 @@ void
 ooSgDrawFuncGnd(SGdrawable *obj)
 {
 
-}
-
-
-static void
-setSgRec(OOscenegraph *sg, OOscene *sc)
-{
-  for (size_t i = 0; i < sc->scenes.length ; i ++) {
-    ((OOscene*)sc->scenes.elems[i])->sg = sg;
-    setSgRec(sg, sc->scenes.elems[i]);
-  }
-}
-void
-ooSgSetRoot(OOscenegraph *sg, OOscene *sc)
-{
-  // TODO: Delete previous scene
-  sg->root = sc;
-
-  // This is really ugly, we should initialise these properly when the objects
-  // are created
-  // TODO: RAII please
-  sc->sg = sg;
-  for (size_t i = 0; i < sc->scenes.length ; i ++) {
-    ((OOscene*)sc->scenes.elems[i])->sg = sg;
-    setSgRec(sg, sc->scenes.elems[i]);
-  }
 }
 
 

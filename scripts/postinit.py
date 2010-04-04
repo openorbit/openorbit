@@ -48,12 +48,12 @@ ooscript.setOrbWorld(oworld)
 #              + (1.74e6 + 100000.0),
 #              z + 10.0,
 #              0.0, 0.0, 1.0)
-sc = ooscript.Spacecraft(oworld, sgr.getScene("root"), "spacecrafts/mercury/mercury.hrml")
+sc = ooscript.Spacecraft(oworld, sgr.getScene("main"), "spacecrafts/mercury/mercury.hrml")
 sc.setSysAndEqCoords("Sol/Earth", 0.0, 0.0, 500.0e3)
 
 ocam = ooscript.OrbitCam()
 
 #ocam.setParams(sgr, sgr.getRoot(), oworld.getPLObjForName("Sol/Earth"), 0.0, 0.0, 6.37e6 + 10000.0e3)
-ocam.setParams(sgr, sgr.getRoot(), sc.getPLObject(), 0.0, 0.0, 20.0)
+ocam.setParams(sgr, sgr.getScene("main"), sc.getPLObject(), 0.0, 0.0, 20.0)
 
 sgr.setCam(ocam)

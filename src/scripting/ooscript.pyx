@@ -18,7 +18,6 @@ cdef extern from "rendering/drawable.h":
     OOobject *obj
     OOdrawfunc draw
 
-  OOscene* ooSgGetRoot(OOscenegraph *sg)
 
   void ooSgSetSky(OOscenegraph *sg, SGdrawable *obj)
   void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
@@ -170,13 +169,7 @@ cdef class Scenegraph:
 
   def setCam(self, Cam cam):
       ooSgSetCam(self.sg, cam.cam)
-      
-  def getRoot(self):
-      cdef Scene sc
-      sc = Scene()
-      sc.sc = ooSgGetRoot(self.sg)
-      return sc
-  
+
   def getScene(self, key):
       cdef Scene sc
       sc.sc = ooSgGetScene(self.sg, key)

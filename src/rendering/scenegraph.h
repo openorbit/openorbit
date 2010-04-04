@@ -41,7 +41,6 @@
 #include "drawable.h"
 
 void ooSgSetScenePos(OOscene *sc, float x, float y, float z);
-void ooSgSetSceneScale(OOscene *sc, float scale);
 
 void sgSetScenePos(OOscene *sc, const OOlwcoord *lwc);
 
@@ -67,22 +66,11 @@ void ooSgSetCam(OOscenegraph *sg, OOcam *cam);
  * ooSgNewSceneGraph creates a root scene by default so you should normally pass
  * in a valid pointer to it.
  */
-OOscene* ooSgNewScene(OOscene *parent, const char *name);
+OOscene* ooSgNewScene(OOscenegraph *sg, const char *name);
 void sgSetSceneAmb4f(OOscene *sc, float r, float g, float b, float a);
 
 void ooSgSetSky(OOscenegraph *sg, SGdrawable *obj);
 
-/*!
-  Finds the root scene from the a given scene. Note that in most cases you want
-  to use the OOscenegraph member root for getting the scene, since member
-  access is O(1) and locating the root for a given scene is O(treeHeight).
-  \param sc Scene from which to find the root scene
-  \result The root of sc
-  \pre sc != NULL
-*/
-OOscene* ooSgSceneGetRoot(OOscene *sc);
-void ooSgSetRoot(OOscenegraph *sg, OOscene *sc);
-OOscene* ooSgGetRoot(OOscenegraph *sg);
 OOcam* ooSgGetCam(OOscenegraph *sg);
 
 OOscene* ooSgSceneGetParent(OOscene *sc);
