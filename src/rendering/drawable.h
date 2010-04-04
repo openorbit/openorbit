@@ -37,9 +37,12 @@
 #include "parsers/model.h"
 #include "rendering/material.h"
 #include "common/lwcoord.h"
-
+#include <gencds/list.h>
 
 struct SGdrawable {
+  LIST_ENTRY(SGdrawable) siblings;
+  LIST_HEAD(SGdrawable) children;
+  struct SGdrawable *parent;
   const char *name;
   OOscene *scene;
   bool enabled;
@@ -48,7 +51,7 @@ struct SGdrawable {
   float3 dr; // delta rot per time step
   quaternion_t q; // Quaternion
                   //float s; // Scale
-  
+  GLfloat R[16];
   SGdrawfunc draw; // Draw function for this object
 };
 
@@ -122,5 +125,10 @@ SGdrawable* sgNewEllipsis(const char *name,
                           size_t vertCount);
 
 SGdrawable* sgLoadModel(const char *file);
+
+void sgDrawableAddChild(SGdrawable * restrict parent, SGdrawable * restrict child,
+                        float3 t, quaternion_t q);
+void sgPaintDrawable(SGdrawable *drawable);
+
 
 #endif /* !SG_DRAWABLE_H */
