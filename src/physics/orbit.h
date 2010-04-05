@@ -78,7 +78,7 @@ struct PLastrobody {
 struct PLsystem {
   PLworld *world;
   PLsystem *parent;
-  OOscene *scene;
+  SGscene *scene;
 
   const char *name;
   double effectiveRadius; //!< Radius of the entire system, i.e how far away
@@ -108,23 +108,23 @@ struct PLworld {
   obj_array_t partSys; // All particle systems in world
 };
 
-PLworld* plNewWorld(const char *name, OOscene *sc,
+PLworld* plNewWorld(const char *name, SGscene *sc,
                     double m, double gm, double radius,
                     double siderealPeriod, double obliquity,
                     double eqRadius, double flattening);
 
-PLsystem* plNewRootSystem(PLworld *world, OOscene *sc, const char *name,
+PLsystem* plNewRootSystem(PLworld *world, SGscene *sc, const char *name,
                           double m, double gm, double obliquity, double siderealPeriod,
                           double eqRadius, double flattening);
 
 
-PLsystem* plNewOrbit(PLworld *world, OOscene *sc, const char *name, double m, double gm,
+PLsystem* plNewOrbit(PLworld *world, SGscene *sc, const char *name, double m, double gm,
                      double orbitPeriod, double obliquity, double siderealPeriod,
                      double semiMaj, double semiMin,
                      double inc, double ascendingNode, double argOfPeriapsis,
                      double meanAnomaly,
                      double eqRadius, double flattening);
-PLsystem* plNewSubOrbit(PLsystem *orb, OOscene *sc, const char *name, double m, double gm,
+PLsystem* plNewSubOrbit(PLsystem *orb, SGscene *sc, const char *name, double m, double gm,
                         double orbitPeriod, double obliquity, double siderealPeriod,
                         double semiMaj, double semiMin,
                         double inc, double ascendingNode, double argOfPeriapsis,
@@ -145,7 +145,7 @@ PLobject* plObjForAstroBody(PLastrobody *abody);
  This function does not belong in the physics system, but will be here for
  now beeing.
  */
-PLworld* ooOrbitLoad(OOscenegraph *sg, const char *fileName);
+PLworld* ooOrbitLoad(SGscenegraph *sg, const char *fileName);
 float3 plComputeCurrentVelocity(PLastrobody *ab);
 
 void plWorldStep(PLworld *world, double dt);

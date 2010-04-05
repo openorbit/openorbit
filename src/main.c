@@ -169,7 +169,7 @@ main_loop(void)
     }
 
     // draw as often as possible
-    ooSgPaint(gSIM_state.sg);
+    sgPaint(gSIM_state.sg);
 
     SDL_GL_SwapBuffers();
     frames ++;
@@ -220,7 +220,7 @@ main(int argc, char*argv[])
   // Init GL state
 
   ooSetVideoDefaults();
-  ooSgCamInit();
+  sgCamInit();
 
   ooTexInit(); // Requires that GL has been initialised
 

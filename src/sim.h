@@ -40,7 +40,7 @@ typedef struct {
   PLsystem *orbSys;   //!< Root orbit system, this will be the sun initially
   PLworld *orbWorld;
   //OOcam *cam;         //!< Current camera
-  OOscenegraph *sg;   //!< Scenegraph of the world
+  SGscenegraph *sg;   //!< Scenegraph of the world
 } SIMstate;
 
 void ooSimInit(void);
@@ -53,7 +53,7 @@ static inline OOsimtime* ooSimTimeState(void)
 
 
 
-void ooSimSetSg(OOscenegraph *sg);
+void ooSimSetSg(SGscenegraph *sg);
 
 void ooSimSetOrbSys(PLsystem *osys);
 void ooSimSetOrbWorld(PLworld *world);

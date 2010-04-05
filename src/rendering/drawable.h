@@ -44,7 +44,7 @@ struct SGdrawable {
   LIST_HEAD(SGdrawable) children;
   struct SGdrawable *parent;
   const char *name;
-  OOscene *scene;
+  SGscene *scene;
   bool enabled;
   float3 p;  // Position
   float3 dp; // delta pos per time step
@@ -70,7 +70,7 @@ typedef struct SGmodel {
   model_t *modelData;
 } SGmodel;
 
-struct OOsphere {
+struct SGsphere {
   SGdrawable super;
   SGmaterial mat;
   GLuint texId;
@@ -103,21 +103,21 @@ struct SGcylinder {
 };
 
 
-SGdrawable* ooSgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df);
+SGdrawable* sgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df);
 
-void ooSgSetObjectQuat(SGdrawable *obj, float x, float y, float z, float w);
+void sgSetObjectQuat4f(SGdrawable *obj, float x, float y, float z, float w);
 void sgSetObjectQuatv(SGdrawable *obj, quaternion_t q);
 void sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset);
 void sgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw);
-void ooSgSetObjectPos(SGdrawable *obj, float x, float y, float z);
-//void ooSgSetObjectScale(OOdrawable *obj, float s);
-void ooSgSetObjectSpeed(SGdrawable *obj, float dx, float dy, float dz);
-void ooSgSetObjectAngularSpeed(SGdrawable *obj, float drx, float dry, float drz);
+void sgSetObjectPos3f(SGdrawable *obj, float x, float y, float z);
+//void ooSgSetObjectScale(SGdrawable *obj, float s);
+void sgSetObjectSpeed(SGdrawable *obj, float dx, float dy, float dz);
+void sgSetObjectAngularSpeed(SGdrawable *obj, float drx, float dry, float drz);
 
-SGmaterial* sgSphereGetMaterial(OOsphere *sphere);
+SGmaterial* sgSphereGetMaterial(SGsphere *sphere);
 
 
-SGdrawable* ooSgNewSphere(const char *name, float radius, const char *tex);
+SGdrawable* sgNewSphere(const char *name, float radius, const char *tex);
 SGdrawable* sgNewEllipsis(const char *name,
                           double semiMajor, double semiMinor,
                           double longAsc, double inc, double argPeri,

@@ -21,16 +21,16 @@
 #define SG_REFTYPES_H
 
 typedef struct SGdrawable SGdrawable;
-typedef struct OOscene OOscene;
-typedef struct OOoverlay OOoverlay;
-typedef struct OOscenegraph OOscenegraph;
+typedef struct SGscene SGscene;
+typedef struct SGoverlay SGoverlay;
+typedef struct SGscenegraph SGscenegraph;
 typedef struct SGmaterial SGmaterial;
 
 typedef struct SGlight SGlight;
 typedef struct SGspotlight SGspotlight;
 typedef struct SGpointlight SGpointlight;
 
-typedef struct OOsphere OOsphere;
+typedef struct SGsphere SGsphere;
 typedef struct SGcylinder SGcylinder;
 
 typedef struct SGparticles SGparticles;
@@ -38,10 +38,10 @@ typedef struct SGparticles SGparticles;
 typedef void (*SGdrawfunc)(SGdrawable*);
 
 
-typedef enum OOcamtype OOcamtype;
-typedef struct OOfreecam OOfreecam;
-typedef struct OOfixedcam OOfixedcam;
-typedef struct OOorbitcam OOorbitcam;
-typedef struct OOcam OOcam;
+typedef enum SGcamtype SGcamtype;
+typedef struct SGfreecam SGfreecam;
+typedef struct SGfixedcam SGfixedcam;
+typedef struct SGorbitcam SGorbitcam;
+typedef struct SGcam SGcam;
 
 #endif /* !SG_REFTYPES_H */

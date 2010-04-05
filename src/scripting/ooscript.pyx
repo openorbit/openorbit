@@ -1,14 +1,14 @@
 
 cdef extern from "rendering/scenegraph.h":
   ctypedef void OOobject
-  ctypedef void (*OOdrawfunc)(OOobject*)
+  ctypedef void (*SGdrawfunc)(OOobject*)
 
-  ctypedef struct OOscene
+  ctypedef struct SGscene
 
-  ctypedef struct OOcam:
-    OOscene *scene
+  ctypedef struct SGcam:
+    SGscene *scene
 
-  ctypedef struct OOscenegraph
+  ctypedef struct SGscenegraph
 
 cdef extern from "physics/object.h":
   ctypedef struct PLobject
@@ -16,26 +16,26 @@ cdef extern from "physics/object.h":
 cdef extern from "rendering/drawable.h":
   ctypedef struct SGdrawable:
     OOobject *obj
-    OOdrawfunc draw
+    SGdrawfunc draw
 
 
-  void ooSgSetSky(OOscenegraph *sg, SGdrawable *obj)
-  void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
+  void sgSetSky(SGscenegraph *sg, SGdrawable *obj)
+  void sgSetCam(SGscenegraph *sg, SGcam *cam)
 
-  OOscenegraph* ooSgNewSceneGraph()
-  void ooSgSetCam(OOscenegraph *sg, OOcam *cam)
+  SGscenegraph* sgNewSceneGraph()
+  void sgSetCam(SGscenegraph *sg, SGcam *cam)
 
-  OOscene* ooSgNewScene(OOscene *parent, char *name)
+  SGscene* sgNewScene(SGscene *parent, char *name)
 
-  void ooSgSceneAddChild(OOscene *parent, OOscene *child)
-  OOscene* ooSgGetScene(OOscenegraph *sg, char *sceneName)
+  void sgSceneAddChild(SGscene *parent, SGscene *child)
+  SGscene* sgGetScene(SGscenegraph *sg, char *sceneName)
 
 
-  OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
+  SGcam* sgNewFreeCam(SGscenegraph *sg, SGscene *sc,
                        float x, float y, float z,
                        float rx, float ry, float rz)
 
-  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
+  SGcam* sgNewOrbitCam(SGscenegraph *sg, SGscene *sc, PLobject *body,
                          float ra, float dec, float dz)
   SGdrawable* sgLoadModel(char *file)
 
@@ -55,7 +55,7 @@ cdef extern from "physics/orbit.h":
   ctypedef struct PLastrobody
 
 
-  PLworld* ooOrbitLoad(OOscenegraph *sg, char *fileName)
+  PLworld* ooOrbitLoad(SGscenegraph *sg, char *fileName)
   void plGetPosForName3f(PLworld *world, char *name,
                          float *x, float *y, float *z)
   PLsystem* plGetSystem(PLworld *world, char *name)
@@ -64,7 +64,7 @@ cdef extern from "physics/orbit.h":
 
 cdef extern from "sim/spacecraft.h":
   ctypedef struct OOspacecraft
-  OOspacecraft* ooScLoad(PLworld *world, OOscene *scene, char *fileName)
+  OOspacecraft* ooScLoad(PLworld *world, SGscene *scene, char *fileName)
   void ooScSetPos(OOspacecraft *sc, double x, double y, double z)
   void ooScSetSystemAndPos(OOspacecraft *sc, char *sysName, double x, double y, double z)
   void ooScSetSysAndCoords(OOspacecraft *sc, char *sysName, double longitude, double latitude, double altitude)
@@ -81,12 +81,12 @@ cdef extern from "rendering/texture.h":
     OOtexture* ooTexGet(char *key)
 
 cdef extern from "sim.h":
-    void ooSimSetSg(OOscenegraph *sg)
-    void ooSimSetCam(OOcam *cam)
+    void ooSimSetSg(SGscenegraph *sg)
+    void ooSimSetCam(SGcam *cam)
     void ooSimSetOrbWorld(PLworld *world)
 
     cdef struct SIMstate:
-      OOscenegraph *sg
+      SGscenegraph *sg
 
 cdef extern from "res-manager.h":
     char* ooResGetPath(char *fileName)
@@ -151,32 +151,32 @@ def unloadTexture(char *key):
     ooTexUnload(key)
 
 cdef class Scene:
-   cdef OOscene *sc
+   cdef SGscene *sc
 
 cdef class Cam:
-  cdef OOcam *cam
+  cdef SGcam *cam
   def __cinit__(self):
-    self.cam = <OOcam*>0
+    self.cam = <SGcam*>0
 
 cdef class Scenegraph:
-  cdef OOscenegraph *sg
+  cdef SGscenegraph *sg
   def __cinit__(self):
-      self.sg = <OOscenegraph*>0
+      self.sg = <SGscenegraph*>0
   
   def new(self):
-      self.sg = ooSgNewSceneGraph()
+      self.sg = sgNewSceneGraph()
       return self
 
   def setCam(self, Cam cam):
-      ooSgSetCam(self.sg, cam.cam)
+      sgSetCam(self.sg, cam.cam)
 
   def getScene(self, key):
       cdef Scene sc
-      sc.sc = ooSgGetScene(self.sg, key)
+      sc.sc = sgGetScene(self.sg, key)
       return sc
   
   def setBackground(self, SkyDrawable sky):
-      ooSgSetSky(self.sg, sky.sky)
+      sgSetSky(self.sg, sky.sky)
   
   def setOverlay(self):
       pass
@@ -192,13 +192,13 @@ cdef class FreeCam(Cam):
   def __cinit__(self):#, node, x, y, z, rx, ry, rz):
     pass
   def setParams(self, Scenegraph sg, Scene sc, x, y, z, rx, ry, rz):
-    self.cam = ooSgNewFreeCam(sg.sg, sc.sc, x, y, z, rx, ry, rz)
+    self.cam = sgNewFreeCam(sg.sg, sc.sc, x, y, z, rx, ry, rz)
 
 cdef class OrbitCam(Cam):
   def __cinit__(self):
     pass
   def setParams(self, Scenegraph sg, Scene sc, PLObject plo, float dec, float ra, float r):
-    self.cam = ooSgNewOrbitCam(sg.sg, sc.sc, plo.obj, dec, ra, r)
+    self.cam = sgNewOrbitCam(sg.sg, sc.sc, plo.obj, dec, ra, r)
 
 cdef class OrbitWorld:
   cdef PLworld *world

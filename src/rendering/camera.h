@@ -29,34 +29,34 @@ extern "C" {
 #include "rendering/reftypes.h"
 #include "common/lwcoord.h"
 
-  enum OOcamtype {
-    OOCam_Free,
-    OOCam_Fixed,
-    OOCam_Orbit
+  enum SGcamtype {
+    SGCam_Free,
+    SGCam_Fixed,
+    SGCam_Orbit
   };
 
-  struct OOcam {
-    OOcamtype kind;
-    OOscene *scene;
+  struct SGcam {
+    SGcamtype kind;
+    SGscene *scene;
   };
 
-  struct OOfreecam {
-    OOcam super;
+  struct SGfreecam {
+    SGcam super;
     OOlwcoord lwc;
     float3 dp;
     quaternion_t q;
     quaternion_t dq;
   };
 
-  struct OOfixedcam {
-    OOcam super;
+  struct SGfixedcam {
+    SGcam super;
     PLobject *body;
     float3 r; // With this offset
     quaternion_t q; // and this rotation (rotate before translation)
   };
 
-  struct OOorbitcam {
-    OOcam super;
+  struct SGorbitcam {
+    SGcam super;
     PLobject *body;
 
     float ra, dec;
@@ -65,25 +65,25 @@ extern "C" {
   };
 
 
-  void ooSgCamInit(void);
+  void sgCamInit(void);
 
-  OOcam* ooSgNewFreeCam(OOscenegraph *sg, OOscene *sc,
+  SGcam* sgNewFreeCam(SGscenegraph *sg, SGscene *sc,
                         float x, float y, float z,
                         float rx, float ry, float rz);
 
-  OOcam* ooSgNewFixedCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
+  SGcam* sgNewFixedCam(SGscenegraph *sg, SGscene *sc, PLobject *body,
                          float dx, float dy, float dz,
                          float rx, float ry, float rz);
 
-  OOcam* ooSgNewOrbitCam(OOscenegraph *sg, OOscene *sc, PLobject *body,
+  SGcam* sgNewOrbitCam(SGscenegraph *sg, SGscene *sc, PLobject *body,
                          float ra, float dec, float r);
 
-  void sgSetCamTarget(OOcam *cam, PLobject *body);
+  void sgSetCamTarget(SGcam *cam, PLobject *body);
 
-  void ooSgCamMove(OOcam *cam);
-  void ooSgCamRotate(OOcam *cam);
-  void ooSgCamStep(OOcam *cam, float dt);
-  void ooSgCamAxisUpdate(OOcam *cam);
+  void sgCamMove(SGcam *cam);
+  void sgCamRotate(SGcam *cam);
+  void sgCamStep(SGcam *cam, float dt);
+  void sgCamAxisUpdate(SGcam *cam);
 
 #ifdef __cplusplus
 }

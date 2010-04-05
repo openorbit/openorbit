@@ -215,7 +215,7 @@ OOsrb* ooScNewSrb(OOstage *stage,
   engine->ps = plNewParticleSystem(name, 100);
   plAttachParticleSystem(engine->ps, stage->obj);
   SGdrawable *dps = sgNewParticleSystem(name, "textures/particle-alpha.png", engine->ps);
-  ooSgSceneAddObj(stage->sc->scene, dps);
+  sgSceneAddObj(stage->sc->scene, dps);
   return engine;
 }
 
@@ -239,7 +239,7 @@ OOrocket* ooScNewLoxEngine(OOstage *stage,
   engine->ps = plNewParticleSystem(name, 100);
   plAttachParticleSystem(engine->ps, stage->obj);
   SGdrawable *dps = sgNewParticleSystem(name, "textures/particle-alpha.png", engine->ps);
-  ooSgSceneAddObj(stage->sc->scene, dps);
+  sgSceneAddObj(stage->sc->scene, dps);
   return engine;
 }
 
@@ -261,7 +261,7 @@ OOrocket* ooScNewThruster(OOstage *stage,
   engine->ps = plNewParticleSystem(name, 100);
   plAttachParticleSystem(engine->ps, stage->obj);
   SGdrawable *dps = sgNewParticleSystem(name, "textures/particle-alpha.png", engine->ps);
-  ooSgSceneAddObj(stage->sc->scene, dps);
+  sgSceneAddObj(stage->sc->scene, dps);
 
   return engine;
 }

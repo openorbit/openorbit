@@ -45,19 +45,19 @@ sgSetLightPosv(SGlight *light, float3 v)
 void
 sgSetLightPosLW(SGlight *light, OOlwcoord *lwc)
 {
-  OOscene *sc = light->scene;
-  OOscenegraph *sg = sc->sg;
-  OOcam *cam = sg->currentCam;
+  SGscene *sc = light->scene;
+  SGscenegraph *sg = sc->sg;
+  SGcam *cam = sg->currentCam;
   
-  if (cam->kind == OOCam_Free) {
-    float3 relPos = ooLwcRelVec(lwc, ((OOfreecam*)cam)->lwc.seg);
+  if (cam->kind == SGCam_Free) {
+    float3 relPos = ooLwcRelVec(lwc, ((SGfreecam*)cam)->lwc.seg);
     
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);
     light->pos[2] = vf3_z(relPos);
     light->pos[3] = 1.0;
-  } else if (cam->kind == OOCam_Orbit) {
-    float3 relPos = ooLwcRelVec(lwc, ((OOorbitcam*)cam)->body->p.seg);
+  } else if (cam->kind == SGCam_Orbit) {
+    float3 relPos = ooLwcRelVec(lwc, ((SGorbitcam*)cam)->body->p.seg);
     
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);
@@ -68,7 +68,7 @@ sgSetLightPosLW(SGlight *light, OOlwcoord *lwc)
 
 
 SGlight*
-sgNewSpotlight(OOscenegraph *sg, float3 p, float3 dir)
+sgNewSpotlight(SGscenegraph *sg, float3 p, float3 dir)
 {
   SGspotlight *light = malloc(sizeof(SGspotlight));
   
@@ -129,7 +129,7 @@ sgLightSetDiffuse4f(SGlight *light, float r, float g, float b, float a)
 
 
 SGlight*
-sgNewPointlight3f(OOscene *sc, float x, float y, float z)
+sgNewPointlight3f(SGscene *sc, float x, float y, float z)
 {
   SGpointlight *light = malloc(sizeof(SGpointlight));
   light->super.enable = (SGenable_light_func)sgEnablePointLight;
@@ -162,7 +162,7 @@ sgNewPointlight3f(OOscene *sc, float x, float y, float z)
 }
 
 SGlight*
-sgNewPointlight(OOscene *sc, float3 p)
+sgNewPointlight(SGscene *sc, float3 p)
 {
   return sgNewPointlight3f(sc, vf3_x(p), vf3_y(p), vf3_z(p));
 }

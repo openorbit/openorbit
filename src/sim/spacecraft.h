@@ -125,10 +125,10 @@ struct OOspacecraft {
   OOscstepfunc poststep;
   OOscdetatchfunc detatchStage;
 
-  OOscene *scene;
+  SGscene *scene;
 };
 
-OOspacecraft* ooScNew(PLworld *world, OOscene *scene);
+OOspacecraft* ooScNew(PLworld *world, SGscene *scene);
 
 void ooScSetStageMesh(OOstage *stage, SGdrawable *mesh);
 void ooScDetatchStage(OOspacecraft *sc);
@@ -169,7 +169,7 @@ OOstage* ooScNewStage(OOspacecraft *sc);
 void ooScStageAddActuator(OOstage *stage, OOactuator *actuator);
 
 
-OOspacecraft* ooScLoad(PLworld *world, OOscene *scene, const char *fileName);
+OOspacecraft* ooScLoad(PLworld *world, SGscene *scene, const char *fileName);
 
 void scStageSetOffset3f(OOstage *stage, float x, float y, float z);
 void scStageSetOffset3fv(OOstage *stage, float3 p);

@@ -76,7 +76,7 @@ OOspacecraft* ooScGetCurrent(void)
 // TODO: Pass on PLsystem instead of PLworld to ensure that object has valid
 //       systems at all times.
 OOspacecraft*
-ooScNew(PLworld *world, OOscene *scene)
+ooScNew(PLworld *world, SGscene *scene)
 {
   OOspacecraft *sc = malloc(sizeof(OOspacecraft));
   //ooObjVecInit(&sc->stages);
@@ -524,7 +524,7 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
 
       SGdrawable *drawable = sgLoadModel(modelPath);
       ooScSetStageMesh(newStage, drawable);
-      ooSgSceneAddObj(sc->scene, drawable);
+      sgSceneAddObj(sc->scene, drawable);
 
       free(modelPath);
       free(pathCopy);
@@ -545,7 +545,7 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
 }
 
 OOspacecraft*
-ooScLoad(PLworld *world, OOscene *scene, const char *fileName)
+ooScLoad(PLworld *world, SGscene *scene, const char *fileName)
 {
   char *path = ooResGetPath(fileName);
   HRMLdocument *spaceCraftDoc = hrmlParse(path);
@@ -586,13 +586,13 @@ ooScLoad(PLworld *world, OOscene *scene, const char *fileName)
 }
 
 void
-ooScSetScene(OOspacecraft *spacecraft, OOscene *scene)
+ooScSetScene(OOspacecraft *spacecraft, SGscene *scene)
 {
   for (int i = 0 ; i < spacecraft->stages.length ; ++i) {
     OOstage *stage = spacecraft->stages.elems[i];
 
     if (stage->state != OO_Stage_Detatched) {
-      ooSgSceneAddObj(scene, stage->obj->drawable);
+      sgSceneAddObj(scene, stage->obj->drawable);
     }
   }
 }

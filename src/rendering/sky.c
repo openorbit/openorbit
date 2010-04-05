@@ -177,7 +177,7 @@ ooSkyNewDrawable(const char *file)
 {
   //  OOdrawable *sky = malloc(sizeof(OOdrawable));
   OOstars *sky = ooSkyLoadStars(file);
-  SGdrawable *drawable = ooSgNewDrawable((SGdrawable*)sky, "sky", (SGdrawfunc)ooSkyDrawStars);
+  SGdrawable *drawable = sgNewDrawable((SGdrawable*)sky, "sky", (SGdrawfunc)ooSkyDrawStars);
 
   return drawable;
 }

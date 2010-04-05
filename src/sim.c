@@ -61,7 +61,7 @@ ooSimInit(void) {
 
 
 void
-ooSimSetSg(OOscenegraph *sg)
+ooSimSetSg(SGscenegraph *sg)
 {
   gSIM_state.sg = sg;
 }
@@ -88,7 +88,7 @@ ooSimStep(float dt)
   struct timeval end;
   gettimeofday(&start, NULL);
 
-  ooSgCamStep(ooSgGetCam(gSIM_state.sg), dt);
+  sgCamStep(sgGetCam(gSIM_state.sg), dt);
 
   plWorldClear(gSIM_state.orbWorld);
   plWorldStep(gSIM_state.orbWorld, dt);

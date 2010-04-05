@@ -39,8 +39,8 @@
 #include "parsers/model.h"
 
 
-OOcam*
-ooSgGetCam(OOscenegraph *sg)
+SGcam*
+sgGetCam(SGscenegraph *sg)
 {
   assert(sg != NULL);
 
@@ -48,7 +48,7 @@ ooSgGetCam(OOscenegraph *sg)
 }
 
 void
-ooSgSetScenePos(OOscene *sc, float x, float y, float z)
+sgSetScenePos3f(SGscene *sc, float x, float y, float z)
 {
   assert(sc != NULL);
 
@@ -57,10 +57,10 @@ ooSgSetScenePos(OOscene *sc, float x, float y, float z)
 }
 
 
-OOscenegraph*
-ooSgNewSceneGraph()
+SGscenegraph*
+sgNewSceneGraph()
 {
-  OOscenegraph *sg = malloc(sizeof(OOscenegraph));
+  SGscenegraph *sg = malloc(sizeof(SGscenegraph));
 
   sg->usedLights = 0;
   obj_array_init(&sg->cams);
@@ -74,8 +74,8 @@ static int
 compareScenes(void *camPos, const void *a, const void *b)
 {
   OOlwcoord *pos = camPos;
-  const OOscene * const *as = a;
-  const OOscene * const *bs = b;
+  const SGscene * const *as = a;
+  const SGscene * const *bs = b;
   float3 da = ooLwcDist(pos, &(*as)->p);
   float3 db = ooLwcDist(pos, &(*bs)->p);
   if (vf3_lte(da, db)) {
@@ -86,33 +86,33 @@ compareScenes(void *camPos, const void *a, const void *b)
 }
 
 void
-sgSortScenes(OOscenegraph *sg)
+sgSortScenes(SGscenegraph *sg)
 {
   switch (sg->currentCam->kind) {
-  case OOCam_Orbit:
+  case SGCam_Orbit:
     {
-      OOorbitcam *ocam = (OOorbitcam*)sg->currentCam;
-      qsort_r(sg->scenes.elems, sg->scenes.length, sizeof(OOscene*), &ocam->body->p, compareScenes);
+      SGorbitcam *ocam = (SGorbitcam*)sg->currentCam;
+      qsort_r(sg->scenes.elems, sg->scenes.length, sizeof(SGscene*), &ocam->body->p, compareScenes);
     }
     break;
-  case OOCam_Free:
+  case SGCam_Free:
     {
-      OOfreecam *fcam = (OOfreecam*)sg->currentCam;
-      qsort_r(sg->scenes.elems, sg->scenes.length, sizeof(OOscene*), &fcam->lwc, compareScenes);
+      SGfreecam *fcam = (SGfreecam*)sg->currentCam;
+      qsort_r(sg->scenes.elems, sg->scenes.length, sizeof(SGscene*), &fcam->lwc, compareScenes);
 
     }
     break;
-  case OOCam_Fixed:
+  case SGCam_Fixed:
     {
-      OOfixedcam *fcam = (OOfixedcam*)sg->currentCam;
-      qsort_r(sg->scenes.elems, sg->scenes.length, sizeof(OOscene*), &fcam->body->p, compareScenes);
+      SGfixedcam *fcam = (SGfixedcam*)sg->currentCam;
+      qsort_r(sg->scenes.elems, sg->scenes.length, sizeof(SGscene*), &fcam->body->p, compareScenes);
     }
     break;
   }
 }
 
 void
-ooSgSetCam(OOscenegraph *sg, OOcam *cam)
+sgSetCam(SGscenegraph *sg, SGcam *cam)
 {
   assert(sg != NULL);
   assert(cam != NULL);
@@ -129,19 +129,19 @@ ooSgSetCam(OOscenegraph *sg, OOcam *cam)
 }
 
 void
-sgSetScenePos(OOscene *sc, const OOlwcoord *lwc)
+sgSetScenePosLW(SGscene *sc, const OOlwcoord *lwc)
 {
   sc->p = *lwc;
 }
 
 
 
-OOscene*
-ooSgNewScene(OOscenegraph *sg, const char *name)
+SGscene*
+sgNewScene(SGscenegraph *sg, const char *name)
 {
   assert(name != NULL);
 
-  OOscene *sc = malloc(sizeof(OOscene));
+  SGscene *sc = malloc(sizeof(SGscene));
   sc->name = strdup(name);
   sc->t = vf3_set(0.0, 0.0, 0.0);
 
@@ -162,7 +162,7 @@ ooSgNewScene(OOscenegraph *sg, const char *name)
 
 
 void
-sgSetSceneAmb4f(OOscene *sc, float r, float g, float b, float a)
+sgSetSceneAmb4f(SGscene *sc, float r, float g, float b, float a)
 {
   sc->amb[0] = r;
   sc->amb[1] = g;
@@ -172,7 +172,7 @@ sgSetSceneAmb4f(OOscene *sc, float r, float g, float b, float a)
 
 
 void
-ooSgSceneAddObj(OOscene *sc, SGdrawable *object)
+sgSceneAddObj(SGscene *sc, SGdrawable *object)
 {
   assert(sc != NULL);
   assert(object != NULL);
@@ -181,14 +181,14 @@ ooSgSceneAddObj(OOscene *sc, SGdrawable *object)
   obj_array_push(&sc->objs, object);
 }
 
-OOscene*
-ooSgGetScene(OOscenegraph *sg, const char *sceneName)
+SGscene*
+sgGetScene(SGscenegraph *sg, const char *sceneName)
 {
   assert(sg != NULL);
 
   for (int i = 0 ; i < sg->scenes.length ; ++ i) {
-    if (!strcmp(sceneName, ((OOscene*)(sg->scenes.elems[i]))->name)) {
-      return (OOscene*)sg->scenes.elems[i];
+    if (!strcmp(sceneName, ((SGscene*)(sg->scenes.elems[i]))->name)) {
+      return (SGscene*)sg->scenes.elems[i];
     }
   }
 
@@ -199,7 +199,7 @@ ooSgGetScene(OOscenegraph *sg, const char *sceneName)
 
 
 void
-ooSgDrawOverlay(OOoverlay *overlay)
+sgDrawOverlay(SGoverlay *overlay)
 {
   glMatrixMode(GL_MODELVIEW);
   // TODO: Ensure that depth test is run, but overlay is infinitly close
@@ -231,7 +231,7 @@ compareDistances(SGdrawable const **o0, SGdrawable const **o1)
 }
 
 void
-sgSceneDraw(OOscene *sc)
+sgSceneDraw(SGscene *sc)
 {
   assert(sc != NULL);
   ooLogTrace("drawing scene %s at %vf", sc->name, sc->t);
@@ -290,7 +290,7 @@ sgSceneDraw(OOscene *sc)
 
 
 void
-ooSgSetSky(OOscenegraph *sg, SGdrawable *obj)
+sgSetSky(SGscenegraph *sg, SGdrawable *obj)
 {
   assert(sg != NULL);
   assert(obj != NULL);
@@ -301,7 +301,7 @@ ooSgSetSky(OOscenegraph *sg, SGdrawable *obj)
 //   paint that, after that, we go to the cam scenes parent and inverse
 //   any rotations and transforms and paint that
 void
-ooSgPaint(OOscenegraph *sg)
+sgPaint(SGscenegraph *sg)
 {
   assert(sg != NULL);
   ooLogTrace("SgPaint");
@@ -313,7 +313,7 @@ ooSgPaint(OOscenegraph *sg)
   glLoadIdentity();
 
   glPushMatrix();
-  ooSgCamRotate(sg->currentCam);
+  sgCamRotate(sg->currentCam);
   // Draw the sky
   sg->sky->draw(sg->sky);
   glPopMatrix();
@@ -321,20 +321,20 @@ ooSgPaint(OOscenegraph *sg)
   // Then the overlays
   for (size_t i = 0 ; i < sg->overlays.length ; i ++) {
     ooLogTrace("draw overlay %d", i);
-    ooSgDrawOverlay(sg->overlays.elems[i]);
+    sgDrawOverlay(sg->overlays.elems[i]);
   }
 
   glPushMatrix();
 
-  ooSgCamRotate(sg->currentCam);
-  ooSgCamMove(sg->currentCam);
+  sgCamRotate(sg->currentCam);
+  sgCamMove(sg->currentCam);
   sgSceneDraw(sg->currentCam->scene);
 
   glPopMatrix();
 }
 
 void
-ooSgDrawFuncGnd(SGdrawable *obj)
+sgDrawFuncGnd(SGdrawable *obj)
 {
 
 }
@@ -342,7 +342,7 @@ ooSgDrawFuncGnd(SGdrawable *obj)
 
 
 void
-sgSceneAddLight(OOscene *sc, SGlight *light)
+sgSceneAddLight(SGscene *sc, SGlight *light)
 {
   for (int i = 0 ; i < SG_MAX_LIGHTS ; ++ i) {
     if (sc->lights[i] == NULL) {

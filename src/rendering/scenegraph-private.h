@@ -30,7 +30,7 @@
 
 static GLenum sgLightNumberMap[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3,
                                     GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
-struct OOscene {
+struct SGscene {
   char *name;
 
   float amb[4]; ///< Ambient light for this scene, initially [0.2,0.2,0.2,1.0]
@@ -39,20 +39,20 @@ struct OOscene {
   float3 t;
   OOlwcoord p;
 
-  OOscenegraph *sg;
+  SGscenegraph *sg;
 
   obj_array_t objs;   // Objects in this scene
 };
 
 
-struct OOoverlay {
+struct SGoverlay {
 //  OOtexture *tex;
   float x, y;
   float w, h;
 };
 
-struct OOscenegraph {
-  OOcam *currentCam;
+struct SGscenegraph {
+  SGcam *currentCam;
   obj_array_t cams;
   obj_array_t scenes;   // All scenes in the scene graph
 

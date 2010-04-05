@@ -474,7 +474,7 @@ plNewObjInSys(PLsystem *sys, const char *name, double m, double gm,
 
 
 PLworld*
-plNewWorld(const char *name, OOscene *sc,
+plNewWorld(const char *name, SGscene *sc,
            double m, double gm, double radius, double siderealPeriod,
            double obliquity, double eqRadius, double flattening)
 {
@@ -490,7 +490,7 @@ plNewWorld(const char *name, OOscene *sc,
 }
 
 PLsystem*
-plCreateOrbitalObject(PLworld *world, OOscene *scene, const char *name,
+plCreateOrbitalObject(PLworld *world, SGscene *scene, const char *name,
                       double m, double gm,
                       double orbitPeriod,
                       double obliquity, double siderealPeriod,
@@ -538,14 +538,13 @@ plCreateOrbitalObject(PLworld *world, OOscene *scene, const char *name,
                                      ascendingNode, inc, argOfPeriapsis,
                                      0.0, 0.0, 1.0,
                                      1024);
-  ooSgSceneAddObj(sys->scene,
-                  sys->orbitDrawable);
+  sgSceneAddObj(sys->scene, sys->orbitDrawable);
 
   return sys;
 }
 
 PLsystem*
-plNewRootSystem(PLworld *world, OOscene *sc, const char *name, double m, double gm, double obliquity, double siderealPeriod,
+plNewRootSystem(PLworld *world, SGscene *sc, const char *name, double m, double gm, double obliquity, double siderealPeriod,
                 double eqRadius, double flattening)
 {
   assert(world);
@@ -578,7 +577,7 @@ plNewRootSystem(PLworld *world, OOscene *sc, const char *name, double m, double 
 
 
 PLsystem*
-plNewOrbit(PLworld *world, OOscene *sc, const char *name,
+plNewOrbit(PLworld *world, SGscene *sc, const char *name,
            double m, double gm,
            double orbitPeriod, double obliquity, double siderealPeriod,
            double semiMaj, double semiMin,
@@ -594,7 +593,7 @@ plNewOrbit(PLworld *world, OOscene *sc, const char *name,
 }
 
 PLsystem*
-plNewSubOrbit(PLsystem *parent, OOscene *sc, const char *name,
+plNewSubOrbit(PLsystem *parent, SGscene *sc, const char *name,
               double m, double gm,
               double orbitPeriod, double obliquity, double siderealPeriod,
               double semiMaj, double semiMin,
@@ -688,7 +687,7 @@ plSysUpdateSg(PLsystem *sys)
   sgSetObjectQuatv(sys->orbitalBody->drawable, q);
   sgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
 
-  sgSetScenePos(sys->scene, &sys->orbitalBody->obj.p);
+  sgSetScenePosLW(sys->scene, &sys->orbitalBody->obj.p);
   // Update orbital path base
   if (sys->parent) {
     sgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->obj.p);
@@ -749,7 +748,7 @@ plWorldStep(PLworld *world, double dt)
 */
 
 void
-ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscene *sc)
+ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -821,10 +820,10 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscene *sc)
   double period = plOrbitalPeriod(semiMajor, sys->orbitalBody->GM * gm) / PL_SEC_PER_DAY;
 
   //  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
-  SGdrawable *drawable = ooSgNewSphere(moonName.u.str, radius, tex);
+  SGdrawable *drawable = sgNewSphere(moonName.u.str, radius, tex);
 
 
-  ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
+  sgSceneAddObj(sc, drawable); // TODO: scale to radius
 
   PLsystem *moonSys = plNewSubOrbit(sys, sys->scene, moonName.u.str, mass, gm,
                                     period, axialTilt, siderealPeriod,
@@ -838,7 +837,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, OOscene *sc)
 }
 
 void
-ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscene *sc)
+ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -911,8 +910,8 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscene *sc)
   // NOTE: At present, all plantes must be specified with AUs as parameters
   double period = plOrbitalPeriod(plAuToMetres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
 
-  SGdrawable *drawable = ooSgNewSphere(planetName.u.str, radius, tex);
-  ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
+  SGdrawable *drawable = sgNewSphere(planetName.u.str, radius, tex);
+  sgSceneAddObj(sc, drawable); // TODO: scale to radius
   PLsystem *sys = plNewOrbit(world, sc, planetName.u.str,
                              mass, gm,
                              period, axialTilt, siderealPeriod,
@@ -933,7 +932,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, OOscene *sc)
 
 
 PLworld*
-ooLoadStar__(HRMLobject *obj, OOscene *sc)
+ooLoadStar__(HRMLobject *obj, SGscene *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -979,14 +978,14 @@ ooLoadStar__(HRMLobject *obj, OOscene *sc)
   }
 
   sgSetSceneAmb4f(sc, 0.2, 0.2, 0.2, 1.0);
-  SGdrawable *drawable = ooSgNewSphere(starName.u.str, radius, tex);
-  SGmaterial *mat = sgSphereGetMaterial((OOsphere*)drawable);
+  SGdrawable *drawable = sgNewSphere(starName.u.str, radius, tex);
+  SGmaterial *mat = sgSphereGetMaterial((SGsphere*)drawable);
   sgSetMaterialEmiss4f(mat, 1.0, 1.0, 1.0, 0.0);
 
   SGlight *starLightSource = sgNewPointlight3f(sc, 0.0f, 0.0f, 0.0f);
 
 
-  ooSgSceneAddObj(sc, drawable); // TODO: scale to radius
+  sgSceneAddObj(sc, drawable); // TODO: scale to radius
   PLworld *world = plNewWorld(starName.u.str, sc, mass, gm, radius,
                               siderealPeriod, axialTilt, radius, flattening);
   world->rootSys->orbitalBody->lightSource = starLightSource;
@@ -1006,7 +1005,7 @@ ooLoadStar__(HRMLobject *obj, OOscene *sc)
   return world;
 }
 PLworld*
-ooOrbitLoad(OOscenegraph *sg, const char *fileName)
+ooOrbitLoad(SGscenegraph *sg, const char *fileName)
 {
   char *file = ooResGetPath(fileName);
   HRMLdocument *solarSys = hrmlParse(file);
@@ -1020,7 +1019,7 @@ ooOrbitLoad(OOscenegraph *sg, const char *fileName)
 
   PLworld *world = NULL;
   // Go through the document and handle each entry in the document
-  OOscene *sc = ooSgNewScene(sg, "main");
+  SGscene *sc = sgNewScene(sg, "main");
   for (HRMLobject *node = hrmlGetRoot(solarSys); node != NULL; node = node->next) {
     if (!strcmp(node->name, "openorbit")) {
       for (HRMLobject *star = node->children; star != NULL; star = star->next) {

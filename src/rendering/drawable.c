@@ -31,19 +31,19 @@ sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset)
   assert(obj != NULL);
   assert(lw != NULL);
   // Get camera position and translate the lw coord with respect to the camera
-  OOscene *sc = obj->scene;
-  OOscenegraph *sg = sc->sg;
-  OOcam *cam = sg->currentCam;
+  SGscene *sc = obj->scene;
+  SGscenegraph *sg = sc->sg;
+  SGcam *cam = sg->currentCam;
 
-  if (cam->kind == OOCam_Free) {
-    float3 relPos = ooLwcRelVec(lw, ((OOfreecam*)cam)->lwc.seg);
+  if (cam->kind == SGCam_Free) {
+    float3 relPos = ooLwcRelVec(lw, ((SGfreecam*)cam)->lwc.seg);
     obj->p = relPos + offset;
-  } else if (cam->kind == OOCam_Fixed) {
-    OOfixedcam *fix = (OOfixedcam*)cam;
+  } else if (cam->kind == SGCam_Fixed) {
+    SGfixedcam *fix = (SGfixedcam*)cam;
     float3 relPos = ooLwcRelVec(lw, fix->body->p.seg) - (mf3_v_mul(fix->body->R, fix->r) + fix->body->p.offs);
     obj->p = relPos + offset;
-  } else if (cam->kind == OOCam_Orbit) {
-    OOorbitcam *orb = (OOorbitcam*)cam;
+  } else if (cam->kind == SGCam_Orbit) {
+    SGorbitcam *orb = (SGorbitcam*)cam;
     float3 relPos = ooLwcRelVec(lw, orb->body->p.seg);
     obj->p = relPos + offset;
   }
@@ -53,32 +53,32 @@ void
 sgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
 {
   // Get camera position and translate the lw coord with respect to the camera
-  OOscene *sc = obj->scene;
-  OOscenegraph *sg = sc->sg;
-  OOcam *cam = sg->currentCam;
+  SGscene *sc = obj->scene;
+  SGscenegraph *sg = sc->sg;
+  SGcam *cam = sg->currentCam;
 
-  if (cam->kind == OOCam_Free) {
-    float3 relPos = ooLwcRelVec(lw, ((OOfreecam*)cam)->lwc.seg);
+  if (cam->kind == SGCam_Free) {
+    float3 relPos = ooLwcRelVec(lw, ((SGfreecam*)cam)->lwc.seg);
     obj->p = relPos;
-  } else if (cam->kind == OOCam_Fixed) {
-    OOfixedcam *fix = (OOfixedcam*)cam;
+  } else if (cam->kind == SGCam_Fixed) {
+    SGfixedcam *fix = (SGfixedcam*)cam;
     float3 relPos = ooLwcRelVec(lw, fix->body->p.seg) - (mf3_v_mul(fix->body->R, fix->r) + fix->body->p.offs);
     obj->p = relPos;
-  } else if (cam->kind == OOCam_Orbit) {
-    OOorbitcam *orb = (OOorbitcam*)cam;
+  } else if (cam->kind == SGCam_Orbit) {
+    SGorbitcam *orb = (SGorbitcam*)cam;
     float3 relPos = ooLwcRelVec(lw, orb->body->p.seg);
     obj->p = relPos;
   }
 }
 void
-ooSgSetObjectPos(SGdrawable *obj, float x, float y, float z)
+sgSetObjectPos3f(SGdrawable *obj, float x, float y, float z)
 {
   assert(obj != NULL);
   obj->p = vf3_set(x, y, z);
 }
 
 void
-ooSgSetObjectQuat(SGdrawable *obj, float x, float y, float z, float w)
+sgSetObjectQuat4f(SGdrawable *obj, float x, float y, float z, float w)
 {
   assert(obj != NULL);
   obj->q = vf4_set(x, y, z, w);
@@ -118,7 +118,7 @@ sgSetObjectQuatv(SGdrawable *obj, quaternion_t q)
 }
 
 void
-ooSgSetObjectScale(SGdrawable *obj, float s)
+sgSetObjectScale(SGdrawable *obj, float s)
 {
   assert(0);
   assert(obj != NULL);
@@ -126,21 +126,21 @@ ooSgSetObjectScale(SGdrawable *obj, float s)
 }
 
 void
-ooSgSetObjectSpeed(SGdrawable *obj, float dx, float dy, float dz)
+sgSetObjectSpeed(SGdrawable *obj, float dx, float dy, float dz)
 {
   assert(obj != NULL);
   obj->dp = vf3_set(dx, dy, dz);
 }
 
 void
-ooSgSetObjectAngularSpeed(SGdrawable *obj, float drx, float dry, float drz)
+sgSetObjectAngularSpeed(SGdrawable *obj, float drx, float dry, float drz)
 {
   assert(obj != NULL);
   obj->dr = vf3_set(drx, dry, drz);
 }
 
 SGdrawable*
-ooSgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df)
+sgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df)
 {
   assert(df != NULL);
   assert(drawable != NULL);
@@ -170,7 +170,7 @@ ooSgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df)
 }
 
 void
-ooSgDrawSphere(OOsphere *sp)
+sgDrawSphere(SGsphere *sp)
 {
   glEnable(GL_TEXTURE_2D);
   glDepthFunc(GL_LEQUAL);
@@ -213,9 +213,9 @@ ooSgDrawSphere(OOsphere *sp)
 }
 
 SGdrawable*
-ooSgNewSphere(const char *name, float radius, const char *tex)
+sgNewSphere(const char *name, float radius, const char *tex)
 {
-  OOsphere *sp = malloc(sizeof(OOsphere));
+  SGsphere *sp = malloc(sizeof(SGsphere));
   sgInitMaterial(&sp->mat);
 
   sp->radius = radius;
@@ -227,14 +227,14 @@ ooSgNewSphere(const char *name, float radius, const char *tex)
   gluQuadricTexture(sp->quadratic, GL_TRUE);
   gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
 
-  return ooSgNewDrawable((SGdrawable*)sp, name, (SGdrawfunc) ooSgDrawSphere);
+  return sgNewDrawable((SGdrawable*)sp, name, (SGdrawfunc) sgDrawSphere);
 }
 
 
 SGdrawable*
 sgNewSphere2(const char *name, const char *tex, float radius, float flattening, int stacks, int slices)
 {
-  OOsphere *sp = malloc(sizeof(OOsphere));
+  SGsphere *sp = malloc(sizeof(SGsphere));
   sgInitMaterial(&sp->mat);
 
   sp->radius = radius;
@@ -253,11 +253,11 @@ sgNewSphere2(const char *name, const char *tex, float radius, float flattening, 
   sp->vertices = calloc(vertexCount*3, sizeof(GLfloat));
   sp->normals = calloc(vertexCount*3, sizeof(GLfloat));
 
-  return ooSgNewDrawable((SGdrawable*)sp, name, (SGdrawfunc) ooSgDrawSphere);
+  return sgNewDrawable((SGdrawable*)sp, name, (SGdrawfunc) sgDrawSphere);
 }
 
 void
-sgDrawSphere2(OOsphere *sp)
+sgDrawSphere2(SGsphere *sp)
 {
   glEnable(GL_TEXTURE_2D); // Lines are not textured...
   glBindTexture(GL_TEXTURE_2D, sp->texId);
@@ -287,7 +287,7 @@ sgDrawSphere2(OOsphere *sp)
 }
 
 SGmaterial*
-sgSphereGetMaterial(OOsphere *sphere)
+sgSphereGetMaterial(SGsphere *sphere)
 {
   return &sphere->mat;
 }
@@ -371,7 +371,7 @@ sgNewEllipsis(const char *name,
     el->verts[3*i+2] = vf3_z(v);
   }
 
-  return ooSgNewDrawable((SGdrawable*)el, name, (SGdrawfunc)sgDrawEllipsis);
+  return sgNewDrawable((SGdrawable*)el, name, (SGdrawfunc)sgDrawEllipsis);
 }
 
 void
@@ -399,7 +399,7 @@ sgNewCylinder(const char *name,
   cyl->col[1] = 255;
   cyl->col[2] = 255;
 
-  return ooSgNewDrawable((SGdrawable*)cyl, name, (SGdrawfunc)sgDrawCylinder);
+  return sgNewDrawable((SGdrawable*)cyl, name, (SGdrawfunc)sgDrawCylinder);
 }
 
 
@@ -498,8 +498,8 @@ sgLoadModel(const char *file)
     return NULL;
   }
 
-  return ooSgNewDrawable((SGdrawable*)model, "unnamed",
-                         (SGdrawfunc)sgDrawModel);
+  return sgNewDrawable((SGdrawable*)model, "unnamed",
+                       (SGdrawfunc)sgDrawModel);
 }
 
 void

@@ -34,7 +34,7 @@ typedef void (*SGenable_light_func)(SGlight *light, GLenum lightId);
 typedef void (*SGdisable_light_func)(SGlight *light);
 
 struct SGlight {
-  struct OOscene *scene;
+  struct SGscene *scene;
   int lightId;
   
   float pos[4];
@@ -56,8 +56,8 @@ struct SGpointlight {
   SGlight super;
 };
 
-SGlight* sgNewPointlight(OOscene *sc, float3 p);
-SGlight* sgNewPointlight3f(OOscene *sc, float x, float y, float z);
+SGlight* sgNewPointlight(SGscene *sc, float3 p);
+SGlight* sgNewPointlight3f(SGscene *sc, float x, float y, float z);
 void sgSetLightPos3f(SGlight *light, float x, float y, float z);
 void sgSetLightPosv(SGlight *light, float3 v);
 void sgSetLightPosLW(SGlight *light, OOlwcoord *lwc);

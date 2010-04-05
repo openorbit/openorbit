@@ -40,14 +40,14 @@
 #include "light.h"
 #include "drawable.h"
 
-void ooSgSetScenePos(OOscene *sc, float x, float y, float z);
+void sgSetScenePos3f(SGscene *sc, float x, float y, float z);
 
-void sgSetScenePos(OOscene *sc, const OOlwcoord *lwc);
+void sgSetScenePosLW(SGscene *sc, const OOlwcoord *lwc);
 
-void ooSgDrawOverlay(OOoverlay *overlay);
+void sgDrawOverlay(SGoverlay *overlay);
 
-OOscenegraph* ooSgNewSceneGraph();
-void ooSgPaint(OOscenegraph *sg);
+SGscenegraph* sgNewSceneGraph();
+void sgPaint(SGscenegraph *sg);
 
 /*!
  * Sets the current camera in the scenegraph to cam. The camera should be in the
@@ -58,27 +58,27 @@ void ooSgPaint(OOscenegraph *sg);
  * \pre sg != NULL
  * \pre cam != NULL
  */
-void ooSgSetCam(OOscenegraph *sg, OOcam *cam);
+void sgSetCam(SGscenegraph *sg, SGcam *cam);
 
 /*!
  * Create a new scene. If parent is NULL, the scene is inserted in the parent's
  * scene vector. In case of null a root scene is created. Note that
- * ooSgNewSceneGraph creates a root scene by default so you should normally pass
+ * sgNewSceneGraph creates a root scene by default so you should normally pass
  * in a valid pointer to it.
  */
-OOscene* ooSgNewScene(OOscenegraph *sg, const char *name);
-void sgSetSceneAmb4f(OOscene *sc, float r, float g, float b, float a);
+SGscene* sgNewScene(SGscenegraph *sg, const char *name);
+void sgSetSceneAmb4f(SGscene *sc, float r, float g, float b, float a);
 
-void ooSgSetSky(OOscenegraph *sg, SGdrawable *obj);
+void sgSetSky(SGscenegraph *sg, SGdrawable *obj);
 
-OOcam* ooSgGetCam(OOscenegraph *sg);
+SGcam* sgGetCam(SGscenegraph *sg);
 
-OOscene* ooSgSceneGetParent(OOscene *sc);
+SGscene* sgSceneGetParent(SGscene *sc);
 
-OOscene* ooSgGetScene(OOscenegraph *sg, const char *sceneName);
-void ooSgSceneAddChild(OOscene *parent, OOscene *child);
-void ooSgSceneAddObj(OOscene *sc, SGdrawable *object);
+SGscene* sgGetScene(SGscenegraph *sg, const char *sceneName);
+void sgSceneAddChild(SGscene *parent, SGscene *child);
+void sgSceneAddObj(SGscene *sc, SGdrawable *object);
 
-void sgSceneAddLight(OOscene *sc, SGlight *light);
+void sgSceneAddLight(SGscene *sc, SGlight *light);
 
 #endif /* SCENEGRAPH_H_ */
