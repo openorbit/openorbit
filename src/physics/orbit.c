@@ -309,9 +309,9 @@ plGetPosForName3f(const PLworld *world, const char *name,
   float3 p = plGetPosForName(world, name);
 
   // TODO: Move to clang ext vector support
-  *x = vf3_get(p, 0);
-  *y = vf3_get(p, 1);
-  *z = vf3_get(p, 2);
+  *x = vf3_x(p);
+  *y = vf3_y(p);
+  *z = vf3_z(p);
 }
 
 void
@@ -336,27 +336,27 @@ plSysUpdateCurrentPos(PLsystem *sys, double dt)
     if (sys->orbitalBody->tUpdate > 0) {
       ooLwcTranslate3fv(&sys->orbitalBody->obj.p,
                         vf3_s_mul(sys->orbitalBody->obj.v, dt));
-      sys->orbitalBody->obj.q = plSideralRotationAtTime(sys->orbitalBody, t);
       sys->orbitalBody->tUpdate --;
     } else {
       float3 newPos = plOrbitPosAtTime(sys->orbitalBody->kepler,
-                                       sys->parent->orbitalBody->GM + sys->orbitalBody->GM,
+                                       sys->parent->orbitalBody->GM,
                                        t*PL_SEC_PER_DAY);
 
       float3 nextPos = plOrbitPosAtTime(sys->orbitalBody->kepler,
-                                        sys->parent->orbitalBody->GM + sys->orbitalBody->GM,
+                                        sys->parent->orbitalBody->GM,
                                         t*PL_SEC_PER_DAY + (double)sys->orbitalBody->orbitFixationPeriod * dt);
 
-      float3 vel = vf3_s_div(vf3_sub(nextPos, newPos), (double)sys->orbitalBody->orbitFixationPeriod * dt);
+      float3 vel = vf3_s_div(vf3_sub(nextPos, newPos),
+                             (double)sys->orbitalBody->orbitFixationPeriod * dt);
 
       sys->orbitalBody->obj.p = sys->parent->orbitalBody->obj.p;
       ooLwcTranslate3fv(&sys->orbitalBody->obj.p, newPos);
 
-      sys->orbitalBody->obj.q = plSideralRotationAtTime(sys->orbitalBody, t);
-      sys->orbitalBody->obj.v = vel;
+      sys->orbitalBody->obj.v = sys->parent->orbitalBody->obj.v + vel;
       // Reset tUpdate;
       sys->orbitalBody->tUpdate = sys->orbitalBody->orbitFixationPeriod;
     }
+    sys->orbitalBody->obj.q = plSideralRotationAtTime(sys->orbitalBody, t);
   }
 }
 
@@ -368,7 +368,7 @@ plSysSetCurrentPos(PLsystem *sys)
   if (sys->parent) {
     double t = ooTimeGetJD();
     float3 newPos = plOrbitPosAtTime(sys->orbitalBody->kepler,
-                                     sys->parent->orbitalBody->GM + sys->orbitalBody->GM,
+                                     sys->parent->orbitalBody->GM,
                                      t*PL_SEC_PER_DAY);
     sys->orbitalBody->obj.p = sys->parent->orbitalBody->obj.p;
     ooLwcTranslate3fv(&sys->orbitalBody->obj.p, newPos);
@@ -425,7 +425,7 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
          double radius, double flattening)
 {
   PLastrobody *obj = malloc(sizeof(PLastrobody));
-  
+
   plInitObject(&obj->obj);
   obj->obj.p = *coord;
   obj->obj.q = q;
@@ -454,7 +454,7 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
 
   // Used for smothening the orbits, this is a rather ugly hack, but should work for now
   obj->tUpdate = 0;
-  obj->orbitFixationPeriod = 100;
+  obj->orbitFixationPeriod = 1000;
   return obj;
 }
 
@@ -640,6 +640,7 @@ plComputeGravity(PLastrobody *a, PLobject *b)
   float3 dist = ooLwcDist(&b->p, &a->obj.p);
   double r12 = vf3_abs_square(dist);
   float3 f12 = vf3_s_mul(vf3_normalise(dist),
+                         //-PL_G * (a->obj.m.m * b->m.m / r12));
                          -a->GM * b->m.m / r12);
   return f12;
 }
@@ -652,16 +653,20 @@ plSysStep(PLsystem *sys, double dt)
     PLobject *obj = sys->rigidObjs.elems[i];
     float3 f12 = plComputeGravity(sys->orbitalBody, obj);
     plForce3fv(obj, f12);
+
     if (sys->parent) {
       f12 = plComputeGravity(sys->parent->orbitalBody, obj);
       plForce3fv(obj, f12);
     }
+
     float3 drag = plComputeDragForObject(obj);
+    plForce3fv(obj, drag);
 
     plStepObjectf(obj, dt);
   }
 
   plSysUpdateCurrentPos(sys, dt);
+
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysStep(sys->orbits.elems[i], dt);
   }
@@ -687,23 +692,10 @@ plSysUpdateSg(PLsystem *sys)
   sgSetObjectQuatv(sys->orbitalBody->drawable, q);
   sgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
 
-  sgSetScenePosLW(sys->scene, &sys->orbitalBody->obj.p);
   // Update orbital path base
   if (sys->parent) {
     sgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->obj.p);
   }
-
-  //ooSgSetObjectSpeed(OOdrawable *obj, float dx, float dy, float dz);
-  //ooSgSetObjectAngularSpeed(OOdrawable *obj, float drx, float dry, float drz);
-  //for (size_t i = 0; i < sys->rigidObjs.length ; i ++) {
-  //  PLobject *obj = sys->rigidObjs.elems[i];
-  //  if (obj->drawable) {
-      //sgSetObjectPosLWAndOffset(obj->drawable, &obj->p, v_q_rot(obj->p_offset, obj->q));
-      //    sgSetObjectPosLW(obj->drawable, &obj->p);
-      // ooLwcDump(&obj->p);
-      //sgSetObjectQuatv(obj->drawable, obj->q);
-      //}
-      //}
 
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysUpdateSg(sys->orbits.elems[i]);
@@ -714,6 +706,8 @@ plSysUpdateSg(PLsystem *sys)
 void
 plWorldStep(PLworld *world, double dt)
 {
+  double t = ooTimeGetJD();
+
   plSysStep(world->rootSys, dt);
   for (size_t i = 0; i < world->objs.length ; i ++) {
     PLobject *obj = world->objs.elems[i];
@@ -907,7 +901,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
     gm = mass*PL_GRAVITATIONAL_CONST;
   }
 
-  // NOTE: At present, all plantes must be specified with AUs as parameters
+  // NOTE: At present, all planets must be specified with AUs as parameters
   double period = plOrbitalPeriod(plAuToMetres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
 
   SGdrawable *drawable = sgNewSphere(planetName.u.str, radius, tex);
@@ -1047,17 +1041,16 @@ plObjForAstroBody(PLastrobody *abody)
 float3
 plComputeCurrentVelocity(PLastrobody *ab)
 {
+  assert(ab->sys->parent != NULL);
   double t = ooTimeGetJD();
-  float3 upVec = vf3_set(0.0, 0.0, 1.0);
-  upVec = v_q_rot(upVec, ab->kepler->qOrbit);
-  double velocity = (2.0*M_PI*ab->kepler->a)/(ab->sys->orbitalPeriod*PL_SEC_PER_DAY);
-  float3 currentPos = plOrbitPosAtTime(ab->kepler, ab->GM, t*PL_SEC_PER_DAY);
-  float3 dir = vf3_normalise(vf3_cross(upVec, currentPos));
 
-  return vf3_s_mul(dir, velocity);
+  float3 currentPos = plOrbitPosAtTime(ab->kepler, ab->sys->parent->orbitalBody->GM,
+                                       t*PL_SEC_PER_DAY);
+  float3 nextPos = plOrbitPosAtTime(ab->kepler, ab->sys->parent->orbitalBody->GM,
+                                    t*PL_SEC_PER_DAY+1000.0f);
 
-  //float3 currentPos = plOrbitPosAtTime(ab->kepler, ab->GM, t*PL_SEC_PER_DAY);
-  //float3 nextPos = plOrbitPosAtTime(ab->kepler, ab->GM, t*PL_SEC_PER_DAY+100.0);
-  // return (nextPos - currentPos) / 100.0;
+  float3 v = nextPos - currentPos;
+  v = vf3_s_div(v, 1000.0f);
+
+  return v;
 }
-

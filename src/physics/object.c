@@ -47,10 +47,11 @@ plInitObject(PLobject *obj)
             0.0f, 0.0f, 0.0f,
             1.0f, 1.0f, 1.0f,
             0.0f, 0.0f, 0.0f);
-  
+
   ooLwcSet(&obj->p, 0.0, 0.0, 0.0);
   obj->sys = NULL;
-  obj->parent = NULL;  
+  obj->name = NULL;
+  obj->parent = NULL;
   obj->drawable = NULL;
   obj->f_ack = vf3_set(0.0, 0.0, 0.0);
   obj->t_ack = vf3_set(0.0, 0.0, 0.0);
@@ -58,7 +59,7 @@ plInitObject(PLobject *obj)
   obj->v = vf3_set(0.0, 0.0, 0.0);
   plSetAngularVel3f(obj, 0.0f, 0.0f, 0.0f);
 
-  obj->q = q_rot(1.0, 0.0, 0.0, 0.0); // Rotation quaternion  
+  obj->q = q_rot(1.0, 0.0, 0.0, 0.0); // Rotation quaternion
   obj->p_offset = vf3_set(0.0, 0.0, 0.0);
 
   obj->dragCoef = 0.0;
@@ -92,9 +93,7 @@ plCompoundObject(PLworld *world)
   PLcompound_object *obj = malloc(sizeof(PLcompound_object));
   plInitObject(&obj->super);
 
-  //plSetAngularVel3f(&obj->super, 0.0f, 0.0f, 0.05f);
-
-  obj_array_push(&world->objs, obj);  
+  obj_array_push(&world->objs, obj);
   obj_array_init(&obj->children);
 
   plComputeDerived(&obj->super);
@@ -110,7 +109,6 @@ plSubObject3f(PLworld *world, PLcompound_object *parent, float x, float y, float
   PLobject *obj = malloc(sizeof(PLobject));
   plInitObject(obj);
 
-//  ooLwcSet(&obj->p, x, y, z);
   obj->sys = parent->super.sys;
   obj->parent = parent;
   obj->p_offset = vf3_set(x, y, z);
@@ -140,12 +138,12 @@ void
 plUpdateMass(PLcompound_object *obj)
 {
   memset(&obj->super.m, 0, sizeof(PLmass));
-  
+
   plMassSet(&obj->super.m, 0.0,
             0.0, 0.0, 0.0,
             1.0, 1.0, 1.0,
             0.0, 0.0, 0.0);
-  
+
   for (int i = 0 ; i < obj->children.length ; ++ i) {
     PLobject *child = obj->children.elems[i];
     if (child->parent) { // Only for attached objects
@@ -199,14 +197,15 @@ plSetObjectPosRel3fv(PLobject * restrict obj,
                      float3 rp)
 {
   obj->p = otherObj->p;
-  ooLwcTranslate3fv(&obj->p, rp);  
+  ooLwcTranslate3fv(&obj->p, rp);
+  ooLwcDump(&obj->p);
 }
 void
 plForce3f(PLobject *obj, float x, float y, float z)
 {
   obj->f_ack.x += x;
   obj->f_ack.y += y;
-  obj->f_ack.z += z;  
+  obj->f_ack.z += z;
 }
 void
 plForce3fv(PLobject *obj, float3 f)
@@ -261,13 +260,14 @@ plDumpObject(PLobject *obj)
   fprintf(stderr, "v: %f %f %f\n", obj->v.x, obj->v.y, obj->v.z);
   fprintf(stderr, "f_acc: %f %f %f\n", obj->f_ack.x, obj->f_ack.y, obj->f_ack.z);
   fprintf(stderr, "t_acc: %f %f %f\n", obj->t_ack.x, obj->t_ack.y, obj->t_ack.z);
+  fprintf(stderr, "p: "); ooLwcDump(&obj->p);
 }
 
 void
 plStepObjectf(PLobject *obj, float dt)
 {
   float3 fm = (obj->f_ack / obj->m.m);
-  obj->v = obj->v + fm * dt; // Update velocity from force
+  obj->v += fm * dt; // Update velocity from force
   ooLwcTranslate3fv(&obj->p, vf3_s_mul(obj->v, dt)); // Update position from velocity
 
   obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
@@ -308,7 +308,7 @@ plNormaliseObject(PLobject *obj)
 
 void
 plClearObject(PLobject *obj)
-{  
+{
   obj->f_ack = vf3_set(0.0f, 0.0f, 0.0f);
   obj->t_ack = vf3_set(0.0f, 0.0f, 0.0f);
 }
@@ -340,12 +340,12 @@ plSetAngularVel4fq(PLobject *obj, quaternion_t q, float r)
   float3 v = vf3_set(1.0f, 0.0f, 0.0f);
   quaternion_t qrx = q_rot(1.0f, 0.0f, 0.0f, r);
   quaternion_t qr = q_mul(q, qrx);
-  
+
   float3x3 m;
   q_mf3_convert(m, qr);
-  
+
   float3 ra = mf3_v_mul(m, v);
-  
+
   obj->angVel = ra;
 }
 
@@ -356,7 +356,8 @@ plSetAngularVel3fv(PLobject *obj, float3 r)
   obj->angVel = r;
 }
 
-quaternion_t plGetQuat(PLobject *obj)
+quaternion_t
+plGetQuat(PLobject *obj)
 {
   return obj->q;
 }
