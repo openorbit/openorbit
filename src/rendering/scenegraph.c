@@ -47,15 +47,6 @@ sgGetCam(SGscenegraph *sg)
   return sg->currentCam;
 }
 
-void
-sgSetScenePos3f(SGscene *sc, float x, float y, float z)
-{
-  assert(sc != NULL);
-
-  ooLogTrace("setting scene %s pos to [%f, %f, %f]", sc->name, x, y, z);
-  sc->t = vf3_set(x, y, z);
-}
-
 
 SGscenegraph*
 sgNewSceneGraph()
@@ -70,46 +61,6 @@ sgNewSceneGraph()
 }
 
 
-static int
-compareScenes(void *camPos, const void *a, const void *b)
-{
-  OOlwcoord *pos = camPos;
-  const SGscene * const *as = a;
-  const SGscene * const *bs = b;
-  float3 da = ooLwcDist(pos, &(*as)->p);
-  float3 db = ooLwcDist(pos, &(*bs)->p);
-  if (vf3_lte(da, db)) {
-    return -1;
-  }
-
-  return 1;
-}
-
-void
-sgSortScenes(SGscenegraph *sg)
-{
-  switch (sg->currentCam->kind) {
-  case SGCam_Orbit:
-    {
-      SGorbitcam *ocam = (SGorbitcam*)sg->currentCam;
-      qsort_r(sg->scenes.elems, sg->scenes.length, sizeof(SGscene*), &ocam->body->p, compareScenes);
-    }
-    break;
-  case SGCam_Free:
-    {
-      SGfreecam *fcam = (SGfreecam*)sg->currentCam;
-      qsort_r(sg->scenes.elems, sg->scenes.length, sizeof(SGscene*), &fcam->lwc, compareScenes);
-
-    }
-    break;
-  case SGCam_Fixed:
-    {
-      SGfixedcam *fcam = (SGfixedcam*)sg->currentCam;
-      qsort_r(sg->scenes.elems, sg->scenes.length, sizeof(SGscene*), &fcam->body->p, compareScenes);
-    }
-    break;
-  }
-}
 
 void
 sgSetCam(SGscenegraph *sg, SGcam *cam)
@@ -128,13 +79,6 @@ sgSetCam(SGscenegraph *sg, SGcam *cam)
   sg->currentCam = cam;
 }
 
-void
-sgSetScenePosLW(SGscene *sc, const OOlwcoord *lwc)
-{
-  sc->p = *lwc;
-}
-
-
 
 SGscene*
 sgNewScene(SGscenegraph *sg, const char *name)
@@ -143,7 +87,6 @@ sgNewScene(SGscenegraph *sg, const char *name)
 
   SGscene *sc = malloc(sizeof(SGscene));
   sc->name = strdup(name);
-  sc->t = vf3_set(0.0, 0.0, 0.0);
 
   sc->amb[0] = 0.2;
   sc->amb[1] = 0.2;
@@ -234,8 +177,6 @@ void
 sgSceneDraw(SGscene *sc)
 {
   assert(sc != NULL);
-  ooLogTrace("drawing scene %s at %vf", sc->name, sc->t);
-
   // Sort objects based on distance from camera, since we are moving
   // objects and not the camera, this is trivial.
   //  qsort(sc->objs.elems, sc->objs.length, sizeof(OOdrawable*),

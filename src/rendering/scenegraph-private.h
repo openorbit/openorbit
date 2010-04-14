@@ -36,15 +36,16 @@ struct SGscene {
   float amb[4]; ///< Ambient light for this scene, initially [0.2,0.2,0.2,1.0]
 
   SGlight *lights[SG_MAX_LIGHTS];
-  float3 t;
-  OOlwcoord p;
 
   SGscenegraph *sg;
 
   obj_array_t objs;   // Objects in this scene
 };
 
+struct SGoctreescene {
+  SGscene super;
 
+};
 struct SGoverlay {
 //  OOtexture *tex;
   float x, y;
