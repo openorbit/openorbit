@@ -133,10 +133,13 @@
 		ECBF1751108C569F00D3E412 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6010748ECA00EB6DDF /* libjpeg.a */; };
 		ECBF1754108C56CF00D3E412 /* libimgload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECBF1745108C565600D3E412 /* libimgload.a */; };
 		ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
+		ECC909A41175A14B00E8D477 /* shader-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909A21175A14B00E8D477 /* shader-manager.c */; };
+		ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909AF1175A65A00E8D477 /* mapped-file.c */; };
 		ECDC29FD111498100066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC29FC111498100066AF2D /* particles.c */; };
 		ECDC2BA4111ACD900066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC2BA3111ACD900066AF2D /* particles.c */; };
 		ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
 		ECE17AB31079E043006B6A37 /* ooscript.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE17AB21079E043006B6A37 /* ooscript.c */; };
+		ECE6A8441167CAB400003CBD /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -418,7 +421,6 @@
 		EC4A893710B152C9002C6513 /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuator.h; sourceTree = "<group>"; };
 		EC4A893810B152C9002C6513 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuator.c; sourceTree = "<group>"; };
 		EC4A895310B1553A002C6513 /* simtypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simtypes.h; sourceTree = "<group>"; };
-		EC4FCC1310748AC900EB6DDF /* libode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libode.a; path = /opt/ode/0.11_float/lib/libode.a; sourceTree = "<absolute>"; };
 		EC4FCC6010748ECA00EB6DDF /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = /opt/local/lib/libjpeg.a; sourceTree = "<absolute>"; };
 		EC4FCC6210748F4B00EB6DDF /* libpng.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng.dylib; path = /usr/X11/lib/libpng.dylib; sourceTree = "<absolute>"; };
 		EC51E6E110BBE766009FA70D /* mass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mass.h; sourceTree = "<group>"; };
@@ -451,12 +453,18 @@
 		ECBF173A108C55ED00D3E412 /* tga.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tga.h; sourceTree = "<group>"; };
 		ECBF173B108C563800D3E412 /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
 		ECBF1745108C565600D3E412 /* libimgload.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libimgload.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		ECC909A21175A14B00E8D477 /* shader-manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "shader-manager.c"; sourceTree = "<group>"; };
+		ECC909A31175A14B00E8D477 /* shader-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "shader-manager.h"; sourceTree = "<group>"; };
+		ECC909AF1175A65A00E8D477 /* mapped-file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "mapped-file.c"; sourceTree = "<group>"; };
+		ECC909B01175A65A00E8D477 /* mapped-file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mapped-file.h"; sourceTree = "<group>"; };
 		ECDC29FB111498100066AF2D /* particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particles.h; sourceTree = "<group>"; };
 		ECDC29FC111498100066AF2D /* particles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = particles.c; sourceTree = "<group>"; };
 		ECDC2BA2111ACD900066AF2D /* particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particles.h; sourceTree = "<group>"; };
 		ECDC2BA3111ACD900066AF2D /* particles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = particles.c; sourceTree = "<group>"; };
 		ECE17A871079DE71006B6A37 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		ECE17AB21079E043006B6A37 /* ooscript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ooscript.c; sourceTree = "<group>"; };
+		ECE6A8421167CAB400003CBD /* pubsub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pubsub.h; sourceTree = "<group>"; };
+		ECE6A8431167CAB400003CBD /* pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pubsub.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -638,6 +646,8 @@
 		EC34BBE01079EE080011B76E /* common */ = {
 			isa = PBXGroup;
 			children = (
+				ECC909AF1175A65A00E8D477 /* mapped-file.c */,
+				ECC909B01175A65A00E8D477 /* mapped-file.h */,
 				EC34BBE11079EE080011B76E /* lwcoord.c */,
 				EC34BBE21079EE080011B76E /* lwcoord.h */,
 				EC204D5210CAFA2300F0A450 /* palloc.h */,
@@ -770,6 +780,8 @@
 		EC34BC271079EE080011B76E /* rendering */ = {
 			isa = PBXGroup;
 			children = (
+				ECC909A21175A14B00E8D477 /* shader-manager.c */,
+				ECC909A31175A14B00E8D477 /* shader-manager.h */,
 				EC34BC281079EE080011B76E /* camera.c */,
 				EC34BC291079EE080011B76E /* camera.h */,
 				EC34BC2A1079EE080011B76E /* colour.c */,
@@ -794,8 +806,8 @@
 				ECDC29FB111498100066AF2D /* particles.h */,
 				ECDC29FC111498100066AF2D /* particles.c */,
 				EC62624E1125545C001C0684 /* reftypes.h */,
-				EC6262571125556C001C0684 /* drawable.h */,
 				EC5F72871155240B00FBE08B /* drawable.c */,
+				EC6262571125556C001C0684 /* drawable.h */,
 				EC5F72511154E10D00FBE08B /* material.h */,
 				EC5F72521154E10D00FBE08B /* material.c */,
 				EC5F72581154E27400FBE08B /* light.h */,
@@ -845,6 +857,8 @@
 				EC4A893710B152C9002C6513 /* actuator.h */,
 				EC4A893810B152C9002C6513 /* actuator.c */,
 				EC4A895310B1553A002C6513 /* simtypes.h */,
+				ECE6A8421167CAB400003CBD /* pubsub.h */,
+				ECE6A8431167CAB400003CBD /* pubsub.c */,
 			);
 			path = sim;
 			sourceTree = "<group>";
@@ -984,7 +998,6 @@
 				EC34BD62107B26D30011B76E /* libcheck.a */,
 				EC4FCC6210748F4B00EB6DDF /* libpng.dylib */,
 				EC4FCC6010748ECA00EB6DDF /* libjpeg.a */,
-				EC4FCC1310748AC900EB6DDF /* libode.a */,
 				ECE17A871079DE71006B6A37 /* OpenGL.framework */,
 				EC89155B0CD503EC000E662E /* Python.framework */,
 				EC4476F20CCC056D001C88AD /* SDL.framework */,
@@ -1529,6 +1542,9 @@
 				EC5F72531154E10D00FBE08B /* material.c in Sources */,
 				EC5F725A1154E27400FBE08B /* light.c in Sources */,
 				EC5F72881155240B00FBE08B /* drawable.c in Sources */,
+				ECE6A8441167CAB400003CBD /* pubsub.c in Sources */,
+				ECC909A41175A14B00E8D477 /* shader-manager.c in Sources */,
+				ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2030,7 +2046,7 @@
 					"$(ORBIT_LIBPATH)",
 					/usr/X11/lib,
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(LOCAL_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5/lib/python2.5/config\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
