@@ -649,6 +649,10 @@ ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName,
 
     ooScSetSystem(sc, astrobody->sys);
     float3 v = plComputeCurrentVelocity(astrobody);
-    plSetVel3fv(&sc->obj->super, v);
+
+    // Compute standard orbital velocity
+    float3 velvec = vf3_normalise(vf3_cross(p, vf3_set(0.0f, 0.0f, 1.0f)));
+    velvec = vf3_s_mul(velvec, sqrtf(sc->obj->super.sys->orbitalBody->GM/vf3_abs(p)));
+    plSetVel3fv(&sc->obj->super, vf3_add(v, velvec));
   }
 }
