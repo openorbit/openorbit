@@ -52,9 +52,9 @@ sgLoadProgram(const char *key,
   if (vspath) {
     mapped_file_t mf;
     GLuint shaderId;
-    char pattern[strlen(vspath)+1+5];
+    char pattern[strlen(vspath)+1+9];
     strcpy(pattern, vspath);
-    strcat(pattern, "/*.vp");
+    strcat(pattern, "/*.vertex");
     glob_t shaders = ooResGetFilePaths(pattern);
 
     for (int i = 0 ; i < shaders.gl_matchc ; ++ i) {
@@ -73,6 +73,7 @@ sgLoadProgram(const char *key,
         ooLogFatal("vertex shader '%s' did not compile", shaders.gl_pathv[i]);
       }
       glAttachShader(shaderProgram, shaderId);
+      ooLogInfo("loaded vertex shader '%s'", shaders.gl_pathv[i]);
     }
     globfree(&shaders);
   }
@@ -81,9 +82,9 @@ sgLoadProgram(const char *key,
   if (fspath) {
     mapped_file_t mf;
     GLuint shaderId;
-    char pattern[strlen(vspath)+1+5];
+    char pattern[strlen(vspath)+1+11];
     strcpy(pattern, vspath);
-    strcat(pattern, "/*.fp");
+    strcat(pattern, "/*.fragment");
     glob_t shaders = ooResGetFilePaths(pattern);
 
     for (int i = 0 ; i < shaders.gl_matchc ; ++ i) {
@@ -102,6 +103,7 @@ sgLoadProgram(const char *key,
         ooLogFatal("fragment shader '%s' did not compile", shaders.gl_pathv[i]);
       }
       glAttachShader(shaderProgram, shaderId);
+      ooLogInfo("loaded fragment shader '%s'", shaders.gl_pathv[i]);
     }
     globfree(&shaders);
   }
@@ -114,6 +116,8 @@ sgLoadProgram(const char *key,
   if (linkStatus == GL_FALSE) {
     ooLogFatal("shader linking did not succeed");
   }
+  ooLogInfo("shader program succesfully linked");
+
   return shaderProgram;
 }
 
@@ -126,6 +130,7 @@ sgEnableProgram(unsigned programId)
 void
 sgDisableProgram(unsigned programId)
 {
+  glUseProgram(0); // Return to fixed functionality
 }
 
 unsigned

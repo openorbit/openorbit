@@ -57,6 +57,7 @@ sgNewSceneGraph()
   obj_array_init(&sg->cams);
   obj_array_init(&sg->overlays);
   obj_array_init(&sg->scenes);
+
   return sg;
 }
 

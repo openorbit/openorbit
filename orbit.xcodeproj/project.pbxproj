@@ -27,6 +27,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		EC13F0F611762C7900E39B89 /* shaders in Resources */ = {isa = PBXBuildFile; fileRef = EC13F0F011762C7900E39B89 /* shaders */; };
 		EC204D5410CAFA2300F0A450 /* palloc.c in Sources */ = {isa = PBXBuildFile; fileRef = EC204D5310CAFA2300F0A450 /* palloc.c */; };
 		EC34BC6B1079EE080011B76E /* lwcoord.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBE11079EE080011B76E /* lwcoord.c */; };
 		EC34BC6D1079EE080011B76E /* ellipse.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBE51079EE080011B76E /* ellipse.c */; };
@@ -74,13 +75,9 @@
 		EC34BCBA1079EECB0011B76E /* data in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCB21079EECB0011B76E /* data */; };
 		EC34BCD11079EEE00011B76E /* textures in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCBB1079EEE00011B76E /* textures */; };
 		EC34BD291079EEF60011B76E /* spacecrafts in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCD21079EEF60011B76E /* spacecrafts */; };
-		EC34BD301079EF5A0011B76E /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2B1079EF5A0011B76E /* CMakeLists.txt */; };
 		EC34BD311079EF5A0011B76E /* hip-filter.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2C1079EF5A0011B76E /* hip-filter.py */; };
 		EC34BD321079EF5A0011B76E /* init.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2D1079EF5A0011B76E /* init.py */; };
-		EC34BD331079EF5A0011B76E /* install-mac-res.sh in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2E1079EF5A0011B76E /* install-mac-res.sh */; };
 		EC34BD341079EF5A0011B76E /* postinit.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2F1079EF5A0011B76E /* postinit.py */; };
-		EC34BD351079EF650011B76E /* init.py in Copy Scripts */ = {isa = PBXBuildFile; fileRef = EC34BD2D1079EF5A0011B76E /* init.py */; };
-		EC34BD361079EF650011B76E /* postinit.py in Copy Scripts */ = {isa = PBXBuildFile; fileRef = EC34BD2F1079EF5A0011B76E /* postinit.py */; };
 		EC34BD63107B26F00011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
 		EC34BD64107B26F50011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
 		EC34BD65107B26F90011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
@@ -95,7 +92,6 @@
 		EC34BDC1107B2CBD0011B76E /* vmath-matvec.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB7107B2C480011B76E /* vmath-matvec.c */; };
 		EC34BDC2107B2CBD0011B76E /* vmath-quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB8107B2C480011B76E /* vmath-quaternions.c */; };
 		EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BDBE107B2C900011B76E /* libvmath.a */; };
-		EC3CD7AA108457BD00C1B458 /* ooscript.pyx in Resources */ = {isa = PBXBuildFile; fileRef = EC34BC411079EE080011B76E /* ooscript.pyx */; };
 		EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CDA2C108677C000C1B458 /* ac3d.c */; };
 		EC3F258B10905FE100E0B0C7 /* simenvironment.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3F258A10905FE100E0B0C7 /* simenvironment.c */; };
 		EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
@@ -222,55 +218,11 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		ECE17AC61079E16D006B6A37 /* Copy Scripts */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = script;
-			dstSubfolderSpec = 7;
-			files = (
-				EC34BD351079EF650011B76E /* init.py in Copy Scripts */,
-				EC34BD361079EF650011B76E /* postinit.py in Copy Scripts */,
-			);
-			name = "Copy Scripts";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		ECE17AC91079E1BD006B6A37 /* Copy Data */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = data;
-			dstSubfolderSpec = 7;
-			files = (
-			);
-			name = "Copy Data";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		ECE17AD11079E1E9006B6A37 /* Copy Textures */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = tex;
-			dstSubfolderSpec = 7;
-			files = (
-			);
-			name = "Copy Textures";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		ECE17AE41079E312006B6A37 /* Copy Spacecrafts */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = sc;
-			dstSubfolderSpec = 7;
-			files = (
-			);
-			name = "Copy Spacecrafts";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		EC030D6911084749004F3AD8 /* Simulation Design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Simulation Design"; sourceTree = "<group>"; };
 		EC1217881125410A007DC66F /* reftypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reftypes.h; sourceTree = "<group>"; };
 		EC124713113CF6EF00A40CE1 /* areodynamics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = areodynamics.h; sourceTree = "<group>"; };
+		EC13F0F011762C7900E39B89 /* shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; path = shaders; sourceTree = "<group>"; };
 		EC204D5210CAFA2300F0A450 /* palloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = palloc.h; sourceTree = "<group>"; };
 		EC204D5310CAFA2300F0A450 /* palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = palloc.c; sourceTree = "<group>"; };
 		EC204D5F10CB09D500F0A450 /* test-palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-palloc.c"; sourceTree = "<group>"; };
@@ -780,6 +732,7 @@
 		EC34BC271079EE080011B76E /* rendering */ = {
 			isa = PBXGroup;
 			children = (
+				EC13F0F011762C7900E39B89 /* shaders */,
 				ECC909A21175A14B00E8D477 /* shader-manager.c */,
 				ECC909A31175A14B00E8D477 /* shader-manager.h */,
 				EC34BC281079EE080011B76E /* camera.c */,
@@ -1317,10 +1270,6 @@
 			buildConfigurationList = EC4476E10CCC0077001C88AD /* Build configuration list for PBXNativeTarget "Open Orbit" */;
 			buildPhases = (
 				EC4476DA0CCC0076001C88AD /* Resources */,
-				ECE17AC61079E16D006B6A37 /* Copy Scripts */,
-				ECE17AC91079E1BD006B6A37 /* Copy Data */,
-				ECE17AE41079E312006B6A37 /* Copy Spacecrafts */,
-				ECE17AD11079E1E9006B6A37 /* Copy Textures */,
 				EC4476DB0CCC0076001C88AD /* Sources */,
 				EC4476DC0CCC0076001C88AD /* Frameworks */,
 			);
@@ -1389,16 +1338,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC13F0F611762C7900E39B89 /* shaders in Resources */,
 				EC34BCA01079EE080011B76E /* __init__.py in Resources */,
 				EC34BCBA1079EECB0011B76E /* data in Resources */,
 				EC34BCD11079EEE00011B76E /* textures in Resources */,
 				EC34BD291079EEF60011B76E /* spacecrafts in Resources */,
-				EC34BD301079EF5A0011B76E /* CMakeLists.txt in Resources */,
 				EC34BD311079EF5A0011B76E /* hip-filter.py in Resources */,
 				EC34BD321079EF5A0011B76E /* init.py in Resources */,
-				EC34BD331079EF5A0011B76E /* install-mac-res.sh in Resources */,
 				EC34BD341079EF5A0011B76E /* postinit.py in Resources */,
-				EC3CD7AA108457BD00C1B458 /* ooscript.pyx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
