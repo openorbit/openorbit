@@ -20,10 +20,16 @@
 #ifndef RENDERING_SHADER_MANAGER_H
 #define RENDERING_SHADER_MANAGER_H
 
-unsigned sgLoadProgram(const char *key, const char *vspath, const char *fspath,
-                       const char *gspath);
-void sgEnableProgram(unsigned programId);
-void sgDisableProgram(unsigned programId);
-unsigned sgShaderFromKey(const char *key);
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <gl/gl.h>
+#endif
+
+GLuint sgLoadProgram(const char *key, const char *vspath, const char *fspath,
+                     const char *gspath);
+void sgEnableProgram(GLuint programId);
+void sgDisableProgram(void);
+GLuint sgShaderFromKey(const char *key);
 
 #endif /* !RENDERING_SHADER_MANAGER_H */

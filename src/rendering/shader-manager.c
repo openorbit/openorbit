@@ -29,25 +29,32 @@
 #include <gl/gl.h>
 #endif
 
-hashtable_t *shaderKeyMap = NULL;
+static hashtable_t *shaderKeyMap = NULL;
 
 typedef struct SGshaderinfo {
-  unsigned ident;
+  GLuint ident;
 } SGshaderinfo;
 
-unsigned
+static void __attribute__((constructor))
+sgInitShaders(void)
+{
+  shaderKeyMap = hashtable_new_with_str_keys(64);
+}
+
+GLuint
 sgLoadProgram(const char *key,
               const char *vspath,
               const char *fspath,
               const char *gspath)
 {
-  if (shaderKeyMap == NULL) {
-    shaderKeyMap = hashtable_new_with_str_keys(32);
-  }
+  SGshaderinfo *tmp = hashtable_lookup(shaderKeyMap, key);
+  if (tmp) return tmp->ident;
 
   SGshaderinfo *si = malloc(sizeof(SGshaderinfo));
 
   GLuint shaderProgram = glCreateProgram();
+  si->ident = shaderProgram;
+  hashtable_insert(shaderKeyMap, key, si);
 
   if (vspath) {
     mapped_file_t mf;
@@ -122,19 +129,20 @@ sgLoadProgram(const char *key,
 }
 
 void
-sgEnableProgram(unsigned programId)
+sgEnableProgram(GLuint programId)
 {
   glUseProgram(programId);
 }
 
 void
-sgDisableProgram(unsigned programId)
+sgDisableProgram(void)
 {
   glUseProgram(0); // Return to fixed functionality
 }
 
-unsigned
+GLuint
 sgShaderFromKey(const char *key)
 {
   SGshaderinfo *si = hashtable_lookup(shaderKeyMap, key);
+  return si->ident;
 }
