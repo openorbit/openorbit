@@ -1,24 +1,24 @@
 /*
  Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
- 
+
  This file is part of Open Orbit.
- 
+
  Open Orbit is free software: you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
- 
+
  Open Orbit is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "material.h"
-
+#include "scenegraph.h"
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
 #else
@@ -28,11 +28,13 @@
 void
 sgBindMaterial(SGmaterial *mat)
 {
+  SG_CHECK_ERROR;
   glMaterialfv(GL_FRONT, GL_AMBIENT, mat->ambient);
   glMaterialfv(GL_FRONT, GL_DIFFUSE, mat->diffuse);
   glMaterialfv(GL_FRONT, GL_SPECULAR, mat->specular);
   glMaterialfv(GL_FRONT, GL_EMISSION, mat->emission);
   glMaterialf(GL_FRONT, GL_SHININESS, mat->shininess);
+  SG_CHECK_ERROR;
 }
 
 void
@@ -42,22 +44,22 @@ sgInitMaterial(SGmaterial *mat)
   mat->ambient[1] = 0.2;
   mat->ambient[2] = 0.2;
   mat->ambient[3] = 1.0;
-  
+
   mat->diffuse[0] = 0.8;
   mat->diffuse[1] = 0.8;
   mat->diffuse[2] = 0.8;
   mat->diffuse[3] = 1.0;
-  
+
   mat->specular[0] = 0.0;
   mat->specular[1] = 0.0;
   mat->specular[2] = 0.0;
   mat->specular[3] = 1.0;
-  
+
   mat->emission[0] = 0.0;
   mat->emission[1] = 0.0;
   mat->emission[2] = 0.0;
   mat->emission[3] = 1.0;
-  
+
   mat->shininess = 0.0;
 }
 

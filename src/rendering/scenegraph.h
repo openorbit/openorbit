@@ -79,4 +79,10 @@ void sgSceneAddObj(SGscene *sc, SGdrawable *object);
 
 void sgSceneAddLight(SGscene *sc, SGlight *light);
 
+void sgAssertNoGLError(void);
+void sgCheckGLError(const char *file, int line);
+void sgClearGLError(void);
+
+#define SG_CHECK_ERROR sgCheckGLError(__FILE__, __LINE__)
+
 #endif /* SCENEGRAPH_H_ */

@@ -182,6 +182,8 @@ sgSceneDraw(SGscene *sc)
   //  qsort(sc->objs.elems, sc->objs.length, sizeof(OOdrawable*),
   //        (int (*)(void const *, void const *))compareDistances);
 
+  SG_CHECK_ERROR;
+
   glClear(GL_DEPTH_BUFFER_BIT);
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, sc->amb);
   glDepthFunc(GL_LEQUAL);
@@ -206,12 +208,14 @@ sgSceneDraw(SGscene *sc)
     }
   }
 
+  SG_CHECK_ERROR;
   // Render objects
   for (size_t i = 0 ; i < sc->objs.length ; i ++) {
     SGdrawable *obj = sc->objs.elems[i];
     ooLogTrace("drawing object %s", obj->name);
     sgPaintDrawable(obj);
   }
+  SG_CHECK_ERROR;
 
   // Pop scene transform
   glPopMatrix();
@@ -227,6 +231,7 @@ sgSceneDraw(SGscene *sc)
   }
 
   sc->sg->usedLights -= localLights;
+  SG_CHECK_ERROR;
 }
 
 
@@ -293,4 +298,49 @@ sgSceneAddLight(SGscene *sc, SGlight *light)
   }
 
   ooLogWarn("to many lights added to scenes '%s'", sc->name);
+}
+
+void
+sgAssertNoGLError(void)
+{
+  assert(glGetError() == GL_NO_ERROR);
+}
+void
+sgClearGLError(void)
+{
+  glGetError();
+}
+
+void
+sgCheckGLError(const char *file, int line)
+{
+  GLenum err = glGetError();
+  switch (err) {
+  case GL_NO_ERROR:
+    // All OK
+    break;
+  case GL_INVALID_ENUM:
+    ooLogError("GL invalid enum at %s:%d", file, line);
+    break;
+  case GL_INVALID_VALUE:
+    ooLogError("GL invalid value at %s:%d", file, line);
+    break;
+  case GL_INVALID_OPERATION:
+    ooLogError("GL invalid operation at %s:%d", file, line);
+    break;
+  case GL_STACK_OVERFLOW:
+    ooLogError("GL stack overflow at %s:%d", file, line);
+    break;
+  case GL_STACK_UNDERFLOW:
+    ooLogError("GL stack underflow at %s:%d", file, line);
+    break;
+  case GL_OUT_OF_MEMORY:
+    ooLogError("GL out of memory at %s:%d", file, line);
+    break;
+  case GL_TABLE_TOO_LARGE:
+    ooLogError("GL invalid enum at %s:%d", file, line);
+    break;
+  default:
+    ooLogError("unknown GL error at %s:%d", file, line);
+  }
 }

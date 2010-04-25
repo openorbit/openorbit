@@ -18,7 +18,7 @@
 */
 
 
- 
+
 #include "sky.h"
 #include "colour.h"
 #include "res-manager.h"
@@ -29,7 +29,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "scenegraph-private.h"
-
+#include "scenegraph.h"
 float3
 ooEquToCart(float ra, float dec)
 {
@@ -51,7 +51,7 @@ ooVmagToAlpha(double vmag)
     double total_diff = pow(MAG_BASE, TOTAL_MAG_DIFF);
     double vmag_diff = pow(MAG_BASE, MAX_MAG-vmag);
     double normalised_lin_diff = (1.0-vmag_diff) / total_diff;
-    
+
     if (normalised_lin_diff > 1.0) return 1.0;
     return normalised_lin_diff;
 }
@@ -61,7 +61,7 @@ ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
 {
     float3 cart;
     cart = ooEquToCart(ra, dec);
-    
+
     // star list full, then extend block?
     if (stars->a_len <= stars->n_stars) {
       OOstar *newData = realloc(stars->data, stars->a_len * 2 * sizeof(OOstar));
@@ -69,12 +69,12 @@ ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
       stars->a_len *= 2;
       return;
     }
-    
+
     double temp = bv_to_temp(bv);
     if (temp < 1000.0) temp = 1000.0;
     if (temp > 40000.0) temp = 40000.0;
     uint8_t *tempRGB = get_temp_colour((int)temp);
-    
+
     stars->data[stars->n_stars].x = 100.0*vf3_x(cart);
     stars->data[stars->n_stars].y = 100.0*vf3_y(cart);
     stars->data[stars->n_stars].z = 100.0*vf3_z(cart);
@@ -83,7 +83,7 @@ ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
     stars->data[stars->n_stars].b = *(tempRGB+2);
     stars->data[stars->n_stars].a = ooVmagToAlpha(mag) * 255;
     if (stars->data[stars->n_stars].a < 40) stars->data[stars->n_stars].a = 40;
-    
+
     stars->n_stars ++;
 }
 
@@ -128,7 +128,7 @@ ooSkyRandomStars(void)
     stars->data[i].b = 255;
     stars->data[i].a = 255;
   }
-  
+
   stars->n_stars = STAR_CNT;
   stars->a_len = STAR_CNT;
 
@@ -151,6 +151,8 @@ ooSkyInitStars(int star_count)
 void
 ooSkyDrawStars(OOstars *stars)
 {
+  SG_CHECK_ERROR;
+
   ooLogTrace("draw %d stars", stars->n_stars);
   glMatrixMode(GL_MODELVIEW);
 
@@ -169,6 +171,8 @@ ooSkyDrawStars(OOstars *stars)
 
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
+
+  SG_CHECK_ERROR;
 }
 
 
