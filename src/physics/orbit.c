@@ -188,6 +188,10 @@ plOrbitPosAtTime(PL_keplerian_elements *orbit, double GM, double t)
   quaternion_t q = orbit->qOrbit;
   float3 v = vf3_set(x, y, 0.0);
   v = v_q_rot(v, q);
+
+  assert(isfinite(v.x));
+  assert(isfinite(v.y));
+  assert(isfinite(v.z));
   return v;
 }
 
@@ -354,6 +358,8 @@ plSysUpdateCurrentPos(PLsystem *sys, double dt)
       sys->orbitalBody->tUpdate = sys->orbitalBody->orbitFixationPeriod;
     }
     sys->orbitalBody->obj.q = plSideralRotationAtTime(sys->orbitalBody, t);
+  } else {
+    ooLwcSet(&sys->orbitalBody->obj.p, 0.0, 0.0, 0.0);
   }
 }
 
@@ -424,7 +430,8 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
   PLastrobody *obj = malloc(sizeof(PLastrobody));
 
   plInitObject(&obj->obj);
-  obj->obj.p = *coord;
+  obj->obj.p.offs = coord->offs;
+  obj->obj.p.seg = coord->seg;
   obj->obj.q = q;
   obj->name = strdup(name);
   obj->sys = NULL;
@@ -636,9 +643,25 @@ plComputeGravity(PLastrobody *a, PLobject *b)
 {
   float3 dist = ooLwcDist(&b->p, &a->obj.p);
   double r12 = vf3_abs_square(dist);
-  float3 f12 = vf3_s_mul(vf3_normalise(dist),
+  float3 ndist = vf3_normalise(dist);
+  float3 f12 = vf3_s_mul(ndist,
                          //-PL_G * (a->obj.m.m * b->m.m / r12));
                          -a->GM * b->m.m / r12);
+
+  assert(isfinite(dist.x));
+  assert(isfinite(dist.y));
+  assert(isfinite(dist.z));
+
+  assert(isfinite(ndist.x));
+  assert(isfinite(ndist.y));
+  assert(isfinite(ndist.z));
+
+  assert(isfinite(r12));
+
+  assert(isfinite(f12.x));
+  assert(isfinite(f12.y));
+  assert(isfinite(f12.z));
+
   return f12;
 }
 
@@ -648,16 +671,20 @@ plSysStep(PLsystem *sys, double dt)
   // Add gravitational forces
   for (size_t i = 0; i < sys->rigidObjs.length ; i ++) {
     PLobject *obj = sys->rigidObjs.elems[i];
+    PL_CHECK_OBJ(obj);
     float3 f12 = plComputeGravity(sys->orbitalBody, obj);
     plForce3fv(obj, f12);
+    PL_CHECK_OBJ(obj);
 
     if (sys->parent) {
       f12 = plComputeGravity(sys->parent->orbitalBody, obj);
       plForce3fv(obj, f12);
+      PL_CHECK_OBJ(obj);
     }
 
     float3 drag = plComputeDragForObject(obj);
     plForce3fv(obj, drag);
+    PL_CHECK_OBJ(obj);
 
     plStepObjectf(obj, dt);
   }
@@ -687,6 +714,7 @@ plSysUpdateSg(PLsystem *sys)
 
   quaternion_t q = plGetQuat(&sys->orbitalBody->obj);
   sgSetObjectQuatv(sys->orbitalBody->drawable, q);
+
   sgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
 
   // Update orbital path base

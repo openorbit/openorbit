@@ -56,10 +56,10 @@ struct PLobject {
 };
 
 // Create standard object
-PLobject* plObject(PLworld *sys);
+PLobject* plObject(PLworld *sys, const char *name);
 
 // Create subobject
-PLobject* plSubObject3f(PLworld *world, PLobject *parent,
+PLobject* plSubObject3f(PLworld *world, PLobject *parent, const char *name,
                         float x, float y, float z);
 
 // Init standard object (useful if allocated with malloc or explicitly in structure)
@@ -111,5 +111,8 @@ quaternion_t plGetQuat(PLobject *obj);
 
 
 void plSetSystem(PLsystem *sys, PLobject *obj);
+
+void plCheckObject(PLobject *obj, const char *file, int line);
+#define PL_CHECK_OBJ(obj) plCheckObject(obj, __FILE__, __LINE__)
 
 #endif /* !PHYSICS_OBJECT_H */

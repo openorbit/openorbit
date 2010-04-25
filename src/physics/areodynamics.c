@@ -282,7 +282,7 @@ plComputeDragForObject(PLobject *obj)
   float3 vel = obj->v; // TODO: Adjust for planet rotation
 
   float3 drag = plComputeDrag(vel, p, obj->dragCoef, obj->area);
-  return drag;
+  return vf3_set(0.0, 0.0, 0.0);
 }
 
 double

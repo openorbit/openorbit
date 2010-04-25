@@ -76,7 +76,7 @@ OOspacecraft* ooScGetCurrent(void)
 // TODO: Pass on PLsystem instead of PLworld to ensure that object has valid
 //       systems at all times.
 OOspacecraft*
-ooScNew(PLworld *world, SGscene *scene)
+ooScNew(PLworld *world, SGscene *scene, const char *name)
 {
   OOspacecraft *sc = malloc(sizeof(OOspacecraft));
   //ooObjVecInit(&sc->stages);
@@ -89,7 +89,7 @@ ooScNew(PLworld *world, SGscene *scene)
   sc->poststep = NULL;
   sc->detatchStage = NULL;
 
-  sc->obj = plObject(world);
+  sc->obj = plObject(world, name);
   sc->scene = scene;
   sc->detatchProg.pc = 0;
   detatchprog_array_init(&sc->detatchProg.instrs);
@@ -278,7 +278,7 @@ static int compar_stages(const OOstage **s0, const OOstage **s1) {
 
 
 OOstage*
-ooScNewStage(OOspacecraft *sc)
+ooScNewStage(OOspacecraft *sc, const char *name)
 {
   OOstage *stage = malloc(sizeof(OOstage));
   stage->state = OO_Stage_Idle;
@@ -291,7 +291,7 @@ ooScNewStage(OOspacecraft *sc)
     obj_array_push(&stage->actuatorGroups, actGroup);
   }
   stage->detachOrder = 0;
-  stage->obj = plSubObject3f(sc->world, sc->obj, 0.0, 0.0, 0.0);
+  stage->obj = plSubObject3f(sc->world, sc->obj, name, 0.0, 0.0, 0.0);
 
   obj_array_push(&sc->stages, stage);
 
@@ -490,7 +490,7 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
   const double *stageCog = NULL;
 
   HRMLvalue stageName = hrmlGetAttrForName(stage, "name");
-  OOstage *newStage = ooScNewStage(sc);
+  OOstage *newStage = ooScNewStage(sc, stageName.u.str);
   for (HRMLobject *stageEntry = stage->children ; stageEntry != NULL; stageEntry = stageEntry->next) {
     if (!strcmp(stageEntry->name, "detach-order")) {
       newStage->detachOrder = hrmlGetInt(stageEntry);
@@ -558,7 +558,7 @@ ooScLoad(PLworld *world, SGscene *scene, const char *fileName)
   }
   HRMLobject *root = hrmlGetRoot(spaceCraftDoc);
   HRMLvalue scName = hrmlGetAttrForName(root, "name");
-  OOspacecraft *sc = ooScNew(world, scene);
+  OOspacecraft *sc = ooScNew(world, scene, scName.u.str);
 
   for (HRMLobject *node = root; node != NULL; node = node->next) {
     if (!strcmp(node->name, "spacecraft")) {

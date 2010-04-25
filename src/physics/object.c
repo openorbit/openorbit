@@ -49,6 +49,7 @@ plInitObject(PLobject *obj)
             0.0f, 0.0f, 0.0f);
 
   ooLwcSet(&obj->p, 0.0, 0.0, 0.0);
+
   obj->sys = NULL;
   obj->name = NULL;
   obj->parent = NULL;
@@ -71,12 +72,13 @@ plInitObject(PLobject *obj)
 }
 
 PLobject*
-plObject(PLworld *world)
+plObject(PLworld *world, const char *name)
 {
   assert(world != NULL);
 
-  PLobject *obj = malloc(sizeof(PLobject));
+  PLobject *obj = calloc(1, sizeof(PLobject));
   plInitObject(obj);
+  obj->name = strdup(name);
 
   obj_array_push(&world->objs, obj);
 
@@ -86,12 +88,13 @@ plObject(PLworld *world)
 }
 
 PLobject*
-plSubObject3f(PLworld *world, PLobject *parent, float x, float y, float z)
+plSubObject3f(PLworld *world, PLobject *parent, const char * name, float x, float y, float z)
 {
   assert(parent != NULL);
 
-  PLobject *obj = malloc(sizeof(PLobject));
+  PLobject *obj = calloc(1, sizeof(PLobject));
   plInitObject(obj);
+  obj->name = strdup(name);
 
   obj->sys = parent->sys;
   obj->parent = parent;
@@ -153,7 +156,11 @@ plSetDrawableForObject(PLobject *obj, SGdrawable *drawable)
 void
 plSetObjectPos3d(PLobject *obj, double x, double y, double z)
 {
+  PL_CHECK_OBJ(obj);
+
   ooLwcSet(&obj->p, x, y, z);
+
+  PL_CHECK_OBJ(obj);
 }
 
 
@@ -162,17 +169,25 @@ plSetObjectPosExt3f(PLobject *obj,
                     int32_t i, int32_t j, int32_t k,
                     float x, float y, float z)
 {
+  PL_CHECK_OBJ(obj);
+
   obj->p.seg = vi3_set(i, j, k);
   obj->p.offs = vf3_set(x, y, z);
   ooLwcNormalise(&obj->p);
+
+  PL_CHECK_OBJ(obj);
 }
 
 void
 plSetObjectPosRel3d(PLobject * restrict obj, const PLobject * restrict otherObj,
                     double x, double y, double z)
 {
+  PL_CHECK_OBJ(obj);
+
   obj->p = otherObj->p;
   ooLwcTranslate3f(&obj->p, x, y, z);
+
+  PL_CHECK_OBJ(obj);
 }
 
 void
@@ -180,27 +195,42 @@ plSetObjectPosRel3fv(PLobject * restrict obj,
                      const PLobject * restrict otherObj,
                      float3 rp)
 {
+  PL_CHECK_OBJ(obj);
+
   obj->p = otherObj->p;
   ooLwcTranslate3fv(&obj->p, rp);
+  ooLwcDump(&otherObj->p);
   ooLwcDump(&obj->p);
+
+  PL_CHECK_OBJ(obj);
 }
 void
 plForce3f(PLobject *obj, float x, float y, float z)
 {
+  PL_CHECK_OBJ(obj);
+
   obj->f_ack.x += x;
   obj->f_ack.y += y;
   obj->f_ack.z += z;
+
+  PL_CHECK_OBJ(obj);
 }
 void
 plForce3fv(PLobject *obj, float3 f)
 {
+  PL_CHECK_OBJ(obj);
+
   obj->f_ack += f;
+
+  PL_CHECK_OBJ(obj);
 }
 
 
 void
 plForceRelative3f(PLobject *obj, float fx, float fy, float fz)
 {
+  PL_CHECK_OBJ(obj);
+
   float3 f = { fx, fy, fz, 0.0f };
   float3 f_rot = mf3_v_mul(obj->R, f);
   obj->f_ack += f_rot;
@@ -209,6 +239,8 @@ plForceRelative3f(PLobject *obj, float fx, float fy, float fz)
 void
 plForceRelative3fv(PLobject *obj, float3 f)
 {
+  PL_CHECK_OBJ(obj);
+
   float3 f_rot = mf3_v_mul(obj->R, f);
   obj->f_ack += f_rot;
 }
@@ -218,6 +250,8 @@ plForceRelativePos3f(PLobject *obj,
                      float fx, float fy, float fz,
                      float px, float py, float pz)
 {
+  PL_CHECK_OBJ(obj);
+
   float3 f = { fx, fy, fz, 0.0f };
   float3 p = { px, py, pz, 0.0f };
   float3 f_rot = mf3_v_mul(obj->R, f);
@@ -250,10 +284,13 @@ plDumpObject(PLobject *obj)
 void
 plStepObjectf(PLobject *obj, float dt)
 {
-  float3 fm = (obj->f_ack / obj->m.m);
-  obj->v += fm * dt; // Update velocity from force
 
-  ooLwcTranslate3fv(&obj->p, vf3_s_mul(obj->v, dt)); // Update position from velocity
+  PL_CHECK_OBJ(obj);
+  float3 fm = (obj->f_ack / obj->m.m);
+
+  obj->v += fm * dt; // Update velocity from force
+  float3 dv = vf3_s_mul(obj->v, dt);
+  ooLwcTranslate3fv(&obj->p, dv); // Update position from velocity
 
   obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
   obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt)); // Update quaternion with rotational velocity
@@ -266,6 +303,8 @@ plStepObjectf(PLobject *obj, float dt)
 void
 plStepChildObjectf(PLobject *obj, float dt)
 {
+  PL_CHECK_OBJ(obj);
+
   obj->v = obj->parent->v; // Update velocity from force
   obj->p = obj->parent->p;
 
@@ -281,6 +320,7 @@ plStepChildObjectf(PLobject *obj, float dt)
 void
 plNormaliseObject(PLobject *obj)
 {
+  PL_CHECK_OBJ(obj);
   // Since we are using non safe casts here, we must ensure this in case someone upgrades
   // to 64 bit positions
   assert(sizeof(obj->p.offs) == sizeof(float3));
@@ -362,4 +402,22 @@ plSetSystem(PLsystem *sys, PLobject *obj)
   }
   obj->sys = sys;
   obj_array_push(&sys->rigidObjs, obj);
+}
+
+
+void
+plCheckObject(PLobject *obj, const char *file, int line)
+{
+  if (!isfinite(obj->p.offs.x) || !isfinite(obj->p.offs.y) || !isfinite(obj->p.offs.z)) {
+    ooLogAbort("%s:%d obj position not finite", file, line);
+  }
+  if (!isfinite(obj->f_ack.x) || !isfinite(obj->f_ack.y) || !isfinite(obj->f_ack.z)) {
+    ooLogAbort("%s:%d obj force ack not finite", file, line);
+  }
+  if (!isfinite(obj->t_ack.x) || !isfinite(obj->t_ack.y) || !isfinite(obj->t_ack.z)) {
+    ooLogAbort("%s:%d obj torque ack not finite", file, line);
+  }
+  if (!isfinite(obj->v.x) || !isfinite(obj->v.y) || !isfinite(obj->v.z)) {
+    ooLogAbort("%s:%d obj velocity not finite", file, line);
+  }
 }

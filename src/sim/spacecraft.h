@@ -128,7 +128,7 @@ struct OOspacecraft {
   SGscene *scene;
 };
 
-OOspacecraft* ooScNew(PLworld *world, SGscene *scene);
+OOspacecraft* ooScNew(PLworld *world, SGscene *scene, const char *name);
 
 void ooScSetStageMesh(OOstage *stage, SGdrawable *mesh);
 void ooScDetatchStage(OOspacecraft *sc);
@@ -165,7 +165,7 @@ void ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName, double x, double
 void ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName, double longitude, double latitude, double altitude);
 
 
-OOstage* ooScNewStage(OOspacecraft *sc);
+OOstage* ooScNewStage(OOspacecraft *sc, const char *name);
 void ooScStageAddActuator(OOstage *stage, OOactuator *actuator);
 
 
