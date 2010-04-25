@@ -24,7 +24,6 @@
 typedef struct OOsimtime {
   double currentTime; //!< Current time in earth days relative to epoch
   int64_t timeStamp; //!< Discrete time stamp in ms since standard UNIX epoch, this allow for +/- 290 M year sim around this point
-  double jdBase;
 } OOsimtime;
 
 static OOsimtime gTimeState;
@@ -32,23 +31,22 @@ static OOsimtime gTimeState;
 void __attribute__ ((constructor)) simTimeInit(void)
 {
   time_t currentTime = time(NULL);
-  gTimeState.jdBase = (double)(currentTime/86400) + 2440587.5;
-  gTimeState.currentTime = gTimeState.jdBase;
   gTimeState.timeStamp = currentTime*1000;
+  gTimeState.currentTime = (double)(currentTime/86400.0) + 2440587.5;
 }
 
 void
 simTimeTick(double dt)
 {
   gTimeState.timeStamp += dt * 1000.0;
-  gTimeState.currentTime = gTimeState.jdBase + ((double)(gTimeState.timeStamp)) / (24.0 * 3600.0 * 1000.0);
+  gTimeState.currentTime = (double)(gTimeState.timeStamp/86400.0)/1000.0 + 2440587.5;
 }
 
 void
 simTimeTick_ms(int64_t dms)
 {
   gTimeState.timeStamp += dms;
-  gTimeState.currentTime = gTimeState.jdBase + ((double)(gTimeState.timeStamp)) / (24.0 * 3600.0 * 1000.0);
+  gTimeState.currentTime = (double)(gTimeState.timeStamp/86400.0)/1000.0 + 2440587.5;
 }
 
 
@@ -58,12 +56,6 @@ simTimeJDToTimeStamp(double jd)
   return (int64_t) (jd - 2440587.5) * 86400.0 * 1000.0;
 }
 
-
-int64_t
-ooTimeJDToTimeStamp(double jd)
-{
-  return (uint64_t) (jd - 2440587.5) * 86400.0 * 1000.0;
-}
 
 double
 simTimeGetJD(void)

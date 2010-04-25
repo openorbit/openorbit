@@ -26,7 +26,6 @@
 void simTimeTick(double dt);
 void simTimeTick_ms(int64_t dms);
 
-
 double simTimeGetJD(void);
 time_t simTimeGetTime(void);
 int64_t simTimeJDToTimeStamp(double jd);
