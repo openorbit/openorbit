@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -21,7 +21,7 @@
 /*!
     \file heap
     \brief   Functions and structures for working with a generic heap type.
-    
+
     The heap can be used as an priority queue, this was actually the reason it
     was implemented, in order to be used for keeping track on events that are
     to be triggered on some time in the future. THe heap structure is designed
@@ -36,7 +36,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 #include <stdbool.h>
 #include <stdint.h>
 #define THREAD_SAFE_HEAP 1
@@ -45,10 +45,10 @@ extern "C" {
 #include <pthread.h>
 #endif
 
-typedef uint64_t (*compute_rank_f)(void *);
+typedef int64_t (*compute_rank_f)(void *);
 
 typedef struct {
-    uint64_t rank;
+    int64_t rank;
     void *data;
 } heap_element_t;
 
@@ -74,5 +74,5 @@ void heap_unlock(heap_t *h);
 #ifdef __cplusplus
 }
 #endif
-    
+
 #endif
