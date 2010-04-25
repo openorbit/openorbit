@@ -23,59 +23,124 @@
 
 #define OO_EVENT_QUEUE_INIT_LEN 100
 
- uint64_t EventRank(OOevent *ev)
- {
-   return ev->fireTime;
- }
+// BUG: If working with events with fire time < 1970 as event time then is negative
+int64_t EventRank(OOevent *ev)
+{
+  return ev->fireTime;
+}
 
- OOeventqueue*
- ooSimNewEventQueue(void)
- {
-     OOeventqueue *queue = malloc(sizeof(OOeventqueue));
-     queue->freeEvents = malloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
-     queue->activeEventHeap = heap_new(8, (compute_rank_f)EventRank);
+OOeventqueue*
+simNewEventQueue(void)
+{
+  OOeventqueue *queue = malloc(sizeof(OOeventqueue));
+  queue->freeEvents = malloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
+  queue->activeEventHeap = heap_new(8, (compute_rank_f)EventRank);
 
-     for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
-         queue->freeEvents[i].next = &queue->freeEvents[i+1];
-         queue->freeEvents[i].data = NULL;
-         queue->freeEvents[i].handler = NULL;
-         queue->freeEvents[i].fireTime = 0;
-     }
+  for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
+    queue->freeEvents[i].next = &queue->freeEvents[i+1];
+    queue->freeEvents[i].data = NULL;
+    queue->freeEvents[i].handler = NULL;
+    queue->freeEvents[i].fireTime = 0;
+  }
 
-     return queue;
- }
+  return queue;
+}
 
- int
- ooSimStackEvent(OOeventqueue *q, OOeventhandler handler, void *data)
- {
+OOevent*
+simAllocEvent(OOeventqueue *queue)
+{
+  if (queue->freeEvents == NULL) {
+    queue->freeEvents = malloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
+    if (queue->freeEvents == NULL) {
+      ooLogFatal("out of memory %s:%d", __FILE__, __LINE__);
+    }
+    for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
+      queue->freeEvents[i].next = &queue->freeEvents[i+1];
+      queue->freeEvents[i].data = NULL;
+      queue->freeEvents[i].handler = NULL;
+      queue->freeEvents[i].fireTime = 0;
+    }
+  }
 
- }
+  OOevent * ev = queue->freeEvents;
+  queue->freeEvents = ev->next;
+  ev->next = NULL;
+  return ev;
+}
 
- int
- ooSimJDEvent(OOeventqueue *q, double jd, OOeventhandler handler, void *data)
- {
+void
+simReleaseEvent(OOeventqueue *queue, OOevent *ev)
+{
+  ev->next = queue->freeEvents;
+  queue->freeEvents = ev;
+}
 
- }
+void
+simInsertEvent(OOeventqueue *queue, OOevent *ev)
+{
+  heap_insert(queue->activeEventHeap, ev);
+}
+
+void
+simStackEvent(OOeventqueue *q, OOeventhandler handler, void *data)
+{
+  OOevent *ev = simAllocEvent(q);
+  ev->fireTime = simTimeGetTimeStamp();
+  ev->handler = handler;
+  ev->data = data;
+  simInsertEvent(q, ev);
+}
+
+void
+simEnqueueAbsoluteEvent(OOeventqueue *q, double jd, OOeventhandler handler, void *data)
+{
+  double currentJD = simTimeGetTime();
+  if (jd < currentJD) {
+    // cannot enqueue events in the future
+    ooLogError("past events cannot be inserted in queue, current JD = %f, event JD = %f",
+               currentJD, jd);
+  }
+
+  OOevent *ev = simAllocEvent(q);
+  ev->fireTime = simTimeJDToTimeStamp(jd);
+  ev->handler = handler;
+  ev->data = data;
+
+  simInsertEvent(q, ev);
+}
 
 
- int
- ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *data)
- {
-     //OOevent *e = q->first;
-     //int tsCnt = e->fireTime = offset;
-     //while (tsCnt < offset) {
-     //    e = e->next;
-     //    tsCnt += e->fireTime;
-     //}
- }
+void
+simEnqueueDelta_ms(OOeventqueue *q, unsigned offset, OOeventhandler handler, void *data)
+{
+  OOevent *ev = simAllocEvent(q);
+  ev->fireTime = simTimeGetTimeStamp() + offset;
+  ev->handler = handler;
+  ev->data = data;
 
- int
- ooSimHandleNextEvent(OOeventqueue *q)
- {
-   //OOevent *ev = heap_peek(q->activeEventHeap);
-   // ev = heap_remove(q->activeEventHeap);
+  simInsertEvent(q, ev);
+}
 
-   //  return ev->fireTime;
-   return 0;
- }
- 
+void
+simEnqueueDelta_s(OOeventqueue *q, double offset, OOeventhandler handler, void *data)
+{
+  OOevent *ev = simAllocEvent(q);
+  ev->fireTime = simTimeGetTimeStamp() + offset*1000.0;
+  ev->handler = handler;
+  ev->data = data;
+
+  simInsertEvent(q, ev);
+}
+
+
+void
+simDispatchPendingEvents(OOeventqueue *q)
+{
+  OOevent *ev = heap_peek(q->activeEventHeap);
+  while (ev && ev->fireTime < simTimeGetTimeStamp()) {
+    heap_remove(q->activeEventHeap);
+    ev->handler(ev->data);
+    simReleaseEvent(q, ev);
+    ev = heap_peek(q->activeEventHeap);
+  }
+}

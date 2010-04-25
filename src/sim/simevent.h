@@ -21,7 +21,7 @@
 #define SIMEVENT_H_KHYQLKNG
 
 #include <gencds/heap.h>
-
+#include <gencds/list.h>
 
 /*!
   Event handler function
@@ -33,12 +33,13 @@
 
   \todo Move to C-file if possible
  */
- typedef struct _OOevent {
-     uint64_t fireTime;
-     OOeventhandler handler;
-     void *data;
-     struct _OOevent *next;
- } OOevent;
+typedef struct _OOevent {
+  int64_t fireTime;
+  OOeventhandler handler;
+//  void (^handler_block)(void)
+  void *data;
+  struct _OOevent *next;
+} OOevent;
 
 
 /*!
@@ -69,8 +70,13 @@
    OOevent *freeEvents;
  } OOeventqueue;
 
- OOeventqueue* ooSimNewEventQueue(void);
- int ooSimInsertEvent(OOeventqueue *q, int offset, OOeventhandler handler, void *data);
- int ooSimHandleNextEvent(OOeventqueue *q);
+OOeventqueue* simNewEventQueue(void);
+
+void simStackEvent(OOeventqueue *q, OOeventhandler handler, void *data);
+void simEnqueueAbsoluteEvent(OOeventqueue *q, double jd, OOeventhandler handler, void *data);
+void simEnqueueDelta_ms(OOeventqueue *q, unsigned offset, OOeventhandler handler, void *data);
+void simEnqueueDelta_s(OOeventqueue *q, double offset, OOeventhandler handler, void *data);
+
+void simDispatchPendingEvents(OOeventqueue *q);
 
 #endif /* end of include guard: SIMEVENT_H_KHYQLKNG */

@@ -32,13 +32,14 @@
 
 #include "log.h"
 
-SIMstate gSIM_state = {0.0, NULL, NULL, NULL};
+SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL};
 
 void
 ooSimInit(void) {
   float freq;
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   gSIM_state.stepSize = 1.0 / freq; // Period in s
+  gSIM_state.evQueue = simNewEventQueue();
 }
 
 
@@ -83,6 +84,5 @@ ooSimStep(float dt)
     // do system simulation
     // sys_step(gSIM_state->systems, dt);
 
-    // check event queue
-    // sim_event_check(gSIM_state->events, );
+  simDispatchPendingEvents(gSIM_state.evQueue);
 }

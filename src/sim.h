@@ -38,6 +38,7 @@ typedef struct {
   PLsystem *orbSys;   //!< Root orbit system, this will be the sun initially
   PLworld *orbWorld;
   SGscenegraph *sg;   //!< Scenegraph of the world
+  OOeventqueue *evQueue;
 } SIMstate;
 
 void ooSimInit(void);
