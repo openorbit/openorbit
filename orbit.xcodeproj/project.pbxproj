@@ -29,6 +29,9 @@
 /* Begin PBXBuildFile section */
 		EC13F0F611762C7900E39B89 /* shaders in Resources */ = {isa = PBXBuildFile; fileRef = EC13F0F011762C7900E39B89 /* shaders */; };
 		EC204D5410CAFA2300F0A450 /* palloc.c in Sources */ = {isa = PBXBuildFile; fileRef = EC204D5310CAFA2300F0A450 /* palloc.c */; };
+		EC239D1511843C5E00C1A5B9 /* world-loader.c in Sources */ = {isa = PBXBuildFile; fileRef = EC239D1411843C5E00C1A5B9 /* world-loader.c */; };
+		EC239D5511843ED200C1A5B9 /* ooscript.pyx in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC411079EE080011B76E /* ooscript.pyx */; };
+		EC239D751184406900C1A5B9 /* script in Resources */ = {isa = PBXBuildFile; fileRef = EC239D731184406900C1A5B9 /* script */; };
 		EC34BC6B1079EE080011B76E /* lwcoord.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBE11079EE080011B76E /* lwcoord.c */; };
 		EC34BC6D1079EE080011B76E /* ellipse.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBE51079EE080011B76E /* ellipse.c */; };
 		EC34BC6E1079EE080011B76E /* io-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBE81079EE080011B76E /* io-manager.c */; };
@@ -76,8 +79,6 @@
 		EC34BCD11079EEE00011B76E /* textures in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCBB1079EEE00011B76E /* textures */; };
 		EC34BD291079EEF60011B76E /* spacecrafts in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCD21079EEF60011B76E /* spacecrafts */; };
 		EC34BD311079EF5A0011B76E /* hip-filter.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2C1079EF5A0011B76E /* hip-filter.py */; };
-		EC34BD321079EF5A0011B76E /* init.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2D1079EF5A0011B76E /* init.py */; };
-		EC34BD341079EF5A0011B76E /* postinit.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2F1079EF5A0011B76E /* postinit.py */; };
 		EC34BD63107B26F00011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
 		EC34BD64107B26F50011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
 		EC34BD65107B26F90011B76E /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
@@ -134,7 +135,6 @@
 		ECDC29FD111498100066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC29FC111498100066AF2D /* particles.c */; };
 		ECDC2BA4111ACD900066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC2BA3111ACD900066AF2D /* particles.c */; };
 		ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
-		ECE17AB31079E043006B6A37 /* ooscript.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE17AB21079E043006B6A37 /* ooscript.c */; };
 		ECE6A8441167CAB400003CBD /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
 /* End PBXBuildFile section */
 
@@ -226,6 +226,9 @@
 		EC204D5210CAFA2300F0A450 /* palloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = palloc.h; sourceTree = "<group>"; };
 		EC204D5310CAFA2300F0A450 /* palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = palloc.c; sourceTree = "<group>"; };
 		EC204D5F10CB09D500F0A450 /* test-palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-palloc.c"; sourceTree = "<group>"; };
+		EC239D1311843C5E00C1A5B9 /* world-loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "world-loader.h"; sourceTree = "<group>"; };
+		EC239D1411843C5E00C1A5B9 /* world-loader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "world-loader.c"; sourceTree = "<group>"; };
+		EC239D731184406900C1A5B9 /* script */ = {isa = PBXFileReference; lastKnownFileType = folder; path = script; sourceTree = "<group>"; };
 		EC34BBD01079EDE90011B76E /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = array.h; sourceTree = "<group>"; };
 		EC34BBD11079EDE90011B76E /* avl-tree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "avl-tree.h"; sourceTree = "<group>"; };
 		EC34BBD21079EDE90011B76E /* hashtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hashtable.h; sourceTree = "<group>"; };
@@ -325,9 +328,7 @@
 		EC34BCD21079EEF60011B76E /* spacecrafts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = spacecrafts; path = vehicles/spacecrafts; sourceTree = "<group>"; };
 		EC34BD2B1079EF5A0011B76E /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		EC34BD2C1079EF5A0011B76E /* hip-filter.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = "hip-filter.py"; sourceTree = "<group>"; };
-		EC34BD2D1079EF5A0011B76E /* init.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = init.py; sourceTree = "<group>"; };
 		EC34BD2E1079EF5A0011B76E /* install-mac-res.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "install-mac-res.sh"; sourceTree = "<group>"; };
-		EC34BD2F1079EF5A0011B76E /* postinit.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = postinit.py; sourceTree = "<group>"; };
 		EC34BD62107B26D30011B76E /* libcheck.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcheck.a; path = /usr/local/lib/libcheck.a; sourceTree = "<absolute>"; };
 		EC34BDA7107B2C2B0011B76E /* vmath-constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-constants.h"; sourceTree = "<group>"; };
 		EC34BDA8107B2C2B0011B76E /* vmath-convert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vmath-convert.h"; sourceTree = "<group>"; };
@@ -812,6 +813,8 @@
 				EC4A895310B1553A002C6513 /* simtypes.h */,
 				ECE6A8421167CAB400003CBD /* pubsub.h */,
 				ECE6A8431167CAB400003CBD /* pubsub.c */,
+				EC239D1311843C5E00C1A5B9 /* world-loader.h */,
+				EC239D1411843C5E00C1A5B9 /* world-loader.c */,
 			);
 			path = sim;
 			sourceTree = "<group>";
@@ -835,6 +838,7 @@
 		EC34BCB11079EEA80011B76E /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
+				EC239D731184406900C1A5B9 /* script */,
 				EC34BCD21079EEF60011B76E /* spacecrafts */,
 				EC34BCBB1079EEE00011B76E /* textures */,
 				EC34BCB21079EECB0011B76E /* data */,
@@ -847,9 +851,7 @@
 			children = (
 				EC34BD2B1079EF5A0011B76E /* CMakeLists.txt */,
 				EC34BD2C1079EF5A0011B76E /* hip-filter.py */,
-				EC34BD2D1079EF5A0011B76E /* init.py */,
 				EC34BD2E1079EF5A0011B76E /* install-mac-res.sh */,
-				EC34BD2F1079EF5A0011B76E /* postinit.py */,
 			);
 			path = scripts;
 			sourceTree = "<group>";
@@ -1344,8 +1346,7 @@
 				EC34BCD11079EEE00011B76E /* textures in Resources */,
 				EC34BD291079EEF60011B76E /* spacecrafts in Resources */,
 				EC34BD311079EF5A0011B76E /* hip-filter.py in Resources */,
-				EC34BD321079EF5A0011B76E /* init.py in Resources */,
-				EC34BD341079EF5A0011B76E /* postinit.py in Resources */,
+				EC239D751184406900C1A5B9 /* script in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1432,7 +1433,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECE17AB31079E043006B6A37 /* ooscript.c in Sources */,
+				EC239D5511843ED200C1A5B9 /* ooscript.pyx in Sources */,
 				EC34BC6B1079EE080011B76E /* lwcoord.c in Sources */,
 				EC34BC6D1079EE080011B76E /* ellipse.c in Sources */,
 				EC34BC6E1079EE080011B76E /* io-manager.c in Sources */,
@@ -1492,6 +1493,7 @@
 				ECE6A8441167CAB400003CBD /* pubsub.c in Sources */,
 				ECC909A41175A14B00E8D477 /* shader-manager.c in Sources */,
 				ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */,
+				EC239D1511843C5E00C1A5B9 /* world-loader.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

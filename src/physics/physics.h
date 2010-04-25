@@ -72,7 +72,7 @@ typedef int16_t __attribute__((vector_size (8))) PLshort3;
 
 // Speed of light
 #define PL_C 299792458.0
-// Universial gravitation
+// Universial gravitation m^3/kg/s^2
 #define PL_G 6.67428e-11
 // Planck constant
 #define PL_H 6.62606896e-34
@@ -90,6 +90,8 @@ typedef int16_t __attribute__((vector_size (8))) PLshort3;
 #define PL_ST 5.670400e-8
 // Molar Mass Constant
 #define PL_M0 1.99264654e-26;
+
+#define PL_SEC_PER_DAY (3600.0 * 24.0)
 
 #include "object.h"
 #include "orbit.h"

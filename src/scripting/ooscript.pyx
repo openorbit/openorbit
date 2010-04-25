@@ -54,13 +54,15 @@ cdef extern from "physics/orbit.h":
   ctypedef struct PLsystem
   ctypedef struct PLastrobody
 
-
-  PLworld* ooOrbitLoad(SGscenegraph *sg, char *fileName)
   void plGetPosForName3f(PLworld *world, char *name,
                          float *x, float *y, float *z)
   PLsystem* plGetSystem(PLworld *world, char *name)
   PLastrobody* plGetObject(PLworld *world, char *name)
   PLobject* plObjForAstroBody(PLastrobody *abody)
+
+cdef extern from "sim/world-loader.h":
+  PLworld* ooOrbitLoad(SGscenegraph *sg, char *fileName)
+
 
 cdef extern from "sim/spacecraft.h":
   ctypedef struct OOspacecraft
@@ -106,7 +108,7 @@ cdef extern from "plugin-handler.h":
 
 cdef extern from "settings.h":
   int ooConfSetBoolAsInt(char *key, int val)
-  int ooConfGetBoolAsInt(char *key, int *val)    
+  int ooConfGetBoolAsInt(char *key, int *val)
   int ooConfSetInt(char *key, int val)
   int ooConfGetInt(char *key, int *val)
   int ooConfSetFloat(char *key, float val)
@@ -162,7 +164,7 @@ cdef class Scenegraph:
   cdef SGscenegraph *sg
   def __cinit__(self):
       self.sg = <SGscenegraph*>0
-  
+
   def new(self):
       self.sg = sgNewSceneGraph()
       return self
@@ -174,10 +176,10 @@ cdef class Scenegraph:
       cdef Scene sc
       sc.sc = sgGetScene(self.sg, key)
       return sc
-  
+
   def setBackground(self, SkyDrawable sky):
       sgSetSky(self.sg, sky.sky)
-  
+
   def setOverlay(self):
       pass
 
@@ -209,6 +211,8 @@ cdef class OrbitWorld:
     pass
   def new(self, Scenegraph scg, char *fileName):
     self.world = ooOrbitLoad(scg.sg, fileName)
+    if self.world == <PLworld*>0:
+      return None
     return self
   def getPosForObjName(self, char *name):
     cdef float x, y, z

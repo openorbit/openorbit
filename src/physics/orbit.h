@@ -103,7 +103,7 @@ struct PLsystem {
 struct PLworld {
   const char *name;
   PLsystem *rootSys;
-  
+
   obj_array_t objs; // All objects in world, even ones not placed in subsystems
   obj_array_t partSys; // All particle systems in world
 };
@@ -138,14 +138,7 @@ float3 plGetPosForName(const PLworld *world, const char *name);
 void plGetPosForName3f(const PLworld *world, const char *name,
                        float *x, float *y, float *z);
 PLobject* plObjForAstroBody(PLastrobody *abody);
-/*!
- Loads an hrml description of a solar system and builds a solar system graph
- it also connects the physics system to the graphics system.
- 
- This function does not belong in the physics system, but will be here for
- now beeing.
- */
-PLworld* ooOrbitLoad(SGscenegraph *sg, const char *fileName);
+
 float3 plComputeCurrentVelocity(PLastrobody *ab);
 
 void plWorldStep(PLworld *world, double dt);
