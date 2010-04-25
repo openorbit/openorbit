@@ -218,11 +218,8 @@ main(int argc, char*argv[])
 //  }
 
   // Init GL state
-
   ooSetVideoDefaults();
   sgCamInit();
-
-  ooTexInit(); // Requires that GL has been initialised
 
   ooIoPrintJoystickNames();
 

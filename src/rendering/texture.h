@@ -22,7 +22,7 @@
 #define TEXTURE_
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
@@ -31,31 +31,29 @@ extern "C" {
 #endif
 
 typedef struct {
-    GLint width, height;
-    GLuint texId;
-    GLenum texType;
-    GLint bytesPerTex;
-    void *data;
+  GLint width, height;
+  GLuint texId;
+  GLenum texType;
+  GLint bytesPerTex;
+  const char *path;
+  void *data;
 } OOtexture;
-
-/*! \brief initialises the texture manager objects */
-void    ooTexInit(void);
 
 /*! \brief loads a named resource texture file */
 int     ooTexLoad(const char *key, const char *name);
 /*! \brief binds the texture specified by key as the current texture
- 
+
     Do not use the bind function to much, it is acceptable to use it in non
     performant rendering code (e.g. user interfaces). In normal cases, use
     tex_num and cache the texid.
  */
 int     ooTexBind(const char *key);
 
-/*! \brief Get the OpenGL texture name associated with the key */    
+/*! \brief Get the OpenGL texture name associated with the key */
 GLuint  ooTexNum(const char *key);
 /*! \brief Remove a texture from the global texture dictionary.
- 
-    Also deletes the texture name 
+
+    Also deletes the texture name
  */
 int     ooTexUnload(const char *key);
 
@@ -63,5 +61,5 @@ OOtexture *ooTexGet(const char *key);
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 #endif /*TEXTURE_*/
