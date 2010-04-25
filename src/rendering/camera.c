@@ -221,7 +221,7 @@ sgCamStep(SGcam *cam, float dt)
       ocam->dec += ocam->ddec;
       ocam->dec = fmod(ocam->dec, 2.0*M_PI);
 
-      ocam->zoom += ocam->dr; if (ocam->zoom < 0.0) ocam->zoom = 0.0;
+      ocam->zoom += ocam->dr; if (ocam->zoom < 1.0) ocam->zoom = 1.0;
       ocam->r = ocam->zoom;
     }
     break;
@@ -256,9 +256,9 @@ sgCamMove(SGcam *cam)
                     ocam->r*sin(ocam->dec),
                     ocam->r*sin(ocam->ra)};
       float3 cogOffset = mf3_v_mul(ocam->body->R, ocam->body->m.cog);
-      glTranslatef(-(p[0]+ocam->body->p.offs.x + cogOffset.x),
-                   -(p[1]+ocam->body->p.offs.y + cogOffset.y),
-                   -(p[2]+ocam->body->p.offs.z + cogOffset.z));
+      glTranslatef(-(p[0] + cogOffset.x),
+                   -(p[1] + cogOffset.y),
+                   -(p[2] + cogOffset.z));
     }
     break;
   case SGCam_Fixed:
@@ -282,9 +282,9 @@ sgCamMove(SGcam *cam)
     {
       SGfreecam *freecam = (SGfreecam*)cam;
 
-      glTranslatef(-vf3_x(freecam->lwc.offs),
-                   -vf3_y(freecam->lwc.offs),
-                   -vf3_z(freecam->lwc.offs));
+//      glTranslatef(-vf3_x(freecam->lwc.offs),
+//                   -vf3_y(freecam->lwc.offs),
+//                   -vf3_z(freecam->lwc.offs));
     }
     break;
   default:

@@ -36,15 +36,15 @@ sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset)
   SGcam *cam = sg->currentCam;
 
   if (cam->kind == SGCam_Free) {
-    float3 relPos = ooLwcRelVec(lw, ((SGfreecam*)cam)->lwc.seg);
+    float3 relPos = ooLwcDist(lw, &((SGfreecam*)cam)->lwc);
     obj->p = relPos + offset;
   } else if (cam->kind == SGCam_Fixed) {
     SGfixedcam *fix = (SGfixedcam*)cam;
-    float3 relPos = ooLwcRelVec(lw, fix->body->p.seg) - (mf3_v_mul(fix->body->R, fix->r) + fix->body->p.offs);
+    float3 relPos = ooLwcDist(lw, &fix->body->p) - (mf3_v_mul(fix->body->R, fix->r));
     obj->p = relPos + offset;
   } else if (cam->kind == SGCam_Orbit) {
     SGorbitcam *orb = (SGorbitcam*)cam;
-    float3 relPos = ooLwcRelVec(lw, orb->body->p.seg);
+    float3 relPos = ooLwcDist(lw, &orb->body->p);
     obj->p = relPos + offset;
   }
 }
@@ -58,15 +58,15 @@ sgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
   SGcam *cam = sg->currentCam;
 
   if (cam->kind == SGCam_Free) {
-    float3 relPos = ooLwcRelVec(lw, ((SGfreecam*)cam)->lwc.seg);
+    float3 relPos = ooLwcDist(lw, &((SGfreecam*)cam)->lwc);
     obj->p = relPos;
   } else if (cam->kind == SGCam_Fixed) {
     SGfixedcam *fix = (SGfixedcam*)cam;
-    float3 relPos = ooLwcRelVec(lw, fix->body->p.seg) - (mf3_v_mul(fix->body->R, fix->r) + fix->body->p.offs);
+    float3 relPos = ooLwcDist(lw, &fix->body->p) - (mf3_v_mul(fix->body->R, fix->r));
     obj->p = relPos;
   } else if (cam->kind == SGCam_Orbit) {
     SGorbitcam *orb = (SGorbitcam*)cam;
-    float3 relPos = ooLwcRelVec(lw, orb->body->p.seg);
+    float3 relPos = ooLwcDist(lw, &orb->body->p);
     obj->p = relPos;
   }
 }
@@ -183,8 +183,18 @@ sgDrawSphere(SGsphere *sp)
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
   glColor3f(1.0f, 1.0f, 1.0f);
-  gluSphere(sp->quadratic, sp->radius, 128, 128);
 
+  // Primitive LOD, note that distances may be messed up for smaller objects, as
+  // this does not take the camera position into account.
+  double angularDiameter = 2.0 * atan(0.5*sp->radius/vf3_abs(sp->super.p));
+  //double angularDiameter = sp->radius/vf3_abs(sp->super.p);// Quicker estimate
+  if (angularDiameter > DEG_TO_RAD(5.0)) {
+    gluSphere(sp->quadratic, sp->radius, 128, 128);
+  } else if (angularDiameter > DEG_TO_RAD(1.0)) {
+    gluSphere(sp->quadratic, sp->radius, 32, 32);
+  } else {
+    gluSphere(sp->quadratic, sp->radius, 16, 16);
+  }
   // Draw point on the sphere in solid colour and size
   glDisable (GL_BLEND);
   glDisable(GL_TEXTURE_2D);
