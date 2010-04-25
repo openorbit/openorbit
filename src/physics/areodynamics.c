@@ -197,7 +197,7 @@ static char *elemNames[PL_Elem_Last] = {
 
 static hashtable_t *ht;
 
-void
+static void __attribute__((constructor))
 plElementInit(void)
 {
   ht = hashtable_new_with_str_keys(128);
@@ -205,12 +205,6 @@ plElementInit(void)
   for (PLelement i = PL_Elem_First ; i < PL_Elem_Last ; ++ i) {
     hashtable_insert(ht, elemNames[i], (void*)i);
   }
-}
-
-void
-plInit(void)
-{
-  plElementInit();
 }
 
 PLelement
@@ -264,7 +258,7 @@ plEstimateTemp(double luminocity, double albedo, double R)
 double
 plComputeAirspeed(PLobject *obj)
 {
-  
+
 }
 // Compute drag force from
 // \param v Velocity of object relative to the fluid
@@ -298,7 +292,7 @@ plComputeAirpressure(PLobject *obj)
   PLatmosphere *atm = &obj->sys->orbitalBody->atm;
   float3 dist = ooLwcDist(&obj->p, &sys->orbitalBody->obj.p);
   float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
-  float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness 
+  float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
   double pressure = plPressureAtAltitude(atm->Pb, atm->Tb, g0, atm->M, h, 0.0);
   return pressure;
 }
@@ -310,7 +304,7 @@ plComputeAirdensity(PLobject *obj)
   PLatmosphere *atm = &obj->sys->orbitalBody->atm;
   float3 dist = ooLwcDist(&obj->p, &sys->orbitalBody->obj.p);
   float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
-  float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness 
+  float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
   double density = plPressureAtAltitude(atm->pb, atm->Tb, g0, atm->M, h, 0.0);
   return density;
 }

@@ -17,7 +17,7 @@
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*! \mainpage Open Orbit Source Documentation 
+/*! \mainpage Open Orbit Source Documentation
  *
  * \section intro_sec Introduction
  *
@@ -26,9 +26,9 @@
  * simulator works with newtonian mechanics. This differs from some other space
  * simulators, that some times use an atmospheric flight model, despite being
  * in vacuum, and microgravity.
- * 
+ *
  * \section build_sec Building
- * 
+ *
  * The build procedure is documented separatelly. See the file INSTALL.txt for
  * more information.
  */
@@ -61,7 +61,7 @@
 /* Simulator SDL events */
 #define SIM_STEP_EVENT 0 // Make physics step
 #define SIM_DEBUG_EVENT 1
- 
+
 // 25Hz
 #define SIM_STEP_PERIOD 40
 
@@ -190,7 +190,6 @@ main(int argc, char*argv[])
   ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
   ooLogSetLevel(ooLogGetLevFromStr(levStr));
 
-  plInit();
   ooSimInit();
 
   ooPluginInit();
