@@ -89,13 +89,13 @@ ooScNew(PLworld *world, SGscene *scene)
   sc->poststep = NULL;
   sc->detatchStage = NULL;
 
-  sc->obj = plCompoundObject(world);
+  sc->obj = plObject(world);
   sc->scene = scene;
   sc->detatchProg.pc = 0;
   detatchprog_array_init(&sc->detatchProg.instrs);
 
-  plMassSet(&sc->obj->super.m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  plSetSystem(world->rootSys, &sc->obj->super);
+  plMassSet(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  plSetSystem(world->rootSys, sc->obj);
 
   return sc;
 }
@@ -126,9 +126,9 @@ ooScNew(PLworld *world, SGscene *scene)
 void
 ooScReevaluateMass(OOspacecraft *sc)
 {
-  memset(&sc->obj->super.m, 0, sizeof(PLmass));
+  memset(&sc->obj->m, 0, sizeof(PLmass));
 
-  plMassSet(&sc->obj->super.m, 0.0,
+  plMassSet(&sc->obj->m, 0.0,
             0.0, 0.0, 0.0,
             1.0, 1.0, 1.0,
             0.0, 0.0, 0.0);
@@ -142,7 +142,7 @@ ooScReevaluateMass(OOspacecraft *sc)
                       stage->pos[1],
                       stage->pos[2]);
 
-      plMassAdd(&sc->obj->super.m, &tmp);
+      plMassAdd(&sc->obj->m, &tmp);
     }
   }
 }
@@ -202,7 +202,7 @@ ooScStep(OOspacecraft *sc, float dt)
   }
 
   float expendedFuel = 0.0f;
-  plMassMod(&sc->obj->super.m, sc->obj->super.m.m - expendedFuel);
+  plMassMod(&sc->obj->m, sc->obj->m.m - expendedFuel);
 }
 
 void // for scripts and events
@@ -600,7 +600,7 @@ ooScSetScene(OOspacecraft *spacecraft, SGscene *scene)
 void
 ooScSetSystem(OOspacecraft *spacecraft, PLsystem *sys)
 {
-  PLsystem *oldSys = spacecraft->obj->super.sys;
+  PLsystem *oldSys = spacecraft->obj->sys;
 
   if (oldSys != NULL) {
     for (int i = 0 ; i < oldSys->rigidObjs.length ; ++i) {
@@ -610,12 +610,12 @@ ooScSetSystem(OOspacecraft *spacecraft, PLsystem *sys)
     }
   }
   obj_array_push(&sys->rigidObjs, spacecraft->obj);
-  spacecraft->obj->super.sys = sys;
+  spacecraft->obj->sys = sys;
 }
 void
 ooScSetPos(OOspacecraft *sc, double x, double y, double z)
 {
-  plSetObjectPos3d(&sc->obj->super, x, y, z);
+  plSetObjectPos3d(sc->obj, x, y, z);
 }
 
 void
@@ -624,10 +624,10 @@ ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName,
 {
   PLastrobody *astrobody = plGetObject(sc->world, sysName);
   if (astrobody != NULL) {
-    plSetObjectPosRel3d(&sc->obj->super, &astrobody->obj, x, y, z);
+    plSetObjectPosRel3d(sc->obj, &astrobody->obj, x, y, z);
     ooScSetSystem(sc, astrobody->sys);
     float3 v = plComputeCurrentVelocity(astrobody);
-    plSetVel3fv(&sc->obj->super, v);
+    plSetVel3fv(sc->obj, v);
   } else {
     ooLogWarn("astrobody '%s' not found", sysName);
   }
@@ -645,14 +645,14 @@ ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName,
     // sideral rotation.
     float3 p = geodetic2cart_f(astrobody->eqRad, astrobody->angEcc,
                                latitude, longitude, altitude);
-    plSetObjectPosRel3fv(&sc->obj->super, &astrobody->obj, p);
+    plSetObjectPosRel3fv(sc->obj, &astrobody->obj, p);
 
     ooScSetSystem(sc, astrobody->sys);
     float3 v = plComputeCurrentVelocity(astrobody);
 
     // Compute standard orbital velocity
     float3 velvec = vf3_normalise(vf3_cross(p, vf3_set(0.0f, 0.0f, 1.0f)));
-    velvec = vf3_s_mul(velvec, sqrtf(sc->obj->super.sys->orbitalBody->GM/vf3_abs(p)));
-    plSetVel3fv(&sc->obj->super, vf3_add(v, velvec));
+    velvec = vf3_s_mul(velvec, sqrtf(sc->obj->sys->orbitalBody->GM/vf3_abs(p)));
+    plSetVel3fv(sc->obj, vf3_add(v, velvec));
   }
 }

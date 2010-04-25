@@ -1,18 +1,18 @@
 /*
  Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
- 
+
  This file is part of Open Orbit.
- 
+
  Open Orbit is free software: you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
- 
+
  Open Orbit is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,12 +30,12 @@
 
 struct PLobject {
   PLsystem *sys;
-  PLcompound_object *parent;
+  struct PLobject *parent;
   char *name;
   PLmass m;
   SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
-  
+
   OOlwcoord p; // Large world coordinates
   quaternion_t q; // Rotation quaternion
   float3 p_offset; // Only for use by subobjects
@@ -50,19 +50,16 @@ struct PLobject {
 
   float dragCoef; // Drag coefficent
   float area; // Average area used when calculating drag
-};
 
-struct PLcompound_object {
-  PLobject super;
+  obj_array_t psystem;// Optionally attatched particle system
   obj_array_t children;
 };
 
 // Create standard object
-PLobject* plObject3f(PLworld *sys);
-// Create standard object
-PLcompound_object* plCompoundObject(PLworld *sys);
+PLobject* plObject(PLworld *sys);
+
 // Create subobject
-PLobject* plSubObject3f(PLworld *world, PLcompound_object *parent,
+PLobject* plSubObject3f(PLworld *world, PLobject *parent,
                         float x, float y, float z);
 
 // Init standard object (useful if allocated with malloc or explicitly in structure)
@@ -73,7 +70,7 @@ void plComputeDerived(PLobject *obj);
 void plDumpObject(PLobject *obj);
 
 void plDetachObject(PLobject *obj);
-void plUpdateMass(PLcompound_object *obj);
+void plUpdateMass(PLobject *obj);
 
 void plSetDrawableForObject(PLobject *obj, SGdrawable *drawable);
 

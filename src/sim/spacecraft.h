@@ -117,7 +117,7 @@ struct OOspacecraft {
   obj_array_t stages;
   int activeStageIdx; // index in stage vector of active stage, this point out where
                       // detachment happens
-  PLcompound_object *obj;
+  PLobject *obj;
 
   OOdetatchprog detatchProg;
 

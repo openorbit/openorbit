@@ -175,14 +175,14 @@ ooScRegisterInGroup(OOactuatorgroup *eg, OOactuator *actuator)
 void
 ooSrbStep(OOsrb *srb, float dt)
 {
-  plForceRelativePos3fv(&srb->super.stage->sc->obj->super,
+  plForceRelativePos3fv(srb->super.stage->sc->obj,
                         srb->dir * srb->forceMag, srb->p);
 }
 
 void
 ooRocketStep(OOrocket *rocket, float dt)
 {
-  plForceRelativePos3fv(&rocket->super.stage->sc->obj->super,
+  plForceRelativePos3fv(rocket->super.stage->sc->obj,
                         rocket->dir * rocket->forceMag * rocket->throttle,
                         rocket->p);
 }
@@ -190,7 +190,7 @@ ooRocketStep(OOrocket *rocket, float dt)
 void
 ooThrusterStep(OOrocket *thruster, float dt)
 {
-  plForceRelativePos3fv(&thruster->super.stage->sc->obj->super,
+  plForceRelativePos3fv(thruster->super.stage->sc->obj,
                         thruster->dir * thruster->forceMag * thruster->throttle,
                         thruster->p);
 }

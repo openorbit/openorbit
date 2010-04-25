@@ -64,6 +64,8 @@ plInitObject(PLobject *obj)
 
   obj->dragCoef = 0.0;
   obj->area = 0.0;
+  obj_array_init(&obj->children);
+  obj_array_init(&obj->psystem);
 
   plComputeDerived(obj);
 }
@@ -76,8 +78,6 @@ plObject(PLworld *world)
   PLobject *obj = malloc(sizeof(PLobject));
   plInitObject(obj);
 
-  plSetAngularVel3f(obj, 0.0f, 0.0f, 0.05f);
-
   obj_array_push(&world->objs, obj);
 
   plComputeDerived(obj);
@@ -85,31 +85,15 @@ plObject(PLworld *world)
   return obj;
 }
 
-PLcompound_object*
-plCompoundObject(PLworld *world)
-{
-  assert(world != NULL);
-
-  PLcompound_object *obj = malloc(sizeof(PLcompound_object));
-  plInitObject(&obj->super);
-
-  obj_array_push(&world->objs, obj);
-  obj_array_init(&obj->children);
-
-  plComputeDerived(&obj->super);
-
-  return obj;
-}
-
 PLobject*
-plSubObject3f(PLworld *world, PLcompound_object *parent, float x, float y, float z)
+plSubObject3f(PLworld *world, PLobject *parent, float x, float y, float z)
 {
   assert(parent != NULL);
 
   PLobject *obj = malloc(sizeof(PLobject));
   plInitObject(obj);
 
-  obj->sys = parent->super.sys;
+  obj->sys = parent->sys;
   obj->parent = parent;
   obj->p_offset = vf3_set(x, y, z);
   obj_array_push(&world->objs, obj);
@@ -127,19 +111,19 @@ plDetatchObject(PLobject *obj)
   assert(obj != NULL);
   assert(obj->parent != NULL);
 
-  obj_array_push(&obj->parent->super.sys->rigidObjs, obj);
-  PLcompound_object *parent = obj->parent;
+  obj_array_push(&obj->parent->sys->rigidObjs, obj);
+  PLobject *parent = obj->parent;
   obj->parent = NULL;
 
   plUpdateMass(parent);
 }
 
 void
-plUpdateMass(PLcompound_object *obj)
+plUpdateMass(PLobject *obj)
 {
-  memset(&obj->super.m, 0, sizeof(PLmass));
+  memset(&obj->m, 0, sizeof(PLmass));
 
-  plMassSet(&obj->super.m, 0.0,
+  plMassSet(&obj->m, 0.0,
             0.0, 0.0, 0.0,
             1.0, 1.0, 1.0,
             0.0, 0.0, 0.0);
@@ -152,7 +136,7 @@ plUpdateMass(PLcompound_object *obj)
                       -child->m.cog[0],
                       -child->m.cog[1],
                       -child->m.cog[2]);
-      plMassAdd(&obj->super.m, &tmp);
+      plMassAdd(&obj->m, &tmp);
     }
   }
 }
@@ -268,6 +252,7 @@ plStepObjectf(PLobject *obj, float dt)
 {
   float3 fm = (obj->f_ack / obj->m.m);
   obj->v += fm * dt; // Update velocity from force
+
   ooLwcTranslate3fv(&obj->p, vf3_s_mul(obj->v, dt)); // Update position from velocity
 
   obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
@@ -281,13 +266,13 @@ plStepObjectf(PLobject *obj, float dt)
 void
 plStepChildObjectf(PLobject *obj, float dt)
 {
-  obj->v = obj->parent->super.v; // Update velocity from force
-  obj->p = obj->parent->super.p;
+  obj->v = obj->parent->v; // Update velocity from force
+  obj->p = obj->parent->p;
 
-  float3 p_offset_rot = v_q_rot(obj->p_offset, obj->parent->super.q);
+  float3 p_offset_rot = v_q_rot(obj->p_offset, obj->parent->q);
   ooLwcTranslate3fv(&obj->p, p_offset_rot); // Update position from parent
   obj->angVel = vf3_set(0.0f, 0.0f, 0.0f);
-  obj->q = obj->parent->super.q;
+  obj->q = obj->parent->q;
 
   plComputeDerived(obj); // Compute derived data (world inverted inertia tensor etc)
   plClearObject(obj); // Clear accums
