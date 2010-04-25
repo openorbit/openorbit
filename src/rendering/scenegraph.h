@@ -20,8 +20,6 @@
 #ifndef SCENEGRAPH_H_
 #define SCENEGRAPH_H_
 
-#define SG_MAX_LIGHTS GL_MAX_LIGHTS
-
 #include <vmath/vmath.h>
 #include <gencds/array.h>
 

@@ -35,7 +35,7 @@ struct SGscene {
 
   float amb[4]; ///< Ambient light for this scene, initially [0.2,0.2,0.2,1.0]
 
-  SGlight *lights[SG_MAX_LIGHTS];
+  SGlight **lights;
 
   SGscenegraph *sg;
 
@@ -56,6 +56,8 @@ struct SGscenegraph {
   SGcam *currentCam;
   obj_array_t cams;
   obj_array_t scenes;   // All scenes in the scene graph
+
+  GLint maxLights;
 
   int usedLights;
 

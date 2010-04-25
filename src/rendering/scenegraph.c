@@ -52,7 +52,7 @@ SGscenegraph*
 sgNewSceneGraph()
 {
   SGscenegraph *sg = malloc(sizeof(SGscenegraph));
-
+  glGetIntegerv(GL_MAX_LIGHTS, &sg->maxLights);
   sg->usedLights = 0;
   obj_array_init(&sg->cams);
   obj_array_init(&sg->overlays);
@@ -94,11 +94,10 @@ sgNewScene(SGscenegraph *sg, const char *name)
   sc->amb[2] = 0.2;
   sc->amb[3] = 1.0;
 
-  memset(sc->lights, 0, SG_MAX_LIGHTS * sizeof(SGlight*));
   sc->sg = sg;
+  sc->lights = calloc(sg->maxLights, sizeof(SGlight*));
 
   obj_array_init(&sc->objs);
-
   obj_array_push(&sg->scenes, sc);
 
   return sc;
@@ -190,9 +189,9 @@ sgSceneDraw(SGscene *sc)
   // Apply scene transforms
   glPushMatrix();
   int localLights = 0;
-  for (int i = 0 ; i < SG_MAX_LIGHTS ; ++ i) {
+  for (int i = 0 ; i < sc->sg->maxLights ; ++ i) {
     if (sc->lights[i] != NULL) {
-     if (sc->sg->usedLights < SG_MAX_LIGHTS) {
+     if (sc->sg->usedLights < sc->sg->maxLights) {
        GLenum lightId = sgLightNumberMap[sc->sg->usedLights];
        SGlight *light = sc->lights[i];
 
@@ -286,7 +285,7 @@ sgDrawFuncGnd(SGdrawable *obj)
 void
 sgSceneAddLight(SGscene *sc, SGlight *light)
 {
-  for (int i = 0 ; i < SG_MAX_LIGHTS ; ++ i) {
+  for (int i = 0 ; i < sc->sg->maxLights ; ++ i) {
     if (sc->lights[i] == NULL) {
       sc->lights[i] = light;
       return;
