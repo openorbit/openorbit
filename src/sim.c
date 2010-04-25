@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -31,29 +31,11 @@
 #include "settings.h"
 
 #include "log.h"
-// epoch = ???
 
-SIMstate gSIM_state = {NULL, 0.0, NULL, NULL, NULL};
+SIMstate gSIM_state = {0.0, NULL, NULL, NULL};
 
 void
 ooSimInit(void) {
-
-  // Note that tm_wday and tm_yday are ignored by timegm
-  // Default to J2000:
-  //    January 1, 2000, 11:58:55.816 UTC
-  struct tm tm;
-  tm.tm_sec = 55;
-  tm.tm_min = 58;
-  tm.tm_hour = 11;
-  tm.tm_mday = 1;
-  tm.tm_mon = 0;
-  tm.tm_year = 100;
-  tm.tm_isdst = 0;
-  tm.tm_zone = NULL;
-  tm.tm_gmtoff = 0;
-  time_t unixJ2000Epoch = timegm(&tm);
-  gSIM_state.timeState = ooSimTimeInit(unixJ2000Epoch);
-
   float freq;
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   gSIM_state.stepSize = 1.0 / freq; // Period in s
@@ -83,7 +65,7 @@ ooSimSetOrbWorld(PLworld *world)
 void
 ooSimStep(float dt)
 {
-  ooSimTimeTick(gSIM_state.timeState, dt);
+  simTimeTick(dt);
   struct timeval start;
   struct timeval end;
   gettimeofday(&start, NULL);
@@ -92,9 +74,6 @@ ooSimStep(float dt)
 
   plWorldClear(gSIM_state.orbWorld);
   plWorldStep(gSIM_state.orbWorld, dt);
-
-//  ooOrbitClear(gSIM_state.orbSys);
-//  ooOrbitStep(gSIM_state.orbSys, dt);
 
   gettimeofday(&end, NULL);
 

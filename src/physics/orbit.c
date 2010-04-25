@@ -331,7 +331,7 @@ void
 plSysUpdateCurrentPos(PLsystem *sys, double dt)
 {
   if (sys->parent) {
-    double t = ooTimeGetJD();
+    double t = simTimeGetJD();
 
     if (sys->orbitalBody->tUpdate > 0) {
       ooLwcTranslate3fv(&sys->orbitalBody->obj.p,
@@ -366,7 +366,7 @@ void
 plSysSetCurrentPos(PLsystem *sys)
 {
   if (sys->parent) {
-    double t = ooTimeGetJD();
+    double t = simTimeGetJD();
     float3 newPos = plOrbitPosAtTime(sys->orbitalBody->kepler,
                                      sys->parent->orbitalBody->GM,
                                      t*PL_SEC_PER_DAY);
@@ -706,7 +706,7 @@ plSysUpdateSg(PLsystem *sys)
 void
 plWorldStep(PLworld *world, double dt)
 {
-  double t = ooTimeGetJD();
+  double t = simTimeGetJD();
 
   plSysStep(world->rootSys, dt);
   for (size_t i = 0; i < world->objs.length ; i ++) {
@@ -1042,7 +1042,7 @@ float3
 plComputeCurrentVelocity(PLastrobody *ab)
 {
   assert(ab->sys->parent != NULL);
-  double t = ooTimeGetJD();
+  double t = simTimeGetJD();
 
   float3 currentPos = plOrbitPosAtTime(ab->kepler, ab->sys->parent->orbitalBody->GM,
                                        t*PL_SEC_PER_DAY);

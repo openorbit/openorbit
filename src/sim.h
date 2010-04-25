@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -32,26 +32,15 @@ extern "C" {
 #include "sim/simtime.h"
 #include "sim/simevent.h"
 
-typedef struct {  
-  OOsimtime *timeState;
-
+typedef struct {
   float stepSize;     //!< Step size for simulation in seconds
   OOspacecraft *currentSc; //!< Current active spacecraft
   PLsystem *orbSys;   //!< Root orbit system, this will be the sun initially
   PLworld *orbWorld;
-  //OOcam *cam;         //!< Current camera
   SGscenegraph *sg;   //!< Scenegraph of the world
 } SIMstate;
 
 void ooSimInit(void);
-
-static inline OOsimtime* ooSimTimeState(void)
-{
-  extern SIMstate gSIM_state;
-  return gSIM_state.timeState;
-}
-
-
 
 void ooSimSetSg(SGscenegraph *sg);
 

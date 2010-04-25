@@ -1,5 +1,5 @@
 /*
-  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -23,28 +23,16 @@
 #include <stdint.h>
 #include <time.h>
 
-typedef struct OOsimtime {
-  time_t epoch; // UNIX time
-  double currentTime; //!< Current time in earth days relative to epoch
-  uint64_t timeStamp; //!< Time stamp (ticking up one every step)
-  double timeStampLength;
-  double jdBase;
-} OOsimtime;
+void simTimeTick(double dt);
+void simTimeTick_ms(int64_t dms);
 
-OOsimtime* ooSimTimeInit(time_t epoch);
 
-static inline void
-ooSimTimeTick(OOsimtime *self, double dt)
-{
-  self->timeStamp ++;
-  self->currentTime = self->jdBase + (((double)(self->timeStamp)) * dt) / (24.0 * 3600.0);
-}
+double simTimeGetJD(void);
+time_t simTimeGetTime(void);
+int64_t simTimeJDToTimeStamp(double jd);
+time_t simTimeGetTime(void);
+int64_t simTimeGetTimeStamp(void);
 
-double ooTimeGetJD(void);
-time_t ooTimeGetTime(void);
-
-time_t ooTimeGetEpoch(void);
-void ooTimeSetEpoch(time_t epoch);
 
 #endif /* end of include guard: SIMTIME_H_STPF70AM */
- 
+

@@ -1,5 +1,5 @@
 /*
-  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -16,56 +16,70 @@
   You should have received a copy of the GNU Lesser General Public License
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
- 
- 
+
+
 #include "sim.h"
 #include "sim/simtime.h"
 
-OOsimtime*
-ooSimTimeInit(time_t epoch)
+typedef struct OOsimtime {
+  double currentTime; //!< Current time in earth days relative to epoch
+  int64_t timeStamp; //!< Discrete time stamp in ms since standard UNIX epoch, this allow for +/- 290 M year sim around this point
+  double jdBase;
+} OOsimtime;
+
+static OOsimtime gTimeState;
+
+void __attribute__ ((constructor)) simTimeInit(void)
 {
-  //  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
-  //float wc_period = 1.0 / freq; // Period in s
-  //Uint32 interv = (Uint32) (wc_period * 1000.0); // SDL wants time in ms
-  //float sim_period;
-  //ooConfGetFloatDef("openorbit/sim/period", &sim_period, wc_period);
-
-
-  OOsimtime *timeState = malloc(sizeof(OOsimtime));
-  timeState->epoch = epoch;
-  timeState->jdBase = (double)(time(NULL)/86400) + 2440587.5;
-  timeState->currentTime = timeState->jdBase;
-  timeState->timeStamp = 0;
-  timeState->timeStampLength = 0.05; // 20 Hz default
-
-  return timeState;
-}
-
-
-double
-ooTimeGetJD(void)
-{
-  OOsimtime *ts = ooSimTimeState();
-  return ts->currentTime;
-}
-
-time_t
-ooTimeGetTime(void)
-{
-  OOsimtime *ts = ooSimTimeState();
-  return ts->epoch + (time_t)ts->timeStamp * (time_t)(1.0/ts->timeStampLength);
-}
-
-time_t
-ooTimeGetEpoch(void)
-{
-  OOsimtime *ts = ooSimTimeState();
-  return ts->epoch;
+  time_t currentTime = time(NULL);
+  gTimeState.jdBase = (double)(currentTime/86400) + 2440587.5;
+  gTimeState.currentTime = gTimeState.jdBase;
+  gTimeState.timeStamp = currentTime*1000;
 }
 
 void
-ooTimeSetEpoch(time_t epoch)
+simTimeTick(double dt)
 {
-  OOsimtime *ts = ooSimTimeState();
-  ts->epoch = epoch;
+  gTimeState.timeStamp += dt * 1000.0;
+  gTimeState.currentTime = gTimeState.jdBase + ((double)(gTimeState.timeStamp)) / (24.0 * 3600.0 * 1000.0);
+}
+
+void
+simTimeTick_ms(int64_t dms)
+{
+  gTimeState.timeStamp += dms;
+  gTimeState.currentTime = gTimeState.jdBase + ((double)(gTimeState.timeStamp)) / (24.0 * 3600.0 * 1000.0);
+}
+
+
+int64_t
+simTimeJDToTimeStamp(double jd)
+{
+  return (int64_t) (jd - 2440587.5) * 86400.0 * 1000.0;
+}
+
+
+int64_t
+ooTimeJDToTimeStamp(double jd)
+{
+  return (uint64_t) (jd - 2440587.5) * 86400.0 * 1000.0;
+}
+
+double
+simTimeGetJD(void)
+{
+  return gTimeState.currentTime;
+}
+
+
+time_t
+simTimeGetTime(void)
+{
+  return gTimeState.timeStamp/1000;
+}
+
+int64_t
+simTimeGetTimeStamp(void)
+{
+  return gTimeState.timeStamp;
 }
