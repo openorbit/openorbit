@@ -81,8 +81,13 @@ ooSimStep(float dt)
   ooLogTrace("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
                                      (start.tv_sec*1000000 + start.tv_usec)));
 
-    // do system simulation
-    // sys_step(gSIM_state->systems, dt);
-
+  // Step spacecraft systems
+  simScStep(gSIM_state.currentSc, dt);
   simDispatchPendingEvents(gSIM_state.evQueue);
+}
+
+void
+simSetSpacecraft(OOspacecraft *sc)
+{
+  gSIM_state.currentSc = sc;
 }

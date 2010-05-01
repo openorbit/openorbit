@@ -86,7 +86,7 @@ cdef extern from "sim.h":
     void ooSimSetSg(SGscenegraph *sg)
     void ooSimSetCam(SGcam *cam)
     void ooSimSetOrbWorld(PLworld *world)
-
+    void simSetSpacecraft(OOspacecraft *sc)
     cdef struct SIMstate:
       SGscenegraph *sg
 
@@ -246,11 +246,13 @@ cdef class Spacecraft:
 
 
 def setSg(Scenegraph scg):
-    ooSimSetSg(scg.sg)
+  ooSimSetSg(scg.sg)
 
 def setOrbWorld(OrbitWorld world):
   ooSimSetOrbWorld(world.world)
 
+def setCurrentSc(Spacecraft sc):
+  simSetSpacecraft(sc.sc)
 
 def getResPath(str):
     cdef char *path

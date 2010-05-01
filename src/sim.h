@@ -50,6 +50,7 @@ void ooSimSetOrbWorld(PLworld *world);
 
 void ooSimStep(float dt);
 
+void simSetSpacecraft(OOspacecraft *sc);
 #ifdef __cplusplus
 }
 #endif
