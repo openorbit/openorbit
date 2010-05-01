@@ -586,7 +586,6 @@
 				EC34BC3E1079EE080011B76E /* scripting */,
 				EC34BC461079EE080011B76E /* settings.c */,
 				EC34BC471079EE080011B76E /* settings.h */,
-				EC34BC481079EE080011B76E /* shaders */,
 				EC34BC4B1079EE080011B76E /* sim */,
 				EC34BC531079EE080011B76E /* sim.c */,
 				EC34BC541079EE080011B76E /* sim.h */,
@@ -787,13 +786,6 @@
 				EC34BC431079EE080011B76E /* __init__.py */,
 			);
 			path = openorbit;
-			sourceTree = "<group>";
-		};
-		EC34BC481079EE080011B76E /* shaders */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = shaders;
 			sourceTree = "<group>";
 		};
 		EC34BC4B1079EE080011B76E /* sim */ = {
