@@ -1,18 +1,18 @@
 /*
  Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
- 
+
  This file is part of Open Orbit.
- 
+
  Open Orbit is free software: you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
- 
+
  Open Orbit is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,6 +24,7 @@
 #include "drawable.h"
 #include "common/lwcoord.h"
 #include "parsers/model.h"
+#include "res-manager.h"
 
 void
 sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset)
@@ -57,18 +58,19 @@ sgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
   SGscenegraph *sg = sc->sg;
   SGcam *cam = sg->currentCam;
 
+  float3 relPos;
   if (cam->kind == SGCam_Free) {
-    float3 relPos = ooLwcDist(lw, &((SGfreecam*)cam)->lwc);
-    obj->p = relPos;
+    relPos = ooLwcDist(lw, &((SGfreecam*)cam)->lwc);
   } else if (cam->kind == SGCam_Fixed) {
     SGfixedcam *fix = (SGfixedcam*)cam;
-    float3 relPos = ooLwcDist(lw, &fix->body->p) - (mf3_v_mul(fix->body->R, fix->r));
-    obj->p = relPos;
+    relPos = ooLwcDist(lw, &fix->body->p) - (mf3_v_mul(fix->body->R, fix->r));
   } else if (cam->kind == SGCam_Orbit) {
     SGorbitcam *orb = (SGorbitcam*)cam;
-    float3 relPos = ooLwcDist(lw, &orb->body->p);
-    obj->p = relPos;
+    relPos = ooLwcDist(lw, &orb->body->p);
+  } else {
+    assert(0 && "invalid camera type");
   }
+  obj->p = relPos;
 }
 void
 sgSetObjectPos3f(SGdrawable *obj, float x, float y, float z)
@@ -172,6 +174,8 @@ sgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df)
 void
 sgDrawSphere(SGsphere *sp)
 {
+  SG_CHECK_ERROR;
+
   glEnable(GL_TEXTURE_2D);
   glDepthFunc(GL_LEQUAL);
   glEnable(GL_DEPTH_TEST);
@@ -184,6 +188,8 @@ sgDrawSphere(SGsphere *sp)
   glFrontFace(GL_CCW);
   glColor3f(1.0f, 1.0f, 1.0f);
 
+  SG_CHECK_ERROR;
+
   // Primitive LOD, note that distances may be messed up for smaller objects, as
   // this does not take the camera position into account.
   double angularDiameter = 2.0 * atan(0.5*sp->radius/vf3_abs(sp->super.p));
@@ -195,6 +201,9 @@ sgDrawSphere(SGsphere *sp)
   } else {
     gluSphere(sp->quadratic, sp->radius, 16, 16);
   }
+
+  SG_CHECK_ERROR;
+
   // Draw point on the sphere in solid colour and size
   glDisable (GL_BLEND);
   glDisable(GL_TEXTURE_2D);
@@ -203,23 +212,30 @@ sgDrawSphere(SGsphere *sp)
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_TEXTURE_2D); // Lines are not textured...
 
+  SG_CHECK_ERROR;
+
   glBegin(GL_LINES);
   glColor3f(1.0, 1.0, 0.0);
   glVertex3f(0.0, 0.0, -2.0*sp->radius);
   glVertex3f(0.0, 0.0, -sp->radius);
   glEnd();
 
+  SG_CHECK_ERROR;
+
+
   glBegin(GL_LINES);
   glColor3f(1.0, 1.0, 0.0);
   glVertex3f(0.0, 0.0, +2.0*sp->radius);
   glVertex3f(0.0, 0.0, sp->radius);
   glEnd();
+  SG_CHECK_ERROR;
 
-  glBegin(GL_POINTS);
   glPointSize(5.0);
+  glBegin(GL_POINTS);
   glColor3f(1.0, 0.0, 0.0);
   glVertex3f(0.0, 0.0, 0.0);
   glEnd();
+  SG_CHECK_ERROR;
 }
 
 SGdrawable*
@@ -250,18 +266,81 @@ sgNewSphere2(const char *name, const char *tex, float radius, float flattening, 
   sp->radius = radius;
   ooTexLoad(tex, tex);
   sp->texId = ooTexNum(tex);
+  stacks = stacks & ~1; // Ensure we have an even number of stacks
 
-  size_t vertexCount = (stacks * slices - 2) * 2 + 2 * (slices + 1); // For the triangle strips and the poles 
+  // For the triangle strips and the poles
+  size_t verticesPerStack = 4+slices*2;
+  size_t verticesPerPole = slices + 2;
+  size_t vertexCount = (stacks-2) * verticesPerStack + 2 * verticesPerPole;
 
   sp->northPoleIdx = 0;
-  sp->northPoleCount = slices + 1;
+  sp->northPoleCount = verticesPerPole;
   sp->southPoleIdx = sp->northPoleCount;
-  sp->southPoleCount = slices + 1;
+  sp->southPoleCount = verticesPerPole;
   sp->sliceCount = slices;
   sp->stackCount = stacks;
-
+  sp->stripIdx = sp->southPoleIdx + sp->southPoleCount;
   sp->vertices = calloc(vertexCount*3, sizeof(GLfloat));
   sp->normals = calloc(vertexCount*3, sizeof(GLfloat));
+  sp->texCoords = calloc(vertexCount*2, sizeof(GLfloat));
+
+  double radsPerSlice = 2.0*M_PI / slices;
+  double radsPerStack = M_PI / stacks;
+
+  //x = r * sin lat cos lon
+  //y = r * sin lat sin lon
+  //z = r * cos lat
+
+  // Create the poles (triangle fans)
+  sp->vertices[0] = 0.0;
+  sp->vertices[1] = 0.0;
+  sp->vertices[2] = radius;
+  sp->normals[0] = 0.0;
+  sp->normals[1] = 0.0;
+  sp->normals[2] = 1.0;
+
+  for (int i = 1 ; i < verticesPerPole ; ++i) {
+    double x = radius * sin((double)(stacks/2-1)*radsPerStack) * cos((double)i * radsPerSlice);
+    double y = radius * sin((double)(stacks/2-1)*radsPerStack) * sin((double)i * radsPerSlice);
+    double z = radius * cos((double)(stacks/2-1)*radsPerStack);
+    sp->vertices[i*3+0] = x;
+    sp->vertices[i*3+1] = y;
+    sp->vertices[i*3+2] = z;
+    sp->normals[i*3+0] = x/radius;
+    sp->normals[i*3+1] = y/radius;
+    sp->normals[i*3+2] = z/radius;
+  }
+
+  // Make second pole, opposite of first one... we may need to reverse the vertices?
+  for (int i = 0 ; i < verticesPerPole ; ++i) {
+    sp->vertices[sp->stripIdx*3+0] = -sp->vertices[i+0];
+    sp->vertices[sp->stripIdx*3+1] = -sp->vertices[i+1];
+    sp->vertices[sp->stripIdx*3+2] = -sp->vertices[i+2];
+    sp->normals[sp->stripIdx*3+0] = -sp->normals[i+0];
+    sp->normals[sp->stripIdx*3+1] = -sp->normals[i+1];
+    sp->normals[sp->stripIdx*3+2] = -sp->normals[i+2];
+  }
+
+  // Now create all the triangle strips needed
+  for (int i = 0 ; i < stacks/2 ; ++i) {
+//    double x0 = radius * sin((double)i*radsPerStack) * cos((double)j * radsPerSlice);
+//    double y0 = radius * sin((double)i*radsPerStack) * sin((double)j * radsPerSlice);
+//    double z0 = radius * cos((double)i*radsPerStack);
+
+//    double x1 = radius * sin((double)i*radsPerStack) * cos((double)j * radsPerSlice);
+//    double y1 = radius * sin((double)i*radsPerStack) * sin((double)j * radsPerSlice);
+//    double z1 = radius * cos((double)i*radsPerStack);
+
+    for (int j = 0 ; i < slices ; ++j) {
+      double x0 = radius * sin((double)i*radsPerStack) * cos((double)j * radsPerSlice);
+      double y0 = radius * sin((double)i*radsPerStack) * sin((double)j * radsPerSlice);
+      double z0 = radius * cos((double)i*radsPerStack);
+
+      double x1 = radius * sin((double)i*radsPerStack) * cos((double)j * radsPerSlice);
+      double y1 = radius * sin((double)i*radsPerStack) * sin((double)j * radsPerSlice);
+      double z1 = radius * cos((double)i*radsPerStack);
+    }
+  }
 
   return sgNewDrawable((SGdrawable*)sp, name, (SGdrawfunc) sgDrawSphere);
 }
@@ -288,12 +367,12 @@ sgDrawSphere2(SGsphere *sp)
   for (int i = 0 ; i < sp->stackCount - 2 ; ++ i) {
     glVertexPointer(3, GL_FLOAT, 0, &sp->vertices[sp->stripIdx + i * sp->sliceCount * 2]);
     glNormalPointer(GL_FLOAT, 0, &sp->normals[sp->southPoleIdx]);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, sp->sliceCount * 2);    
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, sp->sliceCount * 2);
   }
 
-  glDisableClientState(GL_VERTEX_ARRAY);  
+  glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
-  
+
 }
 
 SGmaterial*
@@ -307,6 +386,8 @@ sgSphereGetMaterial(SGsphere *sphere)
 void
 sgDrawEllipsis(SGellipsis *el)
 {
+  SG_CHECK_ERROR;
+
   // Rest may be needed later...
   //glDisable (GL_BLEND);
   //glDisable (GL_DITHER);
@@ -335,6 +416,8 @@ sgDrawEllipsis(SGellipsis *el)
   glColor3f(1.0-el->colour[0], 1.0-el->colour[1], 1.0-el->colour[2]);
   glVertex3f(el->verts[0], el->verts[1], el->verts[2]);
   glEnd();
+
+  SG_CHECK_ERROR;
 }
 
 SGdrawable*
@@ -344,6 +427,8 @@ sgNewEllipsis(const char *name,
               float r, float g, float b,
               size_t vertCount)
 {
+  SG_CHECK_ERROR;
+
   SGellipsis *el = malloc(sizeof(SGellipsis) + vertCount * 3 * sizeof(float));
   el->semiMajor = semiMajor;
   el->semiMinor = semiMinor;
@@ -387,6 +472,8 @@ sgNewEllipsis(const char *name,
 void
 sgDrawCylinder(SGcylinder *cyl)
 {
+  SG_CHECK_ERROR;
+
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
@@ -394,6 +481,7 @@ sgDrawCylinder(SGcylinder *cyl)
   gluCylinder(cyl->quadratic,
               cyl->bottonRadius, cyl->topRadius, cyl->height,
               4, 2);
+  SG_CHECK_ERROR;
 }
 
 SGdrawable*
@@ -416,16 +504,22 @@ sgNewCylinder(const char *name,
 static void
 setMaterial(material_t *mat)
 {
+  SG_CHECK_ERROR;
+
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat->ambient);
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
   glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat->emission);
   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess);
+
+  SG_CHECK_ERROR;
 }
 
 void
 drawModel(model_object_t *model)
 {
+  SG_CHECK_ERROR;
+
   glColor3f(1.0, 1.0, 1.0);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
@@ -487,21 +581,28 @@ drawModel(model_object_t *model)
   }
 
   glPopMatrix();
+  SG_CHECK_ERROR;
 }
 
 void
 sgDrawModel(SGmodel *model)
 {
+  SG_CHECK_ERROR;
+
   glEnable(GL_LIGHTING);
   drawModel(model->modelData->objs.elems[0]);
+
+  SG_CHECK_ERROR;
 }
 
 SGdrawable*
 sgLoadModel(const char *file)
 {
-  SGmodel *model = malloc(sizeof(SGmodel));
-  model->modelData = model_load(file);
+  char *path = ooResGetPath(file);
 
+  SGmodel *model = malloc(sizeof(SGmodel));
+  model->modelData = model_load(path);
+  free(path);
   if (model->modelData == NULL) {
     ooLogError("loading model '%s', returned NULL model data", file);
     free(model);
@@ -544,13 +645,20 @@ sgDrawableLiberate(SGdrawable *drawable)
 void
 sgPaintDrawable(SGdrawable *drawable)
 {
+  SG_CHECK_ERROR;
+
   glPushMatrix();
   glTranslatef(drawable->p.x, drawable->p.y, drawable->p.z);
   glMultMatrixf(drawable->R);
+
+  SG_CHECK_ERROR;
   drawable->draw(drawable);
+  SG_CHECK_ERROR;
+
   LIST_FOREACH(SGdrawable, child, drawable->children, siblings) {
     sgPaintDrawable(child);
   }
 
   glPopMatrix();
+  SG_CHECK_ERROR;
 }
