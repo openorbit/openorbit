@@ -36,13 +36,7 @@ struct OOconf
 };
 
 
-static OOconf gConfSingleton;
-
-void
-ooConfInit(void)
-{
-  gConfSingleton.doc = NULL;
-}
+static OOconf gConfSingleton = {.doc = NULL};
 
 void
 ooConfLoad(const char *name)
@@ -51,7 +45,7 @@ ooConfLoad(const char *name)
   if (!doc) {
     ooLogError("could not load config file '%s'", name);
   }
-  
+
   gConfSingleton.doc = doc;
 }
 
@@ -121,7 +115,7 @@ ooConfGetStrDef(const char *key, const char **val, const char *defVal)
   if (obj && obj->val.typ == HRMLStr) {
     *val = hrmlGetStr(obj);
   } else {
-    *val = defVal;    
+    *val = defVal;
   }
 
   return 0;

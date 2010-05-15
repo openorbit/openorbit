@@ -27,8 +27,15 @@
 #include "log.h"
 
 static FILE *sLogFile;
-static OOloglev sLogLev;
+static OOloglev sLogLev = OOLog_Info;
 static char* sLogNames[] = {"trace", "info", "warning", "error", "fatal", "abort"};
+
+static void __attribute__((constructor))
+logInit(void)
+{
+  sLogFile = stderr;
+  sLogLev = OOLog_Info;
+}
 
 OOloglev ooLogGetLevFromStr(const char *str)
 {

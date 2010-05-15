@@ -47,6 +47,7 @@
 #include "io-manager.h"
 #include "plugin-handler.h"
 #include "sim.h"
+#include "sim/spacecraft-control.h"
 #include "rendering/render.h"
 #include "rendering/camera.h"
 #include "rendering/sky.h"
@@ -57,7 +58,6 @@
 #include "SDL.h"
 //#include "SDL_ttf.h"
 
-//extern settings_t SETTINGS;
 /* Simulator SDL events */
 #define SIM_STEP_EVENT 0 // Make physics step
 #define SIM_DEBUG_EVENT 1
@@ -182,7 +182,6 @@ main(int argc, char*argv[])
 {
   ooLogInit(stderr);
 
-  ooConfInit();
   ooConfLoad(ooResGetConfPath());
 
   // Set log level, need to do that here

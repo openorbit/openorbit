@@ -30,15 +30,14 @@ extern "C" {
  *  most information abour the current game instance's more technical data,
  *  with the notable exception of the IO configuraton that is handled by a
  *  special IO subsystem.
- * 
+ *
  *  \bug The information is stored in a global hashtable, and these
  *      functions are not yet threadsafe.
- * 
+ *
  *  NOTE: In the Python API, this system is called config.
  */
 typedef struct OOconf OOconf;
 
-void ooConfInit(void);
 void ooConfLoad(const char *name);
 
 int ooConfGetBoolDef(const char *key, bool *val, bool defVal);
@@ -48,7 +47,7 @@ int ooConfGetFloatDef(const char *key, float *val, float defVal);
 int ooConfGetStrDef(const char *key, const char **val, const char *defVal);
 
 HRMLobject* ooConfGetNode(const char *key);
-  
+
 #ifdef __cplusplus
 }
 #endif

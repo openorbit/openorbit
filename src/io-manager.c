@@ -306,18 +306,14 @@ static int ioFilter(const SDL_Event *ev)
 }
 void ioInitKeys(void);
 
-void
-ioInit(void)
+static void __attribute__((constructor))
+ioInitBare(void)
 {
-  assert(SDL_WasInit(SDL_INIT_JOYSTICK) == SDL_INIT_JOYSTICK);
-
-  SDL_SetEventFilter(ioFilter);
-
   gIoReverseKeySymMap = hashtable_new_with_str_keys(1024);
   gIoButtonHandlers = hashtable_new_with_str_keys(2048);
   for (size_t i = 0 ; i < SDLK_LAST ; ++ i) {
     if (keysymmap[i] != NULL) {
-      hashtable_insert(gIoReverseKeySymMap, keysymmap[i], (void*)i);      
+      hashtable_insert(gIoReverseKeySymMap, keysymmap[i], (void*)i);
     }
   }
 
@@ -329,7 +325,7 @@ ioInit(void)
       gIoKeyData[i].down[j].isScript = false;
       gIoKeyData[i].down[j].cHandler = ooButtonHandlerGnd;
       gIoKeyData[i].down[j].data = NULL;
-      
+
     }
   }
 
@@ -339,14 +335,31 @@ ioInit(void)
     gIoMouseButtons.up[i].isScript = false;
     gIoMouseButtons.up[i].cHandler = ooButtonHandlerGnd;
   }
-  
+
+  // Hook up the quit handler as default to cmd / meta q, this overrides the initkeys conf
+  gIoKeyData[SDLK_q].down[OO_L_Cmd].isScript = false;
+  gIoKeyData[SDLK_q].down[OO_L_Cmd].cHandler = ioQuitHandler;
+  gIoKeyData[SDLK_q].down[OO_L_Cmd].data = NULL;
+  gIoKeyData[SDLK_q].down[OO_R_Cmd].isScript = false;
+  gIoKeyData[SDLK_q].down[OO_R_Cmd].cHandler = ioQuitHandler;
+  gIoKeyData[SDLK_q].down[OO_R_Cmd].data = NULL;
+
+}
+
+void
+ioInit(void)
+{
+  assert(SDL_WasInit(SDL_INIT_JOYSTICK) == SDL_INIT_JOYSTICK);
+
+  SDL_SetEventFilter(ioFilter);
+
   // Now initialize joysticks
   ioInitJoysticks();
-  
+
   // Init key data
   ioInitKeys();
 
-  
+
   // Hook up the quit handler as default to cmd / meta q, this overrides the initkeys conf
   gIoKeyData[SDLK_q].down[OO_L_Cmd].isScript = false;
   gIoKeyData[SDLK_q].down[OO_L_Cmd].cHandler = ioQuitHandler;
@@ -361,7 +374,7 @@ ioInitKeys(void)
 {
   HRMLobject *confObj = ooConfGetNode("openorbit/controls");
   for (HRMLobject *keyboard = confObj->children; keyboard != NULL ; keyboard = keyboard->next) {
-    if (!strcmp(keyboard->name, "keyboard")) {      
+    if (!strcmp(keyboard->name, "keyboard")) {
 
       for (HRMLobject *keyInfo = keyboard->children; keyInfo != NULL;
            keyInfo = keyInfo->next)
@@ -454,7 +467,7 @@ void
 ioDispatchButtonDown(int dev, int button)
 {
   if (gJoyButtons.joy[dev]->down[button].isScript) {
-    
+
   } else {
     gJoyButtons.joy[dev]->down[button].cHandler(true, gJoyButtons.joy[dev]->down[button].data);
   }
@@ -464,7 +477,7 @@ void
 ioDispatchButtonUp(int dev, int button)
 {
   if (gJoyButtons.joy[dev]->up[button].isScript) {
-    
+
   } else {
     gJoyButtons.joy[dev]->up[button].cHandler(false, gJoyButtons.joy[dev]->up[button].data);
   }
@@ -560,10 +573,10 @@ void
 ooAxisEmulation(bool buttonDown, void *data)
 {
   assert(data != NULL);
-  
+
   IOaxisemudata *ad = data;
   OOaxishandler *handler = hashtable_lookup(gIoAxisHandlers, ad->axisKey);
-  
+
   if (handler) {
     if (buttonDown) {
       handler->buttonDown = true;
@@ -604,7 +617,7 @@ ioInitJoysticks(void)
       gJoyButtons.joy[i]->up[j].data = NULL;
     }
   }
-  
+
   for (HRMLobject *jstick = confObj->children; jstick != NULL ; jstick = jstick->next) {
     if (!strcmp(jstick->name, "joystick")) {
       HRMLvalue name = hrmlGetAttrForName(jstick, "name");
@@ -669,12 +682,12 @@ ooIoGetJoystickId(const char *name, int subId)
 {
   assert(name != NULL);
   assert(0 <= subId);
-  
+
   int joyCount = SDL_NumJoysticks();
   for (int i = 0 ; i < joyCount ; ++ i) {
     const char *joyName = SDL_JoystickName(i);
     if (!strcmp(joyName, name)) {
-      if (subId == 0) {        
+      if (subId == 0) {
         return i;
       } else {
         subId --;
@@ -690,12 +703,12 @@ ioBindJoystickButton(const char *key, int joyStick, int button)
   if (key == NULL) {
     return;
   }
-  
+
   OObuttonhandler *keyHandler = hashtable_lookup(gIoButtonHandlers, key);
   if (keyHandler == NULL) {
     return;
   }
-  
+
   if (joyStick >= gJoyButtons.joyCount || joyStick < 0) {
     ooLogWarn("attempted to bind '%s' to invalid joystick id '%d'", key, joyStick);
     return;
@@ -706,12 +719,12 @@ ioBindJoystickButton(const char *key, int joyStick, int button)
               key, joyStick, button);
     return;
   }
-  
+
   // TODO: We should unmap the old entry properly, not just replace it
   gJoyButtons.joy[joyStick]->down[button] = *keyHandler;
   gJoyButtons.joy[joyStick]->down[button].data = NULL;
   //gJoyButtons.joy[joyStick]->up[button] = *keyHandler;
-  
+
 }
 
 void
@@ -720,13 +733,13 @@ ioBindButtonToAxis(const char *axisKey, int joystick, int button, float val)
   assert(axisKey != NULL);
   assert(joystick >= 0);
   assert(button >= 0);
-  
+
   OOaxishandler *handler = hashtable_lookup(gIoAxisHandlers, axisKey);
 
   if (!handler) {
     handler = malloc(sizeof(OOaxishandler));
     handler->joyId = NULL;
-    
+
     handler->axisId = -1;
     handler->nullZone = 0.1;
     handler->trim = 0.0;
@@ -734,16 +747,16 @@ ioBindButtonToAxis(const char *axisKey, int joystick, int button, float val)
     handler->val = 0.0;
     hashtable_insert(gIoAxisHandlers, axisKey, handler);
   }
-  
+
   gJoyButtons.joy[joystick]->down[button].isScript = false;
   gJoyButtons.joy[joystick]->down[button].cHandler = ooAxisEmulation;
   gJoyButtons.joy[joystick]->up[button].isScript = false;
   gJoyButtons.joy[joystick]->up[button].cHandler = ooAxisEmulation;
-        
+
   IOaxisemudata *ad = malloc(sizeof(IOaxisemudata));
   ad->axisKey = strdup(axisKey);
   ad->val = val;
-  
+
   gJoyButtons.joy[joystick]->down[button].data = ad;
   gJoyButtons.joy[joystick]->up[button].data = ad;
 }
@@ -762,7 +775,7 @@ ooIoBindAxis(const char *key, int joyStick, int axis)
     handler->nullZone = 0.1;
     handler->trim = 0.0;
     handler->buttonDown = false;
-    handler->val = 0.0;    
+    handler->val = 0.0;
   } else {
     OOaxishandler *axisHandler = malloc(sizeof(OOaxishandler));
     axisHandler->joyId = SDL_JoystickOpen(joyStick);
@@ -786,32 +799,32 @@ ioBindKeyToAxis(const char *key, const char *button, float val)
     gIoKeyData[key_id].up[OO_None].cHandler = ooAxisEmulation;
     gIoKeyData[key_id].down[OO_None].isScript = false;
     gIoKeyData[key_id].down[OO_None].cHandler = ooAxisEmulation;
-    
+
     // TODO: Address memory leak when replacing handlers
     IOaxisemudata *ad = malloc(sizeof(IOaxisemudata));
     ad->axisKey = strdup(key);
     ad->val = val;
-    
+
     gIoKeyData[key_id].up[OO_None].data = ad;
     gIoKeyData[key_id].down[OO_None].data = ad;
 
   } else {
     handler = malloc(sizeof(OOaxishandler));
     handler->joyId = NULL;
-    
+
     handler->axisId = -1;
     handler->nullZone = 0.1;
     handler->trim = 0.0;
     handler->buttonDown = false;
     handler->val = 0.0;
-    
-    
-    
+
+
+
     gIoKeyData[key_id].up[OO_None].isScript = false;
     gIoKeyData[key_id].up[OO_None].cHandler = ooAxisEmulation;
     gIoKeyData[key_id].down[OO_None].isScript = false;
     gIoKeyData[key_id].down[OO_None].cHandler = ooAxisEmulation;
-    
+
     IOaxisemudata *ad = malloc(sizeof(IOaxisemudata));
     ad->axisKey = strdup(key);
     ad->val = val;
@@ -864,7 +877,7 @@ ooIoGetAxis(const char *axis)
     // presses
     return 0.0;
   }
-  
+
   int16_t axisVal = SDL_JoystickGetAxis(handler->joyId, handler->axisId);
   float normalisedAxis;
   if (axisVal >= 0) {
