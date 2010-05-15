@@ -25,6 +25,7 @@
 #include <sys/time.h>
 
 #include "sim.h"
+#include "sim/spacecraft-control.h"
 
 #include "physics/orbit.h"
 #include "rendering/planet.h"
@@ -40,6 +41,7 @@ ooSimInit(void) {
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   gSIM_state.stepSize = 1.0 / freq; // Period in s
   gSIM_state.evQueue = simNewEventQueue();
+  simScCtrlInit();
 }
 
 
@@ -59,7 +61,7 @@ ooSimSetOrbSys(PLsystem *osys)
 void
 ooSimSetOrbWorld(PLworld *world)
 {
-  gSIM_state.orbWorld = world;
+  gSIM_state.world = world;
 }
 
 
@@ -73,8 +75,7 @@ ooSimStep(float dt)
 
   sgCamStep(sgGetCam(gSIM_state.sg), dt);
 
-  plWorldClear(gSIM_state.orbWorld);
-  plWorldStep(gSIM_state.orbWorld, dt);
+  plWorldClear(gSIM_state.world);
 
   gettimeofday(&end, NULL);
 
@@ -84,10 +85,36 @@ ooSimStep(float dt)
   // Step spacecraft systems
   simScStep(gSIM_state.currentSc, dt);
   simDispatchPendingEvents(gSIM_state.evQueue);
+
+  plWorldStep(gSIM_state.world, dt);
 }
 
 void
 simSetSpacecraft(OOspacecraft *sc)
 {
   gSIM_state.currentSc = sc;
+}
+
+OOspacecraft*
+simGetSpacecraft(void)
+{
+  return gSIM_state.currentSc;
+}
+
+OOeventqueue*
+simGetEventQueue(void)
+{
+  return gSIM_state.evQueue;
+}
+
+SGscenegraph*
+simGetSg(void)
+{
+  return gSIM_state.sg;
+}
+
+PLworld*
+simGetWorld(void)
+{
+  return gSIM_state.world;
 }

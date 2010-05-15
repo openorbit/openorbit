@@ -22,8 +22,170 @@
 #include <string.h>
 #include <assert.h>
 
-#include "actuator.h"
-#include "spacecraft.h"
+#include "sim/actuator.h"
+#include "sim/spacecraft.h"
+
+
+static void
+TorquerEnable(SIMtorquer *tq)
+{
+}
+static void
+TorquerDisable(SIMtorquer *tq)
+{
+}
+static void
+TorquerStep(SIMtorquer *tq, float dt)
+{
+}
+static void
+TorquerAxisUpdate(SIMtorquer *tq, float axis)
+{
+}
+
+void
+simInitTorquer(SIMtorquer *tq, const char *name, float3 pos, float3 tMax, float3 tMin)
+{
+  tq->super.stage = NULL;
+  tq->super.name = strdup(name);
+  tq->super.state = OO_Act_Disarmed;
+  tq->super.toggleOn = (OOactuatortoggle)TorquerEnable;
+  tq->super.toggleOff = (OOactuatortoggle)TorquerDisable;
+  tq->super.step = (OOactuatorstep)TorquerStep;
+  tq->super.axisUpdate = (OOactuatorstep)TorquerAxisUpdate;
+
+  tq->pos = pos;
+  tq->tMax = tMax;
+  tq->tMin = tMin;
+}
+
+SIMtorquer*
+simNewTorquer(const char *name, float3 pos, float3 tMax, float3 tMin)
+{
+  SIMtorquer *tq = malloc(sizeof(SIMtorquer));
+  simInitTorquer(tq, name, pos, tMax, tMin);
+  return tq;
+}
+
+void
+simSetTorquerPower(SIMtorquer *tq, float v)
+{
+  assert(tq);
+  assert(-1.0f <= v && v <= 1.0f);
+
+  tq->setting = v;
+}
+
+
+
+static void
+ThrusterEnable(SIMthruster *th)
+{
+}
+static void
+ThrusterDisable(SIMthruster *th)
+{
+}
+static void
+ThrusterStep(SIMthruster *th, float dt)
+{
+  plForceRelativePos3fv(th->super.stage->sc->obj,
+                        th->fMax * th->throttle, th->pos);
+}
+static void
+ThrusterAxisUpdate(SIMtorquer *tq, float axis)
+{
+}
+
+void
+simInitThruster(SIMthruster *th, const char *name, float3 pos, float3 fMax)
+{
+  th->super.stage = NULL;
+  th->super.name = strdup(name);
+  th->super.state = OO_Act_Disarmed;
+  th->super.toggleOn = (OOactuatortoggle)ThrusterEnable;
+  th->super.toggleOff = (OOactuatortoggle)ThrusterDisable;
+  th->super.step = (OOactuatorstep)ThrusterStep;
+  th->super.axisUpdate = (OOactuatorstep)ThrusterAxisUpdate;
+
+  th->pos = pos;
+  th->fMax = fMax;
+  th->throttle = 1.0;
+}
+
+void
+simSetThrottle(SIMthruster *th, float throttle)
+{
+  assert(th);
+  assert(0.0f <= throttle && throttle <= 1.0f);
+
+  th->throttle = throttle;
+}
+
+
+SIMthruster*
+simNewThruster(const char *name, float3 pos, float3 fMax)
+{
+  SIMthruster *th = malloc(sizeof(SIMthruster));
+  simInitThruster(th, name, pos, fMax);
+  return th;
+}
+
+void
+simAddActuator(OOstage *stage, OOactuator *act)
+{
+  act->stage = stage;
+  obj_array_push(&stage->actuators, act);
+  obj_array_push(&stage->sc->actuators, act);
+}
+
+void
+simArmActuator(OOactuator *act)
+{
+  assert(act->state == OO_Act_Disarmed && "invalid state");
+  act->state = OO_Act_Armed;
+}
+
+void
+simDisarmActuator(OOactuator *act)
+{
+  assert(act->state == OO_Act_Armed && "invalid state");
+  act->state = OO_Act_Disarmed;
+}
+
+void
+simFireActuator(OOactuator *act)
+{
+  assert(act->state == OO_Act_Armed && "invalid state");
+  act->state = OO_Act_Enabled;
+}
+
+void
+simDisableActuator(OOactuator *act)
+{
+  assert(act->state == OO_Act_Enabled && "invalid state");
+  act->state = OO_Act_Armed;
+}
+
+void
+simLockActuator(OOactuator *act)
+{
+  if (act->state & SIM_ACTUATOR_ON_MASK) {
+    act->state = OO_Act_Locked_Open;
+  } else {
+    act->state = OO_Act_Locked_Closed;
+  }
+}
+
+void
+simFailActuator(OOactuator *act)
+{
+  if (act->state & SIM_ACTUATOR_ON_MASK) {
+    act->state = OO_Act_Fault_Open;
+  } else {
+    act->state = OO_Act_Fault_Closed;
+  }
+}
 
 
 static const char *actuatorNames[OO_Act_Group_Count] = {
@@ -48,112 +210,93 @@ ooGetActuatorGroupId(const char *groupName)
 }
 
 const char*
-ooGetActuatorGroupName(int groupId)
+ooGetActuatorGroupName(unsigned groupId)
 {
   assert(groupId < OO_Act_Group_Count);
   return actuatorNames[groupId];
 }
 
-
 float
-ooGetThrottleForActuatorGroup(int groupId)
+ooGetThrottleForActuatorGroup(unsigned groupId)
 {
-
+  float throttle = ooIoGetAxis(ooGetActuatorGroupName(groupId));
 }
 
 void
 ooScFireOrbital(OOspacecraft *sc)
 {
-  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Orbital];
+//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Orbital];
 
-  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-    OOactuator *act = grp->actuators.elems[i];
-    act->toggleOn(act);
-  }
+//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+//    OOactuator *act = grp->actuators.elems[i];
+//    act->toggleOn(act);
+//  }
 }
 
 void
 ooScFireVertical(OOspacecraft *sc, float dv)
 {
-  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Vertical];
-  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-    OOactuator *act = grp->actuators.elems[i];
-    act->toggleOn(act);
-  }
+//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Vertical];
+//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+//    OOactuator *act = grp->actuators.elems[i];
+//    act->toggleOn(act);
+//  }
 }
 void
 ooScFireHorizontal(OOspacecraft *sc, float dh)
 {
-  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Horisontal];
-  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-    OOactuator *act = grp->actuators.elems[i];
-    act->toggleOn(act);
-  }
+//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Horisontal];
+ // for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+ //   OOactuator *act = grp->actuators.elems[i];
+ //   act->toggleOn(act);
+ // }
 }
 
 void
 ooScFireForward(OOspacecraft *sc)
 {
-  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Forward];
-  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-    OOactuator *act = grp->actuators.elems[i];
-    act->toggleOn(act);
-  }
+//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Forward];
+//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+//    OOactuator *act = grp->actuators.elems[i];
+//    act->toggleOn(act);
+//  }
 }
 
 void
 ooScEngageYaw(OOspacecraft *sc, float dy)
 {
-  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Yaw];
-  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-    OOactuator *act = grp->actuators.elems[i];
-    act->toggleOn(act);
-  }
+//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Yaw];
+//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+//    OOactuator *act = grp->actuators.elems[i];
+//    act->toggleOn(act);
+//  }
 }
 
 void
 ooScEngagePitch(OOspacecraft *sc, float dp)
 {
-  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Pitch];
-  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-    OOactuator *act = grp->actuators.elems[i];
-    act->toggleOn(act);
-  }
+//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Pitch];
+//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+//    OOactuator *act = grp->actuators.elems[i];
+//    act->toggleOn(act);
+//  }
 }
 
 void
 ooScEngageRoll(OOspacecraft *sc, float dr)
 {
-  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Roll];
-  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-    OOactuator *act = grp->actuators.elems[i];
-    act->toggleOn(act);
-  }
-}
-
-
-OOrocket*
-ooScNewEngine(OOstage *stage,
-              const char *name,
-              float f,
-              float x, float y, float z,
-              float dx, float dy, float dz)
-{
-  OOrocket *engine = malloc(sizeof(OOrocket));
-  engine->super.stage = stage;
-  engine->super.state = OO_Act_Disabled;
-  engine->super.name = strdup(name);
-  engine->forceMag = f;
-  engine->p = vf3_set(x, y, z);
-  engine->dir = vf3_set(dx, dy, dz);
-  return engine;
+//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
+//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Roll];
+//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
+//    OOactuator *act = grp->actuators.elems[i];
+ //   act->toggleOn(act);
+//  }
 }
 
 OOactuatorgroup*
@@ -169,100 +312,5 @@ void
 ooScRegisterInGroup(OOactuatorgroup *eg, OOactuator *actuator)
 {
   obj_array_push(&eg->actuators, actuator);
-}
-
-
-void
-ooSrbStep(OOsrb *srb, float dt)
-{
-  plForceRelativePos3fv(srb->super.stage->sc->obj,
-                        srb->dir * srb->forceMag, srb->p);
-}
-
-void
-ooRocketStep(OOrocket *rocket, float dt)
-{
-  plForceRelativePos3fv(rocket->super.stage->sc->obj,
-                        rocket->dir * rocket->forceMag * rocket->throttle,
-                        rocket->p);
-}
-
-void
-ooThrusterStep(OOrocket *thruster, float dt)
-{
-  plForceRelativePos3fv(thruster->super.stage->sc->obj,
-                        thruster->dir * thruster->forceMag * thruster->throttle,
-                        thruster->p);
-}
-
-
-
-OOsrb* ooScNewSrb(OOstage *stage,
-                  const char *name,
-                  float f,
-                  float x, float y, float z,
-                  float dx, float dy, float dz)
-{
-  OOsrb *engine = malloc(sizeof(OOsrb));
-  engine->super.stage = stage;
-  engine->super.state = OO_Act_Disabled;
-  engine->super.name = strdup(name);
-  engine->forceMag = f;
-  engine->p = vf3_set(x, y, z);
-  engine->dir = vf3_set(dx, dy, dz);
-  engine->super.step = (OOactuatorstep) ooSrbStep;
-
-  engine->ps = plNewParticleSystem(name, 100);
-  plAttachParticleSystem(engine->ps, stage->obj);
-  SGdrawable *dps = sgNewParticleSystem(name, "textures/particle-alpha.png", engine->ps);
-  sgSceneAddObj(stage->sc->scene, dps);
-  return engine;
-}
-
-OOrocket* ooScNewLoxEngine(OOstage *stage,
-                           const char *name,
-                           float f,
-                           float x, float y, float z,
-                           float dx, float dy, float dz,
-                           float fuelPerNmPerS)
-{
-  OOrocket *engine = malloc(sizeof(OOrocket));
-  engine->super.stage = stage;
-  engine->super.state = OO_Act_Disabled;
-  engine->super.name = strdup(name);
-  engine->forceMag = f;
-  engine->p = vf3_set(x, y, z);
-  engine->dir = vf3_set(dx, dy, dz);
-
-  engine->super.step = (OOactuatorstep) ooRocketStep;
-
-  engine->ps = plNewParticleSystem(name, 100);
-  plAttachParticleSystem(engine->ps, stage->obj);
-  SGdrawable *dps = sgNewParticleSystem(name, "textures/particle-alpha.png", engine->ps);
-  sgSceneAddObj(stage->sc->scene, dps);
-  return engine;
-}
-
-OOrocket* ooScNewThruster(OOstage *stage,
-                          const char *name,
-                          float f,
-                          float x, float y, float z,
-                          float dx, float dy, float dz)
-{
-  OOrocket *engine = malloc(sizeof(OOrocket));
-  engine->super.stage = stage;
-  engine->super.state = OO_Act_Disabled;
-  engine->super.name = strdup(name);
-  engine->forceMag = f;
-  engine->p = vf3_set(x, y, z);
-  engine->dir = vf3_set(dx, dy, dz);
-  engine->super.step = (OOactuatorstep) ooThrusterStep;
-
-  engine->ps = plNewParticleSystem(name, 100);
-  plAttachParticleSystem(engine->ps, stage->obj);
-  SGdrawable *dps = sgNewParticleSystem(name, "textures/particle-alpha.png", engine->ps);
-  sgSceneAddObj(stage->sc->scene, dps);
-
-  return engine;
 }
 

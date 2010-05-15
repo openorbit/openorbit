@@ -36,7 +36,7 @@ typedef struct {
   float stepSize;     //!< Step size for simulation in seconds
   OOspacecraft *currentSc; //!< Current active spacecraft
   PLsystem *orbSys;   //!< Root orbit system, this will be the sun initially
-  PLworld *orbWorld;
+  PLworld *world;
   SGscenegraph *sg;   //!< Scenegraph of the world
   OOeventqueue *evQueue;
 } SIMstate;
@@ -51,6 +51,11 @@ void ooSimSetOrbWorld(PLworld *world);
 void ooSimStep(float dt);
 
 void simSetSpacecraft(OOspacecraft *sc);
+OOspacecraft* simGetSpacecraft(void);
+OOeventqueue* simGetEventQueue(void);
+SGscenegraph* simGetSg(void);
+PLworld* simGetWorld(void);
+
 #ifdef __cplusplus
 }
 #endif

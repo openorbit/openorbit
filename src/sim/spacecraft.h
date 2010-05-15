@@ -29,6 +29,8 @@
 #include "rendering/scenegraph.h"
 #include "simtypes.h"
 
+#define SCINIT __attribute__((constructor(2)))
+
 /*! Spacecraft system simulation header
 
  The spacecrafts consist of multiple stages, where several stages may be
@@ -45,9 +47,12 @@ typedef struct OOaxises {
   float yaw;
   float pitch;
   float roll;
-  float horizontal;
-  float vertical;
-  float thrust;
+
+  float leftRight;
+  float upDown;
+  float fwdBack;
+
+  float orbital;
 } OOaxises;
 
 
@@ -60,15 +65,16 @@ typedef enum OOstagestate {
 struct OOstage {
   OOspacecraft *sc;
   float3 pos;
+  float expendedMass;
   OOstagestate state;
-  int detachOrder; // How and when to detach the stage
   PLobject *obj; // Mass and inertia tensor of stage, unit is kg
   obj_array_t actuators;
   obj_array_t actuatorGroups;
+  obj_array_t payload;
 };
 
 typedef void (*OOscstepfunc)(OOspacecraft*, double dt);
-typedef void (*OOscdetatchfunc)(OOspacecraft*); // Detatch stages
+typedef void (*OOscactionfunc)(OOspacecraft*); // Detatch stages
 
 // Wing for lifting design
 typedef void (*OOwingstep)(OOwing *, const OOsimenv *env);
@@ -98,44 +104,56 @@ struct OOsimplewing {
 
  */
 
-typedef void (*OOdetatchfunc)(OOstage*);
-typedef struct OOdetatchinstr {
-  short numStages;
-  short stageIdx;
-  OOdetatchfunc detatch;
-} OOdetatchinstr;
-
-DECL_ARRAY(OOdetatchinstr,detatchprog)
-
-typedef struct OOdetatchprog {
-  int pc;
-  detatchprog_array_t instrs;
-} OOdetatchprog;
-
 struct OOspacecraft {
   PLworld *world;
-  obj_array_t stages;
-  int activeStageIdx; // index in stage vector of active stage, this point out where
-                      // detachment happens
   PLobject *obj;
 
-  OOdetatchprog detatchProg;
+  obj_array_t stages;
+  obj_array_t actuators;
+
+  bool detatchPossible;
+  int detatchSequence;
 
   OOscstepfunc prestep;
   OOscstepfunc poststep;
-  OOscdetatchfunc detatchStage;
+  OOscactionfunc detatchStage;
+
+  bool mainEngineOn;
+  OOscactionfunc toggleMainEngine;
+
+  float expendedMass;
 
   SGscene *scene;
 };
 
+typedef struct {
+  const char *name;
+  OOspacecraft *(*alloc)(void);
+  void (*dealloc)(OOspacecraft *sc);
+} SCclass;
+
+void simNewSpacecraftClass(const char *name, OOspacecraft *(*alloc)(void));
+OOspacecraft* simNewSpacecraft(const char *className);
+
+void simScInit(OOspacecraft *sc, const char *name);
+void simInitStage(OOstage *stage);
+void simAddStage(OOspacecraft *sc, OOstage *stage);
+
 OOspacecraft* ooScNew(PLworld *world, SGscene *scene, const char *name);
+void simScDetatchStage(OOspacecraft *sc);
+
+void simArmStageActuators(OOstage *stage);
+void simDisarmStageActuators(OOstage *stage);
+void simLockStageActuators(OOstage *act);
+void simDisableStageActuators(OOstage *act);
+
 
 void ooScSetStageMesh(OOstage *stage, SGdrawable *mesh);
 void ooScDetatchStage(OOspacecraft *sc);
-void ooScStep(OOspacecraft *sc, float dt);
-void ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises, float dt);
+void simScStep(OOspacecraft *sc, float dt);
+void ooScStageStep(OOstage *stage, OOaxises *axises, float dt);
 void ooScForce(OOspacecraft *sc, float rx, float ry, float rz);
-OOspacecraft* ooScGetCurrent(void);
+void ooScSetScene(OOspacecraft *spacecraft, SGscene *scene);
 
 PLobject* ooScGetPLObjForSc(OOspacecraft *sc);
 
@@ -166,8 +184,6 @@ void ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName, double longitude
 
 
 OOstage* ooScNewStage(OOspacecraft *sc, const char *name);
-void ooScStageAddActuator(OOstage *stage, OOactuator *actuator);
-
 
 OOspacecraft* ooScLoad(PLworld *world, SGscene *scene, const char *fileName);
 

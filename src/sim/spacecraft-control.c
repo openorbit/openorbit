@@ -19,10 +19,30 @@
 
 #include <stdbool.h>
 #include "io-manager.h"
+#include "sim.h"
 #include "sim/spacecraft.h"
+#include "sim/spacecraft-control.h"
 #include "log.h"
 
-void ooSimScCtrlMainEngineToggle(bool buttonUp, void *data);
+static void
+simScCtrlMainEngineToggle(bool down, void *data)
+{
+  if (down) {
+    OOspacecraft *sc = simGetSpacecraft();
+    ooLogInfo("main engine toggle");
+    simScToggleMainEngine(sc);
+  }
+}
+
+static void
+simScCtrlDetatchStage(bool down, void *data)
+{
+  if (down) {
+    OOspacecraft *sc = simGetSpacecraft();
+    ooLogInfo("detatch stage");
+    simScDetatchStage(sc);
+  }
+}
 
 void
 ooScReadAxis(OOspacecraft *sc)
@@ -43,105 +63,9 @@ ooScReadAxis(OOspacecraft *sc)
 }
 
 void
-ooSimScCtrlInit()
+simScCtrlInit(void)
 {
-  ooIoRegCKeyHandler("sc-main-engine-toggle", ooSimScCtrlMainEngineToggle);
+  ooIoRegCKeyHandler("main-engine-toggle", simScCtrlMainEngineToggle);
+  ooIoRegCKeyHandler("detatch-stage", simScCtrlDetatchStage);
 }
 
-void
-ooSimScCtrlMainEngineToggle(bool buttonUp, void *data)
-{
-  if (buttonUp) {
-    OOspacecraft *sc = ooScGetCurrent();
-    
-//    if (sc->mainEngine) {
-//      switch (sc->mainEngine->state) {
-//      case OO_Engine_Disabled:
-//        ooLogInfo("firing main engine");
-//        sc->mainEngine->state = OO_Engine_Enabled;
-//        break;
-//      case OO_Engine_Enabled:
-//        ooLogInfo("cutting main engine");
-//        sc->mainEngine->state = OO_Engine_Disabled;
-//        break;
-//      case OO_Engine_Fault:
-//        ooLogInfo("engine toggle on faulty engine");
-//        break;
-//      default:
-//        assert(0 && "invalid case");
-//      }
-//    }
-  }
-}
-
-void
-ooSimScCtrlRcsYawLeft(bool buttonUp, void *data)
-{
-  OOspacecraft *sc = ooScGetCurrent();
-
-  if (buttonUp) {
-    // zero out yaw
-  } else {
-    // apply yaw
-  }
-}
-
-void
-ooSimScCtrlRcsYawRight(bool buttonUp, void *data)
-{
-  OOspacecraft *sc = ooScGetCurrent();
-
-  if (buttonUp) {
-    // zero out yaw
-  } else {
-    // apply yaw
-  }
-}
-
-void
-ooSimScCtrlRcsPitchUp(bool buttonUp, void *data)
-{
-  OOspacecraft *sc = ooScGetCurrent();
-
-  if (buttonUp) {
-    // zero out pitch
-  } else {
-    // apply pitch
-  }
-}
-
-void
-ooSimScCtrlRcsPitchDown(bool buttonUp, void *data)
-{
-  OOspacecraft *sc = ooScGetCurrent();
-
-  if (buttonUp) {
-    // zero out pitch
-  } else {
-    // apply pitch
-  }
-}
-
-void
-ooSimScCtrlRcsRollLeft(bool buttonUp, void *data)
-{
-  OOspacecraft *sc = ooScGetCurrent();
-
-  if (buttonUp) {
-    // zero out roll
-  } else {
-    // apply roll
-  }
-}
-
-void
-ooSimScCtrlRcsRollRight(bool buttonUp, void *data)
-{
-  OOspacecraft *sc = ooScGetCurrent();
-
-  if (buttonUp) {
-    // zero out roll
-  } else {
-    // apply roll
-  }
-}

@@ -69,7 +69,7 @@ void plComputeDerived(PLobject *obj);
 
 void plDumpObject(PLobject *obj);
 
-void plDetachObject(PLobject *obj);
+void plDetatchObject(PLobject *obj);
 void plUpdateMass(PLobject *obj);
 
 void plSetDrawableForObject(PLobject *obj, SGdrawable *drawable);

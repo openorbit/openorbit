@@ -107,18 +107,23 @@ plSubObject3f(PLworld *world, PLobject *parent, const char * name, float x, floa
 void
 plDetatchObject(PLobject *obj)
 {
-  // Should a detatched object be removed from the compound object completetlly
-  // or should it be kept around for future references? At the moment, the
-  // parent of the detatched object is set to NULL in order to indcate the
-  // detachement but the object pointer is still left in the parents child array
   assert(obj != NULL);
   assert(obj->parent != NULL);
 
   obj_array_push(&obj->parent->sys->rigidObjs, obj);
   PLobject *parent = obj->parent;
+
   obj->parent = NULL;
+  for (int i = 0 ; i < parent->children.length ; ++i) {
+    if (parent->children.elems[i] == obj) {
+      obj_array_remove(&parent->children, i);
+      break;
+    }
+  }
 
   plUpdateMass(parent);
+  plComputeDerived(parent);
+  plComputeDerived(obj);
 }
 
 void
@@ -136,9 +141,9 @@ plUpdateMass(PLobject *obj)
     if (child->parent) { // Only for attached objects
       PLmass tmp = child->m;
       plMassTranslate(&tmp,
-                      -child->m.cog[0],
-                      -child->m.cog[1],
-                      -child->m.cog[2]);
+                      child->p_offset.x,
+                      child->p_offset.y,
+                      child->p_offset.z);
       plMassAdd(&obj->m, &tmp);
     }
   }
@@ -254,8 +259,11 @@ plForceRelativePos3f(PLobject *obj,
 
   float3 f = { fx, fy, fz, 0.0f };
   float3 p = { px, py, pz, 0.0f };
+
+  while (obj->parent) { p += obj->p_offset; obj = obj->parent; }
+
   float3 f_rot = mf3_v_mul(obj->R, f);
-  float3 t_rot = vf3_cross(p, f_rot);
+  float3 t_rot = mf3_v_mul(obj->R, vf3_cross(p, f));
   obj->f_ack += f_rot;
   obj->t_ack += t_rot;
 }
@@ -264,10 +272,14 @@ plForceRelativePos3f(PLobject *obj,
 void
 plForceRelativePos3fv(PLobject *obj, float3 f, float3 p)
 {
+  while (obj->parent) { p += obj->p_offset; obj = obj->parent; }
+
   float3 f_rot = mf3_v_mul(obj->R, f);
-  float3 t_rot = vf3_cross(p, f_rot);
+  float3 t_rot = mf3_v_mul(obj->R, vf3_cross(p, f));
   obj->f_ack += f_rot;
   obj->t_ack += t_rot;
+
+  plDumpObject(obj);
 }
 
 void

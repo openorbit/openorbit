@@ -121,6 +121,9 @@
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
 		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
+		EC9ECBE61195964500229A8E /* mercury.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECBE51195964500229A8E /* mercury.c */; };
+		EC9ECC271196C54800229A8E /* battery.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC261196C54800229A8E /* battery.c */; };
+		EC9ECC2A1196C7E000229A8E /* propellant-tank.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC291196C7E000229A8E /* propellant-tank.c */; };
 		ECBF1748108C566E00D3E412 /* image.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1734108C55ED00D3E412 /* image.c */; };
 		ECBF1749108C566E00D3E412 /* jpg.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1735108C55ED00D3E412 /* jpg.c */; };
 		ECBF174B108C566E00D3E412 /* pngfile.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1737108C55ED00D3E412 /* pngfile.c */; };
@@ -396,6 +399,11 @@
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
 		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
+		EC9ECBE51195964500229A8E /* mercury.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mercury.c; sourceTree = "<group>"; };
+		EC9ECC251196C54800229A8E /* battery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battery.h; sourceTree = "<group>"; };
+		EC9ECC261196C54800229A8E /* battery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battery.c; sourceTree = "<group>"; };
+		EC9ECC281196C7E000229A8E /* propellant-tank.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "propellant-tank.h"; sourceTree = "<group>"; };
+		EC9ECC291196C7E000229A8E /* propellant-tank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "propellant-tank.c"; sourceTree = "<group>"; };
 		ECA5F8B1109D8FE7004278EC /* Hrml Manual */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Hrml Manual"; sourceTree = "<group>"; };
 		ECBF1734108C55ED00D3E412 /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
 		ECBF1735108C55ED00D3E412 /* jpg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jpg.c; sourceTree = "<group>"; };
@@ -418,6 +426,7 @@
 		ECE17AB21079E043006B6A37 /* ooscript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ooscript.c; sourceTree = "<group>"; };
 		ECE6A8421167CAB400003CBD /* pubsub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pubsub.h; sourceTree = "<group>"; };
 		ECE6A8431167CAB400003CBD /* pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pubsub.c; sourceTree = "<group>"; };
+		ECF6011F118D53B600332A94 /* spacecraft-control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spacecraft-control.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -791,11 +800,13 @@
 		EC34BC4B1079EE080011B76E /* sim */ = {
 			isa = PBXGroup;
 			children = (
+				EC9ECBE21195958B00229A8E /* spacecraft */,
 				EC34BC4C1079EE080011B76E /* simevent.c */,
 				EC34BC4D1079EE080011B76E /* simevent.h */,
 				EC34BC4E1079EE080011B76E /* simtime.c */,
 				EC34BC4F1079EE080011B76E /* simtime.h */,
 				EC34BC501079EE080011B76E /* spacecraft-control.c */,
+				ECF6011F118D53B600332A94 /* spacecraft-control.h */,
 				EC34BC511079EE080011B76E /* spacecraft.c */,
 				EC34BC521079EE080011B76E /* spacecraft.h */,
 				EC3F258910905FE100E0B0C7 /* simenvironment.h */,
@@ -807,6 +818,10 @@
 				ECE6A8431167CAB400003CBD /* pubsub.c */,
 				EC239D1311843C5E00C1A5B9 /* world-loader.h */,
 				EC239D1411843C5E00C1A5B9 /* world-loader.c */,
+				EC9ECC251196C54800229A8E /* battery.h */,
+				EC9ECC261196C54800229A8E /* battery.c */,
+				EC9ECC281196C7E000229A8E /* propellant-tank.h */,
+				EC9ECC291196C7E000229A8E /* propellant-tank.c */,
 			);
 			path = sim;
 			sourceTree = "<group>";
@@ -1050,6 +1065,22 @@
 				EC7D093410EE160700D9D28E /* flightrecorder.c */,
 			);
 			path = avionics;
+			sourceTree = "<group>";
+		};
+		EC9ECBE21195958B00229A8E /* spacecraft */ = {
+			isa = PBXGroup;
+			children = (
+				EC9ECBE3119595C700229A8E /* mercury */,
+			);
+			path = spacecraft;
+			sourceTree = "<group>";
+		};
+		EC9ECBE3119595C700229A8E /* mercury */ = {
+			isa = PBXGroup;
+			children = (
+				EC9ECBE51195964500229A8E /* mercury.c */,
+			);
+			path = mercury;
 			sourceTree = "<group>";
 		};
 		ECA5F8AF109D8FB3004278EC /* docs */ = {
@@ -1486,6 +1517,9 @@
 				ECC909A41175A14B00E8D477 /* shader-manager.c in Sources */,
 				ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */,
 				EC239D1511843C5E00C1A5B9 /* world-loader.c in Sources */,
+				EC9ECBE61195964500229A8E /* mercury.c in Sources */,
+				EC9ECC271196C54800229A8E /* battery.c in Sources */,
+				EC9ECC2A1196C7E000229A8E /* propellant-tank.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

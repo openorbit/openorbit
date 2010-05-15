@@ -25,10 +25,48 @@
 #include "res-manager.h"
 #include "parsers/hrml.h"
 #include <vmath/vmath.h>
+#include <gencds/hashtable.h>
+
 #include "actuator.h"
+
+
 extern SIMstate gSIM_state;
 
-DEF_ARRAY(OOdetatchinstr,detatchprog)
+static hashtable_t *gSpacecraftClasses;
+
+static void __attribute__((constructor(1)))
+Init(void)
+{
+  gSpacecraftClasses = hashtable_new_with_str_keys(128);
+}
+
+void
+simNewSpacecraftClass(const char *name, OOspacecraft *(*alloc)(void))
+{
+  SCclass *cls = malloc(sizeof(SCclass));
+
+  cls->name = strdup(name);
+  cls->alloc = alloc;
+  cls->dealloc = NULL;
+
+  hashtable_insert(gSpacecraftClasses, name, cls);
+}
+
+OOspacecraft*
+simNewSpacecraft(const char *className)
+{
+  SCclass *cls = hashtable_lookup(gSpacecraftClasses, className);
+  if (!cls) {
+    ooLogError("no such spacecraft class '%s'", className);
+    return NULL;
+  }
+
+  OOspacecraft *sc = cls->alloc();
+  plUpdateMass(sc->obj);
+  ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
+  return sc;
+}
+
 
 void
 ooGetAxises(OOaxises *axises)
@@ -36,9 +74,10 @@ ooGetAxises(OOaxises *axises)
   axises->yaw = ooIoGetAxis("yaw");
   axises->pitch = ooIoGetAxis("pitch");
   axises->roll = ooIoGetAxis("roll");
-  axises->horizontal = ooIoGetAxis("horizontal");
-  axises->vertical = ooIoGetAxis("vertical");
-  axises->thrust = ooIoGetAxis("thrust");
+  axises->upDown = ooIoGetAxis("vertical-throttle");
+  axises->leftRight = ooIoGetAxis("horizontal-throttle");
+  axises->fwdBack = ooIoGetAxis("distance-throttle");
+  axises->orbital = ooIoGetAxis("main-throttle");
 }
 
 
@@ -67,10 +106,54 @@ ooSimpleWingLift(OOsimplewing *wing, const OOsimenv *env)
   return L;
 }
 
-
-OOspacecraft* ooScGetCurrent(void)
+void
+simDefaultDetatch(OOspacecraft *sc)
 {
-  return gSIM_state.currentSc;
+
+}
+
+void
+simDefaultPrestep(OOspacecraft *sc, double dt)
+{
+
+}
+
+void
+simDefaultPoststep(OOspacecraft *sc, double dt)
+{
+
+}
+
+void
+simDefaultEngineToggle(OOspacecraft *sc)
+{
+}
+
+
+
+void
+simScInit(OOspacecraft *sc, const char *name)
+{
+  SGscenegraph *sg = simGetSg();
+  PLworld *world = simGetWorld();
+
+
+  obj_array_init(&sc->stages);
+  obj_array_init(&sc->actuators);
+
+  sc->world = world;
+  sc->prestep = simDefaultPrestep;
+  sc->poststep = simDefaultPoststep;
+  sc->detatchPossible = true;
+  sc->detatchStage = simDefaultDetatch;
+  sc->detatchSequence = 0;
+  sc->obj = plObject(world, name);
+  sc->scene = sgGetScene(sg, "main"); // Just use any of the existing ones
+  sc->expendedMass = 0.0;
+  sc->mainEngineOn = false;
+  sc->toggleMainEngine = simDefaultEngineToggle;
+  plMassSet(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  plSetSystem(world->rootSys, sc->obj);
 }
 
 // TODO: Pass on PLsystem instead of PLworld to ensure that object has valid
@@ -79,23 +162,8 @@ OOspacecraft*
 ooScNew(PLworld *world, SGscene *scene, const char *name)
 {
   OOspacecraft *sc = malloc(sizeof(OOspacecraft));
-  //ooObjVecInit(&sc->stages);
-  //sc->mainEngine = NULL;
-  //sc->body = dBodyCreate(world);
-  sc->activeStageIdx = 0;
-  obj_array_init(&sc->stages);
-  sc->world = world;
-  sc->prestep = NULL;
-  sc->poststep = NULL;
-  sc->detatchStage = NULL;
 
-  sc->obj = plObject(world, name);
-  sc->scene = scene;
-  sc->detatchProg.pc = 0;
-  detatchprog_array_init(&sc->detatchProg.instrs);
-
-  plMassSet(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  plSetSystem(world->rootSys, sc->obj);
+  simScInit(sc, name);
 
   return sc;
 }
@@ -124,60 +192,70 @@ ooScNew(PLworld *world, SGscene *scene, const char *name)
 
 
 void
-ooScReevaluateMass(OOspacecraft *sc)
+simDetatchStage(OOspacecraft *sc, OOstage *stage)
 {
-  memset(&sc->obj->m, 0, sizeof(PLmass));
+  stage->state = OO_Stage_Detatched;
+  plDetatchObject(stage->obj);
+}
 
-  plMassSet(&sc->obj->m, 0.0,
-            0.0, 0.0, 0.0,
-            1.0, 1.0, 1.0,
-            0.0, 0.0, 0.0);
+void
+simScDetatchStage(OOspacecraft *sc)
+{
+  if (sc->detatchPossible) {
+    sc->detatchStage(sc);
+    sc->detatchSequence ++;
+  }
+}
 
-  for (int i = 0 ; i < sc->stages.length ; ++ i) {
-    OOstage *stage = sc->stages.elems[i];
-    if (stage->state != OO_Stage_Detatched) {
-      PLmass tmp = stage->obj->m;
-      plMassTranslate(&tmp,
-                      stage->pos[0],
-                      stage->pos[1],
-                      stage->pos[2]);
+void
+simScToggleMainEngine(OOspacecraft *sc)
+{
+  sc->toggleMainEngine(sc);
+}
 
-      plMassAdd(&sc->obj->m, &tmp);
+
+void
+simArmStageActuators(OOstage *stage)
+{
+  for (int i = 0 ; i < stage->actuators.length ; ++i) {
+    OOactuator *act = stage->actuators.elems[i];
+    if (act->state == OO_Act_Disarmed) {
+      simArmActuator(stage->actuators.elems[i]);
     }
   }
 }
 
 void
-ooScDetatch2(OOspacecraft *sc)
+simDisarmStageActuators(OOstage *stage)
 {
-  if (sc->detatchProg.pc < sc->detatchProg.instrs.length) {
-    OOdetatchinstr instr = sc->detatchProg.instrs.elems[sc->detatchProg.pc];
-
-    for (int i = 0 ; i < instr.numStages ; ++ i) {
-      instr.detatch(sc->stages.elems[instr.stageIdx+i]);
-      ((OOstage*)sc->stages.elems[instr.stageIdx+i])->state = OO_Stage_Detatched;
+  for (int i = 0 ; i < stage->actuators.length ; ++i) {
+    OOactuator *act = stage->actuators.elems[i];
+    if (act->state == OO_Act_Armed) {
+      simDisarmActuator(act);
     }
-    sc->detatchProg.pc ++;
-
-    ooScReevaluateMass(sc);
   }
 }
 
 void
-ooScDetachStage(OOspacecraft *sc)
+simDisableStageActuators(OOstage *stage)
 {
-  int order = ((OOstage*)sc->stages.elems[sc->activeStageIdx])->detachOrder;
-
-  // Move active stage index to next stage with higher detach order
-  while (sc->activeStageIdx < sc->stages.length - 1 &&
-         ((OOstage*)sc->stages.elems[sc->activeStageIdx])->detachOrder == order)
-  {
-    sc->activeStageIdx ++;
+  for (int i = 0 ; i < stage->actuators.length ; ++i) {
+    OOactuator *act = stage->actuators.elems[i];
+    if (act->state == OO_Act_Enabled) {
+      simDisableActuator(act);
+    }
   }
-//  OOstage *stage = ooObjVecPop(&sc->stages);
-  // TODO: Insert in free object vector
-//  dBodyEnable(stage->id);
 }
+void
+simLockStageActuators(OOstage *stage)
+{
+  for (int i = 0 ; i < stage->actuators.length ; ++i) {
+    OOactuator *act = stage->actuators.elems[i];
+    simLockActuator(act);
+  }
+}
+
+
 
 PLobject*
 ooScGetPLObjForSc(OOspacecraft *sc)
@@ -187,28 +265,32 @@ ooScGetPLObjForSc(OOspacecraft *sc)
 
 
 void
-ooScStep(OOspacecraft *sc, float dt)
+simScStep(OOspacecraft *sc, float dt)
 {
   assert(sc != NULL);
+
+
+  sc->expendedMass = 0.0;
 
   OOaxises axises;
   ooGetAxises(&axises);
 
-  for (size_t i = sc->activeStageIdx ; i < sc->stages.length ; ++ i) {
+  sc->prestep(sc, dt);
+
+  for (size_t i = 0 ; i < sc->stages.length ; ++ i) {
     OOstage *stage = sc->stages.elems[i];
-    if (stage->state == OO_Stage_Enabled) {
-      ooScStageStep(sc, stage, &axises, dt);
-    }
+    ooScStageStep(stage, &axises, dt);
   }
 
-  float expendedFuel = 0.0f;
-  plMassMod(&sc->obj->m, sc->obj->m.m - expendedFuel);
+  plMassMod(&sc->obj->m, sc->obj->m.m - sc->expendedMass);
+
+  sc->poststep(sc, dt);
 }
 
 void // for scripts and events
 ooScForce(OOspacecraft *sc, float rx, float ry, float rz)
 {
-//    dBodyAddRelForceAtRelPos(sc->body, rx, ry, rz, sc->);
+  plForceRelative3f(sc->obj, rx, ry, rz);
 }
 
 
@@ -236,15 +318,18 @@ ooScSyncSpacecraft(OOspacecraft *sc)
 }
 
 void
-ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises, float dt) {
-  assert(sc != NULL);
+ooScStageStep(OOstage *stage, OOaxises *axises, float dt) {
   assert(stage != NULL);
   assert(axises != NULL);
 
   // Handle for all actuators call actuator handlers
   const static char * axisKeys[] = {
-    "orbital", "vertical", "horizontal", "thrust", "pitch", "roll", "yaw"
+    "main-throttle",
+    "vertical-throttle", "horizontal-throttle", "distance-throttle",
+    "pitch", "roll", "yaw"
   };
+  stage->expendedMass = 0.0f;
+
   for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
     OOactuatorgroup *actGroup = (OOactuatorgroup*)stage->actuatorGroups.elems[i];
     double axisVal = ooIoGetAxis(axisKeys[i]);
@@ -260,22 +345,15 @@ ooScStageStep(OOspacecraft *sc, OOstage *stage, OOaxises *axises, float dt) {
   for (size_t i = 0 ; i < stage->actuators.length; ++ i) {
     OOactuator *act = stage->actuators.elems[i];
 
-    if (act->state == OO_Act_Burning ||
-        act->state == OO_Act_Fault_Open)
-    {
+    if (act->state & SIM_ACTUATOR_ON_MASK) {
+      ooLogInfo("burning actuator");
       act->step(act, dt);
     }
   }
 
-  float expendedFuel = 0.0f;
-  plMassMod(&stage->obj->m, stage->obj->m.m - expendedFuel);
+  plMassMod(&stage->obj->m, stage->obj->m.m - stage->expendedMass);
+  stage->sc->expendedMass += stage->expendedMass;
 }
-
-typedef int (*qsort_compar_t)(const void *, const void *);
-static int compar_stages(const OOstage **s0, const OOstage **s1) {
-  return (*s1)->detachOrder - (*s0)->detachOrder;
-}
-
 
 OOstage*
 ooScNewStage(OOspacecraft *sc, const char *name)
@@ -283,14 +361,16 @@ ooScNewStage(OOspacecraft *sc, const char *name)
   OOstage *stage = malloc(sizeof(OOstage));
   stage->state = OO_Stage_Idle;
   stage->sc = sc;
+  stage->expendedMass = 0.0;
   // Actuator arrays
   obj_array_init(&stage->actuators);
   obj_array_init(&stage->actuatorGroups);
+  obj_array_init(&stage->payload);
   for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
     OOactuatorgroup *actGroup = ooScNewActuatorGroup(ooGetActuatorGroupName(i));
     obj_array_push(&stage->actuatorGroups, actGroup);
   }
-  stage->detachOrder = 0;
+
   stage->obj = plSubObject3f(sc->world, sc->obj, name, 0.0, 0.0, 0.0);
 
   obj_array_push(&sc->stages, stage);
@@ -310,13 +390,6 @@ scStageSetOffset3fv(OOstage *stage, float3 p)
 {
   stage->pos = p;
   stage->obj->p_offset = p;
-}
-
-
-void
-ooScStageAddActuator(OOstage *stage, OOactuator *actuator)
-{
-  obj_array_push(&stage->actuators, actuator);
 }
 
 
@@ -384,12 +457,12 @@ loadThruster(HRMLobject *thruster, OOstage *newStage)
     }
   }
   if (pos && dir) {
-    OOrocket *engine = ooScNewThruster(newStage /*sc*/,
-                                       thrusterName.u.str,
-                                       thrust,
-                                       pos[0], pos[1], pos[2],
-                                       dir[0], dir[1], dir[2]);
-    ooScStageAddActuator(newStage, (OOactuator*)engine);
+  //  OOrocket *engine = ooScNewThruster(newStage /*sc*/,
+  //                                     thrusterName.u.str,
+  //                                     thrust,
+  //                                     pos[0], pos[1], pos[2],
+   //                                    dir[0], dir[1], dir[2]);
+  //  ooScStageAddActuator(newStage, (OOactuator*)engine);
   } else {
     fprintf(stderr, "no pos or direction of engine found\n");
   }
@@ -417,12 +490,13 @@ loadSolidRocket(HRMLobject *solidRocket, OOstage *newStage)
       }
     }
     if (pos && dir) {
-      OOsrb *engine = ooScNewSrb(newStage /*sc*/,
-                                 engineName.u.str,
-                                 thrust,
-                                 pos[0], pos[1], pos[2],
-                                 dir[0], dir[1], dir[2]);
-      ooScStageAddActuator(newStage, (OOactuator*)engine);
+    //  OOsrb *engine = ooScNewSrb(newStage /*sc*/,
+    //                             engineName.u.str,
+    //                             thrust,
+     //                            pos[0], pos[1], pos[2],
+     //                            dir[0], dir[1], dir[2]);
+     // ooScStageAddActuator(newStage, (OOactuator*)engine);
+
     } else {
       fprintf(stderr, "no pos or direction of engine found\n");
     }
@@ -451,13 +525,13 @@ loadRocket(HRMLobject *rocket, OOstage *newStage)
     }
   }
   if (pos && dir) {
-    OOrocket *engine = ooScNewLoxEngine(newStage /*sc*/,
-                                        engineName.u.str,
-                                        thrust,
-                                        pos[0], pos[1], pos[2],
-                                        dir[0], dir[1], dir[2],
-                                        0.0f);
-    ooScStageAddActuator(newStage, (OOactuator*)engine);
+  //  OOrocket *engine = ooScNewLoxEngine(newStage /*sc*/,
+  //                                      engineName.u.str,
+  //                                      thrust,
+  //                                      pos[0], pos[1], pos[2],
+  //                                      dir[0], dir[1], dir[2],
+  //                                      0.0f);
+  //  ooScStageAddActuator(newStage, (OOactuator*)engine);
   } else {
     fprintf(stderr, "no pos or direction of engine found\n");
   }
@@ -493,7 +567,7 @@ loadStage(HRMLobject *stage, OOspacecraft *sc, const char *filePath)
   OOstage *newStage = ooScNewStage(sc, stageName.u.str);
   for (HRMLobject *stageEntry = stage->children ; stageEntry != NULL; stageEntry = stageEntry->next) {
     if (!strcmp(stageEntry->name, "detach-order")) {
-      newStage->detachOrder = hrmlGetInt(stageEntry);
+//      newStage->detachOrder = hrmlGetInt(stageEntry);
     } else if (!strcmp(stageEntry->name, "mass")) {
       mass = hrmlGetReal(stageEntry);
     } else if (!strcmp(stageEntry->name, "fuel-mass")) {
@@ -577,11 +651,11 @@ ooScLoad(PLworld *world, SGscene *scene, const char *fileName)
   ooLogInfo("loaded spacecraft %s", scName.u.str);
 
   // Ensure that stage vector is sorted by detachOrder
-  qsort(&sc->stages.elems[0], sc->stages.length, sizeof(void*),
-        (qsort_compar_t)compar_stages);
+  //qsort(&sc->stages.elems[0], sc->stages.length, sizeof(void*),
+  //      (qsort_compar_t)compar_stages);
   free(path);
 
-  ooScReevaluateMass(sc);
+  plUpdateMass(sc->obj);
   return sc;
 }
 
@@ -655,4 +729,15 @@ ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName,
     velvec = vf3_s_mul(velvec, sqrtf(sc->obj->sys->orbitalBody->GM/vf3_abs(p)));
     plSetVel3fv(sc->obj, vf3_add(v, velvec));
   }
+}
+
+void
+simInitStage(OOstage *stage)
+{
+}
+
+void
+simAddStage(OOspacecraft *sc, OOstage *stage)
+{
+  obj_array_push(&sc->stages, stage);
 }
