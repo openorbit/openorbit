@@ -161,6 +161,17 @@ simFireActuator(OOactuator *act)
 }
 
 void
+simFireThrusterIfThrottle(SIMthruster *act)
+{
+  assert((act->super.state == OO_Act_Armed || act->super.state == OO_Act_Enabled)
+         && "invalid state");
+
+  if (act->throttle > 0.0) act->super.state = OO_Act_Enabled;
+  else act->super.state = OO_Act_Armed;
+}
+
+
+void
 simDisableActuator(OOactuator *act)
 {
   assert(act->state == OO_Act_Enabled && "invalid state");

@@ -129,6 +129,12 @@ simDefaultEngineToggle(OOspacecraft *sc)
 {
 }
 
+void
+simDefaultAxisUpdate(OOspacecraft *sc)
+{
+}
+
+
 
 
 void
@@ -145,6 +151,7 @@ simScInit(OOspacecraft *sc, const char *name)
   sc->prestep = simDefaultPrestep;
   sc->poststep = simDefaultPoststep;
   sc->detatchPossible = true;
+  sc->detatchComplete = true;
   sc->detatchStage = simDefaultDetatch;
   sc->detatchSequence = 0;
   sc->obj = plObject(world, name);
@@ -152,6 +159,7 @@ simScInit(OOspacecraft *sc, const char *name)
   sc->expendedMass = 0.0;
   sc->mainEngineOn = false;
   sc->toggleMainEngine = simDefaultEngineToggle;
+  sc->axisUpdate = simDefaultAxisUpdate;
   plMassSet(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   plSetSystem(world->rootSys, sc->obj);
 }
@@ -276,7 +284,7 @@ simScStep(OOspacecraft *sc, float dt)
   ooGetAxises(&axises);
 
   sc->prestep(sc, dt);
-
+  sc->axisUpdate(sc);
   for (size_t i = 0 ; i < sc->stages.length ; ++ i) {
     OOstage *stage = sc->stages.elems[i];
     ooScStageStep(stage, &axises, dt);

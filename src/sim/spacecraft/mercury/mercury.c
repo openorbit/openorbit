@@ -46,6 +46,54 @@ enum Capsule_Actuators {
   THR_YAW_1,
 };
 
+ void
+MercuryAxisUpdate(OOspacecraft *sc)
+{
+  OOaxises axises;
+  ooGetAxises(&axises);
+
+  switch (sc->detatchSequence) {
+  case MERC_REDSTONE: {
+    OOstage *redstone = sc->stages.elems[MERC_REDSTONE];
+    SIMthruster *rocketdyne = redstone->actuators.elems[THR_ROCKETDYNE];
+    simSetThrottle(rocketdyne, axises.orbital);
+    break;
+  }
+  case MERC_CAPSULE: {
+    if (!sc->detatchComplete) break;
+    OOstage *capsule = sc->stages.elems[MERC_CAPSULE];
+
+    SIMthruster *roll0 = capsule->actuators.elems[THR_ROLL_0];
+    SIMthruster *roll1 = capsule->actuators.elems[THR_ROLL_1];
+    simSetThrottle(roll0, fmax(axises.roll, 0.0));
+    simSetThrottle(roll1, fmax(-axises.roll, 0.0));
+
+    SIMthruster *pitch0 = capsule->actuators.elems[THR_PITCH_0];
+    SIMthruster *pitch1 = capsule->actuators.elems[THR_PITCH_1];
+    simSetThrottle(pitch0, fmax(axises.pitch, 0.0));
+    simSetThrottle(pitch1, fmax(-axises.pitch, 0.0));
+
+    SIMthruster *yaw0 = capsule->actuators.elems[THR_YAW_0];
+    SIMthruster *yaw1 = capsule->actuators.elems[THR_YAW_1];
+    simSetThrottle(yaw0, fmax(axises.yaw, 0.0));
+    simSetThrottle(yaw1, fmax(-axises.yaw, 0.0));
+
+    simFireThrusterIfThrottle(roll0);
+    simFireThrusterIfThrottle(roll1);
+
+    simFireThrusterIfThrottle(pitch0);
+    simFireThrusterIfThrottle(pitch1);
+
+    simFireThrusterIfThrottle(yaw0);
+    simFireThrusterIfThrottle(yaw1);
+
+    break;
+  }
+  default:
+    assert(0 && "invalid case");
+  }
+}
+
 static void
 MercuryDetatchComplete(void *data)
 {
@@ -53,6 +101,7 @@ MercuryDetatchComplete(void *data)
 
   OOspacecraft *sc = (OOspacecraft*)data;
   sc->detatchPossible = false; // Do not reenable, must be false after last stage detatched
+  sc->detatchComplete = true;
 
   OOstage *stage = sc->stages.elems[MERC_CAPSULE];
   SIMthruster *posi = stage->actuators.elems[THR_POSI];
@@ -79,6 +128,7 @@ MercuryDetatch(OOspacecraft *sc)
     simArmActuator((OOactuator*)posi);
     simFireActuator((OOactuator*)posi);
 
+    sc->detatchComplete = false;
     simEnqueueDelta_s(simGetEventQueue(), 1.0, MercuryDetatchComplete, sc);
   }
 }
@@ -175,7 +225,7 @@ MercuryNew(void)
   simScInit(sc, "Mercury");
   sc->detatchStage = MercuryDetatch;
   sc->toggleMainEngine = MainEngineToggle;
-
+  sc->axisUpdate = MercuryAxisUpdate;
   // inertia tensors are entered in the base form, assuming that the total mass = 1.0
   // for the redstone mercury rocket we assume a solid cylinder for the form
   // 1/2 mrr = 0.5 * 1.0 * 0.89 * 0.89 = 0.39605
@@ -230,8 +280,8 @@ MercuryNew(void)
   roll1 = simNewThruster("Roll 1", (float3){-0.82, 0.55, 0.00}, (float3){0.0, 0.0,108.0});
   pitch0 = simNewThruster("Pitch 0", (float3){0.00, 2.20, 0.41}, (float3){0.0, 0.0,-108.0});
   pitch1 = simNewThruster("Pitch 1", (float3){0.00, 2.20,-0.41}, (float3){0.0, 0.0,108.0});
-  yaw0 = simNewThruster("Yaw 0", (float3){0.41, 2.20, 0.00}, (float3){108.0, 0.0,-108.0});
-  yaw1 = simNewThruster("Yaw 1", (float3){-0.41, 2.20, 0.00}, (float3){-108.0, 0.0,108.0});
+  yaw0 = simNewThruster("Yaw 0", (float3){0.41, 2.20, 0.00}, (float3){-108.0, 0.0,0.0});
+  yaw1 = simNewThruster("Yaw 1", (float3){-0.41, 2.20, 0.00}, (float3){108.0, 0.0,0.0});
 
   simAddActuator(capsule, (OOactuator*)posigrade);
   simAddActuator(capsule, (OOactuator*)retro0);

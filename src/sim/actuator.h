@@ -102,6 +102,7 @@ SIMtorquer* simNewTorquer(const char *name, float3 pos, float3 tMax, float3 tMin
 void simInitThruster(SIMthruster *th, const char *name, float3 pos, float3 fMax);
 SIMthruster* simNewThruster(const char *name, float3 pos, float3 fMax);
 void simAddActuator(OOstage *stage, OOactuator *act);
+void simFireThrusterIfThrottle(SIMthruster *act);
 
 void simSetTorquerPower(SIMtorquer *tq, float v);
 void simSetThrottle(SIMthruster *th, float throttle);

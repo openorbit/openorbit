@@ -112,6 +112,7 @@ struct OOspacecraft {
   obj_array_t actuators;
 
   bool detatchPossible;
+  bool detatchComplete;
   int detatchSequence;
 
   OOscstepfunc prestep;
@@ -120,6 +121,8 @@ struct OOspacecraft {
 
   bool mainEngineOn;
   OOscactionfunc toggleMainEngine;
+
+  OOscactionfunc axisUpdate;
 
   float expendedMass;
 
