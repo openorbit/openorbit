@@ -169,7 +169,6 @@ sgCamRotate(SGcam *cam)
   case SGCam_Orbit:
     {
       SGorbitcam* ocam = (SGorbitcam*)cam;
-      float3 cogOffset = mf3_v_mul(ocam->body->R, ocam->body->m.cog);
       gluLookAt(0.0, 0.0, 0.0,
                 -ocam->r*cos(ocam->dec),
                 -ocam->r*sin(ocam->dec),
