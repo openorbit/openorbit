@@ -303,12 +303,12 @@ sgCamAxisUpdate(SGcam *cam)
   if (cam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)cam;
     // Nice thing is that these return 0.0 if they are not assigned
-    float yaw = ooIoGetAxis("yaw");
-    float pitch = ooIoGetAxis("pitch");
-    float roll = ooIoGetAxis("roll");
-    float horizontal = ooIoGetAxis("horizontal");
-    float vertical = ooIoGetAxis("vertical");
-    float thrust = ooIoGetAxis("thrust");
+    float yaw = ooIoGetAxis(NULL, "yaw");
+    float pitch = ooIoGetAxis(NULL, "pitch");
+    float roll = ooIoGetAxis(NULL, "roll");
+    float horizontal = ooIoGetAxis(NULL, "horizontal");
+    float vertical = ooIoGetAxis(NULL, "vertical");
+    float thrust = ooIoGetAxis(NULL, "thrust");
 
     float3 v = vf3_set(1.0 * horizontal,
                        1.0 * vertical,
@@ -319,9 +319,9 @@ sgCamAxisUpdate(SGcam *cam)
     fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.02f * pitch));
     fcam->dq = q_mul(fcam->dq, q_rot(0.0f,1.0f,0.0f, -0.02f * yaw));
   } else if (cam->kind == SGCam_Orbit) {
-    float yaw = ooIoGetAxis("camyaw");
-    float pitch = ooIoGetAxis("campitch");
-    float zoom = ooIoGetAxis("camzoom");
+    float yaw = ooIoGetAxis(NULL, "camyaw");
+    float pitch = ooIoGetAxis(NULL, "campitch");
+    float zoom = ooIoGetAxis(NULL, "camzoom");
     SGorbitcam *ocam = (SGorbitcam*)cam;
     ocam->dra = pitch * 0.02;
     ocam->ddec = yaw * 0.02;

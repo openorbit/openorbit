@@ -71,13 +71,13 @@ simNewSpacecraft(const char *className)
 void
 ooGetAxises(OOaxises *axises)
 {
-  axises->yaw = ooIoGetAxis("yaw");
-  axises->pitch = ooIoGetAxis("pitch");
-  axises->roll = ooIoGetAxis("roll");
-  axises->upDown = ooIoGetAxis("vertical-throttle");
-  axises->leftRight = ooIoGetAxis("horizontal-throttle");
-  axises->fwdBack = ooIoGetAxis("distance-throttle");
-  axises->orbital = ooIoGetAxis("main-throttle");
+  ooIoGetAxis(&axises->yaw, "yaw");
+  ooIoGetAxis(&axises->pitch, "pitch");
+  ooIoGetAxis(&axises->roll, "roll");
+  ooIoGetAxis(&axises->upDown, "vertical-throttle");
+  ooIoGetAxis(&axises->leftRight, "horizontal-throttle");
+  ooIoGetAxis(&axises->fwdBack, "distance-throttle");
+  ooIoGetAxis(&axises->orbital, "main-throttle");
 }
 
 
@@ -332,7 +332,7 @@ ooScStageStep(OOstage *stage, OOaxises *axises, float dt) {
 
   for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
     OOactuatorgroup *actGroup = (OOactuatorgroup*)stage->actuatorGroups.elems[i];
-    double axisVal = ooIoGetAxis(axisKeys[i]);
+    double axisVal = ooIoGetAxis(NULL, axisKeys[i]);
     for (int j = 0 ; j < actGroup->actuators.length ; ++j) {
       OOactuator *act = actGroup->actuators.elems[j];
       // TODO: Will not really work, we need more parameters if an actuator is

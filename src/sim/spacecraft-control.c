@@ -48,11 +48,11 @@ void
 ooScReadAxis(OOspacecraft *sc)
 {
   // Nice thing is that these return 0.0 if they are not assigned
-  float yaw = ooIoGetAxis("yaw");
-  float pitch = ooIoGetAxis("pitch");
-  float roll = ooIoGetAxis("roll");
-  float horizontal = ooIoGetAxis("horizontal");
-  float vertical = ooIoGetAxis("vertical");
+  float yaw = ooIoGetAxis(NULL, "yaw");
+  float pitch = ooIoGetAxis(NULL, "pitch");
+  float roll = ooIoGetAxis(NULL, "roll");
+  float horizontal = ooIoGetAxis(NULL, "horizontal");
+  float vertical = ooIoGetAxis(NULL, "vertical");
 
   ooScFireHorizontal(sc, horizontal);
   ooScFireVertical(sc, vertical);

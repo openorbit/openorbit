@@ -64,14 +64,14 @@ void ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc);
     \param keyAction Key corresponding to the registered action
     \param up 0 if the handler should fire on button down, otherwise it will fire on
         button up.
-    \param mask ored mask from the OO_IO_MOD* constants 
+    \param mask ored mask from the OO_IO_MOD* constants
 */
 void ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up,
                         uint16_t mask);
 
 
 void ooIoPrintJoystickNames(void);
-float ooIoGetAxis(const char *axis);
+float ooIoGetAxis(float *val, const char *axis);
 int ooIoGetJoystickId(const char *name, int subId);
 void ooIoBindAxis(const char *key, int joyStick, int axis);
 
@@ -80,5 +80,5 @@ void ooIoBindAxis(const char *key, int joyStick, int axis);
 #ifdef __cplusplus
 }
 #endif
-    
+
 #endif /* ! __IO_MANAGER_H */

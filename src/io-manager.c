@@ -859,36 +859,44 @@ ooIoSetNullZone(const char *key, float nz)
 
 
 float
-ooIoGetAxis(const char *axis)
+ooIoGetAxis(float *val, const char *axis)
 {
   OOaxishandler *handler
       = hashtable_lookup(gIoAxisHandlers, axis);
 
   if (!handler) {
     ooLogTrace("axis '%s' is not known", axis);
-    return 0.0;
+    if (val) *val = 0.0f;
+    return 0.0f;
   }
 
   if (handler->buttonDown) {
     // Axis is emulated with a button press
-    return handler->val;
+    if (handler->val > 2.0) {
+      ooLogError("handler value to high %f", handler->val);
+    }
+    if (val) *val = handler->val;
+    return (float)handler->val;
   } else if (handler->joyId == NULL) {
     // No actual joystick bound to the handler, axis is handled by button
     // presses
-    return 0.0;
+    if (val) *val = 0.0f;
+    return 0.0f;
   }
 
   int16_t axisVal = SDL_JoystickGetAxis(handler->joyId, handler->axisId);
   float normalisedAxis;
   if (axisVal >= 0) {
-    normalisedAxis = axisVal / 32767.0;
+    normalisedAxis = axisVal / 32767.0f;
   } else {
-    normalisedAxis = axisVal / 32768.0;
+    normalisedAxis = axisVal / 32768.0f;
   }
 
   if (fabs(normalisedAxis + handler->trim) > handler->nullZone + handler->trim) {
+    if (val) *val = normalisedAxis + handler->trim;
     return normalisedAxis + handler->trim;
   }
 
-  return 0.0;
+  if (val) *val = 0.0;
+  return 0.0f;
 }

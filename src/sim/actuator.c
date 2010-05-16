@@ -219,7 +219,7 @@ ooGetActuatorGroupName(unsigned groupId)
 float
 ooGetThrottleForActuatorGroup(unsigned groupId)
 {
-  float throttle = ooIoGetAxis(ooGetActuatorGroupName(groupId));
+  float throttle = ooIoGetAxis(NULL, ooGetActuatorGroupName(groupId));
 }
 
 void
