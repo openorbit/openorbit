@@ -116,6 +116,12 @@ simInitThruster(SIMthruster *th, const char *name, float3 pos, float3 fMax)
 void
 simSetThrottle(SIMthruster *th, float throttle)
 {
+  if (0.0f <= throttle && throttle <= 1.0f) {
+
+  } else {
+    ooLogError("throttle set to %f", throttle);
+  }
+
   assert(th);
   assert(0.0f <= throttle && throttle <= 1.0f);
 
