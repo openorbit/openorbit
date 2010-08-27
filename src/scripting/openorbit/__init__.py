@@ -1,4 +1,4 @@
-#   Copyright 2007 Mattias Holm <mattias.holm(at)openorbit.org>
+#   Copyright 2007,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
 #   This file is part of Open Orbit.
 #
@@ -16,4 +16,4 @@
 #   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 
 
-__all__ = ["config", "io", "object-manager", "environment", "res"]
+__all__ = ["config", "event"]

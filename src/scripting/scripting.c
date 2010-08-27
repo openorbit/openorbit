@@ -28,7 +28,8 @@
 
 extern void initooscript(void);
 
- 
+extern void init_config(void);
+extern void init_event(void);
 #include "scripting.h"
 
 // TODO: move to configure or something like that
@@ -37,61 +38,65 @@ extern void initooscript(void);
 void
 ooScriptingInit(void)
 {
-    
-    Py_InitializeEx(0); // note that ex(0) prevents python from stealing sighandlers
 
-    initooscript();
-    // insert app-specific python path
-    char *ooPyPath = ooResGetPath("python/");
-    if (! ooPyPath) ooLogFatal("cannot generate python path");
-    
-    const char *pyPath = Py_GetPath();
-    
-    char *newOoPyPath;
-    asprintf(&newOoPyPath, "%s" OO_PATH_SEP "%s", ooPyPath, pyPath);
-    
-    PySys_SetPath(newOoPyPath);
-    
-    free(ooPyPath);
-    free(newOoPyPath);
-    
+  Py_InitializeEx(0); // note that ex(0) prevents python from stealing sighandlers
+
+  initooscript();
+  init_config();
+  init_event();
+
+
+  // insert app-specific python path
+  char *ooPyPath = ooResGetPath("python/");
+  if (! ooPyPath) ooLogFatal("cannot generate python path");
+
+  const char *pyPath = Py_GetPath();
+
+  char *newOoPyPath;
+  asprintf(&newOoPyPath, "%s" OO_PATH_SEP "%s", ooPyPath, pyPath);
+
+  PySys_SetPath(newOoPyPath);
+
+  free(ooPyPath);
+  free(newOoPyPath);
+
 //    ooScriptingRunInit();
 }
 
 void
 ooScriptingFinalise(void)
 {
-    Py_Finalize();
+  Py_Finalize();
 }
 
 void
 ooScriptingRunInit(void)
-{    
-    ooScriptingRunFile(SCR_INIT_SCRIPT_NAME);
+{
+  ooScriptingRunFile(SCR_INIT_SCRIPT_NAME);
 }
 
 bool
 ooScriptingRunPostInit(void)
 {
-    ooScriptingRunFile(SCR_POST_INIT_SCRIPT_NAME);
+  ooScriptingRunFile(SCR_POST_INIT_SCRIPT_NAME);
 }
 
 bool
 ooScriptingRunFile(const char *fname)
 {
   FILE *fp = ooResGetFile(fname);
-  
+
   if (! fp) {
-      ooLogWarn("could not open %s", fname);
-      fprintf(stderr, "could not open %s\n", fname);
-      return false;
+    ooLogWarn("could not open %s", fname);
+    fprintf(stderr, "could not open %s\n", fname);
+    return false;
   }
   if (PyRun_SimpleFile(fp, fname)) {
-      fclose(fp);
-      ooLogFatal("execution of %s failed", fname);
-      //return false;
+    fclose(fp);
+    ooLogFatal("execution of %s failed", fname);
+    //return false;
   }
-  
+
   fclose(fp);
-  return true;  
+  return true;
 }

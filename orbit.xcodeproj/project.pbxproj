@@ -20,6 +20,7 @@
 				EC4476CD0CCC001A001C88AD /* PBXTargetDependency */,
 				EC4476CB0CCC001A001C88AD /* PBXTargetDependency */,
 				EC4476C90CCC001A001C88AD /* PBXTargetDependency */,
+				EC0FB9D211A55BB100CEF95A /* PBXTargetDependency */,
 			);
 			name = tests;
 			productName = tests;
@@ -27,6 +28,15 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		EC0FB8CA119FF1BC00CEF95A /* font in Resources */ = {isa = PBXBuildFile; fileRef = EC0FB8B1119FF1BC00CEF95A /* font */; };
+		EC0FB9BC11A55B5900CEF95A /* test-pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0FB9AF11A558E700CEF95A /* test-pubsub.c */; };
+		EC0FB9BD11A55B5F00CEF95A /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
+		EC0FB9E611A55D3200CEF95A /* hashtable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF01079EE080011B76E /* hashtable.c */; };
+		EC0FB9E711A55D5000CEF95A /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBEB1079EE080011B76E /* array.c */; };
+		EC0FBA1711A55DCB00CEF95A /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF31079EE080011B76E /* list.c */; };
+		EC0FBA7011A66E3300CEF95A /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0FBA6F11A66E3300CEF95A /* CoreFoundation.framework */; };
+		EC0FBAD811A6721B00CEF95A /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0FBAD711A6721B00CEF95A /* ApplicationServices.framework */; };
+		EC0FBAF011A70DEE00CEF95A /* collision.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0FBAEF11A70DEE00CEF95A /* collision.c */; };
 		EC13F0F611762C7900E39B89 /* shaders in Resources */ = {isa = PBXBuildFile; fileRef = EC13F0F011762C7900E39B89 /* shaders */; };
 		EC204D5410CAFA2300F0A450 /* palloc.c in Sources */ = {isa = PBXBuildFile; fileRef = EC204D5310CAFA2300F0A450 /* palloc.c */; };
 		EC239D1511843C5E00C1A5B9 /* world-loader.c in Sources */ = {isa = PBXBuildFile; fileRef = EC239D1411843C5E00C1A5B9 /* world-loader.c */; };
@@ -66,7 +76,7 @@
 		EC34BC9A1079EE080011B76E /* terrain.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC371079EE080011B76E /* terrain.c */; };
 		EC34BC9B1079EE080011B76E /* text.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC391079EE080011B76E /* text.c */; };
 		EC34BC9C1079EE080011B76E /* texture.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC3B1079EE080011B76E /* texture.c */; };
-		EC34BCA01079EE080011B76E /* __init__.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BC431079EE080011B76E /* __init__.py */; };
+		EC34BCA01079EE080011B76E /* __init__.py in Copy Scripts */ = {isa = PBXBuildFile; fileRef = EC34BC431079EE080011B76E /* __init__.py */; };
 		EC34BCA11079EE080011B76E /* scripting.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC441079EE080011B76E /* scripting.c */; };
 		EC34BCA21079EE080011B76E /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC461079EE080011B76E /* settings.c */; };
 		EC34BCA51079EE080011B76E /* simevent.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC4C1079EE080011B76E /* simevent.c */; };
@@ -110,6 +120,7 @@
 		EC4485730CCD258E001C88AD /* test-case.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485470CCD247E001C88AD /* test-case.c */; };
 		EC4485740CCD259D001C88AD /* om-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854A0CCD247E001C88AD /* om-test.c */; };
 		EC4485750CCD25AB001C88AD /* list-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854D0CCD247E001C88AD /* list-test.c */; };
+		EC47E6C211D4D34800523F78 /* event.i in Sources */ = {isa = PBXBuildFile; fileRef = EC47E6C111D4D34800523F78 /* event.i */; };
 		EC4A893910B152C9002C6513 /* actuator.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4A893810B152C9002C6513 /* actuator.c */; };
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
 		EC5F72531154E10D00FBE08B /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
@@ -135,6 +146,7 @@
 		ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
 		ECC909A41175A14B00E8D477 /* shader-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909A21175A14B00E8D477 /* shader-manager.c */; };
 		ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909AF1175A65A00E8D477 /* mapped-file.c */; };
+		ECCED4E011CFD8EB00F20D07 /* config.i in Sources */ = {isa = PBXBuildFile; fileRef = ECCED4DF11CFD8EB00F20D07 /* config.i */; };
 		ECDC29FD111498100066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC29FC111498100066AF2D /* particles.c */; };
 		ECDC2BA4111ACD900066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC2BA3111ACD900066AF2D /* particles.c */; };
 		ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
@@ -153,9 +165,28 @@
 			);
 			script = "/usr/local/bin/pyrexc \"${INPUT_FILE_PATH}\" -o \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.c\"";
 		};
+		ECCED4F211CFD9CA00F20D07 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.i";
+			fileType = pattern.proxy;
+			isEditable = 1;
+			outputFiles = (
+				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.c",
+				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.py",
+			);
+			script = "/usr/bin/swig -python -o \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.c\" \"${INPUT_FILE_PATH}\"\nmkdir -p \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/python/openorbit/\"\ncp -f \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.py\" \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/python/openorbit/\"";
+		};
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
+		EC0FB9D111A55BB100CEF95A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC0FB9B711A55B4D00CEF95A;
+			remoteInfo = t009_pubsub;
+		};
 		EC34BDCA107B2D660011B76E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
@@ -221,8 +252,30 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		EC47E6B411D4D23200523F78 /* Copy Scripts */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = python/openorbit;
+			dstSubfolderSpec = 7;
+			files = (
+				EC34BCA01079EE080011B76E /* __init__.py in Copy Scripts */,
+			);
+			name = "Copy Scripts";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		EC030D6911084749004F3AD8 /* Simulation Design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Simulation Design"; sourceTree = "<group>"; };
+		EC0FB8B1119FF1BC00CEF95A /* font */ = {isa = PBXFileReference; lastKnownFileType = folder; path = font; sourceTree = "<group>"; };
+		EC0FB9AF11A558E700CEF95A /* test-pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-pubsub.c"; sourceTree = "<group>"; };
+		EC0FB9B811A55B4D00CEF95A /* t009_pubsub */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t009_pubsub; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC0FBA4A11A563E000CEF95A /* moduleinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = moduleinit.h; sourceTree = "<group>"; };
+		EC0FBA6F11A66E3300CEF95A /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		EC0FBAD711A6721B00CEF95A /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
+		EC0FBAEE11A70DEE00CEF95A /* collision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collision.h; sourceTree = "<group>"; };
+		EC0FBAEF11A70DEE00CEF95A /* collision.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = collision.c; sourceTree = "<group>"; };
 		EC1217881125410A007DC66F /* reftypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reftypes.h; sourceTree = "<group>"; };
 		EC124713113CF6EF00A40CE1 /* areodynamics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = areodynamics.h; sourceTree = "<group>"; };
 		EC13F0F011762C7900E39B89 /* shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; path = shaders; sourceTree = "<group>"; };
@@ -374,6 +427,7 @@
 		EC44854D0CCD247E001C88AD /* list-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "list-test.c"; sourceTree = "<group>"; };
 		EC4485500CCD247E001C88AD /* test-case.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-case.c"; sourceTree = "<group>"; };
 		EC4485600CCD24C6001C88AD /* Doxyfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
+		EC47E6C111D4D34800523F78 /* event.i */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c.preprocessed; path = event.i; sourceTree = "<group>"; };
 		EC4A893710B152C9002C6513 /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuator.h; sourceTree = "<group>"; };
 		EC4A893810B152C9002C6513 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuator.c; sourceTree = "<group>"; };
 		EC4A895310B1553A002C6513 /* simtypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simtypes.h; sourceTree = "<group>"; };
@@ -418,6 +472,7 @@
 		ECC909A31175A14B00E8D477 /* shader-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "shader-manager.h"; sourceTree = "<group>"; };
 		ECC909AF1175A65A00E8D477 /* mapped-file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "mapped-file.c"; sourceTree = "<group>"; };
 		ECC909B01175A65A00E8D477 /* mapped-file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mapped-file.h"; sourceTree = "<group>"; };
+		ECCED4DF11CFD8EB00F20D07 /* config.i */ = {isa = PBXFileReference; explicitFileType = sourcecode; fileEncoding = 4; path = config.i; sourceTree = "<group>"; };
 		ECDC29FB111498100066AF2D /* particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particles.h; sourceTree = "<group>"; };
 		ECDC29FC111498100066AF2D /* particles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = particles.c; sourceTree = "<group>"; };
 		ECDC2BA2111ACD900066AF2D /* particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particles.h; sourceTree = "<group>"; };
@@ -430,6 +485,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		EC0FB9B611A55B4D00CEF95A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EC34BDBC107B2C900011B76E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -504,6 +566,8 @@
 				EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */,
 				ECBF1754108C56CF00D3E412 /* libimgload.a in Frameworks */,
 				EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */,
+				EC0FBA7011A66E3300CEF95A /* CoreFoundation.framework in Frameworks */,
+				EC0FBAD811A6721B00CEF95A /* ApplicationServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -519,6 +583,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EC0FB9AE11A558A100CEF95A /* t009_pubsub */ = {
+			isa = PBXGroup;
+			children = (
+				EC0FB9AF11A558E700CEF95A /* test-pubsub.c */,
+			);
+			path = t009_pubsub;
+			sourceTree = "<group>";
+		};
 		EC204D5D10CB097700F0A450 /* test_2.0 */ = {
 			isa = PBXGroup;
 			children = (
@@ -613,6 +685,7 @@
 				EC34BBE21079EE080011B76E /* lwcoord.h */,
 				EC204D5210CAFA2300F0A450 /* palloc.h */,
 				EC204D5310CAFA2300F0A450 /* palloc.c */,
+				EC0FBA4A11A563E000CEF95A /* moduleinit.h */,
 			);
 			path = common;
 			sourceTree = "<group>";
@@ -682,6 +755,8 @@
 				ECDC2BA2111ACD900066AF2D /* particles.h */,
 				ECDC2BA3111ACD900066AF2D /* particles.c */,
 				EC1217881125410A007DC66F /* reftypes.h */,
+				EC0FBAEE11A70DEE00CEF95A /* collision.h */,
+				EC0FBAEF11A70DEE00CEF95A /* collision.c */,
 			);
 			path = physics;
 			sourceTree = "<group>";
@@ -793,6 +868,8 @@
 			isa = PBXGroup;
 			children = (
 				EC34BC431079EE080011B76E /* __init__.py */,
+				ECCED4DF11CFD8EB00F20D07 /* config.i */,
+				EC47E6C111D4D34800523F78 /* event.i */,
 			);
 			path = openorbit;
 			sourceTree = "<group>";
@@ -845,6 +922,7 @@
 		EC34BCB11079EEA80011B76E /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
+				EC0FB8B1119FF1BC00CEF95A /* font */,
 				EC239D731184406900C1A5B9 /* script */,
 				EC34BCD21079EEF60011B76E /* spacecrafts */,
 				EC34BCBB1079EEE00011B76E /* textures */,
@@ -920,7 +998,6 @@
 		EC4476740CCBFEDB001C88AD = {
 			isa = PBXGroup;
 			children = (
-				EC88CFC010A2B8F100A11B1D /* libxml2.dylib */,
 				ECA5F8AF109D8FB3004278EC /* docs */,
 				EC34BDB1107B2C480011B76E /* lib */,
 				EC34BD2A1079EF5A0011B76E /* scripts */,
@@ -950,6 +1027,7 @@
 				EC4476DE0CCC0076001C88AD /* Open Orbit.app */,
 				EC34BDBE107B2C900011B76E /* libvmath.a */,
 				ECBF1745108C565600D3E412 /* libimgload.a */,
+				EC0FB9B811A55B4D00CEF95A /* t009_pubsub */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -957,12 +1035,15 @@
 		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EC88CFC010A2B8F100A11B1D /* libxml2.dylib */,
+				EC0FBA6F11A66E3300CEF95A /* CoreFoundation.framework */,
 				EC34BD62107B26D30011B76E /* libcheck.a */,
 				EC4FCC6210748F4B00EB6DDF /* libpng.dylib */,
 				EC4FCC6010748ECA00EB6DDF /* libjpeg.a */,
 				ECE17A871079DE71006B6A37 /* OpenGL.framework */,
 				EC89155B0CD503EC000E662E /* Python.framework */,
 				EC4476F20CCC056D001C88AD /* SDL.framework */,
+				EC0FBAD711A6721B00CEF95A /* ApplicationServices.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -979,6 +1060,7 @@
 				EC4485450CCD247E001C88AD /* t004_physics */,
 				EC4485480CCD247E001C88AD /* t005_object_manager */,
 				EC44854B0CCD247E001C88AD /* t006_list */,
+				EC0FB9AE11A558A100CEF95A /* t009_pubsub */,
 				EC44854E0CCD247E001C88AD /* template */,
 			);
 			path = tests;
@@ -1161,6 +1243,22 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		EC0FB9B711A55B4D00CEF95A /* t009_pubsub */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC0FB9D011A55B8E00CEF95A /* Build configuration list for PBXNativeTarget "t009_pubsub" */;
+			buildPhases = (
+				EC0FB9B511A55B4D00CEF95A /* Sources */,
+				EC0FB9B611A55B4D00CEF95A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = t009_pubsub;
+			productName = t009_pubsub;
+			productReference = EC0FB9B811A55B4D00CEF95A /* t009_pubsub */;
+			productType = "com.apple.product-type.tool";
+		};
 		EC34BDBD107B2C900011B76E /* vmath */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EC34BDC3107B2CDB0011B76E /* Build configuration list for PBXNativeTarget "vmath" */;
@@ -1297,8 +1395,10 @@
 				EC4476DA0CCC0076001C88AD /* Resources */,
 				EC4476DB0CCC0076001C88AD /* Sources */,
 				EC4476DC0CCC0076001C88AD /* Frameworks */,
+				EC47E6B411D4D23200523F78 /* Copy Scripts */,
 			);
 			buildRules = (
+				ECCED4F211CFD9CA00F20D07 /* PBXBuildRule */,
 				EC4485D50CCD4A19001C88AD /* PBXBuildRule */,
 			);
 			dependencies = (
@@ -1354,6 +1454,7 @@
 				EC4476AC0CCBFFD8001C88AD /* t004_physics */,
 				EC4476C00CCBFFF9001C88AD /* t005_object_manager */,
 				EC4476C50CCC0010001C88AD /* t006_list */,
+				EC0FB9B711A55B4D00CEF95A /* t009_pubsub */,
 			);
 		};
 /* End PBXProject section */
@@ -1364,18 +1465,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC13F0F611762C7900E39B89 /* shaders in Resources */,
-				EC34BCA01079EE080011B76E /* __init__.py in Resources */,
 				EC34BCBA1079EECB0011B76E /* data in Resources */,
 				EC34BCD11079EEE00011B76E /* textures in Resources */,
 				EC34BD291079EEF60011B76E /* spacecrafts in Resources */,
 				EC34BD311079EF5A0011B76E /* hip-filter.py in Resources */,
 				EC239D751184406900C1A5B9 /* script in Resources */,
+				EC0FB8CA119FF1BC00CEF95A /* font in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		EC0FB9B511A55B4D00CEF95A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC0FB9BD11A55B5F00CEF95A /* pubsub.c in Sources */,
+				EC0FB9BC11A55B5900CEF95A /* test-pubsub.c in Sources */,
+				EC0FB9E611A55D3200CEF95A /* hashtable.c in Sources */,
+				EC0FB9E711A55D5000CEF95A /* array.c in Sources */,
+				EC0FBA1711A55DCB00CEF95A /* list.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EC34BDBB107B2C900011B76E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1520,6 +1633,9 @@
 				EC9ECBE61195964500229A8E /* mercury.c in Sources */,
 				EC9ECC271196C54800229A8E /* battery.c in Sources */,
 				EC9ECC2A1196C7E000229A8E /* propellant-tank.c in Sources */,
+				EC0FBAF011A70DEE00CEF95A /* collision.c in Sources */,
+				ECCED4E011CFD8EB00F20D07 /* config.i in Sources */,
+				EC47E6C211D4D34800523F78 /* event.i in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1537,6 +1653,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		EC0FB9D211A55BB100CEF95A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC0FB9B711A55B4D00CEF95A /* t009_pubsub */;
+			targetProxy = EC0FB9D111A55BB100CEF95A /* PBXContainerItemProxy */;
+		};
 		EC34BDCB107B2D660011B76E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = EC34BDBD107B2C900011B76E /* vmath */;
@@ -1585,6 +1706,36 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		EC0FB9BA11A55B4D00CEF95A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = t009_pubsub;
+			};
+			name = Debug;
+		};
+		EC0FB9BB11A55B4D00CEF95A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = t009_pubsub;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		EC34BDBF107B2C910011B76E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2137,6 +2288,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		EC0FB9D011A55B8E00CEF95A /* Build configuration list for PBXNativeTarget "t009_pubsub" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC0FB9BA11A55B4D00CEF95A /* Debug */,
+				EC0FB9BB11A55B4D00CEF95A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		EC34BDC3107B2CDB0011B76E /* Build configuration list for PBXNativeTarget "vmath" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
