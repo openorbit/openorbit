@@ -279,6 +279,7 @@
 		EC1217881125410A007DC66F /* reftypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reftypes.h; sourceTree = "<group>"; };
 		EC124713113CF6EF00A40CE1 /* areodynamics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = areodynamics.h; sourceTree = "<group>"; };
 		EC13F0F011762C7900E39B89 /* shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; path = shaders; sourceTree = "<group>"; };
+		EC16BDEF1227A764009F4574 /* bitutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitutils.h; sourceTree = "<group>"; };
 		EC204D5210CAFA2300F0A450 /* palloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = palloc.h; sourceTree = "<group>"; };
 		EC204D5310CAFA2300F0A450 /* palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = palloc.c; sourceTree = "<group>"; };
 		EC204D5F10CB09D500F0A450 /* test-palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-palloc.c"; sourceTree = "<group>"; };
@@ -377,7 +378,6 @@
 		EC34BC521079EE080011B76E /* spacecraft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spacecraft.h; sourceTree = "<group>"; };
 		EC34BC531079EE080011B76E /* sim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sim.c; sourceTree = "<group>"; };
 		EC34BC541079EE080011B76E /* sim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sim.h; sourceTree = "<group>"; };
-		EC34BC561079EE080011B76E /* bitutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitutils.h; sourceTree = "<group>"; };
 		EC34BC581079EE080011B76E /* control.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = control.c; sourceTree = "<group>"; };
 		EC34BCB21079EECB0011B76E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 		EC34BCBB1079EEE00011B76E /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; path = textures; sourceTree = "<group>"; };
@@ -670,7 +670,6 @@
 				EC34BC4B1079EE080011B76E /* sim */,
 				EC34BC531079EE080011B76E /* sim.c */,
 				EC34BC541079EE080011B76E /* sim.h */,
-				EC34BC551079EE080011B76E /* utils */,
 				EC34BC571079EE080011B76E /* vessel */,
 			);
 			path = src;
@@ -679,6 +678,7 @@
 		EC34BBE01079EE080011B76E /* common */ = {
 			isa = PBXGroup;
 			children = (
+				EC16BDEF1227A764009F4574 /* bitutils.h */,
 				ECC909AF1175A65A00E8D477 /* mapped-file.c */,
 				ECC909B01175A65A00E8D477 /* mapped-file.h */,
 				EC34BBE11079EE080011B76E /* lwcoord.c */,
@@ -901,14 +901,6 @@
 				EC9ECC291196C7E000229A8E /* propellant-tank.c */,
 			);
 			path = sim;
-			sourceTree = "<group>";
-		};
-		EC34BC551079EE080011B76E /* utils */ = {
-			isa = PBXGroup;
-			children = (
-				EC34BC561079EE080011B76E /* bitutils.h */,
-			);
-			path = utils;
 			sourceTree = "<group>";
 		};
 		EC34BC571079EE080011B76E /* vessel */ = {

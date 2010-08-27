@@ -19,7 +19,7 @@
 
 
 #include "3ds.h"
-#include "utils/bitutils.h"
+#include "common/bitutils.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -99,7 +99,7 @@ char *readStr(int fd)
     str[i ++] = val;
   }
   str[i] = '\0';
-  
+
   return strdup(str);
 }
 
@@ -151,7 +151,7 @@ static inline int readChunkHeader(chunk_3ds_t *chnk, int fd)
 static inline void
 skipBytes(int fd, off_t bytes)
 {
-  assert(lseek(fd, bytes, SEEK_CUR) != -1);  
+  assert(lseek(fd, bytes, SEEK_CUR) != -1);
 }
 
 // Main reader
@@ -167,7 +167,7 @@ int readFaces(int fd, size_t maxBytes)
   chunk_3ds_t chnk = {0, 0};
   fprintf(stderr, "reading faces... %d\n", (int)maxBytes);
   size_t remBytes = maxBytes;
-  
+
   uint16_t nfaces = readU16(fd);
   struct {
     short vertex1, vertex2, vertex3;
@@ -180,9 +180,9 @@ int readFaces(int fd, size_t maxBytes)
     facearray[i].flags = readU16(fd);
   }
   assert(remBytes >= 2 + 2 * 4 * nfaces);
-    
+
   remBytes -= 2 + nfaces * 4 * 2;
-    
+
   while (remBytes > 0 && (readChunkHeader(&chnk, fd) == 0)) {
     switch (chnk.chunkId) {
     case SMOOTH_GROUP:
@@ -220,7 +220,7 @@ int readTriangles(int fd, size_t maxBytes)
   chunk_3ds_t chnk = {0, 0};
   fprintf(stderr, "reading triangles... %d\n", (int)maxBytes);
   size_t remBytes = maxBytes;
-  
+
   while (remBytes > 0 && (readChunkHeader(&chnk, fd) == 0)) {
     switch (chnk.chunkId) {
     case POINT_ARRAY:
@@ -258,15 +258,15 @@ int readTriangles(int fd, size_t maxBytes)
       struct {
         float x, y;
       } vertices[nverts];
-      
+
       for (int i = 0 ; i < nverts ; i ++) {
         vertices[i].x = readFloat(fd);
         vertices[i].y = readFloat(fd);
       }
       assert(chnk.chunkSize == CHUNK_HDR_SIZE + 2 + nverts * 4 * 2);
-      
+
       fprintf(stderr, "...got tex vertices\n");
-      
+
     }
       break;
     case MESH_MATRIX:
@@ -278,9 +278,9 @@ int readTriangles(int fd, size_t maxBytes)
         }
       }
       assert(chnk.chunkSize == CHUNK_HDR_SIZE + 4 * 3 * 4);
-      
+
       fprintf(stderr, "...mesh matrix\n");
-      
+
     }
     break;
     case MESH_COLOR:
@@ -304,15 +304,15 @@ int readTriangles(int fd, size_t maxBytes)
           matrix[i][j] = readFloat(fd);
         }
       }
-      
+
       float scaling = readFloat(fd);
       float plan_icon_w = readFloat(fd);
       float plan_icon_h = readFloat(fd);
       float cyl_icon_h = readFloat(fd);
       assert(chnk.chunkSize == CHUNK_HDR_SIZE + 2 + 5 * 4 + 4 * 3 * 4 + 4 * 4);
-      
+
       fprintf(stderr, "...mesh texture info\n");
-      
+
     }
       break;
     default:
@@ -327,11 +327,11 @@ int readObject(int fd, size_t maxBytes)
 {
   chunk_3ds_t chnk = {0, 0};
   size_t remBytes = maxBytes;
-  
+
   char *str = readStr(fd);
   remBytes -= (strlen(str) + 1);
   fprintf(stderr, "NAMED_OBJECT \"%s\": %d\n", str, chnk.chunkSize);
-  
+
   while (remBytes > 0 && (readChunkHeader(&chnk, fd) == 0)) {
     switch (chnk.chunkId) {
     case N_TRI_OBJECT:
@@ -383,7 +383,7 @@ readData(int fd, size_t maxBytes)
 {
   chunk_3ds_t chnk = {0, 0};
   size_t remBytes = maxBytes;
-  
+
   while (remBytes > 0 && (readChunkHeader(&chnk, fd) == 0)) {
     switch (chnk.chunkId) {
     case NAMED_OBJECT:
@@ -404,7 +404,7 @@ readData(int fd, size_t maxBytes)
     }
     remBytes -= chnk.chunkSize;
   }
-  
+
 }
 
 int
@@ -439,13 +439,13 @@ load_3ds(const char *fileName)
   if (fd == -1) {
     return -1;
   }
-  
+
   if (setjmp(m3d_err)) {
     // Error
     return -1;
   } else {
     chunk_3ds_t chnk = {0, 0};
-    
+
     if (readChunkHeader(&chnk, fd) == 0) {
       if (chnk.chunkId == M3DMAGIC) {
         readMainChunk(fd, chnk.chunkSize - CHUNK_HDR_SIZE);
@@ -454,7 +454,7 @@ load_3ds(const char *fileName)
       }
     }
   }
-  
+
   return 0;
 }
 

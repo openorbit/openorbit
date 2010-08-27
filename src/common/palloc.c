@@ -18,7 +18,7 @@
  */
 
 #include "palloc.h"
-#include "utils/bitutils.h"
+#include "common/bitutils.h"
 
 #include <stddef.h>
 #include <stdlib.h>
