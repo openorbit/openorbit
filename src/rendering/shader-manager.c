@@ -19,6 +19,7 @@
 
 #include "shader-manager.h"
 #include "common/mapped-file.h"
+#include "common/moduleinit.h"
 #include <gencds/hashtable.h>
 #include "res-manager.h"
 #include <string.h>
@@ -35,8 +36,7 @@ typedef struct SGshaderinfo {
   GLuint ident;
 } SGshaderinfo;
 
-static void __attribute__((constructor))
-sgInitShaders(void)
+INIT_PRIMARY_MODULE
 {
   shaderKeyMap = hashtable_new_with_str_keys(64);
 }
