@@ -22,6 +22,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -101,7 +102,7 @@ typedef struct pool_obj_t {
     pool_t *pool;
     struct pool_obj_t *next;
   } u;
-  uint8_t data[] __attribute__ ((aligned (8)));
+  uint8_t data[] __attribute__ ((aligned (16)));
 } pool_obj_t;
 
 pool_t*
@@ -110,13 +111,18 @@ pool_create(size_t obj_size)
   assert(obj_size <= 4096);
   assert(8 <= obj_size);
   pool_t *pool = malloc(sizeof(pool_t));
+  assert(pool);
+
   pool->obj_size = clp2_32(obj_size);
   pool->free_pointer = mmap(NULL, 8*4096, PROT_READ|PROT_WRITE, MAP_ANON|MAP_PRIVATE, 0, 0);
 
   pool_obj_t *pool_obj = pool->free_pointer;
 
-  for (int i = 0 ; i < 8*4096-1 / (sizeof (pool_obj_t) + pool->obj_size) ; i ++) {
-    pool_obj->u.next = (pool_obj_t*) (((uint8_t*)pool_obj) + sizeof(pool_obj_t) + pool->obj_size);
+  size_t end = (8*4096-1) / (sizeof (pool_obj_t) + pool->obj_size);
+  for (size_t i = 0 ; i < end ; i ++) {
+    uint8_t *ptr = (((uint8_t*)pool_obj) + sizeof(pool_obj_t) + pool->obj_size);
+    pool_obj->u.next = (pool_obj_t*) ptr;
+
     pool_obj = pool_obj->u.next;
   }
 
@@ -136,7 +142,7 @@ pool_alloc(pool_t *pool)
 
     pool_obj_t *pool_obj = pool->free_pointer;
 
-    for (int i = 0 ; i < 8*4096-1 / (sizeof (pool_obj_t) + pool->obj_size) ; i++) {
+    for (size_t i = 0 ; i < (8*4096-1) / (sizeof (pool_obj_t) + pool->obj_size) ; i++) {
       pool_obj->u.next = (pool_obj_t*) (((uint8_t*)pool_obj) + sizeof(pool_obj_t) + pool->obj_size);
       pool_obj = pool_obj->u.next;
     }
@@ -150,6 +156,10 @@ pool_alloc(pool_t *pool)
 
   pthread_mutex_unlock(&pool->lock);
 
+  if ((uintptr_t)&obj->data & 4 )
+    fprintf(stderr, "invalid pointer %p:%p\n", obj, &obj->data);
+  else
+    fprintf(stderr, "good pointer %p:%p\n", obj, &obj->data);
   return &obj->data;
 }
 
