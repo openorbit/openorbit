@@ -32,7 +32,7 @@ static inline uint64_t
 ooBigToHost64(uint64_t a)
 {
   assert(0 && "not implemented");
-  
+
   return a;
 }
 
@@ -64,5 +64,19 @@ static inline uint64_t ooBigToHost64(uint64_t a) {return a;}
 #else
 #error "Unknown endianess of target"
 #endif
+
+// Hackers Delight p48, round up to closest power of 2
+static uint32_t
+clp2_32(uint32_t x)
+{
+  x = x - 1;
+  x = x | (x >> 1);
+  x = x | (x >> 2);
+  x = x | (x >> 4);
+  x = x | (x >> 8);
+  x = x | (x >> 16);
+  return x + 1;
+}
+
 
 #endif /* end of include guard: BITUTILS_H_HBYMFJ6H */
