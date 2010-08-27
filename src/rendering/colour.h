@@ -21,12 +21,12 @@
 #define __COLOUR_H__
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 #include <stdint.h>
 
 /*!
-    @function 
+    @function
     @abstract   Returns RGB values for a black body colour temperature
     @discussion The function takes the temperature in the range [1000K, 40000K] and returns a pointer to the
 		corresponding RGB value. As an RGB value is 24b wide compared to a pointer's 32 or 64, it is advisable
@@ -34,11 +34,11 @@ extern "C" {
     @param      temp The black body colour temperature.
     @result		The address of the best matching RGB-value.
 */
-uint8_t *get_temp_colour(int temp);
+const uint8_t *get_temp_colour(int temp);
 double bv_to_temp(double bv);
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif /* !__COLOUR_H__ */

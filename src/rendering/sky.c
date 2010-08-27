@@ -73,7 +73,7 @@ ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
     double temp = bv_to_temp(bv);
     if (temp < 1000.0) temp = 1000.0;
     if (temp > 40000.0) temp = 40000.0;
-    uint8_t *tempRGB = get_temp_colour((int)temp);
+    const uint8_t *tempRGB = get_temp_colour((int)temp);
 
     stars->data[stars->n_stars].x = 100.0*vf3_x(cart);
     stars->data[stars->n_stars].y = 100.0*vf3_y(cart);

@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-uint8_t gCOLOUR_temperature_tbl[][3] = {
+static uint8_t gCOLOUR_temperature_tbl[][3] = {
 	{255, 56, 0}, // 1000K
 	{255, 71, 0},
 	{255, 83, 0},
@@ -419,28 +419,28 @@ uint16_t
 temp2ci(int temp)
 {
     int index = temp / 100 - 10;
-	
+
     return index;
 }
 
 
 double
 bv_to_temp(double bv)
-{    
+{
     double temp = 1000.0+(5000.0/(bv+0.5));
-    
+
     return temp;
 }
 
-uint8_t
+const uint8_t
 *get_temp_colour(int temp)
 {
 	if (temp < 1000 || temp > 40000) {
 		return NULL;
 	}
-	
+
 	int index = (temp-1000) / 100;
-	
+
 	return gCOLOUR_temperature_tbl[index];
 }
 
