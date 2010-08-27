@@ -180,10 +180,6 @@ main_loop(void)
 int
 main(int argc, char*argv[])
 {
-  ooLogInit(stderr);
-
-  ooConfLoad(ooResGetConfPath());
-
   // Set log level, need to do that here
   const char *levStr = NULL;
   ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");

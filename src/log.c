@@ -23,15 +23,14 @@
 #include <string.h>
 #include <stdarg.h>
 #include <sysexits.h>
-
+#include "common/moduleinit.h"
 #include "log.h"
 
 static FILE *sLogFile;
 static OOloglev sLogLev = OOLog_Info;
 static char* sLogNames[] = {"trace", "info", "warning", "error", "fatal", "abort"};
 
-static void __attribute__((constructor))
-logInit(void)
+INIT_PRIMARY_MODULE
 {
   sLogFile = stderr;
   sLogLev = OOLog_Info;
@@ -57,13 +56,6 @@ ooLogWriteV(OOloglev lev, const char *msg, va_list vaList)
     vfprintf(sLogFile, msg, vaList);
     fprintf(sLogFile, "\n");
   }
-}
-
-void
-ooLogInit(FILE *logFile)
-{
-  sLogFile = logFile;
-  sLogLev = OOLog_Info;
 }
 
 void

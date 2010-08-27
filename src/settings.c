@@ -24,11 +24,10 @@
 #include <stdbool.h>
 #include <assert.h>
 
-// TODO: Remove libconfig req
-//#include <libconfig.h>
-
+#include "res-manager.h"
 #include "parsers/hrml.h"
 #include "log.h"
+#include "common/moduleinit.h"
 
 struct OOconf
 {
@@ -48,6 +47,12 @@ ooConfLoad(const char *name)
 
   gConfSingleton.doc = doc;
 }
+
+INIT_PRIMARY_MODULE
+{
+  ooConfLoad(ooResGetConfPath());
+}
+
 
 void
 ooConfDelete()
