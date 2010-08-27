@@ -50,7 +50,8 @@ void array_compress(array_t *vec);
   typ name##_array_pop(name##_array_t *vec);                      \
   typ name##_array_get(name##_array_t *vec, size_t i);            \
   void name##_array_set(name##_array_t *vec, size_t i, typ obj);  \
-  typ name##_array_remove(name##_array_t *vec, size_t i);
+  typ name##_array_remove(name##_array_t *vec, size_t i);         \
+  void name##_array_dispose(name##_array_t *vec);
 
 
 
@@ -95,7 +96,12 @@ typ name##_array_remove(name##_array_t *vec, size_t i) {                        
     vec->length --;                                                                 \
     return tmp;                                                                     \
   }                                                                                 \
-}
+}                                                                                   \
+void name##_array_dispose(name##_array_t *vec) {                                    \
+  vec->asize = 0;                                                                   \
+  vec->length = 0;                                                                  \
+  free(vec->elems);                                                                 \
+}                                                                                   \
 
 
 
