@@ -115,6 +115,7 @@ split(PLcollisioncontext *ctxt, PLrecgrid *grid)
     if (fits(grid->children[octant], obj)) {
       plInsertObject(ctxt, grid->children[octant], obj);
       obj_array_remove(&grid->objs, i);
+      i --;
     }
   }
 }
@@ -123,7 +124,7 @@ void
 plInsertObject(PLcollisioncontext *ctxt, PLrecgrid *grid, PLobject *obj)
 {
   int octant = getoctant(&grid->centre, obj);
-  if (grid->children[octant]){
+  if (grid->children[octant] && fits(grid->children[octant], obj)){
     plInsertObject(ctxt, grid->children[octant], obj);
   } else {
     obj_array_push(&grid->objs, obj);
@@ -172,9 +173,9 @@ plCollideCoarse(PLcollisioncontext *coll,
   float3 dist = ooLwcDist(&obj_a->p, &obj_b->p);
 
   if (vf3_abs(dist) > (obj_a->radius + obj_b->radius)) {
-    ooLogWarn("collision test failed %s : %s", obj_a->name, obj_b->name);
     return false;
   }
+  ooLogWarn("collision test succeeded %s : %s", obj_a->name, obj_b->name);
 
   return true;
 }
@@ -190,6 +191,22 @@ void
 plCollideInsertObject(PLcollisioncontext *ctxt, PLobject *obj)
 {
   plInsertObject(ctxt, ctxt->otree, obj);
+}
+
+static void
+plCollidePromoteStep(PLcollisioncontext *ctxt, PLrecgrid *otree)
+{
+  for (int i = 0 ; i < 8 ; ++ i) {
+    if (otree->children[i]) plCollidePromoteStep(ctxt, otree->children[i]);
+  }
+
+  for (int i = 0 ; i < otree->objs.length ; ++i) {
+    if (!fits(otree, otree->objs.elems[i])) {
+      plInsertObject(ctxt, otree->parent, otree->objs.elems[i]);
+      obj_array_remove(&otree->objs, i);
+      i --;
+    }
+  }
 }
 
 static void
@@ -235,14 +252,15 @@ void
 plCollideStep(PLcollisioncontext *coll)
 {
   coll->colls.length = 0; // Flush collission array
+  plCollidePromoteStep(coll, coll->otree);
   plCollideTreeNode(coll, coll->otree);
 
   // Resolve computed collisions
   for (int i = 0 ; i < coll->colls.length ; i += 2) {
     PLobject *a = coll->colls.elems[i];
     PLobject *b = coll->colls.elems[i+1];
-    ooLogWarn("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
-    ooLwcDump(&a->p);ooLwcDump(&b->p);
+    //ooLogWarn("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
+    //ooLwcDump(&a->p);ooLwcDump(&b->p);
   }
 }
 
