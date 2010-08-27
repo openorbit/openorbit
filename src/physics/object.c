@@ -63,6 +63,7 @@ plInitObject(PLobject *obj)
   obj->q = q_rot(1.0, 0.0, 0.0, 0.0); // Rotation quaternion
   obj->p_offset = vf3_set(0.0, 0.0, 0.0);
 
+  obj->airPressure = 0.0;
   obj->dragCoef = 0.0;
   obj->area = 0.0;
   obj_array_init(&obj->children);
@@ -122,7 +123,6 @@ plDetatchObject(PLobject *obj)
   }
 
   plUpdateMass(parent);
-  plComputeDerived(parent);
   plComputeDerived(obj);
 }
 
@@ -138,15 +138,14 @@ plUpdateMass(PLobject *obj)
 
   for (int i = 0 ; i < obj->children.length ; ++ i) {
     PLobject *child = obj->children.elems[i];
-    if (child->parent) { // Only for attached objects
-      PLmass tmp = child->m;
-      plMassTranslate(&tmp,
-                      child->p_offset.x,
-                      child->p_offset.y,
-                      child->p_offset.z);
-      plMassAdd(&obj->m, &tmp);
-    }
+    PLmass tmp = child->m;
+    plMassTranslate(&tmp,
+                    child->p_offset.x,
+                    child->p_offset.y,
+                    child->p_offset.z);
+    plMassAdd(&obj->m, &tmp);
   }
+  plComputeDerived(obj);
 }
 
 
@@ -212,6 +211,8 @@ plSetObjectPosRel3fv(PLobject * restrict obj,
 void
 plForce3f(PLobject *obj, float x, float y, float z)
 {
+  while (obj->parent) obj = obj->parent;
+
   PL_CHECK_OBJ(obj);
 
   obj->f_ack.x += x;
@@ -223,6 +224,8 @@ plForce3f(PLobject *obj, float x, float y, float z)
 void
 plForce3fv(PLobject *obj, float3 f)
 {
+  while (obj->parent) obj = obj->parent;
+
   PL_CHECK_OBJ(obj);
 
   obj->f_ack += f;
@@ -234,6 +237,7 @@ plForce3fv(PLobject *obj, float3 f)
 void
 plForceRelative3f(PLobject *obj, float fx, float fy, float fz)
 {
+  while (obj->parent) obj = obj->parent;
   PL_CHECK_OBJ(obj);
 
   float3 f = { fx, fy, fz, 0.0f };
@@ -244,6 +248,7 @@ plForceRelative3f(PLobject *obj, float fx, float fy, float fz)
 void
 plForceRelative3fv(PLobject *obj, float3 f)
 {
+  while (obj->parent) obj = obj->parent;
   PL_CHECK_OBJ(obj);
 
   float3 f_rot = mf3_v_mul(obj->R, f);
@@ -263,7 +268,7 @@ plForceRelativePos3f(PLobject *obj,
   while (obj->parent) { p += obj->p_offset; obj = obj->parent; }
 
   float3 f_rot = mf3_v_mul(obj->R, f);
-  float3 t_rot = mf3_v_mul(obj->R, vf3_cross(p, f));
+  float3 t_rot = vf3_cross(mf3_v_mul(obj->R, p - obj->m.cog), f_rot);
   obj->f_ack += f_rot;
   obj->t_ack += t_rot;
 }
@@ -273,29 +278,34 @@ void
 plForceRelativePos3fv(PLobject *obj, float3 f, float3 p)
 {
   while (obj->parent) { p += obj->p_offset; obj = obj->parent; }
-
-  float3 f_rot = mf3_v_mul(obj->R, f);
-  float3 t_rot = mf3_v_mul(obj->R, vf3_cross(p, f));
+  float3x3 Rt;
+  mf3_transpose2(Rt, obj->R);
+  float3 f_rot = mf3_v_mul(Rt, f);
+  float3 t_rot = vf3_cross(mf3_v_mul(Rt, p - obj->m.cog), f_rot);
   obj->f_ack += f_rot;
   obj->t_ack += t_rot;
-
-  plDumpObject(obj);
 }
 
 void
 plDumpObject(PLobject *obj)
 {
   fprintf(stderr, "obj: %p\n", (void*)obj);
-  fprintf(stderr, "mass: %f [%f, %f, %f]\n", obj->m.m, obj->m.I[0][0], obj->m.I[1][1], obj->m.I[2][2]);
-  fprintf(stderr, "v: %f %f %f\n", obj->v.x, obj->v.y, obj->v.z);
-  fprintf(stderr, "f_acc: %f %f %f\n", obj->f_ack.x, obj->f_ack.y, obj->f_ack.z);
-  fprintf(stderr, "t_acc: %f %f %f\n", obj->t_ack.x, obj->t_ack.y, obj->t_ack.z);
-  fprintf(stderr, "p: "); ooLwcDump(&obj->p);
+  fprintf(stderr, "\tmass: %f [%f, %f, %f]\n", obj->m.m, obj->m.I[0][0], obj->m.I[1][1], obj->m.I[2][2]);
+  fprintf(stderr, "\tcog: [%f, %f, %f]\n", obj->m.cog.x, obj->m.cog.y, obj->m.cog.z);
+  fprintf(stderr, "\tv: %f %f %f\n", obj->v.x, obj->v.y, obj->v.z);
+  fprintf(stderr, "\tf_acc: %f %f %f\n", obj->f_ack.x, obj->f_ack.y, obj->f_ack.z);
+  fprintf(stderr, "\tt_acc: %f %f %f\n", obj->t_ack.x, obj->t_ack.y, obj->t_ack.z);
+  fprintf(stderr, "\tp: "); ooLwcDump(&obj->p);
+  fprintf(stderr, "\tp_offset: [%f %f %f]\n",
+          obj->p_offset.x, obj->p_offset.y, obj->p_offset.z);
+
 }
 
 void
 plStepObjectf(PLobject *obj, float dt)
 {
+  obj->airPressure = plComputeAirpressure(obj);
+  obj->airDensity = plComputeAirdensityWIthCurrentPressure(obj);
 
   PL_CHECK_OBJ(obj);
   float3 fm = (obj->f_ack / obj->m.m);
@@ -310,6 +320,10 @@ plStepObjectf(PLobject *obj, float dt)
   plComputeDerived(obj); // Compute derived data (world inverted inertia tensor etc)
 
   plClearObject(obj); // Clear accums
+
+  for (int i = 0 ; i < obj->children.length ; ++ i) {
+    plStepChildObjectf(obj->children.elems[i], dt);
+  }
 }
 
 void
@@ -320,9 +334,9 @@ plStepChildObjectf(PLobject *obj, float dt)
   obj->v = obj->parent->v; // Update velocity from force
   obj->p = obj->parent->p;
 
-  float3 p_offset_rot = v_q_rot(obj->p_offset, obj->parent->q);
+  float3 p_offset_rot = mf3_v_mul(obj->parent->R, obj->p_offset);
   ooLwcTranslate3fv(&obj->p, p_offset_rot); // Update position from parent
-  obj->angVel = vf3_set(0.0f, 0.0f, 0.0f);
+  obj->angVel = obj->parent->angVel;
   obj->q = obj->parent->q;
 
   plComputeDerived(obj); // Compute derived data (world inverted inertia tensor etc)

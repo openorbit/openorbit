@@ -27,7 +27,7 @@
 #include "physics/reftypes.h"
 
 #include "common/lwcoord.h"
-
+#include "rendering/reftypes.h"
 struct PLobject {
   PLsystem *sys;
   struct PLobject *parent;
@@ -48,10 +48,15 @@ struct PLobject {
   float3 f_ack; // Force accumulator
   float3 t_ack; // Torque accumulator
 
+  float radius; // For simple collission detection
+  float airPressure; // In Pa
+  float airDensity; // In kg / m^3
   float dragCoef; // Drag coefficent
-  float area; // Average area used when calculating drag
+  float area; // Average area used when calculating drag, we should actually add
+              // a callback function to calculate the area
+  float temperature; // Temperature of object in K
 
-  obj_array_t psystem;// Optionally attatched particle system
+  obj_array_t psystem;// Optionally attatched particle systems
   obj_array_t children;
 };
 

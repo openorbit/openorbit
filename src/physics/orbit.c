@@ -734,12 +734,7 @@ plWorldStep(PLworld *world, double dt)
   double t = simTimeGetJD();
 
   plSysStep(world->rootSys, dt);
-  for (size_t i = 0; i < world->objs.length ; i ++) {
-    PLobject *obj = world->objs.elems[i];
-    if (obj->parent && obj->drawable) {
-      plStepChildObjectf(obj, dt);
-    }
-  }
+
   plSysUpdateSg(world->rootSys);
 
   for (size_t i = 0; i < world->objs.length ; i ++) {
