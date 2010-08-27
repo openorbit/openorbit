@@ -18,10 +18,12 @@
  */
 
 #include "pubsub.h"
+#include "common/moduleinit.h"
 #include <gencds/array.h>
 #include <gencds/hashtable.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 #include <assert.h>
 enum type_id {
   SIM_PS_Int,
@@ -55,8 +57,7 @@ struct rec_info {
 static hashtable_t *rectypes;
 static hashtable_t *objects;
 
-static void __attribute__((constructor))
-simPubSubInit(void)
+INIT_PRIMARY_MODULE
 {
   rectypes = hashtable_new_with_str_keys(1024);
   objects = hashtable_new_with_str_keys(4096);
@@ -147,7 +148,6 @@ simPublishInt(const char *key, int *theInt)
   return (OOpubsubref)ref;
 }
 
-
 OOpubsubref
 simPublishFloat(const char *key, float *theFloat)
 {
@@ -174,11 +174,20 @@ simPublishFloat3(const char *key, float3 *vec)
 }
 
 
+void*
+simRetrieveObject(OOpubsubref ref)
+{
+  struct elem_ref *eref = ref;
+  assert(eref->typ == SIM_PS_Record && "not a record object");
+  return (void*)((OOpubsubref)eref->val);
+}
+
 
 int
 simRetrieveInt(OOpubsubref ref)
 {
   struct elem_ref *eref = ref;
+  assert(eref->typ == SIM_PS_Int && "not an integer value");
   return *(int*)((OOpubsubref)eref->val);
 }
 
@@ -187,6 +196,7 @@ float
 simRetrieveFloat(OOpubsubref ref)
 {
   struct elem_ref *eref = ref;
+  assert(eref->typ == SIM_PS_Float && "not a float value");
   return *(float*)((OOpubsubref)eref->val);
 }
 
@@ -195,6 +205,7 @@ float3
 simRetrieveFloat3(OOpubsubref ref)
 {
   struct elem_ref *eref = ref;
+  assert(eref->typ == SIM_PS_Float3 && "not a float3 vector");
   return *(float3*)((OOpubsubref)eref->val);
 }
 
@@ -206,6 +217,19 @@ simQueryValueRef(const char *key)
   return hashtable_lookup(objects, key);
 }
 
+OOpubsubref
+simCloneRef(const char *key, OOpubsubref ref)
+{
+  OOpubsubref new = hashtable_lookup(objects, key);
+  if (new) {
+    hashtable_remove(objects, key);
+  }
+  hashtable_insert(objects, key, ref);
+
+  return ref;
+}
+
+
 
 
 void
@@ -213,66 +237,45 @@ simNotifyChange(OOpubsubref ref)
 {
   struct elem_ref *eref = ref;
 
-  switch (eref->typ) {
-  case SIM_PS_Float:
-    for (int i = 0 ; i < eref->updateFuncs.length ; ++i) {
-      ((OOpubsubupdatefloat)eref->updateFuncs.elems[i])(*(float*)eref->val);
-    }
-    break;
-  case SIM_PS_Float3:
-    for (int i = 0 ; i < eref->updateFuncs.length ; ++i) {
-      ((OOpubsubupdatefloat3)eref->updateFuncs.elems[i])(*(float3*)eref->val);
-    }
-    break;
-  case SIM_PS_Int:
-    for (int i = 0 ; i < eref->updateFuncs.length ; ++i) {
-      ((OOpubsubupdateint)eref->updateFuncs.elems[i])(*(int*)eref->val);
-    }
-    break;
-  case SIM_PS_Record:
-    for (int i = 0 ; i < eref->updateFuncs.length ; ++i) {
-      ((OOpubsubupdaterecord)eref->updateFuncs.elems[i])(eref->val);
-    }
-    break;
-  default:
-    assert(0 && "invalid case");
+  for (int i = 0 ; i < eref->updateFuncs.length ; ++i) {
+    ((OOpubsubupdate)eref->updateFuncs.elems[i])(eref);
   }
 }
 
 
-
 void
-simSubscribeRecord(OOpubsubref val, OOpubsubupdaterecord f)
+simSubscribe(OOpubsubref val, OOpubsubupdate f)
 {
   struct elem_ref *eref = val;
-  assert(eref->typ == SIM_PS_Record && "value reference not a record");
   obj_array_push(&eref->updateFuncs, f);
 }
 
 
 void
-simSubscribeInt(OOpubsubref val, OOpubsubupdateint f)
+simDumpPubsubDB(void)
 {
-  struct elem_ref *eref = val;
-  assert(eref->typ == SIM_PS_Int && "value reference not an int");
-  obj_array_push(&eref->updateFuncs, f);
+  list_entry_t *le = hashtable_first(objects);
+
+  while (le) {
+    const char *key =  hashtable_entry_key(le);
+    struct elem_ref *ref = hashtable_entry_data(le);
+
+    switch (ref->typ) {
+    case SIM_PS_Int:
+      printf("%s: %d\n", key, *(int*)ref->val);
+      break;
+    case SIM_PS_Float:
+      printf("%s: %f\n", key, *(float*)ref->val);
+      break;
+    case SIM_PS_Float3: {
+      float3 data = *(float3*)ref->val;
+      printf("%s: [%f,%f,%f]\n", key, data.x, data.y, data.z);
+      break; }
+    case SIM_PS_Record:
+    default:
+      assert(0 && "not implemented");
+    }
+
+    le = list_entry_next(le);
+  }
 }
-
-
-void
-simSubscribeFloat(OOpubsubref val, OOpubsubupdatefloat f)
-{
-  struct elem_ref *eref = val;
-  assert(eref->typ == SIM_PS_Float && "value reference not a float");
-  obj_array_push(&eref->updateFuncs, f);
-}
-
-
-void
-simSubscribeFloat3(OOpubsubref val, OOpubsubupdatefloat3 f)
-{
-  struct elem_ref *eref = val;
-  assert(eref->typ == SIM_PS_Float3 && "value reference not a float3");
-  obj_array_push(&eref->updateFuncs, f);
-}
-

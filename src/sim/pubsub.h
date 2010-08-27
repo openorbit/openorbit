@@ -30,11 +30,7 @@
 typedef void* OOpubsubref;
 typedef void* OOrecordtyperef;
 
-typedef void (*OOpubsubupdatefloat)(float);
-typedef void (*OOpubsubupdateint)(int);
-typedef void (*OOpubsubupdatefloat3)(float3);
-typedef void (*OOpubsubupdaterecord)(void *);
-
+typedef void (*OOpubsubupdate)(OOpubsubref);
 
 OOrecordtyperef simRegisterRecordType(const char *key);
 
@@ -52,17 +48,34 @@ OOpubsubref simPublishInt(const char *key, int *theInt);
 OOpubsubref simPublishFloat(const char *key, float *theFloat);
 OOpubsubref simPublishFloat3(const char *key, float3 *vec);
 
+void* simRetrieveObject(OOpubsubref ref);
 int simRetrieveInt(OOpubsubref ref);
 float simRetrieveFloat(OOpubsubref ref);
 float3 simRetrieveFloat3(OOpubsubref ref);
 
 OOpubsubref simQueryValueRef(const char *key);
 
+/*
+  Notifies subscribers that the variable has changed and been committed
+ */
 void simNotifyChange(OOpubsubref val);
 
-void simSubscribeRecord(OOpubsubref val, OOpubsubupdaterecord f);
-void simSubscribeInt(OOpubsubref val, OOpubsubupdateint f);
-void simSubscribeFloat(OOpubsubref val, OOpubsubupdatefloat f);
-void simSubscribeFloat3(OOpubsubref val, OOpubsubupdatefloat3 f);
+/*
+  Installs a callback for notification when a variable has changed.
+ */
+void simSubscribe(OOpubsubref val, OOpubsubupdate f);
+
+/*
+ Aliases the ref with a new name. This can be used to implement multiplexing
+ data.
+ */
+OOpubsubref simCloneRef(const char *key, OOpubsubref ref);
+
+
+
+/*
+  Prints the contents of the pubsub database
+ */
+void simDumpPubsubDB(void);
 
 #endif /* !SIM_PUBSUB_H */
