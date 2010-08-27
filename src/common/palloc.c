@@ -1,5 +1,5 @@
 /*
- Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -18,19 +18,27 @@
  */
 
 #include "palloc.h"
+#include "utils/bitutils.h"
+
 #include <stddef.h>
 #include <stdlib.h>
-struct pool_t {
+#include <stdint.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <pthread.h>
+#include <assert.h>
+
+struct bump_pool_t {
   size_t obj_len;
   void *data_start;
   void *data_last;
   void *free_pointer;
 };
 
-pool_t*
-pinit(size_t obj_count, size_t obj_size)
+bump_pool_t*
+bump_init(size_t obj_count, size_t obj_size)
 {
-  pool_t *pool = malloc(sizeof(pool_t));
+  bump_pool_t *pool = malloc(sizeof(bump_pool_t));
 
   if (pool == NULL) {
     return NULL;
@@ -51,7 +59,7 @@ pinit(size_t obj_count, size_t obj_size)
 }
 
 void*
-palloc(pool_t *pool, size_t count)
+bump_alloc(bump_pool_t *pool, size_t count)
 {
   if (pool->free_pointer + (count-1) * pool->obj_len > pool->data_last) {
     return NULL;
@@ -64,7 +72,7 @@ palloc(pool_t *pool, size_t count)
 }
 
 void
-pfree(pool_t *pool)
+bump_free(bump_pool_t *pool)
 {
   free(pool->data_start);
 
@@ -76,7 +84,86 @@ pfree(pool_t *pool)
 }
 
 void
-pclear(pool_t *pool)
+bump_clear(bump_pool_t *pool)
 {
   pool->free_pointer = pool->data_start;
 }
+
+
+struct pool_t {
+  pthread_mutex_t lock;
+  size_t obj_size;
+  void *free_pointer;
+};
+
+typedef struct pool_obj_t {
+  union {
+    pool_t *pool;
+    struct pool_obj_t *next;
+  } u;
+  uint8_t data[] __attribute__ ((aligned (8)));
+} pool_obj_t;
+
+pool_t*
+pool_create(size_t obj_size)
+{
+  assert(obj_size <= 4096);
+  assert(8 <= obj_size);
+  pool_t *pool = malloc(sizeof(pool_t));
+  pool->obj_size = clp2_32(obj_size);
+  pool->free_pointer = mmap(NULL, 8*4096, PROT_READ|PROT_WRITE, MAP_ANON|MAP_PRIVATE, 0, 0);
+
+  pool_obj_t *pool_obj = pool->free_pointer;
+
+  for (int i = 0 ; i < 8*4096-1 / (sizeof (pool_obj_t) + pool->obj_size) ; i ++) {
+    pool_obj->u.next = (pool_obj_t*) (((uint8_t*)pool_obj) + sizeof(pool_obj_t) + pool->obj_size);
+    pool_obj = pool_obj->u.next;
+  }
+
+  pool_obj->u.next = NULL;
+
+  pthread_mutex_init(&pool->lock, NULL);
+
+  return pool;
+}
+
+void*
+pool_alloc(pool_t *pool)
+{
+  pthread_mutex_lock(&pool->lock);
+  if (pool->free_pointer == NULL) {
+    pool->free_pointer = mmap(NULL, 8*4096, PROT_READ|PROT_WRITE, MAP_ANON|MAP_PRIVATE, 0, 0);
+
+    pool_obj_t *pool_obj = pool->free_pointer;
+
+    for (int i = 0 ; i < 8*4096-1 / (sizeof (pool_obj_t) + pool->obj_size) ; i++) {
+      pool_obj->u.next = (pool_obj_t*) (((uint8_t*)pool_obj) + sizeof(pool_obj_t) + pool->obj_size);
+      pool_obj = pool_obj->u.next;
+    }
+
+    pool_obj->u.next = NULL;
+  }
+
+  pool_obj_t *obj = pool->free_pointer;
+  pool->free_pointer = obj->u.next;
+  obj->u.pool = pool;
+
+  pthread_mutex_unlock(&pool->lock);
+
+  return &obj->data;
+}
+
+void
+pool_free(void *obj)
+{
+  pool_obj_t *pool_obj = obj - offsetof(pool_obj_t, data);
+  pool_t *pool = pool_obj->u.pool;
+
+  pthread_mutex_lock(&pool->lock);
+
+  pool_obj->u.next = pool->free_pointer;
+  pool->free_pointer = pool_obj;
+
+  pthread_mutex_unlock(&pool->lock);
+}
+
