@@ -28,8 +28,9 @@
 #include "simenvironment.h"
 #include "rendering/scenegraph.h"
 #include "simtypes.h"
+#include "common/moduleinit.h"
 
-#define SCINIT __attribute__((constructor(2)))
+#define INIT_STATIC_SC_PLUGIN INIT_SECONDARY_MODULE
 
 /*! Spacecraft system simulation header
 
@@ -108,6 +109,8 @@ struct OOspacecraft {
   PLworld *world;
   PLobject *obj;
 
+  OOaxises axises;
+
   obj_array_t stages;
   obj_array_t actuators;
 
@@ -136,7 +139,7 @@ typedef struct {
 } SCclass;
 
 void simNewSpacecraftClass(const char *name, OOspacecraft *(*alloc)(void));
-OOspacecraft* simNewSpacecraft(const char *className);
+OOspacecraft* simNewSpacecraft(const char *className, const char *scName);
 
 void simScInit(OOspacecraft *sc, const char *name);
 void simInitStage(OOstage *stage);

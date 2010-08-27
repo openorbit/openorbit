@@ -18,6 +18,8 @@
 
 import ooscript
 
+from openorbit import *
+
 print "Running post init script..."
 
 def SemiMin(semiMaj, ecc):
@@ -48,7 +50,7 @@ ooscript.setOrbWorld(oworld)
 #              + (1.74e6 + 100000.0),
 #              z + 10.0,
 #              0.0, 0.0, 1.0)
-sc = ooscript.Spacecraft(oworld, sgr.getScene("main"), "mercury")
+sc = ooscript.Spacecraft(oworld, sgr.getScene("main"), "mercury", "Mercury I")
 sc.setSysAndEqCoords("Sol/Earth", 0.0, 0.0, 250.0e3)
 ooscript.setCurrentSc(sc)
 

@@ -26,7 +26,7 @@
 #include "parsers/hrml.h"
 #include <vmath/vmath.h>
 #include <gencds/hashtable.h>
-
+#include "common/moduleinit.h"
 #include "actuator.h"
 
 
@@ -34,8 +34,7 @@ extern SIMstate gSIM_state;
 
 static hashtable_t *gSpacecraftClasses;
 
-static void __attribute__((constructor(1)))
-Init(void)
+INIT_PRIMARY_MODULE
 {
   gSpacecraftClasses = hashtable_new_with_str_keys(128);
 }
@@ -53,7 +52,7 @@ simNewSpacecraftClass(const char *name, OOspacecraft *(*alloc)(void))
 }
 
 OOspacecraft*
-simNewSpacecraft(const char *className)
+simNewSpacecraft(const char *className, const char *scName)
 {
   SCclass *cls = hashtable_lookup(gSpacecraftClasses, className);
   if (!cls) {
@@ -64,6 +63,33 @@ simNewSpacecraft(const char *className)
   OOspacecraft *sc = cls->alloc();
   plUpdateMass(sc->obj);
   ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
+
+  char *yawkey, *pitchkey, *rollkey, *vertkey, *horizontalkey, *distkey,
+       *orbkey;
+  asprintf(&yawkey, "/sc/%s/axis/yaw", scName);
+  asprintf(&pitchkey, "/sc/%s/axis/pitch", scName);
+  asprintf(&rollkey, "/sc/%s/axis/roll", scName);
+  asprintf(&vertkey, "/sc/%s/axis/vertical", scName);
+  asprintf(&horizontalkey, "/sc/%s/axis/horizontal", scName);
+  asprintf(&distkey, "/sc/%s/axis/distance", scName);
+  asprintf(&orbkey, "/sc/%s/axis/orbital", scName);
+
+  simPublishFloat(yawkey, &sc->axises.yaw);
+  simPublishFloat(pitchkey, &sc->axises.pitch);
+  simPublishFloat(rollkey, &sc->axises.roll);
+  simPublishFloat(vertkey, &sc->axises.upDown);
+  simPublishFloat(horizontalkey, &sc->axises.leftRight);
+  simPublishFloat(distkey, &sc->axises.fwdBack);
+  simPublishFloat(orbkey, &sc->axises.orbital);
+
+  free(yawkey);
+  free(pitchkey);
+  free(rollkey);
+  free(vertkey);
+  free(horizontalkey);
+  free(distkey);
+  free(orbkey);
+
   return sc;
 }
 

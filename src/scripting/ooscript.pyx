@@ -71,7 +71,7 @@ cdef extern from "sim/spacecraft.h":
   void ooScSetSystemAndPos(OOspacecraft *sc, char *sysName, double x, double y, double z)
   void ooScSetSysAndCoords(OOspacecraft *sc, char *sysName, double longitude, double latitude, double altitude)
   PLobject* ooScGetPLObjForSc(OOspacecraft *sc)
-  OOspacecraft* simNewSpacecraft(char *className)
+  OOspacecraft* simNewSpacecraft(char *className, char *scName)
 
 
 cdef extern from "rendering/texture.h":
@@ -231,8 +231,8 @@ cdef class OrbitWorld:
 
 cdef class Spacecraft:
   cdef OOspacecraft *sc
-  def __init__(self, OrbitWorld world, Scene scene, scClass):
-    self.sc = simNewSpacecraft(scClass)
+  def __init__(self, OrbitWorld world, Scene scene, scClass, scName):
+    self.sc = simNewSpacecraft(scClass, scName)
     #ooScLoad(world.world, scene.sc, path)
   def setPos(self, double x, double y, double z):
     ooScSetPos(self.sc, x, y, z)
