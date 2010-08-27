@@ -53,7 +53,7 @@ struct SIMpowerbus {
   SIMpoweroverload overloadAction;
 };
 
-
+void simResetPowerbus(SIMpowerbus *pb);
 float simRequestPower(SIMpowerbus *pb, float power);
 void simProducePower(SIMpowerbus *pb, float power);
 

@@ -26,15 +26,27 @@ PowerOverloadLog(SIMpowerbus *pb)
   ooLogWarn("power overload");
 }
 
+void
+simResetPowerbus(SIMpowerbus *pb)
+{
+  pb->currentLoad = 0.0;
+  pb->currentPower = 0.0;
+}
 
 float
 simRequestPower(SIMpowerbus *pb, float power)
 {
-  return 0.0;
+  if (pb->currentLoad + power > pb->currentPower) {
+    // Overload
+    return 0.0;
+  } else {
+    pb->currentLoad += power;
+    return power;
+  }
 }
 
 void
 simProducePower(SIMpowerbus *pb, float power)
 {
-
+  pb->currentPower += power;
 }
