@@ -72,11 +72,11 @@ typedef struct _OOevent {
 
 OOeventqueue* simNewEventQueue(void);
 
-void simStackEvent(OOeventqueue *q, OOeventhandler handler, void *data);
-void simEnqueueAbsoluteEvent(OOeventqueue *q, double jd, OOeventhandler handler, void *data);
-void simEnqueueDelta_ms(OOeventqueue *q, unsigned offset, OOeventhandler handler, void *data);
-void simEnqueueDelta_s(OOeventqueue *q, double offset, OOeventhandler handler, void *data);
+void simStackEvent(OOeventhandler handler, void *data);
+void simEnqueueAbsoluteEvent(double jd, OOeventhandler handler, void *data);
+void simEnqueueDelta_ms(unsigned offset, OOeventhandler handler, void *data);
+void simEnqueueDelta_s(double offset, OOeventhandler handler, void *data);
 
-void simDispatchPendingEvents(OOeventqueue *q);
+void simDispatchPendingEvents(void);
 
 #endif /* end of include guard: SIMEVENT_H_KHYQLKNG */

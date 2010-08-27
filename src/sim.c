@@ -40,7 +40,7 @@ ooSimInit(void) {
   float freq;
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   gSIM_state.stepSize = 1.0 / freq; // Period in s
-  gSIM_state.evQueue = simNewEventQueue();
+  //gSIM_state.evQueue = simNewEventQueue();
   simScCtrlInit();
 }
 
@@ -84,7 +84,7 @@ ooSimStep(float dt)
 
   // Step spacecraft systems
   simScStep(gSIM_state.currentSc, dt);
-  simDispatchPendingEvents(gSIM_state.evQueue);
+  simDispatchPendingEvents();
 
   plWorldStep(gSIM_state.world, dt);
 }
@@ -99,12 +99,6 @@ OOspacecraft*
 simGetSpacecraft(void)
 {
   return gSIM_state.currentSc;
-}
-
-OOeventqueue*
-simGetEventQueue(void)
-{
-  return gSIM_state.evQueue;
 }
 
 SGscenegraph*

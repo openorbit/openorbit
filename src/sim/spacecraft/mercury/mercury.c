@@ -46,7 +46,7 @@ enum Capsule_Actuators {
   THR_YAW_1,
 };
 
- void
+void
 MercuryAxisUpdate(OOspacecraft *sc)
 {
   OOaxises axises;
@@ -129,7 +129,7 @@ MercuryDetatch(OOspacecraft *sc)
     simFireActuator((OOactuator*)posi);
 
     sc->detatchComplete = false;
-    simEnqueueDelta_s(simGetEventQueue(), 1.0, MercuryDetatchComplete, sc);
+    simEnqueueDelta_s(1.0, MercuryDetatchComplete, sc);
   }
 }
 
@@ -150,7 +150,7 @@ RetroFire_2(void *data)
   OOstage *capsule = sc->stages.elems[MERC_CAPSULE];
 
   simFireActuator(capsule->actuators.elems[THR_RETRO_2]);
-  simEnqueueDelta_s(simGetEventQueue(), 10.0, RetroDisable_2, sc);
+  simEnqueueDelta_s(10.0, RetroDisable_2, sc);
 }
 
 static void
@@ -170,8 +170,8 @@ RetroFire_1(void *data)
   OOstage *capsule = sc->stages.elems[MERC_CAPSULE];
 
   simFireActuator(capsule->actuators.elems[THR_RETRO_1]);
-  simEnqueueDelta_s(simGetEventQueue(), 10.0, RetroDisable_1, sc);
-  simEnqueueDelta_s(simGetEventQueue(), 5.0, RetroFire_2, sc);
+  simEnqueueDelta_s(10.0, RetroDisable_1, sc);
+  simEnqueueDelta_s(5.0, RetroFire_2, sc);
 }
 
 static void
@@ -192,8 +192,8 @@ RetroFire_0(void *data)
   OOstage *capsule = sc->stages.elems[MERC_CAPSULE];
   simFireActuator(capsule->actuators.elems[THR_RETRO_0]);
 
-  simEnqueueDelta_s(simGetEventQueue(), 10.0, RetroDisable_0, sc);
-  simEnqueueDelta_s(simGetEventQueue(), 5.0, RetroFire_1, sc);
+  simEnqueueDelta_s(10.0, RetroDisable_0, sc);
+  simEnqueueDelta_s(5.0, RetroFire_1, sc);
 }
 
 static void
@@ -297,8 +297,7 @@ MercuryNew(void)
   return sc;
 }
 
-static void SCINIT
-Init(void)
+INIT_STATIC_SC_PLUGIN
 {
   simNewSpacecraftClass("mercury", MercuryNew);
 }
