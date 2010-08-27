@@ -433,12 +433,15 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
   obj->obj.p.offs = coord->offs;
   obj->obj.p.seg = coord->seg;
   obj->obj.q = q;
-  obj->name = strdup(name);
+  obj->obj.radius = radius;
+  obj->obj.name = obj->name = strdup(name);
   obj->sys = NULL;
   obj->world = world;
   obj->lightSource = NULL;
   // TODO: Ensure quaternion is set for orbit
   //       asc * inc * obl ?
+
+  plCollideInsertObject(world->collCtxt, &obj->obj);
 
   obj->drawable = NULL;
   obj->obj.m.m = m;
@@ -485,9 +488,12 @@ plNewWorld(const char *name, SGscene *sc,
   PLworld *world = malloc(sizeof(PLworld));
 
   world->name = strdup(name);
+  world->collCtxt = plNewCollisionContext();
+
   world->rootSys = plNewRootSystem(world, sc, name, m, gm,
                                    obliquity, siderealPeriod,
                                    eqRadius, flattening);
+
   obj_array_init(&world->objs);
   obj_array_init(&world->partSys);
   return world;
@@ -749,6 +755,8 @@ plWorldStep(PLworld *world, double dt)
     PLparticles *psys = world->partSys.elems[i];
     plStepParticleSystem(psys, dt);
   }
+
+  plCollideStep(world->collCtxt);
 }
 
 PLobject*

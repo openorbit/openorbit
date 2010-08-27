@@ -66,6 +66,8 @@ plInitObject(PLobject *obj)
   obj->airPressure = 0.0;
   obj->dragCoef = 0.0;
   obj->area = 0.0;
+  obj->radius = 0.0;
+
   obj_array_init(&obj->children);
   obj_array_init(&obj->psystem);
 
@@ -84,6 +86,8 @@ plObject(PLworld *world, const char *name)
   obj_array_push(&world->objs, obj);
 
   plComputeDerived(obj);
+
+  plCollideInsertObject(world->collCtxt, obj);
 
   return obj;
 }
@@ -110,7 +114,7 @@ plDetatchObject(PLobject *obj)
 {
   assert(obj != NULL);
   assert(obj->parent != NULL);
-
+  PLworld *world = obj->sys->world;
   obj_array_push(&obj->parent->sys->rigidObjs, obj);
   PLobject *parent = obj->parent;
 
@@ -124,6 +128,7 @@ plDetatchObject(PLobject *obj)
 
   plUpdateMass(parent);
   plComputeDerived(obj);
+  plCollideInsertObject(world->collCtxt, obj);
 }
 
 void

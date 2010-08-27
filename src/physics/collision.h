@@ -35,14 +35,14 @@ struct PLrecgrid {
   obj_array_t objs;
   struct PLrecgrid *children[8];
 };
-typedef struct PLrecgrid PLrecgrid;
 
 struct PLcollisioncontext {
   pool_t *pool;
   PLrecgrid *otree;
   obj_array_t colls;
 };
-typedef struct PLcollisioncontext PLcollisioncontext;
+
+PLcollisioncontext *plNewCollisionContext(void);
 
 bool plCollideCoarse(PLcollisioncontext *coll,
                      PLobject * restrict obj_a, PLobject * restrict obj_b);

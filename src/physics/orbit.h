@@ -36,6 +36,7 @@
 
 #include "physics/reftypes.h"
 #include "physics/areodynamics.h"
+#include "physics/collision.h"
 
 typedef struct PL_keplerian_elements {
   double ecc;
@@ -103,7 +104,7 @@ struct PLsystem {
 struct PLworld {
   const char *name;
   PLsystem *rootSys;
-
+  PLcollisioncontext *collCtxt;
   obj_array_t objs; // All objects in world, even ones not placed in subsystems
   obj_array_t partSys; // All particle systems in world
 };

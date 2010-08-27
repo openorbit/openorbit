@@ -27,5 +27,7 @@ typedef struct PLastrobody PLastrobody;
 typedef struct PLobject PLobject;
 typedef struct PLparticle PLparticle;
 typedef struct PLparticles PLparticles;
+typedef struct PLrecgrid PLrecgrid;
+typedef struct PLcollisioncontext PLcollisioncontext;
 
 #endif /* !PL_REFTYPES_H */

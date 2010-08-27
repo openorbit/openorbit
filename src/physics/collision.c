@@ -19,6 +19,7 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <assert.h>
 
 #include "collision.h"
 #include "common/lwcoord.h"
@@ -31,6 +32,10 @@ PLrecgrid*
 plNewRecgrid(PLcollisioncontext *ctxt, double size)
 {
   PLrecgrid *recgrid = pool_alloc(ctxt->pool);
+
+  recgrid->parent = NULL;
+
+  assert(((uintptr_t)recgrid & 3) == 0);
   recgrid->size = size;
   memset(&recgrid->centre, 0, sizeof(OOlwcoord));
   memset(recgrid->children, 0, sizeof(PLrecgrid *[8]));
@@ -53,6 +58,7 @@ plNewCollisionContext(void)
   ctxt->pool = pool_create(sizeof(PLrecgrid));
   obj_array_init(&ctxt->colls);
   ctxt->otree = plNewRecgrid(ctxt, plAuToMetres(100.0)); // Roughly the heliospause
+  return ctxt;
 }
 
 void plInsertObject(PLcollisioncontext *ctxt, PLrecgrid *grid, PLobject *obj);
@@ -61,8 +67,8 @@ static int
 getoctant(const OOlwcoord *coord, const PLobject *obj)
 {
   float3 dist = ooLwcDist(&obj->p, coord);
-  int quad = signbit(dist.x) * 4 + signbit(dist.y) * 2 + signbit(dist.z);
-  return quad;
+  int oct = signbit(dist.x) * 4 + signbit(dist.y) * 2 + signbit(dist.z);
+  return oct;
 }
 static bool
 fits(const PLrecgrid *grid, const PLobject *obj)
@@ -166,6 +172,7 @@ plCollideCoarse(PLcollisioncontext *coll,
   float3 dist = ooLwcDist(&obj_a->p, &obj_b->p);
 
   if (vf3_abs(dist) > (obj_a->radius + obj_b->radius)) {
+    ooLogWarn("collision test failed %s : %s", obj_a->name, obj_b->name);
     return false;
   }
 
@@ -180,14 +187,15 @@ plCollideFine(PLcollisioncontext *coll,
 }
 
 void
-plCollideInsertObject(PLcollisioncontext *coll, PLobject *obj)
+plCollideInsertObject(PLcollisioncontext *ctxt, PLobject *obj)
 {
-
+  plInsertObject(ctxt, ctxt->otree, obj);
 }
 
 static void
 plCollideTreeNode(PLcollisioncontext *coll, PLrecgrid *otree)
 {
+  if (otree == NULL) return;
   for (int i = 0 ; i < 8 ; ++ i) {
     plCollideTreeNode(coll, otree->children[i]);
   }
@@ -233,6 +241,8 @@ plCollideStep(PLcollisioncontext *coll)
   for (int i = 0 ; i < coll->colls.length ; i += 2) {
     PLobject *a = coll->colls.elems[i];
     PLobject *b = coll->colls.elems[i+1];
+    ooLogWarn("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
+    ooLwcDump(&a->p);ooLwcDump(&b->p);
   }
 }
 

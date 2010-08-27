@@ -222,7 +222,7 @@ static OOspacecraft*
 MercuryNew(void)
 {
   OOspacecraft *sc = malloc(sizeof(OOspacecraft));
-  simScInit(sc, "Mercury");
+  simScInit(sc, "Mercury SC");
   sc->detatchStage = MercuryDetatch;
   sc->toggleMainEngine = MainEngineToggle;
   sc->axisUpdate = MercuryAxisUpdate;
