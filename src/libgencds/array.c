@@ -39,7 +39,7 @@ array_compress(array_t *vec)
       break;
     }
   }
-  
+
   // Move pointers at end of vector to first free entries
   for (size_t i = 0; i < vec->length ; i ++) {
     if (vec->elems[i] == NULL) {
@@ -56,7 +56,6 @@ array_compress(array_t *vec)
     }
 
   }
-  
 }
 
 
