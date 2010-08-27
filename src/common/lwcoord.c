@@ -145,6 +145,28 @@ ooLwcDist(const OOlwcoord *a, const OOlwcoord * b)
   return vf3_add(diff, vf3_s_mul(segdiffr, OO_LW_SEGMENT_LEN));
 }
 
+
+int
+ooLwcOctant(const OOlwcoord *a, const OOlwcoord * b)
+{
+  float3 rel = ooLwcDist(b, a);
+
+  int octant = 0;
+  if (rel.x >= 0.0) {
+    octant += 1;
+  }
+
+  if (rel.y >= 0.0) {
+    octant += 2;
+  }
+
+  if (rel.z >= 0.0) {
+    octant += 4;
+  }
+
+  return octant;
+}
+
 void
 ooLwcSet64(OOlwcoord64 *coord, double x, double y, double z)
 {
@@ -192,11 +214,11 @@ ooLwcRelVec64(const OOlwcoord64 *coord, long3 seg)
 {
   double3 r = coord->offs;
   long3 segdiff = coord->seg - seg;
-  
+
   double3 segdiffr = vd3_set((double)v3l_get(segdiff, 0),
                              (double)v3l_get(segdiff, 1),
                              (double)v3l_get(segdiff, 2));
-  
+
   r = vd3_add(r, vd3_s_mul(segdiffr, OO_LW_SEGMENT_LEN64));
   return r;
 }
