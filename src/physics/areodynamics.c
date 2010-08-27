@@ -24,6 +24,7 @@
 #include <string.h>
 #include <assert.h>
 #include <gencds/hashtable.h>
+#include "common/moduleinit.h"
 // Note that these are molar weights for all elements, this does not take into
 // account that some elements appear in molecules (i.e. H2)
 // TODO: Set all elements that are -0.0 to NAN, but this cannot be done until
@@ -197,8 +198,7 @@ static char *elemNames[PL_Elem_Last] = {
 
 static hashtable_t *ht;
 
-static void __attribute__((constructor))
-plElementInit(void)
+INIT_PRIMARY_MODULE
 {
   ht = hashtable_new_with_str_keys(128);
 
@@ -254,7 +254,8 @@ plEstimateTemp(double luminocity, double albedo, double R)
   double t = pow((luminocity*(1.0 - albedo))/(4.0 * M_PI * PL_ST*R*R), 1.0/4.0);
   return t;
 }
-// Computes the current airspeed of the object
+// Computes the current airspeed of the object, the airspeed is the current speed
+// of the object with the speed of the planet and the current rotation tangent subtracted
 double
 plComputeAirspeed(PLobject *obj)
 {
@@ -305,10 +306,17 @@ plComputeAirdensity(PLobject *obj)
   float3 dist = ooLwcDist(&obj->p, &sys->orbitalBody->obj.p);
   float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
-  double density = plPressureAtAltitude(atm->pb, atm->Tb, g0, atm->M, h, 0.0);
-  return density;
+  double pressure = plPressureAtAltitude(atm->pb, atm->Tb, g0, atm->M, h, 0.0);
+  return pressure * atm->M / (PL_UGC * atm->Tb);
 }
 
+
+double
+plComputeAirdensityWIthCurrentPressure(PLobject *obj)
+{
+  PLatmosphere *atm = &obj->sys->orbitalBody->atm;
+  return obj->airPressure * atm->M / (PL_UGC * atm->Tb);
+}
 
 
 /*!
