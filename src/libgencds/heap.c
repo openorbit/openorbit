@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -29,27 +29,27 @@ heap_t
 *heap_new(size_t n_levels, compute_rank_f f)
 {
     heap_t *h;
-    
+
     h = malloc(sizeof(heap_t));
     if (! h) return NULL;
-    
+
     h->elements = calloc(1 << n_levels, sizeof(heap_element_t));
     if (! h->elements) {
         free(h);
         return NULL;
     }
-    
+
     h->size = (1 << n_levels) - 1;
     h->last = 0;
     h->compute_rank = f;
-    
+
 #if THREAD_SAFE_HEAP
     if (pthread_mutex_init(&h->lock, NULL)) {
         free(h->elements);
         free(h);
     }
 #endif
-    
+
     return h;
 }
 
@@ -60,7 +60,7 @@ heap_delete(heap_t *h)
 #if THREAD_SAFE_HEAP
     pthread_mutex_destroy(&h->lock);
 #endif
-    
+
     free(h->elements);
     free(h);
 }
@@ -73,8 +73,8 @@ heap_insert(heap_t *h, void *data)
 #if THREAD_SAFE_HEAP
     if (pthread_mutex_lock(&h->lock)) return false;
 #endif
-    
-    if (h->last < h->size) {
+
+    if (h->last < h->size - 1) {
         h->elements[h->last + 1].rank = h->compute_rank(data);
         h->elements[h->last + 1].data = data;
         h->last ++;
@@ -97,15 +97,15 @@ heap_insert(heap_t *h, void *data)
 #if THREAD_SAFE_HEAP
         pthread_mutex_unlock(&h->lock);
 #endif
-        
+
         return true;
     }
 
-    
+
 #if THREAD_SAFE_HEAP
     pthread_mutex_unlock(&h->lock);
 #endif
-    
+
     return false;
 }
 
@@ -117,20 +117,20 @@ void
 #if THREAD_SAFE_HEAP
     if (pthread_mutex_lock(&h->lock)) return NULL;
 #endif
-    
-    
+
+
     if (h->last >= 1) {
         void *data = h->elements[1].data;
         h->elements[1] = h->elements[h->last];
         h->last --;
         // bubble down
         int elem_n = 1;
-        
+
         while (elem_n < h->last) {
             int left_child_n = elem_n << 1;
             int right_child_n = (elem_n << 1) + 1;
             int correct_child_n;
-            
+
             if (right_child_n <= h->last) {
                 correct_child_n = (h->elements[left_child_n].rank < h->elements[right_child_n].rank)    ? left_child_n
                                                                                                         : right_child_n;
@@ -140,7 +140,7 @@ void
                 // at bottom, cannot bubble down any more
                 break;
             }
-            
+
             // compare parent and child ranks and bubble down parent if child rank is smaller
             if (h->elements[elem_n].rank > h->elements[correct_child_n].rank) {
                 heap_element_t tmp = h->elements[elem_n];
@@ -156,14 +156,14 @@ void
 #if THREAD_SAFE_HEAP
         pthread_mutex_unlock(&h->lock);
 #endif
-        
+
         return data;
     }
-    
+
 #if THREAD_SAFE_HEAP
     pthread_mutex_unlock(&h->lock);
 #endif
-    
+
     return NULL;
 }
 
@@ -188,12 +188,12 @@ heap_lock(heap_t *h)
 {
 #if THREAD_SAFE_HEAP
     pthread_mutex_lock(&h->lock);
-#endif    
+#endif
 }
 void
 heap_unlock(heap_t *h)
 {
 #if THREAD_SAFE_HEAP
     pthread_mutex_unlock(&h->lock);
-#endif    
+#endif
 }
