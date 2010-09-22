@@ -259,8 +259,19 @@ plCollideStep(PLcollisioncontext *coll)
   for (int i = 0 ; i < coll->colls.length ; i += 2) {
     PLobject *a = coll->colls.elems[i];
     PLobject *b = coll->colls.elems[i+1];
-    //ooLogWarn("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
-    //ooLwcDump(&a->p);ooLwcDump(&b->p);
+
+    float3 av = (a->m.m - b->m.m) / (a->m.m + b->m.m) * a->v +
+                (2.0f*b->m.m) / (a->m.m + b->m.m) * b->v;
+    float3 bv = (b->m.m - a->m.m) / (a->m.m + b->m.m) * b->v +
+                (2.0f*a->m.m) / (a->m.m + b->m.m) * a->v;
+
+
+    a->v = av;
+    b->v = bv;
+
+    // Compute post colission momentums
+    ooLogInfo("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
+    ooLwcDump(&a->p);ooLwcDump(&b->p);
   }
 }
 
