@@ -279,7 +279,7 @@ sgCamMove(SGcam *cam)
     break;
   case SGCam_Free:
     {
-      SGfreecam *freecam = (SGfreecam*)cam;
+//      SGfreecam *freecam = (SGfreecam*)cam;
 
 //      glTranslatef(-vf3_x(freecam->lwc.offs),
 //                   -vf3_y(freecam->lwc.offs),

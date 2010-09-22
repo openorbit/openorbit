@@ -737,8 +737,6 @@ plSysUpdateSg(PLsystem *sys)
 void
 plWorldStep(PLworld *world, double dt)
 {
-  double t = simTimeGetJD();
-
   plSysStep(world->rootSys, dt);
 
   plSysUpdateSg(world->rootSys);
