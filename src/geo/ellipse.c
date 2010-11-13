@@ -19,7 +19,14 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include "SDL_opengl.h"
+
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <GL/gl.h>
+#endif
+
+
 #include "ellipse.h"
 #include "../log.h"
 
