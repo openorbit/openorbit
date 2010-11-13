@@ -177,3 +177,14 @@ pool_free(void *obj)
   pthread_mutex_unlock(&pool->lock);
 }
 
+void*
+smalloc(size_t sz)
+{
+  void *data = malloc(sz);
+
+  if (data == NULL) abort();
+
+  return data;
+}
+
+

@@ -62,4 +62,6 @@ pool_t* pool_create(size_t obj_size);
 void* pool_alloc(pool_t *pool);
 void pool_free(void *obj);
 
+void* smalloc(size_t sz);
+
 #endif /* !COMMON_POOL_H */
