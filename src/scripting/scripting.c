@@ -26,8 +26,6 @@
 
 #include <Python.h>
 
-extern void initooscript(void);
-
 extern void init_config(void);
 extern void init_event(void);
 #include "scripting.h"
@@ -41,7 +39,6 @@ ooScriptingInit(void)
 
   Py_InitializeEx(0); // note that ex(0) prevents python from stealing sighandlers
 
-  initooscript();
   init_config();
   init_event();
 
@@ -78,7 +75,7 @@ ooScriptingRunInit(void)
 bool
 ooScriptingRunPostInit(void)
 {
-  ooScriptingRunFile(SCR_POST_INIT_SCRIPT_NAME);
+  return ooScriptingRunFile(SCR_POST_INIT_SCRIPT_NAME);
 }
 
 bool

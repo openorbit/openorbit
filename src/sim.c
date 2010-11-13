@@ -26,8 +26,10 @@
 
 #include "sim.h"
 #include "sim/spacecraft-control.h"
-
+#include "sim/world-loader.h"
+#include "res-manager.h"
 #include "physics/orbit.h"
+#include "rendering/sky.h"
 #include "rendering/planet.h"
 #include "settings.h"
 
@@ -36,12 +38,34 @@
 SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL};
 
 void
-ooSimInit(void) {
+ooSimInit(void)
+{
   float freq;
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   gSIM_state.stepSize = 1.0 / freq; // Period in s
   //gSIM_state.evQueue = simNewEventQueue();
-  simScCtrlInit();
+
+
+  SGdrawable *sky = ooSkyNewDrawable("data/stars.csv");
+  gSIM_state.sg = sgNewSceneGraph();
+  sgSetSky(gSIM_state.sg, sky);
+
+  gSIM_state.world = ooOrbitLoad(gSIM_state.sg, "data/solsystem.hrml");
+
+
+
+  OOspacecraft *sc = simNewSpacecraft("mercury", "Mercury I");
+  ooScSetSysAndCoords(sc, "Sol/Earth",
+                      0.0 /*longitude*/,
+                      0.0 /*latitude*/,
+                      250.0e3 /*altitude*/);
+  simSetSpacecraft(sc);
+
+  SGscene *scene = sgGetScene(gSIM_state.sg, "main");
+
+  SGcam *cam = sgNewOrbitCam(gSIM_state.sg, scene, ooScGetPLObjForSc(sc),
+                             0.0, 0.0, 20.0);
+  sgSetCam(gSIM_state.sg, cam);
 }
 
 

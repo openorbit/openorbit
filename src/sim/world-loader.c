@@ -23,6 +23,8 @@
 #include "physics/physics.h"
 #include "parsers/hrml.h"
 #include "res-manager.h"
+#include "log.h"
+
 /*
  NOTE: G is defined as 6.67428 e-11 (m^3)/kg/(s^2), let's call that G_m. In AU,
  this would then be G_au = G_m / (au^3)

@@ -23,6 +23,7 @@
 #include "sim/simevent.h"
 #include "sim/spacecraft.h"
 #include "sim/actuator.h"
+#include "log.h"
 
 enum Mercury_Stages {
   MERC_REDSTONE = 0,
@@ -49,6 +50,10 @@ enum Capsule_Actuators {
 void
 MercuryAxisUpdate(OOspacecraft *sc)
 {
+  // TODO: Replace IO-system queries with sim variable lookups.
+  //       This is important in order to allow for multiplexed axis commands,
+  //       in term enabling autopilots and network control.
+
   OOaxises axises;
   ooGetAxises(&axises);
 
@@ -113,6 +118,7 @@ MercuryDetatchComplete(void *data)
 static void
 MercuryDetatch(OOspacecraft *sc)
 {
+  ooLogInfo("detatch commanded");
   sc->detatchPossible = false;
 
   if (sc->detatchSequence == MERC_REDSTONE) {
@@ -237,6 +243,7 @@ MercuryNew(void)
   //       cleaner, this is not a good API
   ooScSetStageMesh(redstone, redstoneModel);
   sgSceneAddObj(sgGetScene(simGetSg(), "main"), redstoneModel);
+
   plMassSet(&redstone->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
             27.14764852, 0.39605, 27.14764852,
@@ -253,10 +260,13 @@ MercuryNew(void)
   simAddActuator(redstone, (OOactuator*)rocketdyne);
   simArmActuator((OOactuator*)rocketdyne);
   //orbital
+
+
   OOstage *capsule = ooScNewStage(sc, "Command-Module");
   SGdrawable *capsuleModel = sgLoadModel("spacecrafts/mercury/mercury.ac");
   ooScSetStageMesh(capsule, capsuleModel);
   sgSceneAddObj(sgGetScene(simGetSg(), "main"), capsuleModel);
+
   plMassSet(&capsule->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
             1.2188583333, 0.39605, 1.2188583333,

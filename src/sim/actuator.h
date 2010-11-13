@@ -25,6 +25,8 @@
 
 #include "simtypes.h"
 #include "physics/reftypes.h"
+#include "rendering/scenegraph.h"
+
 typedef enum OOdefault_actuator_groups {
   OO_Act_Group_First = 0,
   OO_Act_Orbital = 0,
@@ -80,6 +82,7 @@ void simFailActuator(OOactuator *act);
 struct SIMthruster {
   OOactuator super;
   PLparticles *ps;
+  SGdrawable *flame;
   float3 fMax;
   float3 pos;
   float throttle;

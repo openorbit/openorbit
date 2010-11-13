@@ -20,6 +20,7 @@
 #include "physics.h"
 #include "object.h"
 #include "common/lwcoord.h"
+#include "log.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>

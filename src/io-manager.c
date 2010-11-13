@@ -306,8 +306,7 @@ static int ioFilter(const SDL_Event *ev)
 }
 void ioInitKeys(void);
 
-static void __attribute__((constructor))
-ioInitBare(void)
+INIT_PRIMARY_MODULE
 {
   gIoReverseKeySymMap = hashtable_new_with_str_keys(1024);
   gIoButtonHandlers = hashtable_new_with_str_keys(2048);
@@ -433,6 +432,8 @@ ioDispatchKeyUp(int key, uint16_t mask)
 void
 ioDispatchKeyDown(int key, uint16_t mask)
 {
+  ooLogInfo("keydown event");
+
   assert(key < SDLK_LAST);
 
   IOkeymod kmod = OO_None;

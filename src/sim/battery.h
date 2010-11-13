@@ -24,7 +24,11 @@
 #include <gencds/array.h>
 
 // Batteries are the secondary source for power, they are typically charged when
-// the sun is visible and discharged in eclipse.
+// the sun is visible and discharged in eclipse. This interface is pretty stupid
+// and only allow for a constant maximum charge and discharge rate. These
+// parameters are obviously dependent on the design and various environmental
+// parameters. In the future, this interface should be updated to support more
+// complex simulations.
 struct SIMbattery {
   float energyContent;    // Joule
   float maxDischargeRate; // Watt

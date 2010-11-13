@@ -1,4 +1,4 @@
-#   Copyright 2006,2009 Mattias Holm <mattias.holm(at)openorbit.org>
+#   Copyright 2006,2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
 #   This file is part of Open Orbit.
 #
@@ -16,8 +16,6 @@
 #   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import ooscript
-
 from openorbit import *
 
 print "Running post init script..."
@@ -26,15 +24,15 @@ def SemiMin(semiMaj, ecc):
   return math.sqrt(1.0 - ecc**2.0) * semiMaj
 
 
-stars = ooscript.SkyDrawable("data/stars.csv")
-sgr = ooscript.Scenegraph().new()
-sgr.setBackground(stars)
+#stars = ooscript.SkyDrawable("data/stars.csv")
+#sgr = ooscript.Scenegraph().new()
+#sgr.setBackground(stars)
 
-ooscript.setSg(sgr)
+#ooscript.setSg(sgr)
 #osys = ooscript.OrbitSys().new(sgr, "data/solsystem.hrml")
 #ooscript.setOrbSys(osys)
-oworld = ooscript.OrbitWorld().new(sgr, "data/solsystem.hrml")
-ooscript.setOrbWorld(oworld)
+#oworld = ooscript.OrbitWorld().new(sgr, "data/solsystem.hrml")
+#ooscript.setOrbWorld(oworld)
 
 #cam = ooscript.FreeCam()
 #(x, y, z) = oworld.getPosForObjName("Sol/Earth") # TODO: Throw exception
@@ -50,13 +48,13 @@ ooscript.setOrbWorld(oworld)
 #              + (1.74e6 + 100000.0),
 #              z + 10.0,
 #              0.0, 0.0, 1.0)
-sc = ooscript.Spacecraft(oworld, sgr.getScene("main"), "mercury", "Mercury I")
-sc.setSysAndEqCoords("Sol/Earth", 0.0, 0.0, 250.0e3)
-ooscript.setCurrentSc(sc)
+#sc = ooscript.Spacecraft(oworld, sgr.getScene("main"), "mercury", "Mercury I")
+#sc.setSysAndEqCoords("Sol/Earth", 0.0, 0.0, 250.0e3)
+#ooscript.setCurrentSc(sc)
 
-ocam = ooscript.OrbitCam()
+#ocam = ooscript.OrbitCam()
 
 #ocam.setParams(sgr, sgr.getRoot(), oworld.getPLObjForName("Sol/Earth"), 0.0, 0.0, 6.37e6 + 10000.0e3)
-ocam.setParams(sgr, sgr.getScene("main"), sc.getPLObject(), 0.0, 0.0, 20.0)
+#ocam.setParams(sgr, sgr.getScene("main"), sc.getPLObject(), 0.0, 0.0, 20.0)
 
-sgr.setCam(ocam)
+#sgr.setCam(ocam)

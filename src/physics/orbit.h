@@ -145,6 +145,9 @@ float3 plComputeCurrentVelocity(PLastrobody *ab);
 void plWorldStep(PLworld *world, double dt);
 void plWorldClear(PLworld *world);
 
+double plOrbitalPeriod(double a, double GM);
+void plSetDrawable(PLastrobody *obj, SGdrawable *drawable);
+void plSysInit(PLsystem *sys);
 
 
 #endif /* ! _ORBIT_H_ */

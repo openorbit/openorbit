@@ -148,14 +148,19 @@ void simAddStage(OOspacecraft *sc, OOstage *stage);
 OOspacecraft* ooScNew(PLworld *world, SGscene *scene, const char *name);
 void simScDetatchStage(OOspacecraft *sc);
 
+void simScToggleMainEngine(OOspacecraft *sc);
+
 void simArmStageActuators(OOstage *stage);
 void simDisarmStageActuators(OOstage *stage);
 void simLockStageActuators(OOstage *act);
 void simDisableStageActuators(OOstage *act);
 
+// TODO: Implement
+//float3 simGetGravityVector(OOstage *stage);
+//float3 simGetAirspeedVector(OOstage *stage);
 
 void ooScSetStageMesh(OOstage *stage, SGdrawable *mesh);
-void ooScDetatchStage(OOspacecraft *sc);
+void simDetatchStage(OOspacecraft *sc, OOstage *stage);
 void simScStep(OOspacecraft *sc, float dt);
 void ooScStageStep(OOstage *stage, OOaxises *axises, float dt);
 void ooScForce(OOspacecraft *sc, float rx, float ry, float rz);
@@ -195,5 +200,8 @@ OOspacecraft* ooScLoad(PLworld *world, SGscene *scene, const char *fileName);
 
 void scStageSetOffset3f(OOstage *stage, float x, float y, float z);
 void scStageSetOffset3fv(OOstage *stage, float3 p);
+
+
+void ooGetAxises(OOaxises *axises);
 
 #endif /* end of include guard: SPACECRAFT_H_7SCB1CH8 */

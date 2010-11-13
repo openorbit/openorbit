@@ -24,7 +24,8 @@
 
 #include "sim/actuator.h"
 #include "sim/spacecraft.h"
-
+#include "log.h"
+#include "io-manager.h"
 
 static void
 TorquerEnable(SIMtorquer *tq)
@@ -172,7 +173,7 @@ simFireThrusterIfThrottle(SIMthruster *act)
   assert((act->super.state == OO_Act_Armed || act->super.state == OO_Act_Enabled)
          && "invalid state");
 
-  if (act->throttle > 0.0) act->super.state = OO_Act_Enabled;
+  if (act->throttle > 0.0) {act->super.state = OO_Act_Enabled;}
   else act->super.state = OO_Act_Armed;
 }
 
@@ -240,82 +241,6 @@ ooGetThrottleForActuatorGroup(unsigned groupId)
   return throttle;
 }
 
-void
-ooScFireOrbital(OOspacecraft *sc)
-{
-//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Orbital];
-
-//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-//    OOactuator *act = grp->actuators.elems[i];
-//    act->toggleOn(act);
-//  }
-}
-
-void
-ooScFireVertical(OOspacecraft *sc, float dv)
-{
-//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Vertical];
-//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-//    OOactuator *act = grp->actuators.elems[i];
-//    act->toggleOn(act);
-//  }
-}
-void
-ooScFireHorizontal(OOspacecraft *sc, float dh)
-{
-//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Horisontal];
- // for (int i = 0 ; i < grp->actuators.length ; ++ i) {
- //   OOactuator *act = grp->actuators.elems[i];
- //   act->toggleOn(act);
- // }
-}
-
-void
-ooScFireForward(OOspacecraft *sc)
-{
-//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Forward];
-//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-//    OOactuator *act = grp->actuators.elems[i];
-//    act->toggleOn(act);
-//  }
-}
-
-void
-ooScEngageYaw(OOspacecraft *sc, float dy)
-{
-//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Yaw];
-//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-//    OOactuator *act = grp->actuators.elems[i];
-//    act->toggleOn(act);
-//  }
-}
-
-void
-ooScEngagePitch(OOspacecraft *sc, float dp)
-{
-//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Pitch];
-//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-//    OOactuator *act = grp->actuators.elems[i];
-//    act->toggleOn(act);
-//  }
-}
-
-void
-ooScEngageRoll(OOspacecraft *sc, float dr)
-{
-//  OOstage *stage = sc->stages.elems[sc->activeStageIdx];
-//  OOactuatorgroup *grp = stage->actuatorGroups.elems[OO_Act_Roll];
-//  for (int i = 0 ; i < grp->actuators.length ; ++ i) {
-//    OOactuator *act = grp->actuators.elems[i];
- //   act->toggleOn(act);
-//  }
-}
 
 OOactuatorgroup*
 ooScNewActuatorGroup(const char *name)

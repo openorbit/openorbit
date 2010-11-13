@@ -127,6 +127,8 @@ main_loop(void)
       case SDL_MOUSEBUTTONUP:
         break;
       case SDL_KEYDOWN:
+          ooLogInfo("button down");
+
         ioDispatchKeyDown(event.key.keysym.sym, event.key.keysym.mod);
         break;
       case SDL_KEYUP:
@@ -180,16 +182,12 @@ main_loop(void)
 int
 main(int argc, char*argv[])
 {
+  simScCtrlInit();
+
   // Set log level, need to do that here
   const char *levStr = NULL;
   ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
   ooLogSetLevel(ooLogGetLevFromStr(levStr));
-
-  ooSimInit();
-
-  ooPluginInit();
-  ooPluginLoadAll();
-  ooPluginPrintAll();
 
   // Load and run initialisation script
   ooScriptingInit();
@@ -216,6 +214,12 @@ main(int argc, char*argv[])
   sgCamInit();
 
   ooIoPrintJoystickNames();
+
+  ooSimInit();
+
+  ooPluginInit();
+  ooPluginLoadAll();
+  ooPluginPrintAll();
 
   if (!ooScriptingRunFile("script/postinit.py")) {
     ooLogFatal("script/postinit.py missing");

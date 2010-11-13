@@ -28,7 +28,8 @@
 #include <gencds/hashtable.h>
 #include "common/moduleinit.h"
 #include "actuator.h"
-
+#include "io-manager.h"
+#include "sim/pubsub.h"
 
 extern SIMstate gSIM_state;
 
