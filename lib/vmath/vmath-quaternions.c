@@ -217,6 +217,7 @@ m_q_convert(matrix_t *m)
 #undef QZ
 #undef QW
 #undef QIDX
+  return q;
 }
 
 
