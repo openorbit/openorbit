@@ -349,9 +349,6 @@ vd4_dot(double3 a, double3 b)
 
 
 
-float vf3_dot(float3 a, float3 b)
-    __attribute__ ((__pure__));
-
 
 float4 m_v_mul(const matrix_t *a, float4 v);
 float3 m_v3_mulf(const matrix_t *a, float3 v);
