@@ -214,6 +214,7 @@ int readFaces(int fd, size_t maxBytes)
 
 
   fprintf(stderr, "...got face array\n");
+  return -1; // TODO: Fix return value
 }
 int readTriangles(int fd, size_t maxBytes)
 {
@@ -404,7 +405,7 @@ readData(int fd, size_t maxBytes)
     }
     remBytes -= chnk.chunkSize;
   }
-
+  return 0; // TODO: Check return values
 }
 
 int

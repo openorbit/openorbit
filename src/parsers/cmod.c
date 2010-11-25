@@ -119,4 +119,6 @@ cmod_load(const char *path)
   } else if (ferror(fp)) {
   
   }
+
+  return NULL;
 }

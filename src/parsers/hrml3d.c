@@ -41,4 +41,5 @@ hrml3d_load(model_t *model, const char *fileName)
       
     }
   }
+  return -1;
 }

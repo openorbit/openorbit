@@ -54,6 +54,7 @@ omTreeNew(void)
 {
   OMtree *tree = malloc(sizeof(OMtree));
   tree->root = NULL;
+  return tree;
 }
 
 OMobjdesc*
@@ -292,6 +293,7 @@ omTreeLookup(const OMtreenode *root, OOobject *obj)
       return root->data;
     }
   }
+  return NULL;
 }
 
 void*

@@ -22,6 +22,7 @@
 #include "common/moduleinit.h"
 #include <gencds/hashtable.h>
 #include "res-manager.h"
+#include "log.h"
 #include <string.h>
 
 #ifdef __APPLE__

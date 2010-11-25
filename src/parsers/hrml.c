@@ -880,6 +880,7 @@ Token lexToken(LexState *lex)
   } else {
     LexErr(lex, "unknown character %lc", ch);
   }
+  // Unreachable
 }
 
 
@@ -1189,7 +1190,7 @@ void Parse2(ParseState *parser)
 void Parse(ParseState *parser)
 {
   int res = 0;
-  if (res = setjmp(gParseError)) {
+  if ((res = setjmp(gParseError))) {
     parser->errors = true;
     // Longjumped here, error code is in res
     fprintf(stderr, "parse error %d\n", res);
@@ -1515,7 +1516,7 @@ static inline void indent(FILE *fp, int indentlev)
 bool
 hrmlValidate(HRMLdocument *doc, HRMLschema *sc)
 {
-
+  return false;
 }
 
 void

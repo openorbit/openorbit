@@ -150,7 +150,7 @@ ooResGetFd(const char *fileName)
 char*
 ooPluginGetPath(const char *fileName)
 {
-    
+  return NULL;
 }
 
 FILE*

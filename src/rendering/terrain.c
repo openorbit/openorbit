@@ -54,6 +54,7 @@ SGterrain*
 sgTerrainLoad(const char *file)
 {
   assert(file != NULL && "Not NULL");
+  return NULL;
 }
 
 void

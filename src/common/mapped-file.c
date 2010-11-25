@@ -24,7 +24,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <assert.h>
-
+#include <unistd.h>
 static off_t
 get_flen(const char *path)
 {

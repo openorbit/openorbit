@@ -24,8 +24,11 @@
 #include <gencds/hashtable.h>
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #else
 #include <gl/gl.h>
+#include <gl/glu.h>
 #endif
 
 #include "log.h"
@@ -97,12 +100,12 @@ ooTexLoad(const char *key, const char *name)
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
   GLint err;
-  if (err = gluBuild2DMipmaps(GL_TEXTURE_2D,
+  if ((err = gluBuild2DMipmaps(GL_TEXTURE_2D,
                               tex->bytesPerTex,
                               tex->width, tex->height,
                               tex->texType,
                               GL_UNSIGNED_BYTE,
-                              tex->data) )
+                              tex->data)))
   {
     ooLogFatal("failed mipmap generation %s", gluErrorString(err));
   }

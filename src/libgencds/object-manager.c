@@ -417,7 +417,7 @@ om_reg_method(om_meta_iface_t *meta_iface, const char *method_name,
     assert(meta_iface != NULL);
     assert(method_name != NULL);
     
-    hashtable_insert(meta_iface->methods, method_name, (void*)offset);
+    return hashtable_insert(meta_iface->methods, method_name, (void*)offset);
 }
 
 /* TODO: Support complex types (arrays, objects, refs, et.c.) */
@@ -558,7 +558,7 @@ om_reg_iface(om_class_t *class_object, const char *name, void *iface_addr)
     iface->meta_interface = meta_iface;
     iface->address = iface_addr;
     
-    hashtable_insert(class_object->interface_dict, name, iface);
+    return hashtable_insert(class_object->interface_dict, name, iface);
 }
 
 const char*

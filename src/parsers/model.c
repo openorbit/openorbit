@@ -104,5 +104,5 @@ model_load(const char * restrict fileName)
 int
 model_dispose(model_t * model)
 {
-
+  return -1;
 }

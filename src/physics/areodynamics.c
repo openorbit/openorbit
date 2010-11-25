@@ -23,6 +23,7 @@
 #include <math.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 #include <gencds/hashtable.h>
 #include "common/moduleinit.h"
 // Note that these are molar weights for all elements, this does not take into
@@ -259,7 +260,7 @@ plEstimateTemp(double luminocity, double albedo, double R)
 double
 plComputeAirspeed(PLobject *obj)
 {
-
+  return 0.0;
 }
 // Compute drag force from
 // \param v Velocity of object relative to the fluid
