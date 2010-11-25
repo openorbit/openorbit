@@ -16,8 +16,6 @@ FINK_BASE=/sw
 FINK_INC=${FINK_BASE}/include
 FINK_LIB=${FINK_BASE}/lib
 
-SDL_FW=/Library/Frameworks/SDL.framework
-SDL_INC=${SDL_FW}/Versions/A/Headers
 
 // Customise prefixes for your environment
 CHECK_PREFIX=/usr/local

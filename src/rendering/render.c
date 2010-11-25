@@ -23,17 +23,14 @@
 #include <stdbool.h>
 #include <math.h>
 #include <assert.h>
-#include "SDL.h"
+//#include "SDL.h"
+#include <SDL/SDL.h>
 
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
-#else
-#include <gl/gl.h>
-#endif
-
-#ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
+#include <gl/gl.h>
 #include <GL/glut.h>
 #endif
 
@@ -44,29 +41,31 @@
 #include "planet.h"
 #include "log.h"
 
-static SDL_Surface *gScreen = NULL;
+//static SDL_Surface *gScreen = NULL;
 
 
 
 void
 ooInitSdlScreen(int width, int height, bool fullscreen)
 {
+  extern SDL_WindowID mainWindow;
   Uint32 flags = 0;
 
-  flags = SDL_OPENGL;
-  flags |= (fullscreen) ? SDL_FULLSCREEN : SDL_RESIZABLE;
-
-  assert(SDL_VideoModeOK(width, height, 32, flags));
+  flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
+  flags |= (fullscreen) ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE;
 
   // Create window
-  gScreen = SDL_SetVideoMode(width, height, 32, flags);
-  if (gScreen == NULL) {
+  assert(SDL_VideoModeOK(width, height, 32, flags));
+  mainWindow = SDL_CreateWindow("Open Orbit", SDL_WINDOWPOS_CENTERED,
+                                SDL_WINDOWPOS_CENTERED,
+                   width, height, flags);
+
+  if (!mainWindow) {
     ooLogError("Couldn't set %dx%d OpenGL video mode: %s\n",
                width, height, SDL_GetError());
     SDL_Quit();
     exit(2);
   }
-  ooPrintScreenAttributes();
 }
 
 void
@@ -76,14 +75,15 @@ ooSetVideoDefaults(void)
   float fovy;
   bool fullscreen;
 
-  ooInitGlAttributes();
-
   ooConfGetBoolDef("openorbit/video/fullscreen", &fullscreen, false);
   ooConfGetIntDef("openorbit/video/width", &width, 640);
   ooConfGetIntDef("openorbit/video/height", &height, 480);
   ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
-  
+
   ooInitSdlScreen(width, height, fullscreen);
+  ooInitGlAttributes();
+  ooPrintScreenAttributes();
+
   ooSetPerspective(fovy, width, height);
 }
 
@@ -101,12 +101,12 @@ ooResizeScreen(int width, int height, bool fullscreen)
 void
 ooSetPerspective(float fovy, int width, int height)
 {
-  SDL_Surface *window = SDL_GetVideoSurface();
+//  SDL_Surface *window = SDL_GetVideoSurface();
 
   int lowx = 0, lowy = 0;
 
-  if (window->w < width) width = window->w;
-  if (window->h < height) height = window->h;
+//  if (window->w < width) width = window->w;
+//  if (window->h < height) height = window->h;
 
   // lowx = window->w - width;
   // lowy = window->h - height;
@@ -121,7 +121,7 @@ ooSetPerspective(float fovy, int width, int height)
   glLoadIdentity();
   // Near clipping 1 m away, far clipping 20 au away
   gluPerspective(fovy, (double)width / (double)height,
-                 /*near*/1.0, /*far*/149598000000.0*20.0);
+                 /*near*/0.9, /*far*/149598000000.0*20.0);
 
   ooLogInfo("\tperspective %f", (double)width / (double)height);
 
@@ -154,6 +154,8 @@ ooInitGlAttributes(void)
   // Don't set color bit sizes (SDL_GL_RED_SIZE, etc)
   //    Mac OS X will always use 8-8-8-8 ARGB for 32-bit screens and
   //    5-5-5 RGB for 16-bit screens
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
   bool depthSetFailed = true;
   for (int i = 0 ; i < NUM_DEPTH_MODES ; ++ i) {
@@ -180,13 +182,21 @@ ooInitGlAttributes(void)
     ooLogFatal("could not set stencil size SDL: \"%s\"", SDL_GetError());
   }
 #endif
-  
+
   // Request double-buffered OpenGL
   //     The fact that windows are double-buffered on Mac OS X has no effect
   //     on OpenGL double buffering.
   if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
     ooLogFatal("could not set gl double buffer SDL: \"%s\"", SDL_GetError());
   }
+
+  extern SDL_WindowID mainWindow;
+  extern SDL_GLContext mainContext;
+
+  mainContext = SDL_GL_CreateContext(mainWindow);
+
+  /* This makes our buffer swap syncronized with the monitor's vertical refresh */
+  SDL_GL_SetSwapInterval(1);
 }
 
 void

@@ -23,7 +23,8 @@
 #include <gencds/hashtable.h>
 #include "sim.h"
 #include "io-manager.h"
-#include "SDL.h"
+//#include "SDL.h"
+#include <SDL/SDL.h>
 #include "log.h"
 #include "parsers/hrml.h"
 #include "settings.h"
@@ -87,7 +88,7 @@ typedef struct OOkeyhandler {
   OObuttonhandler up[OO_Key_Mod_Count];
   OObuttonhandler down[OO_Key_Mod_Count];
 } OOkeyhandler;
-OOkeyhandler gIoKeyData[SDLK_LAST];
+OOkeyhandler gIoKeyData[SDL_NUM_SCANCODES];
 
 #define MOUSE_BUTTONS 8
 typedef struct OOmousebuttons {
@@ -120,145 +121,122 @@ IOjsticks gJoyButtons = {0, NULL};
 [SDL_BUTTON_X2-1] = "mouse-x2";
 #endif
 
-static const char *keysymmap [SDLK_LAST] = {
-  [SDLK_LSHIFT] = "lshift",
-  [SDLK_RSHIFT] = "rshift",
-  [SDLK_LMETA] = "lmeta",
-  [SDLK_RMETA] = "rmeta",
-  [SDLK_LCTRL] = "lctrl",
-  [SDLK_RCTRL] = "rctrl",
-  [SDLK_LSUPER] = "lsuper",
-  [SDLK_RSUPER] = "rsuper",
+static const char *keysymmap [SDL_NUM_SCANCODES] = {
+  [SDL_SCANCODE_LSHIFT] = "lshift",
+  [SDL_SCANCODE_RSHIFT] = "rshift",
+  [SDL_SCANCODE_LGUI] = "lmeta",
+  [SDL_SCANCODE_RGUI] = "rmeta",
+  [SDL_SCANCODE_LCTRL] = "lctrl",
+  [SDL_SCANCODE_RCTRL] = "rctrl",
 
-  [SDLK_MODE] = "mode",
-  [SDLK_HELP] = "help",
-  [SDLK_PRINT] = "print-screen",
-  [SDLK_SYSREQ] = "sys-req",
-  [SDLK_BREAK] = "break",
-  [SDLK_MENU] = "menu",
-  [SDLK_POWER] = "power",
-  [SDLK_EURO] = "euro",
+  [SDL_SCANCODE_MODE] = "mode",
+  [SDL_SCANCODE_HELP] = "help",
+  [SDL_SCANCODE_SYSREQ] = "sys-req",
+  [SDL_SCANCODE_CLEAR] = "clear",
+  [SDL_SCANCODE_MENU] = "menu",
+  [SDL_SCANCODE_POWER] = "power",
 
-  [SDLK_RETURN] = "return",
-  [SDLK_SPACE] = "space",
-  [SDLK_TAB] = "tab",
-  [SDLK_BACKSPACE] = "backspace",
-  [SDLK_ESCAPE] = "esc",
-  [SDLK_PERIOD] = ".",
-  [SDLK_COMMA] = ",",
-  [SDLK_BACKQUOTE] = "`",
-  [SDLK_CLEAR] = "clear",
-  [SDLK_PAUSE] = "pause",
-  [SDLK_EXCLAIM] = "!",
-  [SDLK_QUOTEDBL] = "\"",
-  [SDLK_HASH] = "#",
-  [SDLK_DOLLAR] = "$",
-  [SDLK_AMPERSAND] = "&",
-  [SDLK_QUOTE] = "'",
-  [SDLK_LEFTPAREN] = "(",
-  [SDLK_RIGHTPAREN] = ")",
-  [SDLK_ASTERISK] = "*",
-  [SDLK_PLUS] = "+",
-  [SDLK_MINUS] = "-",
-  [SDLK_SLASH] = "/",
+  [SDL_SCANCODE_RETURN] = "return",
+  [SDL_SCANCODE_SPACE] = "space",
+  [SDL_SCANCODE_TAB] = "tab",
+  [SDL_SCANCODE_BACKSPACE] = "backspace",
+  [SDL_SCANCODE_ESCAPE] = "esc",
+  [SDL_SCANCODE_PERIOD] = ".",
+  [SDL_SCANCODE_COMMA] = ",",
+  [SDL_SCANCODE_PAUSE] = "pause",
+  [SDL_SCANCODE_MINUS] = "-",
+  [SDL_SCANCODE_SLASH] = "/",
 
-  [SDLK_COLON] = ":",
-  [SDLK_SEMICOLON] = ";",
-  [SDLK_LESS] = "<",
-  [SDLK_EQUALS] = "=",
-  [SDLK_GREATER] = ">",
-  [SDLK_QUESTION] = "?",
-  [SDLK_AT] = "@",
-  [SDLK_LEFTBRACKET] = "[",
-  [SDLK_BACKSLASH] = "\\",
-  [SDLK_RIGHTBRACKET] = "]",
-  [SDLK_CARET] = "^",
-  [SDLK_UNDERSCORE] = "_",
+  [SDL_SCANCODE_SEMICOLON] = ";",
+  [SDL_SCANCODE_EQUALS] = "=",
+  [SDL_SCANCODE_LEFTBRACKET] = "[",
+  [SDL_SCANCODE_BACKSLASH] = "\\",
+  [SDL_SCANCODE_RIGHTBRACKET] = "]",
 
-  [SDLK_0] = "0",
-  [SDLK_1] = "1",
-  [SDLK_2] = "2",
-  [SDLK_3] = "3",
-  [SDLK_4] = "4",
-  [SDLK_5] = "5",
-  [SDLK_6] = "6",
-  [SDLK_7] = "7",
-  [SDLK_8] = "8",
-  [SDLK_9] = "9",
+  [SDL_SCANCODE_0] = "0",
+  [SDL_SCANCODE_1] = "1",
+  [SDL_SCANCODE_2] = "2",
+  [SDL_SCANCODE_3] = "3",
+  [SDL_SCANCODE_4] = "4",
+  [SDL_SCANCODE_5] = "5",
+  [SDL_SCANCODE_6] = "6",
+  [SDL_SCANCODE_7] = "7",
+  [SDL_SCANCODE_8] = "8",
+  [SDL_SCANCODE_9] = "9",
 
-  [SDLK_KP0] = "kp 0",
-  [SDLK_KP1] = "kp 1",
-  [SDLK_KP2] = "kp 2",
-  [SDLK_KP3] = "kp 3",
-  [SDLK_KP4] = "kp 4",
-  [SDLK_KP5] = "kp 5",
-  [SDLK_KP6] = "kp 6",
-  [SDLK_KP7] = "kp 7",
-  [SDLK_KP8] = "kp 8",
-  [SDLK_KP9] = "kp 9",
+  [SDL_SCANCODE_KP_0] = "kp 0",
+  [SDL_SCANCODE_KP_1] = "kp 1",
+  [SDL_SCANCODE_KP_2] = "kp 2",
+  [SDL_SCANCODE_KP_3] = "kp 3",
+  [SDL_SCANCODE_KP_4] = "kp 4",
+  [SDL_SCANCODE_KP_5] = "kp 5",
+  [SDL_SCANCODE_KP_6] = "kp 6",
+  [SDL_SCANCODE_KP_7] = "kp 7",
+  [SDL_SCANCODE_KP_8] = "kp 8",
+  [SDL_SCANCODE_KP_9] = "kp 9",
 
-  [SDLK_KP_PERIOD] = "kp .",
-  [SDLK_KP_DIVIDE] = "kp /",
-  [SDLK_KP_MULTIPLY] = "kp *",
-  [SDLK_KP_MINUS] = "kp -",
-  [SDLK_KP_PLUS] = "kp +",
-  [SDLK_KP_ENTER] = "enter",
-  [SDLK_KP_EQUALS] = "kp =",
-  [SDLK_DELETE] = "delete",
+  [SDL_SCANCODE_KP_PERIOD] = "kp .",
+  [SDL_SCANCODE_KP_DIVIDE] = "kp /",
+  [SDL_SCANCODE_KP_MULTIPLY] = "kp *",
+  [SDL_SCANCODE_KP_MINUS] = "kp -",
+  [SDL_SCANCODE_KP_PLUS] = "kp +",
+  [SDL_SCANCODE_KP_ENTER] = "enter",
+  [SDL_SCANCODE_KP_EQUALS] = "kp =",
+  [SDL_SCANCODE_DELETE] = "delete",
 
-  [SDLK_a] = "a",
-  [SDLK_b] = "b",
-  [SDLK_c] = "c",
-  [SDLK_d] = "d",
-  [SDLK_e] = "e",
-  [SDLK_f] = "f",
-  [SDLK_g] = "g",
-  [SDLK_h] = "h",
-  [SDLK_i] = "i",
-  [SDLK_j] = "j",
-  [SDLK_k] = "k",
-  [SDLK_l] = "l",
-  [SDLK_m] = "m",
-  [SDLK_n] = "n",
-  [SDLK_o] = "o",
-  [SDLK_p] = "p",
-  [SDLK_q] = "q",
-  [SDLK_r] = "r",
-  [SDLK_s] = "s",
-  [SDLK_t] = "t",
-  [SDLK_u] = "u",
-  [SDLK_v] = "v",
-  [SDLK_w] = "w",
-  [SDLK_x] = "x",
-  [SDLK_y] = "y",
-  [SDLK_z] = "z",
+  [SDL_SCANCODE_A] = "a",
+  [SDL_SCANCODE_B] = "b",
+  [SDL_SCANCODE_C] = "c",
+  [SDL_SCANCODE_D] = "d",
+  [SDL_SCANCODE_E] = "e",
+  [SDL_SCANCODE_F] = "f",
+  [SDL_SCANCODE_G] = "g",
+  [SDL_SCANCODE_H] = "h",
+  [SDL_SCANCODE_I] = "i",
+  [SDL_SCANCODE_J] = "j",
+  [SDL_SCANCODE_K] = "k",
+  [SDL_SCANCODE_L] = "l",
+  [SDL_SCANCODE_M] = "m",
+  [SDL_SCANCODE_N] = "n",
+  [SDL_SCANCODE_O] = "o",
+  [SDL_SCANCODE_P] = "p",
+  [SDL_SCANCODE_Q] = "q",
+  [SDL_SCANCODE_R] = "r",
+  [SDL_SCANCODE_S] = "s",
+  [SDL_SCANCODE_T] = "t",
+  [SDL_SCANCODE_U] = "u",
+  [SDL_SCANCODE_V] = "v",
+  [SDL_SCANCODE_W] = "w",
+  [SDL_SCANCODE_X] = "x",
+  [SDL_SCANCODE_Y] = "y",
+  [SDL_SCANCODE_Z] = "z",
 
-  [SDLK_F1] = "f1",
-  [SDLK_F2] = "f2",
-  [SDLK_F3] = "f3",
-  [SDLK_F4] = "f4",
-  [SDLK_F5] = "f5",
-  [SDLK_F6] = "f6",
-  [SDLK_F7] = "f7",
-  [SDLK_F8] = "f8",
-  [SDLK_F9] = "f9",
-  [SDLK_F10] = "f10",
-  [SDLK_F11] = "f11",
-  [SDLK_F12] = "f12",
-  [SDLK_F13] = "f13",
-  [SDLK_F14] = "f14",
-  [SDLK_F15] = "f15",
+  [SDL_SCANCODE_F1] = "f1",
+  [SDL_SCANCODE_F2] = "f2",
+  [SDL_SCANCODE_F3] = "f3",
+  [SDL_SCANCODE_F4] = "f4",
+  [SDL_SCANCODE_F5] = "f5",
+  [SDL_SCANCODE_F6] = "f6",
+  [SDL_SCANCODE_F7] = "f7",
+  [SDL_SCANCODE_F8] = "f8",
+  [SDL_SCANCODE_F9] = "f9",
+  [SDL_SCANCODE_F10] = "f10",
+  [SDL_SCANCODE_F11] = "f11",
+  [SDL_SCANCODE_F12] = "f12",
+  [SDL_SCANCODE_F13] = "f13",
+  [SDL_SCANCODE_F14] = "f14",
+  [SDL_SCANCODE_F15] = "f15",
 
-  [SDLK_UP] = "up",
-  [SDLK_DOWN] = "down",
-  [SDLK_LEFT] = "left",
-  [SDLK_RIGHT] = "right",
+  [SDL_SCANCODE_UP] = "up",
+  [SDL_SCANCODE_DOWN] = "down",
+  [SDL_SCANCODE_LEFT] = "left",
+  [SDL_SCANCODE_RIGHT] = "right",
 
-  [SDLK_INSERT] = "insert",
-  [SDLK_HOME] = "home",
-  [SDLK_END] = "end",
-  [SDLK_PAGEUP] = "page up",
-  [SDLK_PAGEDOWN] = "page down",
+  [SDL_SCANCODE_INSERT] = "insert",
+  [SDL_SCANCODE_HOME] = "home",
+  [SDL_SCANCODE_END] = "end",
+  [SDL_SCANCODE_PAGEUP] = "page up",
+  [SDL_SCANCODE_PAGEDOWN] = "page down",
 };
 hashtable_t *gIoReverseKeySymMap;
 
@@ -293,7 +271,7 @@ void ioInitJoysticks(void);
 /*
     Used to filter away joystick axis events
  */
-static int ioFilter(const SDL_Event *ev)
+static int ioFilter(void *data, SDL_Event *ev)
 {
   switch (ev->type) {
   case SDL_JOYAXISMOTION:
@@ -310,13 +288,13 @@ INIT_PRIMARY_MODULE
 {
   gIoReverseKeySymMap = hashtable_new_with_str_keys(1024);
   gIoButtonHandlers = hashtable_new_with_str_keys(2048);
-  for (size_t i = 0 ; i < SDLK_LAST ; ++ i) {
+  for (size_t i = 0 ; i < SDL_NUM_SCANCODES ; ++ i) {
     if (keysymmap[i] != NULL) {
       hashtable_insert(gIoReverseKeySymMap, keysymmap[i], (void*)i);
     }
   }
 
-  for (size_t i = 0 ; i < SDLK_LAST ; ++ i) {
+  for (size_t i = 0 ; i < SDL_NUM_SCANCODES ; ++ i) {
     for (size_t j = 0 ; j < OO_Key_Mod_Count ; ++ j) {
       gIoKeyData[i].up[j].isScript = false;
       gIoKeyData[i].up[j].cHandler = ooButtonHandlerGnd;
@@ -336,12 +314,12 @@ INIT_PRIMARY_MODULE
   }
 
   // Hook up the quit handler as default to cmd / meta q, this overrides the initkeys conf
-  gIoKeyData[SDLK_q].down[OO_L_Cmd].isScript = false;
-  gIoKeyData[SDLK_q].down[OO_L_Cmd].cHandler = ioQuitHandler;
-  gIoKeyData[SDLK_q].down[OO_L_Cmd].data = NULL;
-  gIoKeyData[SDLK_q].down[OO_R_Cmd].isScript = false;
-  gIoKeyData[SDLK_q].down[OO_R_Cmd].cHandler = ioQuitHandler;
-  gIoKeyData[SDLK_q].down[OO_R_Cmd].data = NULL;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_L_Cmd].isScript = false;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_L_Cmd].cHandler = ioQuitHandler;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_L_Cmd].data = NULL;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_R_Cmd].isScript = false;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_R_Cmd].cHandler = ioQuitHandler;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_R_Cmd].data = NULL;
 
 }
 
@@ -350,7 +328,7 @@ ioInit(void)
 {
   assert(SDL_WasInit(SDL_INIT_JOYSTICK) == SDL_INIT_JOYSTICK);
 
-  SDL_SetEventFilter(ioFilter);
+  SDL_SetEventFilter(ioFilter, NULL);
 
   // Now initialize joysticks
   ioInitJoysticks();
@@ -360,12 +338,12 @@ ioInit(void)
 
 
   // Hook up the quit handler as default to cmd / meta q, this overrides the initkeys conf
-  gIoKeyData[SDLK_q].down[OO_L_Cmd].isScript = false;
-  gIoKeyData[SDLK_q].down[OO_L_Cmd].cHandler = ioQuitHandler;
-  gIoKeyData[SDLK_q].down[OO_L_Cmd].data = NULL;
-  gIoKeyData[SDLK_q].down[OO_R_Cmd].isScript = false;
-  gIoKeyData[SDLK_q].down[OO_R_Cmd].cHandler = ioQuitHandler;
-  gIoKeyData[SDLK_q].down[OO_R_Cmd].data = NULL;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_L_Cmd].isScript = false;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_L_Cmd].cHandler = ioQuitHandler;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_L_Cmd].data = NULL;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_R_Cmd].isScript = false;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_R_Cmd].cHandler = ioQuitHandler;
+  gIoKeyData[SDL_SCANCODE_Q].down[OO_R_Cmd].data = NULL;
 }
 
 void
@@ -399,7 +377,7 @@ ioInitKeys(void)
 void
 ioDispatchKeyUp(int key, uint16_t mask)
 {
-  assert(key < SDLK_LAST);
+  assert(key < SDL_NUM_SCANCODES);
 
   IOkeymod kmod = OO_None;
   if (mask == OO_IO_MOD_NONE) {
@@ -432,9 +410,7 @@ ioDispatchKeyUp(int key, uint16_t mask)
 void
 ioDispatchKeyDown(int key, uint16_t mask)
 {
-  ooLogInfo("keydown event");
-
-  assert(key < SDLK_LAST);
+  assert(key < SDL_NUM_SCANCODES);
 
   IOkeymod kmod = OO_None;
   if (mask == OO_IO_MOD_NONE) {
@@ -482,6 +458,24 @@ ioDispatchButtonUp(int dev, int button)
   } else {
     gJoyButtons.joy[dev]->up[button].cHandler(false, gJoyButtons.joy[dev]->up[button].data);
   }
+}
+
+void
+ioRegActionHandler(const char *name, OObuttonhandlerfunc handlerFunc, void *data)
+{
+  OObuttonhandler *handler =
+    (OObuttonhandler*)hashtable_lookup(gIoButtonHandlers, name);
+  if (handler != NULL) {
+    ooLogWarn("%s already registered as button handler", name);
+    return;
+  }
+
+  handler = malloc(sizeof(OObuttonhandler));
+  handler->isScript = false;
+  handler->cHandler = handlerFunc;
+  handler->data = data;
+
+  hashtable_insert(gIoButtonHandlers, name, handler);
 }
 
 

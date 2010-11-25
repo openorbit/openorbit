@@ -55,7 +55,10 @@
 #include "rendering/texture.h"
 #include "physics/physics.h"
 
-#include "SDL.h"
+
+
+#include <SDL/SDL.h>
+//#include "SDL.h"
 //#include "SDL_ttf.h"
 
 /* Simulator SDL events */
@@ -64,6 +67,10 @@
 
 // 25Hz
 #define SIM_STEP_PERIOD 40
+
+SDL_WindowID mainWindow;
+SDL_GLContext mainContext;
+
 
 Uint32
 sim_step_event(Uint32 interval, void *param)
@@ -118,6 +125,10 @@ main_loop(void)
       switch (event.type) {
       case SDL_ACTIVEEVENT:
         break;
+      case SDL_WINDOWEVENT:
+        break;
+      case SDL_TEXTINPUT:
+        break;
       case SDL_MOUSEMOTION:
         if (event.motion.state) {
         }
@@ -127,12 +138,10 @@ main_loop(void)
       case SDL_MOUSEBUTTONUP:
         break;
       case SDL_KEYDOWN:
-          ooLogInfo("button down");
-
-        ioDispatchKeyDown(event.key.keysym.sym, event.key.keysym.mod);
+        ioDispatchKeyDown(event.key.keysym.scancode, event.key.keysym.mod);
         break;
       case SDL_KEYUP:
-        ioDispatchKeyUp(event.key.keysym.sym, event.key.keysym.mod);
+        ioDispatchKeyUp(event.key.keysym.scancode, event.key.keysym.mod);
         break;
       case SDL_JOYHATMOTION:
         break;
@@ -162,6 +171,10 @@ main_loop(void)
           break;
         }
         break;
+      case SDL_FINGERDOWN:
+      case SDL_FINGERUP:
+      case SDL_FINGERMOTION:
+        break;
       case SDL_QUIT:
         done = 1;
         break;
@@ -173,11 +186,25 @@ main_loop(void)
     // draw as often as possible
     sgPaint(gSIM_state.sg);
 
-    SDL_GL_SwapBuffers();
+    SDL_GL_SwapWindow(mainWindow);
     frames ++;
   }
 }
 
+//int
+//SDL_main(int argc, char *argv[])
+//{
+//  assert(0 && "never go here");
+//  return 0;
+//}
+
+void
+sdl_atexit(void)
+{
+  SDL_GL_DeleteContext(mainContext);
+  SDL_DestroyWindow(mainWindow);
+  SDL_Quit();
+}
 
 int
 main(int argc, char*argv[])
@@ -225,7 +252,7 @@ main(int argc, char*argv[])
     ooLogFatal("script/postinit.py missing");
   }
 
-  atexit(SDL_Quit);
+  atexit(sdl_atexit);
 
   // Draw, get events...
   main_loop();

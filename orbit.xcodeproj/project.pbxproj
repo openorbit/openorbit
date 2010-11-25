@@ -28,6 +28,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		EC00A4A41292E42300B80299 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC00A4A31292E42300B80299 /* SDL.framework */; };
+		EC00A5901292E50500B80299 /* SDL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC0FB8CA119FF1BC00CEF95A /* font in Resources */ = {isa = PBXBuildFile; fileRef = EC0FB8B1119FF1BC00CEF95A /* font */; };
 		EC0FB9BC11A55B5900CEF95A /* test-pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0FB9AF11A558E700CEF95A /* test-pubsub.c */; };
 		EC0FB9BD11A55B5F00CEF95A /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
@@ -63,7 +65,6 @@
 		EC34BC891079EE080011B76E /* rockets.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC151079EE080011B76E /* rockets.c */; };
 		EC34BC8A1079EE080011B76E /* sectors.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC161079EE080011B76E /* sectors.c */; };
 		EC34BC8B1079EE080011B76E /* res-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC191079EE080011B76E /* res-manager.c */; };
-		EC34BC8C1079EE080011B76E /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC1B1079EE080011B76E /* SDLMain.m */; };
 		EC34BC8F1079EE080011B76E /* plugin-handler.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC201079EE080011B76E /* plugin-handler.c */; };
 		EC34BC931079EE080011B76E /* camera.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC281079EE080011B76E /* camera.c */; };
 		EC34BC941079EE080011B76E /* colour.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC2A1079EE080011B76E /* colour.c */; };
@@ -253,6 +254,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		EC00A4961292E34D00B80299 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				EC00A5901292E50500B80299 /* SDL.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EC47E6B411D4D23200523F78 /* Copy Scripts */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -267,6 +279,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		EC00A4A31292E42300B80299 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = deps/SDL.framework; sourceTree = "<group>"; };
 		EC030D6911084749004F3AD8 /* Simulation Design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Simulation Design"; sourceTree = "<group>"; };
 		EC0FB8B1119FF1BC00CEF95A /* font */ = {isa = PBXFileReference; lastKnownFileType = folder; path = font; sourceTree = "<group>"; };
 		EC0FB9AF11A558E700CEF95A /* test-pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-pubsub.c"; sourceTree = "<group>"; };
@@ -413,7 +426,7 @@
 		EC4476C60CCC0010001C88AD /* t006_list */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t006_list; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4476DE0CCC0076001C88AD /* Open Orbit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Open Orbit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Open Orbit-Info.plist"; sourceTree = "<group>"; };
-		EC4476F20CCC056D001C88AD /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
+		EC4476F20CCC056D001C88AD /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = deps/SDL.framework; sourceTree = "<group>"; };
 		EC4485330CCD247E001C88AD /* testdriver-main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "testdriver-main.c"; sourceTree = "<group>"; };
 		EC4485390CCD247E001C88AD /* hash-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "hash-test.c"; sourceTree = "<group>"; };
 		EC44853C0CCD247E001C88AD /* heap-test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "heap-test.c"; sourceTree = "<group>"; };
@@ -569,6 +582,7 @@
 				EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */,
 				EC0FBA7011A66E3300CEF95A /* CoreFoundation.framework in Frameworks */,
 				EC0FBAD811A6721B00CEF95A /* ApplicationServices.framework in Frameworks */,
+				EC00A4A41292E42300B80299 /* SDL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1004,6 +1018,7 @@
 				EC447DDF0CCC0681001C88AD /* Frameworks */,
 				EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */,
 				EC768C4E1060D651009B558C /* openorbit.xcconfig */,
+				EC00A4A31292E42300B80299 /* SDL.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1398,6 +1413,7 @@
 				EC4476DB0CCC0076001C88AD /* Sources */,
 				EC4476DC0CCC0076001C88AD /* Frameworks */,
 				EC47E6B411D4D23200523F78 /* Copy Scripts */,
+				EC00A4961292E34D00B80299 /* Copy Frameworks */,
 			);
 			buildRules = (
 				ECCED4F211CFD9CA00F20D07 /* PBXBuildRule */,
@@ -1600,7 +1616,6 @@
 				EC34BC891079EE080011B76E /* rockets.c in Sources */,
 				EC34BC8A1079EE080011B76E /* sectors.c in Sources */,
 				EC34BC8B1079EE080011B76E /* res-manager.c in Sources */,
-				EC34BC8C1079EE080011B76E /* SDLMain.m in Sources */,
 				EC34BC8F1079EE080011B76E /* plugin-handler.c in Sources */,
 				EC34BC931079EE080011B76E /* camera.c in Sources */,
 				EC34BC941079EE080011B76E /* colour.c in Sources */,
@@ -2153,6 +2168,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/deps\"",
+				);
 				GCC_ALTIVEC_EXTENSIONS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2202,6 +2221,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/deps\"",
+				);
 				GCC_ALTIVEC_EXTENSIONS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;

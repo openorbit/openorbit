@@ -27,8 +27,9 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include <Python.h>
-#include "SDL.h"
-
+	
+//#include "SDL.h"
+#include <SDL/SDL.h>
 
 /* These use the same values as SDL, so for porting (to not use SDL) they must be
    translated in some way */
@@ -53,7 +54,9 @@ extern "C" {
   void ioDispatchButtonUp(int dev, int button);
 
   typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
-/*! Register key handler C function */
+
+  void ioRegActionHandler(const char *name, OObuttonhandlerfunc handlerFunc, void *data);
+  /*! Register key handler C function */
 void ooIoRegCKeyHandler(const char *name, OObuttonhandlerfunc handlerFunc);
 /*! Register key handler Python function */
 void ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc);
