@@ -43,6 +43,7 @@
 /// Used for registering IO handlers in a module. This is guaranteed to be executed
 /// after the IO manager has been initialised.
 #define INIT_IO static void __attribute__((constructor(1))) IOInit(void)
+#define INIT_MFD static void __attribute__((constructor(1))) MFDInit(void)
 
 /// Used for initialiser in a module that depends on a secondary module
 #define INIT_TERTIARY_MODULE static void __attribute__((constructor(2))) Init(void)
