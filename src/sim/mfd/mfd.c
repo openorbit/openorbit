@@ -92,10 +92,22 @@ INIT_MFD {
 //typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
 
 static void
-mfdCycleAction(bool buttonDown, void *data)
+mfdCycleNext(bool buttonDown, void *data)
 {
-
+  assert(mfd_pages.length > 0);
+  SIMmfd *mfd = data;
+  mfd->page_no = (mfd->page_no + 1) % mfd_pages.length;
 }
+
+static void
+mfdCyclePrev(bool buttonDown, void *data)
+{
+  assert(mfd_pages.length > 0);
+  SIMmfd *mfd = data;
+  if (mfd->page_no == 0) mfd->page_no = mfd_pages.length - 1;
+  else mfd->page_no --;
+}
+
 
 static void
 mfdToggle(bool buttonDown, void *data)
@@ -106,17 +118,17 @@ mfdToggle(bool buttonDown, void *data)
 
 
 INIT_IO {
-  ioRegActionHandler("mfd0-cycle-next", mfdCycleAction, &mfd0);
-  ioRegActionHandler("mfd0-cycle-prev", mfdCycleAction, &mfd0);
+  ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, &mfd0);
+  ioRegActionHandler("mfd0-cycle-prev", mfdCyclePrev, &mfd0);
   ioRegActionHandler("mfd0-toggle", mfdToggle, &mfd0);
-  ioRegActionHandler("mfd1-cycle-next", mfdCycleAction, &mfd1);
-  ioRegActionHandler("mfd1-cycle-prev", mfdCycleAction, &mfd1);
+  ioRegActionHandler("mfd1-cycle-next", mfdCycleNext, &mfd1);
+  ioRegActionHandler("mfd1-cycle-prev", mfdCyclePrev, &mfd1);
   ioRegActionHandler("mfd1-toggle", mfdToggle, &mfd1);
-  ioRegActionHandler("mfd2-cycle-next", mfdCycleAction, &mfd2);
-  ioRegActionHandler("mfd2-cycle-prev", mfdCycleAction, &mfd2);
+  ioRegActionHandler("mfd2-cycle-next", mfdCycleNext, &mfd2);
+  ioRegActionHandler("mfd2-cycle-prev", mfdCyclePrev, &mfd2);
   ioRegActionHandler("mfd2-toggle", mfdToggle, &mfd2);
-  ioRegActionHandler("mfd3-cycle-next", mfdCycleAction, &mfd3);
-  ioRegActionHandler("mfd3-cycle-prev", mfdCycleAction, &mfd3);
+  ioRegActionHandler("mfd3-cycle-next", mfdCycleNext, &mfd3);
+  ioRegActionHandler("mfd3-cycle-prev", mfdCyclePrev, &mfd3);
   ioRegActionHandler("mfd3-toggle", mfdToggle, &mfd3);
 }
 
