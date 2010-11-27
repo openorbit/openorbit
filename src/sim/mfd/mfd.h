@@ -20,20 +20,34 @@
 #ifndef SIM_MFD_MFD_H
 #define SIM_MFD_MFD_H
 
+#include <gencds/array.h>
 #include "rendering/scenegraph.h"
 
 typedef struct SIMmfd SIMmfd;
+typedef struct SIMmfdpage SIMmfdpage;
 
-typedef void (*SIMmfddraw)(SIMmfd *mfd);
+typedef void (*SIMmfddraw)(SIMmfdpage *mfd);
 
-struct SIMmfd {
+struct SIMmfdpage {
+  const char *key;
   // drawing context
   SIMmfddraw draw;
 };
 
+struct SIMmfd {
+  SGoverlay super;
+  unsigned page_no;
+};
+
+void simMfdPageRegister(SIMmfdpage *page);
+
+void simMfdInitAll(SGscenegraph *sg);
+
 // Draw top level MFD and the MFD screen
 void simMfdDraw(SIMmfd *mfd);
-
+void simCycleMfd(SIMmfd *mfd);
+void simSelectMfdByKey(SIMmfd *mfd, const char *key);
+void simSelectMfd(SIMmfd *mfd, unsigned mfdId);
 
 typedef struct SIMhud SIMhud;
 

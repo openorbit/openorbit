@@ -27,6 +27,8 @@
 #include "sim.h"
 #include "sim/spacecraft-control.h"
 #include "sim/world-loader.h"
+#include "sim/mfd/mfd.h"
+
 #include "res-manager.h"
 #include "physics/orbit.h"
 #include "rendering/sky.h"
@@ -66,6 +68,8 @@ ooSimInit(void)
   SGcam *cam = sgNewOrbitCam(gSIM_state.sg, scene, ooScGetPLObjForSc(sc),
                              0.0, 0.0, 20.0);
   sgSetCam(gSIM_state.sg, cam);
+
+  simMfdInitAll(gSIM_state.sg);
 }
 
 

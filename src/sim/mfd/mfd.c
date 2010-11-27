@@ -17,19 +17,147 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
+#include <string.h>
 
 #include "mfd.h"
 
-#include <assert.h>
+#include "common/moduleinit.h"
+#include "common/palloc.h"
+#include "io-manager.h"
+#include "rendering/render.h"
 
-void
-simMfdDraw(SIMmfd *mfd)
-{
-  assert(mfd != NULL);
-  // TODO: Draw frame
-  mfd->draw(mfd);
+void simMfdInit(SIMmfd *mfd, unsigned orig_x, unsigned orig_y,
+                unsigned width, unsigned height);
+
+static obj_array_t mfd_pages;
+
+static SIMmfd mfd0, mfd1, mfd2, mfd3;
+
+INIT_PRIMARY_MODULE {
+  obj_array_init(&mfd_pages);
 }
 
+static void
+mfd_draw(SGoverlay *overlay)
+{
+  SIMmfd *mfd = (SIMmfd*)overlay;
+
+  if (mfd_pages.length > 0) {
+    SIMmfdpage *page = ARRAY_ELEM(mfd_pages, mfd->page_no);
+    page->draw(page);
+  } else {
+    glClearColor(0.0, 1.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+  }
+}
+
+
+void
+simMfdInitAll(SGscenegraph *sg)
+{
+  mfd0.page_no = 0;
+  mfd1.page_no = 0;
+  mfd2.page_no = 0;
+  mfd3.page_no = 0;
+
+  sgInitOverlay(&mfd0.super, mfd_draw,   0,   0, 128, 128);
+  sgInitOverlay(&mfd1.super, mfd_draw, sgRenderInfo.w - 128,   0, 128, 128);
+  sgInitOverlay(&mfd2.super, mfd_draw, sgRenderInfo.w - 128, sgRenderInfo.h - 128,
+                128, 128);
+  sgInitOverlay(&mfd3.super, mfd_draw,   0, sgRenderInfo.h - 128, 128, 128);
+
+  sgAddOverlay(sg, &mfd0.super);
+  sgAddOverlay(sg, &mfd1.super);
+  sgAddOverlay(sg, &mfd2.super);
+  sgAddOverlay(sg, &mfd3.super);
+}
+
+// For registring sample mfd
+
+static void
+samplemfddraw(SIMmfdpage *mfd)
+{
+  glClearColor(0.0625, 0.05078125, 0.2265625, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+}
+
+static SIMmfdpage sampleMfdPage = {"sample-mfd", samplemfddraw};
+
+
+INIT_MFD {
+  simMfdPageRegister(&sampleMfdPage);
+}
+
+//typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
+
+static void
+mfdCycleAction(bool buttonDown, void *data)
+{
+
+}
+
+static void
+mfdToggle(bool buttonDown, void *data)
+{
+  SIMmfd *mfd = data;
+  mfd->super.enabled = !mfd->super.enabled;
+}
+
+
+INIT_IO {
+  ioRegActionHandler("mfd0-cycle-next", mfdCycleAction, &mfd0);
+  ioRegActionHandler("mfd0-cycle-prev", mfdCycleAction, &mfd0);
+  ioRegActionHandler("mfd0-toggle", mfdToggle, &mfd0);
+  ioRegActionHandler("mfd1-cycle-next", mfdCycleAction, &mfd1);
+  ioRegActionHandler("mfd1-cycle-prev", mfdCycleAction, &mfd1);
+  ioRegActionHandler("mfd1-toggle", mfdToggle, &mfd1);
+  ioRegActionHandler("mfd2-cycle-next", mfdCycleAction, &mfd2);
+  ioRegActionHandler("mfd2-cycle-prev", mfdCycleAction, &mfd2);
+  ioRegActionHandler("mfd2-toggle", mfdToggle, &mfd2);
+  ioRegActionHandler("mfd3-cycle-next", mfdCycleAction, &mfd3);
+  ioRegActionHandler("mfd3-cycle-prev", mfdCycleAction, &mfd3);
+  ioRegActionHandler("mfd3-toggle", mfdToggle, &mfd3);
+}
+
+void
+simMfdPageRegister(SIMmfdpage *page)
+{
+  assert(page != NULL);
+  obj_array_push(&mfd_pages, page);
+}
+
+
+void
+simCycleMfd(SIMmfd *mfd)
+{
+  assert(mfd != NULL);
+}
+
+void
+simSelectMfdByKey(SIMmfd *mfd, const char *key)
+{
+  assert(mfd != NULL);
+  assert(key != NULL);
+  ARRAY_FOR_EACH(i, mfd_pages) {
+    SIMmfdpage *page = ARRAY_ELEM(mfd_pages, i);
+    if (!strcmp(page->key, key)) {
+      mfd->page_no = i;
+      break;
+    }
+  }
+}
+
+void
+simSelectMfd(SIMmfd *mfd, unsigned mfdId)
+{
+  assert(mfd != NULL);
+  assert(mfdId < mfd_pages.length);
+
+  if (mfdId < mfd_pages.length) {
+    mfd->page_no = mfdId;
+  }
+}
 
 void
 simHudDraw(SIMhud *hud)
