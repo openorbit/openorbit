@@ -43,7 +43,7 @@
 
 //static SDL_Surface *gScreen = NULL;
 
-
+SGrenderinfo sgRenderInfo;
 
 void
 ooInitSdlScreen(int width, int height, bool fullscreen)
@@ -82,6 +82,9 @@ ooSetVideoDefaults(void)
 
   ooInitSdlScreen(width, height, fullscreen);
   ooInitGlAttributes();
+  sgRenderInfo.w = width;
+  sgRenderInfo.h = height;
+
   ooPrintScreenAttributes();
 
   ooSetPerspective(fovy, width, height);
@@ -197,7 +200,47 @@ ooInitGlAttributes(void)
 
   /* This makes our buffer swap syncronized with the monitor's vertical refresh */
   SDL_GL_SetSwapInterval(1);
+
+  // Prepare the renderinfo object
+  const GLubyte *glvers = glGetString(GL_VERSION);
+  const GLubyte *shadervers = glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+  assert(sscanf((const char*)glvers, "%u.%u",
+                &sgRenderInfo.gl_major_vers,
+                &sgRenderInfo.gl_minor_vers) == 2);
+
+  assert(sscanf((const char*)shadervers, "%u.%u",
+                &sgRenderInfo.glsl_major_vers,
+                &sgRenderInfo.glsl_minor_vers) == 2);
+  ooLogInfo("gl version = %u.%u", sgRenderInfo.gl_major_vers,
+            sgRenderInfo.gl_minor_vers);
+  ooLogInfo("glsl version = %u.%u", sgRenderInfo.glsl_major_vers,
+            sgRenderInfo.glsl_minor_vers);
 }
+
+bool
+sgGlslVersionIsAtLeast(unsigned major, unsigned minor)
+{
+  return (major > sgRenderInfo.glsl_major_vers) ||
+         ((major == sgRenderInfo.glsl_major_vers) &&
+          (minor >= sgRenderInfo.glsl_minor_vers));
+}
+
+bool
+sgGlslVersionIsAtMost(unsigned major, unsigned minor)
+{
+  return (major < sgRenderInfo.glsl_major_vers) ||
+  ((major == sgRenderInfo.glsl_major_vers) &&
+   (minor <= sgRenderInfo.glsl_minor_vers));
+}
+
+bool
+sgGlslVersionIs(unsigned major, unsigned minor)
+{
+  return (major == sgRenderInfo.glsl_major_vers) &&
+         (minor == sgRenderInfo.glsl_minor_vers);
+}
+
 
 void
 ooPrintScreenAttributes(void)

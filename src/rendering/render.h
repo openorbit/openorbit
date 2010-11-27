@@ -26,11 +26,27 @@ extern "C" {
 
 #include <stdbool.h>
 
+typedef struct {
+  unsigned w;
+  unsigned h;
+  unsigned gl_major_vers;
+  unsigned gl_minor_vers;
+  unsigned glsl_major_vers;
+  unsigned glsl_minor_vers;
+} SGrenderinfo;
+
+extern SGrenderinfo sgRenderInfo;
+
 void ooInitGlAttributes(void);
 void ooSetPerspective(float fovy, int width, int height);
 void ooSetVideoDefaults(void);
 void ooResizeScreen(int width, int height, bool fullscreen);
 void ooPrintScreenAttributes(void);
+
+  /*! Predicate for glsl version checks */
+  bool sgGlslVersionIs(unsigned major, unsigned minor);
+  bool sgGlslVersionIsAtMost(unsigned major, unsigned minor);
+  bool sgGlslVersionIsAtLeast(unsigned major, unsigned minor);
 
 #ifdef __cplusplus
 }
