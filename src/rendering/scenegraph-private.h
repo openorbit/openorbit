@@ -46,11 +46,6 @@ struct SGoctreescene {
   SGscene super;
 
 };
-struct SGoverlay {
-//  OOtexture *tex;
-  float x, y;
-  float w, h;
-};
 
 struct SGscenegraph {
   SGcam *currentCam;

@@ -1,5 +1,5 @@
 /*
-  Copyright 2008,2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2008,2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -37,7 +37,7 @@
 #include "texture.h"
 #include "common/lwcoord.h"
 #include "parsers/model.h"
-
+#include "render.h"
 
 SGcam*
 sgGetCam(SGscenegraph *sg)
@@ -139,29 +139,112 @@ sgGetScene(SGscenegraph *sg, const char *sceneName)
   return NULL;
 }
 
+void
+sgAddOverlay(SGscenegraph *sg, SGoverlay *overlay)
+{
+  obj_array_push(&sg->overlays, overlay);
+}
+void
+sgInitOverlay(SGoverlay *overlay, SGdrawoverlay drawfunc,
+              unsigned x, unsigned y, unsigned w, unsigned h)
+{
+  overlay->enabled = true;
+  overlay->draw = drawfunc;
+  overlay->x = x;
+  overlay->y = y;
+  overlay->w = w;
+  overlay->h = h;
+
+  glGenFramebuffers(1, &overlay->fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, overlay->fbo);
+  glGenTextures(1, &overlay->tex);
+  glBindTexture(GL_TEXTURE_2D, overlay->tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,  w, h, 0, GL_RGBA,
+               GL_UNSIGNED_BYTE, NULL);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+  SG_CHECK_ERROR;
+
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                         overlay->tex, 0);
+  SG_CHECK_ERROR;
+
+  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  assert(status == GL_FRAMEBUFFER_COMPLETE);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
 
 
 void
-sgDrawOverlay(SGoverlay *overlay)
+sgDrawOverlays(SGscenegraph *sg)
 {
-  glMatrixMode(GL_MODELVIEW);
-  // TODO: Ensure that depth test is run, but overlay is infinitly close
-  glDisable(GL_DEPTH_TEST);//|GL_LIGHTNING);
-
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0.0, sgRenderInfo.w, 0.0, sgRenderInfo.h, -1.0, 1.0);
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
 
-//  glBindTexture(GL_TEXTURE_2D, overlay->tex->texId);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_LIGHTING);
+  glDisable(GL_CULL_FACE);
 
-  glBegin(GL_QUADS);
-    glVertex2f(overlay->x, overlay->y);
-    glVertex2f(overlay->w, overlay->y);
-    glVertex2f(overlay->w, overlay->h);
-    glVertex2f(overlay->x, overlay->h);
-  glEnd();
+  for (size_t i = 0 ; i < sg->overlays.length ; i ++) {
+    SGoverlay *overlay = ARRAY_ELEM(sg->overlays, i);
 
+    if (overlay->enabled) {
+      // Bind the fbo texture so that the mfd rendering ends up in the texture
+      glBindFramebuffer(GL_FRAMEBUFFER, overlay->fbo);
+      glBindTexture(GL_TEXTURE_2D, overlay->tex);
+      glPushAttrib(GL_VIEWPORT_BIT);
+
+      glViewport(0,0, overlay->w, overlay->h);
+
+      ooLogTrace("draw overlay %d", i);
+      overlay->draw(overlay);
+
+      glPopAttrib();
+
+      GLubyte data[4*128*128];
+      glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, overlay->tex);
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+      // Draws the texture in the overlay fbo texture
+      glBegin(GL_QUADS);
+
+      glTexCoord2f(0.0f, 0.0f);
+      glVertex3f (overlay->x, overlay->y, 0.0);
+      glTexCoord2f(1.0f, 0.0f);
+      glVertex3f(overlay->x + overlay->w, overlay->y, 0.0);
+      glTexCoord2f(1.0, 1.0);
+      glVertex3f(overlay->x + overlay->w, overlay->y + overlay->h, 0.0);
+      glTexCoord2f(0.0, 1.0);
+      glVertex3f(overlay->x, overlay->y + overlay->h, 0.0);
+
+      glEnd();
+    }
+  }
+
+
+  glMatrixMode(GL_PROJECTION);
   glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_CULL_FACE);
+
+
 }
 
 int
@@ -252,8 +335,10 @@ sgPaint(SGscenegraph *sg)
   assert(sg != NULL);
   ooLogTrace("SgPaint");
 
+  glClearColor(0.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
+  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -264,12 +349,6 @@ sgPaint(SGscenegraph *sg)
   sg->sky->draw(sg->sky);
   glPopMatrix();
 
-  // Then the overlays
-  for (size_t i = 0 ; i < sg->overlays.length ; i ++) {
-    ooLogTrace("draw overlay %d", i);
-    sgDrawOverlay(sg->overlays.elems[i]);
-  }
-
   glPushMatrix();
 
   sgCamRotate(sg->currentCam);
@@ -277,6 +356,9 @@ sgPaint(SGscenegraph *sg)
   sgSceneDraw(sg->currentCam->scene);
 
   glPopMatrix();
+
+  // Draw overlays
+  sgDrawOverlays(sg);
 }
 
 void

@@ -38,11 +38,24 @@
 #include "light.h"
 #include "drawable.h"
 
+
+typedef void (*SGdrawoverlay)(SGoverlay *);
+
+struct SGoverlay {
+  bool enabled;
+  float x, y;
+  float w, h;
+  GLuint fbo;
+  GLuint tex;
+  SGdrawoverlay draw;
+};
+
+
 void sgSetScenePos3f(SGscene *sc, float x, float y, float z);
 
 void sgSetScenePosLW(SGscene *sc, const OOlwcoord *lwc);
 
-void sgDrawOverlay(SGoverlay *overlay);
+void sgDrawOverlays(SGscenegraph *sg);
 
 SGscenegraph* sgNewSceneGraph();
 void sgPaint(SGscenegraph *sg);
@@ -84,5 +97,10 @@ void sgCheckGLError(const char *file, int line);
 void sgClearGLError(void);
 
 #define SG_CHECK_ERROR sgCheckGLError(__FILE__, __LINE__)
+
+void sgAddOverlay(SGscenegraph *sg, SGoverlay *overlay);
+void sgInitOverlay(SGoverlay *overlay, SGdrawoverlay drawfunc,
+                   unsigned x, unsigned y,
+                   unsigned w, unsigned h);
 
 #endif /* SCENEGRAPH_H_ */
