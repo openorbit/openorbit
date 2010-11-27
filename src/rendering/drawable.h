@@ -53,6 +53,7 @@ struct SGdrawable {
                   //float s; // Scale
   GLfloat R[16];
   SGdrawfunc draw; // Draw function for this object
+  GLuint shader;
 };
 
 typedef struct SGellipsis {
@@ -64,6 +65,21 @@ typedef struct SGellipsis {
   size_t vertCount;
   float verts[];
 } SGellipsis;
+
+// The ellipsoid is drawn half
+typedef struct SGellipsoid {
+  SGdrawable super;
+  float a;
+  float b;
+  float c;
+  float colour[4];
+  size_t vertCountPerStack;
+  size_t triCountPerStack;
+  size_t stacks;
+  size_t slices;
+  float verts[];
+
+} SGellipsoid;
 
 typedef struct SGmodel {
   SGdrawable super;
@@ -108,8 +124,21 @@ struct SGcylinder {
   GLfloat height;
 };
 
+typedef struct SGvector {
+  SGdrawable super;
+  float3 v;
+  float col[3];
+} SGvector;
+
+#define SG_LABEL_LEN 128
+typedef struct SGlabel {
+  SGdrawable super;
+  float col[3];
+  char buff[SG_LABEL_LEN];
+} SGlabel;
 
 SGdrawable* sgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df);
+void sgDrawableLoadShader(SGdrawable *obj, const char *shader);
 
 void sgSetObjectQuat4f(SGdrawable *obj, float x, float y, float z, float w);
 void sgSetObjectQuatv(SGdrawable *obj, quaternion_t q);
@@ -135,6 +164,12 @@ SGdrawable* sgLoadModel(const char *file);
 void sgDrawableAddChild(SGdrawable * restrict parent, SGdrawable * restrict child,
                         float3 t, quaternion_t q);
 void sgPaintDrawable(SGdrawable *drawable);
+
+SGdrawable* sgNewVector(const char *name, float3 vec, float r, float g, float b);
+
+SGdrawable* sgNewEllipsoid(const char *name, float a, float b, float c,
+                           float red, float green, float blue, float alpha,
+                           unsigned slices, unsigned stacks);
 
 
 #endif /* !SG_DRAWABLE_H */

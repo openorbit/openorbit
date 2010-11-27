@@ -25,6 +25,14 @@
 #include "common/lwcoord.h"
 #include "parsers/model.h"
 #include "res-manager.h"
+#include "rendering/texture.h"
+#include "log.h"
+#include "shader-manager.h"
+void
+sgDrawableLoadShader(SGdrawable *obj, const char *shader)
+{
+  obj->shader = sgLoadProgram(shader, shader, shader, shader);
+}
 
 void
 sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset)
@@ -168,6 +176,9 @@ sgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df)
   drawable->siblings.next = NULL;
   drawable->siblings.prev = NULL;
   drawable->parent = NULL;
+
+  drawable->shader = 0;
+
   return drawable;
 }
 
@@ -647,6 +658,7 @@ sgPaintDrawable(SGdrawable *drawable)
 {
   SG_CHECK_ERROR;
 
+  glUseProgram(drawable->shader);
   glPushMatrix();
   glTranslatef(drawable->p.x, drawable->p.y, drawable->p.z);
   glMultMatrixf(drawable->R);
@@ -662,3 +674,167 @@ sgPaintDrawable(SGdrawable *drawable)
   glPopMatrix();
   SG_CHECK_ERROR;
 }
+
+void
+sgDrawVector(SGvector *vec)
+{
+  SG_CHECK_ERROR;
+
+  glDisable(GL_TEXTURE_2D); // Lines are not textured...
+  glDisable(GL_LIGHTING); // Lines are not lit, just colored
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
+
+  glLineWidth(1.0);
+
+  glColor3f(vec->col[0], vec->col[1], vec->col[2]);
+  glBegin(GL_LINES);
+  glVertex3f(0.0, 0.0, 0.0);
+  glVertex3f(vec->v.x, vec->v.y, vec->v.z);
+  glEnd();
+
+  SG_CHECK_ERROR;
+}
+
+SGdrawable*
+sgNewVector(const char *name, float3 vec, float r, float g, float b)
+{
+  SGvector *v = malloc(sizeof(SGvector));
+  v->v = vec;
+  v->col[0] = r;
+  v->col[1] = g;
+  v->col[2] = b;
+
+  return sgNewDrawable((SGdrawable*)v, name, (SGdrawfunc)sgDrawVector);
+}
+
+void
+sgDrawLabel(SGlabel *label)
+{
+
+}
+
+SGdrawable*
+sgNewLabel(const char *name, const char *str)
+{
+  SGlabel *lab = malloc(sizeof(SGlabel));
+
+  strncpy(lab->buff, str, SG_LABEL_LEN);
+  lab->buff[SG_LABEL_LEN-1] = '\0';
+  return sgNewDrawable((SGdrawable*)lab, name, (SGdrawfunc)sgDrawLabel);
+}
+
+void
+sgPrintLabel(SGlabel *label, const char *str)
+{
+  strncpy(label->buff, str, SG_LABEL_LEN);
+  label->buff[SG_LABEL_LEN-1] = '\0';
+}
+
+
+SGdrawable*
+sgNewVectorWithLabel(const char *name, float3 v, float r, float g, float b)
+{
+//  SGdrawable *vec = sgNewVector(name, v, r, g, b);
+
+//  return sgDrawableAddChild(vec, label, v, q_rot(1.0, 0.0, 0.0, 0.0));
+  return NULL;
+}
+
+
+void
+sgDrawEllipsoid(SGellipsoid *el)
+{
+  SG_CHECK_ERROR;
+
+  // Rest may be needed later...
+  //glDisable (GL_BLEND);
+  //glDisable (GL_DITHER);
+  //glDisable (GL_FOG);
+  //glShadeModel (GL_FLAT);
+
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_LIGHTING); // Fully lit, i.e. just colored
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
+  glPushMatrix();
+  glColor4fv(el->colour);
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+
+  //glPrimitiveRestartIndex(0xffffffff)
+  //glDrawElements(	GL_TRIANGLE_STRIP, el->vertexCount, GL_UINT, el->indices);
+
+  // TODO: glMultiDrawArrays
+  for (unsigned i = 0 ; i < el->stacks ; ++i) {
+    glVertexPointer(3, GL_FLOAT, 0, &el->verts[el->vertCountPerStack*i]);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, el->vertCountPerStack);
+  }
+
+  glVertexPointer(3, GL_FLOAT, 0, &el->verts[el->vertCountPerStack*el->stacks]);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, el->slices + 1);
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glPopMatrix();
+
+  SG_CHECK_ERROR;
+}
+
+
+SGdrawable*
+sgNewEllipsoid(const char *name, float a, float b, float c,
+               float red, float green, float blue, float alpha,
+               unsigned slices, unsigned stacks)
+{
+  unsigned vertCount = slices * stacks * 2 + 2 + slices + 1;
+  SGellipsoid *el = malloc(sizeof(SGellipsoid) + vertCount * 3 * sizeof(float));
+  // glGenVertexArrays
+  // glBindVertexArray
+  // glBufferData(GL_ARRAY_BUFFER, vertcount*sizeof(float)*3, vertices, GL_STATIC_DRAW)
+  el->a = a;
+  el->b = b;
+  el->c = c;
+
+  el->colour[0] = red;
+  el->colour[1] = green;
+  el->colour[2] = blue;
+  el->colour[3] = alpha;
+  el->stacks = stacks;
+  el->slices = slices;
+  el->vertCountPerStack = (vertCount - (slices + 1)) / stacks;
+  el->triCountPerStack = el->vertCountPerStack - 2;
+
+  // Build ellipsoid vertices
+  for (unsigned i = 0 ; i < el->stacks ; ++i) {
+    float x, y, z;
+
+    // Initiate the first two vertices in the first triangle, after this the loop
+    // creates one vertex per triangle.
+    x = a * cos(0*DEG_TO_RAD(90.0)/slices) * cos(i*DEG_TO_RAD(360.0)/el->stacks);
+    y = b * cos(0*DEG_TO_RAD(90.0)/slices) * sin(i*DEG_TO_RAD(360.0)/el->stacks);
+    z = c * sin(0*DEG_TO_RAD(90.0)/slices);
+    el->verts[3*(i*el->vertCountPerStack + 2) + 0] = x;
+    el->verts[3*(i*el->vertCountPerStack + 2) + 1] = y;
+    el->verts[3*(i*el->vertCountPerStack + 2) + 2] = z;
+
+    x = a * cos(0*DEG_TO_RAD(90.0)/slices) * cos(i*DEG_TO_RAD(360.0)/el->stacks);
+    y = b * cos(0*DEG_TO_RAD(90.0)/slices) * sin(i*DEG_TO_RAD(360.0)/el->stacks);
+    z = c * sin(0*DEG_TO_RAD(90.0)/slices);
+
+    el->verts[3*(i*el->vertCountPerStack + 2) + 3] = x;
+    el->verts[3*(i*el->vertCountPerStack + 2) + 4] = y;
+    el->verts[3*(i*el->vertCountPerStack + 2) + 5] = z;
+
+    for (unsigned j = 0 ; j < el->triCountPerStack ; ++j) {
+      x = a * cos(j*DEG_TO_RAD(90.0)/slices) * cos(i*DEG_TO_RAD(360.0)/el->stacks);
+      y = b * cos(j*DEG_TO_RAD(90.0)/slices) * sin(i*DEG_TO_RAD(360.0)/el->stacks);
+      z = c * sin(j*DEG_TO_RAD(90.0)/slices);
+      el->verts[3*(i*el->vertCountPerStack + j + 2) + 0] = x;
+      el->verts[3*(i*el->vertCountPerStack + j + 2) + 1] = y;
+      el->verts[3*(i*el->vertCountPerStack + j + 2) + 2] = z;
+    }
+  }
+
+  return sgNewDrawable((SGdrawable*)el, name, (SGdrawfunc)sgDrawEllipsoid);
+}
+

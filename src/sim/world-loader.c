@@ -47,6 +47,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
   double mass, radius, siderealPeriod, gm = NAN, axialTilt = 0.0;
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong;
   const char *tex = NULL;
+  const char *shader = NULL;
 
   double flattening = 0.0;
   HRMLobject *sats = NULL;
@@ -97,6 +98,8 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
 
         } else if (!strcmp(rend->name, "texture")) {
           tex = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "shader")) {
+          shader = hrmlGetStr(rend);
         }
       }
     }
@@ -122,6 +125,10 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);
 
+  if (shader) {
+    sgDrawableLoadShader(drawable, shader);
+  }
+
   plSetDrawable(moonSys->orbitalBody, drawable);
 }
 
@@ -136,6 +143,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
   double mass, radius, siderealPeriod, axialTilt = 0.0, gm = NAN;
   double semiMajor, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
   const char *tex = NULL;
+  const char *shader = NULL;
   HRMLobject *sats = NULL;
   double flattening = 0.0;
 
@@ -185,6 +193,8 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
 
         } else if (!strcmp(rend->name, "texture")) {
           tex = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "shader")) {
+          shader = hrmlGetStr(rend);
         }
       }
     } else if (!strcmp(child->name, "satellites")) {
@@ -210,6 +220,11 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
   plSetDrawable(sys->orbitalBody, drawable);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);
+
+  if (shader) {
+    sgDrawableLoadShader(drawable, shader);
+  }
+
   if (sats) {
     for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {
       if (!strcmp(sat->name, "moon")) {
@@ -229,6 +244,7 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
   double mass = 0.0, gm = NAN;
   double radius, siderealPeriod, axialTilt;
   const char *tex = NULL;
+  const char *shader = NULL;
   double flattening = 0.0;
 
   HRMLobject *sats = NULL;
@@ -257,6 +273,8 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
 
         } else if (!strcmp(rend->name, "texture")) {
           tex = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "shader")) {
+          shader = hrmlGetStr(rend);
         }
       }
     }
@@ -282,6 +300,11 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
   plSetDrawable(world->rootSys->orbitalBody, drawable);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);
+
+  if (shader) {
+    sgDrawableLoadShader(drawable, shader);
+  }
+
 
   assert(sats != NULL);
   for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {

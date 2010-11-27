@@ -55,8 +55,11 @@ sgLoadProgram(const char *key,
 
   GLuint shaderProgram = glCreateProgram();
   si->ident = shaderProgram;
-  hashtable_insert(shaderKeyMap, key, si);
+  hashtable_insert(shaderKeyMap, key, si); // Memoize if loaded again
 
+  bool didLoadVertexShader = false;
+  bool didLoadFragShader = false;
+  bool didLoadGeoShader = false;
   if (vspath) {
     mapped_file_t mf;
     GLuint shaderId;
@@ -64,6 +67,8 @@ sgLoadProgram(const char *key,
     strcpy(pattern, vspath);
     strcat(pattern, "/*.vertex");
     glob_t shaders = ooResGetFilePaths(pattern);
+
+    if (shaders.gl_matchc > 0) didLoadVertexShader = true;
 
     for (int i = 0 ; i < shaders.gl_matchc ; ++ i) {
       mf = map_file(shaders.gl_pathv[i]);
@@ -94,6 +99,8 @@ sgLoadProgram(const char *key,
     strcpy(pattern, vspath);
     strcat(pattern, "/*.fragment");
     glob_t shaders = ooResGetFilePaths(pattern);
+
+    if (shaders.gl_matchc > 0) didLoadFragShader = true;
 
     for (int i = 0 ; i < shaders.gl_matchc ; ++ i) {
       mf = map_file(shaders.gl_pathv[i]);
@@ -126,6 +133,13 @@ sgLoadProgram(const char *key,
   }
   ooLogInfo("shader program succesfully linked");
 
+  if (!didLoadVertexShader && !didLoadFragShader && !didLoadGeoShader) {
+    ooLogInfo("no shaders found for '%s'", key);
+    glDeleteProgram(shaderProgram);
+    hashtable_remove(shaderKeyMap, key); // Memoize if loaded again
+
+    return 0;
+  }
   return shaderProgram;
 }
 
