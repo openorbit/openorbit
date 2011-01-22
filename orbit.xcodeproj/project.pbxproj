@@ -133,6 +133,7 @@
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
 		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
+		EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9DA88A12EB84540028A131 /* libfreetype.a */; };
 		EC9ECBE61195964500229A8E /* mercury.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECBE51195964500229A8E /* mercury.c */; };
 		EC9ECC271196C54800229A8E /* battery.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC261196C54800229A8E /* battery.c */; };
 		EC9ECC2A1196C7E000229A8E /* propellant-tank.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC291196C7E000229A8E /* propellant-tank.c */; };
@@ -467,6 +468,7 @@
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
 		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
+		EC9DA88A12EB84540028A131 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = /opt/local/lib/libfreetype.a; sourceTree = "<absolute>"; };
 		EC9ECBE51195964500229A8E /* mercury.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mercury.c; sourceTree = "<group>"; };
 		EC9ECC251196C54800229A8E /* battery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battery.h; sourceTree = "<group>"; };
 		EC9ECC261196C54800229A8E /* battery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battery.c; sourceTree = "<group>"; };
@@ -583,6 +585,7 @@
 				EC0FBA7011A66E3300CEF95A /* CoreFoundation.framework in Frameworks */,
 				EC0FBAD811A6721B00CEF95A /* ApplicationServices.framework in Frameworks */,
 				EC00A4A41292E42300B80299 /* SDL.framework in Frameworks */,
+				EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1043,6 +1046,7 @@
 		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EC9DA88A12EB84540028A131 /* libfreetype.a */,
 				EC88CFC010A2B8F100A11B1D /* libxml2.dylib */,
 				EC0FBA6F11A66E3300CEF95A /* CoreFoundation.framework */,
 				EC34BD62107B26D30011B76E /* libcheck.a */,
@@ -2199,6 +2203,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(ORBIT_LIBPATH)",
 					/usr/X11/lib,
+					/opt/local/lib,
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "";
 				OTHER_LDFLAGS = (
@@ -2249,6 +2254,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(ORBIT_LIBPATH)",
 					/usr/X11/lib,
+					/opt/local/lib,
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(LOCAL_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5/lib/python2.5/config\"";
 				OTHER_LDFLAGS = (

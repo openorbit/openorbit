@@ -17,16 +17,22 @@
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
- 
+
 #ifndef TEXT_H_CNEFSHUK
 #define TEXT_H_CNEFSHUK
 
 #include "texture.h"
-#include "SDL_ttf.h"
+//#include "SDL_ttf.h"
 
-typedef struct OOfont {
-  TTF_Font *font;
-} OOfont;
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+typedef FT_Face SGfont;
+
+typedef struct {
+  unsigned w, h, stride;
+  unsigned char *data;
+} SGtextbitmap;
 
 typedef struct OOsgtextnode {
   OOtexture *text;
@@ -39,9 +45,12 @@ typedef enum OOprintquadrant {
   OO_Down_Right
 } OOprintquadrant;
 void ooTextInit(void);
-OOfont* ooLoadFont(const char *fontName, int sz);
-OOtexture* ooRenderText(OOfont *font, const char * restrict str);
-void ooPrintfAtPos(OOfont *font, float x, float y, const char *fmt, ...);
-void ooPrintfQuad(OOfont *font, OOprintquadrant quad, const char *fmt, ...);
+SGfont ooLoadFont(const char *fontName, int sz);
+OOtexture* ooRenderText(SGfont font, const char * restrict str);
+void ooPrintfAtPos(SGfont font, float x, float y, const char *fmt, ...);
+void ooPrintfQuad(SGfont font, OOprintquadrant quad, const char *fmt, ...);
+
+void ooPrint(SGfont font, SGtextbitmap *image, const char *text);
+
 
 #endif /* end of include guard: TEXT_H_CNEFSHUK */
