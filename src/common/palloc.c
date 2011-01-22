@@ -156,10 +156,7 @@ pool_alloc(pool_t *pool)
 
   pthread_mutex_unlock(&pool->lock);
 
-  if ((uintptr_t)&obj->data & 4 )
-    fprintf(stderr, "invalid pointer %p:%p\n", obj, &obj->data);
-  else
-    fprintf(stderr, "good pointer %p:%p\n", obj, &obj->data);
+  assert((((uintptr_t)&obj->data & 4) == 0) && "invalid pointer allocated");
   return &obj->data;
 }
 
