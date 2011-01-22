@@ -58,7 +58,7 @@ array_compress(array_t *vec)
   }
 }
 
-
+DEF_ARRAY(unsigned short,ushort);
 DEF_ARRAY(int,int);
 DEF_ARRAY(uint64_t,u64);
 DEF_ARRAY(float,float);

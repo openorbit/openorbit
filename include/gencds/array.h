@@ -101,10 +101,11 @@ void name##_array_dispose(name##_array_t *vec) {                                
   vec->asize = 0;                                                                   \
   vec->length = 0;                                                                  \
   free(vec->elems);                                                                 \
+  vec->elems = NULL;                                                                \
 }                                                                                   \
 
 
-
+DECL_ARRAY(unsigned short,ushort);
 DECL_ARRAY(int,int);
 DECL_ARRAY(uint64_t,u64);
 DECL_ARRAY(float,float);
