@@ -27,7 +27,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-typedef FT_Face SGfont;
+typedef struct {
+  FT_Face face;
+  int size;
+} SGfont;
 
 typedef struct {
   unsigned w, h, stride;
@@ -45,12 +48,12 @@ typedef enum OOprintquadrant {
   OO_Down_Right
 } OOprintquadrant;
 void ooTextInit(void);
-SGfont ooLoadFont(const char *fontName, int sz);
+SGfont* ooLoadFont(const char *fontName, int sz);
 OOtexture* ooRenderText(SGfont font, const char * restrict str);
 void ooPrintfAtPos(SGfont font, float x, float y, const char *fmt, ...);
 void ooPrintfQuad(SGfont font, OOprintquadrant quad, const char *fmt, ...);
 
-void ooPrint(SGfont font, SGtextbitmap *image, const char *text);
+void ooPrint(SGfont *font, SGtextbitmap *image, const char *text);
 
 
 #endif /* end of include guard: TEXT_H_CNEFSHUK */

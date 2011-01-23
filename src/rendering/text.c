@@ -68,33 +68,43 @@ INIT_PRIMARY_MODULE
 //  }
 }
 
-SGfont
+SGfont*
 ooLoadFont(const char *fontName, int sz)
 {
+  FT_Face face;
   char *fontFile = ooResGetPath(fontName);
-  SGfont font;
-  int error = FT_New_Face(library, fontFile, 0, &font);
+
+  int error = FT_New_Face(library, fontFile, 0, &face);
   if (error == FT_Err_Unknown_File_Format) {
     fprintf(stderr, "'%s' is of unknown format\n", fontFile);
     free(fontFile);
-    free(font);
+    free(face);
     return NULL;
   } else if (error) {
     fprintf(stderr, "'%s' could not be loaded\n", fontFile);
     free(fontFile);
-    free(font);
+    free(face);
     return NULL;
   }
   
-  error = FT_Set_Char_Size(font, 0, sz*64, 72, 72);
+  error = FT_Set_Char_Size(face, 0, sz*64, 72, 72);
   // FT_Set_Pixel_Size...
   free(fontFile);
+  
+  SGfont *font = malloc(sizeof(SGfont));
+  font->face = face;
+  font->size = sz;
+  
   return font;
 }
-void ooUnloadFont(SGfont fnt)
+
+void
+ooUnloadFont(SGfont *font)
 {
-  //TTF_CloseFont(fnt);
+  free(font->face);
+  free(font);
 }
+
 #if 0
 
 
@@ -137,6 +147,9 @@ ooPrintfQuad(OOfont *font, OOprintquadrant quad, const char *fmt, ...)
 
 #endif
 
+#define MAX(a, b) (((a) < (b)) ? (b) : (a))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
 void
 copy_character(SGtextbitmap  *image,
                int x,
@@ -144,41 +157,51 @@ copy_character(SGtextbitmap  *image,
                const FT_Bitmap *bitmap)
 {
   assert(bitmap->pixel_mode == FT_PIXEL_MODE_GRAY);
-  
+
+  int width = MIN(image->w - x, bitmap->width);
+  int height = MIN(image->h - (y - bitmap->rows), bitmap->rows);
+
   // Foreach row, copy pixels
-  for (int i = 0 ; i < bitmap->rows ; i++) {
+  for (int i = 0 ; i < height ; i++) {
+    if (y-i < 0) continue;
+
     memcpy(&image->data[(y-i)*image->w + x],
            &bitmap->buffer[i*bitmap->width],
-           bitmap->width);
+           width);
   }
 }
 
 
 void
-ooPrint(SGfont font, SGtextbitmap *image, const char *text)
+ooPrint(SGfont *font, SGtextbitmap *image, const char *text)
 {
-  FT_GlyphSlot  slot = font->glyph;
-  unsigned pen_x = 0, pen_y = 0;
+  FT_GlyphSlot slot = font->face->glyph;
+  unsigned max_x = 0, max_y = 0;
+  unsigned pen_x = 0, pen_y = image->h - font->size;
   for (; *text ; text ++) {
-    //if (*text == '\n') {
-      // TODO: Handle line feeds, or does Freetype do that for us?
-    //}
+    if (*text == '\n') {
+      pen_y -= font->size;
+      pen_x = 0;
+      max_y = MAX(max_y, pen_y);
+      continue;
+    }
     
-    int error = FT_Load_Char( font, *text, FT_LOAD_RENDER );
+    int error = FT_Load_Char( font->face, *text, FT_LOAD_RENDER );
     if ( error )
       continue;  /* ignore errors */
     
     copy_character(image,
                    pen_x + slot->bitmap_left,
-                   pen_y + slot->bitmap_top, // TODO: pen_y - bmp_top
+                   pen_y + slot->bitmap_top,
                    &slot->bitmap);
-    printf("xx %d:%d\n", slot->bitmap_left, slot->bitmap_top);
     
     // Increment pen position
     pen_x += slot->advance.x >> 6;
     pen_y += slot->advance.y >> 6;
+    max_x = MAX(max_x, pen_x);
+    max_y = MAX(max_y, pen_y);
   }
   image->stride = image->w;
-  image->w = pen_x;
+  image->w = max_x;
 }
 
