@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -872,6 +872,8 @@ om_get_ ## N ## _idx_prop(const om_object_t *obj, const char *prop_name,    \
                  idx, (*sz)-1);                                             \
         }                                                                   \
     }                                                                       \
+  assert(0 && "should be unreachable");                                     \
+  \
 }
 
 

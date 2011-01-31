@@ -1,5 +1,5 @@
 /*
-  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -881,6 +881,7 @@ Token lexToken(LexState *lex)
     LexErr(lex, "unknown character %lc", ch);
   }
   // Unreachable
+  assert(0 && "unreachable code");
 }
 
 
