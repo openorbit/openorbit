@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2009,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -47,23 +47,25 @@ texInit(void)
     gOOtexDict = hashtable_new_with_str_keys(128);
 }
 
-int
+GLuint
 ooTexLoad(const char *key, const char *name)
 {
-  if (hashtable_lookup(gOOtexDict, key)) {
-    ooLogWarn("Tried to load texture '%s' which is already loaded", key);
-    return -1;
+  OOtexture *tex = NULL;
+  if ((tex = hashtable_lookup(gOOtexDict, key))) {
+    // Don't reload textures, return memoized value
+    return tex->texId;
   }
+
   char *fname = ooResGetPath(name);
-  if (fname == NULL) return -1;
+  if (fname == NULL) return 0;
 
   image_t img;
 
-  OOtexture *tex = malloc(sizeof(OOtexture));
-  if (tex == NULL) {free(fname); return -1;}
+  tex = malloc(sizeof(OOtexture));
+  if (tex == NULL) {free(fname); return 0;}
 
   int res = img_load(&img, fname);
-  if (res != 0) {free(fname);free(tex);return -1;}
+  if (res != 0) {free(fname);free(tex);return 0;}
   tex->path = strdup(fname);
   switch (img.kind) {
   case IMG_BGRA:
@@ -116,14 +118,16 @@ ooTexLoad(const char *key, const char *name)
                   GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                   GL_LINEAR_MIPMAP_LINEAR);
+  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   // Do not retain texture, is is loaded into GL texture memory
   free(tex->data);
   tex->data = NULL;
 
+  // Memoize loaded texture
   hashtable_insert(gOOtexDict, key, tex);
   free(fname);
-  return 0;
+  return tex->texId;
 }
 
 int
