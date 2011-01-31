@@ -33,27 +33,19 @@ typedef struct {
 } SGfont;
 
 typedef struct {
+  SGfont *font;
   unsigned w, h, stride;
   unsigned char *data;
-} SGtextbitmap;
+} SGtextbuffer;
 
-typedef struct OOsgtextnode {
-  OOtexture *text;
-} OOsgtextnode;
+SGfont* sgLoadFont(const char *fontName, int sz);
+void sgUnloadFont(SGfont *font);
 
-typedef enum OOprintquadrant {
-  OO_Up_Left,
-  OO_Up_Right,
-  OO_Down_Left,
-  OO_Down_Right
-} OOprintquadrant;
-void ooTextInit(void);
-SGfont* ooLoadFont(const char *fontName, int sz);
-OOtexture* ooRenderText(SGfont font, const char * restrict str);
-void ooPrintfAtPos(SGfont font, float x, float y, const char *fmt, ...);
-void ooPrintfQuad(SGfont font, OOprintquadrant quad, const char *fmt, ...);
+SGtextbuffer* sgNewTextBuffer(const char *fontName, unsigned fontSize,
+                              unsigned width, unsigned rows);
+void sgDeleteTextBuffer(SGtextbuffer *buff);
 
-void ooPrint(SGfont *font, SGtextbitmap *image, const char *text);
-
+void sgPrintBuffer(SGtextbuffer *buff, const char *text);
+void sgPrintfBuffer(SGtextbuffer *buff, const char *fmt, ...);
 
 #endif /* end of include guard: TEXT_H_CNEFSHUK */

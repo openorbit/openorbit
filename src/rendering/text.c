@@ -17,41 +17,17 @@
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+
 #include "text.h"
 #include "texture.h"
 #include "res-manager.h"
-//#include "SDL_ttf.h"
 #include "common/moduleinit.h"
-#ifdef __APPLE__
-#include <ApplicationServices/ApplicationServices.h>
-#endif
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-typedef struct SGtextcontext {
-#ifdef __APPLE__
-  CGContextRef cgCtxt;
-  void *data;
-#endif
-} SGtextcontext;
-
 static FT_Library library;
-
-SGtextcontext*
-sgCreateTextContext(size_t w, size_t h)
-{
-#ifdef __APPLE__
-  SGtextcontext *ctxt = malloc(sizeof(SGtextcontext));
-  ctxt->data = malloc(w*h*4);
-
-  ctxt->cgCtxt = CGBitmapContextCreate(ctxt->data, w, h, 8, w*4,
-                                       CGColorSpaceCreateDeviceRGB(),
-                                       kCGImageAlphaLast);
-  CGContextSetRGBFillColor(ctxt->cgCtxt, 0.0, 0.0, 0.0, 0.0);
-  return ctxt;
-#endif
-}
 
 INIT_PRIMARY_MODULE
 {
@@ -60,16 +36,10 @@ INIT_PRIMARY_MODULE
     fprintf(stderr, "freetype failed init\n");
     exit(1);
   }  
-//  if (!TTF_WasInit()) {
-//    if(TTF_Init()==-1) {
-//      fprintf(stderr, "TTF_Init: %s\n", TTF_GetError());
-//      exit(2);
-//    }
-//  }
 }
 
 SGfont*
-ooLoadFont(const char *fontName, int sz)
+sgLoadFont(const char *fontName, int sz)
 {
   FT_Face face;
   char *fontFile = ooResGetPath(fontName);
@@ -99,59 +69,17 @@ ooLoadFont(const char *fontName, int sz)
 }
 
 void
-ooUnloadFont(SGfont *font)
+sgUnloadFont(SGfont *font)
 {
   free(font->face);
   free(font);
 }
 
-#if 0
-
-
-
-
-OOtexture*
-ooRenderText(OOfont *font, const char * restrict str)
-{
-  SDL_Color fg = {0,255,0}, bg = {255, 255, 255}; // r, g, b  (uint8_t)
-
-  //SDL_Surface *surface = TTF_RenderUTF8_Solid(font->font, str, fg);
-  //surface = TTF_RenderUTF8_Shaded(font->font, str, fg, bg);
-  //surface = TTF_RenderUTF8_Blended(font->font, str, fg);
-}
-
-void
-ooPrintfAtPos(OOfont *font, float x, float y, const char *fmt, ...)
-{
-  va_list vaList;
-  va_start(vaList, fmt);
-  char *str = NULL;
-  int res = vasprintf(&str, fmt, vaList);
-
-  free(str);
-  va_end(vaList);
-}
-
-void
-ooPrintfQuad(OOfont *font, OOprintquadrant quad, const char *fmt, ...)
-{
-  va_list vaList;
-  va_start(vaList, fmt);
-  char *str = NULL;
-  int res = vasprintf(&str, fmt, vaList);
-
-  free(str);
-  va_end(vaList);
-}
-
-
-#endif
-
 #define MAX(a, b) (((a) < (b)) ? (b) : (a))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 void
-copy_character(SGtextbitmap  *image,
+copy_character(SGtextbuffer  *image,
                int x,
                int y,
                const FT_Bitmap *bitmap)
@@ -172,36 +100,70 @@ copy_character(SGtextbitmap  *image,
 }
 
 
-void
-ooPrint(SGfont *font, SGtextbitmap *image, const char *text)
+SGtextbuffer*
+sgNewTextBuffer(const char *fontName, unsigned fontSize, unsigned width, unsigned rows)
 {
-  FT_GlyphSlot slot = font->face->glyph;
+  SGtextbuffer *buff = malloc(sizeof(SGtextbuffer));
+
+  buff->font = sgLoadFont(fontName, fontSize);
+  buff->h = rows * fontSize;
+  buff->w = width * fontSize;
+  buff->stride = width * fontSize;
+  buff->data = calloc(buff->w * buff->h, sizeof(char));
+
+  return buff;
+}
+void
+sgDeleteTextBuffer(SGtextbuffer *buff)
+{
+  sgUnloadFont(buff->font);
+  free(buff->data);
+  free(buff);
+}
+
+void
+sgPrintBuffer(SGtextbuffer *buff, const char *text)
+{
+  FT_GlyphSlot slot = buff->font->face->glyph;
   unsigned max_x = 0, max_y = 0;
-  unsigned pen_x = 0, pen_y = image->h - font->size;
+  unsigned pen_x = 0, pen_y = buff->h - buff->font->size;
   for (; *text ; text ++) {
     if (*text == '\n') {
-      pen_y -= font->size;
+      pen_y -= buff->font->size;
       pen_x = 0;
       max_y = MAX(max_y, pen_y);
       continue;
     }
-    
-    int error = FT_Load_Char( font->face, *text, FT_LOAD_RENDER );
+
+    int error = FT_Load_Char( buff->font->face, *text, FT_LOAD_RENDER );
     if ( error )
       continue;  /* ignore errors */
-    
-    copy_character(image,
+
+    copy_character(buff,
                    pen_x + slot->bitmap_left,
                    pen_y + slot->bitmap_top,
                    &slot->bitmap);
-    
+
     // Increment pen position
     pen_x += slot->advance.x >> 6;
     pen_y += slot->advance.y >> 6;
     max_x = MAX(max_x, pen_x);
     max_y = MAX(max_y, pen_y);
   }
-  image->stride = image->w;
-  image->w = max_x;
+  buff->stride = buff->w;
+  buff->w = max_x;
 }
 
+void
+sgPrintfBuffer(SGtextbuffer *buff, const char *fmt, ...)
+{
+  va_list vaList;
+  va_start(vaList, fmt);
+
+  char *str = NULL;
+
+  vasprintf(&str, fmt, vaList);
+  sgPrintBuffer(buff, str);
+
+  va_end(vaList);
+}
