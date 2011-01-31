@@ -32,6 +32,8 @@ typedef void* OOrecordtyperef;
 
 typedef void (*OOpubsubupdate)(OOpubsubref);
 
+#define PUBSUB(t, n, i) t n = i; OOpubsubref n ## _ref;
+
 OOrecordtyperef simRegisterRecordType(const char *key);
 
 

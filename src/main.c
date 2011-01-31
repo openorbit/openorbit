@@ -47,6 +47,7 @@
 #include "io-manager.h"
 #include "plugin-handler.h"
 #include "sim.h"
+#include "sim/pubsub.h"
 #include "sim/spacecraft-control.h"
 #include "rendering/render.h"
 #include "rendering/camera.h"
@@ -64,6 +65,8 @@
 /* Simulator SDL events */
 #define SIM_STEP_EVENT 0 // Make physics step
 #define SIM_DEBUG_EVENT 1
+// FIXME: Must be synced with simevent.c
+#define SIM_WCT_TIMER 2
 
 // 25Hz
 #define SIM_STEP_PERIOD 40
@@ -92,24 +95,40 @@ sim_step_event(Uint32 interval, void *param)
 }
 
 static unsigned frames = 0;
+static int fps_count = 0;
+OOpubsubref fps_count_ref;
 
 Uint32
 fps_event(Uint32 interval, void *param)
 {
   ooLogInfo("fps = %d", frames);
+  fps_count = frames;
   frames = 0;
+  simNotifyChange(fps_count_ref); // FIXME: NOT ASYNC SAFE
+
   return interval;
+}
+
+PUBSUB(static float, freq, 0.0f);
+PUBSUB(static float, sim_period, 0.0f);
+
+static void
+publish_variables(void)
+{
+  fps_count_ref = simPublishInt("/sim/video/fps", &fps_count);
+  freq_ref = simPublishFloat("/sim/freq", &freq);
+  sim_period_ref = simPublishFloat("/sim/period", &sim_period);
 }
 
 static void
 main_loop(void)
 {
+  publish_variables();
+
   extern SIMstate gSIM_state;
-  float freq;
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s
   Uint32 interv = (Uint32) (wc_period * 1000.0); // SDL wants time in ms
-  float sim_period;
   ooConfGetFloatDef("openorbit/sim/period", &sim_period, wc_period);
 
   SDL_Event event;
@@ -167,6 +186,12 @@ main_loop(void)
           break;
         case SIM_DEBUG_EVENT: // display console?
           break;
+        case SIM_WCT_TIMER: {
+            OOeventhandler timer_func = event.user.data1;
+            void *timer_data = event.user.data2;
+            timer_func(timer_data);
+            break;
+          }
         default:
           break;
         }
