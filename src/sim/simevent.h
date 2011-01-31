@@ -76,6 +76,7 @@ void simStackEvent(OOeventhandler handler, void *data);
 void simEnqueueAbsoluteEvent(double jd, OOeventhandler handler, void *data);
 void simEnqueueDelta_ms(unsigned offset, OOeventhandler handler, void *data);
 void simEnqueueDelta_s(double offset, OOeventhandler handler, void *data);
+void simEnqueueDelta_s_wct(double offset, OOeventhandler handler, void *data);
 
 void simDispatchPendingEvents(void);
 

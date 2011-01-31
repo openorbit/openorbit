@@ -20,17 +20,25 @@
 
 #include <stdlib.h>
 #include "common/moduleinit.h"
+#include "common/palloc.h"
+
 #include "sim/simevent.h"
 #include "sim/simtime.h"
 #include "log.h"
 
 #define OO_EVENT_QUEUE_INIT_LEN 100
 
-static OOeventqueue *gQueue;
+struct handler_param {
+  OOeventhandler handler;
+  void *data;
+};
 
+static OOeventqueue *gQueue;
+static pool_t *gTimerParamPool;
 INIT_PRIMARY_MODULE
 {
   gQueue = simNewEventQueue();
+  gTimerParamPool = pool_create(sizeof(struct handler_param));
 }
 
 // BUG: If working with events with fire time < 1970 as event time then is negative
@@ -142,6 +150,43 @@ simEnqueueDelta_s(double offset, OOeventhandler handler, void *data)
   simInsertEvent(ev);
 }
 
+// This is a rather messy thing. We want to be able to enqueue events on a fixed
+// offset from the current time.
+// In the future this needs to be fixed since the user should be able to change
+// the sim frequency.
+
+// FIXME: Must be synced with main.c
+#define SIM_WCT_TIMER 2
+#include <SDL/SDL.h>
+
+static Uint32
+sim_timer_event(Uint32 interval, void *param)
+{
+  struct handler_param *hp = param;
+  SDL_Event event;
+  SDL_UserEvent userevent;
+
+  userevent.type = SDL_USEREVENT;
+  userevent.code = SIM_WCT_TIMER;
+  userevent.data1 = hp->handler;
+  userevent.data2 = hp->data;
+
+  event.type = SDL_USEREVENT;
+  event.user = userevent;
+
+  SDL_PushEvent(&event);
+  pool_free(param);
+  return 0;
+}
+
+void
+simEnqueueDelta_s_wct(double offset, OOeventhandler handler, void *data)
+{
+  struct handler_param *param = pool_alloc(gTimerParamPool);
+  param->handler = handler;
+  param->data = data;
+  SDL_AddTimer((Uint32)(offset*1000.0), sim_timer_event, param);
+}
 
 void
 simDispatchPendingEvents()
