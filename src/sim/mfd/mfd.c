@@ -63,8 +63,8 @@ simMfdInitAll(SGscenegraph *sg)
 
   sgInitOverlay(&mfd0.super, mfd_draw,   0,   0, 128, 128);
   sgInitOverlay(&mfd1.super, mfd_draw, sgRenderInfo.w - 128,   0, 128, 128);
-  sgInitOverlay(&mfd2.super, mfd_draw, sgRenderInfo.w - 128, sgRenderInfo.h - 128,
-                128, 128);
+  sgInitOverlay(&mfd2.super, mfd_draw, sgRenderInfo.w - 128,
+                sgRenderInfo.h - 128, 128, 128);
   sgInitOverlay(&mfd3.super, mfd_draw,   0, sgRenderInfo.h - 128, 128, 128);
 
   sgAddOverlay(sg, &mfd0.super);

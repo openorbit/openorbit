@@ -52,7 +52,7 @@ MercuryAxisUpdate(OOspacecraft *sc)
 {
   // TODO: Replace IO-system queries with sim variable lookups.
   //       This is important in order to allow for multiplexed axis commands,
-  //       in term enabling autopilots and network control.
+  //       in turn enabling autopilots and network control.
 
   OOaxises axises;
   ooGetAxises(&axises);
@@ -279,19 +279,29 @@ MercuryNew(void)
   SIMthruster *posigrade, *retro0, *retro1, *retro2, *roll0, *roll1, *pitch0, *pitch1,
               *yaw0, *yaw1;
 
-  posigrade = simNewThruster("Posigrade", (float3){0.0,0.0,0.0}, (float3){0.0,1.8e3,0.0});
+  posigrade = simNewThruster("Posigrade",
+                             (float3){0.0,0.0,0.0}, (float3){0.0,1.8e3,0.0});
 
   // Ripple fire 10 s burntime each
-  retro0 = simNewThruster("Retro 0", (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
-  retro1 = simNewThruster("Retro 1", (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
-  retro2 = simNewThruster("Retro 2", (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
+  retro0 = simNewThruster("Retro 0",
+                          (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
+  retro1 = simNewThruster("Retro 1",
+                          (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
+  retro2 = simNewThruster("Retro 2",
+                          (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
 
-  roll0 = simNewThruster("Roll 0", (float3){0.82, 0.55, 0.00}, (float3){0.0, 0.0,108.0});
-  roll1 = simNewThruster("Roll 1", (float3){-0.82, 0.55, 0.00}, (float3){0.0, 0.0,108.0});
-  pitch0 = simNewThruster("Pitch 0", (float3){0.00, 2.20, 0.41}, (float3){0.0, 0.0,-108.0});
-  pitch1 = simNewThruster("Pitch 1", (float3){0.00, 2.20,-0.41}, (float3){0.0, 0.0,108.0});
-  yaw0 = simNewThruster("Yaw 0", (float3){0.41, 2.20, 0.00}, (float3){-108.0, 0.0,0.0});
-  yaw1 = simNewThruster("Yaw 1", (float3){-0.41, 2.20, 0.00}, (float3){108.0, 0.0,0.0});
+  roll0 = simNewThruster("Roll 0",
+                         (float3){0.82, 0.55, 0.00}, (float3){0.0, 0.0,108.0});
+  roll1 = simNewThruster("Roll 1",
+                         (float3){-0.82, 0.55, 0.00}, (float3){0.0, 0.0,108.0});
+  pitch0 = simNewThruster("Pitch 0",
+                          (float3){0.00, 2.20, 0.41}, (float3){0.0, 0.0,-108.0});
+  pitch1 = simNewThruster("Pitch 1",
+                          (float3){0.00, 2.20,-0.41}, (float3){0.0, 0.0,108.0});
+  yaw0 = simNewThruster("Yaw 0",
+                        (float3){0.41, 2.20, 0.00}, (float3){-108.0, 0.0,0.0});
+  yaw1 = simNewThruster("Yaw 1",
+                        (float3){-0.41, 2.20, 0.00}, (float3){108.0, 0.0,0.0});
 
   simAddActuator(capsule, (OOactuator*)posigrade);
   simAddActuator(capsule, (OOactuator*)retro0);
