@@ -104,6 +104,7 @@
 		EC34BDC2107B2CBD0011B76E /* vmath-quaternions.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BDB8107B2C480011B76E /* vmath-quaternions.c */; };
 		EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BDBE107B2C900011B76E /* libvmath.a */; };
 		EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CDA2C108677C000C1B458 /* ac3d.c */; };
+		EC3CFF6C1331EFB70002D0C5 /* haps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CFF6A1331EFB70002D0C5 /* haps.c */; };
 		EC3F258B10905FE100E0B0C7 /* simenvironment.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3F258A10905FE100E0B0C7 /* simenvironment.c */; };
 		EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC4485680CCD250C001C88AD /* hash-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485390CCD247E001C88AD /* hash-test.c */; };
@@ -416,6 +417,8 @@
 		EC34BDBE107B2C900011B76E /* libvmath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libvmath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC3CDA2B108677C000C1B458 /* ac3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ac3d.h; sourceTree = "<group>"; };
 		EC3CDA2C108677C000C1B458 /* ac3d.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ac3d.c; sourceTree = "<group>"; };
+		EC3CFF6A1331EFB70002D0C5 /* haps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = haps.c; sourceTree = "<group>"; };
+		EC3CFF6B1331EFB70002D0C5 /* haps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = haps.h; sourceTree = "<group>"; };
 		EC3F258910905FE100E0B0C7 /* simenvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simenvironment.h; sourceTree = "<group>"; };
 		EC3F258A10905FE100E0B0C7 /* simenvironment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simenvironment.c; sourceTree = "<group>"; };
 		EC4476970CCBFF73001C88AD /* t000_hashtable */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t000_hashtable; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -917,6 +920,8 @@
 				EC9ECC261196C54800229A8E /* battery.c */,
 				EC9ECC281196C7E000229A8E /* propellant-tank.h */,
 				EC9ECC291196C7E000229A8E /* propellant-tank.c */,
+				EC3CFF6A1331EFB70002D0C5 /* haps.c */,
+				EC3CFF6B1331EFB70002D0C5 /* haps.h */,
 			);
 			path = sim;
 			sourceTree = "<group>";
@@ -1664,6 +1669,7 @@
 				ECCED4E011CFD8EB00F20D07 /* config.i in Sources */,
 				EC47E6C211D4D34800523F78 /* event.i in Sources */,
 				EC6DFCAB126DCF850029D5E3 /* mfd.c in Sources */,
+				EC3CFF6C1331EFB70002D0C5 /* haps.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
