@@ -54,21 +54,12 @@
 #define __has_feature(x) 0  // Compatibility with non-clang compilers.
 #endif
 
-#if __has_feature(attribute_ext_vector_type)
-typedef float __attribute__((ext_vector_type (4))) PLfloat3;
-typedef double __attribute__((ext_vector_type (4))) PLdouble3;
-typedef int64_t __attribute__((ext_vector_type (4))) PLlong3;
-typedef int32_t __attribute__((ext_vector_type (4))) PLint3;
-typedef int16_t __attribute__((ext_vector_type (4))) PLshort3;
-typedef PLfloat3 __attribute__((ext_vector_type (4))) PLfloat3x3;
-#else
-typedef float __attribute__((vector_size (16))) PLfloat3;
-typedef double __attribute__((vector_size (32))) PLdouble3;
-typedef int64_t __attribute__((vector_size (32))) PLlong3;
-typedef int32_t __attribute__((vector_size (16))) PLint3;
-typedef int16_t __attribute__((vector_size (8))) PLshort3;
-
-#endif
+typedef float4 PLfloat3;
+typedef double3 PLdouble3;
+typedef long3 PLlong3;
+typedef int3 PLint3;
+typedef short3 PLshort3;
+typedef float3x3 PLfloat3x3;
 
 // Speed of light
 #define PL_C 299792458.0

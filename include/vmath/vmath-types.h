@@ -27,7 +27,7 @@
 #define __MATH_TYPES_H__
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 #include <stdint.h>
 
 #ifndef __has_feature
@@ -45,13 +45,13 @@ typedef float vec_arr_t[4];
   typedef float __attribute__((ext_vector_type (4))) float3;
   typedef float __attribute__((ext_vector_type (4))) float4;
   typedef float __attribute__((ext_vector_type (16))) float16;
-  
+
   typedef float3 float3x3[4];
   typedef float4 float4x4[4];
   typedef double __attribute__((ext_vector_type (4))) double3;
   typedef double __attribute__((ext_vector_type (4))) double4;
   typedef double __attribute__((ext_vector_type (16))) double16;
-  
+
   typedef int16_t __attribute__((ext_vector_type (4))) short3;
   typedef int16_t __attribute__((ext_vector_type (4))) short4;
   typedef uint16_t __attribute__((ext_vector_type (4))) ushort3;
@@ -64,28 +64,24 @@ typedef float vec_arr_t[4];
   typedef int64_t __attribute__((ext_vector_type (4))) long4;
   typedef uint64_t __attribute__((ext_vector_type (4))) ulong3;
   typedef uint64_t __attribute__((ext_vector_type (4))) ulong4;
-  
+
   typedef double3 double3x3[3];
   typedef double4 double4x4[4];
-  
-  typedef float __attribute__((ext_vector_type (4))) v4f_t;
-  typedef float __attribute__((ext_vector_type (16))) m4f_t;
-  
-  
+
   typedef float __attribute__((ext_vector_type (4))) quaternion_t;
 
-  
+
 #else
   typedef float __attribute__((vector_size (16))) float3;
   typedef float __attribute__((vector_size (16))) float4;
   typedef float __attribute__((vector_size (64))) float16;
-  
+
   typedef float3 float3x3[4];
   typedef float4 float4x4[4];
   typedef double __attribute__((vector_size (32))) double3;
   typedef double __attribute__((vector_size (32))) double4;
   typedef double __attribute__((vector_size (128))) double16;
-  
+
   typedef int16_t __attribute__((vector_size (8))) short3;
   typedef int16_t __attribute__((vector_size (8))) short4;
   typedef uint16_t __attribute__((vector_size (8))) ushort3;
@@ -98,12 +94,10 @@ typedef float vec_arr_t[4];
   typedef int64_t __attribute__((vector_size (32))) long4;
   typedef uint64_t __attribute__((vector_size (32))) ulong3;
   typedef uint64_t __attribute__((vector_size (32))) ulong4;
-  
+
   typedef double3 double3x3[4];
   typedef double4 double4x4[4];
-  
-  typedef float __attribute__((vector_size (16))) v4f_t;
-  typedef float __attribute__((vector_size (64))) m4f_t;
+
   typedef float __attribute__((vector_size (16))) quaternion_t;
 
 #endif
@@ -213,7 +207,7 @@ v3i_make(int32_t x, int32_t y, int32_t z)
   u.a[1] = y;
   u.a[2] = z;
   u.a[4] = 0;
-  
+
   return u.p;
 }
 // Note, this is not the initial idea of the vmath lib, the vmath lib was supposed to
@@ -239,6 +233,6 @@ typedef struct fix256 {
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif /* ! __MATH_TYPES_H__ */
