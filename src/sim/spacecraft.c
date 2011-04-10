@@ -776,3 +776,36 @@ simAddStage(OOspacecraft *sc, OOstage *stage)
 {
   obj_array_push(&sc->stages, stage);
 }
+
+// TODO: This is buggy, gravity is only set on the parent object unless the
+//       stage has been detatched.
+float3
+simGetStageGravityVector(OOstage *stage)
+{
+  return stage->obj->g_ack;
+}
+
+float3
+simGetGravityVector(OOspacecraft *sc)
+{
+  // TODO: Return the real gravity instead of force ackumulator
+  return sc->obj->g_ack;
+}
+
+float3
+simGetVelocityVector(OOspacecraft *sc)
+{
+  return sc->obj->v;
+}
+
+float3
+simGetForceVector(OOspacecraft *sc)
+{
+  return sc->obj->f_ack;
+}
+
+quaternion_t
+simGetQuaternion(OOspacecraft *sc)
+{
+  return sc->obj->q;
+}

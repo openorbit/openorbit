@@ -155,10 +155,6 @@ void simDisarmStageActuators(OOstage *stage);
 void simLockStageActuators(OOstage *act);
 void simDisableStageActuators(OOstage *act);
 
-// TODO: Implement
-//float3 simGetGravityVector(OOstage *stage);
-//float3 simGetAirspeedVector(OOstage *stage);
-
 void ooScSetStageMesh(OOstage *stage, SGdrawable *mesh);
 void simDetatchStage(OOspacecraft *sc, OOstage *stage);
 void simScStep(OOspacecraft *sc, float dt);
@@ -181,7 +177,8 @@ void ooScSetPos(OOspacecraft *sc, double x, double y, double z);
  \param y Position in y dimension with respect to system centre
  \param z Position in z dimension with respect to system centre
  */
-void ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName, double x, double y, double z);
+void ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName,
+                         double x, double y, double z);
 
 /*!
  Set position of spacecraft relative to the system's central objects surface coordinates
@@ -203,5 +200,13 @@ void scStageSetOffset3fv(OOstage *stage, float3 p);
 
 
 void ooGetAxises(OOaxises *axises);
+
+float3 simGetStageGravityVector(OOstage *stage);
+//float3 simGetAirspeedVector(OOstage *stage);
+
+float3 simGetGravityVector(OOspacecraft *sc);
+float3 simGetVelocityVector(OOspacecraft *sc);
+float3 simGetForceVector(OOspacecraft *sc);
+quaternion_t simGetQuaternion(OOspacecraft *sc);
 
 #endif /* end of include guard: SPACECRAFT_H_7SCB1CH8 */
