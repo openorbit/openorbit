@@ -22,13 +22,14 @@
 #define RENDER_H
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 #include <stdbool.h>
 
 typedef struct {
   unsigned w;
   unsigned h;
+  float aspect;
   unsigned gl_major_vers;
   unsigned gl_minor_vers;
   unsigned glsl_major_vers;
@@ -50,6 +51,6 @@ void ooPrintScreenAttributes(void);
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif /* ! RENDER_H */

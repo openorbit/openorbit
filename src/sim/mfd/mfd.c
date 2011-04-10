@@ -20,12 +20,19 @@
 #include <assert.h>
 #include <string.h>
 
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <GL/gl.h>
+#endif
+
 #include "mfd.h"
 
 #include "common/moduleinit.h"
 #include "common/palloc.h"
 #include "io-manager.h"
 #include "rendering/render.h"
+#include "sim.h"
 
 void simMfdInit(SIMmfd *mfd, unsigned orig_x, unsigned orig_y,
                 unsigned width, unsigned height);
@@ -33,6 +40,7 @@ void simMfdInit(SIMmfd *mfd, unsigned orig_x, unsigned orig_y,
 static obj_array_t mfd_pages;
 
 static SIMmfd mfd0, mfd1, mfd2, mfd3;
+static SIMhud hud;
 
 INIT_PRIMARY_MODULE {
   obj_array_init(&mfd_pages);
@@ -53,25 +61,6 @@ mfd_draw(SGoverlay *overlay)
 }
 
 
-void
-simMfdInitAll(SGscenegraph *sg)
-{
-  mfd0.page_no = 0;
-  mfd1.page_no = 0;
-  mfd2.page_no = 0;
-  mfd3.page_no = 0;
-
-  sgInitOverlay(&mfd0.super, mfd_draw,   0,   0, 128, 128);
-  sgInitOverlay(&mfd1.super, mfd_draw, sgRenderInfo.w - 128,   0, 128, 128);
-  sgInitOverlay(&mfd2.super, mfd_draw, sgRenderInfo.w - 128,
-                sgRenderInfo.h - 128, 128, 128);
-  sgInitOverlay(&mfd3.super, mfd_draw,   0, sgRenderInfo.h - 128, 128, 128);
-
-  sgAddOverlay(sg, &mfd0.super);
-  sgAddOverlay(sg, &mfd1.super);
-  sgAddOverlay(sg, &mfd2.super);
-  sgAddOverlay(sg, &mfd3.super);
-}
 
 // For registring sample mfd
 
@@ -116,22 +105,6 @@ mfdToggle(bool buttonDown, void *data)
   mfd->super.enabled = !mfd->super.enabled;
 }
 
-
-INIT_IO {
-  ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, &mfd0);
-  ioRegActionHandler("mfd0-cycle-prev", mfdCyclePrev, &mfd0);
-  ioRegActionHandler("mfd0-toggle", mfdToggle, &mfd0);
-  ioRegActionHandler("mfd1-cycle-next", mfdCycleNext, &mfd1);
-  ioRegActionHandler("mfd1-cycle-prev", mfdCyclePrev, &mfd1);
-  ioRegActionHandler("mfd1-toggle", mfdToggle, &mfd1);
-  ioRegActionHandler("mfd2-cycle-next", mfdCycleNext, &mfd2);
-  ioRegActionHandler("mfd2-cycle-prev", mfdCyclePrev, &mfd2);
-  ioRegActionHandler("mfd2-toggle", mfdToggle, &mfd2);
-  ioRegActionHandler("mfd3-cycle-next", mfdCycleNext, &mfd3);
-  ioRegActionHandler("mfd3-cycle-prev", mfdCyclePrev, &mfd3);
-  ioRegActionHandler("mfd3-toggle", mfdToggle, &mfd3);
-}
-
 void
 simMfdPageRegister(SIMmfdpage *page)
 {
@@ -172,9 +145,97 @@ simSelectMfd(SIMmfd *mfd, unsigned mfdId)
 }
 
 void
+test_hud_draw(SGoverlay *overlay)
+{
+  SIMhud *hud = (SIMhud*)overlay;
+
+  OOspacecraft *sc = simGetSpacecraft();
+  float3 gv = simGetGravityVector(sc);
+  quaternion_t q = simGetQuaternion(sc);
+
+  glPushAttrib(GL_ENABLE_BIT);
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glDisable(GL_BLEND);
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_LINE_SMOOTH);
+
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  gluOrtho2D(-1.0*sgRenderInfo.aspect, 1.0*sgRenderInfo.aspect,
+             -1.0, 1.0); // TODO: Fix to viewport aspect
+
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+
+  glLineWidth(1.0);
+
+  glBegin(GL_LINES);
+  glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+  glVertex2f(-0.5f, 0.0f);
+  glVertex2f(0.5f, 0.0f);
+
+  glVertex2f(0.0f, -0.5f);
+  glVertex2f(0.0f, 0.5f);
+
+  glEnd();
+
+  glPopMatrix();
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glPopAttrib();
+}
+
+
+void
 simHudDraw(SIMhud *hud)
 {
   assert(hud != NULL);
   // TODO: Draw frame
   hud->draw(hud);
+}
+
+
+void
+simMfdInitAll(SGscenegraph *sg)
+{
+  mfd0.page_no = 0;
+  mfd1.page_no = 0;
+  mfd2.page_no = 0;
+  mfd3.page_no = 0;
+
+  sgInitOverlay(&mfd0.super, mfd_draw,   0,   0, 128, 128);
+  sgInitOverlay(&mfd1.super, mfd_draw, sgRenderInfo.w - 128,   0, 128, 128);
+  sgInitOverlay(&mfd2.super, mfd_draw, sgRenderInfo.w - 128,
+                sgRenderInfo.h - 128, 128, 128);
+  sgInitOverlay(&mfd3.super, mfd_draw,   0, sgRenderInfo.h - 128, 128, 128);
+
+  sgInitOverlay(&hud.super, test_hud_draw,   0, 0, sgRenderInfo.w, sgRenderInfo.h);
+
+
+  sgAddOverlay(sg, &mfd0.super);
+  sgAddOverlay(sg, &mfd1.super);
+  sgAddOverlay(sg, &mfd2.super);
+  sgAddOverlay(sg, &mfd3.super);
+  sgAddOverlay(sg, &hud.super);
+}
+
+
+INIT_IO {
+  ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, &mfd0);
+  ioRegActionHandler("mfd0-cycle-prev", mfdCyclePrev, &mfd0);
+  ioRegActionHandler("mfd0-toggle", mfdToggle, &mfd0);
+  ioRegActionHandler("mfd1-cycle-next", mfdCycleNext, &mfd1);
+  ioRegActionHandler("mfd1-cycle-prev", mfdCyclePrev, &mfd1);
+  ioRegActionHandler("mfd1-toggle", mfdToggle, &mfd1);
+  ioRegActionHandler("mfd2-cycle-next", mfdCycleNext, &mfd2);
+  ioRegActionHandler("mfd2-cycle-prev", mfdCyclePrev, &mfd2);
+  ioRegActionHandler("mfd2-toggle", mfdToggle, &mfd2);
+  ioRegActionHandler("mfd3-cycle-next", mfdCycleNext, &mfd3);
+  ioRegActionHandler("mfd3-cycle-prev", mfdCyclePrev, &mfd3);
+  ioRegActionHandler("mfd3-toggle", mfdToggle, &mfd3);
 }

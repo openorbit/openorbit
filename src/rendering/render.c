@@ -84,6 +84,7 @@ ooSetVideoDefaults(void)
   ooInitGlAttributes();
   sgRenderInfo.w = width;
   sgRenderInfo.h = height;
+  sgRenderInfo.aspect = (float)width/(float)height;
 
   ooPrintScreenAttributes();
 

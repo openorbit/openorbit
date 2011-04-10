@@ -54,6 +54,8 @@ typedef struct SIMhud SIMhud;
 typedef void (*SIMhuddraw)(SIMhud *hud);
 
 struct SIMhud {
+  SGoverlay super;
+
   // drawing context
   SIMhuddraw draw;
 };
