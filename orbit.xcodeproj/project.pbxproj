@@ -106,7 +106,6 @@
 		EC3CDA2D108677C000C1B458 /* ac3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CDA2C108677C000C1B458 /* ac3d.c */; };
 		EC3CFF6C1331EFB70002D0C5 /* haps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CFF6A1331EFB70002D0C5 /* haps.c */; };
 		EC3F258B10905FE100E0B0C7 /* simenvironment.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3F258A10905FE100E0B0C7 /* simenvironment.c */; };
-		EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC4485680CCD250C001C88AD /* hash-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485390CCD247E001C88AD /* hash-test.c */; };
 		EC4485690CCD251E001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
 		EC44856A0CCD252D001C88AD /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
@@ -579,7 +578,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */,
-				EC4476F60CCC056D001C88AD /* SDL.framework in Frameworks */,
 				EC89155C0CD503EC000E662E /* Python.framework in Frameworks */,
 				ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */,
 				EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */,
