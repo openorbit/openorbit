@@ -679,11 +679,13 @@ plSysStep(PLsystem *sys, double dt)
     PLobject *obj = sys->rigidObjs.elems[i];
     PL_CHECK_OBJ(obj);
     float3 f12 = plComputeGravity(sys->orbitalBody, obj);
+    plGravity3fv(obj, f12);
     plForce3fv(obj, f12);
     PL_CHECK_OBJ(obj);
 
     if (sys->parent) {
       f12 = plComputeGravity(sys->parent->orbitalBody, obj);
+      plGravity3fv(obj, f12);
       plForce3fv(obj, f12);
       PL_CHECK_OBJ(obj);
     }

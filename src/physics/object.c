@@ -293,6 +293,22 @@ plForceRelativePos3fv(PLobject *obj, float3 f, float3 p)
 }
 
 void
+plGravity3f(PLobject *obj, float x, float y, float z)
+{
+  while (obj->parent) obj = obj->parent;
+  obj->g_ack += vf3_set(x, y, z);
+}
+
+
+void
+plGravity3fv(PLobject *obj, float3 f)
+{
+  while (obj->parent) obj = obj->parent;
+  obj->g_ack += f;
+}
+
+
+void
 plDumpObject(PLobject *obj)
 {
   fprintf(stderr, "obj: %p\n", (void*)obj);
@@ -368,6 +384,7 @@ plClearObject(PLobject *obj)
 {
   obj->f_ack = vf3_set(0.0f, 0.0f, 0.0f);
   obj->t_ack = vf3_set(0.0f, 0.0f, 0.0f);
+  obj->g_ack = vf3_set(0.0f, 0.0f, 0.0f);
 }
 
 void

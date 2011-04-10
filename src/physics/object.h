@@ -48,6 +48,9 @@ struct PLobject {
   float3 f_ack; // Force accumulator
   float3 t_ack; // Torque accumulator
 
+  float3 g_ack; // Gravitational force accumulator
+
+
   float radius; // For simple collission detection
   float airPressure; // In Pa
   float airDensity; // In kg / m^3
@@ -88,6 +91,9 @@ void plForceRelativePos3f(PLobject *obj,
                           float fx, float fy, float fz,
                           float px, float py, float pz);
 void plForceRelativePos3fv(PLobject *obj, float3 f, float3 p);
+
+void plGravity3f(PLobject *obj, float x, float y, float z);
+void plGravity3fv(PLobject *obj, float3 f);
 
 
 void plSetObjectPos3d(PLobject *obj, double x, double y, double z);
