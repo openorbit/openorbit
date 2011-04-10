@@ -55,6 +55,7 @@
 #include "scripting/scripting.h"
 #include "rendering/texture.h"
 #include "physics/physics.h"
+#include "rendering/shader-manager.h"
 
 
 
@@ -263,6 +264,7 @@ main(int argc, char*argv[])
 
   // Init GL state
   ooSetVideoDefaults();
+  sgLoadAllShaders();
   sgCamInit();
 
   ooIoPrintJoystickNames();

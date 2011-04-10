@@ -57,6 +57,12 @@ struct SGscenegraph {
   int usedLights;
 
   SGdrawable *sky;
+
+  GLuint overlay_shader;
+  GLint modelview_id;
+  GLint projection_id;
+  GLint tex_id;
+
   obj_array_t overlays; // TODO: Consolidate OOobjvector and obj_array_t
 };
 

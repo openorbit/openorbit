@@ -1,0 +1,11 @@
+#version 120
+
+uniform sampler2D Tex;
+varying vec2 TexCoord;
+// This program is to blend four textures, allowing for separate day and night
+// time textures on a planet and additional bump map and cloud texture.
+void main()
+{
+  vec4 texel0 = texture2D(Tex, TexCoord);
+	gl_FragColor = mix(gl_FragColor, texel0, texel0.a);
+}

@@ -26,8 +26,11 @@
 #include <gl/gl.h>
 #endif
 
+void sgLoadAllShaders(void);
+
 GLuint sgLoadProgram(const char *key, const char *vspath, const char *fspath,
                      const char *gspath);
+GLuint sgGetProgram(const char *key);
 void sgEnableProgram(GLuint programId);
 void sgDisableProgram(void);
 GLuint sgShaderFromKey(const char *key);

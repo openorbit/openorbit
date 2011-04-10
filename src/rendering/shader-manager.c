@@ -24,6 +24,11 @@
 #include "res-manager.h"
 #include "log.h"
 #include <string.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <assert.h>
 
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
@@ -42,12 +47,37 @@ INIT_PRIMARY_MODULE
   shaderKeyMap = hashtable_new_with_str_keys(64);
 }
 
+void
+sgLoadAllShaders(void)
+{
+  const char *path = ooResGetPath("shaders");
+
+  DIR *dir = opendir(path);
+  if (dir) {
+    char fullpath[PATH_MAX];
+    struct dirent *entry = NULL;
+    while ((entry = readdir(dir))) {
+      if (entry->d_name[0] == '.') continue; // ignore parent and hidden dirs
+
+      strcpy(fullpath, "shaders/");
+      strcat(fullpath, entry->d_name);
+      sgLoadProgram(entry->d_name, fullpath, fullpath, fullpath);
+    }
+
+    closedir(dir);
+  }
+}
+
 GLuint
 sgLoadProgram(const char *key,
               const char *vspath,
               const char *fspath,
               const char *gspath)
 {
+  assert(key != NULL);
+  assert(vspath != NULL);
+  assert(fspath != NULL);
+
   SGshaderinfo *tmp = hashtable_lookup(shaderKeyMap, key);
   if (tmp) return tmp->ident;
 
@@ -82,6 +112,18 @@ sgLoadProgram(const char *key,
       GLint compileStatus = 0;
       glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compileStatus);
       if (compileStatus == GL_FALSE) {
+        GLint logLen = 0;
+        GLint retrievedLen = 0;
+
+        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logLen);
+
+        char *tmp = malloc(logLen);
+
+        glGetShaderInfoLog(shaderId, logLen, &retrievedLen, tmp);
+        fputs(tmp, stderr);
+
+        free(tmp);
+
         // No globfree as this is a fatal error
         ooLogFatal("vertex shader '%s' did not compile", shaders.gl_pathv[i]);
       }
@@ -114,6 +156,18 @@ sgLoadProgram(const char *key,
       GLint compileStatus = 0;
       glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compileStatus);
       if (compileStatus == GL_FALSE) {
+        GLint logLen = 0;
+        GLint retrievedLen = 0;
+
+        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logLen);
+
+        char *tmp = malloc(logLen);
+
+        glGetShaderInfoLog(shaderId, logLen, &retrievedLen, tmp);
+        fputs(tmp, stderr);
+
+        free(tmp);
+
         // No globfree as this is a fatal error
         ooLogFatal("fragment shader '%s' did not compile", shaders.gl_pathv[i]);
       }
@@ -129,6 +183,18 @@ sgLoadProgram(const char *key,
   GLint linkStatus = 0;
   glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linkStatus);
   if (linkStatus == GL_FALSE) {
+    GLint logLen = 0;
+    GLint retrievedLen = 0;
+
+    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &logLen);
+
+    char *tmp = malloc(logLen);
+
+    glGetProgramInfoLog(shaderProgram, logLen, &retrievedLen, tmp);
+    fputs(tmp, stderr);
+
+    free(tmp);
+
     ooLogFatal("shader linking did not succeed");
   }
   ooLogInfo("shader program succesfully linked");
@@ -141,6 +207,15 @@ sgLoadProgram(const char *key,
     return 0;
   }
   return shaderProgram;
+}
+
+GLuint
+sgGetProgram(const char *key)
+{
+  SGshaderinfo *tmp = hashtable_lookup(shaderKeyMap, key);
+  if (tmp) return tmp->ident;
+  else ooLogWarn("no such shader '%s'", key);
+  return 0;
 }
 
 void

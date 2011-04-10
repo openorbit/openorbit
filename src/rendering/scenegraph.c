@@ -38,6 +38,7 @@
 #include "common/lwcoord.h"
 #include "parsers/model.h"
 #include "render.h"
+#include "shader-manager.h"
 
 SGcam*
 sgGetCam(SGscenegraph *sg)
@@ -57,6 +58,22 @@ sgNewSceneGraph()
   obj_array_init(&sg->cams);
   obj_array_init(&sg->overlays);
   obj_array_init(&sg->scenes);
+
+  sg->overlay_shader = sgGetProgram("overlay");
+  glUseProgram(sg->overlay_shader);
+
+  sg->modelview_id = glGetUniformLocation(sg->overlay_shader,
+                                          "ModelViewMatrix");
+  sg->projection_id = glGetUniformLocation(sg->overlay_shader,
+                                           "ProjectionMatrix");
+  sg->tex_id = glGetUniformLocation(sg->overlay_shader,
+                                    "Tex");
+
+  assert(sg->modelview_id != -1);
+  assert(sg->projection_id != -1);
+  assert(sg->tex_id != -1);
+
+  glUseProgram(0);
 
   return sg;
 }
@@ -163,8 +180,8 @@ sgInitOverlay(SGoverlay *overlay, SGdrawoverlay drawfunc,
                GL_UNSIGNED_BYTE, NULL);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
   SG_CHECK_ERROR;
 
@@ -190,6 +207,8 @@ sgDrawOverlays(SGscenegraph *sg)
   glPushMatrix();
   glLoadIdentity();
 
+  glPushAttrib(GL_ENABLE_BIT);
+
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_LIGHTING);
   glDisable(GL_CULL_FACE);
@@ -200,37 +219,63 @@ sgDrawOverlays(SGscenegraph *sg)
     if (overlay->enabled) {
       // Bind the fbo texture so that the mfd rendering ends up in the texture
       glBindFramebuffer(GL_FRAMEBUFFER, overlay->fbo);
-      glBindTexture(GL_TEXTURE_2D, overlay->tex);
       glPushAttrib(GL_VIEWPORT_BIT);
 
       glViewport(0,0, overlay->w, overlay->h);
 
       ooLogTrace("draw overlay %d", i);
+      // Here we draw the overlay into a texture
       overlay->draw(overlay);
 
       glPopAttrib();
 
-      GLubyte data[4*128*128];
-      glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+      // Re-attach the real framebuffer as rendering target, and draw the
+      // texture using a quad.
+      glUseProgram(sg->overlay_shader);
 
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+      SG_CHECK_ERROR;
+
+      // Set shader arguments
+      GLfloat modelview[16], projection[16];
+      glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
+      glGetFloatv(GL_PROJECTION_MATRIX , projection);
+
+      glUniformMatrix4fv(sg->modelview_id, 1, GL_FALSE, modelview);
+      glUniformMatrix4fv(sg->projection_id, 1, GL_FALSE, projection);
+
       glEnable(GL_TEXTURE_2D);
+      glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, overlay->tex);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glUniform1i(sg->tex_id, 0);
 
-      // Draws the texture in the overlay fbo texture
+      GLint shaderIsValid;
+      glValidateProgram(sg->overlay_shader);
+      glGetProgramiv(sg->overlay_shader, GL_VALIDATE_STATUS, &shaderIsValid);
+      assert(shaderIsValid);
+
+      SG_CHECK_ERROR;
+
       glBegin(GL_QUADS);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-      glTexCoord2f(0.0f, 0.0f);
-      glVertex3f (overlay->x, overlay->y, 0.0);
-      glTexCoord2f(1.0f, 0.0f);
-      glVertex3f(overlay->x + overlay->w, overlay->y, 0.0);
-      glTexCoord2f(1.0, 1.0);
-      glVertex3f(overlay->x + overlay->w, overlay->y + overlay->h, 0.0);
-      glTexCoord2f(0.0, 1.0);
-      glVertex3f(overlay->x, overlay->y + overlay->h, 0.0);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f (overlay->x, overlay->y, 0.0);
 
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(overlay->x, overlay->y + overlay->h, 0.0);
+
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(overlay->x + overlay->w, overlay->y + overlay->h, 0.0);
+
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(overlay->x + overlay->w, overlay->y, 0.0);
       glEnd();
+
+      SG_CHECK_ERROR;
+
+      glUseProgram(0);
     }
   }
 
@@ -240,11 +285,7 @@ sgDrawOverlays(SGscenegraph *sg)
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
 
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_LIGHTING);
-  glEnable(GL_CULL_FACE);
-
-
+  glPopAttrib();
 }
 
 int
