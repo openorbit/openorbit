@@ -149,6 +149,8 @@ main_loop(void)
         break;
       case SDL_TEXTINPUT:
         break;
+      case SDL_TEXTEDITING:
+          break;
       case SDL_MOUSEMOTION:
         if (event.motion.state) {
         }
@@ -157,6 +159,17 @@ main_loop(void)
         break;
       case SDL_MOUSEBUTTONUP:
         break;
+      case SDL_MOUSEWHEEL:
+          break;
+
+      case SDL_INPUTMOTION:
+      case SDL_INPUTBUTTONDOWN:
+      case SDL_INPUTBUTTONUP:
+      case SDL_INPUTWHEEL:
+      case SDL_INPUTPROXIMITYIN:
+      case SDL_INPUTPROXIMITYOUT:
+        break;
+
       case SDL_KEYDOWN:
         ioDispatchKeyDown(event.key.keysym.scancode, event.key.keysym.mod);
         break;
@@ -200,6 +213,12 @@ main_loop(void)
       case SDL_FINGERDOWN:
       case SDL_FINGERUP:
       case SDL_FINGERMOTION:
+      case SDL_TOUCHBUTTONDOWN:
+      case SDL_TOUCHBUTTONUP:
+      case SDL_DOLLARGESTURE:
+      case SDL_DOLLARRECORD:
+      case SDL_MULTIGESTURE:
+
         break;
       case SDL_QUIT:
         done = 1;
