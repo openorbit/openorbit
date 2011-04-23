@@ -1,0 +1,33 @@
+#version 120
+
+uniform sampler2D Tex0;
+varying vec2 TexCoord;
+
+varying vec4 Diffuse, Ambient, AmbientGlob;
+varying vec3 N, Ld, Eye;
+varying float Dist;
+
+void main()
+{
+  vec3 Normal = normalize(N);
+  vec4 color = AmbientGlob;
+  
+  float NdotL = max(dot(Normal, Ld), 0.0);
+
+  if (NdotL > 0.0) {
+    float att = 1.0 / (gl_LightSource[0].constantAttenuation +
+                 Dist * gl_LightSource[0].linearAttenuation +
+                 Dist * Dist * gl_LightSource[0].quadraticAttenuation);
+    
+    color += att * (Diffuse * NdotL + Ambient);
+    float RdotE = max(dot(reflect(-Ld, Normal), normalize(Eye)), 0.0);
+
+    vec4 Spec = gl_FrontMaterial.specular * gl_LightSource[0].specular *
+                pow(RdotE, gl_FrontMaterial.shininess);
+
+    color += att * Spec;
+  }
+  
+  vec4 texel0 = texture2D(Tex0, TexCoord);
+	gl_FragColor = color * texel0;
+}

@@ -12,6 +12,7 @@ openorbit {
     rendering {
        model: "sphere"; # Special keys are sphere
        texture: "textures/sol.tga";
+       shader: "star";
     }
     satellites {
       planet (name: Mercury) {
@@ -48,6 +49,7 @@ openorbit {
         rendering {
           model: "sphere";
           texture: "textures/mercury.tga";
+          shader: "planet";
         }
       }
       planet (name: Venus) {
@@ -82,7 +84,8 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "textures/venus.tga";
+          texture: "textures/venus.jpg";
+          shader: "planet";
         }
       }
       planet (name: Earth) {
@@ -118,7 +121,9 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "textures/land_ocean_ice_cloud_2048.jpg";
+          texture: "textures/earth.jpg";
+          night-texture: "textures/earth-night.jpg";
+          shader: "planet";
         }
         satellites {
           moon (name: Luna) {
@@ -142,6 +147,7 @@ openorbit {
             rendering {
               model: "sphere";
               texture: "textures/moonmap4k.jpg";
+              shader: "planet";
             }
           }
         }
@@ -169,6 +175,7 @@ openorbit {
         rendering {
           model: "sphere";
           texture: "textures/mars.jpg";
+          shader: "planet";
         }
       }
       planet (name: Jupiter) {
@@ -193,7 +200,8 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "textures/JupiterNormalized2k.jpg";
+          texture: "textures/jupiter.jpg";
+          shader: "planet";
         }
         satellites {
           moon (name: Io) {
@@ -213,8 +221,9 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "textures/Io.png";
+              texture: "textures/io.jpg";
               //albedo: 0.62;
+              shader: "planet";
             }
           }
           moon (name: Europa) {
@@ -235,6 +244,7 @@ openorbit {
             rendering {
               model: "sphere";
               texture: "textures/Europa.png";
+              shader: "planet";
               //albedo: 0.68;
             }
           }
@@ -256,6 +266,7 @@ openorbit {
             rendering {
               model: "sphere";
               texture: "textures/4kGanymede.png";
+              shader: "planet";
               //albedo: 0.44;
             }
           }
@@ -277,6 +288,7 @@ openorbit {
             rendering {
               model: "sphere";
               texture: "textures/Callisto.png";
+              shader: "planet";
               //albedo: 0.19;
             }
           }
@@ -328,6 +340,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
+          shader: "planet";
           texture: "textures/uranus.jpg";
         }
       }
@@ -352,10 +365,10 @@ openorbit {
         }
         rendering {
           model: "sphere";
+          shader: "planet";
           texture: "textures/neptune.jpg";
         }
       }
-
     }
   }
 }

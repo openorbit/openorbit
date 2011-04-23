@@ -241,6 +241,7 @@ MercuryNew(void)
   SGdrawable *redstoneModel = sgLoadModel("spacecrafts/mercury/redstone.ac");
   // TODO: Loading models and attaching them to the stages should really be made
   //       cleaner, this is not a good API
+  sgDrawableLoadShader(redstoneModel, "spacecraft");
   ooScSetStageMesh(redstone, redstoneModel);
   sgSceneAddObj(sgGetScene(simGetSg(), "main"), redstoneModel);
 
@@ -264,6 +265,8 @@ MercuryNew(void)
 
   OOstage *capsule = ooScNewStage(sc, "Command-Module");
   SGdrawable *capsuleModel = sgLoadModel("spacecrafts/mercury/mercury.ac");
+  sgDrawableLoadShader(capsuleModel, "spacecraft");
+
   ooScSetStageMesh(capsule, capsuleModel);
   sgSceneAddObj(sgGetScene(simGetSg(), "main"), capsuleModel);
 
