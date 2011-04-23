@@ -544,22 +544,8 @@ sgNewCylinder(const char *name,
 }
 
 
-static void
-setMaterial(material_t *mat)
-{
-  SG_CHECK_ERROR;
-
-  glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat->ambient);
-  glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
-  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
-  glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat->emission);
-  glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess);
-
-  SG_CHECK_ERROR;
-}
-
 void
-drawModel(model_object_t *model)
+drawModel(SGmodel *sgmod, model_object_t *model)
 {
   SG_CHECK_ERROR;
 
@@ -571,7 +557,7 @@ drawModel(model_object_t *model)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   //glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
-  setMaterial(model->model->materials[model->materialId]);
+  sgBindMaterial(model->model->materials[model->materialId]);
 
   glPushMatrix();
 
@@ -581,6 +567,13 @@ drawModel(model_object_t *model)
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
+
+  GLfloat modelview[16], projection[16];
+  glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+  glGetFloatv(GL_PROJECTION_MATRIX, projection);
+
+  glUniformMatrix4fv(sgmod->super.modelview_id, 1, GL_FALSE, modelview);
+  glUniformMatrix4fv(sgmod->super.projection_id, 1, GL_FALSE, projection);
 
   glVertexPointer(3, GL_FLOAT, 0, model->vertices.elems);
   glTexCoordPointer(2, GL_FLOAT, 0, model->texCoords.elems);
@@ -620,7 +613,7 @@ drawModel(model_object_t *model)
 #endif
 
   for (int i = 0 ; i < model->children.length ; ++ i) {
-    drawModel(model->children.elems[i]);
+    drawModel(sgmod, model->children.elems[i]);
   }
 
   glPopMatrix();
@@ -633,7 +626,7 @@ sgDrawModel(SGmodel *model)
   SG_CHECK_ERROR;
 
   glEnable(GL_LIGHTING);
-  drawModel(model->modelData->objs.elems[0]);
+  drawModel(model, model->modelData->objs.elems[0]);
 
   SG_CHECK_ERROR;
 }
