@@ -28,10 +28,39 @@
 #include "rendering/texture.h"
 #include "log.h"
 #include "shader-manager.h"
+
+void
+sgInitDrawable(SGdrawable *obj)
+{
+  obj->tex_id[0] = -1;
+  obj->tex_id[1] = -1;
+  obj->tex_id[2] = -1;
+  obj->tex_id[3] = -1;
+
+  obj->shader = 0;
+
+  obj->tex_uni_id[0] = -1;
+  obj->tex_uni_id[1] = -1;
+  obj->tex_uni_id[2] = -1;
+  obj->tex_uni_id[3] = -1;
+}
+
 void
 sgDrawableLoadShader(SGdrawable *obj, const char *shader)
 {
   obj->shader = sgLoadProgram(shader, shader, shader, shader);
+  obj->modelview_id = glGetUniformLocation(obj->shader,
+                                          "ModelViewMatrix");
+  obj->projection_id = glGetUniformLocation(obj->shader,
+                                           "ProjectionMatrix");
+  obj->tex_uni_id[0] = glGetUniformLocation(obj->shader,
+                                     "Tex0");
+  obj->tex_uni_id[1] = glGetUniformLocation(obj->shader,
+                                        "Tex1");
+  obj->tex_uni_id[2] = glGetUniformLocation(obj->shader,
+                                        "Tex2");
+  obj->tex_uni_id[3] = glGetUniformLocation(obj->shader,
+                                        "Tex3");
 }
 
 void
@@ -177,8 +206,6 @@ sgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df)
   drawable->siblings.prev = NULL;
   drawable->parent = NULL;
 
-  drawable->shader = 0;
-
   return drawable;
 }
 
@@ -193,7 +220,7 @@ sgDrawSphere(SGsphere *sp)
   glEnable(GL_LIGHTING);
 
   sgBindMaterial(&sp->mat);
-  glBindTexture(GL_TEXTURE_2D, sp->texId);
+//  glBindTexture(GL_TEXTURE_2D, sp->super->texId);
 
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
@@ -253,11 +280,12 @@ SGdrawable*
 sgNewSphere(const char *name, float radius, const char *tex)
 {
   SGsphere *sp = malloc(sizeof(SGsphere));
+  sgInitDrawable(&sp->super);
   sgInitMaterial(&sp->mat);
 
   sp->radius = radius;
-  ooTexLoad(tex, tex);
-  sp->texId = ooTexNum(tex);
+  sp->super.tex_id[0] = ooTexLoad(tex, tex);
+
   sp->quadratic = gluNewQuadric();
   gluQuadricOrientation(sp->quadratic, GLU_OUTSIDE);
   gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
@@ -272,11 +300,12 @@ SGdrawable*
 sgNewSphere2(const char *name, const char *tex, float radius, float flattening, int stacks, int slices)
 {
   SGsphere *sp = malloc(sizeof(SGsphere));
+  sgInitDrawable(&sp->super);
   sgInitMaterial(&sp->mat);
 
   sp->radius = radius;
-  ooTexLoad(tex, tex);
-  sp->texId = ooTexNum(tex);
+  sp->super.tex_id[0] = ooTexLoad(tex, tex);
+
   stacks = stacks & ~1; // Ensure we have an even number of stacks
 
   // For the triangle strips and the poles
@@ -359,8 +388,8 @@ sgNewSphere2(const char *name, const char *tex, float radius, float flattening, 
 void
 sgDrawSphere2(SGsphere *sp)
 {
-  glEnable(GL_TEXTURE_2D); // Lines are not textured...
-  glBindTexture(GL_TEXTURE_2D, sp->texId);
+  //glEnable(GL_TEXTURE_2D); // Lines are not textured...
+  //glBindTexture(GL_TEXTURE_2D, sp->texId);
   glEnable(GL_LIGHTING); // Lines are not lit, just colored
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
@@ -441,6 +470,7 @@ sgNewEllipsis(const char *name,
   SG_CHECK_ERROR;
 
   SGellipsis *el = malloc(sizeof(SGellipsis) + vertCount * 3 * sizeof(float));
+  sgInitDrawable(&el->super);
   el->semiMajor = semiMajor;
   el->semiMinor = semiMinor;
   el->ecc = sqrt((semiMajor * semiMajor - semiMinor * semiMinor)
@@ -500,6 +530,8 @@ sgNewCylinder(const char *name,
               float top, float bottom, float height)
 {
   SGcylinder *cyl = malloc(sizeof(SGcylinder));
+  sgInitDrawable(&cyl->super);
+
   cyl->height = height;
   cyl->bottonRadius = bottom;
   cyl->topRadius = top;
@@ -612,6 +644,8 @@ sgLoadModel(const char *file)
   char *path = ooResGetPath(file);
 
   SGmodel *model = malloc(sizeof(SGmodel));
+  sgInitDrawable(&model->super);
+
   model->modelData = model_load(path);
   free(path);
   if (model->modelData == NULL) {
@@ -657,14 +691,41 @@ void
 sgPaintDrawable(SGdrawable *drawable)
 {
   SG_CHECK_ERROR;
-
   glUseProgram(drawable->shader);
   glPushMatrix();
   glTranslatef(drawable->p.x, drawable->p.y, drawable->p.z);
   glMultMatrixf(drawable->R);
 
   SG_CHECK_ERROR;
+
+  if (drawable->shader) {
+    GLfloat modelview[16], projection[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+    glGetFloatv(GL_PROJECTION_MATRIX, projection);
+
+    glUniformMatrix4fv(drawable->modelview_id, 1, GL_FALSE, modelview);
+    glUniformMatrix4fv(drawable->projection_id, 1, GL_FALSE, projection);
+
+    for (int i = 0 ; i < 4 ; i ++) {
+      if (drawable->tex_id[i] >= 0) {
+        glEnable(GL_TEXTURE_2D);
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, drawable->tex_id[i]);
+        glUniform1i(drawable->tex_uni_id[i], i);
+      }
+    }
+
+    GLint shaderIsValid;
+    glValidateProgram(drawable->shader);
+    glGetProgramiv(drawable->shader, GL_VALIDATE_STATUS, &shaderIsValid);
+    assert(shaderIsValid);
+
+    SG_CHECK_ERROR;
+  }
+
+  //  glPushAttrib(GL_ENABLE_BIT);
   drawable->draw(drawable);
+//  glPopAttrib();
   SG_CHECK_ERROR;
 
   LIST_FOREACH(SGdrawable, child, drawable->children, siblings) {
@@ -672,6 +733,10 @@ sgPaintDrawable(SGdrawable *drawable)
   }
 
   glPopMatrix();
+
+
+  glUseProgram(0);
+
   SG_CHECK_ERROR;
 }
 
@@ -718,6 +783,7 @@ SGdrawable*
 sgNewLabel(const char *name, const char *str)
 {
   SGlabel *lab = malloc(sizeof(SGlabel));
+  sgInitDrawable(&lab->super);
 
   strncpy(lab->buff, str, SG_LABEL_LEN);
   lab->buff[SG_LABEL_LEN-1] = '\0';
@@ -788,6 +854,8 @@ sgNewEllipsoid(const char *name, float a, float b, float c,
 {
   unsigned vertCount = slices * stacks * 2 + 2 + slices + 1;
   SGellipsoid *el = malloc(sizeof(SGellipsoid) + vertCount * 3 * sizeof(float));
+  sgInitDrawable(&el->super);
+
   // glGenVertexArrays
   // glBindVertexArray
   // glBufferData(GL_ARRAY_BUFFER, vertcount*sizeof(float)*3, vertices, GL_STATIC_DRAW)

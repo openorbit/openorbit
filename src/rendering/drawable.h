@@ -53,7 +53,12 @@ struct SGdrawable {
                   //float s; // Scale
   GLfloat R[16];
   SGdrawfunc draw; // Draw function for this object
+
   GLuint shader;
+  GLint modelview_id;
+  GLint projection_id;
+  GLint tex_id[4];
+  GLint tex_uni_id[4];
 };
 
 typedef struct SGellipsis {
@@ -89,13 +94,8 @@ typedef struct SGmodel {
 struct SGsphere {
   SGdrawable super;
   SGmaterial mat;
-  GLuint texId;
-  GLUquadricObj *quadratic;
 
-  GLuint dayTexId;
-  GLuint nightTexId;
-  GLuint cloudTexId;
-  GLuint bumpTexId;
+  GLUquadricObj *quadratic;
 
   GLuint northPoleIdx;
   GLuint northPoleCount;
