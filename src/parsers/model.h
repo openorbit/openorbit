@@ -24,17 +24,11 @@
 #include <stdlib.h>
 #include <gencds/array.h>
 
-typedef struct model_t model_t;
-typedef struct material_t material_t;
-typedef struct model_object_t model_object_t;
+#include "rendering/material.h"
 
-struct material_t {
-  float ambient[4];
-  float diffuse[4];
-  float specular[4];
-  float emission[4];
-  float shininess;
-};
+typedef struct model_t model_t;
+typedef SGmaterial material_t;
+typedef struct model_object_t model_object_t;
 
 struct model_object_t {
   model_t *model;
