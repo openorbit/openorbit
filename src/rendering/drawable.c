@@ -684,6 +684,17 @@ void
 sgPaintDrawable(SGdrawable *drawable)
 {
   SG_CHECK_ERROR;
+  glPushAttrib(GL_ENABLE_BIT);
+
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CCW);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
+  glEnable(GL_LIGHTING);
+
   glUseProgram(drawable->shader);
   glPushMatrix();
   glTranslatef(drawable->p.x, drawable->p.y, drawable->p.z);
@@ -726,6 +737,7 @@ sgPaintDrawable(SGdrawable *drawable)
   }
 
   glPopMatrix();
+  glPopAttrib();
 
 
   glUseProgram(0);

@@ -256,7 +256,8 @@ sgDrawOverlays(SGscenegraph *sg)
       assert(shaderIsValid);
 
       SG_CHECK_ERROR;
-
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glBegin(GL_QUADS);
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -313,6 +314,7 @@ sgSceneDraw(SGscene *sc)
   glDepthFunc(GL_LEQUAL);
 
   // Apply scene transforms
+  glPushAttrib(GL_ENABLE_BIT);
   glPushMatrix();
   int localLights = 0;
   for (int i = 0 ; i < sc->sg->maxLights ; ++ i) {
@@ -342,6 +344,7 @@ sgSceneDraw(SGscene *sc)
   SG_CHECK_ERROR;
 
   // Pop scene transform
+  glPopAttrib();
   glPopMatrix();
 
 
@@ -385,9 +388,11 @@ sgPaint(SGscenegraph *sg)
   glLoadIdentity();
 
   glPushMatrix();
+  glPushAttrib(GL_ENABLE_BIT);
   sgCamRotate(sg->currentCam);
   // Draw the sky
   sg->sky->draw(sg->sky);
+  glPopAttrib();
   glPopMatrix();
 
   glPushMatrix();
@@ -399,7 +404,9 @@ sgPaint(SGscenegraph *sg)
   glPopMatrix();
 
   // Draw overlays
+  glPushAttrib(GL_ENABLE_BIT);
   sgDrawOverlays(sg);
+  glPopAttrib();
 }
 
 void
