@@ -60,7 +60,7 @@ png_read_file(png_image_t *img, FILE *file)
     return -1;//TODO: is this for errors? If so, return -1
   }
 
-  png_struct->io_ptr = (png_voidp)file;
+  png_init_io(png_struct, file);
 
   // Tell libpng that we already read the header
   png_set_sig_bytes(png_struct, 8);
