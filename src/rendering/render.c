@@ -40,15 +40,32 @@
 #include "texture.h"
 #include "planet.h"
 #include "log.h"
+#include "common/moduleinit.h"
+#include "io-manager.h"
 
 //static SDL_Surface *gScreen = NULL;
-
 SGrenderinfo sgRenderInfo;
+
+static void
+io_toggle_fs(bool buttonDown, void *data)
+{
+  extern SDL_Window *mainWindow;
+
+  Uint32 flags = SDL_GetWindowFlags(mainWindow);
+  if (flags & SDL_WINDOW_FULLSCREEN)
+    SDL_SetWindowFullscreen(mainWindow, SDL_FALSE);
+  else
+    SDL_SetWindowFullscreen(mainWindow, SDL_TRUE);
+}
+
+INIT_IO {
+  ioRegActionHandler("toggle-fullscreen", io_toggle_fs, NULL);
+}
 
 void
 ooInitSdlScreen(int width, int height, bool fullscreen)
 {
-  extern SDL_WindowID mainWindow;
+  extern SDL_Window* mainWindow;
   Uint32 flags = 0;
 
   flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
