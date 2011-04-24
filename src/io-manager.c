@@ -359,8 +359,18 @@ ioInitKeys(void)
         if (!strcmp(keyInfo->name, "key")) {
           const char *actionName = hrmlGetStr(keyInfo);
           HRMLvalue keyId = hrmlGetAttrForName(keyInfo, "id");
+          HRMLvalue keyMod = hrmlGetAttrForName(keyInfo, "mod");
+
+          uint32_t flags = 0;
+
+          if (keyMod.typ == HRMLStr) {
+            if (!strcmp(keyMod.u.str, "lmeta")) {
+              flags = OO_IO_MOD_LMETA;
+            }
+          }
+
           assert(keyId.typ == HRMLStr);
-          ooIoBindKeyHandler(keyId.u.str, actionName, 0, 0);
+          ooIoBindKeyHandler(keyId.u.str, actionName, 0, flags);
         } else if (!strcmp(keyInfo->name, "key-axis")) {
           const char *axisName = hrmlGetStr(keyInfo);
           HRMLvalue keyId = hrmlGetAttrForName(keyInfo, "id");

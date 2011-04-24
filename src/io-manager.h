@@ -33,18 +33,18 @@ extern "C" {
 
 /* These use the same values as SDL, so for porting (to not use SDL) they must be
    translated in some way */
-#define OO_IO_MOD_NONE   0x0000
-#define OO_IO_MOD_LSHIFT 0x0001
-#define OO_IO_MOD_RSHIFT 0x0002
-#define OO_IO_MOD_LCTRL  0x0040
-#define OO_IO_MOD_RCTRL  0x0080
-#define OO_IO_MOD_LALT   0x0100
-#define OO_IO_MOD_RALT   0x0200
-#define OO_IO_MOD_LMETA  0x0400
-#define OO_IO_MOD_RMETA  0x0800
-#define OO_IO_MOD_NUM    0x1000
-#define OO_IO_MOD_CAPS   0x2000
-#define OO_IO_MOD_MODE   0x4000
+#define OO_IO_MOD_NONE   KMOD_NONE
+#define OO_IO_MOD_LSHIFT KMOD_LSHIFT
+#define OO_IO_MOD_RSHIFT KMOD_RSHIFT
+#define OO_IO_MOD_LCTRL  KMOD_LCTRL
+#define OO_IO_MOD_RCTRL  KMOD_RCTRL
+#define OO_IO_MOD_LALT   KMOD_LALT
+#define OO_IO_MOD_RALT   KMOD_RALT
+#define OO_IO_MOD_LMETA  KMOD_LGUI
+#define OO_IO_MOD_RMETA  KMOD_RGUI
+#define OO_IO_MOD_NUM    KMOD_NUM
+#define OO_IO_MOD_CAPS   KMOD_CAPS
+#define OO_IO_MOD_MODE   KMOD_MODE
 
   void ioInit(void);
   void ioDispatchKeyUp(int key, uint16_t mask);
