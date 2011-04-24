@@ -67,6 +67,9 @@ mfd_draw(SGoverlay *overlay)
 static void
 samplemfddraw(SIMmfdpage *mfd)
 {
+  glDisable(GL_BLEND);
+  glDisable(GL_TEXTURE_2D);
+
   glClearColor(0.0625, 0.05078125, 0.2265625, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -208,13 +211,16 @@ simMfdInitAll(SGscenegraph *sg)
   mfd2.page_no = 0;
   mfd3.page_no = 0;
 
-  sgInitOverlay(&mfd0.super, mfd_draw,   0,   0, 128, 128);
-  sgInitOverlay(&mfd1.super, mfd_draw, sgRenderInfo.w - 128,   0, 128, 128);
-  sgInitOverlay(&mfd2.super, mfd_draw, sgRenderInfo.w - 128,
-                sgRenderInfo.h - 128, 128, 128);
-  sgInitOverlay(&mfd3.super, mfd_draw,   0, sgRenderInfo.h - 128, 128, 128);
+  sgInitOverlay(&mfd0.super, mfd_draw,   0.0,   0.0, 128.0, 128.0, 128, 128);
+  sgInitOverlay(&mfd1.super, mfd_draw, sgRenderInfo.w - 128.0,   0.0,
+                128.0, 128.0, 128, 128);
+  sgInitOverlay(&mfd2.super, mfd_draw, sgRenderInfo.w - 128.0,
+                sgRenderInfo.h - 128.0, 128.0, 128.0, 128, 128);
+  sgInitOverlay(&mfd3.super, mfd_draw,   0.0, sgRenderInfo.h - 128.0,
+                128.0, 128.0, 128, 128);
 
-  sgInitOverlay(&hud.super, test_hud_draw,   0, 0, sgRenderInfo.w, sgRenderInfo.h);
+  sgInitOverlay(&hud.super, test_hud_draw,   0.0, 0.0,
+                sgRenderInfo.w, sgRenderInfo.h, 128, 128);
 
 
   sgAddOverlay(sg, &mfd0.super);

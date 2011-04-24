@@ -100,7 +100,8 @@ void sgClearGLError(void);
 
 void sgAddOverlay(SGscenegraph *sg, SGoverlay *overlay);
 void sgInitOverlay(SGoverlay *overlay, SGdrawoverlay drawfunc,
-                   unsigned x, unsigned y,
-                   unsigned w, unsigned h);
+                   float x, float y,
+                   float w, float h,
+                   unsigned rw, unsigned rh);
 
 #endif /* SCENEGRAPH_H_ */
