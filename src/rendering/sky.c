@@ -160,7 +160,7 @@ ooSkyDrawStars(OOstars *stars)
   glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glPointSize(2.0f);
   glInterleavedArrays(GL_C4UB_V3F, 0, stars->data);
