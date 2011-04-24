@@ -72,7 +72,7 @@
 // 25Hz
 #define SIM_STEP_PERIOD 40
 
-SDL_WindowID mainWindow;
+SDL_Window *mainWindow;
 SDL_GLContext mainContext;
 
 
@@ -145,8 +145,16 @@ main_loop(void)
       switch (event.type) {
       case SDL_ACTIVEEVENT:
         break;
-      case SDL_WINDOWEVENT:
+      case SDL_WINDOWEVENT: {
+        switch (event.window.event) {
+        case SDL_WINDOWEVENT_RESIZED:
+          ooResizeScreen(event.window.data1, event.window.data2, false);
+          break;
+        default:
+          ooLogTrace("unknown window event %d", (int)event.window.event);
+        }
         break;
+      }
       case SDL_TEXTINPUT:
         break;
       case SDL_TEXTEDITING:
@@ -224,7 +232,7 @@ main_loop(void)
         done = 1;
         break;
       default:
-        assert(0 && "unhandled event in main event loop");
+        ooLogWarn("did not handle event number %d in main loop", event.type);
       }
     }
 
@@ -235,13 +243,6 @@ main_loop(void)
     frames ++;
   }
 }
-
-//int
-//SDL_main(int argc, char *argv[])
-//{
-//  assert(0 && "never go here");
-//  return 0;
-//}
 
 void
 sdl_atexit(void)

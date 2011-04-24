@@ -114,7 +114,10 @@ ooResizeScreen(int width, int height, bool fullscreen)
   float fovy;
   ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
 
-  //  ooInitSdlScreen(width, height, fullscreen);
+  sgRenderInfo.w = width;
+  sgRenderInfo.h = height;
+  sgRenderInfo.aspect = (float)width/(float)height;
+
   ooSetPerspective(fovy, width, height);
 }
 
@@ -122,17 +125,7 @@ ooResizeScreen(int width, int height, bool fullscreen)
 void
 ooSetPerspective(float fovy, int width, int height)
 {
-//  SDL_Surface *window = SDL_GetVideoSurface();
-
   int lowx = 0, lowy = 0;
-
-//  if (window->w < width) width = window->w;
-//  if (window->h < height) height = window->h;
-
-  // lowx = window->w - width;
-  // lowy = window->h - height;
-  // width += lowx;
-  // height += lowy;
 
   ooLogInfo("resize to %f (%d %d) %d %d", fovy, lowx, lowy, width, height);
   glViewport(lowx, lowy, width, height);
@@ -143,8 +136,6 @@ ooSetPerspective(float fovy, int width, int height)
   // Near clipping 1 m away, far clipping 20 au away
   gluPerspective(fovy, (double)width / (double)height,
                  /*near*/0.9, /*far*/149598000000.0*20.0);
-
-  ooLogInfo("\tperspective %f", (double)width / (double)height);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
