@@ -24,6 +24,7 @@
 #include "parsers/hrml.h"
 #include "res-manager.h"
 #include "log.h"
+#include "rendering/texture.h"
 
 /*
  NOTE: G is defined as 6.67428 e-11 (m^3)/kg/(s^2), let's call that G_m. In AU,
@@ -36,6 +37,38 @@
 
  */
 
+
+
+void
+loadMaterial(SGmaterial *mat, HRMLobject *obj)
+{
+  sgInitMaterial(mat);
+
+  for (HRMLobject *matEntry = obj->children; matEntry != NULL;
+       matEntry = matEntry->next) {
+    if (!strcmp(matEntry->name, "emission")) {
+      assert(hrmlGetRealArrayLen(matEntry) == 4);
+      const double *vec = hrmlGetRealArray(matEntry);
+      sgSetMaterialEmiss4f(mat, vec[0], vec[1], vec[2], vec[3]);
+    } else if (!strcmp(matEntry->name, "ambient")) {
+      assert(hrmlGetRealArrayLen(matEntry) == 4);
+      const double *vec = hrmlGetRealArray(matEntry);
+      sgSetMaterialAmb4f(mat, vec[0], vec[1], vec[2], vec[3]);
+    } else if (!strcmp(matEntry->name, "diffuse")) {
+      assert(hrmlGetRealArrayLen(matEntry) == 4);
+      const double *vec = hrmlGetRealArray(matEntry);
+      sgSetMaterialDiff4f(mat, vec[0], vec[1], vec[2], vec[3]);
+    } else if (!strcmp(matEntry->name, "specular")) {
+      assert(hrmlGetRealArrayLen(matEntry) == 4);
+      const double *vec = hrmlGetRealArray(matEntry);
+      sgSetMaterialSpec4f(mat, vec[0], vec[1], vec[2], vec[3]);
+    } else if (!strcmp(matEntry->name, "shininess")) {
+      float shininess = hrmlGetReal(matEntry);
+      sgSetMaterialShininess(mat, shininess);
+    }
+  }
+}
+
 void
 ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
 {
@@ -46,8 +79,14 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
 
   double mass, radius, siderealPeriod, gm = NAN, axialTilt = 0.0;
   double semiMajor, ecc, inc, longAscNode, longPerihel, meanLong;
+
   const char *tex = NULL;
   const char *shader = NULL;
+  const char *spec = NULL;
+  const char *bump = NULL;
+  const char *nightTex = NULL;
+  SGmaterial mat;
+  sgInitMaterial(&mat);
 
   double flattening = 0.0;
   HRMLobject *sats = NULL;
@@ -98,8 +137,16 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
 
         } else if (!strcmp(rend->name, "texture")) {
           tex = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "night-texture")) {
+          nightTex = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "specular-map")) {
+          spec = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "bump-map")) {
+          bump = hrmlGetStr(rend);
         } else if (!strcmp(rend->name, "shader")) {
           shader = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "material")) {
+          loadMaterial(&mat, rend);
         }
       }
     }
@@ -112,7 +159,8 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
   double period = plOrbitalPeriod(semiMajor, sys->orbitalBody->GM * gm) / PL_SEC_PER_DAY;
 
   //  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
-  SGdrawable *drawable = sgNewSphere(moonName.u.str, radius, tex);
+  SGdrawable *drawable = sgNewSphere(moonName.u.str, shader, radius,
+                                     tex, nightTex, spec, &mat);
 
 
   sgSceneAddObj(sc, drawable); // TODO: scale to radius
@@ -132,6 +180,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
   plSetDrawable(moonSys->orbitalBody, drawable);
 }
 
+
 void
 ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
 {
@@ -144,7 +193,13 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
   double semiMajor, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
   const char *tex = NULL;
   const char *shader = NULL;
+  const char *spec = NULL;
+  const char *bump = NULL;
+  const char *nightTex = NULL;
   HRMLobject *sats = NULL;
+  SGmaterial mat;
+  sgInitMaterial(&mat);
+
   double flattening = 0.0;
 
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
@@ -193,8 +248,16 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
 
         } else if (!strcmp(rend->name, "texture")) {
           tex = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "night-texture")) {
+          nightTex = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "specular-map")) {
+          spec = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "bump-map")) {
+          bump = hrmlGetStr(rend);
         } else if (!strcmp(rend->name, "shader")) {
           shader = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "material")) {
+          loadMaterial(&mat, rend);
         }
       }
     } else if (!strcmp(child->name, "satellites")) {
@@ -209,7 +272,9 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
   // NOTE: At present, all planets must be specified with AUs as parameters
   double period = plOrbitalPeriod(plAuToMetres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
 
-  SGdrawable *drawable = sgNewSphere(planetName.u.str, radius, tex);
+  SGdrawable *drawable = sgNewSphere(planetName.u.str, shader, radius,
+                                     tex, nightTex, spec, &mat);
+
   sgSceneAddObj(sc, drawable); // TODO: scale to radius
   PLsystem *sys = plNewOrbit(world, sc, planetName.u.str,
                              mass, gm,
@@ -220,10 +285,6 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
   plSetDrawable(sys->orbitalBody, drawable);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);
-
-  if (shader) {
-    sgDrawableLoadShader(drawable, shader);
-  }
 
   if (sats) {
     for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {
@@ -243,8 +304,13 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
   HRMLvalue starName = hrmlGetAttrForName(obj, "name");
   double mass = 0.0, gm = NAN;
   double radius, siderealPeriod, axialTilt;
+
   const char *tex = NULL;
   const char *shader = NULL;
+  const char *bump = NULL;
+  SGmaterial mat;
+  sgInitMaterial(&mat);
+
   double flattening = 0.0;
 
   HRMLobject *sats = NULL;
@@ -273,8 +339,12 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
 
         } else if (!strcmp(rend->name, "texture")) {
           tex = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "bump-map")) {
+          bump = hrmlGetStr(rend);
         } else if (!strcmp(rend->name, "shader")) {
           shader = hrmlGetStr(rend);
+        } else if (!strcmp(rend->name, "material")) {
+          loadMaterial(&mat, rend);
         }
       }
     }
@@ -285,9 +355,9 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
   }
 
   sgSetSceneAmb4f(sc, 0.2, 0.2, 0.2, 1.0);
-  SGdrawable *drawable = sgNewSphere(starName.u.str, radius, tex);
-  SGmaterial *mat = sgSphereGetMaterial((SGsphere*)drawable);
-  sgSetMaterialEmiss4f(mat, 1.0, 1.0, 1.0, 0.0);
+  sgSetMaterialEmiss4f(&mat, 1.0, 1.0, 1.0, 1.0);
+  SGdrawable *drawable = sgNewSphere(starName.u.str, shader, radius,
+                                     tex, NULL, NULL, &mat);
 
   SGlight *starLightSource = sgNewPointlight3f(sc, 0.0f, 0.0f, 0.0f);
 

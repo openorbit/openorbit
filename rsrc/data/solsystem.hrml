@@ -124,6 +124,15 @@ openorbit {
           texture: "textures/earth.jpg";
           night-texture: "textures/earth-night.jpg";
           shader: "planet";
+          // Materials are used if not textures are given, though not fully so
+          // Specular hilights are used when a specular map is given
+          material {
+            emission: [0.0, 0.0, 0.0, 0.0];
+            ambient: [1.0, 1.0, 1.0, 1.0];
+            diffuse: [1.0, 1.0, 1.0, 1.0];
+            specular: [0.5, 0.5, 0.55, 1.0];
+            shininess: 10.0;
+          }
         }
         satellites {
           moon (name: Luna) {

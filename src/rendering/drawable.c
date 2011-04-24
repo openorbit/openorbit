@@ -48,19 +48,23 @@ sgInitDrawable(SGdrawable *obj)
 void
 sgDrawableLoadShader(SGdrawable *obj, const char *shader)
 {
-  obj->shader = sgLoadProgram(shader, shader, shader, shader);
-  obj->modelview_id = glGetUniformLocation(obj->shader,
-                                          "ModelViewMatrix");
-  obj->projection_id = glGetUniformLocation(obj->shader,
-                                           "ProjectionMatrix");
-  obj->tex_uni_id[0] = glGetUniformLocation(obj->shader,
-                                     "Tex0");
-  obj->tex_uni_id[1] = glGetUniformLocation(obj->shader,
-                                        "Tex1");
-  obj->tex_uni_id[2] = glGetUniformLocation(obj->shader,
-                                        "Tex2");
-  obj->tex_uni_id[3] = glGetUniformLocation(obj->shader,
-                                        "Tex3");
+  if (shader) {
+    obj->shader = sgLoadProgram(shader, shader, shader, shader);
+    obj->modelview_id = glGetUniformLocation(obj->shader,
+                                             "ModelViewMatrix");
+    obj->projection_id = glGetUniformLocation(obj->shader,
+                                              "ProjectionMatrix");
+    obj->tex_uni_id[0] = glGetUniformLocation(obj->shader,
+                                              "Tex0");
+    obj->tex_uni_id[1] = glGetUniformLocation(obj->shader,
+                                              "Tex1");
+    obj->tex_uni_id[2] = glGetUniformLocation(obj->shader,
+                                              "Tex2");
+    obj->tex_uni_id[3] = glGetUniformLocation(obj->shader,
+                                              "Tex3");
+  } else {
+    obj->shader = 0; // Fixed functionality
+  }
 }
 
 void
@@ -220,11 +224,12 @@ sgDrawSphere(SGsphere *sp)
   glEnable(GL_LIGHTING);
 
   sgBindMaterial(&sp->mat);
-//  glBindTexture(GL_TEXTURE_2D, sp->super->texId);
 
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
   glColor3f(1.0f, 1.0f, 1.0f);
+  glUniform1i(sp->use_spec_map_id, sp->use_spec_map_val);
+  glUniform1i(sp->use_night_tex_id, sp->use_night_tex_val);
 
   SG_CHECK_ERROR;
 
@@ -277,20 +282,39 @@ sgDrawSphere(SGsphere *sp)
 }
 
 SGdrawable*
-sgNewSphere(const char *name, float radius, const char *tex)
+sgNewSphere(const char *name, const char* shader, float radius,
+            const char *tex, const char *nightTex, const char *specMap,
+            SGmaterial *mat)
 {
   SGsphere *sp = malloc(sizeof(SGsphere));
   sgInitDrawable(&sp->super);
   sgInitMaterial(&sp->mat);
+  sp->mat = *mat;
+
+  // Safe for shader == NULL, then use fixed functionality
+  sgDrawableLoadShader(&sp->super, shader);
 
   sp->radius = radius;
-  sp->super.tex_id[0] = ooTexLoad(tex, tex);
+
+  if (tex) sp->super.tex_id[0] = ooTexLoad(tex, tex);
+  if (specMap) sp->super.tex_id[1] = ooTexLoad(specMap, specMap);
+  if (nightTex) sp->super.tex_id[3] = ooTexLoad(nightTex, nightTex);
 
   sp->quadratic = gluNewQuadric();
   gluQuadricOrientation(sp->quadratic, GLU_OUTSIDE);
   gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
   gluQuadricTexture(sp->quadratic, GL_TRUE);
   gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
+
+
+  sp->use_night_tex_id = glGetUniformLocation(sp->super.shader,
+                                              "UseNightTexture");
+  sp->use_night_tex_val = (nightTex != NULL);
+
+  sp->use_spec_map_id = glGetUniformLocation(sp->super.shader,
+                                             "UseSpecMap");
+  sp->use_spec_map_val = (specMap != NULL);
+
 
   return sgNewDrawable((SGdrawable*)sp, name, (SGdrawfunc) sgDrawSphere);
 }
@@ -548,11 +572,10 @@ void
 drawModel(SGmodel *sgmod, model_object_t *model)
 {
   SG_CHECK_ERROR;
-
-  glColor3f(1.0, 1.0, 1.0);
+  //glColor3f(1.0, 1.0, 1.0);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
-  glShadeModel(GL_SMOOTH);
+  //glShadeModel(GL_SMOOTH);
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

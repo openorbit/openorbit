@@ -95,6 +95,11 @@ struct SGsphere {
   SGdrawable super;
   SGmaterial mat;
 
+  GLint use_night_tex_id;
+  GLboolean use_night_tex_val;
+  GLint use_spec_map_id;
+  GLboolean use_spec_map_val;
+
   GLUquadricObj *quadratic;
 
   GLuint northPoleIdx;
@@ -151,8 +156,10 @@ void sgSetObjectAngularSpeed(SGdrawable *obj, float drx, float dry, float drz);
 
 SGmaterial* sgSphereGetMaterial(SGsphere *sphere);
 
+SGdrawable* sgNewSphere(const char *name, const char* shader, float radius,
+                        const char *tex, const char *nightTex, const char *specMap,
+                        SGmaterial *mat);
 
-SGdrawable* sgNewSphere(const char *name, float radius, const char *tex);
 SGdrawable* sgNewEllipsis(const char *name,
                           double semiMajor, double semiMinor,
                           double longAsc, double inc, double argPeri,
