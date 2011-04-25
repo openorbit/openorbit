@@ -1,0 +1,23 @@
+The textures in this directory are primarily sourced from NASA and the USGS.
+This file list the original source of these images, even though some may have
+been retouched in order to clean up incomplete mapping data.
+
+venus.jpg:          http://maps.jpl.nasa.gov/
+earth.jpg:          http://visibleearth.nasa.gov/view_rec.php?id=1438
+earth-night.jpg:    http://earthobservatory.nasa.gov/Features/BlueMarble/BlueMarble_monthlies.php
+moon.jpg:           http://www.mapaplanet.org/
+mars.jpg:           http://www.mapaplanet.org/
+jupiter.jpg:        http://saturn.jpl.nasa.gov/
+io.jpg:             http://www.mapaplanet.org/
+titan.jpg:          http://maps.jpl.nasa.gov/
+neptune.jpg:        http://maps.jpl.nasa.gov/
+
+
+Usage policy of images are located at these sites:
+    http://www.jpl.nasa.gov/imagepolicy/
+    http://visibleearth.nasa.gov/useterms.php
+    http://earthobservatory.nasa.gov/ImageUse/
+
+Maps from mapaplanet:
+Courtesy USGS Astrogeology Science Center
+    http://astrogeology.usgs.gov

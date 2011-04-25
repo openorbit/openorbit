@@ -84,7 +84,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "textures/venus.jpg";
+          texture: "textures/default/venus.jpg";
           shader: "planet";
         }
       }
@@ -121,8 +121,9 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "textures/earth.jpg";
-          night-texture: "textures/earth-night.jpg";
+          texture: "textures/default/earth.jpg";
+          night-texture: "textures/default/earth-night.jpg";
+          specular-map: "textures/default/earth-spec.jpg";
           shader: "planet";
           // Materials are used if not textures are given, though not fully so
           // Specular hilights are used when a specular map is given
@@ -155,7 +156,8 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "textures/moonmap4k.jpg";
+              texture: "textures/default/moon.jpg";
+              bump-map: "textures/default/moon-bump.jpg";
               shader: "planet";
             }
           }
@@ -183,7 +185,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "textures/mars.jpg";
+          texture: "textures/default/mars.jpg";
           shader: "planet";
         }
       }
@@ -209,7 +211,7 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "textures/jupiter.jpg";
+          texture: "textures/default/jupiter.jpg";
           shader: "planet";
         }
         satellites {
@@ -230,7 +232,7 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "textures/io.jpg";
+              texture: "textures/default/io.jpg";
               //albedo: 0.62;
               shader: "planet";
             }
@@ -252,7 +254,7 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "textures/Europa.png";
+              texture: "textures/default/europa.jpg";
               shader: "planet";
               //albedo: 0.68;
             }
@@ -375,7 +377,7 @@ openorbit {
         rendering {
           model: "sphere";
           shader: "planet";
-          texture: "textures/neptune.jpg";
+          texture: "textures/default/neptune.jpg";
         }
       }
     }

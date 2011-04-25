@@ -1,11 +1,17 @@
-Some texture maps and 3d models come originally from NASA, but may have been modified
-since retrieval. Guidelines for NASA images and models are available at
-http://www.nasa.gov/audience/formedia/features/MP_Photo_Guidelines.html
+Some texture maps and 3d models come originally from NASA, but may have been
+modified since retrieval. Guidelines for NASA images and models are available
+at http://www.nasa.gov/audience/formedia/features/MP_Photo_Guidelines.html
+and at http://www.jpl.nasa.gov/imagepolicy/
+
+Some texture maps come from the USGS astrogeology website, for more info see:
+http://astrogeology.usgs.gov
+
 In general, attribution is given in a file in the same directory as the models.
 
-Open Orbit is distributed under the LGPLv3 or later licence. The full license text is
-available in the "licences" directory.
-
+Open Orbit is distributed under the LGPLv3 or later licence. The full license
+text is available in the "licences" directory. Some files of the code may be
+available in other licenses as well, in such a case this will be mentioned in
+this file.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
