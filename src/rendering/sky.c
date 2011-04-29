@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -28,6 +28,8 @@
 #include <stdint.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <stddef.h>
+
 #include "scenegraph-private.h"
 #include "scenegraph.h"
 float3
@@ -103,6 +105,17 @@ OOstars* ooSkyLoadStars(const char *file)
   }
 
   ooLogInfo("loaded %d stars from %s", stars->n_stars, file);
+  glGenBuffers(1, &stars->vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, stars->vbo);
+  glBufferData(GL_ARRAY_BUFFER, stars->n_stars*sizeof(OOstar), stars->data,
+               GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  free(stars->data); // GL has copied arrays over
+  stars->data = NULL;
+
+  SG_CHECK_ERROR;
+
   return stars;
 }
 
@@ -131,6 +144,15 @@ ooSkyRandomStars(void)
 
   stars->n_stars = STAR_CNT;
   stars->a_len = STAR_CNT;
+  glGenBuffers(1, &stars->vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, stars->vbo);
+  glBufferData(GL_ARRAY_BUFFER, stars->n_stars*sizeof(OOstar), stars->data,
+               GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  free(stars->data); // GL has copied arrays over
+  stars->data = NULL;
+  SG_CHECK_ERROR;
 
   return stars;
 }
@@ -155,6 +177,8 @@ ooSkyDrawStars(OOstars *stars)
 
   ooLogTrace("draw %d stars", stars->n_stars);
   glMatrixMode(GL_MODELVIEW);
+  glPushAttrib(GL_ENABLE_BIT);
+  glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_LIGHTING);
@@ -162,16 +186,19 @@ ooSkyDrawStars(OOstars *stars)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  glBindBuffer(GL_ARRAY_BUFFER, stars->vbo);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+
   glPointSize(2.0f);
-  glInterleavedArrays(GL_C4UB_V3F, 0, stars->data);
+  glVertexPointer(3, GL_FLOAT, sizeof(OOstar), (GLvoid*)offsetof(OOstar, x));
+  glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(OOstar), (GLvoid*)offsetof(OOstar, r));
+
   glDrawArrays(GL_POINTS, 0, stars->n_stars);
 
-  glDisable(GL_BLEND);
-  glEnable(GL_DEPTH_TEST);
-
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
-
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glPopAttrib();
+  glPopClientAttrib();
   SG_CHECK_ERROR;
 }
 

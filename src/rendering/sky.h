@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -43,6 +43,7 @@ typedef struct {
 
 typedef struct {
   SGdrawable super;
+  GLuint vbo;
   size_t n_stars; //!< Number of stars loaded
   size_t a_len; //!< Length of data
   OOstar *data;
