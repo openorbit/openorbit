@@ -3,3 +3,5 @@ orbit.xcodeproj/*.mode1v3
 orbit.xcodeproj/*.pbxuser
 orbit.xcodeproj/*.perspective
 *~
+.DS_Store
+xcuserdata
