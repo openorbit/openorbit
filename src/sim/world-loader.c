@@ -170,6 +170,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
                                     semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc),
                                     inc, longAscNode, longPerihel, meanLong, radius, flattening);
 
+  moonSys->orbitalBody->atm = NULL; // Init as vaccuum
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);
 
@@ -180,6 +181,68 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
   plSetDrawable(moonSys->orbitalBody, drawable);
 }
 
+PLatmosphereTemplate*
+load_atm(HRMLobject *obj)
+{
+  double scale_height = NAN, pressure = NAN;
+  double g0 = NAN, M = NAN;
+  const double *h_b = NULL, *p_b = NULL, *P_b = NULL, *L_b = NULL, *T_b = NULL;
+  size_t h_b_len = 0, p_b_len = 0, P_b_len = 0, L_b_len = 0, T_b_len = 0;
+  for ( ; obj != NULL; obj = obj->next) {
+    if (!strcmp(obj->name, "surface-pressure")) {
+      pressure = hrmlGetReal(obj);
+    } else if (!strcmp(obj->name, "scale-height")) {
+      scale_height = hrmlGetReal(obj);
+    } else if (!strcmp(obj->name, "h_b")) {
+      h_b = hrmlGetRealArray(obj);
+      h_b_len = hrmlGetRealArrayLen(obj);
+    } else if (!strcmp(obj->name, "P_b")) {
+      P_b = hrmlGetRealArray(obj);
+      P_b_len = hrmlGetRealArrayLen(obj);
+    } else if (!strcmp(obj->name, "p_b")) {
+      p_b = hrmlGetRealArray(obj);
+      p_b_len = hrmlGetRealArrayLen(obj);
+    } else if (!strcmp(obj->name, "L_b")) {
+      L_b = hrmlGetRealArray(obj);
+      L_b_len = hrmlGetRealArrayLen(obj);
+    } else if (!strcmp(obj->name, "T_b")) {
+      T_b = hrmlGetRealArray(obj);
+      T_b_len = hrmlGetRealArrayLen(obj);
+    } else if (!strcmp(obj->name, "g0")) {
+      g0 = hrmlGetReal(obj);
+    } else if (!strcmp(obj->name, "molar-mass")) {
+      M = hrmlGetReal(obj);
+    }
+  }
+
+  if (!(T_b && L_b && p_b && P_b && h_b)) {
+    ooLogError("missing one or more atmospheric parameter array "
+               "(T_b, L_b, p_b, P_b or h_b)");
+    return NULL;
+  }
+
+  if (!(T_b_len == L_b_len) && (L_b_len == p_b_len) && (p_b_len == P_b_len)
+      && (P_b_len == h_b_len)) {
+    ooLogError("atmospheric parameter arrays must be of equal length"
+               "(%d %d %d %d %d)",
+               (int)T_b_len, (int)L_b_len, (int)p_b_len, (int)P_b_len,
+               (int)h_b_len);
+    return NULL;
+  }
+
+  if (!isfinite(g0)) {
+    ooLogError("atmospheric parameter g0 not set / finite");
+    return NULL;
+  }
+  if (!isfinite(M)) {
+    ooLogError("atmospheric parameter molar-mass not set / finite");
+    return NULL;
+  }
+
+  PLatmosphereTemplate *atm = plAtmosphered(h_b_len, g0, M, p_b, P_b, T_b, h_b,
+                                            L_b);
+  return atm;
+}
 
 void
 ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
@@ -189,8 +252,10 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
 
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
+  PLatmosphereTemplate *atm = NULL;
   double mass, radius, siderealPeriod, axialTilt = 0.0, gm = NAN;
   double semiMajor, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
+  double pressure = 0.0, scale_height = 1.0;
   const char *tex = NULL;
   const char *shader = NULL;
   const char *spec = NULL;
@@ -241,7 +306,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
         }
       }
     } else if (!strcmp(child->name, "atmosphere")) {
-
+      atm = load_atm(child->children);
     } else if (!strcmp(child->name, "rendering")) {
       for (HRMLobject *rend = child->children; rend != NULL; rend = rend->next) {
         if (!strcmp(rend->name, "model")) {
@@ -282,6 +347,8 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
                              plAuToMetres(semiMajor),
                              plAuToMetres(ooGeoComputeSemiMinor(semiMajor, ecc)),
                              inc, longAscNode, longPerihel, meanLong, radius, flattening);
+  sys->orbitalBody->atm = NULL; // Init as vaccuum
+  if (atm) sys->orbitalBody->atm = plAtmosphere(1000.0, 100000.0, atm);
   plSetDrawable(sys->orbitalBody, drawable);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);
@@ -366,7 +433,7 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
   PLworld *world = plNewWorld(starName.u.str, sc, mass, gm, radius,
                               siderealPeriod, axialTilt, radius, flattening);
   world->rootSys->orbitalBody->lightSource = starLightSource;
-
+  world->rootSys->orbitalBody->atm = NULL; // Init as vaccuum
   plSetDrawable(world->rootSys->orbitalBody, drawable);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sgSetObjectQuatv(drawable, q);

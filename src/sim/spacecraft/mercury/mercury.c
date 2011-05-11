@@ -232,15 +232,16 @@ MercuryNew(void)
   sc->detatchStage = MercuryDetatch;
   sc->toggleMainEngine = MainEngineToggle;
   sc->axisUpdate = MercuryAxisUpdate;
-  // inertia tensors are entered in the base form, assuming that the total mass = 1.0
+  // inertia tensors are entered in the base form, assuming that the total
+  // mass = 1.0
   // for the redstone mercury rocket we assume a solid cylinder for the form
   // 1/2 mrr = 0.5 * 1.0 * 0.89 * 0.89 = 0.39605
   // 1/12 m(3rr + hh) = 27.14764852
 
   OOstage *redstone = ooScNewStage(sc, "Mercury-Redstone");
   SGdrawable *redstoneModel = sgLoadModel("spacecrafts/mercury/redstone.ac");
-  // TODO: Loading models and attaching them to the stages should really be made
-  //       cleaner, this is not a good API
+  // TODO: Loading models and attaching them to the stages should really be
+  //       made cleaner, this is not a good API
   sgDrawableLoadShader(redstoneModel, "spacecraft");
   ooScSetStageMesh(redstone, redstoneModel);
   sgSceneAddObj(sgGetScene(simGetSg(), "main"), redstoneModel);
@@ -252,6 +253,9 @@ MercuryNew(void)
   plMassMod(&redstone->obj->m, 24000.0 + 2200.0);
   plMassTranslate(&redstone->obj->m, 0.0, 8.9916, 0.0);
   plMassSetMin(&redstone->obj->m, 4400.0);
+  plSetDragCoef(redstone->obj, 0.5);
+  plSetArea(redstone->obj, 2.0*M_PI);
+
   scStageSetOffset3f(redstone, 0.0, 0.0, 0.0);
 
   //"LOX/ethyl alcohol"
@@ -277,10 +281,14 @@ MercuryNew(void)
   plMassMod(&capsule->obj->m, 1354.0);
   plMassTranslate(&capsule->obj->m, 0.0, 0.55, 0.0);
   plMassSetMin(&capsule->obj->m, 1354.0);
+  plSetDragCoef(capsule->obj, 0.5);
+  plSetArea(capsule->obj, 2.0*M_PI);
+
   scStageSetOffset3f(capsule, 0.0, 17.9832, 0.0);
 
-  SIMthruster *posigrade, *retro0, *retro1, *retro2, *roll0, *roll1, *pitch0, *pitch1,
-              *yaw0, *yaw1;
+
+  SIMthruster *posigrade, *retro0, *retro1, *retro2, *roll0, *roll1,
+              *pitch0, *pitch1, *yaw0, *yaw1;
 
   posigrade = simNewThruster("Posigrade",
                              (float3){0.0,0.0,0.0}, (float3){0.0,1.8e3,0.0});

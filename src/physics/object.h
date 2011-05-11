@@ -124,6 +124,11 @@ quaternion_t plGetQuat(PLobject *obj);
 void plSetSystem(PLsystem *sys, PLobject *obj);
 
 void plCheckObject(PLobject *obj, const char *file, int line);
+
+void plSetDragCoef(PLobject *obj, float coef);
+void plSetArea(PLobject *obj, float area);
+
+
 #define PL_CHECK_OBJ(obj) plCheckObject(obj, __FILE__, __LINE__)
 
 #endif /* !PHYSICS_OBJECT_H */

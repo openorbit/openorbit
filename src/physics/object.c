@@ -116,13 +116,14 @@ plDetatchObject(PLobject *obj)
   assert(obj != NULL);
   assert(obj->parent != NULL);
   PLworld *world = obj->sys->world;
-  obj_array_push(&obj->parent->sys->rigidObjs, obj);
   PLobject *parent = obj->parent;
 
   obj->parent = NULL;
+  obj->sys = parent->sys;
   for (int i = 0 ; i < parent->children.length ; ++i) {
     if (parent->children.elems[i] == obj) {
       obj_array_remove(&parent->children, i);
+      obj_array_push(&parent->sys->rigidObjs, obj);
       break;
     }
   }
@@ -327,7 +328,7 @@ void
 plStepObjectf(PLobject *obj, float dt)
 {
   obj->airPressure = plComputeAirpressure(obj);
-  obj->airDensity = plComputeAirdensityWIthCurrentPressure(obj);
+  obj->airDensity = plComputeAirdensity(obj);
 
   PL_CHECK_OBJ(obj);
   float3 fm = (obj->f_ack / obj->m.m);
@@ -402,6 +403,18 @@ void
 plSetVel3fv(PLobject *obj, float3 dp)
 {
   obj->v = dp;
+}
+
+void
+plSetDragCoef(PLobject *obj, float coef)
+{
+  obj->dragCoef = coef;
+}
+
+void
+plSetArea(PLobject *obj, float area)
+{
+  obj->area = area;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -90,20 +90,57 @@ typedef struct PLmolecule {
   } atoms[];
 } PLmolecule;
 
+// Atmospheres are divided into troposphere, stratosphere, mesosphere,
+// thermosphere and exosphere. The boundaries between these are the
+// tropopause, stratopause, mesopause, thermopause.
+// In order to have a reasonable model of a planets atmosphere, we need to take
+// all these levels into account. However, we generalize this as follows:
+// an arbitrary number of layers can be specified, each layer having different
+// properties. A template object is then created, which in turn is used to build
+// an atmosphere object which contain a number of sample points of fixed
+// distance. The values are then interpolated between the sample points.
+
+typedef struct PLatmosphereLayer PLatmosphereLayer;
+typedef struct PLatmosphereTemplate PLatmosphereTemplate;
+
+typedef float (*PLatmcomputef)(PLatmosphereLayer *,float);
+
+struct PLatmosphereLayer {
+  float g0;
+  float P_b;
+  float T_b;
+  float M; // Molar mass (kg / mol)
+  float p_b;
+  float h_b;
+  float L_b;
+  PLatmcomputef compPressure;
+  PLatmcomputef compDensity;
+};
+
+struct PLatmosphereTemplate {
+  size_t layer_count;
+  PLatmosphereLayer layer[];
+};
+
 
 typedef struct PLatmosphere {
-  float Pb; // Standard pressure at "ground"-level
-  float Tb; // Standard temperature at "ground"-level
+  float P0; // Standard pressure at "ground"-level
+  float T0; // Standard temperature at "ground"-level
   float M; // Molar mass (kg / mol)
-  float pb; // Standard density at "ground"-level
+  float p0; // Standard density at "ground"-level
+  float h0; // Scale height of atmosphere
+
+  float sample_distance;
+  float_array_t P; // Pressure points
+  float_array_t p; // Density points
 } PLatmosphere;
 
 double plComputeAirspeed(PLobject *obj);
 double plComputeAirpressure(PLobject *obj);
 double plComputeAirdensity(PLobject *obj);
 float3 plComputeDragForObject(PLobject *obj);
-double plComputeAirdensityWIthCurrentPressure(PLobject *obj);
-void plInitAtmosphere(PLatmosphere *atm, double groundPressure);
+double plComputeAirdensityWithCurrentPressure(PLobject *obj);
+void plInitAtmosphere(PLatmosphere *atm, float groundPressure, float h0);
 
 /*!
  Computes the air preasure at a given altitude, note that for simplicitys sake,
@@ -124,5 +161,19 @@ plPressureAtAltitudeWithLapse(double Pb, double Tb, double g0, double M,
 double
 plPressureAtAltitude(double Pb, double Tb, double g0, double M, double h,
                      double hb);
+
+// Simplified atmospheric model
+float plComputeSimpleAirpressure(const PLatmosphere *atm, float h);
+
+float plComputeAirpressure2(PLatmosphereTemplate *atm, float h);
+float plComputeAirdensity2(PLatmosphereTemplate *atm, float h);
+
+PLatmosphereTemplate*
+plAtmosphered(size_t layers, double g0, double M, const double *p_b,
+              const double *P_b, const double *T_b, const double *h_b,
+              const double *L_b);
+PLatmosphere* plAtmosphere(float sample_dist, float h, PLatmosphereTemplate *t);
+float plAtmosphereDensity(const PLatmosphere *atm, float h);
+float plAtmospherePressure(const PLatmosphere *atm, float h);
 
 #endif /* ! PL_ATMOSPHERE_H */

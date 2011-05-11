@@ -1,5 +1,5 @@
 /*
-  Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -25,7 +25,9 @@
 #include <assert.h>
 #include <ctype.h>
 #include <gencds/hashtable.h>
+#include "common/palloc.h"
 #include "common/moduleinit.h"
+#include "log.h"
 // Note that these are molar weights for all elements, this does not take into
 // account that some elements appear in molecules (i.e. H2)
 // TODO: Set all elements that are -0.0 to NAN, but this cannot be done until
@@ -248,22 +250,34 @@ plComputeDensity(double molWeight, double P, double T)
 {
   return (molWeight*P) / (PL_UGC * T);
 }
+
 double
 plEstimateTemp(double luminocity, double albedo, double R)
 {
   // Quad root
-  double t = pow((luminocity*(1.0 - albedo))/(4.0 * M_PI * PL_ST*R*R), 1.0/4.0);
+  double t = pow((luminocity*(1.0 - albedo))/(4.0 * M_PI * PL_ST*R*R),
+                 1.0/4.0);
   return t;
 }
-// Computes the current airspeed of the object, the airspeed is the current speed
-// of the object with the speed of the planet and the current rotation tangent subtracted
+
+// Computes the current airspeed of the object, the airspeed is the
+// current speed of the object with the speed of the planet and the current
+// rotation tangent subtracted
+
+float3
+plComputeAirvelocity(PLobject *obj)
+{
+  // TODO: Adjust for planet rotation and wind
+  return -(obj->v - obj->sys->orbitalBody->obj.v);
+}
+
 double
 plComputeAirspeed(PLobject *obj)
 {
-  return 0.0;
+  return vf3_abs(plComputeAirvelocity(obj));
 }
 // Compute drag force from
-// \param v Velocity of object relative to the fluid
+// \param v Velocity of object of fluid
 // \param p Density of fluid
 // \param Cd Drag coeficient for object
 // \param A Area of object (i.e. the orthographic projection area)
@@ -271,31 +285,44 @@ plComputeAirspeed(PLobject *obj)
 float3
 plComputeDrag(float3 v, double p, double Cd, double A)
 {
-  double v_mag = vf3_abs(v);
+  double v_mag = vf3_abs(vf3_neg(v));
   double fd = 0.5 * p * v_mag * v_mag * Cd * A;
-  float3 vf_dir = vf3_neg(vf3_normalise(v));
+  float3 vf_dir = vf3_normalise(v);
   return vf3_s_mul(vf_dir, fd);
+}
+
+void
+plInitAtmosphere(PLatmosphere *atm, float groundPressure, float h0)
+{
+  atm->P0 = groundPressure;
+  atm->T0 = NAN;
+  atm->M = NAN;
+  atm->p0 = NAN;
+  atm->h0 = h0;
 }
 
 float3
 plComputeDragForObject(PLobject *obj)
 {
   double p = plComputeAirdensity(obj);
-  float3 vel = obj->v; // TODO: Adjust for planet rotation
+  float3 vel = plComputeAirvelocity(obj); // TODO: Adjust for planet rotation
 
   float3 drag = plComputeDrag(vel, p, obj->dragCoef, obj->area);
-  return vf3_set(0.0, 0.0, 0.0);
+  return drag;//vf3_set(0.0, 0.0, 0.0);
 }
 
 double
 plComputeAirpressure(PLobject *obj)
 {
   PLsystem *sys = obj->sys;
-  PLatmosphere *atm = &obj->sys->orbitalBody->atm;
+  PLatmosphere *atm = obj->sys->orbitalBody->atm;
   float3 dist = ooLwcDist(&obj->p, &sys->orbitalBody->obj.p);
-  float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
+  //float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
-  double pressure = plPressureAtAltitude(atm->Pb, atm->Tb, g0, atm->M, h, 0.0);
+  double pressure = plAtmospherePressure(atm, h);//plComputeSimpleAirpressure(atm, h);
+  //plPressureAtAltitude(atm->P0, atm->T0, g0, atm->M, h, 0.0);
+  //ooLogInfo("airpressure for %s = %f Pa", obj->name, pressure);
+
   return pressure;
 }
 
@@ -303,21 +330,29 @@ double
 plComputeAirdensity(PLobject *obj)
 {
   PLsystem *sys = obj->sys;
-  PLatmosphere *atm = &obj->sys->orbitalBody->atm;
+  PLatmosphere *atm = obj->sys->orbitalBody->atm;
   float3 dist = ooLwcDist(&obj->p, &sys->orbitalBody->obj.p);
   float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
-  double pressure = plPressureAtAltitude(atm->pb, atm->Tb, g0, atm->M, h, 0.0);
-  return pressure * atm->M / (PL_UGC * atm->Tb);
+  //double pressure = plComputeSimpleAirpressure(atm, h);
+
+  double density = plAtmosphereDensity(atm, h);
+  //ooLogInfo("altitude for %s = %f m above surface of %s", obj->name, h,
+  //          obj->sys->orbitalBody->name);
+  //ooLogInfo("atmosphere: P = %f Pa, h0 = %f m", atm->P0, atm->h0);
+  //ooLogInfo("airdensity for %s = %f kg/m**3", obj->name, density);
+  //plPressureAtAltitude(atm->p0, atm->T0, g0, atm->M, h, 0.0);
+  //return pressure * atm->M / (PL_UGC * atm->T0);
+  return density;
 }
 
 
-double
-plComputeAirdensityWIthCurrentPressure(PLobject *obj)
-{
-  PLatmosphere *atm = &obj->sys->orbitalBody->atm;
-  return obj->airPressure * atm->M / (PL_UGC * atm->Tb);
-}
+//double
+//plComputeAirdensityWithCurrentPressure(PLobject *obj)
+//{
+//  PLatmosphere *atm = obj->sys->orbitalBody->atm;
+//  return obj->airPressure * atm->M / (PL_UGC * atm->T0);
+//}
 
 
 /*!
@@ -345,4 +380,185 @@ plPressureAtAltitude(double Pb, double Tb, double g0, double M, double h,
                      double hb)
 {
   return Pb * exp((-g0 * M * (h-hb)) / (PL_UGC * Tb));
+}
+
+float
+plComputeSimpleAirpressure(const PLatmosphere *atm, float h)
+{
+  double e = exp(-h/atm->h0);
+  double p = atm->P0 * e;
+  return p;
+}
+
+float
+comp_pressure_lapse(PLatmosphereLayer *atm, float h)
+{
+  return atm->P_b * pow(atm->T_b/(atm->T_b+atm->L_b*(h-atm->h_b)),
+                        atm->g0 * atm->M / (PL_UGC*atm->L_b));
+}
+
+
+float
+comp_pressure_no_lapse(PLatmosphereLayer *atm, float h)
+{
+  return atm->P_b * exp((-atm->g0 * atm->M * (h - atm->h_b)) / (PL_UGC * atm->T_b));
+}
+
+
+float
+comp_density_lapse(PLatmosphereLayer *atm, float h)
+{
+  return atm->p_b * pow((atm->T_b+atm->L_b*(h-atm->h_b))/atm->T_b,
+                        (-atm->g0 * atm->M / (PL_UGC*atm->L_b)) - 1.0);
+}
+
+
+float
+comp_density_no_lapse(PLatmosphereLayer *atm, float h)
+{
+  return atm->p_b * exp((-atm->g0 * atm->M * (h - atm->h_b)) / (PL_UGC * atm->T_b));
+}
+
+
+
+float
+plComputeAirpressure2(PLatmosphereTemplate *atm, float h)
+{
+  int i = 0;
+  for (i = 0 ; i < atm->layer_count - 1 ; i++) {
+    if (atm->layer[i+1].h_b > h) break;
+  }
+  return atm->layer[i].compPressure(&atm->layer[i], h);
+}
+
+float
+plComputeAirdensity2(PLatmosphereTemplate *atm, float h)
+{
+  int i = 0;
+  for (i = 0 ; i < atm->layer_count - 1 ; i++) {
+    if (atm->layer[i+1].h_b > h) break;
+  }
+  return atm->layer[i].compDensity(&atm->layer[i], h);
+}
+
+PLatmosphereTemplate*
+plAtmospheref(size_t layers, float g0, float M, float *p_b, float *P_b,
+             float *T_b, float *h_b, float *L_b)
+{
+  PLatmosphereTemplate *atm = malloc(sizeof(PLatmosphereTemplate) +
+                                     sizeof(PLatmosphereLayer) * layers);
+  atm->layer_count = layers;
+  for (int i = 0 ; i < layers ; i++) {
+    atm->layer[i].g0 = g0;
+    atm->layer[i].M = M;
+    atm->layer[i].h_b = h_b[i];
+    atm->layer[i].L_b = L_b[i];
+    atm->layer[i].P_b = P_b[i];
+    atm->layer[i].p_b = p_b[i];
+    atm->layer[i].T_b = T_b[i];
+    if (L_b[i] == 0.0) {
+      atm->layer[i].compPressure = comp_pressure_no_lapse;
+      atm->layer[i].compDensity = comp_density_no_lapse;
+    } else {
+      atm->layer[i].compPressure = comp_pressure_lapse;
+      atm->layer[i].compDensity = comp_density_lapse;
+    }
+  }
+
+  return atm;
+}
+
+
+PLatmosphereTemplate*
+plAtmosphered(size_t layers, double g0, double M, const double *p_b,
+              const double *P_b, const double *T_b, const double *h_b,
+              const double *L_b)
+{
+  PLatmosphereTemplate *atm = malloc(sizeof(PLatmosphereTemplate) +
+                                     sizeof(PLatmosphereLayer) * layers);
+  atm->layer_count = layers;
+  for (int i = 0 ; i < layers ; i++) {
+    atm->layer[i].g0 = g0;
+    atm->layer[i].M = M;
+    atm->layer[i].h_b = h_b[i];
+    atm->layer[i].L_b = L_b[i];
+    atm->layer[i].P_b = P_b[i];
+    atm->layer[i].p_b = p_b[i];
+    atm->layer[i].T_b = T_b[i];
+    if (L_b[i] == 0.0) {
+      atm->layer[i].compPressure = comp_pressure_no_lapse;
+      atm->layer[i].compDensity = comp_density_no_lapse;
+    } else {
+      atm->layer[i].compPressure = comp_pressure_lapse;
+      atm->layer[i].compDensity = comp_density_lapse;
+    }
+  }
+
+  return atm;
+}
+
+PLatmosphere*
+plAtmosphere(float sample_dist, float h, PLatmosphereTemplate *t)
+{
+  PLatmosphere *atm = smalloc(sizeof(PLatmosphere));
+  float_array_init(&atm->P);
+  float_array_init(&atm->p);
+
+  size_t samples = (size_t) h / sample_dist;
+  atm->sample_distance = sample_dist;
+  for (size_t i = 0 ; i < samples ; i ++) {
+    float P = plComputeAirpressure2(t, i*sample_dist);
+    float p = plComputeAirdensity2(t, i*sample_dist);
+    float_array_push(&atm->P, P);
+    float_array_push(&atm->p, p);
+  }
+  return atm;
+}
+
+float
+plAtmospherePressure(const PLatmosphere *atm, float h)
+{
+  if (atm == NULL) return 0.0;
+  if (h < 0.0) {
+    float P0 = ARRAY_ELEM(atm->P, 0);
+    float P1 = ARRAY_ELEM(atm->P, 1);
+    float P = P0 - (P0-P1)/atm->sample_distance * fabsf(h);
+    return P;
+  } else if (h > atm->sample_distance * atm->P.length-1) {
+    float P0 = ARRAY_ELEM(atm->P, atm->P.length-2);
+    float P1 = ARRAY_ELEM(atm->P, atm->P.length-1);
+    float P = fmaxf(P1+((P0-P1)/atm->sample_distance)*(h-atm->sample_distance *
+                                                       atm->P.length-1), 0.0f);
+    return P;
+  } else {
+    size_t idx = h / atm->sample_distance;
+    float f = fmodf(h, atm->sample_distance) / atm->sample_distance;
+    float P = ARRAY_ELEM(atm->P, idx) * (1.0f-f) +
+              ARRAY_ELEM(atm->P, idx+1) * f;
+    return P;
+  }
+}
+
+float
+plAtmosphereDensity(const PLatmosphere *atm, float h)
+{
+  if (atm == NULL) return 0.0;
+  if (h < 0.0) {
+    float p0 = ARRAY_ELEM(atm->p, 0);
+    float p1 = ARRAY_ELEM(atm->p, 1);
+    float p = p0 - (p0-p1)/atm->sample_distance * fabsf(h);
+    return p;
+  } else if (h > atm->sample_distance * atm->p.length-1) {
+    float p0 = ARRAY_ELEM(atm->p, atm->p.length-2);
+    float p1 = ARRAY_ELEM(atm->p, atm->p.length-1);
+    float p = fmaxf(p1+((p0-p1)/atm->sample_distance)*(h-atm->sample_distance *
+                                                       atm->p.length-1), 0.0f);
+    return p;
+  } else {
+    size_t idx = h / atm->sample_distance;
+    float f = fmodf(h, atm->sample_distance) / atm->sample_distance;
+    float p = ARRAY_ELEM(atm->p, idx) * (1.0f-f) +
+              ARRAY_ELEM(atm->p, idx+1) * f;
+    return p;
+  }
 }

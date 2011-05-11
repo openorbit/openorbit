@@ -772,9 +772,11 @@ plComputeCurrentVelocity(PLastrobody *ab)
   assert(ab->sys->parent != NULL);
   double t = simTimeGetJD();
 
-  float3 currentPos = plOrbitPosAtTime(ab->kepler, ab->sys->parent->orbitalBody->GM,
+  float3 currentPos = plOrbitPosAtTime(ab->kepler,
+                                       ab->sys->parent->orbitalBody->GM,
                                        t*PL_SEC_PER_DAY);
-  float3 nextPos = plOrbitPosAtTime(ab->kepler, ab->sys->parent->orbitalBody->GM,
+  float3 nextPos = plOrbitPosAtTime(ab->kepler,
+                                    ab->sys->parent->orbitalBody->GM,
                                     t*PL_SEC_PER_DAY+1000.0f);
 
   float3 v = nextPos - currentPos;

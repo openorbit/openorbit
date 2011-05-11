@@ -35,17 +35,8 @@ openorbit {
           mean-longitude: 252.25084 deg;
           //reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
         }
-        atmosphere {
-          surface-pressure: 0.001 pbar;
-          temp: 440.0 K; # TODO: Should include sunward temperature
-//        composition {
-//          oxygen: 42 %;
-//          sodium: 29 %;
-//          hydrogen: 22 %;
-//          helium: 6 %;
-//          potassium: 6 %;
-//        }
-        }
+        // Mercury has a vacuum
+
         rendering {
           model: "sphere";
           texture: "textures/mercury.tga";
@@ -73,14 +64,18 @@ openorbit {
           //reference-date: 2000-01-01 12:00Z; # (JD 2451545.0)
         }
         atmosphere {
-          surface-pressure: 92.0 bar;
+          surface-pressure: 9200.0e3 Pa;
           temp: 737.0 K;
+          molar-mass: 43.45e-3 kg_mol;
+          adiabatic-lapse-rate: 10.468e-3 K_m;
           //  wind: 0.3-1.0 m/s;
-          height: 15.9 km; # Height where pressure changes by e (2.7183)
-//        composition {
-//          co2: 96.5 %;
-//          nitrogen: 3.5 %;
-//        }
+          scale-height: 15.9e3 m; # Height where pressure changes by e**-1
+          g0: 8.8989; // m / s**2
+          h_b: [0.0];
+          P_b: [9200.0e3];
+          p_b: [66.61900];
+          L_b: [0.0]; // Unknown lapse rate
+          T_b: [731.0];
         }
         rendering {
           model: "sphere";
@@ -109,21 +104,25 @@ openorbit {
           //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
         }
         atmosphere {
-          surface-pressure: 1014.0 mb;
+          surface-pressure: 101.4e3 Pa;
           temp: 288.0 K; #, (diurnal) 283 K to 293 K
+          molar-mass: 28.97e-3 kg_mol;
+          adiabatic-lapse-rate: 9.760e-3 K_m;
           //wind: 0 - 100 m/s;
-          height: 8.5 km;
-//        composition {
-//          nitrogen: 78.084 %;
-//          oxygen: 20.946 %; 
-//          water: 1.0 %; # (variable)
-//        }
+          scale-height: 8.5e3 m;
+          g0: 9.7986; // m / s**2
+          h_b: [     0.0, 11000.0, 20000.0, 32000.0, 47000.0, 51000.0,  71000.0];
+          P_b: [111325.0, 22632.1, 5474.89, 868.019, 110.906, 66.9389,  3.95642];
+          p_b: [  1.2250, 0.36391, 0.08803, 0.01322, 0.00143, 0.00086, 0.000086];
+          L_b: [ -0.0065,     0.0,   0.001,  0.0028,     0.0, -0.0028,   -0.002];
+          T_b: [  288.15,  216.65,  216.65,  228.65,  270.65,  270.65,   214.65];
         }
         rendering {
           model: "sphere";
           texture: "textures/default/earth.jpg";
           night-texture: "textures/default/earth-night.jpg";
           specular-map: "textures/default/earth-spec.jpg";
+          bump-map: "textures/planetpixelemporium/earthbump1k.jpg";
           shader: "planet";
           // Materials are used if not textures are given, though not fully so
           // Specular hilights are used when a specular map is given
@@ -183,6 +182,20 @@ openorbit {
           mean-longitude: 355.45332 deg;
           //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
         }
+        atmosphere {
+          surface-pressure: 600.0 Pa;
+          temp: 210.0 K;
+          molar-mass: 43.34e-3 kg_mol;
+          adiabatic-lapse-rate: 4.500e-3 K_m;
+          scale-height: 11.1e3 m;
+          g0: 3.7410; // m / s**2
+          h_b: [0.0];
+          P_b: [700.0];
+          p_b: [0.017314];
+          L_b: [0.0]; // Unknown lapse rate
+          T_b: [214.0];
+        }
+
         rendering {
           model: "sphere";
           texture: "textures/default/mars.jpg";
@@ -213,6 +226,18 @@ openorbit {
           model: "sphere";
           texture: "textures/default/jupiter.jpg";
           shader: "planet";
+        }
+        atmosphere {
+          adiabatic-lapse-rate: 1.963e-3 K_m;
+          surface-pressure: 1000.0 Pa; // No fixed surface
+          scale-height: 27.0e3 m;
+          molar-mass: 2.22e-3 kg_mol;
+          g0: 24.2561; // m / s**2
+          h_b: [0.0];
+          P_b: [100.0e3];
+          p_b: [0.16182];
+          L_b: [0.0]; // Unknown lapse rate
+          T_b: [165.0];
         }
         satellites {
           moon (name: Io) {
@@ -324,11 +349,24 @@ openorbit {
           mean-longitude: 320.346750 deg;
           //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
         }
+        atmosphere {
+            adiabatic-lapse-rate: 0.714e-3 K_m;
+            surface-pressure: 1000.0 Pa; // No fixed surface
+            scale-height: 59.5e3 m;
+            molar-mass: 2.07e-3 kg_mol;
+            g0: 10.0009; // m / s**2
+            h_b: [0.0];
+            P_b: [100.0e3];
+            p_b: [0.19172];
+            L_b: [0.0]; // Unknown lapse rate
+            T_b: [134.0];
+        }
         rendering {
           model: "sphere";
           texture: "textures/saturn.jpg";
           // albedo: 0.342 bond, 0.47 geom
         }
+        // Titan: adiabatic-lapse-rate: 1.301e-3 K/m;
       }
       planet (name: Uranus) {
         physical {
@@ -348,6 +386,18 @@ openorbit {
           longitude-periapsis: 96.541318 deg;
           mean-longitude: 142.955717 deg;
           //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
+        }
+        atmosphere {
+          adiabatic-lapse-rate: 0.676e-3 K_m;
+          surface-pressure: 1000.0 Pa; // No fixed surface
+          scale-height: 27.7e3 m;
+          molar-mass: 2.64e-3 kg_mol;
+          g0: 8.8007; // m / s**2
+          h_b: [0.0];
+          P_b: [100.0e3];
+          p_b: [0.36399];
+          L_b: [0.0]; // Unknown lapse rate
+          T_b: [76.0];
         }
         rendering {
           model: "sphere";
@@ -373,6 +423,18 @@ openorbit {
           longitude-periapsis: 265.646853 deg;
           mean-longitude: 267.767281 deg;
           //reference-date : 2000-01-01 12:00Z; # (JD 2451545.0)
+        }
+        atmosphere {
+          adiabatic-lapse-rate: 0.853e-3 K_m;
+          surface-pressure: 1000.0 Pa; // No fixed surface
+          scale-height: 20.0e3 m;
+          molar-mass: 2.53e-3 kg_mol;
+          g0: 11.1046; // m / s**2
+          h_b: [0.0];
+          P_b: [100.0e3];
+          p_b: [0.36399];
+          L_b: [0.0]; // Unknown lapse rate
+          T_b: [76.0];
         }
         rendering {
           model: "sphere";

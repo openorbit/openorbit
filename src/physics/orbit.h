@@ -55,7 +55,7 @@ struct PLastrobody {
   PLsystem *sys;
   PLobject obj;
   double GM;
-  PLatmosphere atm;
+  PLatmosphere *atm;
   PL_keplerian_elements *kepler;
   SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
