@@ -101,8 +101,32 @@ model_load(const char * restrict fileName)
   return model;
 }
 
+void
+model_obj_dispose(model_object_t * model)
+{
+  free(model->texture);
+
+  ARRAY_FOR_EACH(i, model->children) {
+    model_obj_dispose(ARRAY_ELEM(model->children, i));
+  }
+  obj_array_dispose(&model->children);
+
+  float_array_dispose(&model->vertices);
+  float_array_dispose(&model->texCoords);
+  float_array_dispose(&model->normals);
+  float_array_dispose(&model->colours);
+
+  free(model);
+}
+
 int
 model_dispose(model_t * model)
 {
+  ARRAY_FOR_EACH(i, model->objs) {
+    model_obj_dispose(ARRAY_ELEM(model->objs, i));
+  }
+  obj_array_dispose(&model->objs);
+  free(model->materials);
+  free(model);
   return -1;
 }

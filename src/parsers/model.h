@@ -36,6 +36,7 @@ struct model_object_t {
   float trans[3];
   float rot[4][4];
 
+  char *texture;
   obj_array_t children;
 
   uint32_t vertexCount;

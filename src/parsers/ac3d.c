@@ -397,6 +397,8 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
                    ac3d_obj_to_model(mod, ac3d, obj->children[i]));
   }
 
+  model->texture = (obj->texture) ? strdup(obj->texture) : NULL;
+
   model->model = mod;
   return model;
 }
