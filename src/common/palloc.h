@@ -62,6 +62,13 @@ pool_t* pool_create(size_t obj_size);
 void* pool_alloc(pool_t *pool);
 void pool_free(void *obj);
 
+/*!
+  Safe malloc. Either returns the requested size or calls abort if out of memory
+ */
 void* smalloc(size_t sz);
+/*!
+ Safe calloc. Either returns the requested objects or calls abort if out of memory
+ */
+void* scalloc(size_t count, size_t sz);
 
 #endif /* !COMMON_POOL_H */

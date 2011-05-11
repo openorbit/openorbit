@@ -184,4 +184,13 @@ smalloc(size_t sz)
   return data;
 }
 
+void*
+scalloc(size_t count, size_t sz)
+{
+  void *data = calloc(count, sz);
+
+  if (data == NULL) abort();
+
+  return data;
+}
 
