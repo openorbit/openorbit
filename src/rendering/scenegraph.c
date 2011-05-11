@@ -1,5 +1,5 @@
 /*
-  Copyright 2008,2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2008,2009,2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -383,6 +383,12 @@ sgPaint(SGscenegraph *sg)
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  // Near clipping 1 m away, far clipping 20 au away
+  gluPerspective(sgRenderInfo.fovy, sgRenderInfo.aspect,
+                 /*near*/0.9, /*far*/149598000000.0*20.0);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();

@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -56,6 +56,12 @@ io_toggle_fs(bool buttonDown, void *data)
     SDL_SetWindowFullscreen(mainWindow, SDL_FALSE);
   else
     SDL_SetWindowFullscreen(mainWindow, SDL_TRUE);
+
+  SDL_DisplayMode mode;
+  SDL_GetWindowDisplayMode(mainWindow, &mode);
+  glViewport(0, 0, mode.w, mode.h);
+  ooResizeScreen(mode.w, mode.h, false);
+
 }
 
 INIT_IO {
@@ -102,6 +108,7 @@ ooSetVideoDefaults(void)
   sgRenderInfo.w = width;
   sgRenderInfo.h = height;
   sgRenderInfo.aspect = (float)width/(float)height;
+  sgRenderInfo.fovy = fovy;
 
   ooPrintScreenAttributes();
 

@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -30,6 +30,7 @@ typedef struct {
   unsigned w;
   unsigned h;
   float aspect;
+  float fovy;
   unsigned gl_major_vers;
   unsigned gl_minor_vers;
   unsigned glsl_major_vers;
