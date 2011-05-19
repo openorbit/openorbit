@@ -57,6 +57,7 @@ plInitObject(PLobject *obj)
   obj->drawable = NULL;
   obj->f_ack = vf3_set(0.0, 0.0, 0.0);
   obj->t_ack = vf3_set(0.0, 0.0, 0.0);
+  obj->g_ack = vf3_set(0.0, 0.0, 0.0);
 
   obj->v = vf3_set(0.0, 0.0, 0.0);
   plSetAngularVel3f(obj, 0.0f, 0.0f, 0.0f);
@@ -479,6 +480,10 @@ plCheckObject(PLobject *obj, const char *file, int line)
   if (!isfinite(obj->t_ack.x) || !isfinite(obj->t_ack.y) || !isfinite(obj->t_ack.z)) {
     ooLogAbort("%s:%d obj torque ack not finite", file, line);
   }
+  if (!isfinite(obj->g_ack.x) || !isfinite(obj->g_ack.y) || !isfinite(obj->g_ack.z)) {
+    ooLogAbort("%s:%d obj gravity ack not finite", file, line);
+  }
+
   if (!isfinite(obj->v.x) || !isfinite(obj->v.y) || !isfinite(obj->v.z)) {
     ooLogAbort("%s:%d obj velocity not finite", file, line);
   }

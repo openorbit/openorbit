@@ -70,19 +70,28 @@ PLobject* plObject(PLworld *sys, const char *name);
 PLobject* plSubObject3f(PLworld *world, PLobject *parent, const char *name,
                         float x, float y, float z);
 
-// Init standard object (useful if allocated with malloc or explicitly in structure)
+// Init standard object (useful if allocated with malloc or explicitly in
+// structure).
 void plInitObject(PLobject *obj);
+
+/*! Update and compute all derived properties */
 void plComputeDerived(PLobject *obj);
 
-
+/*! Print object to console */
 void plDumpObject(PLobject *obj);
 
+/*! Detatch object from parent */
 void plDetatchObject(PLobject *obj);
+
+/*! Compute aggregate object mass from children */
 void plUpdateMass(PLobject *obj);
 
+/*! Assigns an SGdrawable pointer to the object. */
 void plSetDrawableForObject(PLobject *obj, SGdrawable *drawable);
 
+/*! Apply force vector xyz on object */
 void plForce3f(PLobject *obj, float x, float y, float z);
+/*! Apply force vector f on object */
 void plForce3fv(PLobject *obj, float3 f);
 
 void plForceRelative3f(PLobject *obj, float x, float y, float z);
@@ -92,7 +101,9 @@ void plForceRelativePos3f(PLobject *obj,
                           float px, float py, float pz);
 void plForceRelativePos3fv(PLobject *obj, float3 f, float3 p);
 
+/*! Apply gravity vector */
 void plGravity3f(PLobject *obj, float x, float y, float z);
+/*! Apply gravity vector */
 void plGravity3fv(PLobject *obj, float3 f);
 
 
@@ -110,6 +121,7 @@ void plSetObjectPosRel3fv(PLobject * restrict obj,
 void plStepObjectf(PLobject *obj, float dt);
 void plStepChildObjectf(PLobject *obj, float dt);
 void plNormaliseObject(PLobject *obj);
+/*! Clear object accumulators */
 void plClearObject(PLobject *obj);
 
 void plSetVel3f(PLobject *obj, float dx, float dy, float dz);
@@ -123,12 +135,20 @@ quaternion_t plGetQuat(PLobject *obj);
 
 void plSetSystem(PLsystem *sys, PLobject *obj);
 
+/*! Check consistency of object. DO NOT CALL DIRECTLY. */
 void plCheckObject(PLobject *obj, const char *file, int line);
 
 void plSetDragCoef(PLobject *obj, float coef);
 void plSetArea(PLobject *obj, float area);
 
 
+/*! Check consistency of object. When checking, the macro will assert that
+    accumulators and other properties are finite, not NaNs and so on. This macro
+    is a useful debugging tool.
+
+    In the case that a value is not finite, the program will abort and print an
+    error message.
+ */
 #define PL_CHECK_OBJ(obj) plCheckObject(obj, __FILE__, __LINE__)
 
 #endif /* !PHYSICS_OBJECT_H */
