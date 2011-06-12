@@ -36,7 +36,7 @@
 #include <imgload/image.h>
 
 #include "res-manager.h"
-
+#include "rendering/scenegraph.h"
 #include <string.h>
 
 static hashtable_t *gOOtexDict;
@@ -50,6 +50,8 @@ texInit(void)
 GLuint
 ooTexLoad(const char *key, const char *name)
 {
+  SG_CHECK_ERROR;
+
   OOtexture *tex = NULL;
   if ((tex = hashtable_lookup(gOOtexDict, key))) {
     // Don't reload textures, return memoized value
@@ -127,6 +129,9 @@ ooTexLoad(const char *key, const char *name)
   // Memoize loaded texture
   hashtable_insert(gOOtexDict, key, tex);
   free(fname);
+
+  SG_CHECK_ERROR;
+
   return tex->texId;
 }
 

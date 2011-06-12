@@ -95,6 +95,8 @@ double deg2rad(double deg) {
 
 OOstars* ooSkyLoadStars(const char *file)
 {
+  SG_CHECK_ERROR;
+
   OOstars *stars = ooSkyInitStars(4096);
   FILE *f = ooResGetFile(file);
   assert(f != NULL);

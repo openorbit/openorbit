@@ -531,6 +531,8 @@ sgNewEllipsis(const char *name,
     el->verts[3*i+2] = vf3_z(v);
   }
 
+  SG_CHECK_ERROR;
+
   return sgNewDrawable((SGdrawable*)el, name, (SGdrawfunc)sgDrawEllipsis);
 }
 
@@ -553,6 +555,8 @@ SGdrawable*
 sgNewCylinder(const char *name,
               float top, float bottom, float height)
 {
+  SG_CHECK_ERROR;
+
   SGcylinder *cyl = malloc(sizeof(SGcylinder));
   sgInitDrawable(&cyl->super);
 
@@ -564,6 +568,7 @@ sgNewCylinder(const char *name,
   cyl->col[1] = 255;
   cyl->col[2] = 255;
 
+  SG_CHECK_ERROR;
   return sgNewDrawable((SGdrawable*)cyl, name, (SGdrawfunc)sgDrawCylinder);
 }
 
@@ -657,6 +662,8 @@ sgDrawModel(SGmodel *model)
 SGdrawable*
 sgLoadModel(const char *file)
 {
+  SG_CHECK_ERROR;
+
   char *path = ooResGetPath(file);
 
   SGmodel *model = malloc(sizeof(SGmodel));
@@ -669,6 +676,7 @@ sgLoadModel(const char *file)
     free(model);
     return NULL;
   }
+  SG_CHECK_ERROR;
 
   return sgNewDrawable((SGdrawable*)model, "unnamed",
                        (SGdrawfunc)sgDrawModel);
@@ -792,11 +800,15 @@ sgDrawVector(SGvector *vec)
 SGdrawable*
 sgNewVector(const char *name, float3 vec, float r, float g, float b)
 {
+  SG_CHECK_ERROR;
+
   SGvector *v = malloc(sizeof(SGvector));
   v->v = vec;
   v->col[0] = r;
   v->col[1] = g;
   v->col[2] = b;
+
+  SG_CHECK_ERROR;
 
   return sgNewDrawable((SGdrawable*)v, name, (SGdrawfunc)sgDrawVector);
 }
@@ -810,11 +822,15 @@ sgDrawLabel(SGlabel *label)
 SGdrawable*
 sgNewLabel(const char *name, const char *str)
 {
+  SG_CHECK_ERROR;
+
   SGlabel *lab = malloc(sizeof(SGlabel));
   sgInitDrawable(&lab->super);
 
   strncpy(lab->buff, str, SG_LABEL_LEN);
   lab->buff[SG_LABEL_LEN-1] = '\0';
+  SG_CHECK_ERROR;
+
   return sgNewDrawable((SGdrawable*)lab, name, (SGdrawfunc)sgDrawLabel);
 }
 
@@ -880,6 +896,8 @@ sgNewEllipsoid(const char *name, float a, float b, float c,
                float red, float green, float blue, float alpha,
                unsigned slices, unsigned stacks)
 {
+  SG_CHECK_ERROR;
+
   unsigned vertCount = slices * stacks * 2 + 2 + slices + 1;
   SGellipsoid *el = malloc(sizeof(SGellipsoid) + vertCount * 3 * sizeof(float));
   sgInitDrawable(&el->super);
@@ -930,6 +948,7 @@ sgNewEllipsoid(const char *name, float a, float b, float c,
       el->verts[3*(i*el->vertCountPerStack + j + 2) + 2] = z;
     }
   }
+  SG_CHECK_ERROR;
 
   return sgNewDrawable((SGdrawable*)el, name, (SGdrawfunc)sgDrawEllipsoid);
 }
