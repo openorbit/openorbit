@@ -176,4 +176,13 @@ PLatmosphere* plAtmosphere(float sample_dist, float h, PLatmosphereTemplate *t);
 float plAtmosphereDensity(const PLatmosphere *atm, float h);
 float plAtmospherePressure(const PLatmosphere *atm, float h);
 
+
+typedef struct PLairfoil {
+  float area;
+  float Ct0;
+} PLairfoil;
+
+float3 plComputeLift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil);
+
+
 #endif /* ! PL_ATMOSPHERE_H */

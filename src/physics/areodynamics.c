@@ -291,6 +291,28 @@ plComputeDrag(float3 v, double p, double Cd, double A)
   return vf3_s_mul(vf_dir, fd);
 }
 
+// Computing lift of airfoils using thin airfoil theory
+// Symetric airfoil: CL = 2 * M_PI * alpha
+// Chambered airfoil: CL = Ct0 + 2 * M_PI * alpha
+// Lift: 0.5 * density * velocity ** 2 * A * CL
+//  where A is the planform area, i.e. area of the wings
+float3
+plComputeLift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil)
+{
+  float3 vel = plComputeAirvelocity(obj);
+  float speed = plComputeAirspeed(obj);
+
+  // TODO: Compute alpha from rotation and velocity, obviously this should
+  //       somehow be adjusted for beta and gamma, but we skip that for now.
+  float alpha = 0.0f;
+  float CL = foil->Ct0 + 2.0f * M_PI * alpha;
+
+  float lift = 0.5f * plComputeAirdensity(obj) * speed * speed * foil->area * CL;
+
+  return vf3_set(0.0f, 0.0f, 0.0f);
+}
+
+
 void
 plInitAtmosphere(PLatmosphere *atm, float groundPressure, float h0)
 {
@@ -301,6 +323,11 @@ plInitAtmosphere(PLatmosphere *atm, float groundPressure, float h0)
   atm->h0 = h0;
 }
 
+
+/*! Compute drag for a given object
+ *  We need to compute parasitic drag (form, profile, interference and skin
+ *  friction drag), and the drag from any airfoils.
+ */
 float3
 plComputeDragForObject(PLobject *obj)
 {
