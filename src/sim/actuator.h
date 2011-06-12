@@ -150,7 +150,6 @@ struct OOactuatorgroup {
 
 
 OOactuatorgroup* ooScNewActuatorGroup(const char *name);
-void ooScRegisterInGroup(OOactuatorgroup *eg, OOactuator *actuator);
 
 // Standard engine groups are:
 // Main: orbital

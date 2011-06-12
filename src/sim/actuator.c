@@ -75,12 +75,6 @@ ooScNewActuatorGroup(const char *name)
 }
 
 void
-ooScRegisterInGroup(OOactuatorgroup *eg, OOactuator *actuator)
-{
-  obj_array_push(&eg->actuators, actuator);
-}
-
-void
 thruster_step(SIMengine *engine, float dt)
 {
   SIMthrust *thruster = (SIMthrust*)engine;
