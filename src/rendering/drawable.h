@@ -86,6 +86,28 @@ typedef struct SGellipsoid {
 
 } SGellipsoid;
 
+typedef struct SGmodeldata {
+  GLint tex_id;
+  int vertex_count;
+  GLuint vbo;
+
+  bool has_normals;
+  bool has_tex_coords;
+  GLsizei normal_offset;
+  GLsizei tex_coord_offset;
+
+  SGmaterial material;
+  GLfloat trans[4];
+  GLfloat rot[4][4];
+
+  obj_array_t children;
+} SGmodeldata;
+
+typedef struct SGmodel2 {
+  SGdrawable super;
+  obj_array_t roots;
+} SGmodel2;
+
 typedef struct SGmodel {
   SGdrawable super;
   model_t *modelData;
@@ -141,6 +163,13 @@ typedef struct SGlabel {
   float col[3];
   char buff[SG_LABEL_LEN];
 } SGlabel;
+
+typedef struct SGdisc {
+  SGdrawable super;
+  float inner_rad, outer_rad;
+  GLfloat *vertices;
+} SGdisc;
+
 
 SGdrawable* sgNewDrawable(SGdrawable *drawable, const char *name, SGdrawfunc df);
 void sgDrawableLoadShader(SGdrawable *obj, const char *shader);

@@ -683,6 +683,143 @@ sgLoadModel(const char *file)
 }
 
 void
+draw_modeldata(SGmodel2 *sgmod, SGmodeldata *mod)
+{
+  SG_CHECK_ERROR;
+
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CCW);
+
+  sgBindMaterial(&mod->material);
+
+  glPushMatrix();
+  glPushAttrib(GL_ENABLE_BIT);
+  glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+
+  glTranslatef(mod->trans[0], mod->trans[1], mod->trans[2]);
+  glMultMatrixf((GLfloat*)mod->rot);
+
+  glBindBuffer(GL_ARRAY_BUFFER, mod->vbo);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glEnableClientState(GL_NORMAL_ARRAY);
+
+  GLfloat modelview[16], projection[16];
+  glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+  glGetFloatv(GL_PROJECTION_MATRIX, projection);
+
+  glUniformMatrix4fv(sgmod->super.modelview_id, 1, GL_FALSE, modelview);
+  glUniformMatrix4fv(sgmod->super.projection_id, 1, GL_FALSE, projection);
+
+  glVertexPointer(3, GL_FLOAT, 0, 0);
+  glTexCoordPointer(2, GL_FLOAT, 0, (GLvoid*)mod->tex_coord_offset);
+  glNormalPointer(GL_FLOAT, 0, (GLvoid*)mod->normal_offset);
+
+  glDrawArrays(GL_TRIANGLES, 0, mod->vertex_count);
+
+  glPopClientAttrib();
+  glPopAttrib();
+
+  ARRAY_FOR_EACH(i, mod->children) {
+    draw_modeldata(sgmod, ARRAY_ELEM(mod->children, i));
+  }
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glPopMatrix();
+  SG_CHECK_ERROR;
+}
+
+void
+sgDrawModel2(SGmodel2 *mod)
+{
+  ARRAY_FOR_EACH(i, mod->roots) {
+    draw_modeldata(mod, ARRAY_ELEM(mod->roots, i));
+  }
+}
+
+static SGmodeldata*
+handle_model_obj(model_object_t *obj)
+{
+  SG_CHECK_ERROR;
+
+  SGmodeldata *moddata = malloc(sizeof(SGmodeldata));
+  obj_array_init(&moddata->children);
+
+  moddata->material = *obj->model->materials[obj->materialId];
+  moddata->vertex_count = obj->vertices.length / 3;
+  moddata->tex_id = ooTexLoad(obj->texture, obj->texture);
+  moddata->trans[0] = obj->trans[0];
+  moddata->trans[1] = obj->trans[1];
+  moddata->trans[2] = obj->trans[2];
+  moddata->trans[3] = 0.0f;
+
+  memcpy(moddata->rot, obj->rot, sizeof(obj->rot));
+
+  size_t vertex_data_size = obj->vertices.length*3*sizeof(float);
+  size_t normal_data_size = obj->normals.length*3*sizeof(float);
+  size_t texcoord_data_size = obj->texCoords.length*2*sizeof(float);
+  moddata->normal_offset = vertex_data_size;
+  moddata->tex_coord_offset = vertex_data_size + normal_data_size;
+  moddata->has_normals = normal_data_size != 0;
+  moddata->has_tex_coords = texcoord_data_size != 0;
+
+  glGenBuffers(1, &moddata->vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, moddata->vbo);
+  glBufferData(GL_ARRAY_BUFFER,
+               vertex_data_size + normal_data_size + texcoord_data_size,
+               NULL, // Just allocate, will copy with subdata
+               GL_STATIC_DRAW);
+
+  glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_data_size, obj->vertices.elems);
+  glBufferSubData(GL_ARRAY_BUFFER, vertex_data_size, normal_data_size,
+                  obj->normals.elems);
+  glBufferSubData(GL_ARRAY_BUFFER, vertex_data_size + normal_data_size,
+                  texcoord_data_size, obj->texCoords.elems);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  SG_CHECK_ERROR;
+
+  ARRAY_FOR_EACH(i, obj->children) {
+    obj_array_push(&moddata->children,
+                   handle_model_obj(ARRAY_ELEM(obj->children, i)));
+  }
+
+  SG_CHECK_ERROR;
+  return moddata;
+}
+
+SGdrawable*
+sgLoadModel2(const char *file)
+{
+  SG_CHECK_ERROR;
+
+  char *path = ooResGetPath(file);
+
+  SGmodel2 *model = malloc(sizeof(SGmodel2));
+  sgInitDrawable(&model->super);
+  obj_array_init(&model->roots);
+
+  model_t *mod = model_load(path);
+  free(path);
+  if (mod == NULL) {
+    ooLogError("loading model '%s', returned NULL model data", file);
+    free(model);
+    return NULL;
+  }
+
+  ARRAY_FOR_EACH(i, mod->objs) {
+    obj_array_push(&model->roots, handle_model_obj(ARRAY_ELEM(mod->objs, i)));
+  }
+  model_dispose(mod);
+
+  SG_CHECK_ERROR;
+
+  return sgNewDrawable((SGdrawable*)model, "unnamed",
+                       (SGdrawfunc)sgDrawModel2);
+}
+
+
+void
 sgDrawableAddChild(SGdrawable * restrict parent, SGdrawable * restrict child,
                    float3 t, quaternion_t q)
 {
