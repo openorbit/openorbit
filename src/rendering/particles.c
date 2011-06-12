@@ -21,7 +21,7 @@
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
 #else
-#include <gl/gl.h>
+#include <GL/gl.h>
 #endif
 #include "texture.h"
 #include <vmath/vmath.h>

@@ -30,7 +30,7 @@
 #include <OpenGL/OpenGL.h>
 #include <GLUT/glut.h>
 #else
-#include <gl/gl.h>
+#include <GL/gl.h>
 #include <GL/glut.h>
 #endif
 

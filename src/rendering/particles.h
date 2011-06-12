@@ -27,7 +27,7 @@
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
 #else
-#include <gl/gl.h>
+#include <GL/gl.h>
 #endif
 #include "physics/particles.h"
 
