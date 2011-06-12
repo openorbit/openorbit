@@ -1,5 +1,5 @@
 /*
-  Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -69,7 +69,8 @@ struct OOstage {
   float expendedMass;
   OOstagestate state;
   PLobject *obj; // Mass and inertia tensor of stage, unit is kg
-  obj_array_t actuators;
+                 //  obj_array_t actuators;
+  obj_array_t engines;
   obj_array_t actuatorGroups;
   obj_array_t payload;
 };
@@ -112,7 +113,7 @@ struct OOspacecraft {
   OOaxises axises;
 
   obj_array_t stages;
-  obj_array_t actuators;
+  obj_array_t engines;
 
   bool detatchPossible;
   bool detatchComplete;
@@ -149,11 +150,6 @@ OOspacecraft* ooScNew(PLworld *world, SGscene *scene, const char *name);
 void simScDetatchStage(OOspacecraft *sc);
 
 void simScToggleMainEngine(OOspacecraft *sc);
-
-void simArmStageActuators(OOstage *stage);
-void simDisarmStageActuators(OOstage *stage);
-void simLockStageActuators(OOstage *act);
-void simDisableStageActuators(OOstage *act);
 
 void ooScSetStageMesh(OOstage *stage, SGdrawable *mesh);
 void simDetatchStage(OOspacecraft *sc, OOstage *stage);
@@ -208,5 +204,10 @@ float3 simGetGravityVector(OOspacecraft *sc);
 float3 simGetVelocityVector(OOspacecraft *sc);
 float3 simGetForceVector(OOspacecraft *sc);
 quaternion_t simGetQuaternion(OOspacecraft *sc);
+
+void simStageArmEngines(OOstage *stage);
+void simStageDisarmEngines(OOstage *stage);
+void simStageDisableEngines(OOstage *stage);
+void simStageLockEngines(OOstage *stage);
 
 #endif /* end of include guard: SPACECRAFT_H_7SCB1CH8 */

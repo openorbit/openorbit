@@ -1,5 +1,5 @@
 /*
- Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2009,2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -24,8 +24,10 @@
 
 typedef struct OOspacecraft OOspacecraft;
 typedef struct OOstage OOstage;
+typedef struct OOspacecraft SIMspacecraft;
+typedef struct OOstage SIMstage;
+
 typedef struct OOactuatorgroup OOactuatorgroup;
-typedef struct OOactuator OOactuator;
 
 typedef struct OOrocket OOrocket;
 typedef struct OOsrb OOsrb;

@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -20,19 +20,25 @@
 #ifndef SIM_PROPELLANT_TANK
 #define SIM_PROPELLANT_TANK
 
-struct SIMpropellanttank {
+typedef enum {
+  SIM_Liquid,
+  SIM_Solid,
+} SIMpropellanttype;
+
+struct SIMtank {
+  SIMpropellanttype kind;
   const char *propellantType;
   float pressure;
   float volume;
 };
 
-typedef struct SIMpropellanttank SIMpropellanttank;
+typedef struct SIMtank SIMtank;
 
 // Two ways of getting propellant mass, one is to rely on a pumping system and
 // request mass through the pumps, the other way is to request mass by opening
 // valves attached to the pressurised tank.
 
-void simOpenValve(SIMpropellanttank *tank);
-void simEnablePump(SIMpropellanttank *tank);
+void simOpenValve(SIMtank *tank);
+void simEnablePump(SIMtank *tank);
 
 #endif /* !SIM_PROPELLANT_TANK */

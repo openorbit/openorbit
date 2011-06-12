@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -20,12 +20,12 @@
 #include "propellant-tank.h"
 
 void
-simOpenValve(SIMpropellanttank *tank)
+simOpenValve(SIMtank *tank)
 {
 }
 
 void
-simEnablePump(SIMpropellanttank *tank)
+simEnablePump(SIMtank *tank)
 {
 
 }
