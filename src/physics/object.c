@@ -409,12 +409,14 @@ plSetVel3fv(PLobject *obj, float3 dp)
 void
 plSetDragCoef(PLobject *obj, float coef)
 {
+  // TODO: What about parent objects?
   obj->dragCoef = coef;
 }
 
 void
 plSetArea(PLobject *obj, float area)
 {
+  // TODO: What about parent objects?
   obj->area = area;
 }
 
