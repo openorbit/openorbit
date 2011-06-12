@@ -28,6 +28,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		EC00A4A41292E42300B80299 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC00A4A31292E42300B80299 /* SDL.framework */; };
+		EC00A5901292E50500B80299 /* SDL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC0FB8CA119FF1BC00CEF95A /* font in Resources */ = {isa = PBXBuildFile; fileRef = EC0FB8B1119FF1BC00CEF95A /* font */; };
 		EC0FB9BC11A55B5900CEF95A /* test-pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0FB9AF11A558E700CEF95A /* test-pubsub.c */; };
 		EC0FB9BD11A55B5F00CEF95A /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
@@ -151,7 +153,6 @@
 		ECDC2BA4111ACD900066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC2BA3111ACD900066AF2D /* particles.c */; };
 		ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
 		ECE6A8441167CAB400003CBD /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
-		ECEFCE5A13A532AE00B63315 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -260,6 +261,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				EC00A5901292E50500B80299 /* SDL.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -278,6 +280,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		EC00A4A31292E42300B80299 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = deps/SDL.framework; sourceTree = "<group>"; };
 		EC030D6911084749004F3AD8 /* Simulation Design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Simulation Design"; sourceTree = "<group>"; };
 		EC0FB8B1119FF1BC00CEF95A /* font */ = {isa = PBXFileReference; lastKnownFileType = folder; path = font; sourceTree = "<group>"; };
 		EC0FB9AF11A558E700CEF95A /* test-pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-pubsub.c"; sourceTree = "<group>"; };
@@ -582,8 +585,8 @@
 				EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */,
 				EC0FBA7011A66E3300CEF95A /* CoreFoundation.framework in Frameworks */,
 				EC0FBAD811A6721B00CEF95A /* ApplicationServices.framework in Frameworks */,
+				EC00A4A41292E42300B80299 /* SDL.framework in Frameworks */,
 				EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */,
-				ECEFCE5A13A532AE00B63315 /* SDL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1021,6 +1024,7 @@
 				EC447DDF0CCC0681001C88AD /* Frameworks */,
 				EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */,
 				EC768C4E1060D651009B558C /* openorbit.xcconfig */,
+				EC00A4A31292E42300B80299 /* SDL.framework */,
 			);
 			sourceTree = "<group>";
 		};

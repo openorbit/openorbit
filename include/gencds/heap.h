@@ -67,7 +67,7 @@ void heap_delete(heap_t *h);
 bool heap_insert(heap_t *h, void *data);
 void *heap_remove(heap_t *h);
 void *heap_peek(heap_t *h);
-unsigned int heap_peek_rank(heap_t *h);
+int64_t heap_peek_rank(heap_t *h);
 void heap_lock(heap_t *h);
 void heap_unlock(heap_t *h);
 

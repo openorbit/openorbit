@@ -896,9 +896,6 @@ Token lexToken(LexState *lex)
 void
 InsertNewNode(ParseState *parser, const char *name)
 {
-  HRMLvalue val;  
-  
-  
   if (parser->obj == NULL) {
     
     parser->doc->rootNode = malloc(sizeof(HRMLobject));

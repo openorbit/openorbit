@@ -175,7 +175,7 @@ void
     else return NULL;
 }
 
-unsigned int
+int64_t
 heap_peek_rank(heap_t *h)
 {
     assert(h);

@@ -125,7 +125,7 @@ uint32_t readU32(int fd)
 
 static inline int readChunkHeader(chunk_3ds_t *chnk, int fd)
 {
-  int readBytes = 0;
+  ssize_t readBytes = 0;
 
   if ((readBytes = read(fd, &chnk->chunkId, 2)) != 2) {
     if (readBytes == 0) {

@@ -383,7 +383,7 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
                        ac3d->materials[obj->surfs[i].material_idx].b);
     }
   }
-  model->vertexCount = model->vertices.length / 3;
+  model->vertexCount = (uint32_t)model->vertices.length / 3;
 
 
 

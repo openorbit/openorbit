@@ -233,7 +233,7 @@ avl_find(avl_tree_t *tree, uintptr_t key)
 void
 avl_remove(avl_tree_t *tree, uintptr_t key)
 {
-  avl_node_t *node = tree->root;
+  //avl_node_t *node = tree->root;
   assert(0 && "avl_remove not supported yet");
   // TODO: Add remove support
 }
