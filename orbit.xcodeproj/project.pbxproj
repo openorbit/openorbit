@@ -28,8 +28,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		EC00A4A41292E42300B80299 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC00A4A31292E42300B80299 /* SDL.framework */; };
-		EC00A5901292E50500B80299 /* SDL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC0FB8CA119FF1BC00CEF95A /* font in Resources */ = {isa = PBXBuildFile; fileRef = EC0FB8B1119FF1BC00CEF95A /* font */; };
 		EC0FB9BC11A55B5900CEF95A /* test-pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0FB9AF11A558E700CEF95A /* test-pubsub.c */; };
 		EC0FB9BD11A55B5F00CEF95A /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
@@ -122,6 +120,24 @@
 		EC4485750CCD25AB001C88AD /* list-test.c in Sources */ = {isa = PBXBuildFile; fileRef = EC44854D0CCD247E001C88AD /* list-test.c */; };
 		EC47E6C211D4D34800523F78 /* event.i in Sources */ = {isa = PBXBuildFile; fileRef = EC47E6C111D4D34800523F78 /* event.i */; };
 		EC4A893910B152C9002C6513 /* actuator.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4A893810B152C9002C6513 /* actuator.c */; };
+		EC4C89F8137D4E77007AC0DF /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4C89F6137D4E77007AC0DF /* main.c */; };
+		EC4C8A03137D59FC007AC0DF /* 3ds.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBFB1079EE080011B76E /* 3ds.c */; };
+		EC4C8A04137D59FC007AC0DF /* hrml.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBFE1079EE080011B76E /* hrml.c */; };
+		EC4C8A05137D59FC007AC0DF /* hrml3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC001079EE080011B76E /* hrml3d.c */; };
+		EC4C8A06137D59FC007AC0DF /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC061079EE080011B76E /* model.c */; };
+		EC4C8A07137D59FC007AC0DF /* ac3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CDA2C108677C000C1B458 /* ac3d.c */; };
+		EC4C8A08137D59FC007AC0DF /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
+		EC4C8A09137D59FC007AC0DF /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
+		EC4C8A0A137D5BD9007AC0DF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
+		EC4C8A0C137D5C1D007AC0DF /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4C8A0B137D5C1D007AC0DF /* GLUT.framework */; };
+		EC4C8A0D137D5C69007AC0DF /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
+		EC4C8A0E137D5D0A007AC0DF /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBEB1079EE080011B76E /* array.c */; };
+		EC4C8A0F137D5D0A007AC0DF /* avl-tree.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBEC1079EE080011B76E /* avl-tree.c */; };
+		EC4C8A10137D5D0A007AC0DF /* hashtable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF01079EE080011B76E /* hashtable.c */; };
+		EC4C8A11137D5D0A007AC0DF /* heap.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF11079EE080011B76E /* heap.c */; };
+		EC4C8A12137D5D0A007AC0DF /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF31079EE080011B76E /* list.c */; };
+		EC4C8A13137D5D0A007AC0DF /* object-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF51079EE080011B76E /* object-manager.c */; };
+		EC4C8A14137D5D0A007AC0DF /* object-manager2.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF61079EE080011B76E /* object-manager2.c */; };
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
 		EC5F72531154E10D00FBE08B /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
 		EC5F725A1154E27400FBE08B /* light.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72591154E27400FBE08B /* light.c */; };
@@ -153,6 +169,7 @@
 		ECDC2BA4111ACD900066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC2BA3111ACD900066AF2D /* particles.c */; };
 		ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
 		ECE6A8441167CAB400003CBD /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
+		ECEFCE5A13A532AE00B63315 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -261,7 +278,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				EC00A5901292E50500B80299 /* SDL.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -277,10 +293,18 @@
 			name = "Copy Scripts";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EC4C89E8137D4D0D007AC0DF /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		EC00A4A31292E42300B80299 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = deps/SDL.framework; sourceTree = "<group>"; };
 		EC030D6911084749004F3AD8 /* Simulation Design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Simulation Design"; sourceTree = "<group>"; };
 		EC0FB8B1119FF1BC00CEF95A /* font */ = {isa = PBXFileReference; lastKnownFileType = folder; path = font; sourceTree = "<group>"; };
 		EC0FB9AF11A558E700CEF95A /* test-pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-pubsub.c"; sourceTree = "<group>"; };
@@ -446,6 +470,9 @@
 		EC4A893710B152C9002C6513 /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuator.h; sourceTree = "<group>"; };
 		EC4A893810B152C9002C6513 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuator.c; sourceTree = "<group>"; };
 		EC4A895310B1553A002C6513 /* simtypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simtypes.h; sourceTree = "<group>"; };
+		EC4C89EA137D4D0D007AC0DF /* dragarea */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = dragarea; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC4C89F6137D4E77007AC0DF /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		EC4C8A0B137D5C1D007AC0DF /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
 		EC4FCC6010748ECA00EB6DDF /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = /opt/local/lib/libjpeg.a; sourceTree = "<absolute>"; };
 		EC4FCC6210748F4B00EB6DDF /* libpng.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng.dylib; path = /usr/X11/lib/libpng.dylib; sourceTree = "<absolute>"; };
 		EC51E6E110BBE766009FA70D /* mass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mass.h; sourceTree = "<group>"; };
@@ -585,8 +612,18 @@
 				EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */,
 				EC0FBA7011A66E3300CEF95A /* CoreFoundation.framework in Frameworks */,
 				EC0FBAD811A6721B00CEF95A /* ApplicationServices.framework in Frameworks */,
-				EC00A4A41292E42300B80299 /* SDL.framework in Frameworks */,
 				EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */,
+				ECEFCE3E13A50BC900B63315 /* SDL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4C89E7137D4D0D007AC0DF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC4C8A0A137D5BD9007AC0DF /* OpenGL.framework in Frameworks */,
+				EC4C8A0C137D5C1D007AC0DF /* GLUT.framework in Frameworks */,
+				EC4C8A0D137D5C69007AC0DF /* libxml2.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1011,6 +1048,7 @@
 		EC4476740CCBFEDB001C88AD = {
 			isa = PBXGroup;
 			children = (
+				EC4C89F5137D4E5B007AC0DF /* tools */,
 				ECA5F8AF109D8FB3004278EC /* docs */,
 				EC34BDB1107B2C480011B76E /* lib */,
 				EC34BD2A1079EF5A0011B76E /* scripts */,
@@ -1024,7 +1062,6 @@
 				EC447DDF0CCC0681001C88AD /* Frameworks */,
 				EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */,
 				EC768C4E1060D651009B558C /* openorbit.xcconfig */,
-				EC00A4A31292E42300B80299 /* SDL.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1042,6 +1079,7 @@
 				EC34BDBE107B2C900011B76E /* libvmath.a */,
 				ECBF1745108C565600D3E412 /* libimgload.a */,
 				EC0FB9B811A55B4D00CEF95A /* t009_pubsub */,
+				EC4C89EA137D4D0D007AC0DF /* dragarea */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1049,6 +1087,7 @@
 		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EC4C8A0B137D5C1D007AC0DF /* GLUT.framework */,
 				EC9DA88A12EB84540028A131 /* libfreetype.a */,
 				EC88CFC010A2B8F100A11B1D /* libxml2.dylib */,
 				EC0FBA6F11A66E3300CEF95A /* CoreFoundation.framework */,
@@ -1155,6 +1194,43 @@
 			path = template;
 			sourceTree = "<group>";
 		};
+		EC4C89F3137D4E48007AC0DF /* dragarea */ = {
+			isa = PBXGroup;
+			children = (
+				EC4C89F6137D4E77007AC0DF /* main.c */,
+			);
+			path = dragarea;
+			sourceTree = "<group>";
+		};
+		EC4C89F5137D4E5B007AC0DF /* tools */ = {
+			isa = PBXGroup;
+			children = (
+				EC4C89F3137D4E48007AC0DF /* dragarea */,
+			);
+			path = tools;
+			sourceTree = "<group>";
+		};
+		EC5C084A13A4C76300CC1D0D /* gemeni */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = gemeni;
+			sourceTree = "<group>";
+		};
+		EC5C084B13A4C77A00CC1D0D /* apollo */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = apollo;
+			sourceTree = "<group>";
+		};
+		EC5C084C13A4C79400CC1D0D /* shuttle */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = shuttle;
+			sourceTree = "<group>";
+		};
 		EC6DFCA8126DCF580029D5E3 /* mfd */ = {
 			isa = PBXGroup;
 			children = (
@@ -1176,6 +1252,9 @@
 		EC9ECBE21195958B00229A8E /* spacecraft */ = {
 			isa = PBXGroup;
 			children = (
+				EC5C084C13A4C79400CC1D0D /* shuttle */,
+				EC5C084B13A4C77A00CC1D0D /* apollo */,
+				EC5C084A13A4C76300CC1D0D /* gemeni */,
 				EC9ECBE3119595C700229A8E /* mercury */,
 			);
 			path = spacecraft;
@@ -1435,6 +1514,23 @@
 			productReference = EC4476DE0CCC0076001C88AD /* Open Orbit.app */;
 			productType = "com.apple.product-type.application";
 		};
+		EC4C89E9137D4D0D007AC0DF /* dragarea */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC4C89F0137D4D0D007AC0DF /* Build configuration list for PBXNativeTarget "dragarea" */;
+			buildPhases = (
+				EC4C89E6137D4D0D007AC0DF /* Sources */,
+				EC4C89E7137D4D0D007AC0DF /* Frameworks */,
+				EC4C89E8137D4D0D007AC0DF /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = dragarea;
+			productName = dragarea;
+			productReference = EC4C89EA137D4D0D007AC0DF /* dragarea */;
+			productType = "com.apple.product-type.tool";
+		};
 		ECBF1744108C565600D3E412 /* imgload */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = ECBF1757108C56ED00D3E412 /* Build configuration list for PBXNativeTarget "imgload" */;
@@ -1487,6 +1583,7 @@
 				EC4476C00CCBFFF9001C88AD /* t005_object_manager */,
 				EC4476C50CCC0010001C88AD /* t006_list */,
 				EC0FB9B711A55B4D00CEF95A /* t009_pubsub */,
+				EC4C89E9137D4D0D007AC0DF /* dragarea */,
 			);
 		};
 /* End PBXProject section */
@@ -1668,6 +1765,28 @@
 				EC47E6C211D4D34800523F78 /* event.i in Sources */,
 				EC6DFCAB126DCF850029D5E3 /* mfd.c in Sources */,
 				EC3CFF6C1331EFB70002D0C5 /* haps.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC4C89E6137D4D0D007AC0DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC4C89F8137D4E77007AC0DF /* main.c in Sources */,
+				EC4C8A03137D59FC007AC0DF /* 3ds.c in Sources */,
+				EC4C8A04137D59FC007AC0DF /* hrml.c in Sources */,
+				EC4C8A05137D59FC007AC0DF /* hrml3d.c in Sources */,
+				EC4C8A06137D59FC007AC0DF /* model.c in Sources */,
+				EC4C8A07137D59FC007AC0DF /* ac3d.c in Sources */,
+				EC4C8A08137D59FC007AC0DF /* collada.c in Sources */,
+				EC4C8A09137D59FC007AC0DF /* cmod.c in Sources */,
+				EC4C8A0E137D5D0A007AC0DF /* array.c in Sources */,
+				EC4C8A0F137D5D0A007AC0DF /* avl-tree.c in Sources */,
+				EC4C8A10137D5D0A007AC0DF /* hashtable.c in Sources */,
+				EC4C8A11137D5D0A007AC0DF /* heap.c in Sources */,
+				EC4C8A12137D5D0A007AC0DF /* list.c in Sources */,
+				EC4C8A13137D5D0A007AC0DF /* object-manager.c in Sources */,
+				EC4C8A14137D5D0A007AC0DF /* object-manager2.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2275,6 +2394,56 @@
 			};
 			name = Release;
 		};
+		EC4C89F1137D4D0D007AC0DF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					include,
+					"${XML_INC}",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				VALID_ARCHS = "i386 x86_64 ppc ppc64";
+			};
+			name = Debug;
+		};
+		EC4C89F2137D4D0D007AC0DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					include,
+					"${XML_INC}",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				VALID_ARCHS = "i386 x86_64 ppc ppc64";
+			};
+			name = Release;
+		};
 		ECBF1746108C565700D3E412 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
@@ -2434,6 +2603,15 @@
 			buildConfigurations = (
 				EC4476E20CCC0077001C88AD /* Debug */,
 				EC4476E30CCC0077001C88AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC4C89F0137D4D0D007AC0DF /* Build configuration list for PBXNativeTarget "dragarea" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC4C89F1137D4D0D007AC0DF /* Debug */,
+				EC4C89F2137D4D0D007AC0DF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
