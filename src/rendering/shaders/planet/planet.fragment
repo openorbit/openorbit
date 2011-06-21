@@ -16,7 +16,8 @@ varying float Dist;
 const float twilightZone = 0.25;
 const float invTwilightZone = 1.0 / (2.0 * twilightZone);
 
-void main()
+void
+main()
 {
   vec3 Normal = normalize(N);
   float NdotL = max(dot(Normal, Ld), 0.0);
@@ -48,7 +49,8 @@ void main()
 
     // Note: Grayscale spec map texture
     if (UseSpecMap && (texture2D(Tex1, TexCoord).r > 0.1) || !UseSpecMap) {
-      specIntensity = gl_LightSource[0].specular * pow(RdotE, gl_FrontMaterial.shininess);
+      specIntensity = gl_LightSource[0].specular *
+                      pow(RdotE, gl_FrontMaterial.shininess);
     }
 
     color += att * specColor * specIntensity;
@@ -57,7 +59,8 @@ void main()
   if (UseNightTexture) {
     // Mix day and night if we are in the twilight zone
     if (abs(NdotL) < twilightZone) {
-      color = mix(diffuseNightTexel, color, (NdotL+twilightZone) * invTwilightZone);
+      color = mix(diffuseNightTexel, color,
+                  (NdotL+twilightZone) * invTwilightZone);
     }
 
     if (NdotL < -twilightZone) {
@@ -66,5 +69,5 @@ void main()
     }
   }
 
-	gl_FragColor = color;
+  gl_FragColor = color;
 }

@@ -8,7 +8,8 @@ varying vec2 TexCoord;
 varying vec3 N, Ld, Eye;
 varying float Dist;
 
-void main()
+void
+main()
 {
   N = normalize(gl_NormalMatrix * gl_Normal);
 
