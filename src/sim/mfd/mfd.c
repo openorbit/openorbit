@@ -154,7 +154,29 @@ test_hud_draw(SGoverlay *overlay)
 
   OOspacecraft *sc = simGetSpacecraft();
   float3 gv = simGetGravityVector(sc);
-  quaternion_t q = simGetQuaternion(sc);
+  //quaternion_t q = simGetQuaternion(sc);
+  const float3x3 *R = simGetRotMat(sc);
+  float3x3 R_inv;
+  mf3_transpose2(R_inv, *R); // Invert rotation matrix, we need this to
+                             // transform the vectors into view relative values
+  float3 v = simGetVelocityVector(sc);
+  float3 as = simGetAirspeedVector(sc);
+  float3 p = simGetRelPos(sc);
+  float3 rv = simGetRelVel(sc);
+
+  float3 v_view = mf3_v_mul(R_inv, v);
+  float3 g_view = mf3_v_mul(R_inv, gv);
+  float3 rv_view = mf3_v_mul(R_inv, rv);
+  float3 as_view = mf3_v_mul(R_inv, as);
+  float3 p_view = mf3_v_mul(R_inv, p);
+
+  float h = simGetAltitude(sc);
+  // The hud should display the following data: airspeed, altitude, horizon,
+  // heading, turn / bank
+  // Angle of attack, accelleration, boresight, flight path vector
+  // Hud should adopt to whether it is used in space or not.
+  // Hud need to be able to select reference object in space as data is always
+  // relative.
 
   glPushAttrib(GL_ENABLE_BIT);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

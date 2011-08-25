@@ -187,7 +187,7 @@ void ooScSetSystemAndPos(OOspacecraft *sc, const char *sysName,
 void ooScSetSysAndCoords(OOspacecraft *sc, const char *sysName, double longitude, double latitude, double altitude);
 
 
-OOstage* ooScNewStage(OOspacecraft *sc, const char *name);
+OOstage* simNewStage(OOspacecraft *sc, const char *name, const char *mesh);
 
 OOspacecraft* ooScLoad(PLworld *world, SGscene *scene, const char *fileName);
 
@@ -202,8 +202,17 @@ float3 simGetStageGravityVector(OOstage *stage);
 
 float3 simGetGravityVector(OOspacecraft *sc);
 float3 simGetVelocityVector(OOspacecraft *sc);
+float3 simGetAirspeedVector(OOspacecraft *sc);
 float3 simGetForceVector(OOspacecraft *sc);
 quaternion_t simGetQuaternion(OOspacecraft *sc);
+const float3x3* simGetRotMat(OOspacecraft *sc);
+float simGetAltitude(OOspacecraft *sc);
+
+// Returns the position vector that is relative to the dominating
+// gravitational source
+float3 simGetRelPos(OOspacecraft *sc);
+float3 simGetRelVel(OOspacecraft *sc);
+PLsystem* simGetSys(OOspacecraft *sc);
 
 void simStageArmEngines(OOstage *stage);
 void simStageDisarmEngines(OOstage *stage);

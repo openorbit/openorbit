@@ -345,7 +345,7 @@ ooScStageStep(OOstage *stage, OOaxises *axises, float dt) {
 }
 
 OOstage*
-ooScNewStage(OOspacecraft *sc, const char *name)
+simNewStage(OOspacecraft *sc, const char *name, const char *mesh)
 {
   OOstage *stage = malloc(sizeof(OOstage));
   stage->state = OO_Stage_Idle;
@@ -486,6 +486,12 @@ simGetVelocityVector(OOspacecraft *sc)
 }
 
 float3
+simGetAirspeedVector(OOspacecraft *sc)
+{
+  return plComputeAirvelocity(sc->obj);
+}
+
+float3
 simGetForceVector(OOspacecraft *sc)
 {
   return sc->obj->f_ack;
@@ -497,6 +503,36 @@ simGetQuaternion(OOspacecraft *sc)
   return sc->obj->q;
 }
 
+const float3x3*
+simGetRotMat(OOspacecraft *sc)
+{
+  return (const float3x3*)&sc->obj->R;
+}
+
+float
+simGetAltitude(OOspacecraft *sc)
+{
+  return plComputeAltitude(sc->obj);
+}
+
+
+float3
+simGetRelPos(OOspacecraft *sc)
+{
+  return ooLwcDist(&sc->obj->p, &sc->obj->sys->orbitalBody->obj.p);
+}
+
+float3
+simGetRelVel(OOspacecraft *sc)
+{
+  return sc->obj->v - sc->obj->sys->orbitalBody->obj.v;
+}
+
+PLsystem*
+simGetSys(OOspacecraft *sc)
+{
+  return sc->obj->sys;
+}
 
 
 void
