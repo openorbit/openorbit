@@ -241,13 +241,8 @@ MercuryNew(void)
   // 1/2 mrr = 0.5 * 1.0 * 0.89 * 0.89 = 0.39605
   // 1/12 m(3rr + hh) = 27.14764852
 
-  OOstage *redstone = ooScNewStage(sc, "Mercury-Redstone");
-  SGdrawable *redstoneModel = sgLoadModel("spacecrafts/mercury/redstone.ac");
-  // TODO: Loading models and attaching them to the stages should really be
-  //       made cleaner, this is not a good API
-  sgDrawableLoadShader(redstoneModel, "spacecraft");
-  ooScSetStageMesh(redstone, redstoneModel);
-  sgSceneAddObj(sgGetScene(simGetSg(), "main"), redstoneModel);
+  OOstage *redstone = simNewStage(sc, "Mercury-Redstone",
+                                  "spacecrafts/mercury/redstone.ac");
 
   plMassSet(&redstone->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
@@ -267,12 +262,8 @@ MercuryNew(void)
   //orbital
 
 
-  OOstage *capsule = ooScNewStage(sc, "Command-Module");
-  SGdrawable *capsuleModel = sgLoadModel("spacecrafts/mercury/mercury.ac");
-  sgDrawableLoadShader(capsuleModel, "spacecraft");
-
-  ooScSetStageMesh(capsule, capsuleModel);
-  sgSceneAddObj(sgGetScene(simGetSg(), "main"), capsuleModel);
+  OOstage *capsule = simNewStage(sc, "Command-Module",
+                                 "spacecrafts/mercury/mercury.ac");
 
   plMassSet(&capsule->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
