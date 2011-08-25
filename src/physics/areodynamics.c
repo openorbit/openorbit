@@ -354,6 +354,15 @@ plComputeAirpressure(PLobject *obj)
 }
 
 double
+plComputeAltitude(PLobject *obj)
+{
+  PLsystem *sys = obj->sys;
+  float3 dist = ooLwcDist(&obj->p, &sys->orbitalBody->obj.p);
+  float h = vf3_abs(dist) - sys->orbitalBody->eqRad;
+  return h;
+}
+
+double
 plComputeAirdensity(PLobject *obj)
 {
   PLsystem *sys = obj->sys;

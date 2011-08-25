@@ -135,6 +135,8 @@ typedef struct PLatmosphere {
   float_array_t p; // Density points
 } PLatmosphere;
 
+double plComputeAltitude(PLobject *obj);
+float3 plComputeAirvelocity(PLobject *obj);
 double plComputeAirspeed(PLobject *obj);
 double plComputeAirpressure(PLobject *obj);
 double plComputeAirdensity(PLobject *obj);
