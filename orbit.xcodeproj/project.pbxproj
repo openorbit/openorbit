@@ -154,6 +154,8 @@
 		EC9ECBE61195964500229A8E /* mercury.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECBE51195964500229A8E /* mercury.c */; };
 		EC9ECC271196C54800229A8E /* battery.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC261196C54800229A8E /* battery.c */; };
 		EC9ECC2A1196C7E000229A8E /* propellant-tank.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC291196C7E000229A8E /* propellant-tank.c */; };
+		ECA0639913A54C8600D720F1 /* gemeni.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA0639713A54C8600D720F1 /* gemeni.c */; };
+		ECA0639B13A54D7100D720F1 /* apollo.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA0639A13A54D7100D720F1 /* apollo.c */; };
 		ECBF1748108C566E00D3E412 /* image.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1734108C55ED00D3E412 /* image.c */; };
 		ECBF1749108C566E00D3E412 /* jpg.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1735108C55ED00D3E412 /* jpg.c */; };
 		ECBF174B108C566E00D3E412 /* pngfile.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1737108C55ED00D3E412 /* pngfile.c */; };
@@ -503,6 +505,8 @@
 		EC9ECC261196C54800229A8E /* battery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battery.c; sourceTree = "<group>"; };
 		EC9ECC281196C7E000229A8E /* propellant-tank.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "propellant-tank.h"; sourceTree = "<group>"; };
 		EC9ECC291196C7E000229A8E /* propellant-tank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "propellant-tank.c"; sourceTree = "<group>"; };
+		ECA0639713A54C8600D720F1 /* gemeni.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gemeni.c; sourceTree = "<group>"; };
+		ECA0639A13A54D7100D720F1 /* apollo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = apollo.c; sourceTree = "<group>"; };
 		ECA5F8B1109D8FE7004278EC /* Hrml Manual */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Hrml Manual"; sourceTree = "<group>"; };
 		ECBF1734108C55ED00D3E412 /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
 		ECBF1735108C55ED00D3E412 /* jpg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jpg.c; sourceTree = "<group>"; };
@@ -1213,6 +1217,7 @@
 		EC5C084A13A4C76300CC1D0D /* gemeni */ = {
 			isa = PBXGroup;
 			children = (
+				ECA0639713A54C8600D720F1 /* gemeni.c */,
 			);
 			path = gemeni;
 			sourceTree = "<group>";
@@ -1220,6 +1225,7 @@
 		EC5C084B13A4C77A00CC1D0D /* apollo */ = {
 			isa = PBXGroup;
 			children = (
+				ECA0639A13A54D7100D720F1 /* apollo.c */,
 			);
 			path = apollo;
 			sourceTree = "<group>";
@@ -1765,6 +1771,8 @@
 				EC47E6C211D4D34800523F78 /* event.i in Sources */,
 				EC6DFCAB126DCF850029D5E3 /* mfd.c in Sources */,
 				EC3CFF6C1331EFB70002D0C5 /* haps.c in Sources */,
+				ECA0639913A54C8600D720F1 /* gemeni.c in Sources */,
+				ECA0639B13A54D7100D720F1 /* apollo.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
