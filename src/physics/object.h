@@ -106,6 +106,12 @@ void plGravity3f(PLobject *obj, float x, float y, float z);
 /*! Apply gravity vector */
 void plGravity3fv(PLobject *obj, float3 f);
 
+void plTorque3f(PLobject *obj, float tx, float ty, float tz);
+void plTorque3fv(PLobject *obj, float3 t);
+void plTorqueRelative3f(PLobject *obj, float tx, float ty, float tz,
+                        float px, float py, float pz);
+void plTorqueRelative3fv(PLobject *obj, float3 t, float3 p);
+
 
 void plSetObjectPos3d(PLobject *obj, double x, double y, double z);
 void plSetObjectPosRel3d(PLobject * restrict obj,

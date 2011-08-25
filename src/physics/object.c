@@ -281,6 +281,32 @@ plForceRelativePos3f(PLobject *obj,
   obj->t_ack += t_rot;
 }
 
+void
+plTorque3f(PLobject *obj, float tx, float ty, float tz)
+{
+  obj->t_ack += vf3_set(tx, ty, tz);
+}
+
+void
+plTorque3fv(PLobject *obj, float3 t)
+{
+  obj->t_ack += t;
+}
+
+void
+plTorqueRelative3f(PLobject *obj, float tx, float ty, float tz,
+                   float px, float py, float pz)
+{
+  obj->t_ack += mf3_v_mul(obj->R, vf3_set(tx, ty, tz));
+}
+
+void
+plTorqueRelative3fv(PLobject *obj, float3 t, float3 p)
+{
+  obj->t_ack += mf3_v_mul(obj->R, t);
+}
+
+
 
 void
 plForceRelativePos3fv(PLobject *obj, float3 f, float3 p)
