@@ -99,7 +99,15 @@ void
 solid_rocket_step(SIMengine *engine, float dt)
 {
   SIMsolidrocketengine *srocket = (SIMsolidrocketengine*)engine;
-
+  switch (srocket->grain) {
+  case SIM_Circular:
+  case SIM_End_Burner:
+  case SIM_C_Slot:
+  case SIM_Moon_Burner:
+  case SIM_Finocyl:
+  default:
+    assert(0 && "invalid solid rocket type");
+  }
   // Thrust F = m Ve + (Pe-Pa)Ae
   //  momentum thrust m Ve: m = rohp tau Ab
   //  pressure thrust (Pe-Pa)Ae
@@ -122,6 +130,10 @@ void
 prop_step(SIMengine *engine, float dt)
 {
   SIMpropengine *prop = (SIMpropengine*)engine;
+  plForceRelativePos3fv(prop->super.stage->obj, prop->super.dir,
+                        prop->super.pos);
+  plTorqueRelative3fv(prop->super.stage->obj,
+                     vf3_set(0.0, 0.0, 0.0), prop->super.pos);
 }
 void
 turboprop_step(SIMengine *engine, float dt)
@@ -189,6 +201,13 @@ simNewEngine(char *name, SIMstage *stage, SIMenginekind kind,
   engine->pos = pos;
   engine->dir = vf3_normalise(dir);
 
+  // Create particle system for engine
+  PLparticles *psys = plNewParticleSystem(name, 1000);
+  engine->psys = (SGparticles*) sgNewParticleSystem(name,
+                                                    "textures/particle-alpha.png",
+                                                    psys);
+  sgDrawableAddChild(stage->obj->drawable, (SGdrawable*)engine->psys,
+                     pos, q_rot(1.0f, 0.0f, 0.0f, 0.0f));
   obj_array_push(&stage->engines, engine);
   obj_array_push(&stage->sc->engines, engine);
 
