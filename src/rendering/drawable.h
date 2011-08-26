@@ -34,6 +34,7 @@
 
 #include <vmath/vmath.h>
 #include "rendering/reftypes.h"
+#include "rendering/light.h"
 #include "parsers/model.h"
 #include "rendering/material.h"
 #include "common/lwcoord.h"
@@ -54,6 +55,7 @@ struct SGdrawable {
   GLfloat R[16];
   SGdrawfunc draw; // Draw function for this object
 
+  SGlight *lights[8];
   GLuint shader;
   GLint modelview_id;
   GLint projection_id;
@@ -90,6 +92,7 @@ typedef struct SGmodeldata {
   GLint tex_id;
   int vertex_count;
   GLuint vbo;
+  SGlight *lights[8];
 
   bool has_normals;
   bool has_tex_coords;
