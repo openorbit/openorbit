@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -19,7 +19,7 @@
 
 #include "battery.h"
 #include "log.h"
-
+#include <gencds/array.h>
 static void
 PowerOverloadLog(SIMpowerbus *pb)
 {
@@ -38,6 +38,7 @@ simRequestPower(SIMpowerbus *pb, float power)
 {
   if (pb->currentLoad + power > pb->currentPower) {
     // Overload
+    pb->overloadAction(pb);
     return 0.0;
   } else {
     pb->currentLoad += power;
@@ -49,4 +50,16 @@ void
 simProducePower(SIMpowerbus *pb, float power)
 {
   pb->currentPower += power;
+}
+
+void
+simPowerStep(SIMpowerbus *pb, float dt)
+{
+  ARRAY_FOR_EACH(i, pb->batteries) {
+
+  }
+
+  ARRAY_FOR_EACH(i, pb->energySources) {
+
+  }
 }

@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -37,7 +37,6 @@ struct SIMbattery {
 };
 
 typedef struct SIMbattery SIMbattery;
-
 
 // Energy sources are the primary energy reserves, these may be for example
 // solar panels or similar.
