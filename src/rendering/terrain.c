@@ -22,7 +22,24 @@
 #include <assert.h>
 #include <sys/mman.h>
 
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#else
+#include <GL/gl.h>
+#endif
+
+typedef enum SGterrainstatus {
+  SG_TERRAIN_ON_DISK,
+  SG_TERRAIN_IN_RAM,
+  SG_TERRAIN_IN_GPU,
+} SGterrainstatus;
+
 typedef struct SGterrainloddata {
+  SGterrainstatus status;
+  int fd; // File descriptor
+  off_t offset; // Offset in file to terrain chunk
+  GLuint vbo;
+  // In ram data
   size_t vertexCount;
   float *vertices;
   float *texCoords;
@@ -57,6 +74,20 @@ sgTerrainLoad(const char *file)
   return NULL;
 }
 
+// Page in lod chunk to RAM
+void
+sgTerrainPageIn(SGterrainloddata *lod_chunk)
+{
+
+}
+
+// Copy data to GPU VBO.
+void
+sgTerrainToGPU(SGterrainloddata *lod_chunk)
+{
+
+}
+
 void
 sgTerrainDrawChunk(SGterrainchunk *chunk)
 {
@@ -72,7 +103,9 @@ void
 sgTerrainDraw(SGterrain *terrain)
 {
   assert(terrain != NULL && "Not NULL");
-  
+  // TODO: Cull backfaces
+  //        probably, best way is to dot product the cam->poly vector and the
+  //        face normal, this should be > 0 (or <0)
   for (size_t i = 0; i < terrain->height; ++ i) {
     for (size_t j = 0; i < terrain->width; ++ j) {
       sgTerrainDrawChunk(terrain->chunks[i][j]);
