@@ -20,3 +20,22 @@
 * Move physics system to be part of a more generic scale-graph, a scale graph has objects and positions relating to parent systems
 
 * Add VSOP84 and ELP2000 support for Sol system.
+
+* Per object lighting
+
+* Atmosphere shader
+
+* Particle system for smoke and flame
+
+* Aerofoil simulation
+
+* Cockpits in 2D and 3D
+
+* Launcher models and simulation code
+    * Mercury
+    * Gemini
+    * Apollo with moon lander
+    * Shuttle
+    * Soyuz
+    * Ariane with human rated capsule
+    * Skylon
