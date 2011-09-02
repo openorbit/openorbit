@@ -854,7 +854,7 @@ om_get_ ## N ## _idx_prop(const om_object_t *obj, const char *prop_name,    \
         } else {                                                            \
             errx(EX_SOFTWARE,                                               \
                  "om: index out of static bounds (idx = %d, maxidx = %d)",  \
-                 idx, prop->info.static_array.length-1);                    \
+                 idx, (int)prop->info.static_array.length-1);                    \
         }                                                                   \
     } else if (prop && prop->type_code == (OM_ARRAY|OM_REF|(TC))) {         \
         om_prop_t *length_prop = prop->info.dynamic_array.length;           \
@@ -869,7 +869,7 @@ om_get_ ## N ## _idx_prop(const om_object_t *obj, const char *prop_name,    \
         } else {                                                            \
             errx(EX_SOFTWARE,                                               \
                  "om: index out of dynamic bounds (idx = %d, maxidx = %d)", \
-                 idx, (*sz)-1);                                             \
+                 idx, (int)(*sz)-1);                                             \
         }                                                                   \
     }                                                                       \
   assert(0 && "should be unreachable");                                     \
@@ -899,7 +899,7 @@ om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name,          \
         } else {                                                            \
             errx(EX_SOFTWARE,                                               \
                  "om: index out of static bounds (idx = %d, maxidx = %d)",  \
-                 idx, prop->info.static_array.length-1);                    \
+                 idx, (int)prop->info.static_array.length-1);                    \
         }                                                                   \
     } else if (prop && prop->type_code == (OM_ARRAY|OM_REF|(TC))) {         \
         om_prop_t *length_prop = prop->info.dynamic_array.length;           \
@@ -914,7 +914,7 @@ om_set_ ## N ## _idx_prop(om_object_t *obj, const char *prop_name,          \
         } else {                                                            \
             errx(EX_SOFTWARE,                                               \
                  "om: index out of dynamic bounds (idx = %d, maxidx = %d)", \
-                 idx, (*sz)-1);                                             \
+                 idx, (int)(*sz)-1);                                             \
         }                                                                   \
     }                                                                       \
 }
