@@ -1200,9 +1200,12 @@ void Parse(ParseState *parser)
 ParseState *newParser(const char *path)
 {
   assert(path != NULL);
-  
+  LexState *lex = newLex(path); 
+  if (lex == NULL) return NULL; // No file exists (or file empty)
+
   ParseState *parser = malloc(sizeof(ParseState));
-  parser->lexer = newLex(path);
+  parser->lexer = lex;
+  
   parser->errors = false;
   parser->doc = NULL;
   parser->obj = NULL;
@@ -1220,6 +1223,9 @@ HRMLdocument *hrmlParse(const char *path)
 {
   assert(path != NULL);
   ParseState *parser = newParser(path);
+  
+  if (parser == NULL) return NULL; // No file found (or file empty)
+  
   parser->doc = malloc(sizeof(HRMLdocument));
   parser->doc->rootNode = NULL;
 
@@ -1556,6 +1562,9 @@ hrmlFreeDocument(HRMLdocument *doc)
 HRMLobject*
 hrmlGetObject(HRMLdocument *doc, const char *docPath)
 {
+  if (doc == NULL) return NULL;
+  if (docPath == NULL) return NULL;
+
   char str[strlen(docPath)+1];
   strcpy(str, docPath); // TODO: We do not trust the user, should probably
                         // check alloca result
