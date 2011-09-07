@@ -25,10 +25,16 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
+
+#include <jansson.h>
+
 enum type_id {
   SIM_PS_Int,
   SIM_PS_Float,
   SIM_PS_Float3,
+  SIM_PS_Float4,
+  SIM_PS_Float9,
+  SIM_PS_Float16,
   SIM_PS_Record,
 };
 
@@ -54,8 +60,14 @@ struct rec_info {
   str_offs_array_t fields;
 };
 
+struct rec_container_t {
+  const char *name;
+  obj_array_t entries;
+};
+
 static hashtable_t *rectypes;
 static hashtable_t *objects;
+static struct rec_container_t *root;
 
 INIT_PRIMARY_MODULE
 {
@@ -278,4 +290,42 @@ simDumpPubsubDB(void)
 
     le = list_entry_next(le);
   }
+}
+
+// JSON validation codes
+static const char *mat4x4_str = "[FFFF, FFFF, FFFF, FFFF!]";
+static const char *mat3x3_str = "[FFF, FFF, FFF!]";
+static const char *float4_str = "[FFFF!]";
+static const char *float3_str = "[FFF!]";
+static const char *float_str = "F";
+static const char *int_str = "I";
+
+void
+simPackPubSubDB(void)
+{
+  struct rec_container_t *rec_cont = root;
+
+  ARRAY_FOR_EACH(i, rec_cont->entries) {
+#if 0
+    switch (((struct rec_container_t)ARRAY_ELEM(rec_cont->entries, i))) {
+      case SIM_PS_Int:
+        break;
+      case SIM_PS_Float:
+        break;
+      case SIM_PS_Float3: {
+        float3 data = *(float3*)ref->val;
+        break; }
+      case SIM_PS_Record:
+      default:
+        assert(0 && "not implemented");
+    }
+#endif
+  }
+}
+
+
+void
+simUnpackPubSubDB(void)
+{
+
 }

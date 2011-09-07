@@ -156,6 +156,7 @@
 		EC9ECC2A1196C7E000229A8E /* propellant-tank.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC291196C7E000229A8E /* propellant-tank.c */; };
 		ECA0639913A54C8600D720F1 /* gemeni.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA0639713A54C8600D720F1 /* gemeni.c */; };
 		ECA0639B13A54D7100D720F1 /* apollo.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA0639A13A54D7100D720F1 /* apollo.c */; };
+		ECA662E8140B6F6500964A72 /* libjansson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECA662E7140B6F6500964A72 /* libjansson.a */; };
 		ECBF1748108C566E00D3E412 /* image.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1734108C55ED00D3E412 /* image.c */; };
 		ECBF1749108C566E00D3E412 /* jpg.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1735108C55ED00D3E412 /* jpg.c */; };
 		ECBF174B108C566E00D3E412 /* pngfile.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1737108C55ED00D3E412 /* pngfile.c */; };
@@ -508,6 +509,7 @@
 		ECA0639713A54C8600D720F1 /* gemeni.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gemeni.c; sourceTree = "<group>"; };
 		ECA0639A13A54D7100D720F1 /* apollo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = apollo.c; sourceTree = "<group>"; };
 		ECA5F8B1109D8FE7004278EC /* Hrml Manual */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Hrml Manual"; sourceTree = "<group>"; };
+		ECA662E7140B6F6500964A72 /* libjansson.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjansson.a; path = ../../../../opt/local/lib/libjansson.a; sourceTree = "<group>"; };
 		ECBF1734108C55ED00D3E412 /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
 		ECBF1735108C55ED00D3E412 /* jpg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jpg.c; sourceTree = "<group>"; };
 		ECBF1736108C55ED00D3E412 /* jpg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jpg.h; sourceTree = "<group>"; };
@@ -618,6 +620,7 @@
 				EC0FBAD811A6721B00CEF95A /* ApplicationServices.framework in Frameworks */,
 				EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */,
 				EC2F737D13A53BEE0008C996 /* SDL.framework in Frameworks */,
+				ECA662E8140B6F6500964A72 /* libjansson.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1091,6 +1094,7 @@
 		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ECA662E7140B6F6500964A72 /* libjansson.a */,
 				EC4C8A0B137D5C1D007AC0DF /* GLUT.framework */,
 				EC9DA88A12EB84540028A131 /* libfreetype.a */,
 				EC88CFC010A2B8F100A11B1D /* libxml2.dylib */,
