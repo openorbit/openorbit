@@ -144,6 +144,10 @@
 		EC5F725A1154E27400FBE08B /* light.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72591154E27400FBE08B /* light.c */; };
 		EC5F72881155240B00FBE08B /* drawable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72871155240B00FBE08B /* drawable.c */; };
 		EC6DFCAB126DCF850029D5E3 /* mfd.c in Sources */ = {isa = PBXBuildFile; fileRef = EC6DFCAA126DCF850029D5E3 /* mfd.c */; };
+		EC75350914176FEB000A7CB4 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EC75350314176FEB000A7CB4 /* MainMenu.xib */; };
+		EC75350A14176FEB000A7CB4 /* OOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EC75350514176FEB000A7CB4 /* OOAppDelegate.m */; };
+		EC75350B14176FEB000A7CB4 /* OOOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = EC75350714176FEB000A7CB4 /* OOOpenGLView.m */; };
+		EC75350C14176FEB000A7CB4 /* osx-main.m in Sources */ = {isa = PBXBuildFile; fileRef = EC75350814176FEB000A7CB4 /* osx-main.m */; };
 		EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7D093410EE160700D9D28E /* flightrecorder.c */; };
 		EC823729113140E100A725B1 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
@@ -488,6 +492,12 @@
 		EC6262571125556C001C0684 /* drawable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drawable.h; sourceTree = "<group>"; };
 		EC6DFCA9126DCF850029D5E3 /* mfd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mfd.h; sourceTree = "<group>"; };
 		EC6DFCAA126DCF850029D5E3 /* mfd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mfd.c; sourceTree = "<group>"; };
+		EC75350314176FEB000A7CB4 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		EC75350414176FEB000A7CB4 /* OOAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OOAppDelegate.h; sourceTree = "<group>"; };
+		EC75350514176FEB000A7CB4 /* OOAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OOAppDelegate.m; sourceTree = "<group>"; };
+		EC75350614176FEB000A7CB4 /* OOOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OOOpenGLView.h; sourceTree = "<group>"; };
+		EC75350714176FEB000A7CB4 /* OOOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OOOpenGLView.m; sourceTree = "<group>"; };
+		EC75350814176FEB000A7CB4 /* osx-main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "osx-main.m"; sourceTree = "<group>"; };
 		EC768C4E1060D651009B558C /* openorbit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = openorbit.xcconfig; sourceTree = "<group>"; };
 		EC7D093310EE160700D9D28E /* flightrecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightrecorder.h; sourceTree = "<group>"; };
 		EC7D093410EE160700D9D28E /* flightrecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightrecorder.c; sourceTree = "<group>"; };
@@ -834,6 +844,12 @@
 		EC34BC181079EE080011B76E /* macosx */ = {
 			isa = PBXGroup;
 			children = (
+				EC75350314176FEB000A7CB4 /* MainMenu.xib */,
+				EC75350414176FEB000A7CB4 /* OOAppDelegate.h */,
+				EC75350514176FEB000A7CB4 /* OOAppDelegate.m */,
+				EC75350614176FEB000A7CB4 /* OOOpenGLView.h */,
+				EC75350714176FEB000A7CB4 /* OOOpenGLView.m */,
+				EC75350814176FEB000A7CB4 /* osx-main.m */,
 				EC34BC191079EE080011B76E /* res-manager.c */,
 				EC34BC1A1079EE080011B76E /* SDLMain.h */,
 				EC34BC1B1079EE080011B76E /* SDLMain.m */,
@@ -1607,6 +1623,7 @@
 				EC34BD311079EF5A0011B76E /* hip-filter.py in Resources */,
 				EC239D751184406900C1A5B9 /* script in Resources */,
 				EC0FB8CA119FF1BC00CEF95A /* font in Resources */,
+				EC75350914176FEB000A7CB4 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1774,6 +1791,9 @@
 				EC3CFF6C1331EFB70002D0C5 /* haps.c in Sources */,
 				ECA0639913A54C8600D720F1 /* gemeni.c in Sources */,
 				ECA0639B13A54D7100D720F1 /* apollo.c in Sources */,
+				EC75350A14176FEB000A7CB4 /* OOAppDelegate.m in Sources */,
+				EC75350B14176FEB000A7CB4 /* OOOpenGLView.m in Sources */,
+				EC75350C14176FEB000A7CB4 /* osx-main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

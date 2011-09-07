@@ -148,7 +148,7 @@ main_loop(void)
       case SDL_WINDOWEVENT: {
         switch (event.window.event) {
         case SDL_WINDOWEVENT_RESIZED:
-          ooResizeScreen(event.window.data1, event.window.data2, false);
+          ooResizeScreen(0, 0, event.window.data1, event.window.data2, false);
           break;
         default:
           ooLogTrace("unknown window event %d", (int)event.window.event);
@@ -196,7 +196,7 @@ main_loop(void)
         {
           bool fullscreen;
           ooConfGetBoolDef("openorbit/video/fullscreen", &fullscreen, false);
-          ooResizeScreen(event.resize.w, event.resize.h, fullscreen);
+          ooResizeScreen(0, 0, event.resize.w, event.resize.h, fullscreen);
         }
         break;
       case SDL_VIDEOEXPOSE:

@@ -42,7 +42,7 @@ extern SGrenderinfo sgRenderInfo;
 void ooInitGlAttributes(void);
 void ooSetPerspective(float fovy, int width, int height);
 void ooSetVideoDefaults(void);
-void ooResizeScreen(int width, int height, bool fullscreen);
+void ooResizeScreen(int x, int y, int width, int height, bool fullscreen);
 void ooPrintScreenAttributes(void);
 
   /*! Predicate for glsl version checks */

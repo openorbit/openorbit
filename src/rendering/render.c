@@ -59,9 +59,7 @@ io_toggle_fs(bool buttonDown, void *data)
 
   SDL_DisplayMode mode;
   SDL_GetWindowDisplayMode(mainWindow, &mode);
-  glViewport(0, 0, mode.w, mode.h);
-  ooResizeScreen(mode.w, mode.h, false);
-
+  ooResizeScreen(0, 0, mode.w, mode.h, false);
 }
 
 INIT_IO {
@@ -116,7 +114,7 @@ ooSetVideoDefaults(void)
 }
 
 void
-ooResizeScreen(int width, int height, bool fullscreen)
+ooResizeScreen(int x, int y, int width, int height, bool fullscreen)
 {
   float fovy;
   ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
@@ -125,18 +123,16 @@ ooResizeScreen(int width, int height, bool fullscreen)
   sgRenderInfo.h = height;
   sgRenderInfo.aspect = (float)width/(float)height;
 
+  ooLogInfo("resize to %f (%d %d) %d %d", fovy, x, y, width, height);
+
+  glViewport(x, y, width, height);
+
   ooSetPerspective(fovy, width, height);
 }
-
 
 void
 ooSetPerspective(float fovy, int width, int height)
 {
-  int lowx = 0, lowy = 0;
-
-  ooLogInfo("resize to %f (%d %d) %d %d", fovy, lowx, lowy, width, height);
-  glViewport(lowx, lowy, width, height);
-
   glMatrixMode(GL_PROJECTION);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glLoadIdentity();
