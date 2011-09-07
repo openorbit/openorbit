@@ -19,7 +19,11 @@
 
 #import "OOOpenGLView.h"
 #import <OpenGL/OpenGL.h>
+#import <OpenGL/gl.h>
+
 #import "rendering/render.h"
+#import "rendering/scenegraph.h"
+#import "sim.h"
 
 int init_sim(int argc, const char* argv[argc]);
 
@@ -38,6 +42,16 @@ int init_sim(int argc, const char* argv[argc]);
 
 - (void) awakeFromNib
 {
+}
+
+
+- (BOOL)acceptsFirstResponder
+{
+  return YES;
+}
+
+- (void) prepareOpenGL
+{
   init_sim(0, NULL);
 }
 
@@ -48,7 +62,7 @@ int init_sim(int argc, const char* argv[argc]);
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-
+  NSLog(@"key down");
 }
 
 - (void) reshape
@@ -60,7 +74,10 @@ int init_sim(int argc, const char* argv[argc]);
 
 - (void) drawRect:(NSRect)dirtyRect
 {
-
+  extern SIMstate gSIM_state;
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  sgPaint(gSIM_state.sg);
   [self.openGLContext flushBuffer];
 }
 

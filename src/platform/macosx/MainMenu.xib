@@ -1314,10 +1314,11 @@
 							<string key="NSFrameSize">{480, 375}</string>
 							<reference key="NSSuperview" ref="414427165"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<object class="NSOpenGLPixelFormat" key="NSPixelFormat">
 								<object class="NSMutableData" key="NSPixelAttributes">
-									<bytes key="NS.bytes">AAAASAAAAGAAAAAAA</bytes>
+									<bytes key="NS.bytes">AAAABQAAAEgAAABgAAAAAA</bytes>
 								</object>
 							</object>
 						</object>
