@@ -59,8 +59,6 @@ ooSetVideoDefaults(void)
   sgRenderInfo.h = height;
   sgRenderInfo.aspect = (float)width/(float)height;
   sgRenderInfo.fovy = fovy;
-
-  ooSetPerspective(fovy, width, height);
 }
 
 void

@@ -376,6 +376,8 @@ sgSetSky(SGscenegraph *sg, SGdrawable *obj)
 void
 sgPaint(SGscenegraph *sg)
 {
+  ooSetPerspective(sgRenderInfo.fovy, sgRenderInfo.w, sgRenderInfo.h);
+
   assert(sg != NULL);
   ooLogTrace("SgPaint");
 
