@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2008 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2008,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -46,17 +46,143 @@ extern "C" {
 #define OO_IO_MOD_CAPS   KMOD_CAPS
 #define OO_IO_MOD_MODE   KMOD_MODE
 
-  void ioInit(void);
-  void ioDispatchKeyUp(int key, uint16_t mask);
-  void ioDispatchKeyDown(int key, uint16_t mask);
-  void ioBindKeyToAxis(const char *key, const char *button, float val);
-  void ioDispatchButtonDown(int dev, int button);
-  void ioDispatchButtonUp(int dev, int button);
+typedef enum io_keycode_t
+{
+  IO_INVALID = 0,
+  IO_LSHIFT,
+  IO_RSHIFT,
+  IO_LMETA,
+  IO_RMETA,
+  IO_LCTRL,
+  IO_RCTRL,
+  IO_LALT,
+  IO_RALT,
 
-  typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
+  IO_MODE,
+  IO_HELP,
+  IO_SYSREQ,
+  IO_CLEAR,
+  IO_MENU,
+  IO_POWER,
 
-  void ioRegActionHandler(const char *name, OObuttonhandlerfunc handlerFunc, void *data);
-  /*! Register key handler C function */
+  IO_RETURN,
+  IO_SPACE,
+  IO_TAB,
+  IO_BACKSPACE,
+  IO_ESCAPE,
+  IO_PERIOD,
+  IO_COMMA,
+  IO_PAUSE,
+  IO_MINUS,
+  IO_SLASH,
+
+  IO_SEMICOLON,
+  IO_EQUALS,
+  IO_LEFTBRACKET,
+  IO_BACKSLASH,
+  IO_RIGHTBRACKET,
+
+  IO_0,
+  IO_1,
+  IO_2,
+  IO_3,
+  IO_4,
+  IO_5,
+  IO_6,
+  IO_7,
+  IO_8,
+  IO_9,
+
+  IO_KP_0,
+  IO_KP_1,
+  IO_KP_2,
+  IO_KP_3,
+  IO_KP_4,
+  IO_KP_5,
+  IO_KP_6,
+  IO_KP_7,
+  IO_KP_8,
+  IO_KP_9,
+
+  IO_KP_PERIOD,
+  IO_KP_DIV,
+  IO_KP_MUL,
+  IO_KP_MIN,
+  IO_KP_PLUS,
+  IO_KP_ENTER,
+  IO_KP_EQ,
+  IO_KP_CLR,
+
+  IO_DEL,
+
+  IO_A,
+  IO_B,
+  IO_C,
+  IO_D,
+  IO_E,
+  IO_F,
+  IO_G,
+  IO_H,
+  IO_I,
+  IO_J,
+  IO_K,
+  IO_L,
+  IO_M,
+  IO_N,
+  IO_O,
+  IO_P,
+  IO_Q,
+  IO_R,
+  IO_S,
+  IO_T,
+  IO_U,
+  IO_V,
+  IO_W,
+  IO_X,
+  IO_Y,
+  IO_Z,
+
+  IO_F1,
+  IO_F2,
+  IO_F3,
+  IO_F4,
+  IO_F5,
+  IO_F6,
+  IO_F7,
+  IO_F8,
+  IO_F9,
+  IO_F10,
+  IO_F11,
+  IO_F12,
+  IO_F13,
+  IO_F14,
+  IO_F15,
+
+  IO_UP,
+  IO_DOWN,
+  IO_LEFT,
+  IO_RIGHT,
+
+  IO_INSERT,
+  IO_HOME,
+  IO_END,
+  IO_PAGEUP,
+  IO_PAGEDOWN,
+
+  IO_COUNT,
+} io_keycode_t;
+
+void ioInit(void);
+void ioDispatchKeyUp(io_keycode_t key, uint16_t mask);
+void ioDispatchKeyDown(io_keycode_t key, uint16_t mask);
+void ioBindKeyToAxis(const char *key, const char *button, float val);
+void ioDispatchButtonDown(int dev, int button);
+void ioDispatchButtonUp(int dev, int button);
+
+typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
+
+void ioRegActionHandler(const char *name, OObuttonhandlerfunc handlerFunc, void *data);
+/*! Register key handler C function */
 void ooIoRegCKeyHandler(const char *name, OObuttonhandlerfunc handlerFunc);
 /*! Register key handler Python function */
 void ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc);
@@ -78,7 +204,7 @@ float ooIoGetAxis(float *val, const char *axis);
 int ooIoGetJoystickId(const char *name, int subId);
 void ooIoBindAxis(const char *key, int joyStick, int axis);
 
-  const char *ooIoSdlMouseButtonNameLookup(unsigned buttonId);
+const char *ooIoSdlMouseButtonNameLookup(unsigned buttonId);
 
 #ifdef __cplusplus
 }

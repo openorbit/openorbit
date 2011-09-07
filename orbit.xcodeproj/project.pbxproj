@@ -53,7 +53,7 @@
 		EC34BC761079EE080011B76E /* object-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF51079EE080011B76E /* object-manager.c */; };
 		EC34BC771079EE080011B76E /* object-manager2.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF61079EE080011B76E /* object-manager2.c */; };
 		EC34BC781079EE080011B76E /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF71079EE080011B76E /* log.c */; };
-		EC34BC791079EE080011B76E /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF91079EE080011B76E /* main.c */; };
+		EC34BC791079EE080011B76E /* startup.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF91079EE080011B76E /* startup.c */; };
 		EC34BC7A1079EE080011B76E /* 3ds.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBFB1079EE080011B76E /* 3ds.c */; };
 		EC34BC7C1079EE080011B76E /* hrml.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBFE1079EE080011B76E /* hrml.c */; };
 		EC34BC7D1079EE080011B76E /* hrml3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC001079EE080011B76E /* hrml3d.c */; };
@@ -144,12 +144,108 @@
 		EC5F725A1154E27400FBE08B /* light.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72591154E27400FBE08B /* light.c */; };
 		EC5F72881155240B00FBE08B /* drawable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72871155240B00FBE08B /* drawable.c */; };
 		EC6DFCAB126DCF850029D5E3 /* mfd.c in Sources */ = {isa = PBXBuildFile; fileRef = EC6DFCAA126DCF850029D5E3 /* mfd.c */; };
+		EC75350914176FEB000A7CB4 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EC75350314176FEB000A7CB4 /* MainMenu.xib */; };
+		EC75350A14176FEB000A7CB4 /* OOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EC75350514176FEB000A7CB4 /* OOAppDelegate.m */; };
+		EC75350B14176FEB000A7CB4 /* OOOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = EC75350714176FEB000A7CB4 /* OOOpenGLView.m */; };
+		EC75350C14176FEB000A7CB4 /* osx-main.m in Sources */ = {isa = PBXBuildFile; fileRef = EC75350814176FEB000A7CB4 /* osx-main.m */; };
+		EC75351D14177EA6000A7CB4 /* shaders in Resources */ = {isa = PBXBuildFile; fileRef = EC13F0F011762C7900E39B89 /* shaders */; };
+		EC75351E14177EA6000A7CB4 /* data in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCB21079EECB0011B76E /* data */; };
+		EC75351F14177EA6000A7CB4 /* textures in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCBB1079EEE00011B76E /* textures */; };
+		EC75352014177EA6000A7CB4 /* spacecrafts in Resources */ = {isa = PBXBuildFile; fileRef = EC34BCD21079EEF60011B76E /* spacecrafts */; };
+		EC75352114177EA6000A7CB4 /* hip-filter.py in Resources */ = {isa = PBXBuildFile; fileRef = EC34BD2C1079EF5A0011B76E /* hip-filter.py */; };
+		EC75352214177EA6000A7CB4 /* script in Resources */ = {isa = PBXBuildFile; fileRef = EC239D731184406900C1A5B9 /* script */; };
+		EC75352314177EA6000A7CB4 /* font in Resources */ = {isa = PBXBuildFile; fileRef = EC0FB8B1119FF1BC00CEF95A /* font */; };
+		EC75352614177EA6000A7CB4 /* lwcoord.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBE11079EE080011B76E /* lwcoord.c */; };
+		EC75352714177EA6000A7CB4 /* ellipse.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBE51079EE080011B76E /* ellipse.c */; };
+		EC75352814177EA6000A7CB4 /* io-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBE81079EE080011B76E /* io-manager.c */; };
+		EC75352914177EA6000A7CB4 /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBEB1079EE080011B76E /* array.c */; };
+		EC75352A14177EA6000A7CB4 /* avl-tree.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBEC1079EE080011B76E /* avl-tree.c */; };
+		EC75352B14177EA6000A7CB4 /* hashtable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF01079EE080011B76E /* hashtable.c */; };
+		EC75352C14177EA6000A7CB4 /* heap.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF11079EE080011B76E /* heap.c */; };
+		EC75352D14177EA6000A7CB4 /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF31079EE080011B76E /* list.c */; };
+		EC75352E14177EA6000A7CB4 /* object-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF51079EE080011B76E /* object-manager.c */; };
+		EC75352F14177EA6000A7CB4 /* object-manager2.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF61079EE080011B76E /* object-manager2.c */; };
+		EC75353014177EA6000A7CB4 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF71079EE080011B76E /* log.c */; };
+		EC75353114177EA6000A7CB4 /* startup.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF91079EE080011B76E /* startup.c */; };
+		EC75353214177EA6000A7CB4 /* 3ds.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBFB1079EE080011B76E /* 3ds.c */; };
+		EC75353314177EA6000A7CB4 /* hrml.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBFE1079EE080011B76E /* hrml.c */; };
+		EC75353414177EA6000A7CB4 /* hrml3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC001079EE080011B76E /* hrml3d.c */; };
+		EC75353514177EA6000A7CB4 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC061079EE080011B76E /* model.c */; };
+		EC75353614177EA6000A7CB4 /* areodynamics.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC0F1079EE080011B76E /* areodynamics.c */; };
+		EC75353714177EA6000A7CB4 /* object.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC111079EE080011B76E /* object.c */; };
+		EC75353814177EA6000A7CB4 /* orbit.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC121079EE080011B76E /* orbit.c */; };
+		EC75353914177EA6000A7CB4 /* rockets.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC151079EE080011B76E /* rockets.c */; };
+		EC75353A14177EA6000A7CB4 /* sectors.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC161079EE080011B76E /* sectors.c */; };
+		EC75353B14177EA6000A7CB4 /* res-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC191079EE080011B76E /* res-manager.c */; };
+		EC75353C14177EA6000A7CB4 /* plugin-handler.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC201079EE080011B76E /* plugin-handler.c */; };
+		EC75353D14177EA6000A7CB4 /* camera.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC281079EE080011B76E /* camera.c */; };
+		EC75353E14177EA6000A7CB4 /* colour.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC2A1079EE080011B76E /* colour.c */; };
+		EC75353F14177EA6000A7CB4 /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC2C1079EE080011B76E /* gui.c */; };
+		EC75354014177EA6000A7CB4 /* planet.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC2E1079EE080011B76E /* planet.c */; };
+		EC75354114177EA6000A7CB4 /* render.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC301079EE080011B76E /* render.c */; };
+		EC75354214177EA6000A7CB4 /* scenegraph.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC331079EE080011B76E /* scenegraph.c */; };
+		EC75354314177EA6000A7CB4 /* sky.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC351079EE080011B76E /* sky.c */; };
+		EC75354414177EA6000A7CB4 /* terrain.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC371079EE080011B76E /* terrain.c */; };
+		EC75354514177EA6000A7CB4 /* text.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC391079EE080011B76E /* text.c */; };
+		EC75354614177EA6000A7CB4 /* texture.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC3B1079EE080011B76E /* texture.c */; };
+		EC75354714177EA6000A7CB4 /* scripting.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC441079EE080011B76E /* scripting.c */; };
+		EC75354814177EA6000A7CB4 /* settings.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC461079EE080011B76E /* settings.c */; };
+		EC75354914177EA6000A7CB4 /* simevent.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC4C1079EE080011B76E /* simevent.c */; };
+		EC75354A14177EA6000A7CB4 /* simtime.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC4E1079EE080011B76E /* simtime.c */; };
+		EC75354B14177EA6000A7CB4 /* spacecraft-control.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC501079EE080011B76E /* spacecraft-control.c */; };
+		EC75354C14177EA6000A7CB4 /* spacecraft.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC511079EE080011B76E /* spacecraft.c */; };
+		EC75354D14177EA6000A7CB4 /* sim.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC531079EE080011B76E /* sim.c */; };
+		EC75354E14177EA6000A7CB4 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC581079EE080011B76E /* control.c */; };
+		EC75354F14177EA6000A7CB4 /* ac3d.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CDA2C108677C000C1B458 /* ac3d.c */; };
+		EC75355014177EA6000A7CB4 /* simenvironment.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3F258A10905FE100E0B0C7 /* simenvironment.c */; };
+		EC75355114177EA6000A7CB4 /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
+		EC75355214177EA6000A7CB4 /* actuator.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4A893810B152C9002C6513 /* actuator.c */; };
+		EC75355314177EA6000A7CB4 /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
+		EC75355414177EA6000A7CB4 /* palloc.c in Sources */ = {isa = PBXBuildFile; fileRef = EC204D5310CAFA2300F0A450 /* palloc.c */; };
+		EC75355514177EA6000A7CB4 /* flightrecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7D093410EE160700D9D28E /* flightrecorder.c */; };
+		EC75355614177EA6000A7CB4 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
+		EC75355714177EA6000A7CB4 /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC29FC111498100066AF2D /* particles.c */; };
+		EC75355814177EA6000A7CB4 /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC2BA3111ACD900066AF2D /* particles.c */; };
+		EC75355914177EA6000A7CB4 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
+		EC75355A14177EA6000A7CB4 /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
+		EC75355B14177EA6000A7CB4 /* light.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72591154E27400FBE08B /* light.c */; };
+		EC75355C14177EA6000A7CB4 /* drawable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72871155240B00FBE08B /* drawable.c */; };
+		EC75355D14177EA6000A7CB4 /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
+		EC75355E14177EA6000A7CB4 /* shader-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909A21175A14B00E8D477 /* shader-manager.c */; };
+		EC75355F14177EA6000A7CB4 /* mapped-file.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909AF1175A65A00E8D477 /* mapped-file.c */; };
+		EC75356014177EA6000A7CB4 /* world-loader.c in Sources */ = {isa = PBXBuildFile; fileRef = EC239D1411843C5E00C1A5B9 /* world-loader.c */; };
+		EC75356114177EA6000A7CB4 /* mercury.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECBE51195964500229A8E /* mercury.c */; };
+		EC75356214177EA6000A7CB4 /* battery.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC261196C54800229A8E /* battery.c */; };
+		EC75356314177EA6000A7CB4 /* propellant-tank.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC291196C7E000229A8E /* propellant-tank.c */; };
+		EC75356414177EA6000A7CB4 /* collision.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0FBAEF11A70DEE00CEF95A /* collision.c */; };
+		EC75356514177EA6000A7CB4 /* config.i in Sources */ = {isa = PBXBuildFile; fileRef = ECCED4DF11CFD8EB00F20D07 /* config.i */; };
+		EC75356614177EA6000A7CB4 /* event.i in Sources */ = {isa = PBXBuildFile; fileRef = EC47E6C111D4D34800523F78 /* event.i */; };
+		EC75356714177EA6000A7CB4 /* mfd.c in Sources */ = {isa = PBXBuildFile; fileRef = EC6DFCAA126DCF850029D5E3 /* mfd.c */; };
+		EC75356814177EA6000A7CB4 /* haps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC3CFF6A1331EFB70002D0C5 /* haps.c */; };
+		EC75356914177EA6000A7CB4 /* gemeni.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA0639713A54C8600D720F1 /* gemeni.c */; };
+		EC75356A14177EA6000A7CB4 /* apollo.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA0639A13A54D7100D720F1 /* apollo.c */; };
+		EC75356E14177EA6000A7CB4 /* sdl-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7535121417725F000A7CB4 /* sdl-main.c */; };
+		EC75356F14177EA6000A7CB4 /* sdl-window.c in Sources */ = {isa = PBXBuildFile; fileRef = EC753514141774CB000A7CB4 /* sdl-window.c */; };
+		EC75357114177EA6000A7CB4 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
+		EC75357214177EA6000A7CB4 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
+		EC75357314177EA6000A7CB4 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
+		EC75357414177EA6000A7CB4 /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BDBE107B2C900011B76E /* libvmath.a */; };
+		EC75357514177EA6000A7CB4 /* libimgload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECBF1745108C565600D3E412 /* libimgload.a */; };
+		EC75357614177EA6000A7CB4 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
+		EC75357714177EA6000A7CB4 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0FBA6F11A66E3300CEF95A /* CoreFoundation.framework */; };
+		EC75357814177EA6000A7CB4 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0FBAD711A6721B00CEF95A /* ApplicationServices.framework */; };
+		EC75357914177EA6000A7CB4 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9DA88A12EB84540028A131 /* libfreetype.a */; };
+		EC75357A14177EA6000A7CB4 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
+		EC75357C14177EA6000A7CB4 /* __init__.py in Copy Scripts */ = {isa = PBXBuildFile; fileRef = EC34BC431079EE080011B76E /* __init__.py */; };
 		EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7D093410EE160700D9D28E /* flightrecorder.c */; };
 		EC823729113140E100A725B1 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
 		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
+		EC935D4C1417B26C00953D20 /* sdl-events.c in Sources */ = {isa = PBXBuildFile; fileRef = EC935D4B1417B26C00953D20 /* sdl-events.c */; };
+		EC935D4E1417F77A00953D20 /* SDL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
+		EC935D4F1417F78200953D20 /* SDL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9DA88A12EB84540028A131 /* libfreetype.a */; };
 		EC9ECBE61195964500229A8E /* mercury.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECBE51195964500229A8E /* mercury.c */; };
 		EC9ECC271196C54800229A8E /* battery.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC261196C54800229A8E /* battery.c */; };
@@ -177,6 +273,29 @@
 
 /* Begin PBXBuildRule section */
 		EC4485D50CCD4A19001C88AD /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.pyx";
+			fileType = pattern.proxy;
+			isEditable = 1;
+			outputFiles = (
+				"$(DERIVED_FILES_DIR)/$(INPUT_FILE_BASE).c",
+			);
+			script = "/usr/local/bin/pyrexc \"${INPUT_FILE_PATH}\" -o \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.c\"";
+		};
+		EC75357E14177EA6000A7CB4 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.i";
+			fileType = pattern.proxy;
+			isEditable = 1;
+			outputFiles = (
+				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.c",
+				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.py",
+			);
+			script = "${SWIG} -python -o \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.c\" \"${INPUT_FILE_PATH}\"\nmkdir -p \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/python/openorbit/\"\ncp -f \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.py\" \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/python/openorbit/\"";
+		};
+		EC75357F14177EA6000A7CB4 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
 			filePatterns = "*.pyx";
@@ -265,6 +384,20 @@
 			remoteGlobalIDString = EC44769D0CCBFF95001C88AD;
 			remoteInfo = t001_heap;
 		};
+		EC75351914177EA6000A7CB4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC34BDBD107B2C900011B76E;
+			remoteInfo = vmath;
+		};
+		EC75351B14177EA6000A7CB4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ECBF1744108C565600D3E412;
+			remoteInfo = imgload;
+		};
 		ECBF1752108C56C700D3E412 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
@@ -281,6 +414,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				EC935D4F1417F78200953D20 /* SDL.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -304,6 +438,28 @@
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 1;
+		};
+		EC75357B14177EA6000A7CB4 /* Copy Scripts */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = python/openorbit;
+			dstSubfolderSpec = 7;
+			files = (
+				EC75357C14177EA6000A7CB4 /* __init__.py in Copy Scripts */,
+			);
+			name = "Copy Scripts";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC75357D14177EA6000A7CB4 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				EC935D4E1417F77A00953D20 /* SDL.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -358,7 +514,7 @@
 		EC34BBF61079EE080011B76E /* object-manager2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "object-manager2.c"; sourceTree = "<group>"; };
 		EC34BBF71079EE080011B76E /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
 		EC34BBF81079EE080011B76E /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
-		EC34BBF91079EE080011B76E /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		EC34BBF91079EE080011B76E /* startup.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = startup.c; sourceTree = "<group>"; };
 		EC34BBFB1079EE080011B76E /* 3ds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = 3ds.c; sourceTree = "<group>"; };
 		EC34BBFC1079EE080011B76E /* 3ds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = 3ds.h; sourceTree = "<group>"; };
 		EC34BBFE1079EE080011B76E /* hrml.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hrml.c; sourceTree = "<group>"; };
@@ -489,6 +645,17 @@
 		EC6262571125556C001C0684 /* drawable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drawable.h; sourceTree = "<group>"; };
 		EC6DFCA9126DCF850029D5E3 /* mfd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mfd.h; sourceTree = "<group>"; };
 		EC6DFCAA126DCF850029D5E3 /* mfd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mfd.c; sourceTree = "<group>"; };
+		EC75350314176FEB000A7CB4 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		EC75350414176FEB000A7CB4 /* OOAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OOAppDelegate.h; sourceTree = "<group>"; };
+		EC75350514176FEB000A7CB4 /* OOAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OOAppDelegate.m; sourceTree = "<group>"; };
+		EC75350614176FEB000A7CB4 /* OOOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OOOpenGLView.h; sourceTree = "<group>"; };
+		EC75350714176FEB000A7CB4 /* OOOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OOOpenGLView.m; sourceTree = "<group>"; };
+		EC75350814176FEB000A7CB4 /* osx-main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "osx-main.m"; sourceTree = "<group>"; };
+		EC7535121417725F000A7CB4 /* sdl-main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-main.c"; sourceTree = "<group>"; };
+		EC753514141774CB000A7CB4 /* sdl-window.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-window.c"; sourceTree = "<group>"; };
+		EC753516141776B4000A7CB4 /* sdl-window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sdl-window.h"; sourceTree = "<group>"; };
+		EC75358314177EA6000A7CB4 /* Open Orbit copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Open Orbit copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC75358514177EA6000A7CB4 /* Open Orbit copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Open Orbit copy-Info.plist"; path = "/Users/holm/Projects/openorbit/Open Orbit copy-Info.plist"; sourceTree = "<absolute>"; };
 		EC768C4E1060D651009B558C /* openorbit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = openorbit.xcconfig; sourceTree = "<group>"; };
 		EC7D093310EE160700D9D28E /* flightrecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightrecorder.h; sourceTree = "<group>"; };
 		EC7D093410EE160700D9D28E /* flightrecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightrecorder.c; sourceTree = "<group>"; };
@@ -500,6 +667,8 @@
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
 		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
+		EC935D4B1417B26C00953D20 /* sdl-events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-events.c"; sourceTree = "<group>"; };
+		EC935D4D1417F70200953D20 /* sdl-events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sdl-events.h"; sourceTree = "<group>"; };
 		EC9DA88A12EB84540028A131 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = /opt/local/lib/libfreetype.a; sourceTree = "<absolute>"; };
 		EC9ECBE51195964500229A8E /* mercury.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mercury.c; sourceTree = "<group>"; };
 		EC9ECC251196C54800229A8E /* battery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battery.h; sourceTree = "<group>"; };
@@ -634,6 +803,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EC75357014177EA6000A7CB4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC75357114177EA6000A7CB4 /* libpng.dylib in Frameworks */,
+				EC75357214177EA6000A7CB4 /* Python.framework in Frameworks */,
+				EC75357314177EA6000A7CB4 /* OpenGL.framework in Frameworks */,
+				EC75357414177EA6000A7CB4 /* libvmath.a in Frameworks */,
+				EC75357514177EA6000A7CB4 /* libimgload.a in Frameworks */,
+				EC75357614177EA6000A7CB4 /* libxml2.dylib in Frameworks */,
+				EC75357714177EA6000A7CB4 /* CoreFoundation.framework in Frameworks */,
+				EC75357814177EA6000A7CB4 /* ApplicationServices.framework in Frameworks */,
+				EC75357914177EA6000A7CB4 /* libfreetype.a in Frameworks */,
+				EC75357A14177EA6000A7CB4 /* SDL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		ECBF1743108C565600D3E412 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -718,7 +904,7 @@
 				EC34BBEA1079EE080011B76E /* libgencds */,
 				EC34BBF71079EE080011B76E /* log.c */,
 				EC34BBF81079EE080011B76E /* log.h */,
-				EC34BBF91079EE080011B76E /* main.c */,
+				EC34BBF91079EE080011B76E /* startup.c */,
 				EC34BBFA1079EE080011B76E /* parsers */,
 				EC34BC0E1079EE080011B76E /* physics */,
 				EC34BC171079EE080011B76E /* platform */,
@@ -827,6 +1013,7 @@
 		EC34BC171079EE080011B76E /* platform */ = {
 			isa = PBXGroup;
 			children = (
+				EC7535111417721B000A7CB4 /* sdl */,
 				EC34BC181079EE080011B76E /* macosx */,
 				EC34BC1C1079EE080011B76E /* posix */,
 				EC34BC1E1079EE080011B76E /* win */,
@@ -837,6 +1024,12 @@
 		EC34BC181079EE080011B76E /* macosx */ = {
 			isa = PBXGroup;
 			children = (
+				EC75350314176FEB000A7CB4 /* MainMenu.xib */,
+				EC75350414176FEB000A7CB4 /* OOAppDelegate.h */,
+				EC75350514176FEB000A7CB4 /* OOAppDelegate.m */,
+				EC75350614176FEB000A7CB4 /* OOOpenGLView.h */,
+				EC75350714176FEB000A7CB4 /* OOOpenGLView.m */,
+				EC75350814176FEB000A7CB4 /* osx-main.m */,
 				EC34BC191079EE080011B76E /* res-manager.c */,
 				EC34BC1A1079EE080011B76E /* SDLMain.h */,
 				EC34BC1B1079EE080011B76E /* SDLMain.m */,
@@ -1069,6 +1262,7 @@
 				EC447DDF0CCC0681001C88AD /* Frameworks */,
 				EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */,
 				EC768C4E1060D651009B558C /* openorbit.xcconfig */,
+				EC75358514177EA6000A7CB4 /* Open Orbit copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1087,6 +1281,7 @@
 				ECBF1745108C565600D3E412 /* libimgload.a */,
 				EC0FB9B811A55B4D00CEF95A /* t009_pubsub */,
 				EC4C89EA137D4D0D007AC0DF /* dragarea */,
+				EC75358314177EA6000A7CB4 /* Open Orbit copy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1248,6 +1443,18 @@
 				EC6DFCAA126DCF850029D5E3 /* mfd.c */,
 			);
 			path = mfd;
+			sourceTree = "<group>";
+		};
+		EC7535111417721B000A7CB4 /* sdl */ = {
+			isa = PBXGroup;
+			children = (
+				EC7535121417725F000A7CB4 /* sdl-main.c */,
+				EC753514141774CB000A7CB4 /* sdl-window.c */,
+				EC753516141776B4000A7CB4 /* sdl-window.h */,
+				EC935D4B1417B26C00953D20 /* sdl-events.c */,
+				EC935D4D1417F70200953D20 /* sdl-events.h */,
+			);
+			path = sdl;
 			sourceTree = "<group>";
 		};
 		EC7D093210EE15C100D9D28E /* avionics */ = {
@@ -1541,6 +1748,29 @@
 			productReference = EC4C89EA137D4D0D007AC0DF /* dragarea */;
 			productType = "com.apple.product-type.tool";
 		};
+		EC75351714177EA6000A7CB4 /* Open Orbit SDL */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC75358014177EA6000A7CB4 /* Build configuration list for PBXNativeTarget "Open Orbit SDL" */;
+			buildPhases = (
+				EC75351C14177EA6000A7CB4 /* Resources */,
+				EC75352514177EA6000A7CB4 /* Sources */,
+				EC75357014177EA6000A7CB4 /* Frameworks */,
+				EC75357B14177EA6000A7CB4 /* Copy Scripts */,
+				EC75357D14177EA6000A7CB4 /* Copy Frameworks */,
+			);
+			buildRules = (
+				EC75357E14177EA6000A7CB4 /* PBXBuildRule */,
+				EC75357F14177EA6000A7CB4 /* PBXBuildRule */,
+			);
+			dependencies = (
+				EC75351814177EA6000A7CB4 /* PBXTargetDependency */,
+				EC75351A14177EA6000A7CB4 /* PBXTargetDependency */,
+			);
+			name = "Open Orbit SDL";
+			productName = "Open Orbit";
+			productReference = EC75358314177EA6000A7CB4 /* Open Orbit copy.app */;
+			productType = "com.apple.product-type.application";
+		};
 		ECBF1744108C565600D3E412 /* imgload */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = ECBF1757108C56ED00D3E412 /* Build configuration list for PBXNativeTarget "imgload" */;
@@ -1583,6 +1813,7 @@
 			projectRoot = "";
 			targets = (
 				EC4476DD0CCC0076001C88AD /* Open Orbit */,
+				EC75351714177EA6000A7CB4 /* Open Orbit SDL */,
 				EC4476890CCBFF1C001C88AD /* tests */,
 				EC34BDBD107B2C900011B76E /* vmath */,
 				ECBF1744108C565600D3E412 /* imgload */,
@@ -1611,6 +1842,21 @@
 				EC34BD311079EF5A0011B76E /* hip-filter.py in Resources */,
 				EC239D751184406900C1A5B9 /* script in Resources */,
 				EC0FB8CA119FF1BC00CEF95A /* font in Resources */,
+				EC75350914176FEB000A7CB4 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC75351C14177EA6000A7CB4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC75351D14177EA6000A7CB4 /* shaders in Resources */,
+				EC75351E14177EA6000A7CB4 /* data in Resources */,
+				EC75351F14177EA6000A7CB4 /* textures in Resources */,
+				EC75352014177EA6000A7CB4 /* spacecrafts in Resources */,
+				EC75352114177EA6000A7CB4 /* hip-filter.py in Resources */,
+				EC75352214177EA6000A7CB4 /* script in Resources */,
+				EC75352314177EA6000A7CB4 /* font in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1720,7 +1966,7 @@
 				EC34BC761079EE080011B76E /* object-manager.c in Sources */,
 				EC34BC771079EE080011B76E /* object-manager2.c in Sources */,
 				EC34BC781079EE080011B76E /* log.c in Sources */,
-				EC34BC791079EE080011B76E /* main.c in Sources */,
+				EC34BC791079EE080011B76E /* startup.c in Sources */,
 				EC34BC7A1079EE080011B76E /* 3ds.c in Sources */,
 				EC34BC7C1079EE080011B76E /* hrml.c in Sources */,
 				EC34BC7D1079EE080011B76E /* hrml3d.c in Sources */,
@@ -1778,6 +2024,9 @@
 				EC3CFF6C1331EFB70002D0C5 /* haps.c in Sources */,
 				ECA0639913A54C8600D720F1 /* gemeni.c in Sources */,
 				ECA0639B13A54D7100D720F1 /* apollo.c in Sources */,
+				EC75350A14176FEB000A7CB4 /* OOAppDelegate.m in Sources */,
+				EC75350B14176FEB000A7CB4 /* OOOpenGLView.m in Sources */,
+				EC75350C14176FEB000A7CB4 /* osx-main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1800,6 +2049,85 @@
 				EC4C8A12137D5D0A007AC0DF /* list.c in Sources */,
 				EC4C8A13137D5D0A007AC0DF /* object-manager.c in Sources */,
 				EC4C8A14137D5D0A007AC0DF /* object-manager2.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EC75352514177EA6000A7CB4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC75352614177EA6000A7CB4 /* lwcoord.c in Sources */,
+				EC75352714177EA6000A7CB4 /* ellipse.c in Sources */,
+				EC75352814177EA6000A7CB4 /* io-manager.c in Sources */,
+				EC75352914177EA6000A7CB4 /* array.c in Sources */,
+				EC75352A14177EA6000A7CB4 /* avl-tree.c in Sources */,
+				EC75352B14177EA6000A7CB4 /* hashtable.c in Sources */,
+				EC75352C14177EA6000A7CB4 /* heap.c in Sources */,
+				EC75352D14177EA6000A7CB4 /* list.c in Sources */,
+				EC75352E14177EA6000A7CB4 /* object-manager.c in Sources */,
+				EC75352F14177EA6000A7CB4 /* object-manager2.c in Sources */,
+				EC75353014177EA6000A7CB4 /* log.c in Sources */,
+				EC75353114177EA6000A7CB4 /* startup.c in Sources */,
+				EC75353214177EA6000A7CB4 /* 3ds.c in Sources */,
+				EC75353314177EA6000A7CB4 /* hrml.c in Sources */,
+				EC75353414177EA6000A7CB4 /* hrml3d.c in Sources */,
+				EC75353514177EA6000A7CB4 /* model.c in Sources */,
+				EC75353614177EA6000A7CB4 /* areodynamics.c in Sources */,
+				EC75353714177EA6000A7CB4 /* object.c in Sources */,
+				EC75353814177EA6000A7CB4 /* orbit.c in Sources */,
+				EC75353914177EA6000A7CB4 /* rockets.c in Sources */,
+				EC75353A14177EA6000A7CB4 /* sectors.c in Sources */,
+				EC75353B14177EA6000A7CB4 /* res-manager.c in Sources */,
+				EC75353C14177EA6000A7CB4 /* plugin-handler.c in Sources */,
+				EC75353D14177EA6000A7CB4 /* camera.c in Sources */,
+				EC75353E14177EA6000A7CB4 /* colour.c in Sources */,
+				EC75353F14177EA6000A7CB4 /* gui.c in Sources */,
+				EC75354014177EA6000A7CB4 /* planet.c in Sources */,
+				EC75354114177EA6000A7CB4 /* render.c in Sources */,
+				EC75354214177EA6000A7CB4 /* scenegraph.c in Sources */,
+				EC75354314177EA6000A7CB4 /* sky.c in Sources */,
+				EC75354414177EA6000A7CB4 /* terrain.c in Sources */,
+				EC75354514177EA6000A7CB4 /* text.c in Sources */,
+				EC75354614177EA6000A7CB4 /* texture.c in Sources */,
+				EC75354714177EA6000A7CB4 /* scripting.c in Sources */,
+				EC75354814177EA6000A7CB4 /* settings.c in Sources */,
+				EC75354914177EA6000A7CB4 /* simevent.c in Sources */,
+				EC75354A14177EA6000A7CB4 /* simtime.c in Sources */,
+				EC75354B14177EA6000A7CB4 /* spacecraft-control.c in Sources */,
+				EC75354C14177EA6000A7CB4 /* spacecraft.c in Sources */,
+				EC75354D14177EA6000A7CB4 /* sim.c in Sources */,
+				EC75354E14177EA6000A7CB4 /* control.c in Sources */,
+				EC75354F14177EA6000A7CB4 /* ac3d.c in Sources */,
+				EC75355014177EA6000A7CB4 /* simenvironment.c in Sources */,
+				EC75355114177EA6000A7CB4 /* collada.c in Sources */,
+				EC75355214177EA6000A7CB4 /* actuator.c in Sources */,
+				EC75355314177EA6000A7CB4 /* mass.c in Sources */,
+				EC75355414177EA6000A7CB4 /* palloc.c in Sources */,
+				EC75355514177EA6000A7CB4 /* flightrecorder.c in Sources */,
+				EC75355614177EA6000A7CB4 /* vmath-convert.c in Sources */,
+				EC75355714177EA6000A7CB4 /* particles.c in Sources */,
+				EC75355814177EA6000A7CB4 /* particles.c in Sources */,
+				EC75355914177EA6000A7CB4 /* cmod.c in Sources */,
+				EC75355A14177EA6000A7CB4 /* material.c in Sources */,
+				EC75355B14177EA6000A7CB4 /* light.c in Sources */,
+				EC75355C14177EA6000A7CB4 /* drawable.c in Sources */,
+				EC75355D14177EA6000A7CB4 /* pubsub.c in Sources */,
+				EC75355E14177EA6000A7CB4 /* shader-manager.c in Sources */,
+				EC75355F14177EA6000A7CB4 /* mapped-file.c in Sources */,
+				EC75356014177EA6000A7CB4 /* world-loader.c in Sources */,
+				EC75356114177EA6000A7CB4 /* mercury.c in Sources */,
+				EC75356214177EA6000A7CB4 /* battery.c in Sources */,
+				EC75356314177EA6000A7CB4 /* propellant-tank.c in Sources */,
+				EC75356414177EA6000A7CB4 /* collision.c in Sources */,
+				EC75356514177EA6000A7CB4 /* config.i in Sources */,
+				EC75356614177EA6000A7CB4 /* event.i in Sources */,
+				EC75356714177EA6000A7CB4 /* mfd.c in Sources */,
+				EC75356814177EA6000A7CB4 /* haps.c in Sources */,
+				EC75356914177EA6000A7CB4 /* gemeni.c in Sources */,
+				EC75356A14177EA6000A7CB4 /* apollo.c in Sources */,
+				EC75356E14177EA6000A7CB4 /* sdl-main.c in Sources */,
+				EC75356F14177EA6000A7CB4 /* sdl-window.c in Sources */,
+				EC935D4C1417B26C00953D20 /* sdl-events.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1861,6 +2189,16 @@
 			isa = PBXTargetDependency;
 			target = EC44769D0CCBFF95001C88AD /* t001_heap */;
 			targetProxy = EC4476D20CCC001A001C88AD /* PBXContainerItemProxy */;
+		};
+		EC75351814177EA6000A7CB4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC34BDBD107B2C900011B76E /* vmath */;
+			targetProxy = EC75351914177EA6000A7CB4 /* PBXContainerItemProxy */;
+		};
+		EC75351A14177EA6000A7CB4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ECBF1744108C565600D3E412 /* imgload */;
+			targetProxy = EC75351B14177EA6000A7CB4 /* PBXContainerItemProxy */;
 		};
 		ECBF1753108C56C700D3E412 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2416,6 +2754,107 @@
 			};
 			name = Release;
 		};
+		EC75358114177EA6000A7CB4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/deps\"",
+				);
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					PYTHON_FWORK,
+					WITH_PYTHON,
+					USE_ALTIVEC,
+				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					src/,
+					"$(ORBIT_INCPATH)",
+					include,
+				);
+				INFOPLIST_FILE = "Open Orbit copy-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+					"$(ORBIT_LIBPATH)",
+					/usr/X11/lib,
+					/opt/local/lib,
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PRODUCT_NAME = "Open Orbit copy";
+				USER_HEADER_SEARCH_PATHS = "src ${SDL_INC}";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EC75358214177EA6000A7CB4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/deps\"",
+				);
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					WITH_PYTHON,
+					USE_ALTIVEC,
+				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					src/,
+					"$(ORBIT_INCPATH)",
+					include,
+				);
+				INFOPLIST_FILE = "Open Orbit copy-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+					"$(ORBIT_LIBPATH)",
+					/usr/X11/lib,
+					/opt/local/lib,
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(LOCAL_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5/lib/python2.5/config\"";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PRODUCT_NAME = "Open Orbit copy";
+				USER_HEADER_SEARCH_PATHS = "src ${SDL_INC}";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		ECBF1746108C565700D3E412 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
@@ -2580,6 +3019,15 @@
 			buildConfigurations = (
 				EC4C89F1137D4D0D007AC0DF /* Debug */,
 				EC4C89F2137D4D0D007AC0DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EC75358014177EA6000A7CB4 /* Build configuration list for PBXNativeTarget "Open Orbit SDL" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC75358114177EA6000A7CB4 /* Debug */,
+				EC75358214177EA6000A7CB4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

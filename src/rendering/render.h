@@ -39,16 +39,14 @@ typedef struct {
 
 extern SGrenderinfo sgRenderInfo;
 
-void ooInitGlAttributes(void);
 void ooSetPerspective(float fovy, int width, int height);
 void ooSetVideoDefaults(void);
-void ooResizeScreen(int width, int height, bool fullscreen);
-void ooPrintScreenAttributes(void);
+void ooResizeScreen(int x, int y, int width, int height, bool fullscreen);
 
-  /*! Predicate for glsl version checks */
-  bool sgGlslVersionIs(unsigned major, unsigned minor);
-  bool sgGlslVersionIsAtMost(unsigned major, unsigned minor);
-  bool sgGlslVersionIsAtLeast(unsigned major, unsigned minor);
+/*! Predicate for glsl version checks */
+bool sgGlslVersionIs(unsigned major, unsigned minor);
+bool sgGlslVersionIsAtMost(unsigned major, unsigned minor);
+bool sgGlslVersionIsAtLeast(unsigned major, unsigned minor);
 
 #ifdef __cplusplus
 }
