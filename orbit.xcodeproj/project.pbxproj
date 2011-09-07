@@ -768,6 +768,7 @@
 		ECE6A8421167CAB400003CBD /* pubsub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pubsub.h; sourceTree = "<group>"; };
 		ECE6A8431167CAB400003CBD /* pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pubsub.c; sourceTree = "<group>"; };
 		ECF6011F118D53B600332A94 /* spacecraft-control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spacecraft-control.h"; sourceTree = "<group>"; };
+		ECF60B4D140F75DD00EAD012 /* location.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = location.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1206,6 +1207,7 @@
 				EC5F72521154E10D00FBE08B /* material.c */,
 				EC5F72581154E27400FBE08B /* light.h */,
 				EC5F72591154E27400FBE08B /* light.c */,
+				ECF60B4D140F75DD00EAD012 /* location.h */,
 			);
 			path = rendering;
 			sourceTree = "<group>";

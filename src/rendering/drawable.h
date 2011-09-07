@@ -113,6 +113,9 @@ typedef struct SGmodel2 {
 
 typedef struct SGmodel {
   SGdrawable super;
+  GLint pos_loc;
+  GLint norm_loc;
+  GLint tex0_coord_loc;
   model_t *modelData;
 } SGmodel;
 
@@ -198,7 +201,7 @@ SGdrawable* sgNewEllipsis(const char *name,
                           float r, float g, float b,
                           size_t vertCount);
 
-SGdrawable* sgLoadModel(const char *file);
+SGdrawable* sgLoadModel(const char *file, const char *shader);
 
 void sgDrawableAddChild(SGdrawable * restrict parent, SGdrawable * restrict child,
                         float3 t, quaternion_t q);

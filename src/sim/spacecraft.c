@@ -374,8 +374,8 @@ simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
   obj_array_push(&sc->stages, stage);
 
   // Load stage model
-  SGdrawable *model = sgLoadModel(mesh);
-  sgDrawableLoadShader(model, "spacecraft");
+  SGdrawable *model = sgLoadModel(mesh, "spacecraft");
+  //sgDrawableLoadShader(model, "spacecraft");
   ooScSetStageMesh(stage, model);
   sgSceneAddObj(sgGetScene(simGetSg(), "main"), model);
 

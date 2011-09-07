@@ -3,6 +3,10 @@
 uniform mat4 ModelViewMatrix;
 uniform mat4 ProjectionMatrix;
 
+attribute vec3 Position;
+attribute vec3 Normal;
+attribute vec2 Tex0Coord;
+
 varying vec4 Diffuse, Ambient, AmbientGlob;
 varying vec3 N, Ld, Eye;
 varying float Dist;
@@ -10,12 +14,12 @@ varying float Dist;
 void
 main()
 {
-  N = normalize(gl_NormalMatrix * gl_Normal);
+  N = normalize(gl_NormalMatrix * Normal);//gl_Normal);
 
-  vec3 Lv = vec3(gl_LightSource[0].position - ModelViewMatrix * gl_Vertex);
+  vec3 Lv = vec3(gl_LightSource[0].position - ModelViewMatrix * Position);//gl_Vertex);
   Dist = length(Lv);
   Ld = normalize(Lv);
-  Eye = -vec3(ModelViewMatrix * gl_Vertex);
+  Eye = -vec3(ModelViewMatrix * Position);//gl_Vertex);
 
   // Diffuse light
   float NdotL = max(dot(N, Ld), 0.0);
@@ -26,5 +30,5 @@ main()
   Ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
 
   //gl_FrontColor = Diffuse + Ambient + Spec;
-  gl_Position = ProjectionMatrix * ModelViewMatrix * gl_Vertex;
+  gl_Position = ProjectionMatrix * ModelViewMatrix * Position;//gl_Vertex;
 }
