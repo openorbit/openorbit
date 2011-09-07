@@ -17,17 +17,14 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import <Cocoa/Cocoa.h>
-#import <SDL/SDL.h> // Needed for joystick access
-int
-main(int argc, const char *argv[argc])
-{
-  if (SDL_Init(SDL_INIT_JOYSTICK) != 0) {
-    NSLog(@"Could not initialize SDL, bailing out!");
-    exit(0);
-  } else {
-    atexit(SDL_Quit);
-  }
+#ifndef orbit_sdl_window_h
+#define orbit_sdl_window_h
 
-  return NSApplicationMain(argc, argv);
-}
+void sdl_window_resize(SDL_Window *window, int width, int height);
+void sdl_window_toggle_fs(SDL_Window *window);
+SDL_Window* sdl_window_init(int width, int height, bool fullscreen);
+
+void sdl_init_gl(void);
+void sdl_print_gl_attrs(void);
+
+#endif

@@ -21,6 +21,9 @@
 #import <OpenGL/OpenGL.h>
 #import "rendering/render.h"
 
+int init_sim(int argc, const char* argv[argc]);
+
+
 @implementation OOOpenGLView
 
 - (id)init
@@ -31,6 +34,11 @@
     }
     
     return self;
+}
+
+- (void) awakeFromNib
+{
+  init_sim(0, NULL);
 }
 
 - (void)clearGLContext
