@@ -243,6 +243,9 @@
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
 		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
+		EC935D4C1417B26C00953D20 /* sdl-events.c in Sources */ = {isa = PBXBuildFile; fileRef = EC935D4B1417B26C00953D20 /* sdl-events.c */; };
+		EC935D4E1417F77A00953D20 /* SDL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
+		EC935D4F1417F78200953D20 /* SDL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = EC4476F20CCC056D001C88AD /* SDL.framework */; };
 		EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9DA88A12EB84540028A131 /* libfreetype.a */; };
 		EC9ECBE61195964500229A8E /* mercury.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECBE51195964500229A8E /* mercury.c */; };
 		EC9ECC271196C54800229A8E /* battery.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECC261196C54800229A8E /* battery.c */; };
@@ -410,6 +413,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				EC935D4F1417F78200953D20 /* SDL.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -451,6 +455,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				EC935D4E1417F77A00953D20 /* SDL.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -661,6 +666,8 @@
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
 		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
+		EC935D4B1417B26C00953D20 /* sdl-events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-events.c"; sourceTree = "<group>"; };
+		EC935D4D1417F70200953D20 /* sdl-events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sdl-events.h"; sourceTree = "<group>"; };
 		EC9DA88A12EB84540028A131 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = /opt/local/lib/libfreetype.a; sourceTree = "<absolute>"; };
 		EC9ECBE51195964500229A8E /* mercury.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mercury.c; sourceTree = "<group>"; };
 		EC9ECC251196C54800229A8E /* battery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battery.h; sourceTree = "<group>"; };
@@ -1440,6 +1447,8 @@
 				EC7535121417725F000A7CB4 /* sdl-main.c */,
 				EC753514141774CB000A7CB4 /* sdl-window.c */,
 				EC753516141776B4000A7CB4 /* sdl-window.h */,
+				EC935D4B1417B26C00953D20 /* sdl-events.c */,
+				EC935D4D1417F70200953D20 /* sdl-events.h */,
 			);
 			path = sdl;
 			sourceTree = "<group>";
@@ -2114,6 +2123,7 @@
 				EC75356A14177EA6000A7CB4 /* apollo.c in Sources */,
 				EC75356E14177EA6000A7CB4 /* sdl-main.c in Sources */,
 				EC75356F14177EA6000A7CB4 /* sdl-window.c in Sources */,
+				EC935D4C1417B26C00953D20 /* sdl-events.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -28,6 +28,7 @@
 #include "log.h"
 #include "settings.h"
 #include "sdl-window.h"
+#include "sdl-events.h"
 
 /* Simulator SDL events */
 #define SIM_STEP_EVENT 0 // Make physics step
@@ -154,10 +155,11 @@ sdl_main_loop(void)
           break;
           
         case SDL_KEYDOWN:
-          ioDispatchKeyDown(event.key.keysym.scancode, event.key.keysym.mod);
+          sdl_dispatch_key_down(event.key.keysym.scancode, event.key.keysym.mod);
           break;
         case SDL_KEYUP:
-          ioDispatchKeyUp(event.key.keysym.scancode, event.key.keysym.mod);
+          sdl_dispatch_key_up(event.key.keysym.scancode, event.key.keysym.mod);
+
           break;
         case SDL_JOYHATMOTION:
           break;

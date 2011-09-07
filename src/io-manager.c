@@ -29,7 +29,6 @@
 #include "parsers/hrml.h"
 #include "settings.h"
 
-
 static const char * gIoSdlMouseStringMap[7];
 static hashtable_t *gIoButtonHandlers; // of type OObuttonhandler
 
@@ -88,7 +87,7 @@ typedef struct OOkeyhandler {
   OObuttonhandler up[OO_Key_Mod_Count];
   OObuttonhandler down[OO_Key_Mod_Count];
 } OOkeyhandler;
-OOkeyhandler gIoKeyData[SDL_NUM_SCANCODES];
+OOkeyhandler gIoKeyData[IO_END];
 
 #define MOUSE_BUTTONS 8
 typedef struct OOmousebuttons {
@@ -121,122 +120,126 @@ IOjsticks gJoyButtons = {0, NULL};
 [SDL_BUTTON_X2-1] = "mouse-x2";
 #endif
 
-static const char *keysymmap [SDL_NUM_SCANCODES] = {
-  [SDL_SCANCODE_LSHIFT] = "lshift",
-  [SDL_SCANCODE_RSHIFT] = "rshift",
-  [SDL_SCANCODE_LGUI] = "lmeta",
-  [SDL_SCANCODE_RGUI] = "rmeta",
-  [SDL_SCANCODE_LCTRL] = "lctrl",
-  [SDL_SCANCODE_RCTRL] = "rctrl",
+static const char *keysymmap [IO_COUNT] = {
+  [IO_LSHIFT] = "lshift",
+  [IO_RSHIFT] = "rshift",
+  [IO_LMETA] = "lmeta",
+  [IO_RMETA] = "rmeta",
+  [IO_LCTRL] = "lctrl",
+  [IO_RCTRL] = "rctrl",
+  [IO_LALT] = "lalt",
+  [IO_RALT] = "ralt",
 
-  [SDL_SCANCODE_MODE] = "mode",
-  [SDL_SCANCODE_HELP] = "help",
-  [SDL_SCANCODE_SYSREQ] = "sys-req",
-  [SDL_SCANCODE_CLEAR] = "clear",
-  [SDL_SCANCODE_MENU] = "menu",
-  [SDL_SCANCODE_POWER] = "power",
+  [IO_MODE] = "mode",
+  [IO_HELP] = "help",
+  [IO_SYSREQ] = "sys-req",
+  [IO_CLEAR] = "clear",
+  [IO_MENU] = "menu",
+  [IO_POWER] = "power",
 
-  [SDL_SCANCODE_RETURN] = "return",
-  [SDL_SCANCODE_SPACE] = "space",
-  [SDL_SCANCODE_TAB] = "tab",
-  [SDL_SCANCODE_BACKSPACE] = "backspace",
-  [SDL_SCANCODE_ESCAPE] = "esc",
-  [SDL_SCANCODE_PERIOD] = ".",
-  [SDL_SCANCODE_COMMA] = ",",
-  [SDL_SCANCODE_PAUSE] = "pause",
-  [SDL_SCANCODE_MINUS] = "-",
-  [SDL_SCANCODE_SLASH] = "/",
+  [IO_RETURN] = "return",
+  [IO_SPACE] = "space",
+  [IO_TAB] = "tab",
+  [IO_BACKSPACE] = "backspace",
+  [IO_ESCAPE] = "esc",
+  [IO_PERIOD] = ".",
+  [IO_COMMA] = ",",
+  [IO_PAUSE] = "pause",
+  [IO_MINUS] = "-",
+  [IO_SLASH] = "/",
 
-  [SDL_SCANCODE_SEMICOLON] = ";",
-  [SDL_SCANCODE_EQUALS] = "=",
-  [SDL_SCANCODE_LEFTBRACKET] = "[",
-  [SDL_SCANCODE_BACKSLASH] = "\\",
-  [SDL_SCANCODE_RIGHTBRACKET] = "]",
+  [IO_SEMICOLON] = ";",
+  [IO_EQUALS] = "=",
+  [IO_LEFTBRACKET] = "[",
+  [IO_BACKSLASH] = "\\",
+  [IO_RIGHTBRACKET] = "]",
 
-  [SDL_SCANCODE_0] = "0",
-  [SDL_SCANCODE_1] = "1",
-  [SDL_SCANCODE_2] = "2",
-  [SDL_SCANCODE_3] = "3",
-  [SDL_SCANCODE_4] = "4",
-  [SDL_SCANCODE_5] = "5",
-  [SDL_SCANCODE_6] = "6",
-  [SDL_SCANCODE_7] = "7",
-  [SDL_SCANCODE_8] = "8",
-  [SDL_SCANCODE_9] = "9",
+  [IO_0] = "0",
+  [IO_1] = "1",
+  [IO_2] = "2",
+  [IO_3] = "3",
+  [IO_4] = "4",
+  [IO_5] = "5",
+  [IO_6] = "6",
+  [IO_7] = "7",
+  [IO_8] = "8",
+  [IO_9] = "9",
 
-  [SDL_SCANCODE_KP_0] = "kp 0",
-  [SDL_SCANCODE_KP_1] = "kp 1",
-  [SDL_SCANCODE_KP_2] = "kp 2",
-  [SDL_SCANCODE_KP_3] = "kp 3",
-  [SDL_SCANCODE_KP_4] = "kp 4",
-  [SDL_SCANCODE_KP_5] = "kp 5",
-  [SDL_SCANCODE_KP_6] = "kp 6",
-  [SDL_SCANCODE_KP_7] = "kp 7",
-  [SDL_SCANCODE_KP_8] = "kp 8",
-  [SDL_SCANCODE_KP_9] = "kp 9",
+  [IO_KP_0] = "kp 0",
+  [IO_KP_1] = "kp 1",
+  [IO_KP_2] = "kp 2",
+  [IO_KP_3] = "kp 3",
+  [IO_KP_4] = "kp 4",
+  [IO_KP_5] = "kp 5",
+  [IO_KP_6] = "kp 6",
+  [IO_KP_7] = "kp 7",
+  [IO_KP_8] = "kp 8",
+  [IO_KP_9] = "kp 9",
 
-  [SDL_SCANCODE_KP_PERIOD] = "kp .",
-  [SDL_SCANCODE_KP_DIVIDE] = "kp /",
-  [SDL_SCANCODE_KP_MULTIPLY] = "kp *",
-  [SDL_SCANCODE_KP_MINUS] = "kp -",
-  [SDL_SCANCODE_KP_PLUS] = "kp +",
-  [SDL_SCANCODE_KP_ENTER] = "enter",
-  [SDL_SCANCODE_KP_EQUALS] = "kp =",
-  [SDL_SCANCODE_DELETE] = "delete",
+  [IO_KP_PERIOD] = "kp .",
+  [IO_KP_DIV] = "kp /",
+  [IO_KP_MUL] = "kp *",
+  [IO_KP_MIN] = "kp -",
+  [IO_KP_PLUS] = "kp +",
+  [IO_KP_ENTER] = "enter",
+  [IO_KP_EQ] = "kp =",
+  [IO_KP_CLR] = "kp clr",
 
-  [SDL_SCANCODE_A] = "a",
-  [SDL_SCANCODE_B] = "b",
-  [SDL_SCANCODE_C] = "c",
-  [SDL_SCANCODE_D] = "d",
-  [SDL_SCANCODE_E] = "e",
-  [SDL_SCANCODE_F] = "f",
-  [SDL_SCANCODE_G] = "g",
-  [SDL_SCANCODE_H] = "h",
-  [SDL_SCANCODE_I] = "i",
-  [SDL_SCANCODE_J] = "j",
-  [SDL_SCANCODE_K] = "k",
-  [SDL_SCANCODE_L] = "l",
-  [SDL_SCANCODE_M] = "m",
-  [SDL_SCANCODE_N] = "n",
-  [SDL_SCANCODE_O] = "o",
-  [SDL_SCANCODE_P] = "p",
-  [SDL_SCANCODE_Q] = "q",
-  [SDL_SCANCODE_R] = "r",
-  [SDL_SCANCODE_S] = "s",
-  [SDL_SCANCODE_T] = "t",
-  [SDL_SCANCODE_U] = "u",
-  [SDL_SCANCODE_V] = "v",
-  [SDL_SCANCODE_W] = "w",
-  [SDL_SCANCODE_X] = "x",
-  [SDL_SCANCODE_Y] = "y",
-  [SDL_SCANCODE_Z] = "z",
+  [IO_DEL] = "delete",
 
-  [SDL_SCANCODE_F1] = "f1",
-  [SDL_SCANCODE_F2] = "f2",
-  [SDL_SCANCODE_F3] = "f3",
-  [SDL_SCANCODE_F4] = "f4",
-  [SDL_SCANCODE_F5] = "f5",
-  [SDL_SCANCODE_F6] = "f6",
-  [SDL_SCANCODE_F7] = "f7",
-  [SDL_SCANCODE_F8] = "f8",
-  [SDL_SCANCODE_F9] = "f9",
-  [SDL_SCANCODE_F10] = "f10",
-  [SDL_SCANCODE_F11] = "f11",
-  [SDL_SCANCODE_F12] = "f12",
-  [SDL_SCANCODE_F13] = "f13",
-  [SDL_SCANCODE_F14] = "f14",
-  [SDL_SCANCODE_F15] = "f15",
+  [IO_A] = "a",
+  [IO_B] = "b",
+  [IO_C] = "c",
+  [IO_D] = "d",
+  [IO_E] = "e",
+  [IO_F] = "f",
+  [IO_G] = "g",
+  [IO_H] = "h",
+  [IO_I] = "i",
+  [IO_J] = "j",
+  [IO_K] = "k",
+  [IO_L] = "l",
+  [IO_M] = "m",
+  [IO_N] = "n",
+  [IO_O] = "o",
+  [IO_P] = "p",
+  [IO_Q] = "q",
+  [IO_R] = "r",
+  [IO_S] = "s",
+  [IO_T] = "t",
+  [IO_U] = "u",
+  [IO_V] = "v",
+  [IO_W] = "w",
+  [IO_X] = "x",
+  [IO_Y] = "y",
+  [IO_Z] = "z",
 
-  [SDL_SCANCODE_UP] = "up",
-  [SDL_SCANCODE_DOWN] = "down",
-  [SDL_SCANCODE_LEFT] = "left",
-  [SDL_SCANCODE_RIGHT] = "right",
+  [IO_F1] = "f1",
+  [IO_F2] = "f2",
+  [IO_F3] = "f3",
+  [IO_F4] = "f4",
+  [IO_F5] = "f5",
+  [IO_F6] = "f6",
+  [IO_F7] = "f7",
+  [IO_F8] = "f8",
+  [IO_F9] = "f9",
+  [IO_F10] = "f10",
+  [IO_F11] = "f11",
+  [IO_F12] = "f12",
+  [IO_F13] = "f13",
+  [IO_F14] = "f14",
+  [IO_F15] = "f15",
 
-  [SDL_SCANCODE_INSERT] = "insert",
-  [SDL_SCANCODE_HOME] = "home",
-  [SDL_SCANCODE_END] = "end",
-  [SDL_SCANCODE_PAGEUP] = "page up",
-  [SDL_SCANCODE_PAGEDOWN] = "page down",
+  [IO_UP] = "up",
+  [IO_DOWN] = "down",
+  [IO_LEFT] = "left",
+  [IO_RIGHT] = "right",
+
+  [IO_INSERT] = "insert",
+  [IO_HOME] = "home",
+  [IO_END] = "end",
+  [IO_PAGEUP] = "page up",
+  [IO_PAGEDOWN] = "page down",
 };
 hashtable_t *gIoReverseKeySymMap;
 
@@ -288,13 +291,13 @@ INIT_PRIMARY_MODULE
 {
   gIoReverseKeySymMap = hashtable_new_with_str_keys(1024);
   gIoButtonHandlers = hashtable_new_with_str_keys(2048);
-  for (size_t i = 0 ; i < SDL_NUM_SCANCODES ; ++ i) {
+  for (size_t i = 0 ; i < IO_END ; ++ i) {
     if (keysymmap[i] != NULL) {
       hashtable_insert(gIoReverseKeySymMap, keysymmap[i], (void*)i);
     }
   }
 
-  for (size_t i = 0 ; i < SDL_NUM_SCANCODES ; ++ i) {
+  for (size_t i = 0 ; i < IO_END ; ++ i) {
     for (size_t j = 0 ; j < OO_Key_Mod_Count ; ++ j) {
       gIoKeyData[i].up[j].isScript = false;
       gIoKeyData[i].up[j].cHandler = ooButtonHandlerGnd;
@@ -385,10 +388,8 @@ ioInitKeys(void)
 }
 
 void
-ioDispatchKeyUp(int key, uint16_t mask)
+ioDispatchKeyUp(io_keycode_t key, uint16_t mask)
 {
-  assert(key < SDL_NUM_SCANCODES);
-
   IOkeymod kmod = OO_None;
   if (mask == OO_IO_MOD_NONE) {
     kmod = OO_None;
@@ -418,10 +419,8 @@ ioDispatchKeyUp(int key, uint16_t mask)
 }
 
 void
-ioDispatchKeyDown(int key, uint16_t mask)
+ioDispatchKeyDown(io_keycode_t key, uint16_t mask)
 {
-  assert(key < SDL_NUM_SCANCODES);
-
   IOkeymod kmod = OO_None;
   if (mask == OO_IO_MOD_NONE) {
     kmod = OO_None;
