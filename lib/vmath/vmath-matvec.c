@@ -744,6 +744,7 @@ mf3_inv1(float3x3 mat)
     }
   }
 }
+
 void
 mf3_ident(float3x3 m)
 {
@@ -752,6 +753,17 @@ mf3_ident(float3x3 m)
   m[1][1] = 1.0f;
   m[2][2] = 1.0f;
 }
+
+void
+mf4_ident(float4x4 m)
+{
+  memset(m, 0, sizeof(float4x4));
+  m[0][0] = 1.0f;
+  m[1][1] = 1.0f;
+  m[2][2] = 1.0f;
+  m[3][3] = 1.0f;
+}
+
 
 bool
 m_eq(const matrix_t *a, const matrix_t *b, float tol)
@@ -788,4 +800,140 @@ mf3_basis(float3x3 res, const float3x3 m, const float3x3 b)
   mf3_transpose2(binv, b); // Inverse is the transpose for a rotation matrix
   mf3_mul3(res, b, m);
   mf3_mul2(res, binv);
+}
+
+void
+mf4_cpy(float4x4 a, const float4x4 b)
+{
+  memcpy(a, b, sizeof(float4x4));
+}
+
+void
+mf4_transpose2(float4x4 a, const float4x4 b)
+{
+  for (int i = 0 ; i < 4 ; ++ i) {
+    for (int j = 0 ; j < 4 ; ++ j) {
+#if __has_feature(attribute_ext_vector_type)
+      a[i][j] = b[j][i];
+#else
+      vf4_seti(&a[i], j, b[j][i]);
+#endif
+    }
+  }
+
+}
+
+
+void
+mf4_mul2(float4x4 a, const float4x4 b)
+{
+  float4x4 atmp;
+  float4x4 btransp;
+
+  mf4_cpy(atmp, a);
+  mf4_transpose2(btransp, b);
+
+  for (int i = 0 ; i < 4 ; ++ i) {
+    for (int j = 0 ; j < 4 ; ++ j) {
+#if __has_feature(attribute_ext_vector_type)
+      a[i][j] = vf4_dot(atmp[i], b[j]);
+#else
+#error "Please fix for non clang compiler"
+#endif
+    }
+  }
+}
+
+
+// Replacement for glOrtho needed in OpenGL 3
+// Note that this is a row major matrix
+void
+mf4_ortho(float4x4 m, float left, float right, float bottom, float top,
+          float near, float far)
+{
+  memset(m, 0, sizeof(float4x4));
+
+  // diagonals
+  m[0][0] = 2.0f/(right-left);
+  m[1][1] = 2.0f/(top-bottom);
+  m[2][2] = -2.0f/(far-near);
+  m[3][3] = 1.0f;
+
+  m[0][3] = (right+left)/(right-left);
+  m[1][3] = (top+bottom)/(top-bottom);
+  m[2][3] = (far+near)/(far-near);
+}
+
+void
+mf4_ortho2D(float4x4 m, float left, float right, float bottom, float top)
+{
+  mf4_ortho(m, left, right, bottom, top, -1.0f, 1.0f);
+}
+
+
+void
+mf4_fustum(float4x4 m, float left, float right, float bottom, float top,
+           float near, float far)
+{
+  memset(m, 0, sizeof(float4x4));
+
+  // diagonals
+  m[0][0] = 2.0f*near/(right-left);
+  m[1][1] = 2.0f*near/(top-bottom);
+  m[2][2] = (far+near)/(far-near); // C
+  m[3][3] = 0.0f;
+
+  m[0][2] = (right+left)/(right-left); // A
+  m[1][2] = (top+bottom)/(top-bottom); // B
+  m[2][3] = (2.0f*far*near)/(far-near); // D
+  m[3][2] = 1.0f;
+
+}
+
+void
+mf4_perspective(float4x4 m, float fovy, float aspect, float near, float far)
+{
+  memset(m, 0, sizeof(float4x4));
+
+  float f = 1.0f/tanf(fovy/2.0f); // Cotan
+
+  m[0][0] = f/aspect;
+  m[1][1] = f;
+  m[2][2] = (far+near)/(near-far);
+  m[3][3] = 0.0f;
+
+  m[2][3] = (2.0f*far*near)/(near-far);
+  m[3][2] = -1.0f;
+}
+
+void
+mf4_lookat(float4x4 m, float ex, float ey, float ez,
+           float cx, float cy, float cz, float ux, float uy, float uz)
+{
+  memset(m, 0, sizeof(float4x4));
+  float3 F = {cx-ex, cy-ey, cz-ez};
+  float3 U = {ux, uy, uz};
+
+  float F_abs = vf3_abs(F);
+  float U_abs = vf3_abs(U);
+
+  float3 f = F/F_abs;
+  float3 UP = U/U_abs;
+
+  float3 s = vf3_cross(f, UP);
+  float3 u = vf3_cross(s, f);
+
+  m[0].xyz = s.xyz;
+  m[1].xyz = u.xyz;
+  m[2].xyz = -f.xyz;
+  m[3][3] = 1.0f;
+
+  // Finally, translate to ey pos
+  float4x4 T;
+  mf4_ident(T);
+  T[0][3] = -ex;
+  T[1][3] = -ey;
+  T[2][3] = -ez;
+
+  mf4_mul2(m, T);
 }
