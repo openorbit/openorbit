@@ -72,8 +72,8 @@ omKeyCmp(OMkey a, OMkey b)
 
   if (u.a[0] != 0) return u.a[0];
   if (u.a[1] != 0) return u.a[1];
-  if (u.a[2] != 0) return u.a[2];
-  if (u.a[3] != 0) return u.a[3];
+//  if (u.a[2] != 0) return u.a[2];
+//  if (u.a[3] != 0) return u.a[3];
   
   return 0; // Vectors are equal
 }

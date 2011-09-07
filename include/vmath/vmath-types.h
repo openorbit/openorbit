@@ -206,7 +206,7 @@ v3i_make(int32_t x, int32_t y, int32_t z)
   u.a[0] = x;
   u.a[1] = y;
   u.a[2] = z;
-  u.a[4] = 0;
+  u.a[3] = 0;
 
   return u.p;
 }

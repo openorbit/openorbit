@@ -101,7 +101,7 @@ tga_read_file(tga_image_t *img, FILE *file)
     size_t uncomp_bitmap_bytes = n_pixels * pixel_size;
     void *data = malloc(uncomp_bitmap_bytes);
     if (data == NULL) {
-        err(EX_OSERR, "malloc failed to allocate %d bytes", uncomp_bitmap_bytes);
+        err(EX_OSERR, "malloc failed to allocate %d bytes", (int)uncomp_bitmap_bytes);
         return -1;
     }
     
@@ -114,7 +114,7 @@ tga_read_file(tga_image_t *img, FILE *file)
     case TGA_UNCOMP_TRUE_COL_IMG:
         len = fread(data, pixel_size, n_pixels, file);
         if (len != n_pixels) {
-            warnx("tga loader only read %d pixels, but expected %d pixels", len, n_pixels);
+            warnx("tga loader only read %d pixels, but expected %d pixels", (int)len, (int)n_pixels);
             free(data);
             return -1;
         }

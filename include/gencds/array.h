@@ -77,19 +77,19 @@ typ name##_array_pop(name##_array_t *vec) {                                     
 }                                                                                   \
 typ name##_array_get(name##_array_t *vec, size_t i) {                               \
   if (vec->length <= i)                                                             \
-    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
+    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", (int)vec->length, (int)i); \
   else                                                                              \
     return vec->elems[i];                                                           \
 }                                                                                   \
 void name##_array_set(name##_array_t *vec, size_t i, typ obj) {                     \
   if (vec->length <= i)                                                             \
-    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
+    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", (int)vec->length, (int)i); \
   else                                                                              \
     vec->elems[i] = obj;                                                            \
 }                                                                                   \
 typ name##_array_remove(name##_array_t *vec, size_t i) {                            \
   if (vec->length <= i)                                                             \
-    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", vec->length, i); \
+    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d", (int)vec->length, (int)i); \
   else {                                                                            \
     typ tmp = vec->elems[i];                                                        \
     vec->elems[i] = vec->elems[vec->length - 1];                                    \

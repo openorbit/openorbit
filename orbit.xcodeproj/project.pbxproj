@@ -196,7 +196,7 @@
 				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.c",
 				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.py",
 			);
-			script = "/usr/bin/swig -python -o \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.c\" \"${INPUT_FILE_PATH}\"\nmkdir -p \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/python/openorbit/\"\ncp -f \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.py\" \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/python/openorbit/\"";
+			script = "${SWIG} -python -o \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.c\" \"${INPUT_FILE_PATH}\"\nmkdir -p \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/python/openorbit/\"\ncp -f \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.py\" \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/python/openorbit/\"";
 		};
 /* End PBXBuildRule section */
 
@@ -1561,6 +1561,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 0410;
 			};
 			buildConfigurationList = EC4476770CCBFEDB001C88AD /* Build configuration list for PBXProject "orbit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1871,11 +1872,9 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = t009_pubsub;
 			};
 			name = Debug;
@@ -1886,10 +1885,8 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = t009_pubsub;
 				ZERO_LINK = NO;
 			};
@@ -1902,13 +1899,11 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = include;
 				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
 				PRODUCT_NAME = vmath;
 			};
 			name = Debug;
@@ -1920,12 +1915,10 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = include;
 				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
 				PRODUCT_NAME = vmath;
 				ZERO_LINK = NO;
 			};
@@ -1941,7 +1934,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = include;
 				LIBRARY_SEARCH_PATHS = "";
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = src;
 			};
 			name = Debug;
@@ -1956,7 +1949,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = include;
 				LIBRARY_SEARCH_PATHS = "";
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = src;
 			};
 			name = Release;
@@ -1976,7 +1969,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				PRODUCT_NAME = tests;
 				ZERO_LINK = NO;
@@ -1992,7 +1984,6 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2002,7 +1993,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t000_hashtable;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
@@ -2017,7 +2007,6 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
@@ -2026,7 +2015,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t000_hashtable;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
@@ -2039,7 +2027,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2049,7 +2036,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t001_heap;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
@@ -2061,7 +2047,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
@@ -2070,7 +2055,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t001_heap;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
@@ -2083,7 +2067,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2093,7 +2076,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t002_tga;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
@@ -2105,7 +2087,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
@@ -2114,7 +2095,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t002_tga;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
@@ -2127,7 +2107,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2137,7 +2116,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t003_math;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
@@ -2149,7 +2127,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
@@ -2158,7 +2135,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t003_math;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
@@ -2171,7 +2147,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2181,7 +2156,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t004_physics;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
@@ -2193,7 +2167,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
@@ -2202,7 +2175,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t004_physics;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
@@ -2215,7 +2187,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2225,7 +2196,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t005_object_manager;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
@@ -2237,7 +2207,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
@@ -2246,7 +2215,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t005_object_manager;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
@@ -2259,7 +2227,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2269,7 +2236,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t006_list;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = YES;
@@ -2281,7 +2247,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
@@ -2290,7 +2255,6 @@
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = "${TEST_LIBPATH}";
-				PREBINDING = NO;
 				PRODUCT_NAME = t006_list;
 				USER_HEADER_SEARCH_PATHS = src;
 				ZERO_LINK = NO;
@@ -2310,7 +2274,6 @@
 				GCC_ALTIVEC_EXTENSIONS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2343,7 +2306,6 @@
 					"-framework",
 					AppKit,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = "Open Orbit";
 				USER_HEADER_SEARCH_PATHS = "src ${SDL_INC}";
 				WRAPPER_EXTENSION = app;
@@ -2363,7 +2325,6 @@
 				);
 				GCC_ALTIVEC_EXTENSIONS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G4;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
@@ -2394,7 +2355,6 @@
 					"-framework",
 					AppKit,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = "Open Orbit";
 				USER_HEADER_SEARCH_PATHS = "src ${SDL_INC}";
 				WRAPPER_EXTENSION = app;
@@ -2459,7 +2419,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
@@ -2473,7 +2432,6 @@
 					/usr/X11/lib,
 					/opt/local/lib,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = imgload;
 			};
 			name = Debug;
@@ -2485,7 +2443,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
 					"${ORBIT_INCPATH}",
@@ -2498,7 +2455,6 @@
 					/usr/X11/lib,
 					/opt/local/lib,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = imgload;
 				ZERO_LINK = NO;
 			};
