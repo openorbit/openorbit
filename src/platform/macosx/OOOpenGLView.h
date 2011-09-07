@@ -21,5 +21,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface OOOpenGLView : NSOpenGLView
-
+{
+  NSTimer *timer;
+}
 @end
