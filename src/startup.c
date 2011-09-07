@@ -57,6 +57,24 @@
 #include "physics/physics.h"
 #include "rendering/shader-manager.h"
 
+void
+init_graphics(void)
+{
+  // Init GL state
+  ooSetVideoDefaults();
+  sgLoadAllShaders();
+  sgCamInit();
+}
+
+void
+init_plugins(void)
+{
+  ooPluginInit();
+  ooPluginLoadAll();
+  ooPluginPrintAll();
+}
+
+
 int
 init_sim(int argc, char*argv[])
 {
@@ -83,18 +101,14 @@ init_sim(int argc, char*argv[])
 //    ooLogFatal("Couldn't initialize SDL_ttf: %s", TTF_GetError());
 //  }
 
-  // Init GL state
-  ooSetVideoDefaults();
-  sgLoadAllShaders();
-  sgCamInit();
+  init_graphics();
+
 
   ooIoPrintJoystickNames();
 
   ooSimInit();
 
-  ooPluginInit();
-  ooPluginLoadAll();
-  ooPluginPrintAll();
+  init_plugins();
 
   if (!ooScriptingRunFile("script/postinit.py")) {
     ooLogFatal("script/postinit.py missing");
