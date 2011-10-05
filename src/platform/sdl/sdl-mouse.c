@@ -17,22 +17,21 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#import <Cocoa/Cocoa.h>
 
-void hidInit(void);
+#include <SDL/SDL.h>
 
-//#import <SDL/SDL.h> // Needed for joystick access
-int
-main(int argc, const char *argv[argc])
+#include <assert.h>
+
+void
+platform_get_mouse(float *x, float *y)
 {
-  //if (SDL_Init(SDL_INIT_JOYSTICK) != 0) {
-  //  NSLog(@"Could not initialize SDL, bailing out!");
-  //  exit(0);
-  //} else {
-  //  atexit(SDL_Quit);
-  //}
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  hidInit();
-  [pool release];
-  return NSApplicationMain(argc, argv);
+  assert(x != NULL);
+  assert(y != NULL);
+  int xp, yp;
+
+  SDL_GetMouseState(&xp, &yp);
+  SDL_Surface *videoSurface = SDL_GetVideoSurface();
+
+  *x = ((float)xp / (float)videoSurface->w) * 2.0f - 1.0f;
+  *y = ((float)yp / (float)videoSurface->h) * 2.0f - 1.0f;
 }

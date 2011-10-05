@@ -231,6 +231,22 @@ sdl_atexit(void)
 
 int init_sim(int argc, const char *argv[argc]);
 
+/*
+ Used to filter away joystick axis events
+ */
+static int sdl_io_filter(void *data, SDL_Event *ev)
+{
+  switch (ev->type) {
+    case SDL_JOYAXISMOTION:
+    case SDL_JOYBALLMOTION:
+      return 0;
+    default:
+      // Accept all other events
+      return 1;
+  }
+}
+
+
 int
 main(int argc, const char *argv[argc])
 {
@@ -238,9 +254,13 @@ main(int argc, const char *argv[argc])
   if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {
     ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
   }
+
+  assert(SDL_WasInit(SDL_INIT_JOYSTICK) == SDL_INIT_JOYSTICK);
   
+  SDL_SetEventFilter(sdl_io_filter, NULL);
+
   atexit(sdl_atexit);
-    
+
   bool fullscreen;
   int width, height;
   

@@ -60,7 +60,7 @@ ooGetActuatorGroupName(unsigned groupId)
 float
 ooGetThrottleForActuatorGroup(unsigned groupId)
 {
-  float throttle = ooIoGetAxis(NULL, ooGetActuatorGroupName(groupId));
+  float throttle = ioGetSlider(IO_SLIDER_THROT_0);//ooIoGetAxis(NULL, ooGetActuatorGroupName(groupId));
   return throttle;
 }
 

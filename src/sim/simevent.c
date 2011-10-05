@@ -156,11 +156,13 @@ simEnqueueDelta_s(double offset, OOeventhandler handler, void *data)
 // the sim frequency.
 
 // FIXME: Must be synced with main.c
-#define SIM_WCT_TIMER 2
-#include <SDL/SDL.h>
+//#define SIM_WCT_TIMER 2
+//#include <SDL/SDL.h>
 
-static Uint32
-sim_timer_event(Uint32 interval, void *param)
+// TODO: Factor out sdl stuff
+#if 0
+static uint32_t
+sim_timer_event(uint32_t interval, void *param)
 {
   struct handler_param *hp = param;
   SDL_Event event;
@@ -187,6 +189,7 @@ simEnqueueDelta_s_wct(double offset, OOeventhandler handler, void *data)
   param->data = data;
   SDL_AddTimer((Uint32)(offset*1000.0), sim_timer_event, param);
 }
+#endif
 
 void
 simDispatchPendingEvents()

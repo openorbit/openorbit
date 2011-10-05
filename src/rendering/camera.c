@@ -26,6 +26,7 @@
 #endif
 
 #include <vmath/vmath.h>
+#include "common/moduleinit.h"
 #include "log.h"
 #include "io-manager.h"
 #include "camera.h"
@@ -36,31 +37,31 @@
 /* Camera actions, registered as action handlers */
 
 
-void sgCamFwd(bool up, void *data);
-void sgCamBack(bool up, void *data);
-void sgCamLeft(bool up, void *data);
-void sgCamRight(bool up, void *data);
-void sgCamUp(bool up, void *data);
-void sgCamDown(bool up, void *data);
-void sgCamRollLeft(bool up, void *data);
-void sgCamRollRight(bool up, void *data);
-void sgCamYawLeft(bool up, void *data);
-void sgCamYawRight(bool up, void *data);
-void sgCamPitchDown(bool up, void *data);
-void sgCamPitchUp(bool up, void *data);
+void sgCamFwd(int state, void *data);
+void sgCamBack(int state, void *data);
+void sgCamLeft(int state, void *data);
+void sgCamRight(int state, void *data);
+void sgCamUp(int state, void *data);
+void sgCamDown(int state, void *data);
+void sgCamRollLeft(int state, void *data);
+void sgCamRollRight(int state, void *data);
+void sgCamYawLeft(int state, void *data);
+void sgCamYawRight(int state, void *data);
+void sgCamPitchDown(int state, void *data);
+void sgCamPitchUp(int state, void *data);
 
+void sgCamRotateHat(int state, void *data);
 
 struct str_action_triplet {
   const char *confKey;
   const char *ioKey;
-  OObuttonhandlerfunc action;
+  IObuttonhandlerfunc action;
 };
 
-void
-sgCamInit(void)
-{
+INIT_IO {
   const char *key;
   static const struct str_action_triplet keyBindings[] = {
+    {"openorbit/controls/hat/cam-rotate", "cam-rotate", sgCamRotateHat},
     {"openorbit/controls/keyboard/cam-fwd", "cam-fwd", sgCamFwd},
     {"openorbit/controls/keyboard/cam-back", "cam-back", sgCamBack},
     {"openorbit/controls/keyboard/cam-left", "cam-left", sgCamLeft},
@@ -75,15 +76,19 @@ sgCamInit(void)
     {"openorbit/controls/keyboard/cam-pitch-up", "cam-pitch-up", sgCamPitchUp}
   };
 
+  ioRegActionHandler(keyBindings[0].ioKey, keyBindings[0].action,
+                     IO_BUTTON_HAT, NULL);
+
   // Register camera actions
-  for (int i = 0 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
-    ooIoRegCKeyHandler(keyBindings[i].ioKey, keyBindings[i].action);
-    ooConfGetStrDef(keyBindings[i].confKey, &key, NULL);
-    if (key) {
-      ooIoBindKeyHandler(key, keyBindings[i].ioKey, 0, 0);
-      ooIoBindKeyHandler(key, keyBindings[i].ioKey, 1, 0);
-    }
+  for (int i = 1 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
+    ioRegActionHandler(keyBindings[i].ioKey, keyBindings[i].action,
+                       IO_BUTTON_PUSH, NULL);
   }
+}
+
+void
+sgCamInit(void)
+{
 }
 
 SGcam*
@@ -213,7 +218,7 @@ sgCamStep(SGcam *cam, float dt)
   case SGCam_Orbit:
     {
       SGorbitcam *ocam = (SGorbitcam*)cam;
-      sgCamAxisUpdate(cam);
+      //sgCamAxisUpdate(cam);
 
       ocam->ra += ocam->dra;
       ocam->ra = fmod(ocam->ra, 2.0*M_PI);
@@ -302,12 +307,12 @@ sgCamAxisUpdate(SGcam *cam)
   if (cam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)cam;
     // Nice thing is that these return 0.0 if they are not assigned
-    float yaw = ooIoGetAxis(NULL, "yaw");
-    float pitch = ooIoGetAxis(NULL, "pitch");
-    float roll = ooIoGetAxis(NULL, "roll");
-    float horizontal = ooIoGetAxis(NULL, "horizontal");
-    float vertical = ooIoGetAxis(NULL, "vertical");
-    float thrust = ooIoGetAxis(NULL, "thrust");
+    float yaw = ioGetAxis(IO_AXIS_RZ);//ooIoGetAxis(NULL, "yaw");
+    float pitch = ioGetAxis(IO_AXIS_Y);//ooIoGetAxis(NULL, "pitch");
+    float roll = ioGetAxis(IO_AXIS_X);//ooIoGetAxis(NULL, "roll");
+    float horizontal = ioGetAxis(IO_AXIS_RX);//ooIoGetAxis(NULL, "horizontal");
+    float vertical = ioGetAxis(IO_AXIS_Z);//ooIoGetAxis(NULL, "vertical");
+    float thrust = ioGetAxis(IO_AXIS_RY);//ooIoGetAxis(NULL, "thrust");
 
     float3 v = vf3_set(1.0 * horizontal,
                        1.0 * vertical,
@@ -318,9 +323,14 @@ sgCamAxisUpdate(SGcam *cam)
     fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.02f * pitch));
     fcam->dq = q_mul(fcam->dq, q_rot(0.0f,1.0f,0.0f, -0.02f * yaw));
   } else if (cam->kind == SGCam_Orbit) {
-    float yaw = ooIoGetAxis(NULL, "camyaw");
-    float pitch = ooIoGetAxis(NULL, "campitch");
-    float zoom = ooIoGetAxis(NULL, "camzoom");
+    //float yaw = ooIoGetAxis(NULL, "camyaw");
+    //float pitch = ooIoGetAxis(NULL, "campitch");
+    float yaw = ioGetAxis(IO_AXIS_RZ);
+    float pitch = ioGetAxis(IO_AXIS_Y);
+
+    float zoom = ioGetAxis(IO_AXIS_Z);
+
+//    float zoom = ooIoGetAxis(NULL, "camzoom");
     SGorbitcam *ocam = (SGorbitcam*)cam;
     ocam->dra = pitch * 0.02;
     ocam->ddec = yaw * 0.02;
@@ -329,160 +339,181 @@ sgCamAxisUpdate(SGcam *cam)
 }
 
 
+void
+sgCamRotateHat(int state, void *data)
+{
+  if (gSIM_state.sg->currentCam->kind == SGCam_Orbit) {
+    SGorbitcam *cam = (SGorbitcam*)gSIM_state.sg->currentCam;
+    if (state == -1) {
+      // Depressed
+      cam->dra = 0.0;
+      cam->ddec = 0.0;
+      cam->dr = 0.0;
+    } else {
+      float pitch = sin(DEG_TO_RAD((360 - (state - 90))%360));
+      float yaw = cos(DEG_TO_RAD((360 - (state - 90))%360));
+      cam->dra = pitch * 0.02;
+      cam->ddec = yaw * 0.02;
+      cam->dr = 0.0;
+    }
+  }
+}
+
+
 /* Camera actions, registered as action handlers */
 void
-sgCamFwd(bool up, void *data)
+sgCamFwd(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    } else {
+    if (state) {
       float3 v = vf3_set(0.0, 0.0, -10000.0);
       fcam->dp = v_q_rot(v, fcam->q);
+    } else {
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     }
   }
 }
 
 void
-sgCamBack(bool up, void *data)
+sgCamBack(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    } else {
+    if (state) {
       float3 v = vf3_set(0.0, 0.0, 10000.0);
       fcam->dp = v_q_rot(v, fcam->q);
+    } else {
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     }
   }
 }
 void
-sgCamLeft(bool up, void *data)
+sgCamLeft(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    } else {
+    if (state) {
       float3 v = vf3_set(-10000.0, 0.0, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
+    } else {
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     }
   }
 }
 void
-sgCamRight(bool up, void *data)
+sgCamRight(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    } else {
+    if (state) {
       float3 v = vf3_set(10000.0, 0.0, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
+    } else {
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     }
   }
 }
 void
-sgCamUp(bool up, void *data)
+sgCamUp(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    } else {
+    if (state) {
       float3 v = vf3_set(0.0, 10000.0, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
+    } else {
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     }
   }
 }
 void
-sgCamDown(bool up, void *data)
+sgCamDown(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    } else {
+    if (state) {
       float3 v = vf3_set(0.0, -10000.0, 0.0);
       fcam->dp = v_q_rot(v, fcam->q);
+    } else {
+      fcam->dp = vf3_set(0.0, 0.0, 0.0);
     }
   }
 }
 void
-sgCamRollLeft(bool up, void *data)
+sgCamRollLeft(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.00f);
-    } else {
+    if (state) {
       fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.01f);
-    }
-  }
-}
-void
-sgCamRollRight(bool up, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
+    } else {
       fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.00f);
-    } else {
+    }
+  }
+}
+void
+sgCamRollRight(int state, void *data)
+{
+  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
+    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
+    if (state) {
       fcam->dq = q_rot(0.0f,0.0f,1.0f, -0.01f);
+    } else {
+      fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.00f);
     }
   }
 }
 
 void
-sgCamYawLeft(bool up, void *data)
+sgCamYawLeft(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.00f);
-    } else {
+    if (state) {
       fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.01f);
-    }
-  }
-}
-
-void
-sgCamYawRight(bool up, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
+    } else {
       fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.00f);
-    } else {
+    }
+  }
+}
+
+void
+sgCamYawRight(int state, void *data)
+{
+  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
+    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
+    if (state) {
       fcam->dq = q_rot(0.0f,1.0f,0.0f, -0.01f);
+    } else {
+      fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.00f);
     }
   }
 }
 
 void
-sgCamPitchDown(bool up, void *data)
+sgCamPitchDown(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.00f);
-    } else {
+    if (state) {
       fcam->dq = q_rot(1.0f,0.0f,0.0f, -0.01f);
+    } else {
+      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.00f);
     }
   }
 }
 
 
 void
-sgCamPitchUp(bool up, void *data)
+sgCamPitchUp(int state, void *data)
 {
   if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
     SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (up) {
-      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.00f);
-    } else {
+    if (state) {
       fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.01f);
+    } else {
+      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.00f);
     }
   }
 }

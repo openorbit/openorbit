@@ -18,6 +18,7 @@
  */
 #include "io-manager.h"
 
+
 static io_keycode_t keymap [SDL_NUM_SCANCODES] = {
   [SDL_SCANCODE_LSHIFT] = IO_LSHIFT,
   [SDL_SCANCODE_RSHIFT] = IO_RSHIFT,

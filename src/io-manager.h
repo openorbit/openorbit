@@ -27,24 +27,33 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include <Python.h>
-	
-//#include "SDL.h"
-#include <SDL/SDL.h>
 
-/* These use the same values as SDL, so for porting (to not use SDL) they must be
-   translated in some way */
-#define OO_IO_MOD_NONE   KMOD_NONE
-#define OO_IO_MOD_LSHIFT KMOD_LSHIFT
-#define OO_IO_MOD_RSHIFT KMOD_RSHIFT
-#define OO_IO_MOD_LCTRL  KMOD_LCTRL
-#define OO_IO_MOD_RCTRL  KMOD_RCTRL
-#define OO_IO_MOD_LALT   KMOD_LALT
-#define OO_IO_MOD_RALT   KMOD_RALT
-#define OO_IO_MOD_LMETA  KMOD_LGUI
-#define OO_IO_MOD_RMETA  KMOD_RGUI
-#define OO_IO_MOD_NUM    KMOD_NUM
-#define OO_IO_MOD_CAPS   KMOD_CAPS
-#define OO_IO_MOD_MODE   KMOD_MODE
+  typedef enum IOkeymod {
+    OO_None = 0,
+
+    OO_L_Shift,
+    OO_L_Ctrl,
+    OO_L_Cmd,
+    OO_L_Alt,
+
+    OO_R_Shift,
+    OO_R_Ctrl,
+    OO_R_Cmd,
+    OO_R_Alt,
+
+    OO_Key_Mod_Count
+  } IOkeymod;
+
+
+#define OO_IO_MOD_NONE   (0)
+#define OO_IO_MOD_LSHIFT (1 << OO_L_Shift)
+#define OO_IO_MOD_RSHIFT (1 << OO_R_Shift)
+#define OO_IO_MOD_LCTRL  (1 << OO_L_Ctrl)
+#define OO_IO_MOD_RCTRL  (1 << OO_R_Ctrl)
+#define OO_IO_MOD_LALT   (1 << OO_L_Alt)
+#define OO_IO_MOD_RALT   (1 << OO_R_Alt)
+#define OO_IO_MOD_LMETA  (1 << OO_L_Cmd)
+#define OO_IO_MOD_RMETA  (1 << OO_R_Cmd)
 
 typedef enum io_keycode_t
 {
@@ -172,18 +181,92 @@ typedef enum io_keycode_t
   IO_COUNT,
 } io_keycode_t;
 
+// Axises are ranged in calibrated form from -1.0 to +1.0
+typedef enum {
+  IO_AXIS_X = 0,
+  IO_AXIS_Y,
+  IO_AXIS_Z,
+  IO_AXIS_RX,
+  IO_AXIS_RY,
+  IO_AXIS_RZ,
+  IO_AXIS_COUNT,
+} io_axis_t;
+
+// Sliders are like axises, but range is from 0.0 to 1.0
+typedef enum {
+  IO_SLIDER_THROT_0 = 0,
+  IO_SLIDER_THROT_1,
+  IO_SLIDER_COUNT,
+} io_slider_t;
+
+
+// Vector controls
+typedef enum {
+  IO_VEC_X,
+  IO_VEC_Y,
+  IO_VEC_Z,
+  IO_VEC_BRX,
+  IO_VEC_BRY,
+  IO_VEC_BRZ,
+  IO_VEC_NO,
+} io_vec_t;
+
+typedef enum {
+  IO_BUTTON_PUSH, // 0 = depressed, 1 = pressed
+  IO_BUTTON_MULTI, // -1 = depressed, 0..n are normal states, also used for switches that are never depressed
+  IO_BUTTON_HAT, // Like multi, except values are degrees from north, -1 is depressed
+} io_button_kind_t;
+
+void ioSetKeyHandler(io_keycode_t key, const char *action, void *data);
+
 void ioInit(void);
+void ioInitKeys(void);
+void ioInitJoysticks(void);
+
 void ioDispatchKeyUp(io_keycode_t key, uint16_t mask);
 void ioDispatchKeyDown(io_keycode_t key, uint16_t mask);
 void ioBindKeyToAxis(const char *key, const char *button, float val);
 void ioDispatchButtonDown(int dev, int button);
 void ioDispatchButtonUp(int dev, int button);
 
-typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
+void ioSetAxisEmu(io_axis_t axis, io_keycode_t plus, io_keycode_t minus);
 
-void ioRegActionHandler(const char *name, OObuttonhandlerfunc handlerFunc, void *data);
-/*! Register key handler C function */
-void ooIoRegCKeyHandler(const char *name, OObuttonhandlerfunc handlerFunc);
+void ioPhysicalAxisChanged(int dev_id, io_axis_t axis, float val);
+void ioAxisChanged(io_axis_t axis, float val);
+float ioGetAxis(io_axis_t axis);
+
+void ioPhysicalSliderChanged(int dev_id, io_slider_t slider, float val);
+void ioSliderChanged(io_slider_t slider, float val);
+float ioGetSlider(io_slider_t slider);
+
+int ioRegisterDevice(int vendorID, const char *vendorName,
+                     int productID, const char *productName,
+                     int buttonCount, int hatCount);
+void ioRemoveDevice(int deviceID);
+
+void ioBindDeviceSlider(int deviceID, io_slider_t phys_slider,
+                        io_slider_t virt_slider);
+
+void ioBindDeviceAxis(int deviceID, io_axis_t phys_axis, io_axis_t virt_axis);
+void ioBindDeviceButton(int deviceID, int button, const char *key);
+void ioBindDeviceHat(int deviceID, int button, const char *key);
+
+void ioDeviceButtonDown(int deviceID, int button);
+void ioDeviceButtonUp(int deviceID, int button);
+
+// State will be 0..n
+// Dir will be direction in degrees from up, if the hat is cleared
+// dir will be -1
+void ioDeviceHatSet(int deviceID, int hat_id, int state, int dir);
+
+int ioGetNamedDevice(int pos, const char *vendorName, const char *productName);
+
+// For buttons, 0 means depressed, 1 is down, further values can be
+// issued by for example hat switches
+typedef void (*IObuttonhandlerfunc)(int buttonVal, void *data);
+
+void ioRegActionHandler(const char *name, IObuttonhandlerfunc handlerFunc, io_button_kind_t kind, void *data);
+
 /*! Register key handler Python function */
 void ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc);
 
@@ -191,20 +274,12 @@ void ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc);
 
     \param keyName String key for the keyboard button
     \param keyAction Key corresponding to the registered action
-    \param up 0 if the handler should fire on button down, otherwise it will fire on
-        button up.
+    \param up 0 if the handler should fire on button down, otherwise it will
+        fire on button up.
     \param mask ored mask from the OO_IO_MOD* constants
 */
 void ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up,
                         uint16_t mask);
-
-
-void ooIoPrintJoystickNames(void);
-float ooIoGetAxis(float *val, const char *axis);
-int ooIoGetJoystickId(const char *name, int subId);
-void ooIoBindAxis(const char *key, int joyStick, int axis);
-
-const char *ooIoSdlMouseButtonNameLookup(unsigned buttonId);
 
 #ifdef __cplusplus
 }

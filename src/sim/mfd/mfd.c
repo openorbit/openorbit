@@ -84,7 +84,7 @@ INIT_MFD {
 //typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
 
 static void
-mfdCycleNext(bool buttonDown, void *data)
+mfdCycleNext(int buttonDown, void *data)
 {
   assert(mfd_pages.length > 0);
   SIMmfd *mfd = data;
@@ -92,7 +92,7 @@ mfdCycleNext(bool buttonDown, void *data)
 }
 
 static void
-mfdCyclePrev(bool buttonDown, void *data)
+mfdCyclePrev(int buttonDown, void *data)
 {
   assert(mfd_pages.length > 0);
   SIMmfd *mfd = data;
@@ -102,7 +102,7 @@ mfdCyclePrev(bool buttonDown, void *data)
 
 
 static void
-mfdToggle(bool buttonDown, void *data)
+mfdToggle(int buttonDown, void *data)
 {
   SIMmfd *mfd = data;
   mfd->super.enabled = !mfd->super.enabled;
@@ -254,16 +254,16 @@ simMfdInitAll(SGscenegraph *sg)
 
 
 INIT_IO {
-  ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, &mfd0);
-  ioRegActionHandler("mfd0-cycle-prev", mfdCyclePrev, &mfd0);
-  ioRegActionHandler("mfd0-toggle", mfdToggle, &mfd0);
-  ioRegActionHandler("mfd1-cycle-next", mfdCycleNext, &mfd1);
-  ioRegActionHandler("mfd1-cycle-prev", mfdCyclePrev, &mfd1);
-  ioRegActionHandler("mfd1-toggle", mfdToggle, &mfd1);
-  ioRegActionHandler("mfd2-cycle-next", mfdCycleNext, &mfd2);
-  ioRegActionHandler("mfd2-cycle-prev", mfdCyclePrev, &mfd2);
-  ioRegActionHandler("mfd2-toggle", mfdToggle, &mfd2);
-  ioRegActionHandler("mfd3-cycle-next", mfdCycleNext, &mfd3);
-  ioRegActionHandler("mfd3-cycle-prev", mfdCyclePrev, &mfd3);
-  ioRegActionHandler("mfd3-toggle", mfdToggle, &mfd3);
+  ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd0);
+  ioRegActionHandler("mfd0-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd0);
+  ioRegActionHandler("mfd0-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd0);
+  ioRegActionHandler("mfd1-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd1);
+  ioRegActionHandler("mfd1-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd1);
+  ioRegActionHandler("mfd1-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd1);
+  ioRegActionHandler("mfd2-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd2);
+  ioRegActionHandler("mfd2-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd2);
+  ioRegActionHandler("mfd2-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd2);
+  ioRegActionHandler("mfd3-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd3);
+  ioRegActionHandler("mfd3-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd3);
+  ioRegActionHandler("mfd3-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd3);
 }

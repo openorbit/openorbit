@@ -25,9 +25,9 @@
 #include "log.h"
 
 static void
-simScCtrlMainEngineToggle(bool down, void *data)
+simScCtrlMainEngineToggle(int state, void *data)
 {
-  if (down) {
+  if (state) {
     OOspacecraft *sc = simGetSpacecraft();
     ooLogInfo("main engine toggle");
     simScToggleMainEngine(sc);
@@ -35,11 +35,11 @@ simScCtrlMainEngineToggle(bool down, void *data)
 }
 
 static void
-simScCtrlDetatchStage(bool down, void *data)
+simScCtrlDetatchStage(int state, void *data)
 {
   ooLogInfo("detatch commanded 0");
 
-  if (down) {
+  if (state) {
     OOspacecraft *sc = simGetSpacecraft();
     ooLogInfo("detatch stage");
     simScDetatchStage(sc);
@@ -49,6 +49,8 @@ simScCtrlDetatchStage(bool down, void *data)
 void
 simScCtrlInit(void)
 {
-  ooIoRegCKeyHandler("main-engine-toggle", simScCtrlMainEngineToggle);
-  ooIoRegCKeyHandler("detatch-stage", simScCtrlDetatchStage);
+  ioRegActionHandler("main-engine-toggle", simScCtrlMainEngineToggle,
+                     IO_BUTTON_PUSH, NULL);
+  ioRegActionHandler("detatch-stage", simScCtrlDetatchStage,
+                     IO_BUTTON_PUSH, NULL);
 }
