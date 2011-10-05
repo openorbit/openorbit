@@ -28,12 +28,15 @@
 #include "sim/spacecraft-control.h"
 #include "sim/world-loader.h"
 #include "sim/mfd/mfd.h"
+#include "sim/pubsub.h"
 
 #include "res-manager.h"
 #include "physics/orbit.h"
 #include "rendering/sky.h"
 #include "rendering/planet.h"
 #include "settings.h"
+#include "io-manager.h"
+
 
 #include "log.h"
 
@@ -92,6 +95,31 @@ ooSimSetOrbWorld(PLworld *world)
   gSIM_state.world = world;
 }
 
+void
+simAxisPush(void)
+{
+  sim_record_t *io = simPubsubGetRecord("/io/axis");
+  if (io) {
+    float yaw_val = ioGetAxis(IO_AXIS_RZ);
+    sim_value_t *yaw = simGetValueByName(io, "yaw");
+    simPubsubSetVal(yaw, SIM_TYPE_FLOAT, &yaw_val);
+
+    float roll_val = ioGetAxis(IO_AXIS_RY);
+    sim_value_t *roll = simGetValueByName(io, "roll");
+    simPubsubSetVal(roll, SIM_TYPE_FLOAT, &roll_val);
+
+    float pitch_val = ioGetAxis(IO_AXIS_RX);
+    sim_value_t *pitch = simGetValueByName(io, "pitch");
+    simPubsubSetVal(pitch, SIM_TYPE_FLOAT, &pitch_val);
+
+    float throttle_val = ioGetSlider(IO_SLIDER_THROT_0);
+    sim_value_t *throttle = simGetValueByName(io, "throttle");
+    simPubsubSetVal(throttle, SIM_TYPE_FLOAT, &throttle_val);
+
+    ooLogTrace("axises: %f %f %f / %f",
+               pitch_val, roll_val, yaw_val, throttle_val);
+  }
+}
 
 void
 ooSimStep(float dt)
@@ -101,6 +129,7 @@ ooSimStep(float dt)
   struct timeval end;
   gettimeofday(&start, NULL);
 
+  simAxisPush();
   sgCamStep(sgGetCam(gSIM_state.sg), dt);
 
   plWorldClear(gSIM_state.world);
@@ -121,6 +150,15 @@ void
 simSetSpacecraft(OOspacecraft *sc)
 {
   gSIM_state.currentSc = sc;
+  // Update standard pubsub links
+  sim_record_t *axis_rec = simPubsubGetRecordWithComps("sc", sc->name,
+                                                       "axis",
+                                                       NULL);
+
+  sim_record_t *io_rec = simPubsubCreateRecord("/io");
+  simLinkRecord(io_rec, "axis", axis_rec);
+
+  // Notify spacecraft that it is current (so it can update custom pubsub links)
 }
 
 OOspacecraft*

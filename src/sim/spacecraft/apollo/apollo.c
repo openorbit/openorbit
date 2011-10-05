@@ -75,21 +75,24 @@ AxisUpdate(OOspacecraft *sc)
     case SATURN_1C: {
       OOstage *saturn_1c = sc->stages.elems[SATURN_1C];
       ARRAY_FOR_EACH(i, saturn_1c->engines) {
-        simEngineSetThrottle(ARRAY_ELEM(saturn_1c->engines, i), axises.orbital);
+        simEngineSetThrottle(ARRAY_ELEM(saturn_1c->engines, i),
+                             SIM_VAL(axises.orbital));
       }
       break;
     }
     case SATURN_II: {
       OOstage *saturn_ii = sc->stages.elems[SATURN_II];
       ARRAY_FOR_EACH(i, saturn_ii->engines) {
-        simEngineSetThrottle(ARRAY_ELEM(saturn_ii->engines, i), axises.orbital);
+        simEngineSetThrottle(ARRAY_ELEM(saturn_ii->engines, i),
+                             SIM_VAL(axises.orbital));
       }
       break;
     }
     case SATURN_IVB: {
       OOstage *saturn_ivb = sc->stages.elems[SATURN_IVB];
       ARRAY_FOR_EACH(i, saturn_ivb->engines) {
-        simEngineSetThrottle(ARRAY_ELEM(saturn_ivb->engines, i), axises.orbital);
+        simEngineSetThrottle(ARRAY_ELEM(saturn_ivb->engines, i),
+                             SIM_VAL(axises.orbital));
       }
       break;
     }

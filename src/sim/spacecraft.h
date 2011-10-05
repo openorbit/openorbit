@@ -29,6 +29,7 @@
 #include "rendering/scenegraph.h"
 #include "simtypes.h"
 #include "common/moduleinit.h"
+#include "sim/pubsub.h"
 
 #define INIT_STATIC_SC_PLUGIN INIT_SECONDARY_MODULE
 
@@ -45,15 +46,14 @@
  the stage.
 */
 typedef struct OOaxises {
-  float yaw;
-  float pitch;
-  float roll;
-
-  float leftRight;
-  float upDown;
-  float fwdBack;
-
-  float orbital;
+  sim_float_t yaw;
+  sim_float_t pitch;
+  sim_float_t roll;
+  sim_float_t lateral;
+  sim_float_t vertical;
+  sim_float_t fwd;
+  sim_float_t orbital;
+  sim_float_t throttle;
 } OOaxises;
 
 
@@ -110,6 +110,7 @@ struct OOspacecraft {
   PLworld *world;
   PLobject *obj;
 
+  const char *name;
   OOaxises axises;
 
   obj_array_t stages;

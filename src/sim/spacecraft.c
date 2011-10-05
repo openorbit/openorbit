@@ -63,34 +63,25 @@ simNewSpacecraft(const char *className, const char *scName)
   }
 
   OOspacecraft *sc = cls->alloc();
+  sc->name = strdup(scName);
   plUpdateMass(sc->obj);
   ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
 
-  char *yawkey, *pitchkey, *rollkey, *vertkey, *horizontalkey, *distkey,
-       *orbkey;
-  asprintf(&yawkey, "/sc/%s/axis/yaw", scName);
-  asprintf(&pitchkey, "/sc/%s/axis/pitch", scName);
-  asprintf(&rollkey, "/sc/%s/axis/roll", scName);
-  asprintf(&vertkey, "/sc/%s/axis/vertical", scName);
-  asprintf(&horizontalkey, "/sc/%s/axis/horizontal", scName);
-  asprintf(&distkey, "/sc/%s/axis/distance", scName);
-  asprintf(&orbkey, "/sc/%s/axis/orbital", scName);
+  char *axises;
+  asprintf(&axises, "/sc/%s/axis", scName);
 
-  simPublishFloat(yawkey, &sc->axises.yaw);
-  simPublishFloat(pitchkey, &sc->axises.pitch);
-  simPublishFloat(rollkey, &sc->axises.roll);
-  simPublishFloat(vertkey, &sc->axises.upDown);
-  simPublishFloat(horizontalkey, &sc->axises.leftRight);
-  simPublishFloat(distkey, &sc->axises.fwdBack);
-  simPublishFloat(orbkey, &sc->axises.orbital);
-
-  free(yawkey);
-  free(pitchkey);
-  free(rollkey);
-  free(vertkey);
-  free(horizontalkey);
-  free(distkey);
-  free(orbkey);
+  sim_record_t *rec = simPubsubCreateRecord(axises);
+  if (rec) {
+    simPublishValue(rec, SIM_TYPE_FLOAT, "yaw", &sc->axises.yaw);
+    simPublishValue(rec, SIM_TYPE_FLOAT, "roll", &sc->axises.roll);
+    simPublishValue(rec, SIM_TYPE_FLOAT, "pitch", &sc->axises.pitch);
+    simPublishValue(rec, SIM_TYPE_FLOAT, "lateral", &sc->axises.lateral);
+    simPublishValue(rec, SIM_TYPE_FLOAT, "vertical", &sc->axises.vertical);
+    simPublishValue(rec, SIM_TYPE_FLOAT, "forward", &sc->axises.fwd);
+    simPublishValue(rec, SIM_TYPE_FLOAT, "orbital", &sc->axises.orbital);
+    simPublishValue(rec, SIM_TYPE_FLOAT, "throttle", &sc->axises.throttle);
+  }
+  free(axises);
 
   return sc;
 }
@@ -99,13 +90,15 @@ simNewSpacecraft(const char *className, const char *scName)
 void
 ooGetAxises(OOaxises *axises)
 {
-  ooIoGetAxis(&axises->yaw, "yaw");
-  ooIoGetAxis(&axises->pitch, "pitch");
-  ooIoGetAxis(&axises->roll, "roll");
-  ooIoGetAxis(&axises->upDown, "vertical-throttle");
-  ooIoGetAxis(&axises->leftRight, "horizontal-throttle");
-  ooIoGetAxis(&axises->fwdBack, "distance-throttle");
-  ooIoGetAxis(&axises->orbital, "main-throttle");
+  SIM_VAL(axises->pitch) = ioGetAxis(IO_AXIS_Y);
+  SIM_VAL(axises->roll) = ioGetAxis(IO_AXIS_X);
+  SIM_VAL(axises->yaw) = ioGetAxis(IO_AXIS_RZ);
+
+  SIM_VAL(axises->vertical) = ioGetAxis(IO_AXIS_Z);
+  SIM_VAL(axises->lateral) = ioGetAxis(IO_AXIS_RX);
+  SIM_VAL(axises->fwd) = ioGetAxis(IO_AXIS_RY);
+
+  SIM_VAL(axises->orbital) = ioGetSlider(IO_SLIDER_THROT_0);
 }
 
 
@@ -323,7 +316,7 @@ ooScStageStep(OOstage *stage, OOaxises *axises, float dt) {
 
   for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
     OOactuatorgroup *actGroup = (OOactuatorgroup*)stage->actuatorGroups.elems[i];
-    double axisVal = ooIoGetAxis(NULL, axisKeys[i]);
+    //double axisVal = ooIoGetAxis(NULL, axisKeys[i]);
     for (int j = 0 ; j < actGroup->actuators.length ; ++j) {
       //OOactuator *act = actGroup->actuators.elems[j];
       // TODO: Will not really work, we need more parameters if an actuator is

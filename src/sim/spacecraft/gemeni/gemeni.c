@@ -62,7 +62,7 @@ AxisUpdate(OOspacecraft *sc)
     case MERC_REDSTONE: {
       OOstage *redstone = sc->stages.elems[MERC_REDSTONE];
       SIMengine *eng = ARRAY_ELEM(redstone->engines, THR_ROCKETDYNE);
-      simEngineSetThrottle(eng, axises.orbital);
+      simEngineSetThrottle(eng, SIM_VAL(axises.orbital));
       break;
     }
     case MERC_CAPSULE: {
@@ -70,27 +70,27 @@ AxisUpdate(OOspacecraft *sc)
       OOstage *capsule = sc->stages.elems[MERC_CAPSULE];
 
       simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_ROLL_0),
-                           axises.roll);
+                           SIM_VAL(axises.roll));
       simEngineFire(ARRAY_ELEM(capsule->engines, THR_ROLL_0));
 
       simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_ROLL_1),
-                           -axises.roll);
+                           -SIM_VAL(axises.roll));
       simEngineFire(ARRAY_ELEM(capsule->engines, THR_ROLL_1));
 
       simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_PITCH_0),
-                           axises.pitch);
+                           SIM_VAL(axises.pitch));
       simEngineFire(ARRAY_ELEM(capsule->engines, THR_PITCH_0));
 
       simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_PITCH_1),
-                           -axises.pitch);
+                           -SIM_VAL(axises.pitch));
       simEngineFire(ARRAY_ELEM(capsule->engines, THR_PITCH_1));
 
       simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_YAW_0),
-                           axises.yaw);
+                           SIM_VAL(axises.yaw));
       simEngineFire(ARRAY_ELEM(capsule->engines, THR_YAW_0));
 
       simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_YAW_1),
-                           -axises.yaw);
+                           -SIM_VAL(axises.yaw));
       simEngineFire(ARRAY_ELEM(capsule->engines, THR_YAW_1));
 
       break;
