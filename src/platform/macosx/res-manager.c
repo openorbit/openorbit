@@ -47,41 +47,58 @@
     //#endif /* _UNIX_ */
 
 const char*
-ooResGetConfPath()
+ooResGetConfPath(void)
 {
   char *homeDir = getenv("HOME");
   ooLogFatalIfNull(homeDir, "$HOME not set");
-  
-  char *confPath = NULL;
-  
+
+  static char *confPath = NULL;
+
   if (confPath == NULL) {
     asprintf(&confPath, "%s/%s", homeDir, "Library/Preferences/org.openorbit.conf");
   }
-  
+
   return confPath;
 }
+
+const char*
+ooResGetJsonConfPath(void)
+{
+  char *homeDir = getenv("HOME");
+  ooLogFatalIfNull(homeDir, "$HOME not set");
+
+  static char *confPath = NULL;
+
+  if (confPath == NULL) {
+    asprintf(&confPath, "%s/%s", homeDir, "Library/Preferences/org.openorbit.json");
+  }
+
+  return confPath;
+}
+
+
 
 const char*
 ooResGetBasePath(void)
 {
     static UInt8 base[PATH_MAX+1] = {0};
-    
+
     // If first call, get the path to the bundle's resource directory
     if (base[0] == '\0') {
         CFBundleRef bundle = CFBundleGetMainBundle();
-        CFURLRef resUrl = CFBundleCopyResourcesDirectoryURL(bundle);        
+        CFURLRef resUrl = CFBundleCopyResourcesDirectoryURL(bundle);
         // use absolute path
         if (!CFURLGetFileSystemRepresentation(resUrl, true, base, PATH_MAX)) {
             // Something went wrong
             CFRelease(resUrl);
             ooLogFatal("%s:%d:base path not found", __FILE__, __LINE__); // no ret
         }
-        
+
         CFRelease(resUrl);
-        
+
         ooLogTrace("res base = %s", base);
     }
-    
+
     return (const char*)base;
 }
 
@@ -89,10 +106,10 @@ char*
 ooResGetPath(const char *fileName)
 {
     assert(fileName != NULL && "File name cannot be null");
-        
+
     char *path;
     asprintf(&path, "%s/%s", ooResGetBasePath(), fileName);
-    
+
     return path; // Note, asprintf sets this to NULL if it fails
 }
 
@@ -100,10 +117,10 @@ glob_t
 ooResGetFilePaths(const char *pattern)
 {
   const char *base = ooResGetBasePath();
-  
+
   char *fullPattern;
   asprintf(&fullPattern, "%s/%s", base, pattern);
-  ooLogInfo("search for %s", fullPattern);
+  ooLogTrace("search for %s", fullPattern);
   glob_t globs;
   glob(fullPattern, 0, NULL, &globs);
 
@@ -116,12 +133,12 @@ FILE*
 ooResGetFile(const char *fileName)
 {
     char *path = ooResGetPath(fileName);
-    
+
     if (path != NULL) {
         FILE *file = fopen(path, "r");
         if (!file) ooLogWarn("file %s not readable", path);
         free(path);
-        
+
         return file;
     }
 
@@ -132,14 +149,14 @@ int
 ooResGetFd(const char *fileName)
 {
     char *path = ooResGetPath(fileName);
-    
+
     if (path != NULL) {
         int fd = open(path, O_RDONLY);
-        
+
         if (fd == -1) ooLogWarn("file %s not readable", path);
-        
+
         free(path);
-        
+
         return fd;
     }
 
@@ -157,28 +174,28 @@ FILE*
 ooPluginGetFile(const char *fileName)
 {
     char *path = ooPluginGetPath(fileName);
-    
+
     if (path != NULL) {
         FILE *file = fopen(path, "r");
         free(path);
         return file;
     }
-    
-    return NULL;    
+
+    return NULL;
 }
 
 int
 ooPluginGetFd(const char *fileName)
 {
     char *path = ooPluginGetPath(fileName);
-    
+
     if (path != NULL) {
         int fd = open(path, O_RDONLY);
         free(path);
-        
+
         return fd;
     }
-    
-    return -1;    
+
+    return -1;
 }
 

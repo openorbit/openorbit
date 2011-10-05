@@ -37,7 +37,8 @@
 #include <stdio.h>
 #include <glob.h>
 
-const char* ooResGetConfPath();
+const char* ooResGetConfPath(void);
+const char* ooResGetJsonConfPath(void);
 
 char* ooResGetPath(const char *fileName);
 FILE* ooResGetFile(const char *fileName);
