@@ -1,0 +1,54 @@
+{"openorbit": {
+  "sys": {
+    "log-level": "info"
+  },
+  "video": {
+    "gl": {
+      "aspect": 1.33,
+      "fovy": 45.0
+    },
+    "fullscreen": false,
+    "width": 800,
+    "height": 600,
+    "depth": 32
+  },
+  "audio": {
+    "master-volume": 0.8,
+    "engine-volume": 0.8,
+    "cockpit-volume": 0.8,
+    "music-volume": 0.8
+  },
+  "sim": {
+    "freq": 25.0
+  },
+  "controls": {
+    "keys": [
+      {
+        "kind": "hat",
+        "keys": ["up", "right", "down", "left"],
+        "action": "cam-rotate" 
+      }
+    ],
+    "mouse": {
+
+		},
+    "joystick": [
+      {
+        "name": "default",
+        "id": -1,
+        "axises": ["roll", "pitch", "vertical", "lateral", "forward", "yaw"],
+        "sliders": ["throttle"],
+        "buttons": [],
+        "hats": ["cam-rotate"],
+      },
+      {
+        "name": "Logitech Extreme 3D",
+        "id": 0,
+        "axises": ["roll", "pitch", "vertical", "lateral", "forward", "yaw"],
+        "sliders": ["throttle"],
+        "buttons": ["default"],
+        "hats": ["cam-rotate"]
+      }
+    ]
+  }
+}}
