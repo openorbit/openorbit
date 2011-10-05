@@ -65,10 +65,10 @@ void pool_free(void *obj);
 /*!
   Safe malloc. Either returns the requested size or calls abort if out of memory
  */
-void* smalloc(size_t sz);
+void* smalloc(size_t sz) __attribute__((malloc));
 /*!
  Safe calloc. Either returns the requested objects or calls abort if out of memory
  */
-void* scalloc(size_t count, size_t sz);
+void* scalloc(size_t count, size_t sz) __attribute__((malloc));
 
 #endif /* !COMMON_POOL_H */
