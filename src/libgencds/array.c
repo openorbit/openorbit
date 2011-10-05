@@ -21,6 +21,7 @@
 #include <err.h>
 #include <sysexits.h>
 #include <stdint.h>
+#include <assert.h>
 void
 array_init(array_t *vec)
 {
@@ -58,10 +59,32 @@ array_compress(array_t *vec)
   }
 }
 
+DEF_ARRAY(_Bool,bool);
+
+DEF_ARRAY(char,char);
+DEF_ARRAY(unsigned char,uchar);
+DEF_ARRAY(short,short);
 DEF_ARRAY(unsigned short,ushort);
 DEF_ARRAY(int,int);
+DEF_ARRAY(unsigned int,uint);
+DEF_ARRAY(long,long);
+DEF_ARRAY(unsigned long,ulong);
+
+DEF_ARRAY(uint8_t,u8);
+DEF_ARRAY(uint16_t,u16);
+DEF_ARRAY(uint32_t,u32);
 DEF_ARRAY(uint64_t,u64);
+
+DEF_ARRAY(int8_t,i8);
+DEF_ARRAY(int16_t,i16);
+DEF_ARRAY(int32_t,i32);
+DEF_ARRAY(int64_t,i64);
+
+
 DEF_ARRAY(float,float);
 DEF_ARRAY(double,double);
+DEF_ARRAY(_Complex float,complex_float);
+DEF_ARRAY(_Complex double,complex_double);
+
 DEF_ARRAY(void*,obj);
 
