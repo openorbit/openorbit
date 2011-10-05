@@ -503,7 +503,7 @@ sgNewEllipsis(const char *name,
   el->colour[1] = g;
   el->colour[2] = b;
   el->vertCount = vertCount;
-  ooLogInfo("new ellipses '%s' %f %f %f", name, semiMajor, semiMinor, el->ecc);
+  ooLogTrace("new ellipses '%s' %f %f %f", name, semiMajor, semiMinor, el->ecc);
 
   // Build an ellipse with the requested number of vertices
   double w = 2.0 * M_PI / (double)vertCount;
@@ -857,11 +857,15 @@ sgPaintDrawable(SGdrawable *drawable)
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
 
+  SG_CHECK_ERROR;
+
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
   glEnable(GL_LIGHTING);
+
+  SG_CHECK_ERROR;
 
   glUseProgram(drawable->shader);
   glPushMatrix();
@@ -877,6 +881,7 @@ sgPaintDrawable(SGdrawable *drawable)
 
     glUniformMatrix4fv(drawable->modelview_id, 1, GL_FALSE, modelview);
     glUniformMatrix4fv(drawable->projection_id, 1, GL_FALSE, projection);
+    SG_CHECK_ERROR;
 
     for (int i = 0 ; i < 4 ; i ++) {
       if (drawable->tex_id[i] >= 0) {
@@ -886,6 +891,7 @@ sgPaintDrawable(SGdrawable *drawable)
         glUniform1i(drawable->tex_uni_id[i], i);
       }
     }
+    SG_CHECK_ERROR;
 
     GLint shaderIsValid;
     glValidateProgram(drawable->shader);

@@ -104,7 +104,7 @@ init_sim(int argc, char*argv[])
   init_graphics();
 
 
-  ooIoPrintJoystickNames();
+  //ooIoPrintJoystickNames();
 
   ooSimInit();
 
@@ -114,7 +114,7 @@ init_sim(int argc, char*argv[])
     ooLogFatal("script/postinit.py missing");
   }
 
-  ooLogInfo("Shutting down normally...");
+//  ooLogInfo("Shutting down normally...");
   return 0;
 }
 

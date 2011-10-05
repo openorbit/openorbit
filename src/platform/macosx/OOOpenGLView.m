@@ -167,13 +167,14 @@ static io_keycode_t keymap [256] = {
     return self;
 }
 
+
 - (void) awakeFromNib
 {
 }
 
 - (void)simTicker:(NSTimer*)theTimer
 {
-  NSLog(@"sim step");
+  //NSLog(@"sim step");
   ooSimStep(theTimer.timeInterval);
   [self setNeedsDisplay:YES];
 }
