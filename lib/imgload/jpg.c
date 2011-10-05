@@ -25,6 +25,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include "log.h"
 #include "jpg.h"
 
 // TODO: handle color spaces
@@ -38,7 +39,7 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
   JSAMPARRAY buffer;  /* Output row buffer */
   
   if ((infile = fopen(filename, "rb")) == NULL) {
-    fprintf(stderr, "can't open %s\n", filename);
+    ooLogError("can't open %s\n", filename);
     return -1;
   }
   cinfo.err = jpeg_std_error(&jerr);
@@ -51,10 +52,10 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
   img->h = cinfo.output_height;
   if (cinfo.output_components == 3) {
     img->kind = JPG_RGB;
-    fprintf(stderr, "loading colour jpg %s\n", filename);
+    ooLogTrace("loading colour jpg %s\n", filename);
   } else if (cinfo.output_components == 1) {
     img->kind = JPG_GRAY;
-    fprintf(stderr, "loading grayscale jpg %s\n", filename);
+    ooLogTrace("loading grayscale jpg %s\n", filename);
   } else {
     assert(0 && "no support for non RGB or GRAYSCALE jpgs");
   }

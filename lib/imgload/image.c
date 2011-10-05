@@ -23,6 +23,7 @@
 #include <assert.h>
 
 #include <imgload/image.h>
+#include "log.h"
 
 #include "tga.h"
 #include "jpg.h"
@@ -90,7 +91,7 @@ img_load(image_t * restrict img, const char * restrict fileName)
           break;
         case JPG_GRAY:
           img->kind = IMG_GRAY8;
-          fprintf(stderr, "set img to gray8\n");
+          ooLogTrace("set img to gray8\n");
           break;
         default:
           assert(0 && "invalid case");
