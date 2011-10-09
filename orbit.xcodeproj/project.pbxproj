@@ -28,6 +28,11 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		EC0C020B1441739200A2AE5E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0C020A1441739100A2AE5E /* OpenAL.framework */; };
+		EC0C020C1441739200A2AE5E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0C020A1441739100A2AE5E /* OpenAL.framework */; };
+		EC0C021A144174D700A2AE5E /* wav.h in Headers */ = {isa = PBXBuildFile; fileRef = EC0C02111441745D00A2AE5E /* wav.h */; };
+		EC0C021B144174D700A2AE5E /* wav.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0C020E1441744500A2AE5E /* wav.c */; };
+		EC0C021C1441753A00A2AE5E /* libauload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0C0216144174AD00A2AE5E /* libauload.a */; };
 		EC0FB8CA119FF1BC00CEF95A /* font in Resources */ = {isa = PBXBuildFile; fileRef = EC0FB8B1119FF1BC00CEF95A /* font */; };
 		EC0FB9BC11A55B5900CEF95A /* test-pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0FB9AF11A558E700CEF95A /* test-pubsub.c */; };
 		EC0FB9BD11A55B5F00CEF95A /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
@@ -467,6 +472,10 @@
 
 /* Begin PBXFileReference section */
 		EC030D6911084749004F3AD8 /* Simulation Design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Simulation Design"; sourceTree = "<group>"; };
+		EC0C020A1441739100A2AE5E /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = ../../../../System/Library/Frameworks/OpenAL.framework; sourceTree = "<group>"; };
+		EC0C020E1441744500A2AE5E /* wav.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = wav.c; sourceTree = "<group>"; };
+		EC0C02111441745D00A2AE5E /* wav.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wav.h; sourceTree = "<group>"; };
+		EC0C0216144174AD00A2AE5E /* libauload.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libauload.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC0FB8B1119FF1BC00CEF95A /* font */ = {isa = PBXFileReference; lastKnownFileType = folder; path = font; sourceTree = "<group>"; };
 		EC0FB9AF11A558E700CEF95A /* test-pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-pubsub.c"; sourceTree = "<group>"; };
 		EC0FB9B811A55B4D00CEF95A /* t009_pubsub */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t009_pubsub; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -654,7 +663,7 @@
 		EC7535121417725F000A7CB4 /* sdl-main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-main.c"; sourceTree = "<group>"; };
 		EC753514141774CB000A7CB4 /* sdl-window.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-window.c"; sourceTree = "<group>"; };
 		EC753516141776B4000A7CB4 /* sdl-window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sdl-window.h"; sourceTree = "<group>"; };
-		EC75358314177EA6000A7CB4 /* Open Orbit copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Open Orbit copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EC75358314177EA6000A7CB4 /* Open Orbit SDL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Open Orbit SDL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC75358514177EA6000A7CB4 /* Open Orbit copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Open Orbit copy-Info.plist"; path = "/Users/holm/Projects/openorbit/Open Orbit copy-Info.plist"; sourceTree = "<absolute>"; };
 		EC768C4E1060D651009B558C /* openorbit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = openorbit.xcconfig; sourceTree = "<group>"; };
 		EC7CA611143AF4B500E22F4E /* stringextras.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stringextras.c; sourceTree = "<group>"; };
@@ -712,6 +721,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		EC0C0213144174AD00A2AE5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EC0FB9B611A55B4D00CEF95A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -786,6 +802,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC0C021C1441753A00A2AE5E /* libauload.a in Frameworks */,
 				ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */,
 				EC89155C0CD503EC000E662E /* Python.framework in Frameworks */,
 				ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */,
@@ -797,6 +814,7 @@
 				EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */,
 				ECA662E8140B6F6500964A72 /* libjansson.a in Frameworks */,
 				ECA27D7E14343E570074B04C /* IOKit.framework in Frameworks */,
+				EC0C020B1441739200A2AE5E /* OpenAL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -823,6 +841,7 @@
 				EC75357714177EA6000A7CB4 /* CoreFoundation.framework in Frameworks */,
 				EC75357814177EA6000A7CB4 /* ApplicationServices.framework in Frameworks */,
 				EC75357914177EA6000A7CB4 /* libfreetype.a in Frameworks */,
+				EC0C020C1441739200A2AE5E /* OpenAL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -838,6 +857,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EC0C020D144173CD00A2AE5E /* auload */ = {
+			isa = PBXGroup;
+			children = (
+				EC0C02111441745D00A2AE5E /* wav.h */,
+				EC0C020E1441744500A2AE5E /* wav.c */,
+			);
+			path = auload;
+			sourceTree = "<group>";
+		};
 		EC0FB9AE11A558A100CEF95A /* t009_pubsub */ = {
 			isa = PBXGroup;
 			children = (
@@ -1221,6 +1249,7 @@
 		EC34BDB1107B2C480011B76E /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				EC0C020D144173CD00A2AE5E /* auload */,
 				ECBF1731108C547800D3E412 /* imgload */,
 				EC34BDB2107B2C480011B76E /* vmath */,
 			);
@@ -1290,7 +1319,8 @@
 				ECBF1745108C565600D3E412 /* libimgload.a */,
 				EC0FB9B811A55B4D00CEF95A /* t009_pubsub */,
 				EC4C89EA137D4D0D007AC0DF /* dragarea */,
-				EC75358314177EA6000A7CB4 /* Open Orbit copy.app */,
+				EC75358314177EA6000A7CB4 /* Open Orbit SDL.app */,
+				EC0C0216144174AD00A2AE5E /* libauload.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1298,6 +1328,7 @@
 		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EC0C020A1441739100A2AE5E /* OpenAL.framework */,
 				ECA27D7D14343E570074B04C /* IOKit.framework */,
 				ECA662E7140B6F6500964A72 /* libjansson.a */,
 				EC4C8A0B137D5C1D007AC0DF /* GLUT.framework */,
@@ -1556,6 +1587,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		EC0C0214144174AD00A2AE5E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC0C021A144174D700A2AE5E /* wav.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EC34BDBA107B2C900011B76E /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1574,6 +1613,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		EC0C0215144174AD00A2AE5E /* auload */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EC0C0217144174AE00A2AE5E /* Build configuration list for PBXNativeTarget "auload" */;
+			buildPhases = (
+				EC0C0212144174AD00A2AE5E /* Sources */,
+				EC0C0213144174AD00A2AE5E /* Frameworks */,
+				EC0C0214144174AD00A2AE5E /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = auload;
+			productName = auload;
+			productReference = EC0C0216144174AD00A2AE5E /* libauload.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		EC0FB9B711A55B4D00CEF95A /* t009_pubsub */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EC0FB9D011A55B8E00CEF95A /* Build configuration list for PBXNativeTarget "t009_pubsub" */;
@@ -1779,7 +1835,7 @@
 			);
 			name = "Open Orbit SDL";
 			productName = "Open Orbit";
-			productReference = EC75358314177EA6000A7CB4 /* Open Orbit copy.app */;
+			productReference = EC75358314177EA6000A7CB4 /* Open Orbit SDL.app */;
 			productType = "com.apple.product-type.application";
 		};
 		ECBF1744108C565600D3E412 /* imgload */ = {
@@ -1825,9 +1881,10 @@
 			targets = (
 				EC4476DD0CCC0076001C88AD /* Open Orbit */,
 				EC75351714177EA6000A7CB4 /* Open Orbit SDL */,
-				EC4476890CCBFF1C001C88AD /* tests */,
 				EC34BDBD107B2C900011B76E /* vmath */,
 				ECBF1744108C565600D3E412 /* imgload */,
+				EC0C0215144174AD00A2AE5E /* auload */,
+				EC4476890CCBFF1C001C88AD /* tests */,
 				EC4476960CCBFF73001C88AD /* t000_hashtable */,
 				EC44769D0CCBFF95001C88AD /* t001_heap */,
 				EC4476A20CCBFFB1001C88AD /* t002_tga */,
@@ -1876,6 +1933,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		EC0C0212144174AD00A2AE5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC0C021B144174D700A2AE5E /* wav.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EC0FB9B511A55B4D00CEF95A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2226,6 +2291,45 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		EC0C0218144174AE00A2AE5E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		EC0C0219144174AE00A2AE5E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		EC0FB9BA11A55B4D00CEF95A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2817,7 +2921,7 @@
 					"-framework",
 					AppKit,
 				);
-				PRODUCT_NAME = "Open Orbit copy";
+				PRODUCT_NAME = "Open Orbit SDL";
 				USER_HEADER_SEARCH_PATHS = "src ${SDL_INC}";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
@@ -2866,7 +2970,7 @@
 					"-framework",
 					AppKit,
 				);
-				PRODUCT_NAME = "Open Orbit copy";
+				PRODUCT_NAME = "Open Orbit SDL";
 				USER_HEADER_SEARCH_PATHS = "src ${SDL_INC}";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
@@ -2924,6 +3028,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		EC0C0217144174AE00A2AE5E /* Build configuration list for PBXNativeTarget "auload" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC0C0218144174AE00A2AE5E /* Debug */,
+				EC0C0219144174AE00A2AE5E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		EC0FB9D011A55B8E00CEF95A /* Build configuration list for PBXNativeTarget "t009_pubsub" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

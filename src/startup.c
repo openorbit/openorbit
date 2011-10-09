@@ -41,6 +41,14 @@
 #include <assert.h>
 #include <glob.h>
 
+#ifdef __APPLE__
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
+#else
+#include <AL/al.h>
+#include <AL/alc.h>
+#endif
+
 #include "res-manager.h"
 #include "log.h"
 #include "settings.h"
@@ -75,6 +83,26 @@ init_plugins(void)
 }
 
 
+void
+init_al(void)
+{
+  ALCdevice *dev = alcOpenDevice(NULL);
+  ALenum err = alcGetError(dev);
+  if (err != ALC_NO_ERROR) {
+    ooLogError("could not get the default al device");
+  }
+
+  ALCcontext *ctxt = alcCreateContext(dev, NULL);
+  err = alcGetError(dev);
+  if (err != ALC_NO_ERROR) {
+    ooLogError("could not create al context");
+  }
+
+  if (alcMakeContextCurrent(ctxt) == ALC_FALSE) {
+    ooLogError("could not make the al context current");
+  }
+}
+
 int
 init_sim(int argc, char*argv[])
 {
@@ -92,7 +120,7 @@ init_sim(int argc, char*argv[])
     ooLogFatal("script/init.py missing");
   }
   // Initialise SDL, GL and AL
-
+  init_al();
 
   // Setup IO-tables, must be done after joystick system has been initialised
   ioInit();
