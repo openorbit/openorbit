@@ -19,6 +19,12 @@
 
 #include <assert.h>
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
+
 #include "text.h"
 #include "texture.h"
 #include "res-manager.h"
@@ -75,6 +81,7 @@ sgUnloadFont(SGfont *font)
   free(font);
 }
 
+#if 0
 #define MAX(a, b) (((a) < (b)) ? (b) : (a))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
@@ -98,32 +105,67 @@ copy_character(SGtextbuffer  *image,
            width);
   }
 }
+#endif
+
+SGtextbuffer*
+sgNewStaticTextBuffer(const char *fontName, unsigned fontSize,
+                      unsigned width, unsigned rows)
+{
+  return sgNewTextBuffer(fontName, fontSize, width, rows);
+}
 
 
 SGtextbuffer*
 sgNewTextBuffer(const char *fontName, unsigned fontSize, unsigned width, unsigned rows)
 {
-  SGtextbuffer *buff = malloc(sizeof(SGtextbuffer));
+//  SGtextbuffer *buff = malloc(sizeof(SGtextbuffer));
 
-  buff->font = sgLoadFont(fontName, fontSize);
-  buff->h = rows * fontSize;
-  buff->w = width * fontSize;
-  buff->stride = width * fontSize;
-  buff->data = calloc(buff->w * buff->h, sizeof(char));
-
+//  buff->font = sgLoadFont(fontName, fontSize);
+//  buff->h = rows * fontSize;
+//  buff->w = width * fontSize;
+//  buff->stride = width * fontSize;
+//  buff->data = calloc(buff->w * buff->h, sizeof(char));
+  SGtextbuffer *buff = text_bitmap_create(fontName, fontSize, width, rows);
   return buff;
 }
+
+SGtextbuffer*
+sgNewTextLabel(const char *fontName, unsigned fontSize, const char *label)
+{
+  SGtextbuffer *buff = text_bitmap_create_label(fontName, fontSize, label);
+  return buff;
+}
+
+SGtextbuffer* sgNewTextLabelf(const char *fontName, unsigned fontSize,
+                              const char *label, ...)
+{
+  va_list vaList;
+  va_start(vaList, label);
+
+  char *str = NULL;
+
+  vasprintf(&str, label, vaList);
+  SGtextbuffer* buff = sgNewTextLabel(fontName, fontSize, str);
+  free(str);
+
+  va_end(vaList);
+  return buff;
+}
+
 void
 sgDeleteTextBuffer(SGtextbuffer *buff)
 {
-  sgUnloadFont(buff->font);
-  free(buff->data);
-  free(buff);
+  text_bitmap_dispose(buff, true);
+//  sgUnloadFont(buff->font);
+//  free(buff->data);
+//  free(buff);
 }
 
 void
 sgPrintBuffer(SGtextbuffer *buff, const char *text)
 {
+  text_bitmap_drawtext(buff, text);
+#if 0
   FT_GlyphSlot slot = buff->font->face->glyph;
   unsigned max_x = 0, max_y = 0;
   unsigned pen_x = 0, pen_y = buff->h - buff->font->size;
@@ -152,6 +194,7 @@ sgPrintBuffer(SGtextbuffer *buff, const char *text)
   }
   buff->stride = buff->w;
   buff->w = max_x;
+#endif
 }
 
 void
@@ -164,6 +207,21 @@ sgPrintfBuffer(SGtextbuffer *buff, const char *fmt, ...)
 
   vasprintf(&str, fmt, vaList);
   sgPrintBuffer(buff, str);
+  free(str);
 
   va_end(vaList);
 }
+
+void
+sgBindTextBuffer(SGtextbuffer *buff)
+{
+  GLuint texID = text_bitmap_texid(buff);
+  glBindTexture(GL_TEXTURE_2D, texID);
+}
+
+GLuint
+sgTextTexture(SGtextbuffer *buff)
+{
+  return text_bitmap_texid(buff);
+}
+

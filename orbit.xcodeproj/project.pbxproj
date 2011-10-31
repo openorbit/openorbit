@@ -144,6 +144,8 @@
 		EC4C8A13137D5D0A007AC0DF /* object-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF51079EE080011B76E /* object-manager.c */; };
 		EC4C8A14137D5D0A007AC0DF /* object-manager2.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF61079EE080011B76E /* object-manager2.c */; };
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
+		EC571BE61443675D002CA003 /* cgbitmaps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC571BE51443675D002CA003 /* cgbitmaps.c */; };
+		EC571BE71443675D002CA003 /* cgbitmaps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC571BE51443675D002CA003 /* cgbitmaps.c */; };
 		EC5F72531154E10D00FBE08B /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
 		EC5F725A1154E27400FBE08B /* light.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72591154E27400FBE08B /* light.c */; };
 		EC5F72881155240B00FBE08B /* drawable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72871155240B00FBE08B /* drawable.c */; };
@@ -644,6 +646,7 @@
 		EC4FCC6210748F4B00EB6DDF /* libpng.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng.dylib; path = /usr/X11/lib/libpng.dylib; sourceTree = "<absolute>"; };
 		EC51E6E110BBE766009FA70D /* mass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mass.h; sourceTree = "<group>"; };
 		EC51E6E210BBE766009FA70D /* mass.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mass.c; sourceTree = "<group>"; };
+		EC571BE51443675D002CA003 /* cgbitmaps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cgbitmaps.c; sourceTree = "<group>"; };
 		EC5F72511154E10D00FBE08B /* material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
 		EC5F72521154E10D00FBE08B /* material.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = material.c; sourceTree = "<group>"; };
 		EC5F72581154E27400FBE08B /* light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = light.h; sourceTree = "<group>"; };
@@ -1069,6 +1072,7 @@
 				EC34BC191079EE080011B76E /* res-manager.c */,
 				ECA27D7B1433BDD60074B04C /* hid.m */,
 				ECE3C1ED14363D85001C1F32 /* mouse.c */,
+				EC571BE51443675D002CA003 /* cgbitmaps.c */,
 			);
 			path = macosx;
 			sourceTree = "<group>";
@@ -1862,7 +1866,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 0410;
+				LastUpgradeCheck = 0420;
 			};
 			buildConfigurationList = EC4476770CCBFEDB001C88AD /* Build configuration list for PBXProject "orbit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -2108,6 +2112,7 @@
 				ECA27D7C1433BDD60074B04C /* hid.m in Sources */,
 				ECE3C1EE14363D85001C1F32 /* mouse.c in Sources */,
 				EC7CA612143AF4B500E22F4E /* stringextras.c in Sources */,
+				EC571BE61443675D002CA003 /* cgbitmaps.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2211,6 +2216,7 @@
 				EC935D4C1417B26C00953D20 /* sdl-events.c in Sources */,
 				ECE3C1F014363DCB001C1F32 /* sdl-mouse.c in Sources */,
 				EC7CA613143AF4B500E22F4E /* stringextras.c in Sources */,
+				EC571BE71443675D002CA003 /* cgbitmaps.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3035,6 +3041,7 @@
 				EC0C0219144174AE00A2AE5E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		EC0FB9D011A55B8E00CEF95A /* Build configuration list for PBXNativeTarget "t009_pubsub" */ = {
 			isa = XCConfigurationList;
