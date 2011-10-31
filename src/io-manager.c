@@ -999,10 +999,10 @@ void
 ioDeviceButtonDown(int deviceID, int button)
 {
   io_device_info_t *dev = obj_array_get(&devices, deviceID);
-  if (dev->buttonHandler[button].isScript) {
-
+  if (dev->buttonHandler[button-1].isScript) {
+    ooLogInfo("is script...");
   } else {
-    dev->buttonHandler[button].cHandler(true, dev->buttonHandler[button].data);
+    dev->buttonHandler[button-1].cHandler(true, dev->buttonHandler[button-1].data);
   }
 }
 
@@ -1010,10 +1010,10 @@ void
 ioDeviceButtonUp(int deviceID, int button)
 {
   io_device_info_t *dev = obj_array_get(&devices, deviceID);
-  if (dev->buttonHandler[button].isScript) {
+  if (dev->buttonHandler[button-1].isScript) {
 
   } else {
-    dev->buttonHandler[button].cHandler(false, dev->buttonHandler[button].data);
+    dev->buttonHandler[button-1].cHandler(false, dev->buttonHandler[button-1].data);
   }
 }
 
