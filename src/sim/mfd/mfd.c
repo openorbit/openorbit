@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -84,28 +84,34 @@ INIT_MFD {
 //typedef void (*OObuttonhandlerfunc)(bool buttonDown, void *data);
 
 static void
-mfdCycleNext(int buttonDown, void *data)
+mfdCycleNext(int state, void *data)
 {
-  assert(mfd_pages.length > 0);
-  SIMmfd *mfd = data;
-  mfd->page_no = (mfd->page_no + 1) % mfd_pages.length;
+  if (state) {
+    assert(mfd_pages.length > 0);
+    SIMmfd *mfd = data;
+    mfd->page_no = (mfd->page_no + 1) % mfd_pages.length;
+  }
 }
 
 static void
-mfdCyclePrev(int buttonDown, void *data)
+mfdCyclePrev(int state, void *data)
 {
-  assert(mfd_pages.length > 0);
-  SIMmfd *mfd = data;
-  if (mfd->page_no == 0) mfd->page_no = mfd_pages.length - 1;
-  else mfd->page_no --;
+  if (state) {
+    assert(mfd_pages.length > 0);
+    SIMmfd *mfd = data;
+    if (mfd->page_no == 0) mfd->page_no = mfd_pages.length - 1;
+    else mfd->page_no --;
+  }
 }
 
 
 static void
-mfdToggle(int buttonDown, void *data)
+mfdToggle(int state, void *data)
 {
-  SIMmfd *mfd = data;
-  mfd->super.enabled = !mfd->super.enabled;
+  if (state) {
+    SIMmfd *mfd = data;
+    mfd->super.enabled = !mfd->super.enabled;
+  }
 }
 
 void
@@ -177,7 +183,6 @@ test_hud_draw(SGoverlay *overlay)
   // Hud should adopt to whether it is used in space or not.
   // Hud need to be able to select reference object in space as data is always
   // relative.
-
   glPushAttrib(GL_ENABLE_BIT);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -207,6 +212,37 @@ test_hud_draw(SGoverlay *overlay)
   glVertex2f(0.0f, 0.5f);
 
   glEnd();
+
+  glEnable(GL_TEXTURE_2D);
+  //glEnable(GL_POINT_SPRITE);
+  //glPointSize(10.0);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, sgTextTexture(hud->text));
+  SG_CHECK_ERROR;
+  //GLuint tex_num = glGetUniformLocation(, )
+  //glUniform1i(, 0);
+  //sgBindTextBuffer(hud->text);
+  glDisable(GL_LIGHTING);
+  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+
+  glColor4f(0.0, 1.0, 0.0, 0.0);
+  glBegin(GL_QUADS);
+
+  glTexCoord2f(0.0, 0.0);
+  glVertex2f(-0.025f, 0.025f);
+
+  glTexCoord2f(1.0, 0.0);
+  glVertex2f(0.025f, 0.025f);
+
+  glTexCoord2f(1.0, 1.0);
+  glVertex2f(0.025f, -0.025f);
+
+  glTexCoord2f(0.0, 1.0);
+  glVertex2f(-0.025f, -0.025f);
+
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
 
   glPopMatrix();
   glMatrixMode(GL_PROJECTION);
@@ -244,14 +280,32 @@ simMfdInitAll(SGscenegraph *sg)
   sgInitOverlay(&hud.super, test_hud_draw,   0.0, 0.0,
                 sgRenderInfo.w, sgRenderInfo.h, sgRenderInfo.w, sgRenderInfo.h);
 
+  hud.text = sgNewTextLabel("Helvetica", 14.0, "20");
+  SG_CHECK_ERROR;
+  hud.lines = 360 / 10;
+  hud.lineVerts = calloc(hud.lines, sizeof(GLfloat)*4);
+  for (int i = 0 ; i < hud.lines ; i++) {
+    hud.lineVerts[i*4+0] = -0.5f;
+    hud.lineVerts[i*4+1] = i*0.1f; // TODO: What will we set the lines to?
 
+    hud.lineVerts[i*4+2] = 0.5f;
+    hud.lineVerts[i*4+3] = i*0.1f;
+  }
+
+  for (int i = 0 ; i < SIM_HUD_MARKS ; i++) {
+    hud.marks[i] = sgNewTextLabelf("Helvetica", 14, "%d", i * SIM_HUD_STEP);
+  }
+
+  glGenBuffers(1, &hud.lineBuff);
+  SG_CHECK_ERROR;
+  glBufferData(GL_ARRAY_BUFFER, hud.lines*4*sizeof(GLfloat), hud.lineVerts,
+               GL_STATIC_DRAW);
   sgAddOverlay(sg, &mfd0.super);
   sgAddOverlay(sg, &mfd1.super);
   sgAddOverlay(sg, &mfd2.super);
   sgAddOverlay(sg, &mfd3.super);
   sgAddOverlay(sg, &hud.super);
 }
-
 
 INIT_IO {
   ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd0);

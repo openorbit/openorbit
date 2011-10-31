@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -22,6 +22,7 @@
 
 #include <gencds/array.h>
 #include "rendering/scenegraph.h"
+#include "rendering/text.h"
 
 typedef struct SIMmfd SIMmfd;
 typedef struct SIMmfdpage SIMmfdpage;
@@ -53,13 +54,20 @@ typedef struct SIMhud SIMhud;
 
 typedef void (*SIMhuddraw)(SIMhud *hud);
 
+#define SIM_HUD_STEP 10
+#define SIM_HUD_MARKS (360/SIM_HUD_STEP)
+
 struct SIMhud {
   SGoverlay super;
 
   // drawing context
   SIMhuddraw draw;
+  SGtextbuffer *text;
+  SGtextbuffer *marks[SIM_HUD_MARKS]; // Degree marks
+  int lines;
+  GLuint lineBuff;
+  GLfloat *lineVerts;
 };
-
 
 void simHudDraw(SIMhud *hud);
 
