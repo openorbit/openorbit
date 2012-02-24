@@ -249,6 +249,7 @@
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
 		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
+		EC8E74A114F7732F0052BBE6 /* pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8E749E14F773240052BBE6 /* pcm.c */; };
 		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
 		EC935D4C1417B26C00953D20 /* sdl-events.c in Sources */ = {isa = PBXBuildFile; fileRef = EC935D4B1417B26C00953D20 /* sdl-events.c */; };
 		EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9DA88A12EB84540028A131 /* libfreetype.a */; };
@@ -679,6 +680,8 @@
 		EC88CF8F10A2B1D700A11B1D /* collada.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = collada.c; sourceTree = "<group>"; };
 		EC88CFC010A2B8F100A11B1D /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
 		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
+		EC8E749E14F773240052BBE6 /* pcm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcm.c; sourceTree = "<group>"; };
+		EC8E749F14F773240052BBE6 /* pcm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcm.h; sourceTree = "<group>"; };
 		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
 		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
 		EC935D4B1417B26C00953D20 /* sdl-events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-events.c"; sourceTree = "<group>"; };
@@ -863,6 +866,8 @@
 		EC0C020D144173CD00A2AE5E /* auload */ = {
 			isa = PBXGroup;
 			children = (
+				EC8E749E14F773240052BBE6 /* pcm.c */,
+				EC8E749F14F773240052BBE6 /* pcm.h */,
 				EC0C02111441745D00A2AE5E /* wav.h */,
 				EC0C020E1441744500A2AE5E /* wav.c */,
 			);
@@ -1942,6 +1947,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC0C021B144174D700A2AE5E /* wav.c in Sources */,
+				EC8E74A114F7732F0052BBE6 /* pcm.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
