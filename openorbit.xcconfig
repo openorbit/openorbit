@@ -16,40 +16,25 @@ FINK_BASE=/sw
 FINK_INC=${FINK_BASE}/include
 FINK_LIB=${FINK_BASE}/lib
 
+X11R6_BASE=/usr/X11R6
+X11R6_INC=/usr/X11R6/inc
+X11R6_LIB=/usr/X11R6/lib
+
+DEPS_BASE=${SRCROOT}/deps/local
+DEPS_LIB=${DEPS_BASE}/lib
+DEPS_INC=${DEPS_BASE}/include
+
+// Define for swig support for the python framework
+PYTHON_EXTRA_INC=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Python.framework/Headers/
 
 // Customise prefixes for your environment
-CHECK_PREFIX=/usr/local
-PNG_PREFIX=/usr/X11R6
-JPG_PREFIX=/opt/local
-PYTHON_PREFIX=/usr
-XML_PREFIX=/usr
+// We should be able to locate: libpng, libjpeg, libxml2, libfreetype
+// libcheck
 
-CHECK_LIB=${CHECK_PREFIX}/lib
-CHECK_INC=${CHECK_PREFIX}/include
-
-PNG_LIB=${PNG_PREFIX}/lib
-PNG_INC=${PNG_PREFIX}/include
-
-JPG_LIB=${JPG_PREFIX}/lib
-JPG_INC=${JPG_PREFIX}/include
-
-PYTHON_LIB=${PYTHON_PREFIX}/lib
-PYTHON_INC=${PYTHON_PREFIX}/include/python2.5
-
-XML_LIB=${XML_PREFIX}/lib
-XML_INC=${XML_PREFIX}/include/libxml2
-
-FREETYPE_INC=${PORTS_INC} ${PORTS_INC}/freetype2
-FREETYPE_LIB=${PORTS_LIB}
-
-JANSSON_INC=${PORTS_INC}
-JANSSON_LIB=${PORTS_LIB}
-
-ORBIT_LIBPATH=${JPG_LIB} ${PNG_LIB} ${PYTHON_LIB} ${XML_LIB} ${FREETYPE_LIB} ${JANSSON_LIB}
-ORBIT_INCPATH=${JPG_INC} ${PNG_INC} ${PYTHON_INC} ${XML_INC} ${FREETYPE_INC} ${JANSSON_INC}
+ORBIT_LIBPATH=${DEPS_LIB} ${PORTS_LIB} ${X11R6_LIB} ${FINK_LIB}
+ORBIT_INCPATH=${DEPS_INC} ${DEPS_INC}/python2.7 ${PORTS_INC} ${PORTS_INC}/freetype2 /usr/include/libxml2 ${X11R6_INC} ${FINK_INC}
 
 TEST_LIBPATH=${JPG_LIB} ${PNG_LIB} ${CHECK_LIB}
 TEST_INCPATH=${JPG_INC} ${PNG_INC} ${CHECK_INC}
 
 SWIG=/opt/local/bin/swig
-

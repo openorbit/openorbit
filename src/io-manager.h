@@ -26,7 +26,11 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stdint.h>
+#ifdef PYTHON_FWORK
+#include <Python/Python.h>
+#else
 #include <Python.h>
+#endif
 
   typedef enum IOkeymod {
     OO_None = 0,

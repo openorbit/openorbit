@@ -28,8 +28,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		EC0C020B1441739200A2AE5E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0C020A1441739100A2AE5E /* OpenAL.framework */; };
-		EC0C020C1441739200A2AE5E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0C020A1441739100A2AE5E /* OpenAL.framework */; };
 		EC0C021A144174D700A2AE5E /* wav.h in Headers */ = {isa = PBXBuildFile; fileRef = EC0C02111441745D00A2AE5E /* wav.h */; };
 		EC0C021B144174D700A2AE5E /* wav.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0C020E1441744500A2AE5E /* wav.c */; };
 		EC0C021C1441753A00A2AE5E /* libauload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0C0216144174AD00A2AE5E /* libauload.a */; };
@@ -44,6 +42,9 @@
 		EC0FBAF011A70DEE00CEF95A /* collision.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0FBAEF11A70DEE00CEF95A /* collision.c */; };
 		EC13F0F611762C7900E39B89 /* shaders in Resources */ = {isa = PBXBuildFile; fileRef = EC13F0F011762C7900E39B89 /* shaders */; };
 		EC204D5410CAFA2300F0A450 /* palloc.c in Sources */ = {isa = PBXBuildFile; fileRef = EC204D5310CAFA2300F0A450 /* palloc.c */; };
+		EC2386F814F7849400C59F16 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC2386F714F7849400C59F16 /* OpenAL.framework */; };
+		EC2386FE14F7851F00C59F16 /* libjansson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC2386FD14F7851F00C59F16 /* libjansson.a */; };
+		EC23870014F7866E00C59F16 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC2386FF14F7866E00C59F16 /* IOKit.framework */; };
 		EC239D1511843C5E00C1A5B9 /* world-loader.c in Sources */ = {isa = PBXBuildFile; fileRef = EC239D1411843C5E00C1A5B9 /* world-loader.c */; };
 		EC239D751184406900C1A5B9 /* script in Resources */ = {isa = PBXBuildFile; fileRef = EC239D731184406900C1A5B9 /* script */; };
 		EC34BC6B1079EE080011B76E /* lwcoord.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBE11079EE080011B76E /* lwcoord.c */; };
@@ -134,7 +135,6 @@
 		EC4C8A08137D59FC007AC0DF /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
 		EC4C8A09137D59FC007AC0DF /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
 		EC4C8A0A137D5BD9007AC0DF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
-		EC4C8A0C137D5C1D007AC0DF /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4C8A0B137D5C1D007AC0DF /* GLUT.framework */; };
 		EC4C8A0D137D5C69007AC0DF /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
 		EC4C8A0E137D5D0A007AC0DF /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBEB1079EE080011B76E /* array.c */; };
 		EC4C8A0F137D5D0A007AC0DF /* avl-tree.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBEC1079EE080011B76E /* avl-tree.c */; };
@@ -233,7 +233,6 @@
 		EC75356E14177EA6000A7CB4 /* sdl-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7535121417725F000A7CB4 /* sdl-main.c */; };
 		EC75356F14177EA6000A7CB4 /* sdl-window.c in Sources */ = {isa = PBXBuildFile; fileRef = EC753514141774CB000A7CB4 /* sdl-window.c */; };
 		EC75357114177EA6000A7CB4 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
-		EC75357214177EA6000A7CB4 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
 		EC75357314177EA6000A7CB4 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
 		EC75357414177EA6000A7CB4 /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BDBE107B2C900011B76E /* libvmath.a */; };
 		EC75357514177EA6000A7CB4 /* libimgload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECBF1745108C565600D3E412 /* libimgload.a */; };
@@ -248,9 +247,9 @@
 		EC823729113140E100A725B1 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
-		EC89155C0CD503EC000E662E /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC89155B0CD503EC000E662E /* Python.framework */; };
 		EC8E74A114F7732F0052BBE6 /* pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8E749E14F773240052BBE6 /* pcm.c */; };
 		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
+		EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9351D314F7989900962391 /* libpython2.7.a */; };
 		EC935D4C1417B26C00953D20 /* sdl-events.c in Sources */ = {isa = PBXBuildFile; fileRef = EC935D4B1417B26C00953D20 /* sdl-events.c */; };
 		EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9DA88A12EB84540028A131 /* libfreetype.a */; };
 		EC9ECBE61195964500229A8E /* mercury.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECBE51195964500229A8E /* mercury.c */; };
@@ -259,10 +258,8 @@
 		ECA0639913A54C8600D720F1 /* gemeni.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA0639713A54C8600D720F1 /* gemeni.c */; };
 		ECA0639B13A54D7100D720F1 /* apollo.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA0639A13A54D7100D720F1 /* apollo.c */; };
 		ECA27D7C1433BDD60074B04C /* hid.m in Sources */ = {isa = PBXBuildFile; fileRef = ECA27D7B1433BDD60074B04C /* hid.m */; };
-		ECA27D7E14343E570074B04C /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECA27D7D14343E570074B04C /* IOKit.framework */; };
 		ECA27D8514360CBE0074B04C /* default-conf.json in Resources */ = {isa = PBXBuildFile; fileRef = ECA27D8414360CBE0074B04C /* default-conf.json */; };
 		ECA27D8614360CBE0074B04C /* default-conf.json in Resources */ = {isa = PBXBuildFile; fileRef = ECA27D8414360CBE0074B04C /* default-conf.json */; };
-		ECA662E8140B6F6500964A72 /* libjansson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECA662E7140B6F6500964A72 /* libjansson.a */; };
 		ECBF1748108C566E00D3E412 /* image.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1734108C55ED00D3E412 /* image.c */; };
 		ECBF1749108C566E00D3E412 /* jpg.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1735108C55ED00D3E412 /* jpg.c */; };
 		ECBF174B108C566E00D3E412 /* pngfile.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1737108C55ED00D3E412 /* pngfile.c */; };
@@ -475,7 +472,6 @@
 
 /* Begin PBXFileReference section */
 		EC030D6911084749004F3AD8 /* Simulation Design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Simulation Design"; sourceTree = "<group>"; };
-		EC0C020A1441739100A2AE5E /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = ../../../../System/Library/Frameworks/OpenAL.framework; sourceTree = "<group>"; };
 		EC0C020E1441744500A2AE5E /* wav.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = wav.c; sourceTree = "<group>"; };
 		EC0C02111441745D00A2AE5E /* wav.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wav.h; sourceTree = "<group>"; };
 		EC0C0216144174AD00A2AE5E /* libauload.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libauload.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -494,6 +490,9 @@
 		EC204D5210CAFA2300F0A450 /* palloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = palloc.h; sourceTree = "<group>"; };
 		EC204D5310CAFA2300F0A450 /* palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = palloc.c; sourceTree = "<group>"; };
 		EC204D5F10CB09D500F0A450 /* test-palloc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-palloc.c"; sourceTree = "<group>"; };
+		EC2386F714F7849400C59F16 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		EC2386FD14F7851F00C59F16 /* libjansson.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjansson.a; path = /opt/local/lib/libjansson.a; sourceTree = "<absolute>"; };
+		EC2386FF14F7866E00C59F16 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		EC239D1311843C5E00C1A5B9 /* world-loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "world-loader.h"; sourceTree = "<group>"; };
 		EC239D1411843C5E00C1A5B9 /* world-loader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "world-loader.c"; sourceTree = "<group>"; };
 		EC239D731184406900C1A5B9 /* script */ = {isa = PBXFileReference; lastKnownFileType = folder; path = script; sourceTree = "<group>"; };
@@ -642,7 +641,6 @@
 		EC4A895310B1553A002C6513 /* simtypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simtypes.h; sourceTree = "<group>"; };
 		EC4C89EA137D4D0D007AC0DF /* dragarea */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = dragarea; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4C89F6137D4E77007AC0DF /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		EC4C8A0B137D5C1D007AC0DF /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
 		EC4FCC6010748ECA00EB6DDF /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = /opt/local/lib/libjpeg.a; sourceTree = "<absolute>"; };
 		EC4FCC6210748F4B00EB6DDF /* libpng.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng.dylib; path = /usr/X11/lib/libpng.dylib; sourceTree = "<absolute>"; };
 		EC51E6E110BBE766009FA70D /* mass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mass.h; sourceTree = "<group>"; };
@@ -679,11 +677,11 @@
 		EC88CF8E10A2B1D700A11B1D /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
 		EC88CF8F10A2B1D700A11B1D /* collada.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = collada.c; sourceTree = "<group>"; };
 		EC88CFC010A2B8F100A11B1D /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
-		EC89155B0CD503EC000E662E /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		EC8E749E14F773240052BBE6 /* pcm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcm.c; sourceTree = "<group>"; };
 		EC8E749F14F773240052BBE6 /* pcm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcm.h; sourceTree = "<group>"; };
 		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
 		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
+		EC9351D314F7989900962391 /* libpython2.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpython2.7.a; path = deps/local/lib/libpython2.7.a; sourceTree = "<group>"; };
 		EC935D4B1417B26C00953D20 /* sdl-events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-events.c"; sourceTree = "<group>"; };
 		EC935D4D1417F70200953D20 /* sdl-events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sdl-events.h"; sourceTree = "<group>"; };
 		EC9DA88A12EB84540028A131 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = /opt/local/lib/libfreetype.a; sourceTree = "<absolute>"; };
@@ -695,10 +693,8 @@
 		ECA0639713A54C8600D720F1 /* gemeni.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gemeni.c; sourceTree = "<group>"; };
 		ECA0639A13A54D7100D720F1 /* apollo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = apollo.c; sourceTree = "<group>"; };
 		ECA27D7B1433BDD60074B04C /* hid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = hid.m; sourceTree = "<group>"; };
-		ECA27D7D14343E570074B04C /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../System/Library/Frameworks/IOKit.framework; sourceTree = "<group>"; };
 		ECA27D8414360CBE0074B04C /* default-conf.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "default-conf.json"; sourceTree = "<group>"; };
 		ECA5F8B1109D8FE7004278EC /* Hrml Manual */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Hrml Manual"; sourceTree = "<group>"; };
-		ECA662E7140B6F6500964A72 /* libjansson.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjansson.a; path = ../../../../opt/local/lib/libjansson.a; sourceTree = "<group>"; };
 		ECBF1734108C55ED00D3E412 /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
 		ECBF1735108C55ED00D3E412 /* jpg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jpg.c; sourceTree = "<group>"; };
 		ECBF1736108C55ED00D3E412 /* jpg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jpg.h; sourceTree = "<group>"; };
@@ -808,19 +804,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC0C021C1441753A00A2AE5E /* libauload.a in Frameworks */,
-				ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */,
-				EC89155C0CD503EC000E662E /* Python.framework in Frameworks */,
+				EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */,
 				ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */,
-				EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */,
-				ECBF1754108C56CF00D3E412 /* libimgload.a in Frameworks */,
-				EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */,
+				EC2386F814F7849400C59F16 /* OpenAL.framework in Frameworks */,
+				EC23870014F7866E00C59F16 /* IOKit.framework in Frameworks */,
 				EC0FBA7011A66E3300CEF95A /* CoreFoundation.framework in Frameworks */,
 				EC0FBAD811A6721B00CEF95A /* ApplicationServices.framework in Frameworks */,
+				ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */,
+				EC2386FE14F7851F00C59F16 /* libjansson.a in Frameworks */,
+				EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */,
 				EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */,
-				ECA662E8140B6F6500964A72 /* libjansson.a in Frameworks */,
-				ECA27D7E14343E570074B04C /* IOKit.framework in Frameworks */,
-				EC0C020B1441739200A2AE5E /* OpenAL.framework in Frameworks */,
+				ECBF1754108C56CF00D3E412 /* libimgload.a in Frameworks */,
+				EC0C021C1441753A00A2AE5E /* libauload.a in Frameworks */,
+				EC34BDC4107B2D000011B76E /* libvmath.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -829,7 +825,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC4C8A0A137D5BD9007AC0DF /* OpenGL.framework in Frameworks */,
-				EC4C8A0C137D5C1D007AC0DF /* GLUT.framework in Frameworks */,
 				EC4C8A0D137D5C69007AC0DF /* libxml2.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -839,7 +834,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC75357114177EA6000A7CB4 /* libpng.dylib in Frameworks */,
-				EC75357214177EA6000A7CB4 /* Python.framework in Frameworks */,
 				EC75357314177EA6000A7CB4 /* OpenGL.framework in Frameworks */,
 				EC75357414177EA6000A7CB4 /* libvmath.a in Frameworks */,
 				EC75357514177EA6000A7CB4 /* libimgload.a in Frameworks */,
@@ -847,7 +841,6 @@
 				EC75357714177EA6000A7CB4 /* CoreFoundation.framework in Frameworks */,
 				EC75357814177EA6000A7CB4 /* ApplicationServices.framework in Frameworks */,
 				EC75357914177EA6000A7CB4 /* libfreetype.a in Frameworks */,
-				EC0C020C1441739200A2AE5E /* OpenAL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1337,10 +1330,9 @@
 		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				EC0C020A1441739100A2AE5E /* OpenAL.framework */,
-				ECA27D7D14343E570074B04C /* IOKit.framework */,
-				ECA662E7140B6F6500964A72 /* libjansson.a */,
-				EC4C8A0B137D5C1D007AC0DF /* GLUT.framework */,
+				EC9351D314F7989900962391 /* libpython2.7.a */,
+				EC2386FD14F7851F00C59F16 /* libjansson.a */,
+				EC2386F714F7849400C59F16 /* OpenAL.framework */,
 				EC9DA88A12EB84540028A131 /* libfreetype.a */,
 				EC88CFC010A2B8F100A11B1D /* libxml2.dylib */,
 				EC0FBA6F11A66E3300CEF95A /* CoreFoundation.framework */,
@@ -1348,7 +1340,7 @@
 				EC4FCC6210748F4B00EB6DDF /* libpng.dylib */,
 				EC4FCC6010748ECA00EB6DDF /* libjpeg.a */,
 				ECE17A871079DE71006B6A37 /* OpenGL.framework */,
-				EC89155B0CD503EC000E662E /* Python.framework */,
+				EC2386FF14F7866E00C59F16 /* IOKit.framework */,
 				EC0FBAD711A6721B00CEF95A /* ApplicationServices.framework */,
 			);
 			name = Frameworks;
@@ -1871,7 +1863,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = EC4476770CCBFEDB001C88AD /* Build configuration list for PBXProject "orbit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -2747,19 +2739,13 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
 				);
-				GCC_ALTIVEC_EXTENSIONS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					PYTHON_FWORK,
-					WITH_PYTHON,
-					USE_ALTIVEC,
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					src/,
@@ -2774,8 +2760,9 @@
 					"$(ORBIT_LIBPATH)",
 					/usr/X11/lib,
 					/opt/local/lib,
+					/opt/local/Library/Frameworks/Python.framework/Versions/2.7,
+					"\"$(SRCROOT)/deps/local/lib\"",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -2799,16 +2786,11 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
 				);
-				GCC_ALTIVEC_EXTENSIONS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G4;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					WITH_PYTHON,
-					USE_ALTIVEC,
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = (
 					src/,
@@ -2823,8 +2805,9 @@
 					"$(ORBIT_LIBPATH)",
 					/usr/X11/lib,
 					/opt/local/lib,
+					/opt/local/Library/Frameworks/Python.framework/Versions/2.7,
+					"\"$(SRCROOT)/deps/local/lib\"",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(LOCAL_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.5/lib/python2.5/config\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,

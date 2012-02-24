@@ -1,0 +1,7 @@
+This directory is a droplocation for openorbit dependencies. A script exist to
+build all the dependencies that have been installed.
+
+Dependencies should be named as follows:
+
+	     Python: This directory should contain the uncompressed sources
+	     	     of the C-python 2.7 distribution.

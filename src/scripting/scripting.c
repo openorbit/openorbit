@@ -24,7 +24,11 @@
 #include "res-manager.h"
 #include "log.h"
 
+#ifdef PYTHON_FWORK
+#include <Python/Python.h>
+#else
 #include <Python.h>
+#endif
 
 extern void init_config(void);
 extern void init_event(void);
