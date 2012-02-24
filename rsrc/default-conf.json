@@ -39,7 +39,7 @@
         "axises": ["roll", "pitch", "vertical", "lateral", "forward", "yaw"],
         "sliders": ["throttle"],
         "buttons": [],
-        "hats": ["cam-rotate"],
+        "hats": ["cam-rotate"]
       },
       {
         "name": "Logitech Extreme 3D",
