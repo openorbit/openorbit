@@ -42,12 +42,14 @@ INIT_PRIMARY_MODULE
 }
 
 void
-simNewSpacecraftClass(const char *name, OOspacecraft *(*alloc)(void))
+simNewSpacecraftClass(const char *name, OOspacecraft *(*alloc)(void),
+                      void (*init)(SIMspacecraft *sc))
 {
   SCclass *cls = malloc(sizeof(SCclass));
 
   cls->name = strdup(name);
   cls->alloc = alloc;
+  cls->init = init;
   cls->dealloc = NULL;
 
   hashtable_insert(gSpacecraftClasses, name, cls);
@@ -63,14 +65,17 @@ simNewSpacecraft(const char *className, const char *scName)
   }
 
   OOspacecraft *sc = cls->alloc();
-  sc->name = strdup(scName);
+  simScInit(sc, scName);
+  cls->init(sc);
+
   plUpdateMass(sc->obj);
   ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
 
-  char *axises;
-  asprintf(&axises, "/sc/%s/axis", scName);
+  //  char *axises;
+  // asprintf(&axises, "/sc/%s/axis", scName);
 
-  sim_record_t *rec = simPubsubCreateRecord(axises);
+  sim_record_t *rec = simPubsubMakeRecord(sc->rec, "axis");
+
   if (rec) {
     simPublishValue(rec, SIM_TYPE_FLOAT, "yaw", &sc->axises.yaw);
     simPublishValue(rec, SIM_TYPE_FLOAT, "roll", &sc->axises.roll);
@@ -81,7 +86,6 @@ simNewSpacecraft(const char *className, const char *scName)
     simPublishValue(rec, SIM_TYPE_FLOAT, "orbital", &sc->axises.orbital);
     simPublishValue(rec, SIM_TYPE_FLOAT, "throttle", &sc->axises.throttle);
   }
-  free(axises);
 
   return sc;
 }
@@ -161,6 +165,13 @@ simDefaultAxisUpdate(OOspacecraft *sc)
 void
 simScInit(OOspacecraft *sc, const char *name)
 {
+  sc->name = strdup(name);
+
+  char *sckey;
+  asprintf(&sckey, "/sc/%s", name);
+  sc->rec = simPubsubCreateRecord(sckey);
+  free(sckey);
+
   SGscenegraph *sg = simGetSg();
   PLworld *world = simGetWorld();
 
@@ -344,6 +355,7 @@ simNewStage(OOspacecraft *sc, const char *name, const char *mesh)
   stage->state = OO_Stage_Idle;
   stage->sc = sc;
   stage->expendedMass = 0.0;
+  stage->rec = simPubsubMakeRecord(sc->rec, name);
 
   obj_array_init(&stage->engines);
   obj_array_init(&stage->actuatorGroups);

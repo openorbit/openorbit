@@ -64,6 +64,7 @@ typedef enum OOstagestate {
 } OOstagestate;
 
 struct OOstage {
+  sim_record_t *rec;
   OOspacecraft *sc;
   float3 pos;
   float expendedMass;
@@ -107,6 +108,8 @@ struct OOsimplewing {
  */
 
 struct OOspacecraft {
+  sim_record_t *rec;
+
   PLworld *world;
   PLobject *obj;
 
@@ -137,10 +140,14 @@ struct OOspacecraft {
 typedef struct {
   const char *name;
   OOspacecraft *(*alloc)(void);
+  void (*init)(SIMspacecraft *sc);
   void (*dealloc)(OOspacecraft *sc);
 } SCclass;
 
-void simNewSpacecraftClass(const char *name, OOspacecraft *(*alloc)(void));
+void
+simNewSpacecraftClass(const char *name, OOspacecraft *(*alloc)(void),
+                      void (*init)(SIMspacecraft *sc));
+
 OOspacecraft* simNewSpacecraft(const char *className, const char *scName);
 
 void simScInit(OOspacecraft *sc, const char *name);

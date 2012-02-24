@@ -201,7 +201,12 @@ static OOspacecraft*
 ApolloNew(void)
 {
   OOspacecraft *sc = smalloc(sizeof(OOspacecraft));
-  simScInit(sc, "Saturn V");
+  return sc;
+}
+
+static void
+ApolloInit(SIMspacecraft *sc)
+{
   sc->detatchStage = DetatchStage;
   sc->toggleMainEngine = MainEngineToggle;
   sc->axisUpdate = AxisUpdate;
@@ -210,19 +215,19 @@ ApolloNew(void)
   // for the redstone mercury rocket we assume a solid cylinder for the form
   // 1/2 mrr = 0.5 * 1.0 * 0.89 * 0.89 = 0.39605
   // 1/12 m(3rr + hh) = 27.14764852
-
+  
   OOstage *sat_1c = simNewStage(sc, "Saturn 1C",
-                                 "spacecrafts/saturn/saturn_1c.ac");
+                                "spacecrafts/saturn/saturn_1c.ac");
   OOstage *sat_ii = simNewStage(sc, "Saturn II",
-                                 "spacecrafts/saturn/saturn_ii.ac");
+                                "spacecrafts/saturn/saturn_ii.ac");
   OOstage *sat_ivb = simNewStage(sc, "Saturn IVB",
-                                  "spacecrafts/saturn/saturn_ivb.ac");
+                                 "spacecrafts/saturn/saturn_ivb.ac");
   OOstage *apollo_serv = simNewStage(sc, "Service Module",
-                                      "spacecrafts/saturn/apollo_serv.ac");
+                                     "spacecrafts/saturn/apollo_serv.ac");
   OOstage *apollo_cmd = simNewStage(sc, "Command Module",
-                                     "spacecrafts/saturn/apollo_cmd.ac");
-
-
+                                    "spacecrafts/saturn/apollo_cmd.ac");
+  
+  
   plMassSet(&sat_1c->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
             27.14764852, 0.39605, 27.14764852,
@@ -232,9 +237,9 @@ ApolloNew(void)
   plMassSetMin(&sat_1c->obj->m, 4400.0);
   plSetDragCoef(sat_1c->obj, 0.5);
   plSetArea(sat_1c->obj, 2.0*M_PI);
-
+  
   scStageSetOffset3f(sat_1c, 0.0, 0.0, 0.0);
-
+  
   simNewEngine("Rocketdyne F-1:0", sat_1c, SIM_Thruster, SIM_Armed, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
   simNewEngine("Rocketdyne F-1:1", sat_1c, SIM_Thruster, SIM_Armed, 1.0f,
@@ -246,10 +251,9 @@ ApolloNew(void)
   simNewEngine("Rocketdyne F-1:4", sat_1c, SIM_Thruster, SIM_Armed, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
 
-  return sc;
 }
 
 INIT_STATIC_SC_PLUGIN
 {
-  simNewSpacecraftClass("apollo", ApolloNew);
+  simNewSpacecraftClass("apollo", ApolloNew, ApolloInit);
 }

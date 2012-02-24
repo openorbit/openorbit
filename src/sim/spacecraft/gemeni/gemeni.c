@@ -167,7 +167,12 @@ static OOspacecraft*
 GemeniNew(void)
 {
   OOspacecraft *sc = smalloc(sizeof(OOspacecraft));
-  simScInit(sc, "Gemeni SC");
+  return sc;
+}
+
+static void
+GemeniInit(SIMspacecraft *sc)
+{
   sc->detatchStage = DetatchStage;
   sc->toggleMainEngine = MainEngineToggle;
   sc->axisUpdate = AxisUpdate;
@@ -176,10 +181,10 @@ GemeniNew(void)
   // for the redstone mercury rocket we assume a solid cylinder for the form
   // 1/2 mrr = 0.5 * 1.0 * 0.89 * 0.89 = 0.39605
   // 1/12 m(3rr + hh) = 27.14764852
-
+  
   OOstage *launcher = simNewStage(sc, "Command-Module",
                                   "spacecrafts/mercury/gemeni.ac");
-
+  
 #if 0
   plMassSet(&redstone->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
@@ -190,17 +195,17 @@ GemeniNew(void)
   plMassSetMin(&redstone->obj->m, 4400.0);
   plSetDragCoef(redstone->obj, 0.5);
   plSetArea(redstone->obj, 2.0*M_PI);
-
+  
   scStageSetOffset3f(redstone, 0.0, 0.0, 0.0);
-
+  
   //"LOX/ethyl alcohol"
   simNewEngine("Rocketdyne A7", redstone, SIM_Thruster, SIM_Armed, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
   //orbital
 #endif
-
+  
   OOstage *capsule = simNewStage(sc, "Command-Module",
-                                "spacecrafts/mercury/gemeni.ac");
+                                 "spacecrafts/mercury/gemeni.ac");
 #if 0
   plMassSet(&capsule->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
@@ -211,12 +216,12 @@ GemeniNew(void)
   plMassSetMin(&capsule->obj->m, 1354.0);
   plSetDragCoef(capsule->obj, 0.5);
   plSetArea(capsule->obj, 2.0*M_PI);
-
+  
   scStageSetOffset3f(capsule, 0.0, 17.9832, 0.0);
 #endif
   simNewEngine("Posigrade", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,1.8e3,0.0});
-
+  
   // Ripple fire 10 s burntime each
   simNewEngine("Retro 0", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
@@ -236,11 +241,11 @@ GemeniNew(void)
                (float3){0.41, 2.20, 0.00}, (float3){-108.0, 0.0,0.0});
   simNewEngine("Yaw 1", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
                (float3){-0.41, 2.20, 0.00}, (float3){108.0, 0.0,0.0});
+  
 
-  return sc;
 }
 
 INIT_STATIC_SC_PLUGIN
 {
-  simNewSpacecraftClass("gemeni", GemeniNew);
+  simNewSpacecraftClass("gemeni", GemeniNew, GemeniInit);
 }
