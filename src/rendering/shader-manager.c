@@ -1,19 +1,19 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
  Open Orbit is free software: you can redistribute it and/or modify
- it under the terms of the GNU Lesser General Public License as published by
+ it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
  Open Orbit is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Lesser General Public License for more details.
+ GNU General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public License
+ You should have received a copy of the GNU General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -129,7 +129,7 @@ sgLoadProgram(const char *key,
         ooLogFatal("vertex shader '%s' did not compile", shaders.gl_pathv[i]);
       }
       glAttachShader(shaderProgram, shaderId);
-      ooLogInfo("loaded vertex shader '%s'", shaders.gl_pathv[i]);
+      ooLogTrace("loaded vertex shader '%s'", shaders.gl_pathv[i]);
     }
     globfree(&shaders);
   }
@@ -173,7 +173,7 @@ sgLoadProgram(const char *key,
         ooLogFatal("fragment shader '%s' did not compile", shaders.gl_pathv[i]);
       }
       glAttachShader(shaderProgram, shaderId);
-      ooLogInfo("loaded fragment shader '%s'", shaders.gl_pathv[i]);
+      ooLogTrace("loaded fragment shader '%s'", shaders.gl_pathv[i]);
     }
     globfree(&shaders);
   }
@@ -198,7 +198,7 @@ sgLoadProgram(const char *key,
 
     ooLogFatal("shader linking did not succeed");
   }
-  ooLogInfo("shader program succesfully linked");
+  ooLogInfo("shader program '%s' succesfully linked", key);
 
   if (!didLoadVertexShader && !didLoadFragShader && !didLoadGeoShader) {
     ooLogInfo("no shaders found for '%s'", key);
@@ -236,4 +236,37 @@ sgShaderFromKey(const char *key)
 {
   SGshaderinfo *si = hashtable_lookup(shaderKeyMap, key);
   return si->ident;
+}
+
+static const char* param_names[SG_PARAM_COUNT] = {
+  [SG_VERTEX0] = "Position",
+  [SG_TEX_COORD0] = "TexCoord[0]",
+  [SG_COLOR0] = "Color",
+  [SG_TEX0] = "Tex[0]",
+  [SG_TEX1] = "Tex[1]",
+  [SG_TEX2] = "Tex[2]",
+  [SG_TEX3] = "Tex[3]",
+  [SG_LIGHT0] = "Light[0]",
+  [SG_LIGHT1] = "Light[1]",
+  [SG_LIGHT2] = "Light[2]",
+  [SG_LIGHT3] = "Light[3]",
+  [SG_MODELVIEW] = "ModelView",
+  [SG_PROJECTION] = "Projection",
+};
+
+GLint
+sgGetLocationForParam(GLuint program, sg_param_id_t param)
+{
+  GLint loc = glGetUniformLocation(program, param_names[param]);
+  return loc;
+}
+
+void
+sgSetShaderTex(GLuint program, sg_param_id_t param, GLuint tex)
+{
+  assert(SG_TEX0 <= param && param <= SG_TEX3);
+  glActiveTexture(GL_TEXTURE0 + param - SG_TEX0);
+  glBindTexture(GL_TEXTURE_2D, tex);
+  GLint loc = sgGetLocationForParam(program, param);
+  glUniform1i(loc, param - SG_TEX0);
 }

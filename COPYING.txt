@@ -8,20 +8,27 @@ http://astrogeology.usgs.gov
 
 In general, attribution is given in a file in the same directory as the models.
 
-Open Orbit is distributed under the LGPLv3 or later licence. The full license
+Open Orbit is distributed under the GPLv3 or later licence. The full license
 text is available in the "licences" directory. Some files of the code may be
 available in other licenses as well, in such a case this will be mentioned in
-this file.
+this file. For example, the modified BSD license has been applied on certain
+utility libraries (dynamic arrays, hashtables, linked lists et.c.) not relating
+directly to the actual simulation code.
+
+You should assume that all source code is licensed according to the GPL unless
+otherwise explicitly stated otherwise. Exception are given on a file by file
+basis.
+
 
 This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
+it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
+GNU General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License
+You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.

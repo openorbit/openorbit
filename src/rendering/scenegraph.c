@@ -4,16 +4,16 @@
   This file is part of Open Orbit.
 
   Open Orbit is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as published by
+  it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
 
   Open Orbit is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Lesser General Public License for more details.
+  GNU General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public License
+  You should have received a copy of the GNU General Public License
   along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 */
 
@@ -199,6 +199,7 @@ sgInitOverlay(SGoverlay *overlay, SGdrawoverlay drawfunc,
 void
 sgDrawOverlays(SGscenegraph *sg)
 {
+  SG_CHECK_ERROR;
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
   glLoadIdentity();
@@ -217,6 +218,7 @@ sgDrawOverlays(SGscenegraph *sg)
     SGoverlay *overlay = ARRAY_ELEM(sg->overlays, i);
 
     if (overlay->enabled) {
+      glUseProgram(0); // No shader for now
       // Bind the fbo texture so that the mfd rendering ends up in the texture
       glBindFramebuffer(GL_FRAMEBUFFER, overlay->fbo);
       glPushAttrib(GL_VIEWPORT_BIT);
@@ -287,6 +289,7 @@ sgDrawOverlays(SGscenegraph *sg)
   glPopMatrix();
 
   glPopAttrib();
+  SG_CHECK_ERROR;
 }
 
 int
