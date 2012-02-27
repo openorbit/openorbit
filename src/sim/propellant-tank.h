@@ -20,16 +20,21 @@
 #ifndef SIM_PROPELLANT_TANK
 #define SIM_PROPELLANT_TANK
 
+#include <sim/pubsub.h>
+#include <sim/simtypes.h>
+
 typedef enum {
   SIM_Liquid,
   SIM_Solid,
 } SIMpropellanttype;
 
 struct SIMtank {
+  sim_record_t *rec;
   SIMpropellanttype kind;
   const char *propellantType;
-  float pressure;
-  float volume;
+  sim_float_t pressure;
+  sim_float_t volume;
+  sim_float_t temperature;
 };
 
 typedef struct SIMtank SIMtank;
@@ -38,6 +43,8 @@ typedef struct SIMtank SIMtank;
 // request mass through the pumps, the other way is to request mass by opening
 // valves attached to the pressurised tank.
 
+SIMtank* simNewTank(SIMstage *stage, const char *tankName, float p, float v, float t);
+void simDeleteTank(SIMtank *tank);
 void simOpenValve(SIMtank *tank);
 void simEnablePump(SIMtank *tank);
 

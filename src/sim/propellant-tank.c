@@ -18,6 +18,29 @@
  */
 
 #include "propellant-tank.h"
+#include "spacecraft.h"
+SIMtank*
+simNewTank(SIMstage *stage, const char *tankName, float p, float v, float t)
+{
+  SIMtank *tank = malloc(sizeof(SIMtank));
+
+  tank->rec = simPubsubMakeRecord(stage->rec, tankName);
+
+  simPublishValue(tank->rec, SIM_TYPE_FLOAT, "pressure", &tank->pressure);
+  simPublishValue(tank->rec, SIM_TYPE_FLOAT, "volume", &tank->volume);
+  simPublishValue(tank->rec, SIM_TYPE_FLOAT, "temperature", &tank->temperature);
+
+  SIM_VAL(tank->pressure) = p;
+  SIM_VAL(tank->volume) = v;
+  SIM_VAL(tank->pressure) = p;
+}
+
+void
+simDeleteTank(SIMtank *tank)
+{
+  free(tank);
+}
+
 
 void
 simOpenValve(SIMtank *tank)
