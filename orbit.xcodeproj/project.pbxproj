@@ -250,6 +250,10 @@
 		EC8E74A114F7732F0052BBE6 /* pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8E749E14F773240052BBE6 /* pcm.c */; };
 		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
 		EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9351D314F7989900962391 /* libpython2.7.a */; };
+		EC9351EB14F9449700962391 /* menus.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351EA14F9449700962391 /* menus.c */; };
+		EC9351EC14F9449700962391 /* menus.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351EA14F9449700962391 /* menus.c */; };
+		EC9351EF14F94D9100962391 /* console.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351EE14F94D9100962391 /* console.c */; };
+		EC9351F014F94D9100962391 /* console.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351EE14F94D9100962391 /* console.c */; };
 		EC935D4C1417B26C00953D20 /* sdl-events.c in Sources */ = {isa = PBXBuildFile; fileRef = EC935D4B1417B26C00953D20 /* sdl-events.c */; };
 		EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9DA88A12EB84540028A131 /* libfreetype.a */; };
 		EC9ECBE61195964500229A8E /* mercury.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECBE51195964500229A8E /* mercury.c */; };
@@ -682,6 +686,10 @@
 		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
 		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
 		EC9351D314F7989900962391 /* libpython2.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpython2.7.a; path = deps/local/lib/libpython2.7.a; sourceTree = "<group>"; };
+		EC9351EA14F9449700962391 /* menus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = menus.c; sourceTree = "<group>"; };
+		EC9351ED14F944A600962391 /* menus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = menus.h; sourceTree = "<group>"; };
+		EC9351EE14F94D9100962391 /* console.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = console.c; sourceTree = "<group>"; };
+		EC9351F114F94D9F00962391 /* console.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = console.h; sourceTree = "<group>"; };
 		EC935D4B1417B26C00953D20 /* sdl-events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-events.c"; sourceTree = "<group>"; };
 		EC935D4D1417F70200953D20 /* sdl-events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sdl-events.h"; sourceTree = "<group>"; };
 		EC9DA88A12EB84540028A131 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = /opt/local/lib/libfreetype.a; sourceTree = "<absolute>"; };
@@ -1110,6 +1118,7 @@
 		EC34BC271079EE080011B76E /* rendering */ = {
 			isa = PBXGroup;
 			children = (
+				EC9351E914F9443C00962391 /* ui */,
 				EC13F0F011762C7900E39B89 /* shaders */,
 				ECC909A21175A14B00E8D477 /* shader-manager.c */,
 				ECC909A31175A14B00E8D477 /* shader-manager.h */,
@@ -1506,6 +1515,17 @@
 				EC7D093410EE160700D9D28E /* flightrecorder.c */,
 			);
 			path = avionics;
+			sourceTree = "<group>";
+		};
+		EC9351E914F9443C00962391 /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				EC9351EA14F9449700962391 /* menus.c */,
+				EC9351ED14F944A600962391 /* menus.h */,
+				EC9351EE14F94D9100962391 /* console.c */,
+				EC9351F114F94D9F00962391 /* console.h */,
+			);
+			path = ui;
 			sourceTree = "<group>";
 		};
 		EC9ECBE21195958B00229A8E /* spacecraft */ = {
@@ -2111,6 +2131,8 @@
 				ECE3C1EE14363D85001C1F32 /* mouse.c in Sources */,
 				EC7CA612143AF4B500E22F4E /* stringextras.c in Sources */,
 				EC571BE61443675D002CA003 /* cgbitmaps.c in Sources */,
+				EC9351EB14F9449700962391 /* menus.c in Sources */,
+				EC9351EF14F94D9100962391 /* console.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2215,6 +2237,8 @@
 				ECE3C1F014363DCB001C1F32 /* sdl-mouse.c in Sources */,
 				EC7CA613143AF4B500E22F4E /* stringextras.c in Sources */,
 				EC571BE71443675D002CA003 /* cgbitmaps.c in Sources */,
+				EC9351EC14F9449700962391 /* menus.c in Sources */,
+				EC9351F014F94D9100962391 /* console.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
