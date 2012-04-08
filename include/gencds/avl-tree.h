@@ -53,33 +53,53 @@ typedef struct avl_node_t {
   void *data;
   int8_t balance; // Constrained to +/-1
   
-  uintptr_t key[]; // Can be any integer, also a pointer
+  
+  //uintptr_t key[] __attribute__((aligned(8))); // Can be any integer, also a pointer
 } avl_node_t;
 
-typedef int (*avl_compare_f)(void *, void *);
-typedef void (*avl_keycopy_f)(void *, void *);
+typedef struct {
+  avl_node_t super;
+  uuid_t key;
+} avl_uuid_node_t ;
+
+typedef struct {
+  avl_node_t super;
+  uintptr_t key;
+} avl_intptr_node_t ;
+
+typedef struct {
+  avl_node_t super;
+  char *key;
+} avl_str_node_t;
+
+typedef int (*avl_compare_nodes_f)(avl_node_t *, avl_node_t *);
+typedef int (*avl_compare_f)(avl_node_t *, const void *);
+typedef void (*avl_keycopy_f)(avl_node_t *, const void *);
+typedef void (*avl_nodefree_f)(avl_node_t *);
 
 typedef struct avl_tree_t {
   avl_node_t *root;
   size_t node_size;
   avl_compare_f compare;
+  avl_compare_nodes_f compareNodes;
   avl_keycopy_f copy;
+  avl_nodefree_f free;
 } avl_tree_t;
 
 
 typedef void (*avl_func)(void*);
 
-avl_tree_t* avl_new();
-avl_tree_t* avl_uuid_new();
+avl_tree_t* avl_new(void);
+avl_tree_t* avl_uuid_new(void);
+avl_tree_t* avl_str_new(void);
 
 void avl_delete(avl_tree_t *tree);
 void avl_apply(avl_tree_t *tree, avl_func f);
 
-void* avl_find(avl_tree_t *tree, uintptr_t key);
-void avl_remove(avl_tree_t *tree, uintptr_t key);
-void avl_insert(avl_tree_t *tree, void *key, void *data);
+void* avl_find(avl_tree_t *tree, const void *key);
+void avl_remove(avl_tree_t *tree, const void *key);
+void avl_insert(avl_tree_t *tree, const void *key, void *data);
 void avl_dump_tree(FILE *file, avl_tree_t *tree);
 
-avl_tree_t* avl_uuid_new();
 
 #endif /* end of include guard: AVL_TREE_H_VVXFFKFK */

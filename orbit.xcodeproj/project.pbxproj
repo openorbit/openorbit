@@ -21,6 +21,7 @@
 				EC4476CB0CCC001A001C88AD /* PBXTargetDependency */,
 				EC4476C90CCC001A001C88AD /* PBXTargetDependency */,
 				EC0FB9D211A55BB100CEF95A /* PBXTargetDependency */,
+				ECB81B46153170F0006E8EAC /* PBXTargetDependency */,
 			);
 			name = tests;
 			productName = tests;
@@ -266,6 +267,11 @@
 		ECA27D7C1433BDD60074B04C /* hid.m in Sources */ = {isa = PBXBuildFile; fileRef = ECA27D7B1433BDD60074B04C /* hid.m */; };
 		ECA27D8514360CBE0074B04C /* default-conf.json in Resources */ = {isa = PBXBuildFile; fileRef = ECA27D8414360CBE0074B04C /* default-conf.json */; };
 		ECA27D8614360CBE0074B04C /* default-conf.json in Resources */ = {isa = PBXBuildFile; fileRef = ECA27D8414360CBE0074B04C /* default-conf.json */; };
+		ECB81B41153170AE006E8EAC /* t010_avltree.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = ECB81B40153170AE006E8EAC /* t010_avltree.1 */; };
+		ECB81B4715317153006E8EAC /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
+		ECB81B4815317170006E8EAC /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
+		ECB81B49153171B3006E8EAC /* test-avltree.c in Sources */ = {isa = PBXBuildFile; fileRef = ECB81B3615317079006E8EAC /* test-avltree.c */; };
+		ECB81B4A153171CC006E8EAC /* avl-tree.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBEC1079EE080011B76E /* avl-tree.c */; };
 		ECBF1748108C566E00D3E412 /* image.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1734108C55ED00D3E412 /* image.c */; };
 		ECBF1749108C566E00D3E412 /* jpg.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1735108C55ED00D3E412 /* jpg.c */; };
 		ECBF174B108C566E00D3E412 /* pngfile.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1737108C55ED00D3E412 /* pngfile.c */; };
@@ -413,6 +419,13 @@
 			remoteGlobalIDString = ECBF1744108C565600D3E412;
 			remoteInfo = imgload;
 		};
+		ECB81B45153170F0006E8EAC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ECB81B3A153170AE006E8EAC;
+			remoteInfo = t010_avltree;
+		};
 		ECBF1752108C56C700D3E412 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
@@ -473,6 +486,16 @@
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ECB81B39153170AE006E8EAC /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				ECB81B41153170AE006E8EAC /* t010_avltree.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -707,6 +730,10 @@
 		ECA27D7B1433BDD60074B04C /* hid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = hid.m; sourceTree = "<group>"; };
 		ECA27D8414360CBE0074B04C /* default-conf.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "default-conf.json"; sourceTree = "<group>"; };
 		ECA5F8B1109D8FE7004278EC /* Hrml Manual */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Hrml Manual"; sourceTree = "<group>"; };
+		ECB81B3615317079006E8EAC /* test-avltree.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "test-avltree.c"; sourceTree = "<group>"; };
+		ECB81B3B153170AE006E8EAC /* t010_avltree */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t010_avltree; sourceTree = BUILT_PRODUCTS_DIR; };
+		ECB81B3E153170AE006E8EAC /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		ECB81B40153170AE006E8EAC /* t010_avltree.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = t010_avltree.1; sourceTree = "<group>"; };
 		ECBF1734108C55ED00D3E412 /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
 		ECBF1735108C55ED00D3E412 /* jpg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jpg.c; sourceTree = "<group>"; };
 		ECBF1736108C55ED00D3E412 /* jpg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jpg.h; sourceTree = "<group>"; };
@@ -853,6 +880,14 @@
 				EC75357714177EA6000A7CB4 /* CoreFoundation.framework in Frameworks */,
 				EC75357814177EA6000A7CB4 /* ApplicationServices.framework in Frameworks */,
 				EC75357914177EA6000A7CB4 /* libfreetype.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ECB81B38153170AE006E8EAC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ECB81B4715317153006E8EAC /* libcheck.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1313,6 +1348,7 @@
 				ECE17AB11079E005006B6A37 /* derived */,
 				EC44852F0CCD247E001C88AD /* tests */,
 				EC4485600CCD24C6001C88AD /* Doxyfile */,
+				ECB81B3D153170AE006E8EAC /* t010_avltree */,
 				EC4476850CCBFEFA001C88AD /* Products */,
 				EC447DDF0CCC0681001C88AD /* Frameworks */,
 				EC4476E00CCC0076001C88AD /* Open Orbit-Info.plist */,
@@ -1338,6 +1374,7 @@
 				EC4C89EA137D4D0D007AC0DF /* dragarea */,
 				EC75358314177EA6000A7CB4 /* Open Orbit SDL.app */,
 				EC0C0216144174AD00A2AE5E /* libauload.a */,
+				ECB81B3B153170AE006E8EAC /* t010_avltree */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1374,6 +1411,7 @@
 				EC4485480CCD247E001C88AD /* t005_object_manager */,
 				EC44854B0CCD247E001C88AD /* t006_list */,
 				EC0FB9AE11A558A100CEF95A /* t009_pubsub */,
+				ECB81B3515317020006E8EAC /* t010_avltree */,
 				EC44854E0CCD247E001C88AD /* template */,
 			);
 			path = tests;
@@ -1561,6 +1599,23 @@
 				EC030D6911084749004F3AD8 /* Simulation Design */,
 			);
 			path = docs;
+			sourceTree = "<group>";
+		};
+		ECB81B3515317020006E8EAC /* t010_avltree */ = {
+			isa = PBXGroup;
+			children = (
+				ECB81B3615317079006E8EAC /* test-avltree.c */,
+			);
+			path = t010_avltree;
+			sourceTree = "<group>";
+		};
+		ECB81B3D153170AE006E8EAC /* t010_avltree */ = {
+			isa = PBXGroup;
+			children = (
+				ECB81B3E153170AE006E8EAC /* main.c */,
+				ECB81B40153170AE006E8EAC /* t010_avltree.1 */,
+			);
+			path = t010_avltree;
 			sourceTree = "<group>";
 		};
 		ECBF1731108C547800D3E412 /* imgload */ = {
@@ -1865,6 +1920,23 @@
 			productReference = EC75358314177EA6000A7CB4 /* Open Orbit SDL.app */;
 			productType = "com.apple.product-type.application";
 		};
+		ECB81B3A153170AE006E8EAC /* t010_avltree */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ECB81B42153170AE006E8EAC /* Build configuration list for PBXNativeTarget "t010_avltree" */;
+			buildPhases = (
+				ECB81B37153170AE006E8EAC /* Sources */,
+				ECB81B38153170AE006E8EAC /* Frameworks */,
+				ECB81B39153170AE006E8EAC /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = t010_avltree;
+			productName = t010_avltree;
+			productReference = ECB81B3B153170AE006E8EAC /* t010_avltree */;
+			productType = "com.apple.product-type.tool";
+		};
 		ECBF1744108C565600D3E412 /* imgload */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = ECBF1757108C56ED00D3E412 /* Build configuration list for PBXNativeTarget "imgload" */;
@@ -1920,6 +1992,7 @@
 				EC4476C00CCBFFF9001C88AD /* t005_object_manager */,
 				EC4476C50CCC0010001C88AD /* t006_list */,
 				EC0FB9B711A55B4D00CEF95A /* t009_pubsub */,
+				ECB81B3A153170AE006E8EAC /* t010_avltree */,
 				EC4C89E9137D4D0D007AC0DF /* dragarea */,
 			);
 		};
@@ -2250,6 +2323,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		ECB81B37153170AE006E8EAC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ECB81B4815317170006E8EAC /* testdriver-main.c in Sources */,
+				ECB81B49153171B3006E8EAC /* test-avltree.c in Sources */,
+				ECB81B4A153171CC006E8EAC /* avl-tree.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		ECBF1742108C565600D3E412 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2318,6 +2401,11 @@
 			isa = PBXTargetDependency;
 			target = ECBF1744108C565600D3E412 /* imgload */;
 			targetProxy = EC75351B14177EA6000A7CB4 /* PBXContainerItemProxy */;
+		};
+		ECB81B46153170F0006E8EAC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ECB81B3A153170AE006E8EAC /* t010_avltree */;
+			targetProxy = ECB81B45153170F0006E8EAC /* PBXContainerItemProxy */;
 		};
 		ECBF1753108C56C700D3E412 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3004,6 +3092,59 @@
 			};
 			name = Release;
 		};
+		ECB81B43153170AE006E8EAC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					include,
+					/opt/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		ECB81B44153170AE006E8EAC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					include,
+					/opt/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		ECBF1746108C565700D3E412 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
@@ -3189,6 +3330,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		ECB81B42153170AE006E8EAC /* Build configuration list for PBXNativeTarget "t010_avltree" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ECB81B43153170AE006E8EAC /* Debug */,
+				ECB81B44153170AE006E8EAC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		ECBF1757108C56ED00D3E412 /* Build configuration list for PBXNativeTarget "imgload" */ = {
 			isa = XCConfigurationList;
