@@ -30,7 +30,7 @@ typedef struct ui_line_t {
   size_t line_len; // Allocation length
   char *line;
 
-  SGtextbuffer buff;
+  SGtextbuffer *buff;
   GLuint texid;
 } ui_line_t;
 
