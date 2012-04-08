@@ -30,8 +30,9 @@
 #include <gencds/hashtable.h>
 #include <gencds/avl-tree.h>
 #include "log.h"
+#include "common/moduleinit.h"
 
-static hashtable_t *classes;
+static avl_tree_t *classes;
 static avl_tree_t *objects;
 
 static void
@@ -45,7 +46,7 @@ Object_init(void *obj, void *arg)
 void
 sim_class_init(void)
 {
-  classes = hashtable_new_with_str_keys(1024);
+  classes = avl_str_new();
   sim_class_t *cls = sim_register_class(NULL, "Object", Object_init,
                                         sizeof(sim_object_t));
   sim_class_add_field(cls, SIM_TYPE_CLASS_PTR,
@@ -58,10 +59,15 @@ sim_class_init(void)
   objects = avl_uuid_new();
 }
 
+INIT_PRIMARY_MODULE
+{
+  sim_class_init();
+}
+
 sim_class_t*
 sim_class_get(const char *cls_name)
 {
-  sim_class_t *cls = hashtable_lookup(classes, cls_name);
+  sim_class_t *cls = avl_find(classes, cls_name);
   ooLogFatalIfNull(cls, "unknown class '%s'", cls_name);
   return cls;
 }
@@ -88,7 +94,7 @@ sim_register_class_(const char *super, const char *name,
 
   obj_array_init(&cls->fields);
   cls->key_index_map = hashtable_new_with_str_keys(64);
-  hashtable_insert(classes, name, cls);
+  avl_insert(classes, name, cls);
 
   return cls;
 }
