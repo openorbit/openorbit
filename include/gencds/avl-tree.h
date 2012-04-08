@@ -40,34 +40,46 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <uuid/uuid.h>
 
 /*!
     Generic implementation of an avl tree. It allows you to store pointers in
     the tree that is accessed by an integer identifier (that is large enough to
     hold a pointer).
 */
-
 typedef struct avl_node_t {
   struct avl_node_t *left;
   struct avl_node_t *right;
-  uintptr_t key; // Can be any integer, also a pointer
   void *data;
   int8_t balance; // Constrained to +/-1
+  
+  uintptr_t key[]; // Can be any integer, also a pointer
 } avl_node_t;
+
+typedef int (*avl_compare_f)(void *, void *);
+typedef void (*avl_keycopy_f)(void *, void *);
 
 typedef struct avl_tree_t {
   avl_node_t *root;
+  size_t node_size;
+  avl_compare_f compare;
+  avl_keycopy_f copy;
 } avl_tree_t;
+
 
 typedef void (*avl_func)(void*);
 
 avl_tree_t* avl_new();
+avl_tree_t* avl_uuid_new();
+
 void avl_delete(avl_tree_t *tree);
 void avl_apply(avl_tree_t *tree, avl_func f);
 
 void* avl_find(avl_tree_t *tree, uintptr_t key);
 void avl_remove(avl_tree_t *tree, uintptr_t key);
-void avl_insert(avl_tree_t *tree, uintptr_t key, void *data);
+void avl_insert(avl_tree_t *tree, void *key, void *data);
 void avl_dump_tree(FILE *file, avl_tree_t *tree);
+
+avl_tree_t* avl_uuid_new();
 
 #endif /* end of include guard: AVL_TREE_H_VVXFFKFK */

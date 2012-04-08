@@ -254,6 +254,8 @@
 		EC9351EC14F9449700962391 /* menus.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351EA14F9449700962391 /* menus.c */; };
 		EC9351EF14F94D9100962391 /* console.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351EE14F94D9100962391 /* console.c */; };
 		EC9351F014F94D9100962391 /* console.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351EE14F94D9100962391 /* console.c */; };
+		EC9351F414FB701900962391 /* class.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351F314FB701800962391 /* class.c */; };
+		EC9351F514FB701900962391 /* class.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351F314FB701800962391 /* class.c */; };
 		EC935D4C1417B26C00953D20 /* sdl-events.c in Sources */ = {isa = PBXBuildFile; fileRef = EC935D4B1417B26C00953D20 /* sdl-events.c */; };
 		EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9DA88A12EB84540028A131 /* libfreetype.a */; };
 		EC9ECBE61195964500229A8E /* mercury.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9ECBE51195964500229A8E /* mercury.c */; };
@@ -690,6 +692,8 @@
 		EC9351ED14F944A600962391 /* menus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = menus.h; sourceTree = "<group>"; };
 		EC9351EE14F94D9100962391 /* console.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = console.c; sourceTree = "<group>"; };
 		EC9351F114F94D9F00962391 /* console.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = console.h; sourceTree = "<group>"; };
+		EC9351F214FB6FF800962391 /* class.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = class.h; sourceTree = "<group>"; };
+		EC9351F314FB701800962391 /* class.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = class.c; sourceTree = "<group>"; };
 		EC935D4B1417B26C00953D20 /* sdl-events.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-events.c"; sourceTree = "<group>"; };
 		EC935D4D1417F70200953D20 /* sdl-events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sdl-events.h"; sourceTree = "<group>"; };
 		EC9DA88A12EB84540028A131 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = /opt/local/lib/libfreetype.a; sourceTree = "<absolute>"; };
@@ -1204,6 +1208,8 @@
 				EC9ECC291196C7E000229A8E /* propellant-tank.c */,
 				EC3CFF6A1331EFB70002D0C5 /* haps.c */,
 				EC3CFF6B1331EFB70002D0C5 /* haps.h */,
+				EC9351F214FB6FF800962391 /* class.h */,
+				EC9351F314FB701800962391 /* class.c */,
 			);
 			path = sim;
 			sourceTree = "<group>";
@@ -2133,6 +2139,7 @@
 				EC571BE61443675D002CA003 /* cgbitmaps.c in Sources */,
 				EC9351EB14F9449700962391 /* menus.c in Sources */,
 				EC9351EF14F94D9100962391 /* console.c in Sources */,
+				EC9351F414FB701900962391 /* class.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2239,6 +2246,7 @@
 				EC571BE71443675D002CA003 /* cgbitmaps.c in Sources */,
 				EC9351EC14F9449700962391 /* menus.c in Sources */,
 				EC9351F014F94D9100962391 /* console.c in Sources */,
+				EC9351F514FB701900962391 /* class.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

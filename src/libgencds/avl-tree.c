@@ -39,6 +39,35 @@
 #include <sysexits.h>
 #include <err.h>
 #include <gencds/avl-tree.h>
+#include <uuid/uuid.h>
+
+
+static int
+avl_default_compare(uintptr_t *l, uintptr_t *r)
+{
+  if (*l < *r) return -1; 
+  if (*r < *l) return 1;
+  else return 0;
+}
+
+static int
+avl_uuid_compare(uuid_t l, uuid_t r)
+{
+  return uuid_compare(l, r);
+}
+
+static void
+avl_default_keycopy(uintptr_t *l, uintptr_t *r)
+{
+  *l = *r;
+}
+
+static void
+avl_uuid_keycopy(uuid_t l, uuid_t r)
+{
+  uuid_copy(l, r);
+}
+
 
 static avl_node_t*
 avl_left_single(avl_node_t * restrict root)
@@ -166,16 +195,16 @@ avl_insert_balance_right(avl_node_t *root)
 }
 
 static avl_node_t*
-avl_insert__(avl_node_t *root, avl_node_t *node, bool *done)
+avl_insert__(avl_tree_t *tree, avl_node_t *root, avl_node_t *node, bool *done)
 {
   if (root == NULL) {
     root = node;
-  } else if (node->key < root->key) {
-    root->left = avl_insert__(root->left, node, done);
-    
+  } else if (tree->compare(node->key, root->key) < 0) {
+    root->left = avl_insert__(tree, root->left, node, done);
+
     if (!*done) {
       root->balance --;
-      
+
       if (root->balance == 0) {
         *done = true;
       } else if ((root->balance < -1) || (root->balance > 1)) {
@@ -184,11 +213,11 @@ avl_insert__(avl_node_t *root, avl_node_t *node, bool *done)
       }
     }
   } else {
-    root->right = avl_insert__(root->right, node, done);
-    
+    root->right = avl_insert__(tree, root->right, node, done);
+
     if (!*done) {
       root->balance ++;
-      
+
       if (root->balance == 0) {
         *done = true;
       } else if ((root->balance < -1) || (root->balance > 1)) {
@@ -201,20 +230,24 @@ avl_insert__(avl_node_t *root, avl_node_t *node, bool *done)
   return root;
 }
 
+
 static void
 avl_insert_(avl_tree_t *tree, avl_node_t *node)
 {
   bool done = false;
-  tree->root = avl_insert__(tree->root, node, &done);
+  tree->root = avl_insert__(tree, tree->root, node, &done);
 }
 
+
+
 void
-avl_insert(avl_tree_t *tree, uintptr_t key, void *data)
+avl_insert(avl_tree_t *tree, void *key, void *data)
 {
-  avl_node_t *node = malloc(sizeof(avl_node_t));
+  avl_node_t *node = malloc(tree->node_size);
 
   node->data = data;
-  node->key = key;
+  tree->copy(node->key, &key);
+  //node->key = key;
   node->left = NULL;
   node->right = NULL;
   node->balance = 0;
@@ -222,30 +255,30 @@ avl_insert(avl_tree_t *tree, uintptr_t key, void *data)
   avl_insert_(tree, node);
 }
 
-
 // naive recursive version
 static void*
-avl_find_node(avl_node_t *node, uintptr_t key)
+avl_find_node(avl_tree_t *tree, avl_node_t *node, uintptr_t key)
 {
   if (node == NULL) return NULL;
   
-  if (node->key < key) {
-    return avl_find_node(node->left, key);
-  } else if (node->key > key) {
-    return avl_find_node(node->right, key);
+  int res = tree->compare(node->key, &key);
+  if (res < 0) {
+    return avl_find_node(tree, node->left, key);
+  } else if (res > 0) {
+    return avl_find_node(tree, node->right, key);
   } else {
     return node;
   }
 }
+
 
 void*
 avl_find(avl_tree_t *tree, uintptr_t key)
 {
   avl_node_t *node = tree->root;
   
-  return avl_find_node(node, key);
+  return avl_find_node(tree, node, key);
 }
-
 
 void
 avl_remove(avl_tree_t *tree, uintptr_t key)
@@ -313,8 +346,28 @@ avl_new()
     err(EX_SOFTWARE, "allocation of avl tree failed\n");
   }
   tree->root = NULL;
+  tree->compare = (avl_compare_f)avl_default_compare;
+  tree->copy = (avl_keycopy_f)avl_default_keycopy;
+  tree->node_size = sizeof(avl_node_t) + sizeof(uintptr_t);
   return tree;
 }
+
+avl_tree_t*
+avl_uuid_new()
+{
+  avl_tree_t * tree = malloc(sizeof(avl_tree_t));
+  if (tree == NULL) {
+    err(EX_SOFTWARE, "allocation of avl tree failed\n");
+  }
+  tree->root = NULL;
+  
+  tree->compare = (avl_compare_f)avl_uuid_compare;
+  tree->copy = (avl_keycopy_f)avl_uuid_keycopy;
+  tree->node_size = sizeof(avl_node_t) + sizeof(uuid_t);
+
+  return tree;
+}
+
 
 void
 avl_delete2(avl_node_t *node)

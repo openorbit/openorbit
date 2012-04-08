@@ -39,6 +39,9 @@ typedef enum {
   SIM_TYPE_RECORD = 0,
   SIM_TYPE_LINK, // Record alias
 
+  SIM_TYPE_CLASS_PTR,
+  SIM_TYPE_UUID,
+
   SIM_TYPE_BOOL,
   SIM_TYPE_CHAR,
   SIM_TYPE_UCHAR,
