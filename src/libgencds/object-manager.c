@@ -759,7 +759,7 @@ om_delete_iface_obj(om_iface_t *iface)
     
     free(iface);
 }
-
+#if 0
 void
 om_call_method(const char *obj_name, const char *iface, const char *method,
                void *res, ...)
@@ -811,7 +811,7 @@ om_call_method(const char *obj_name, const char *iface, const char *method,
     }
     va_end(vl);    
 }
-
+#endif
 // TODO: Ensure that runtime errors are propagated on invalid prop names
 #define _OM_GET_PROP_FN_(T, N, TC)                                          \
 T                                                                           \
