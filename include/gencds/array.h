@@ -52,8 +52,8 @@ typedef struct {
 void array_init(array_t *vec);
 void array_compress(array_t *vec);
 
-#define ARRAY_FOR_EACH(I, VEC) for (size_t I = 0 ; I < VEC.length ; I ++)
-#define ARRAY_ELEM(VEC, I) (VEC).elems[I]
+#define ARRAY_FOR_EACH(I, VEC) for (size_t I = 0 ; I < (VEC).length ; I ++)
+#define ARRAY_ELEM(VEC, I) ((VEC).elems[I])
 #define ARRAY_LEN(VEC) ((VEC).length)
 
 #define DECL_ARRAY(typ,name)                                      \
