@@ -3,8 +3,10 @@
 //  orbit
 //
 //  Created by Mattias Holm on 2009-09-16.
-//  Copyright 2009. All rights reserved.
+//  Copyright 2009,2012. All rights reserved.
 //
+
+//  TODO: Use autoconf like thing...
 
 // Idea is that we add paths for macports, fink, /usr/local and a project local
 // {PRJ}/build/dependencies as prefixes
@@ -31,8 +33,8 @@ PYTHON_EXTRA_INC=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.pla
 // We should be able to locate: libpng, libjpeg, libxml2, libfreetype
 // libcheck
 
-ORBIT_LIBPATH=${DEPS_LIB} ${PORTS_LIB} ${X11R6_LIB} ${FINK_LIB}
-ORBIT_INCPATH=${DEPS_INC} ${DEPS_INC}/python2.7 ${PORTS_INC} ${PORTS_INC}/freetype2 /usr/include/libxml2 ${X11R6_INC} ${FINK_INC}
+ORBIT_LIBPATH=${DEPS_LIB} ${PORTS_LIB} ${X11R6_LIB}
+ORBIT_INCPATH=${DEPS_INC} ${DEPS_INC}/python2.7 ${PORTS_INC} ${PORTS_INC}/freetype2 /usr/include/libxml2 ${X11R6_INC}
 
 TEST_LIBPATH=${JPG_LIB} ${PNG_LIB} ${CHECK_LIB}
 TEST_INCPATH=${JPG_INC} ${PNG_INC} ${CHECK_INC}
