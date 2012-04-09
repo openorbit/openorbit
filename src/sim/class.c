@@ -437,22 +437,21 @@ sim_print_field(FILE *fout, sim_object_t *obj, sim_field_t *field)
     fprintf(fout, "\t%s : %s\n", field->name, uuid_str);
     break;
   }
-  case SIM_TYPE_OBJ_ARR:
-    {
-      obj_array_t *val = (obj_array_t*)((uintptr_t)obj + field->offs);
-      fprintf(fout, "\t\"%s\" : [", field->name);
-      ARRAY_FOR_EACH(i, *val) {
-        sim_object_t *sobj = ARRAY_ELEM(*val, i);
-        uuid_string_t uuid_str;
-        uuid_unparse(sobj->uuid, uuid_str);
-        fprintf(fout, "%s", uuid_str);
-        if (i != ARRAY_LEN(*val) - 1) {
-          fprintf(fout, ", ");
-        }
+  case SIM_TYPE_OBJ_ARR: {
+    obj_array_t *val = (obj_array_t*)((uintptr_t)obj + field->offs);
+    fprintf(fout, "\t\"%s\" : [", field->name);
+    ARRAY_FOR_EACH(i, *val) {
+      sim_object_t *sobj = ARRAY_ELEM(*val, i);
+      uuid_string_t uuid_str;
+      uuid_unparse(sobj->uuid, uuid_str);
+      fprintf(fout, "%s", uuid_str);
+      if (i != ARRAY_LEN(*val) - 1) {
+        fprintf(fout, ", ");
       }
-      fprintf(fout, "]\n");
     }
+    fprintf(fout, "]\n");
     break;
+  }
   default:
     assert(0 && "invalid case");
   }
