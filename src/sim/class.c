@@ -21,6 +21,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include <complex.h>
@@ -171,18 +172,53 @@ sim_init_object(sim_object_t *obj, const char *name, void *arg)
   obj->cls->init(obj, arg);
 }
 
-#define PRINT_MACRO(T, FMT)\
-  {\
-    T val = *(T*)((uintptr_t)obj + field->offs);\
+// For printing normal scalars
+#define PRINT_MACRO(T, FMT)                                   \
+  do {                                                        \
+    T val = *(T*)((uintptr_t)obj + field->offs);              \
     fprintf(fout, "\t\"%s\" : %" #FMT "\n", field->name, val);\
-    break;\
-  }
-#define PRINT_MACRO2(T, FMT)\
-  {\
-    T val = *(T*)((uintptr_t)obj + field->offs);\
-    fprintf(fout, "\t\"%s\" : %" FMT "\n", field->name, val);\
-    break;\
-  }
+    break;                                                    \
+  } while (0)
+
+// For printing C99 fixed size scalars
+#define PRINT_MACRO2(T, FMT)                                  \
+  do {                                                        \
+    T val = *(T*)((uintptr_t)obj + field->offs);              \
+    fprintf(fout, "\t\"%s\" : %" FMT "\n", field->name, val); \
+    break;                                                    \
+  } while (0)
+
+// For printing normal typed arrays
+#define PRINT_MACRO3(T, FMT)                        \
+  do {                                              \
+    T *val = (T*)((uintptr_t)obj + field->offs);    \
+    fprintf(fout, "\t\"%s\" : [", field->name);     \
+    ARRAY_FOR_EACH(i, *val) {                       \
+      fprintf(fout, "%"#FMT, ARRAY_ELEM(*val, i));  \
+      if (i != ARRAY_LEN(*val) - 1) {               \
+        fprintf(fout, ", ");                        \
+      }                                             \
+    }                                               \
+    fprintf(fout, "]\n");                           \
+    break;                                          \
+  } while (0)
+
+
+// For printing C99 fixed size typed arrays
+#define PRINT_MACRO4(T, FMT)                        \
+  do {                                              \
+    T *val = (T*)((uintptr_t)obj + field->offs);    \
+    fprintf(fout, "\t\"%s\" : [", field->name);     \
+    ARRAY_FOR_EACH(i, *val) {                       \
+      fprintf(fout, "%" FMT, ARRAY_ELEM(*val, i) );  \
+      if (i != ARRAY_LEN(*val) - 1) {               \
+        fprintf(fout, ", ");                        \
+      }                                             \
+    }                                               \
+    fprintf(fout, "]\n");                           \
+    break;                                          \
+  } while (0)
+
 
 void
 sim_print_field(FILE *fout, sim_object_t *obj, sim_field_t *field)
@@ -217,25 +253,63 @@ sim_print_field(FILE *fout, sim_object_t *obj, sim_field_t *field)
     fprintf(fout, "\t\"%s\" : %s\n", field->name, val ? "true" : "false");
     break;
   }
-  case SIM_TYPE_CHAR:   PRINT_MACRO(char, c)
-  case SIM_TYPE_UCHAR:  PRINT_MACRO(unsigned char, c)
-  case SIM_TYPE_SHORT:  PRINT_MACRO(short, d)
-  case SIM_TYPE_USHORT: PRINT_MACRO(unsigned short, u)
-  case SIM_TYPE_INT:    PRINT_MACRO(int, d)
-  case SIM_TYPE_UINT:   PRINT_MACRO(unsigned int, u)
-  case SIM_TYPE_LONG:   PRINT_MACRO(long, ld)
-  case SIM_TYPE_ULONG:  PRINT_MACRO(unsigned long, lu)
-  case SIM_TYPE_UINT8:  PRINT_MACRO2(uint8_t, PRIu8)
-  case SIM_TYPE_UINT16: PRINT_MACRO2(uint16_t, PRIu16)
-  case SIM_TYPE_UINT32: PRINT_MACRO2(uint32_t, PRIu32)
-  case SIM_TYPE_UINT64: PRINT_MACRO2(uint64_t, PRIu64)
-  case SIM_TYPE_INT8:   PRINT_MACRO2(int8_t, PRId8)
-  case SIM_TYPE_INT16:  PRINT_MACRO2(int16_t, PRId16)
-  case SIM_TYPE_INT32:  PRINT_MACRO2(int32_t, PRId32)
-  case SIM_TYPE_INT64:  PRINT_MACRO2(int64_t, PRId64)
-  case SIM_TYPE_STR:    PRINT_MACRO(char*, s)
-  case SIM_TYPE_FLOAT:  PRINT_MACRO(float, f)
-  case SIM_TYPE_DOUBLE: PRINT_MACRO(double, f)
+  case SIM_TYPE_CHAR:
+    PRINT_MACRO(char, c);
+    break;
+  case SIM_TYPE_UCHAR:
+    PRINT_MACRO(unsigned char, hhu);
+    break;
+  case SIM_TYPE_SHORT:
+    PRINT_MACRO(short, hd);
+    break;
+  case SIM_TYPE_USHORT:
+    PRINT_MACRO(unsigned short, hu);
+    break;
+  case SIM_TYPE_INT:
+    PRINT_MACRO(int, d);
+    break;
+  case SIM_TYPE_UINT:
+    PRINT_MACRO(unsigned int, u);
+    break;
+  case SIM_TYPE_LONG:
+    PRINT_MACRO(long, ld);
+    break;
+  case SIM_TYPE_ULONG:
+    PRINT_MACRO(unsigned long, lu);
+    break;
+  case SIM_TYPE_UINT8:
+    PRINT_MACRO2(uint8_t, PRIu8);
+    break;
+  case SIM_TYPE_UINT16:
+    PRINT_MACRO2(uint16_t, PRIu16);
+    break;
+  case SIM_TYPE_UINT32:
+    PRINT_MACRO2(uint32_t, PRIu32);
+    break;
+  case SIM_TYPE_UINT64:
+    PRINT_MACRO2(uint64_t, PRIu64);
+    break;
+  case SIM_TYPE_INT8:
+    PRINT_MACRO2(int8_t, PRId8);
+    break;
+  case SIM_TYPE_INT16:
+    PRINT_MACRO2(int16_t, PRId16);
+    break;
+  case SIM_TYPE_INT32:
+    PRINT_MACRO2(int32_t, PRId32);
+    break;
+  case SIM_TYPE_INT64:
+    PRINT_MACRO2(int64_t, PRId64);
+    break;
+  case SIM_TYPE_STR:
+    PRINT_MACRO(char*, s);
+    break;
+  case SIM_TYPE_FLOAT:
+    PRINT_MACRO(float, f);
+    break;
+  case SIM_TYPE_DOUBLE:
+    PRINT_MACRO(double, f);
+    break;
   case SIM_TYPE_COMPLEX_FLOAT: {
     complex float val = *(complex float*)((uintptr_t)obj + field->offs);
     fprintf(fout, "\t\"%s\" : %f + %f I\n", field->name,
@@ -264,49 +338,120 @@ sim_print_field(FILE *fout, sim_object_t *obj, sim_field_t *field)
     break;
   case SIM_TYPE_FLOAT_VEC4x4:
     break;
-  case SIM_TYPE_BOOL_ARR:
+  case SIM_TYPE_BOOL_ARR: {
+    bool_array_t *val = (bool_array_t*)((uintptr_t)obj + field->offs);
+    fprintf(fout, "\t\"%s\" : [", field->name);
+    ARRAY_FOR_EACH(i, *val) {
+      fprintf(fout, "%s", ARRAY_ELEM(*val, i) ? "true" : "false");
+      if (i != ARRAY_LEN(*val) - 1) {
+        fprintf(fout, ", ");
+      }
+    }
+    fprintf(fout, "]\n");
     break;
+  }
   case SIM_TYPE_CHAR_ARR:
+    PRINT_MACRO3(char_array_t, c);
     break;
   case SIM_TYPE_UCHAR_ARR:
+    PRINT_MACRO3(uchar_array_t, hhu);
     break;
   case SIM_TYPE_SHORT_ARR:
+    PRINT_MACRO3(short_array_t, hd);
     break;
   case SIM_TYPE_USHORT_ARR:
+    PRINT_MACRO3(ushort_array_t, hu);
     break;
   case SIM_TYPE_INT_ARR:
+    PRINT_MACRO3(int_array_t, d);
     break;
   case SIM_TYPE_UINT_ARR:
+    PRINT_MACRO3(uint_array_t, u);
     break;
   case SIM_TYPE_LONG_ARR:
+    PRINT_MACRO3(long_array_t, ld);
     break;
   case SIM_TYPE_ULONG_ARR:
+    PRINT_MACRO3(ulong_array_t, lu);
     break;
   case SIM_TYPE_UINT8_ARR:
+    PRINT_MACRO4(u8_array_t, PRIu8);
     break;
   case SIM_TYPE_UINT16_ARR:
+    PRINT_MACRO4(u16_array_t, PRIu16);
     break;
   case SIM_TYPE_UINT32_ARR:
+    PRINT_MACRO4(u32_array_t, PRIu32);
     break;
   case SIM_TYPE_UINT64_ARR:
+    PRINT_MACRO4(u64_array_t, PRIu64);
     break;
   case SIM_TYPE_INT8_ARR:
+    PRINT_MACRO4(i8_array_t, PRId8);
     break;
   case SIM_TYPE_INT16_ARR:
+    PRINT_MACRO4(i16_array_t, PRId16);
     break;
   case SIM_TYPE_INT32_ARR:
+    PRINT_MACRO4(i32_array_t, PRId32);
     break;
   case SIM_TYPE_INT64_ARR:
+    PRINT_MACRO4(i64_array_t, PRId64);
     break;
   case SIM_TYPE_FLOAT_ARR:
+    PRINT_MACRO3(float_array_t, f);
     break;
   case SIM_TYPE_DOUBLE_ARR:
+    PRINT_MACRO3(double_array_t, f);
     break;
-  case SIM_TYPE_COMPLEX_FLOAT_ARR:
+  case SIM_TYPE_COMPLEX_FLOAT_ARR: {
+    complex_float_array_t *val = (complex_float_array_t*)((uintptr_t)obj + field->offs);
+    fprintf(fout, "\t\"%s\" : [", field->name);
+    ARRAY_FOR_EACH(i, *val) {
+      fprintf(fout, "%f + %f I",
+              crealf(ARRAY_ELEM(*val, i)), cimagf(ARRAY_ELEM(*val, i)));
+      if (i != ARRAY_LEN(*val) - 1) {
+        fprintf(fout, ", ");
+      }
+    }
+    fprintf(fout, "]\n");
     break;
-  case SIM_TYPE_COMPLEX_DOUBLE_ARR:
+  }
+  case SIM_TYPE_COMPLEX_DOUBLE_ARR: {
+    complex_double_array_t *val = (complex_double_array_t*)((uintptr_t)obj + field->offs);
+    fprintf(fout, "\t\"%s\" : [", field->name);
+    ARRAY_FOR_EACH(i, *val) {
+      fprintf(fout, "%f + %f I",
+              creal(ARRAY_ELEM(*val, i)), cimag(ARRAY_ELEM(*val, i)));
+      if (i != ARRAY_LEN(*val) - 1) {
+        fprintf(fout, ", ");
+      }
+    }
+    fprintf(fout, "]\n");
     break;
+  }
+  case SIM_TYPE_OBJ: {
+    sim_object_t *sobj = (sim_object_t*)((uintptr_t)obj + field->offs);
+    uuid_string_t uuid_str;
+    uuid_unparse(sobj->uuid, uuid_str);
+    fprintf(fout, "\t%s : %s\n", field->name, uuid_str);
+    break;
+  }
   case SIM_TYPE_OBJ_ARR:
+    {
+      obj_array_t *val = (obj_array_t*)((uintptr_t)obj + field->offs);
+      fprintf(fout, "\t\"%s\" : [", field->name);
+      ARRAY_FOR_EACH(i, *val) {
+        sim_object_t *sobj = ARRAY_ELEM(*val, i);
+        uuid_string_t uuid_str;
+        uuid_unparse(sobj->uuid, uuid_str);
+        fprintf(fout, "%s", uuid_str);
+        if (i != ARRAY_LEN(*val) - 1) {
+          fprintf(fout, ", ");
+        }
+      }
+      fprintf(fout, "]\n");
+    }
     break;
   default:
     assert(0 && "invalid case");
