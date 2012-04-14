@@ -22,7 +22,7 @@
 
 #include <uuid/uuid.h>
 #include <gencds/array.h>
-#include <gencds/hashtable.h>
+#include <gencds/avl-tree.h>
 #include "pubsub.h"
 
 typedef struct sim_class_t {
@@ -36,7 +36,8 @@ typedef struct sim_class_t {
   void (*restored)(void *obj); // Called after deserialization (instead of init)
   
   obj_array_t fields;
-  hashtable_t *key_index_map;
+  avl_tree_t *key_index_map;
+  avl_tree_t *interfaces;
 } sim_class_t;
 
 typedef struct {
@@ -66,12 +67,34 @@ sim_register_class_(const char *super, const char *name,
 
 void sim_class_add_field(sim_class_t *class, sim_type_id_t type,
                          const char *key, off_t offset);
+sim_field_t* sim_class_get_field(sim_class_t *cls, const char *key);
+
+void sim_class_add_interface(sim_class_t *class, const char *key,
+                             void *iface);
+void* sim_class_get_interface(sim_class_t *class, const char *key);
+
 
 sim_object_t* sim_alloc_object(const char *cls_name);
 void sim_init_object(sim_object_t *obj, const char *name, void *arg);
 void sim_delete_object(sim_object_t *obj);
 
+// Set a field in an object. Len is ignored for scalars, otherwise, it is the
+// length of the array pointed to by data.
+void sim_set_field(sim_object_t *obj, const char *field_name,
+                   size_t len, void *data);
+// Sets a field, but uses an optional index to set a specific element in
+// arrays, vectors and complex numbers.
+void sim_set_field_by_index(sim_object_t *obj, const char *field_name,
+                            size_t index, void *data);
+
+
 void sim_print_object(FILE *fout, sim_object_t *obj);
+void sim_read_objects(FILE *fin);
+
+#define SIM_SUPER_INIT(o, a)                      \
+  do {                                            \
+    ((sim_object_t*)(o))->cls->super->init(o, a); \
+  } while (0)
 
 
 #endif
