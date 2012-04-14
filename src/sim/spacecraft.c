@@ -69,7 +69,7 @@ simNewSpacecraft(const char *className, const char *scName)
 
   sim_spacecraft_t *sc = cls->alloc(cls);
   InitScArgs args = {""};
-  cls->init(sc, &(InitScArgs){scName});
+  cls->init(cls, sc, &(InitScArgs){scName});
   simScInit(sc, scName);
 
   //cls->init(sc);
@@ -599,9 +599,9 @@ simStageLockEngines(sim_stage_t *stage)
 
 
 static void
-InitSpacecraft(void *obj, void *arg)
+InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
 {
-  SIM_SUPER_INIT(obj, arg);
+  SIM_SUPER_INIT(cls, obj, arg);
 
   sim_spacecraft_t *sc = obj;
   InitScArgs *args = arg;
@@ -636,9 +636,9 @@ typedef struct {
 } InitStageArgs;
 
 static void
-InitStage(void *obj, void *arg)
+InitStage(sim_class_t *cls, void *obj, void *arg)
 {
-  SIM_SUPER_INIT(obj, arg);
+  SIM_SUPER_INIT(cls, obj, arg);
   sim_stage_t *stage = obj;
 }
 

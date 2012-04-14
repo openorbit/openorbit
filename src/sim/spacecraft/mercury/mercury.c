@@ -301,9 +301,9 @@ MercuryInit(sim_spacecraft_t *sc)
 }
 
 static void
-MercuryInit2(void *sc, void *arg)
+MercuryInit2(sim_class_t *cls, void *sc, void *arg)
 {
-  SIM_SUPER_INIT(sc, arg);
+  SIM_SUPER_INIT(cls, sc, arg);
   MercuryInit(sc);
 }
 

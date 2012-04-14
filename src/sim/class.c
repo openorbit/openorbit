@@ -37,7 +37,7 @@ static avl_tree_t *classes;
 static avl_tree_t *objects;
 
 static void
-Object_init(void *obj, void *arg)
+Object_init(sim_class_t *cls, void *obj, void *arg)
 {
   sim_object_t *sobj = obj;
   uuid_generate(sobj->uuid);
@@ -78,7 +78,7 @@ sim_class_get(const char *cls_name)
 sim_class_t*
 sim_register_class_(const char *super, const char *name,
                     void *(*alloc)(sim_class_t *cls),
-                    void (*init)(void *obj, void *arg),
+                    void (*init)(sim_class_t *cls, void *obj, void *arg),
                     void (*dealloc)(void *obj),
                     void (*restored)(void *obj))
 {
@@ -114,7 +114,7 @@ def_alloc(sim_class_t *cls)
 
 sim_class_t*
 sim_register_class(const char *super, const char *name,
-                   void (*init)(void *obj, void *arg),
+                   void (*init)(sim_class_t *cls, void *obj, void *arg),
                    size_t size)
 {
   sim_class_t *cls = sim_register_class_(super, name,
@@ -186,7 +186,7 @@ void
 sim_init_object(sim_object_t *obj, const char *name, void *arg)
 {
   obj->name = strdup(name);
-  obj->cls->init(obj, arg);
+  obj->cls->init(obj->cls, obj, arg);
 }
 
 void

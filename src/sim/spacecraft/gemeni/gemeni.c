@@ -246,9 +246,9 @@ GemeniInit(sim_spacecraft_t *sc)
 }
 
 static void
-GemeniInit2(void *sc, void *arg)
+GemeniInit2(sim_class_t *cls, void *sc, void *arg)
 {
-  SIM_SUPER_INIT(sc, arg);
+  SIM_SUPER_INIT(cls, sc, arg);
   GemeniInit(sc);
 }
 

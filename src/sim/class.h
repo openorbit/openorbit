@@ -31,7 +31,7 @@ typedef struct sim_class_t {
   const char *name;
   size_t obj_size; // Optional
   void *(*alloc)(struct sim_class_t *cls);
-  void (*init)(void *obj, void *arg);
+  void (*init)(struct sim_class_t *cls, void *obj, void *arg);
   void (*dealloc)(void *obj);
   void (*restored)(void *obj); // Called after deserialization (instead of init)
 
@@ -55,12 +55,12 @@ typedef struct {
 // Default class registry function
 sim_class_t*
 sim_register_class(const char *super, const char *name,
-                   void (*init)(void *obj, void *arg),
+                   void (*init)(sim_class_t *cls, void *obj, void *arg),
                    size_t size);
 sim_class_t*
 sim_register_class_(const char *super, const char *name,
                     void *(*alloc)(sim_class_t *cls),
-                    void (*init)(void *obj, void *arg),
+                    void (*init)(sim_class_t *cls, void *obj, void *arg),
                     void (*dealloc)(void *obj),
                     void (*restored)(void *obj));
 
@@ -93,9 +93,9 @@ void sim_set_field_by_index(sim_object_t *obj, const char *field_name,
 void sim_print_object(FILE *fout, sim_object_t *obj);
 void sim_read_objects(FILE *fin);
 
-#define SIM_SUPER_INIT(o, a)                      \
-  do {                                            \
-    ((sim_object_t*)(o))->cls->super->init(o, a); \
+#define SIM_SUPER_INIT(c, o, a)                      \
+  do {                                               \
+    (c)->super->init(c->super, o, a);                \
   } while (0)
 
 

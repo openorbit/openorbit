@@ -254,9 +254,9 @@ ApolloInit(sim_spacecraft_t *sc)
 }
 
 static void
-ApolloInit2(void *sc, void *arg)
+ApolloInit2(sim_class_t *cls, void *sc, void *arg)
 {
-  SIM_SUPER_INIT(sc, arg);
+  SIM_SUPER_INIT(cls, sc, arg);
   ApolloInit(sc);
 }
 
