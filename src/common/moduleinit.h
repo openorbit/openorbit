@@ -34,19 +34,31 @@
  */
 
 /// Used when initialising modules that do not depend on any specific order
-#define INIT_PRIMARY_MODULE static void __attribute__((constructor(0))) Init(void)
+#define INIT_PRIMARY_MODULE \
+  static void __attribute__((constructor(101))) Init(void)
 
 /// Used for initialiser of secondary modules. That is modules that depend on other
 /// modules such as a module that depend on the settings module is available
-#define INIT_SECONDARY_MODULE static void __attribute__((constructor(1))) Init(void)
+#define INIT_SECONDARY_MODULE \
+  static void __attribute__((constructor(102))) Init(void)
+
+/// Used for initialiser in a module that depends on a secondary module
+#define INIT_TERTIARY_MODULE \
+static void __attribute__((constructor(103))) Init(void)
 
 /// Used for registering IO handlers in a module. This is guaranteed to be executed
 /// after the IO manager has been initialised.
-#define INIT_IO static void __attribute__((constructor(1))) IOInit(void)
-#define INIT_MFD static void __attribute__((constructor(1))) MFDInit(void)
+#define INIT_IO \
+  static void __attribute__((constructor(102))) IOInit(void)
 
-/// Used for initialiser in a module that depends on a secondary module
-#define INIT_TERTIARY_MODULE static void __attribute__((constructor(2))) Init(void)
+#define INIT_MFD \
+  static void __attribute__((constructor(102))) MFDInit(void)
+
+#define INIT_SIM_MODULE\
+  static void __attribute__((constructor(103))) SIMInit(void)
+
+#define INIT_STATIC_SC_PLUGIN \
+  static void __attribute__((constructor(104))) PluginInit(void)
 
 
 #endif /*  !COMMON__MODULE_INIT_H */

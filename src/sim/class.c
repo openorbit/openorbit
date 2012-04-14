@@ -48,6 +48,7 @@ void
 sim_class_init(void)
 {
   classes = avl_str_new();
+  assert(classes && "avl tree not allocated");
   sim_class_t *cls = sim_register_class(NULL, "Object", Object_init,
                                         sizeof(sim_object_t));
   sim_class_add_field(cls, SIM_TYPE_CLASS_PTR,

@@ -643,7 +643,7 @@ InitStage(void *obj, void *arg)
 }
 
 
-INIT_PRIMARY_MODULE
+INIT_SIM_MODULE
 {
   //  gSpacecraftClasses = hashtable_new_with_str_keys(128);
 

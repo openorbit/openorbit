@@ -32,8 +32,6 @@
 #include "sim/pubsub.h"
 #include "sim/class.h"
 
-#define INIT_STATIC_SC_PLUGIN INIT_SECONDARY_MODULE
-
 /*! Spacecraft system simulation header
 
  The spacecrafts consist of multiple stages, where several stages may be
