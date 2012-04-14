@@ -106,8 +106,9 @@ sim_register_class_(const char *super, const char *name,
 static void*
 def_alloc(sim_class_t *cls)
 {
-  void* obj = malloc(cls->obj_size);
+  sim_object_t* obj = malloc(cls->obj_size);
   memset(obj, 0, cls->obj_size);
+  obj->cls = cls;
   return obj;
 }
 
