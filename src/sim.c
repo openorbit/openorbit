@@ -59,7 +59,7 @@ ooSimInit(void)
 
 
 
-  sim_spacecraft_t *sc = simNewSpacecraft("mercury", "Mercury I");
+  sim_spacecraft_t *sc = simNewSpacecraft("Mercury", "Mercury I");
   ooScSetSysAndCoords(sc, "Sol/Earth",
                       0.0 /*longitude*/,
                       0.0 /*latitude*/,
