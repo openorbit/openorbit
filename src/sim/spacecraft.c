@@ -34,8 +34,14 @@
 
 extern SIMstate gSIM_state;
 
-static hashtable_t *gSpacecraftClasses;
+typedef struct {
+  const char *name;
+} InitScArgs;
 
+
+//static hashtable_t *gSpacecraftClasses;
+
+#if 0
 void
 simNewSpacecraftClass(const char *name, sim_spacecraft_t *(*alloc)(void),
                       void (*init)(sim_spacecraft_t *sc))
@@ -49,19 +55,24 @@ simNewSpacecraftClass(const char *name, sim_spacecraft_t *(*alloc)(void),
 
   hashtable_insert(gSpacecraftClasses, name, cls);
 }
+#endif
 
 sim_spacecraft_t*
 simNewSpacecraft(const char *className, const char *scName)
 {
-  SCclass *cls = hashtable_lookup(gSpacecraftClasses, className);
+  sim_class_t *cls = sim_class_get(className);
+  //SCclass *cls = hashtable_lookup(gSpacecraftClasses, className);
   if (!cls) {
     ooLogError("no such spacecraft class '%s'", className);
     return NULL;
   }
 
-  sim_spacecraft_t *sc = cls->alloc();
+  sim_spacecraft_t *sc = cls->alloc(cls);
+  InitScArgs args = {""};
+  cls->init(sc, &(InitScArgs){scName});
   simScInit(sc, scName);
-  cls->init(sc);
+
+  //cls->init(sc);
 
   plUpdateMass(sc->obj);
   ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
@@ -583,6 +594,82 @@ simStageLockEngines(sim_stage_t *stage)
       simEngineLock(eng);
     }
   }
+}
+
+
+
+static void
+InitSpacecraft(void *obj, void *arg)
+{
+  SIM_SUPER_INIT(obj, arg);
+
+  sim_spacecraft_t *sc = obj;
+  InitScArgs *args = arg;
+
+  sc->super.name = strdup(args->name);
+
+  SGscenegraph *sg = simGetSg();
+  PLworld *world = simGetWorld();
+
+  obj_array_init(&sc->stages);
+  obj_array_init(&sc->engines);
+
+  sc->world = world;
+  sc->prestep = simDefaultPrestep;
+  sc->poststep = simDefaultPoststep;
+  sc->detatchPossible = true;
+  sc->detatchComplete = true;
+  sc->detatchStage = simDefaultDetatch;
+  sc->detatchSequence = 0;
+  sc->obj = plObject(world, args->name);
+  sc->scene = sgGetScene(sg, "main"); // Just use any of the existing ones
+  sc->expendedMass = 0.0;
+  sc->mainEngineOn = false;
+  sc->toggleMainEngine = simDefaultEngineToggle;
+  sc->axisUpdate = simDefaultAxisUpdate;
+  plMassSet(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  plSetSystem(world->rootSys, sc->obj);
+}
+
+typedef struct {
+  int dummy;
+} InitStageArgs;
+
+static void
+InitStage(void *obj, void *arg)
+{
+  SIM_SUPER_INIT(obj, arg);
+  sim_stage_t *stage = obj;
+}
+
+
+INIT_PRIMARY_MODULE
+{
+  //  gSpacecraftClasses = hashtable_new_with_str_keys(128);
+
+  sim_class_t *sc_class = sim_register_class("Object", "Spacecraft",
+                                             InitSpacecraft,
+                                             sizeof(sim_spacecraft_t));
+  sim_class_t *stage_class = sim_register_class("Object", "Stage",
+                                                InitStage,
+                                                sizeof(sim_stage_t));
+
+  // Fields in the spacecraft class
+  sim_class_add_field(sc_class, SIM_TYPE_OBJ_ARR,
+                      "stages", offsetof(sim_spacecraft_t, stages));
+  sim_class_add_field(sc_class, SIM_TYPE_OBJ_ARR,
+                      "engines", offsetof(sim_spacecraft_t, engines));
+
+
+  // Fields in the stage class
+  sim_class_add_field(stage_class, SIM_TYPE_OBJ,
+                      "sc", offsetof(sim_stage_t, sc));
+  sim_class_add_field(stage_class, SIM_TYPE_FLOAT_VEC3,
+                      "pos", offsetof(sim_stage_t, pos));
+  sim_class_add_field(stage_class, SIM_TYPE_OBJ_ARR,
+                      "engines", offsetof(sim_stage_t, engines));
+  sim_class_add_field(stage_class, SIM_TYPE_OBJ_ARR,
+                      "payload", offsetof(sim_stage_t, payload));
 }
 
 

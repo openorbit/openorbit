@@ -253,7 +253,16 @@ ApolloInit(sim_spacecraft_t *sc)
 
 }
 
+static void
+ApolloInit2(void *sc, void *arg)
+{
+  SIM_SUPER_INIT(sc, arg);
+  ApolloInit(sc);
+}
+
 INIT_STATIC_SC_PLUGIN
 {
-  simNewSpacecraftClass("apollo", ApolloNew, ApolloInit);
+  sim_class_t *cls = sim_register_class("Spacecraft", "Apollo",
+                                        ApolloInit2, sizeof(sim_spacecraft_t));
+
 }

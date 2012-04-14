@@ -148,9 +148,6 @@ typedef struct {
   void (*dealloc)(sim_spacecraft_t *sc);
 } SCclass;
 
-void
-simNewSpacecraftClass(const char *name, sim_spacecraft_t *(*alloc)(void),
-                      void (*init)(sim_spacecraft_t *sc));
 
 sim_spacecraft_t* simNewSpacecraft(const char *className, const char *scName);
 

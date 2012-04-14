@@ -245,7 +245,16 @@ GemeniInit(sim_spacecraft_t *sc)
 
 }
 
+static void
+GemeniInit2(void *sc, void *arg)
+{
+  SIM_SUPER_INIT(sc, arg);
+  GemeniInit(sc);
+}
+
 INIT_STATIC_SC_PLUGIN
 {
-  simNewSpacecraftClass("gemeni", GemeniNew, GemeniInit);
+  sim_class_t *cls = sim_register_class("Spacecraft", "Gemeni",
+                                        GemeniInit2, sizeof(sim_spacecraft_t));
+
 }

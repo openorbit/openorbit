@@ -303,13 +303,13 @@ MercuryInit(sim_spacecraft_t *sc)
 static void
 MercuryInit2(void *sc, void *arg)
 {
+  SIM_SUPER_INIT(sc, arg);
   MercuryInit(sc);
 }
 
 
 INIT_STATIC_SC_PLUGIN
 {
-  simNewSpacecraftClass("mercury", MercuryNew, MercuryInit);
   sim_class_t *cls = sim_register_class("Spacecraft", "Mercury",
                                         MercuryInit2, sizeof(sim_spacecraft_t));
 
