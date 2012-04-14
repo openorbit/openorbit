@@ -201,7 +201,7 @@ static char *elemNames[PL_Elem_Last] = {
 
 static hashtable_t *ht;
 
-INIT_PRIMARY_MODULE
+MODULE_INIT(areodynamics, NULL)
 {
   ht = hashtable_new_with_str_keys(128);
 

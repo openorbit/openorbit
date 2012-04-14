@@ -35,13 +35,13 @@
 
 static FT_Library library;
 
-INIT_PRIMARY_MODULE
+MODULE_INIT(text, NULL)
 {
   int error = FT_Init_FreeType( &library );
   if ( error ) {
     fprintf(stderr, "freetype failed init\n");
     exit(1);
-  }  
+  }
 }
 
 SGfont*
@@ -62,15 +62,15 @@ sgLoadFont(const char *fontName, int sz)
     free(face);
     return NULL;
   }
-  
+
   error = FT_Set_Char_Size(face, 0, sz*64, 72, 72);
   // FT_Set_Pixel_Size...
   free(fontFile);
-  
+
   SGfont *font = malloc(sizeof(SGfont));
   font->face = face;
   font->size = sz;
-  
+
   return font;
 }
 

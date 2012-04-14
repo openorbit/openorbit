@@ -260,7 +260,7 @@ ApolloInit2(void *sc, void *arg)
   ApolloInit(sc);
 }
 
-INIT_STATIC_SC_PLUGIN
+MODULE_INIT(apollo, "spacecraft", NULL)
 {
   sim_class_t *cls = sim_register_class("Spacecraft", "Apollo",
                                         ApolloInit2, sizeof(sim_spacecraft_t));

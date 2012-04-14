@@ -19,12 +19,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "common/moduleinit.h"
 void hidInit(void);
 
 //#import <SDL/SDL.h> // Needed for joystick access
 int
 main(int argc, const char *argv[argc])
 {
+  module_initialize();
   //if (SDL_Init(SDL_INIT_JOYSTICK) != 0) {
   //  NSLog(@"Could not initialize SDL, bailing out!");
   //  exit(0);

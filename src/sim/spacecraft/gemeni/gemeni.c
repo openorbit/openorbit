@@ -252,7 +252,7 @@ GemeniInit2(void *sc, void *arg)
   GemeniInit(sc);
 }
 
-INIT_STATIC_SC_PLUGIN
+MODULE_INIT(gemeni, "spacecraft", NULL)
 {
   sim_class_t *cls = sim_register_class("Spacecraft", "Gemeni",
                                         GemeniInit2, sizeof(sim_spacecraft_t));

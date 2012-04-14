@@ -35,7 +35,8 @@ struct handler_param {
 
 static OOeventqueue *gQueue;
 static pool_t *gTimerParamPool;
-INIT_PRIMARY_MODULE
+
+MODULE_INIT(simevent, NULL)
 {
   gQueue = simNewEventQueue();
   gTimerParamPool = pool_create(sizeof(struct handler_param));

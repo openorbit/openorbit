@@ -42,7 +42,7 @@ static obj_array_t mfd_pages;
 static SIMmfd mfd0, mfd1, mfd2, mfd3;
 static SIMhud hud;
 
-INIT_PRIMARY_MODULE {
+MODULE_INIT(mfd, NULL) {
   obj_array_init(&mfd_pages);
 }
 
@@ -77,7 +77,7 @@ samplemfddraw(SIMmfdpage *mfd)
 static SIMmfdpage sampleMfdPage = {"sample-mfd", samplemfddraw};
 
 
-INIT_MFD {
+MODULE_INIT(samplemfd, "mfd", NULL) {
   simMfdPageRegister(&sampleMfdPage);
 }
 
@@ -307,7 +307,7 @@ simMfdInitAll(SGscenegraph *sg)
   sgAddOverlay(sg, &hud.super);
 }
 
-INIT_IO {
+MODULE_INIT(mfdio, "mfd", "iomanager", NULL) {
   ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd0);
   ioRegActionHandler("mfd0-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd0);
   ioRegActionHandler("mfd0-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd0);

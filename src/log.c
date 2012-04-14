@@ -30,7 +30,7 @@ static FILE *sLogFile;
 static OOloglev sLogLev = OOLog_Info;
 static char* sLogNames[] = {"trace", "info", "warning", "error", "fatal", "abort"};
 
-INIT_PRIMARY_MODULE
+MODULE_INIT(log, NULL)
 {
   sLogFile = stderr;
   sLogLev = OOLog_Info;

@@ -284,6 +284,8 @@
 		ECC909A41175A14B00E8D477 /* shader-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909A21175A14B00E8D477 /* shader-manager.c */; };
 		ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909AF1175A65A00E8D477 /* mapped-file.c */; };
 		ECCED4E011CFD8EB00F20D07 /* config.i in Sources */ = {isa = PBXBuildFile; fileRef = ECCED4DF11CFD8EB00F20D07 /* config.i */; };
+		ECDA4BBF1539FCCB00B78FED /* moduleinit.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDA4BBE1539FCCB00B78FED /* moduleinit.c */; };
+		ECDA4BC01539FCCB00B78FED /* moduleinit.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDA4BBE1539FCCB00B78FED /* moduleinit.c */; };
 		ECDC29FD111498100066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC29FC111498100066AF2D /* particles.c */; };
 		ECDC2BA4111ACD900066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC2BA3111ACD900066AF2D /* particles.c */; };
 		ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
@@ -748,6 +750,7 @@
 		ECC909AF1175A65A00E8D477 /* mapped-file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "mapped-file.c"; sourceTree = "<group>"; };
 		ECC909B01175A65A00E8D477 /* mapped-file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mapped-file.h"; sourceTree = "<group>"; };
 		ECCED4DF11CFD8EB00F20D07 /* config.i */ = {isa = PBXFileReference; explicitFileType = sourcecode; fileEncoding = 4; path = config.i; sourceTree = "<group>"; };
+		ECDA4BBE1539FCCB00B78FED /* moduleinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = moduleinit.c; sourceTree = "<group>"; };
 		ECDC29FB111498100066AF2D /* particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particles.h; sourceTree = "<group>"; };
 		ECDC29FC111498100066AF2D /* particles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = particles.c; sourceTree = "<group>"; };
 		ECDC2BA2111ACD900066AF2D /* particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particles.h; sourceTree = "<group>"; };
@@ -1017,6 +1020,7 @@
 				EC204D5210CAFA2300F0A450 /* palloc.h */,
 				EC204D5310CAFA2300F0A450 /* palloc.c */,
 				EC0FBA4A11A563E000CEF95A /* moduleinit.h */,
+				ECDA4BBE1539FCCB00B78FED /* moduleinit.c */,
 				EC7CA611143AF4B500E22F4E /* stringextras.c */,
 				EC7CA614143AF50B00E22F4E /* stringextras.h */,
 			);
@@ -2213,6 +2217,7 @@
 				EC9351EB14F9449700962391 /* menus.c in Sources */,
 				EC9351EF14F94D9100962391 /* console.c in Sources */,
 				EC9351F414FB701900962391 /* class.c in Sources */,
+				ECDA4BBF1539FCCB00B78FED /* moduleinit.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2320,6 +2325,7 @@
 				EC9351EC14F9449700962391 /* menus.c in Sources */,
 				EC9351F014F94D9100962391 /* console.c in Sources */,
 				EC9351F514FB701900962391 /* class.c in Sources */,
+				ECDA4BC01539FCCB00B78FED /* moduleinit.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3338,6 +3344,7 @@
 				ECB81B44153170AE006E8EAC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		ECBF1757108C56ED00D3E412 /* Build configuration list for PBXNativeTarget "imgload" */ = {
 			isa = XCConfigurationList;

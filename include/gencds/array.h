@@ -15,13 +15,13 @@
   Redistribution and use of this file in source and binary forms, with or
   without modification, are permitted provided that the following conditions are
   met:
- 
+
     - Redistributions of source code must retain the above copyright notice,
       this list of conditions and the following disclaimer.
     - Redistributions in binary form must reproduce the above copyright notice,
       this list of conditions and the following disclaimer in the documentation
       and/or other materials provided with the distribution.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -78,12 +78,12 @@ void array_compress(array_t *vec);
   void name##_array_init(name##_array_t *vec) {                                \
     vec->asize = 16;                                                           \
     vec->length = 0;                                                           \
-    vec->elems = calloc(vec->asize, sizeof(void*));                            \
+    vec->elems = calloc(vec->asize, sizeof(typ));                              \
   }                                                                            \
   void name##_array_push(name##_array_t *vec, typ obj) {                       \
     if (vec->length >= vec->asize) {                                           \
       void *newVec = realloc(vec->elems,                                       \
-                              vec->asize * sizeof(void*) * 2);                 \
+                             vec->asize * sizeof(typ) * 2);                  \
       if (newVec == NULL) errx(EX_SOFTWARE, "realloc of vector failed");       \
       vec->asize *= 2;                                                         \
       vec->elems = newVec;                                                     \
@@ -129,6 +129,64 @@ void name##_array_dispose(name##_array_t *vec) {                               \
   vec->elems = NULL;                                                           \
 }                                                                              \
 
+
+
+#define DEF_COPY_ARRAY(typ,name,copyfunc,freefunc)                          \
+void name##_array_init(name##_array_t *vec) {                             \
+  vec->asize = 16;                                                          \
+  vec->length = 0;                                                          \
+  vec->elems = calloc(vec->asize, sizeof(typ));                           \
+}                                                                         \
+void name##_array_push(name##_array_t *vec, typ obj) {                    \
+  if (vec->length >= vec->asize) {                                          \
+    void *newVec = realloc(vec->elems,                                        \
+    vec->asize * sizeof(typ) * 2);                                          \
+    if (newVec == NULL) errx(EX_SOFTWARE, "realloc of vector failed");       \
+      vec->asize *= 2;                                                         \
+      vec->elems = newVec;                                                     \
+    }                                                                          \
+    vec->elems[vec->length ++] = copyfunc(obj);                                \
+  }                                                                            \
+typ name##_array_pop(name##_array_t *vec) {                                    \
+  assert(vec->length >= 1);                                                    \
+  return vec->elems[--vec->length];                                            \
+}                                                                              \
+typ name##_array_get(name##_array_t *vec, size_t i) {                          \
+  assert(i < vec->length);                                                     \
+  if (vec->length <= i)                                                        \
+    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d",             \
+         (int)vec->length, (int)i);                                            \
+  else                                                                         \
+    return vec->elems[i];                                                      \
+}                                                                              \
+void name##_array_set(name##_array_t *vec, size_t i, typ obj) {                \
+  assert(i < vec->length);                                                     \
+  if (vec->length <= i)                                                        \
+    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d",             \
+         (int)vec->length, (int)i);                                            \
+  else                                                                         \
+    vec->elems[i] = obj;                                                       \
+}                                                                              \
+typ name##_array_remove(name##_array_t *vec, size_t i) {                       \
+  assert(i < vec->length);                                                     \
+  if (vec->length <= i)                                                        \
+    errx(EX_SOFTWARE, "vector out of bounds length = %d idx = %d",             \
+         (int)vec->length, (int)i);                                            \
+  else {                                                                       \
+    typ tmp = vec->elems[i];                                                   \
+    vec->elems[i] = vec->elems[vec->length - 1];                               \
+    vec->length --;                                                            \
+    return tmp;                                                                \
+  }                                                                            \
+}                                                                              \
+void name##_array_dispose(name##_array_t *vec) {                               \
+  vec->asize = 0;                                                              \
+  vec->length = 0;                                                             \
+  free(vec->elems);                                                            \
+  vec->elems = NULL;                                                           \
+}                                                                              \
+
+
 DECL_ARRAY(_Bool,bool);
 
 DECL_ARRAY(char,char);
@@ -158,5 +216,8 @@ DECL_ARRAY(_Complex float,complex_float);
 DECL_ARRAY(_Complex double,complex_double);
 
 DECL_ARRAY(void*,obj);
+
+DECL_ARRAY(const char*,str);
+
 
 #endif /* end of include guard: ARRAY_H_QLY2MS7T */

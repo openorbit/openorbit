@@ -212,7 +212,7 @@ validate(void)
   return valid;
 }
 
-INIT_PRIMARY_MODULE
+MODULE_INIT(settings, NULL)
 {
   //ooConfLoad(ooResGetConfPath());
 

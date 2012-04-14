@@ -61,8 +61,9 @@ sim_class_init(void)
   objects = avl_uuid_new();
 }
 
-INIT_PRIMARY_MODULE
+MODULE_INIT(object, NULL)
 {
+  ooLogError("initializing primary module");
   sim_class_init();
 }
 

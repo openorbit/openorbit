@@ -364,8 +364,9 @@ io_builtin_throttle(int state, void *data)
 }
 
 
-INIT_PRIMARY_MODULE
+MODULE_INIT(iomanager, NULL)
 {
+  fprintf(stderr, "iomanager init\n");
   gIoReverseKeySymMap = hashtable_new_with_str_keys(1024);
   gIoButtonHandlers = hashtable_new_with_str_keys(2048);
   gIoAxisNameMap = hashtable_new_with_str_keys(16);

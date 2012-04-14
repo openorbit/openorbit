@@ -29,6 +29,7 @@
 #include "settings.h"
 #include "sdl-window.h"
 #include "sdl-events.h"
+#include "common/moduleinit.h"
 
 /* Simulator SDL events */
 #define SIM_STEP_EVENT 0 // Make physics step
@@ -57,16 +58,16 @@ sim_step_event(Uint32 interval, void *param)
 {
   SDL_Event event;
   SDL_UserEvent userevent;
-  
-  
+
+
   userevent.type = SDL_USEREVENT;
   userevent.code = SIM_STEP_EVENT;
   userevent.data1 = NULL;
   userevent.data2 = NULL;
-  
+
   event.type = SDL_USEREVENT;
   event.user = userevent;
-  
+
   SDL_PushEvent(&event);
   return interval;
 }
@@ -82,7 +83,7 @@ fps_event(Uint32 interval, void *param)
   fps_count = frames;
   frames = 0;
   simNotifyChange(fps_count_ref); // FIXME: NOT ASYNC SAFE
-  
+
   return interval;
 }
 
@@ -101,20 +102,20 @@ static void
 sdl_main_loop(void)
 {
   publish_variables();
-  
+
   extern SIMstate gSIM_state;
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s
   Uint32 interv = (Uint32) (wc_period * 1000.0); // SDL wants time in ms
   ooConfGetFloatDef("openorbit/sim/period", &sim_period, wc_period);
-  
+
   SDL_Event event;
   const char *evName;
   int done = 0;
   SDL_AddTimer(interv, sim_step_event, NULL);
   SDL_AddTimer(1000, fps_event, NULL);
-  
-  
+
+
   while ( !done ) {
     /* Check for events, will do the initial io-decoding */
     while ( SDL_PollEvent(&event) ) {
@@ -145,7 +146,7 @@ sdl_main_loop(void)
           break;
         case SDL_MOUSEWHEEL:
           break;
-          
+
         case SDL_INPUTMOTION:
         case SDL_INPUTBUTTONDOWN:
         case SDL_INPUTBUTTONUP:
@@ -153,7 +154,7 @@ sdl_main_loop(void)
         case SDL_INPUTPROXIMITYIN:
         case SDL_INPUTPROXIMITYOUT:
           break;
-          
+
         case SDL_KEYDOWN:
           sdl_dispatch_key_down(event.key.keysym.scancode, event.key.keysym.mod);
           break;
@@ -203,7 +204,7 @@ sdl_main_loop(void)
         case SDL_DOLLARGESTURE:
         case SDL_DOLLARRECORD:
         case SDL_MULTIGESTURE:
-          
+
           break;
         case SDL_QUIT:
           done = 1;
@@ -212,10 +213,10 @@ sdl_main_loop(void)
           ooLogWarn("did not handle event number %d in main loop", event.type);
       }
     }
-    
+
     // draw as often as possible
     sgPaint(gSIM_state.sg);
-    
+
     SDL_GL_SwapWindow(mainWindow);
     frames ++;
   }
@@ -250,24 +251,25 @@ static int sdl_io_filter(void *data, SDL_Event *ev)
 int
 main(int argc, const char *argv[argc])
 {
+  module_initialize();
   // Init SDL video subsystem
   if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {
     ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
   }
 
   assert(SDL_WasInit(SDL_INIT_JOYSTICK) == SDL_INIT_JOYSTICK);
-  
+
   SDL_SetEventFilter(sdl_io_filter, NULL);
 
   atexit(sdl_atexit);
 
   bool fullscreen;
   int width, height;
-  
+
   ooConfGetBoolDef("openorbit/video/fullscreen", &fullscreen, false);
   ooConfGetIntDef("openorbit/video/width", &width, 640);
   ooConfGetIntDef("openorbit/video/height", &height, 480);
-  
+
   mainWindow = sdl_window_init(width, height, fullscreen);
   sdl_init_gl();
   sdl_print_gl_attrs();

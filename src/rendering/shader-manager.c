@@ -43,7 +43,7 @@ typedef struct SGshaderinfo {
   GLuint ident;
 } SGshaderinfo;
 
-INIT_PRIMARY_MODULE
+MODULE_INIT(shadermanager, NULL)
 {
   shaderKeyMap = hashtable_new_with_str_keys(64);
 }

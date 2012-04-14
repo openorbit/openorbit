@@ -58,7 +58,7 @@ struct str_action_triplet {
   IObuttonhandlerfunc action;
 };
 
-INIT_IO {
+MODULE_INIT(camera, "iomanager", NULL) {
   const char *key;
   static const struct str_action_triplet keyBindings[] = {
     {"openorbit/controls/hat/cam-rotate", "cam-rotate", sgCamRotateHat},

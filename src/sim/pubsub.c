@@ -35,7 +35,7 @@
 
 static sim_record_t *_root;
 
-INIT_PRIMARY_MODULE
+MODULE_INIT(pubsub, NULL)
 {
   _root = simPubsubMakeRecord(NULL, NULL);
 }

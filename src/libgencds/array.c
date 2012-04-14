@@ -1,27 +1,27 @@
 /*
  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
- 
+
  This file is part of Open Orbit. Open Orbit is free software: you can
  redistribute it and/or modify it under the terms of the GNU General Public
  License as published by the Free Software Foundation, either version 3 of the
  License, or (at your option) any later version.
- 
+
  You should have received a copy of the GNU General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
- 
+
  Some files of Open Orbit have relaxed licensing conditions. This file is
  licenced under the 2-clause BSD licence.
- 
+
  Redistribution and use of this file in source and binary forms, with or
  without modification, are permitted provided that the following conditions are
  met:
- 
+
  - Redistributions of source code must retain the above copyright notice,
    this list of conditions and the following disclaimer.
  - Redistributions in binary form must reproduce the above copyright notice,
    this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -38,6 +38,7 @@
 #include <err.h>
 #include <sysexits.h>
 #include <stdint.h>
+#include <string.h>
 #include <assert.h>
 void
 array_init(array_t *vec)
@@ -104,4 +105,6 @@ DEF_ARRAY(_Complex float,complex_float);
 DEF_ARRAY(_Complex double,complex_double);
 
 DEF_ARRAY(void*,obj);
+
+DEF_COPY_ARRAY(const char*, str, strdup, free);
 
