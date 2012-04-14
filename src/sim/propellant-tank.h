@@ -43,7 +43,7 @@ typedef struct SIMtank SIMtank;
 // request mass through the pumps, the other way is to request mass by opening
 // valves attached to the pressurised tank.
 
-SIMtank* simNewTank(SIMstage *stage, const char *tankName, float p, float v, float t);
+SIMtank* simNewTank(sim_stage_t *stage, const char *tankName, float p, float v, float t);
 void simDeleteTank(SIMtank *tank);
 void simOpenValve(SIMtank *tank);
 void simEnablePump(SIMtank *tank);

@@ -143,7 +143,7 @@ turboprop_step(SIMengine *engine, float dt)
 
 
 SIMengine*
-simNewEngine(char *name, SIMstage *stage, SIMenginekind kind,
+simNewEngine(char *name, sim_stage_t *stage, SIMenginekind kind,
              SIMenginestate state, float throttle, float3 pos, float3 dir)
 {
   SIMengine *engine = NULL;

@@ -28,7 +28,7 @@ static void
 simScCtrlMainEngineToggle(int state, void *data)
 {
   if (state) {
-    OOspacecraft *sc = simGetSpacecraft();
+    sim_spacecraft_t *sc = simGetSpacecraft();
     ooLogInfo("main engine toggle");
     simScToggleMainEngine(sc);
   }
@@ -40,7 +40,7 @@ simScCtrlDetatchStage(int state, void *data)
   ooLogInfo("detatch commanded 0");
 
   if (state) {
-    OOspacecraft *sc = simGetSpacecraft();
+    sim_spacecraft_t *sc = simGetSpacecraft();
     ooLogInfo("detatch stage");
     simScDetatchStage(sc);
   }

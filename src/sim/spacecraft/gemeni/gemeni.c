@@ -49,7 +49,7 @@ enum Capsule_Actuators {
 };
 
 static void
-AxisUpdate(OOspacecraft *sc)
+AxisUpdate(sim_spacecraft_t *sc)
 {
   // TODO: Replace IO-system queries with sim variable lookups.
   //       This is important in order to allow for multiplexed axis commands,
@@ -60,14 +60,14 @@ AxisUpdate(OOspacecraft *sc)
 
   switch (sc->detatchSequence) {
     case MERC_REDSTONE: {
-      OOstage *redstone = sc->stages.elems[MERC_REDSTONE];
+      sim_stage_t *redstone = sc->stages.elems[MERC_REDSTONE];
       SIMengine *eng = ARRAY_ELEM(redstone->engines, THR_ROCKETDYNE);
       simEngineSetThrottle(eng, SIM_VAL(axises.orbital));
       break;
     }
     case MERC_CAPSULE: {
       if (!sc->detatchComplete) break;
-      OOstage *capsule = sc->stages.elems[MERC_CAPSULE];
+      sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
       simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_ROLL_0),
                            SIM_VAL(axises.roll));
@@ -105,11 +105,11 @@ DetatchComplete(void *data)
 {
   ooLogInfo("detatch complete");
 
-  OOspacecraft *sc = (OOspacecraft*)data;
+  sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sc->detatchPossible = false; // Do not reenable, must be false after last stage detatched
   sc->detatchComplete = true;
 
-  OOstage *stage = sc->stages.elems[MERC_CAPSULE];
+  sim_stage_t *stage = sc->stages.elems[MERC_CAPSULE];
 
   simEngineDisable(ARRAY_ELEM(stage->engines, THR_POSI));
   simStageArmEngines(stage);
@@ -117,15 +117,15 @@ DetatchComplete(void *data)
 }
 
 static void
-DetatchStage(OOspacecraft *sc)
+DetatchStage(sim_spacecraft_t *sc)
 {
   ooLogInfo("detatch commanded");
   sc->detatchPossible = false;
 
   if (sc->detatchSequence == MERC_REDSTONE) {
     ooLogInfo("detatching redstone");
-    OOstage *redstone = sc->stages.elems[MERC_REDSTONE];
-    OOstage *capsule = sc->stages.elems[MERC_CAPSULE];
+    sim_stage_t *redstone = sc->stages.elems[MERC_REDSTONE];
+    sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
     simStageDisableEngines(redstone);
     simStageLockEngines(redstone);
@@ -142,18 +142,18 @@ DetatchStage(OOspacecraft *sc)
 
 
 static void
-MainEngineToggle(OOspacecraft *sc)
+MainEngineToggle(sim_spacecraft_t *sc)
 {
   switch (sc->detatchSequence) {
     case MERC_REDSTONE: {
-      OOstage *redstone = sc->stages.elems[MERC_REDSTONE];
+      sim_stage_t *redstone = sc->stages.elems[MERC_REDSTONE];
       SIMengine *eng = ARRAY_ELEM(redstone->engines, THR_ROCKETDYNE);
       if (eng->state == SIM_Armed) simEngineFire(eng);
       else if (eng->state == SIM_Burning) simEngineDisable(eng);
       break;
     }
     case MERC_CAPSULE: {
-      OOstage *capsule = sc->stages.elems[MERC_CAPSULE];
+      sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
       SIMengine *eng = ARRAY_ELEM(capsule->engines, THR_RETRO_0);
       //if (eng->state == SIM_Armed) RetroFire_0(sc);
       break;
@@ -163,15 +163,15 @@ MainEngineToggle(OOspacecraft *sc)
   }
 }
 
-static OOspacecraft*
+static sim_spacecraft_t*
 GemeniNew(void)
 {
-  OOspacecraft *sc = smalloc(sizeof(OOspacecraft));
+  sim_spacecraft_t *sc = smalloc(sizeof(sim_spacecraft_t));
   return sc;
 }
 
 static void
-GemeniInit(SIMspacecraft *sc)
+GemeniInit(sim_spacecraft_t *sc)
 {
   sc->detatchStage = DetatchStage;
   sc->toggleMainEngine = MainEngineToggle;
@@ -181,10 +181,10 @@ GemeniInit(SIMspacecraft *sc)
   // for the redstone mercury rocket we assume a solid cylinder for the form
   // 1/2 mrr = 0.5 * 1.0 * 0.89 * 0.89 = 0.39605
   // 1/12 m(3rr + hh) = 27.14764852
-  
-  OOstage *launcher = simNewStage(sc, "Command-Module",
+
+  sim_stage_t *launcher = simNewStage(sc, "Command-Module",
                                   "spacecrafts/mercury/gemeni.ac");
-  
+
 #if 0
   plMassSet(&redstone->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
@@ -195,16 +195,16 @@ GemeniInit(SIMspacecraft *sc)
   plMassSetMin(&redstone->obj->m, 4400.0);
   plSetDragCoef(redstone->obj, 0.5);
   plSetArea(redstone->obj, 2.0*M_PI);
-  
+
   scStageSetOffset3f(redstone, 0.0, 0.0, 0.0);
-  
+
   //"LOX/ethyl alcohol"
   simNewEngine("Rocketdyne A7", redstone, SIM_Thruster, SIM_Armed, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
   //orbital
 #endif
-  
-  OOstage *capsule = simNewStage(sc, "Command-Module",
+
+  sim_stage_t *capsule = simNewStage(sc, "Command-Module",
                                  "spacecrafts/mercury/gemeni.ac");
 #if 0
   plMassSet(&capsule->obj->m, 1.0f, // Default to 1.0 kg
@@ -216,12 +216,12 @@ GemeniInit(SIMspacecraft *sc)
   plMassSetMin(&capsule->obj->m, 1354.0);
   plSetDragCoef(capsule->obj, 0.5);
   plSetArea(capsule->obj, 2.0*M_PI);
-  
+
   scStageSetOffset3f(capsule, 0.0, 17.9832, 0.0);
 #endif
   simNewEngine("Posigrade", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,1.8e3,0.0});
-  
+
   // Ripple fire 10 s burntime each
   simNewEngine("Retro 0", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
@@ -241,7 +241,7 @@ GemeniInit(SIMspacecraft *sc)
                (float3){0.41, 2.20, 0.00}, (float3){-108.0, 0.0,0.0});
   simNewEngine("Yaw 1", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
                (float3){-0.41, 2.20, 0.00}, (float3){108.0, 0.0,0.0});
-  
+
 
 }
 

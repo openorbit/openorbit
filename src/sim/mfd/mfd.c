@@ -158,7 +158,7 @@ test_hud_draw(SGoverlay *overlay)
 {
   SIMhud *hud = (SIMhud*)overlay;
 
-  OOspacecraft *sc = simGetSpacecraft();
+  sim_spacecraft_t *sc = simGetSpacecraft();
   float3 gv = simGetGravityVector(sc);
   //quaternion_t q = simGetQuaternion(sc);
   const float3x3 *R = simGetRotMat(sc);

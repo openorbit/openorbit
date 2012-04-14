@@ -22,10 +22,8 @@
 #ifndef OO_SIM_SIMTYPES_H__
 #define OO_SIM_SIMTYPES_H__
 
-typedef struct OOspacecraft OOspacecraft;
-typedef struct OOstage OOstage;
-typedef struct OOspacecraft SIMspacecraft;
-typedef struct OOstage SIMstage;
+typedef struct sim_spacecraft_t sim_spacecraft_t;
+typedef struct sim_stage_t sim_stage_t;
 
 typedef struct OOactuatorgroup OOactuatorgroup;
 

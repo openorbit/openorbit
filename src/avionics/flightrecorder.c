@@ -22,7 +22,7 @@
 #include "sim/spacecraft.h"
 #include <gencds/array.h>
 OOflightrecorder*
-ooNewFlightRecorder(OOspacecraft *sc, int maxSamples, int sampleInterval)
+ooNewFlightRecorder(sim_spacecraft_t *sc, int maxSamples, int sampleInterval)
 {
   OOflightrecorder *fr = malloc(sizeof(OOflightrecorder));
   double_array_init(&fr->data);

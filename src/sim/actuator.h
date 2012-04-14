@@ -76,7 +76,7 @@ typedef enum {
 
 struct SIMengine {
   const char *name;
-  SIMstage *stage;
+  sim_stage_t *stage;
   SIMenginekind kind;
   SIMenginestate state;
   float throttle;
@@ -118,7 +118,7 @@ typedef struct SIMjetengine SIMjetengine;
 typedef struct SIMliquidrocketengine SIMliquidrocketengine;
 typedef struct SIMsolidrocketengine SIMsolidrocketengine;
 
-SIMengine * simNewEngine(char *name, SIMstage *stage, SIMenginekind kind,
+SIMengine * simNewEngine(char *name, sim_stage_t *stage, SIMenginekind kind,
                          SIMenginestate state, float throttle,
                          float3 pos, float3 dir);
 void simEngineAddTank(SIMengine *engine, SIMtank *tank);

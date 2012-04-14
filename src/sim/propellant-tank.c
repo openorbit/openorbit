@@ -20,7 +20,7 @@
 #include "propellant-tank.h"
 #include "spacecraft.h"
 SIMtank*
-simNewTank(SIMstage *stage, const char *tankName, float p, float v, float t)
+simNewTank(sim_stage_t *stage, const char *tankName, float p, float v, float t)
 {
   SIMtank *tank = malloc(sizeof(SIMtank));
 

@@ -59,7 +59,7 @@ ooSimInit(void)
 
 
 
-  OOspacecraft *sc = simNewSpacecraft("mercury", "Mercury I");
+  sim_spacecraft_t *sc = simNewSpacecraft("mercury", "Mercury I");
   ooScSetSysAndCoords(sc, "Sol/Earth",
                       0.0 /*longitude*/,
                       0.0 /*latitude*/,
@@ -147,7 +147,7 @@ ooSimStep(float dt)
 }
 
 void
-simSetSpacecraft(OOspacecraft *sc)
+simSetSpacecraft(sim_spacecraft_t *sc)
 {
   gSIM_state.currentSc = sc;
   // Update standard pubsub links
@@ -161,7 +161,7 @@ simSetSpacecraft(OOspacecraft *sc)
   // Notify spacecraft that it is current (so it can update custom pubsub links)
 }
 
-OOspacecraft*
+sim_spacecraft_t*
 simGetSpacecraft(void)
 {
   return gSIM_state.currentSc;
