@@ -1,18 +1,18 @@
 /*
  Copyright 2012 Mattias Holm <mattias.holm(at)openorbit.org>
- 
+
  This file is part of Open Orbit.
- 
+
  Open Orbit is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
- 
+
  Open Orbit is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,7 +34,7 @@ typedef struct sim_class_t {
   void (*init)(void *obj, void *arg);
   void (*dealloc)(void *obj);
   void (*restored)(void *obj); // Called after deserialization (instead of init)
-  
+
   obj_array_t fields;
   avl_tree_t *key_index_map;
   avl_tree_t *interfaces;
@@ -63,6 +63,8 @@ sim_register_class_(const char *super, const char *name,
                     void (*init)(void *obj, void *arg),
                     void (*dealloc)(void *obj),
                     void (*restored)(void *obj));
+
+sim_class_t* sim_class_get(const char *cls_name);
 
 
 void sim_class_add_field(sim_class_t *class, sim_type_id_t type,
