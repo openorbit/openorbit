@@ -61,18 +61,16 @@ sim_spacecraft_t*
 simNewSpacecraft(const char *className, const char *scName)
 {
   sim_class_t *cls = sim_class_get(className);
-  //SCclass *cls = hashtable_lookup(gSpacecraftClasses, className);
+
   if (!cls) {
     ooLogError("no such spacecraft class '%s'", className);
     return NULL;
   }
 
   sim_spacecraft_t *sc = cls->alloc(cls);
-  InitScArgs args = {""};
-  cls->init(cls, sc, &(InitScArgs){scName});
-  simScInit(sc, scName);
-
-  //cls->init(sc);
+  //simScInit(sc, scName);
+  InitScArgs args = {scName};
+  cls->init(cls, sc, &args);
 
   plUpdateMass(sc->obj);
   ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
@@ -417,8 +415,10 @@ ooScSetSystem(sim_spacecraft_t *spacecraft, PLsystem *sys)
 
   if (oldSys != NULL) {
     for (int i = 0 ; i < oldSys->rigidObjs.length ; ++i) {
-      if (oldSys->rigidObjs.elems[i] == spacecraft->obj) {
+      PLobject *oldSysObj = oldSys->rigidObjs.elems[i];
+      if (oldSysObj == spacecraft->obj) {
         obj_array_remove(&oldSys->rigidObjs, i);
+        break;
       }
     }
   }
