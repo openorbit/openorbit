@@ -182,23 +182,18 @@ validate(void)
 
       if (json_is_object(controls)) {
         json_t *j = json_object_get(controls, "keys");
-        if (!json_is_object(j)) {
+        if (!json_is_array(j)) {
           valid = false;
-          ooLogError("openorbit/control/keys is not an object");
+          ooLogError("openorbit/controls/keys is not an array");
         }
         j = json_object_get(controls, "mouse");
         if (!json_is_object(j)) {
           valid = false;
-          ooLogError("openorbit/control/mouse is not an object");
-        }
-        j = json_object_get(controls, "axis");
-        if (!json_is_object(j)) {
-          valid = false;
-          ooLogError("openorbit/control/axis is not an object");
+          ooLogError("openorbit/controls/mouse is not an object");
         }
       } else {
         valid = false;
-        ooLogError("openorbit/control is not an object");
+        ooLogError("openorbit/controls is not an object");
       }
     } else {
       valid = false;
