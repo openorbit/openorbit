@@ -132,6 +132,18 @@ simGetRecordByName(sim_record_t *rec, const char *name)
   return simGetRecordByIndex(rec, idx);
 }
 
+sim_record_t*
+simGetRecordByNameSilent(sim_record_t *rec, const char *name)
+{
+  if (!rec) return NULL;
+  intptr_t idx = ((intptr_t) hashtable_lookup(rec->key_index_map, name)) - 1;
+  if (idx < 0) {
+    return NULL;
+  }
+
+  return simGetRecordByIndex(rec, idx);
+}
+
 
 
 sim_record_t*
@@ -184,7 +196,7 @@ simPubsubCreateRecord(const char *path)
 
   while (*comp_start) {
     comp_start = strtcpy(key, comp_start+1, '/', sizeof(key));
-    rec = simGetRecordByName(parent, key);
+    rec = simGetRecordByNameSilent(parent, key);
     if (!rec) {
       rec = simPubsubMakeRecord(parent, key);
     }
