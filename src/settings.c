@@ -214,6 +214,8 @@ validate(void)
 
 MODULE_INIT(settings, NULL)
 {
+  ooLogTrace("initialising 'settings' module");
+
   //ooConfLoad(ooResGetConfPath());
 
   json_error_t err;

@@ -25,6 +25,7 @@
 #include <GL/gl.h>
 #endif
 
+#include "log.h"
 #include "text.h"
 #include "texture.h"
 #include "res-manager.h"
@@ -37,6 +38,8 @@ static FT_Library library;
 
 MODULE_INIT(text, NULL)
 {
+  ooLogTrace("initialising 'text' module");
+
   int error = FT_Init_FreeType( &library );
   if ( error ) {
     fprintf(stderr, "freetype failed init\n");

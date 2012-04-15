@@ -254,6 +254,7 @@ GemeniInit2(sim_class_t *cls, void *sc, void *arg)
 
 MODULE_INIT(gemeni, "spacecraft", NULL)
 {
+  ooLogTrace("initialising 'gemeni' module");
   sim_class_t *cls = sim_register_class("Spacecraft", "Gemeni",
                                         GemeniInit2, sizeof(sim_spacecraft_t));
 

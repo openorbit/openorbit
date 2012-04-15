@@ -310,6 +310,8 @@ MercuryInit2(sim_class_t *cls, void *sc, void *arg)
 
 MODULE_INIT(mercury, "spacecraft", NULL)
 {
+  ooLogTrace("initialising 'mercury' module");
+
   sim_class_t *cls = sim_register_class("Spacecraft", "Mercury",
                                         MercuryInit2, sizeof(sim_spacecraft_t));
 

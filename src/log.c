@@ -30,12 +30,6 @@ static FILE *sLogFile;
 static OOloglev sLogLev = OOLog_Info;
 static char* sLogNames[] = {"trace", "info", "warning", "error", "fatal", "abort"};
 
-MODULE_INIT(log, NULL)
-{
-  sLogFile = stderr;
-  sLogLev = OOLog_Info;
-}
-
 OOloglev ooLogGetLevFromStr(const char *str)
 {
   for (int i = 0 ; i < sizeof(sLogNames)/sizeof(char*) ; ++ i) {
@@ -51,6 +45,7 @@ OOloglev ooLogGetLevFromStr(const char *str)
 static void
 ooLogWriteV(OOloglev lev, const char *msg, va_list vaList)
 {
+  if (!sLogFile) sLogFile = stderr;
   if (lev >= sLogLev) {
     fprintf(sLogFile, "oo: %s: ", sLogNames[lev]);
     vfprintf(sLogFile, msg, vaList);

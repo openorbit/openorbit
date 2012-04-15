@@ -59,6 +59,7 @@ struct str_action_triplet {
 };
 
 MODULE_INIT(camera, "iomanager", NULL) {
+  ooLogTrace("initialising 'camera' module");
   const char *key;
   static const struct str_action_triplet keyBindings[] = {
     {"openorbit/controls/hat/cam-rotate", "cam-rotate", sgCamRotateHat},

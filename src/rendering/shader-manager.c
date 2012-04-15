@@ -45,6 +45,7 @@ typedef struct SGshaderinfo {
 
 MODULE_INIT(shadermanager, NULL)
 {
+  ooLogTrace("initialising 'shadermanager' module");
   shaderKeyMap = hashtable_new_with_str_keys(64);
 }
 

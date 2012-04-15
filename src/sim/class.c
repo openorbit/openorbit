@@ -63,7 +63,7 @@ sim_class_init(void)
 
 MODULE_INIT(object, NULL)
 {
-  ooLogError("initializing primary module");
+  ooLogTrace("initialising 'object' module");
   sim_class_init();
 }
 

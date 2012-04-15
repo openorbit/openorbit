@@ -645,8 +645,8 @@ InitStage(sim_class_t *cls, void *obj, void *arg)
 
 MODULE_INIT(spacecraft, "object", NULL)
 {
-  //  gSpacecraftClasses = hashtable_new_with_str_keys(128);
-  ooLogError("init sim module");
+  ooLogTrace("initialising 'spacecraft' module");
+
   sim_class_t *sc_class = sim_register_class("Object", "Spacecraft",
                                              InitSpacecraft,
                                              sizeof(sim_spacecraft_t));

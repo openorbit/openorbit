@@ -37,6 +37,7 @@ static sim_record_t *_root;
 
 MODULE_INIT(pubsub, NULL)
 {
+  ooLogTrace("initialising 'pubsub' module");
   _root = simPubsubMakeRecord(NULL, NULL);
 }
 

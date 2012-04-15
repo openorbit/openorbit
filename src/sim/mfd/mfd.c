@@ -28,6 +28,7 @@
 
 #include "mfd.h"
 
+#include "log.h"
 #include "common/moduleinit.h"
 #include "common/palloc.h"
 #include "io-manager.h"
@@ -43,6 +44,7 @@ static SIMmfd mfd0, mfd1, mfd2, mfd3;
 static SIMhud hud;
 
 MODULE_INIT(mfd, NULL) {
+  ooLogTrace("initialising 'mfd' module");
   obj_array_init(&mfd_pages);
 }
 
@@ -78,6 +80,7 @@ static SIMmfdpage sampleMfdPage = {"sample-mfd", samplemfddraw};
 
 
 MODULE_INIT(samplemfd, "mfd", NULL) {
+  ooLogTrace("initialising 'samplemfd' module");
   simMfdPageRegister(&sampleMfdPage);
 }
 
@@ -308,6 +311,8 @@ simMfdInitAll(SGscenegraph *sg)
 }
 
 MODULE_INIT(mfdio, "mfd", "iomanager", NULL) {
+  ooLogTrace("initialising 'mfdio' module");
+
   ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd0);
   ioRegActionHandler("mfd0-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd0);
   ioRegActionHandler("mfd0-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd0);

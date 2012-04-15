@@ -203,6 +203,7 @@ static hashtable_t *ht;
 
 MODULE_INIT(areodynamics, NULL)
 {
+  ooLogTrace("initialising 'areodynamics' module");
   ht = hashtable_new_with_str_keys(128);
 
   for (PLelement i = PL_Elem_First ; i < PL_Elem_Last ; ++ i) {

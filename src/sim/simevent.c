@@ -38,6 +38,7 @@ static pool_t *gTimerParamPool;
 
 MODULE_INIT(simevent, NULL)
 {
+  ooLogTrace("initialising 'simevent' module");
   gQueue = simNewEventQueue();
   gTimerParamPool = pool_create(sizeof(struct handler_param));
 }

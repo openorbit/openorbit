@@ -262,6 +262,7 @@ ApolloInit2(sim_class_t *cls, void *sc, void *arg)
 
 MODULE_INIT(apollo, "spacecraft", NULL)
 {
+  ooLogTrace("initialising 'apollo' module");
   sim_class_t *cls = sim_register_class("Spacecraft", "Apollo",
                                         ApolloInit2, sizeof(sim_spacecraft_t));
 
