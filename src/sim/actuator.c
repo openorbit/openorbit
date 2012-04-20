@@ -26,7 +26,7 @@
 #include "common/palloc.h"
 #include "sim/actuator.h"
 #include "sim/spacecraft.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "io-manager.h"
 
 static const char *actuatorNames[OO_Act_Group_Count] = {

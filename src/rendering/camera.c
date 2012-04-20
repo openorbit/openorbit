@@ -27,7 +27,7 @@
 
 #include <vmath/vmath.h>
 #include "common/moduleinit.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "io-manager.h"
 #include "camera.h"
 #include "settings.h"

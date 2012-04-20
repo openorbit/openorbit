@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 #include "res-manager.h"
-#include "log.h"
+#include <openorbit/log.h>
 
 #ifdef PYTHON_FWORK
 #include <Python/Python.h>

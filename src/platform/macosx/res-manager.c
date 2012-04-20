@@ -27,7 +27,7 @@
 #include <glob.h>
 // Open Orbit headers
 #include "res-manager.h"
-#include "log.h"
+#include <openorbit/log.h>
 
 #ifndef INSTALL_PREFIX
 #define INSTALL_PREFIX "/usr/local"

@@ -1,18 +1,18 @@
 /*
  Copyright 2011 Mattias Holm <mattias.holm(at)openorbit.org>
- 
+
  This file is part of Open Orbit.
- 
+
  Open Orbit is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
- 
+
  Open Orbit is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include "res-manager.h"
 #include "rendering/scenegraph.h"
-#include "log.h"
+#include <openorbit/log.h>
 
 typedef struct text_bitmap_t {
   CGContextRef ctxt;
@@ -34,7 +34,7 @@ void dump_bytes(size_t len, char data[len]);
 
 text_bitmap_t*
 text_bitmap_create_label(const char *fontName, float fontsize, const char *text)
-{  
+{
   CFStringRef fontNameStr = CFStringCreateWithCString(kCFAllocatorDefault, fontName, kCFStringEncodingUTF8);
   CFStringRef string = CFStringCreateWithCString(kCFAllocatorDefault, text, kCFStringEncodingUTF8);
 
@@ -47,24 +47,24 @@ text_bitmap_create_label(const char *fontName, float fontsize, const char *text)
                           8, // Bits per comp
                           strlen(text)*fontsize, // Bytes per row
                           cs, // Color space
-                          kCGImageAlphaNone); // No alpha 
-  
+                          kCGImageAlphaNone); // No alpha
+
   // Initialize string, font, and context
   CFStringRef keys[] = { kCTFontAttributeName, kCTForegroundColorAttributeName};
   CFTypeRef values[] = { font, CGColorGetConstantColor(kCGColorWhite)};
-  
+
   CFDictionaryRef attributes =
   CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
                      (const void**)&values, sizeof(keys) / sizeof(keys[0]),
                      &kCFTypeDictionaryKeyCallBacks,
                      &kCFTypeDictionaryValueCallBacks);
-  
+
   CFAttributedStringRef attrString =
   CFAttributedStringCreate(kCFAllocatorDefault, string, attributes);
   CFRelease(string);
   CFRelease(fontNameStr);
   CFRelease(attributes);
-  
+
 
   CTLineRef line = CTLineCreateWithAttributedString(attrString);
   CGRect rect = CTLineGetImageBounds(line, context);
@@ -80,7 +80,7 @@ text_bitmap_create_label(const char *fontName, float fontsize, const char *text)
                           8, // Bits per comp
                           w, // Bytes per row
                           cs, // Color space
-                          kCGImageAlphaNone); // No alpha 
+                          kCGImageAlphaNone); // No alpha
 
   // Set text position and draw the line into the graphics context
   CGContextSetTextPosition(context, 0.0, 0.0);
@@ -93,7 +93,7 @@ text_bitmap_create_label(const char *fontName, float fontsize, const char *text)
   text_bitmap_t *bitmap = malloc(sizeof(text_bitmap_t));
   bitmap->ctxt = context;
   bitmap->data = CGBitmapContextGetData(context);
-  
+
   glGenTextures(1, &bitmap->tex);
   SG_CHECK_ERROR;
 
@@ -112,7 +112,7 @@ text_bitmap_create_label(const char *fontName, float fontsize, const char *text)
                0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap->data);
 
   //dump_bytes(w*h, bitmap->data);
-  
+
   return bitmap;
 }
 
@@ -139,7 +139,7 @@ text_bitmap_create(const char *font, float fontsize, unsigned w, unsigned h)
                                        8, // Bits per comp
                                        w, // Bytes per row
                                        cs, // Color space
-                                       kCGImageAlphaNone); // No alpha 
+                                       kCGImageAlphaNone); // No alpha
 
 
   // TODO: Use font in fontArr
@@ -188,7 +188,7 @@ dump_bytes(size_t len, char data[len])
 void
 text_bitmap_drawtext(text_bitmap_t *bitmap, const char *text)
 {
-  //dump_bytes(CGBitmapContextGetWidth(bitmap->ctxt)*CGBitmapContextGetHeight(bitmap->ctxt), bitmap->data); 
+  //dump_bytes(CGBitmapContextGetWidth(bitmap->ctxt)*CGBitmapContextGetHeight(bitmap->ctxt), bitmap->data);
   CGContextShowTextAtPoint(bitmap->ctxt,
                            0.0, CGBitmapContextGetHeight(bitmap->ctxt)-14,
                            text, strlen(text));
@@ -200,7 +200,7 @@ text_bitmap_drawtext(text_bitmap_t *bitmap, const char *text)
                CGBitmapContextGetHeight(bitmap->ctxt),
                0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap->data);
   SG_CHECK_ERROR;
-  //dump_bytes(CGBitmapContextGetWidth(bitmap->ctxt)*CGBitmapContextGetHeight(bitmap->ctxt), bitmap->data); 
+  //dump_bytes(CGBitmapContextGetWidth(bitmap->ctxt)*CGBitmapContextGetHeight(bitmap->ctxt), bitmap->data);
 
 }
 

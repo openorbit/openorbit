@@ -37,7 +37,7 @@
 #include "sky.h"
 #include "texture.h"
 #include "planet.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "common/moduleinit.h"
 #include "io-manager.h"
 

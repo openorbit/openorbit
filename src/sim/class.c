@@ -30,7 +30,7 @@
 
 #include <gencds/hashtable.h>
 #include <gencds/avl-tree.h>
-#include "log.h"
+#include <openorbit/log.h>
 #include "common/moduleinit.h"
 
 static avl_tree_t *classes;

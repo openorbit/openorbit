@@ -26,7 +26,7 @@
 #include "parsers/model.h"
 #include "res-manager.h"
 #include "rendering/texture.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "shader-manager.h"
 
 void

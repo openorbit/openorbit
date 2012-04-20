@@ -19,7 +19,7 @@
 
 #include "pubsub.h"
 #include "common/moduleinit.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "common/palloc.h"
 #include "common/stringextras.h"
 

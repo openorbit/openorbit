@@ -33,7 +33,7 @@
 
 #include "res-manager.h"
 #include "plugin-handler.h"
-#include "log.h"
+#include <openorbit/log.h>
 
 #ifndef SO_EXT
 #define SO_EXT ".so"
@@ -54,7 +54,7 @@ ooPluginInit(void)
         hashtable_delete(gPLUGIN_interface_dict);
         ooLogFatal("plugin: plugin dictionary not created");
     }
-    
+
     ctxt.objectManager = omCtxtNew();
 }
 
@@ -77,23 +77,23 @@ static char*
 ooPluginLoadSO(char *filename)
 {
     void *plugin_handle = dlopen(filename, RTLD_NOW|RTLD_LOCAL);
-    
+
     if (! plugin_handle) {
       ooLogError("plugin load failed: %s", dlerror());
       return NULL;
     }
-    
+
     OOpluginversion *vers = dlsym(plugin_handle, "oopluginversion");
-    
+
     init_f init_func = dlsym(plugin_handle, PLUGIN_INIT_SYMBOL);
-    
+
     if (! init_func) {
         ooLogError("plugin %s does not supply " PLUGIN_INIT_SYMBOL "()",
                    filename);
         dlclose(plugin_handle);
         return NULL;
     }
-    
+
     if (vers && *vers == OO_Plugin_Ver_1_00) {
       OOplugin *plugin = init_func(&ctxt);
       plugin->dynlib_handle = plugin_handle; // this is a runtime param not set by the plugin itself
@@ -106,7 +106,7 @@ ooPluginLoadSO(char *filename)
       else ooLogError("plugin %s incompatible (plugin v = %d, supported = %d)",
                       filename, *vers, OO_Plugin_Ver_1_00);
     }
-    
+
     return NULL;
 }
 
@@ -115,24 +115,24 @@ char*
 ooPluginLoad(char *filename)
 {
     if (! filename) return NULL;
-    
+
     // relative path? if so, append the SO_EXT to the file name and load in WD
     if (filename[0] != '/') {
         char *file = malloc(strlen(filename) + strlen(SO_EXT) + 1);
         strcpy(file, filename);
         strcat(file, SO_EXT);
-        
+
         char *key = ooPluginLoadSO(file);
 
         free(file);
-        
+
         return key;
     }
-    
+
     // this is an absolute path, we should load the file as is
-    
+
     return ooPluginLoadSO(filename);
-        
+
     return NULL;
 }
 
@@ -140,9 +140,9 @@ void
 unload_plugin(char *key)
 {
     OOplugin *plugin = hashtable_remove(gPLUGIN_dict, key);
-    
+
     OOpluginversion *vers = dlsym(plugin->dynlib_handle, "oopluginversion");
-    
+
     if (! vers) ooLogFatal("pluginversion not found when unloading");
     switch (*vers) {
     case OO_Plugin_Ver_1_00:
@@ -156,7 +156,7 @@ unload_plugin(char *key)
       assert(0 && "invalid case");
     }
 
-    
+
     dlclose(plugin->dynlib_handle);
 }
 
@@ -182,12 +182,12 @@ ooPluginPrintAll()
   printf("=============== PLUGIN LIST ==============\n");
   printf("|KEY     |NAME            |REV|STATUS|VER|\n");
   printf("|--------|----------------|---|------|---|\n");
-  
+
   while (entry) {
     OOplugin *plugin = (OOplugin*) hashtable_entry_data(entry);
     printf("|%-8s|%-16s|%3u|LOADED|%3d|\n",
-           plugin->key, plugin->name, plugin->rev, plugin->vers);    
-    
+           plugin->key, plugin->name, plugin->rev, plugin->vers);
+
     entry = list_entry_next(entry);
   }
 

@@ -22,7 +22,7 @@
 #include "sky.h"
 #include "colour.h"
 #include "res-manager.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include <tgmath.h>
 #include <stdio.h>
 #include <stdint.h>

@@ -24,7 +24,7 @@
 #include "sim/spacecraft.h"
 #include "sim/actuator.h"
 #include "common/palloc.h"
-#include "log.h"
+#include <openorbit/log.h>
 
 enum Stages {
   SATURN_1C = 0,

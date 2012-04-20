@@ -24,7 +24,7 @@
 #include <stdarg.h>
 #include <sysexits.h>
 #include "common/moduleinit.h"
-#include "log.h"
+#include <openorbit/log.h>
 
 static FILE *sLogFile;
 static OOloglev sLogLev = OOLog_Info;

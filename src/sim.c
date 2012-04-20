@@ -38,7 +38,7 @@
 #include "io-manager.h"
 
 
-#include "log.h"
+#include <openorbit/log.h>
 
 SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL};
 

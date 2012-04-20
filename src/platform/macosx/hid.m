@@ -21,7 +21,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/hid/IOHIDLib.h>
 #include <IOKit/hid/IOHIDKeys.h>
-#include "log.h"
+#include <openorbit/log.h>
 #include "io-manager.h"
 
 void hidValueChanged(void *ctxt, IOReturn result, void *sender,

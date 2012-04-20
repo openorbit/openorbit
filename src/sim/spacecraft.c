@@ -19,7 +19,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include "log.h"
+#include <openorbit/log.h>
 #include "sim.h"
 #include "sim/spacecraft.h"
 #include "res-manager.h"

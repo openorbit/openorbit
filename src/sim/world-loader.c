@@ -23,7 +23,7 @@
 #include "physics/physics.h"
 #include "parsers/hrml.h"
 #include "res-manager.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "rendering/texture.h"
 
 /*

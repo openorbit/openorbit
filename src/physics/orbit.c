@@ -29,7 +29,7 @@
 #include "sim.h"
 #include "sim/simtime.h"
 #include "geo/geo.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "parsers/hrml.h"
 #include "res-manager.h"
 #include "rendering/scenegraph.h"

@@ -22,7 +22,7 @@
 #include "common/moduleinit.h"
 #include <gencds/hashtable.h>
 #include "res-manager.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>

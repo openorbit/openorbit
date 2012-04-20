@@ -22,7 +22,7 @@
 #include "sim.h"
 #include "sim/spacecraft.h"
 #include "sim/spacecraft-control.h"
-#include "log.h"
+#include <openorbit/log.h>
 
 static void
 simScCtrlMainEngineToggle(int state, void *data)

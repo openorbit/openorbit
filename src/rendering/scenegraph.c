@@ -30,7 +30,7 @@
 #include "scenegraph.h"
 #include "scenegraph-private.h"
 #include "sky.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include <vmath/vmath.h>
 #include "geo/geo.h"
 #include "physics/orbit.h"

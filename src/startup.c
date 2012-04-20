@@ -50,7 +50,7 @@
 #endif
 
 #include "res-manager.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "settings.h"
 #include "io-manager.h"
 #include "plugin-handler.h"

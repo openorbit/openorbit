@@ -28,7 +28,7 @@
 
 #include "mfd.h"
 
-#include "log.h"
+#include <openorbit/log.h>
 #include "common/moduleinit.h"
 #include "common/palloc.h"
 #include "io-manager.h"

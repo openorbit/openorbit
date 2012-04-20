@@ -27,7 +27,7 @@
 #include <gencds/hashtable.h>
 #include "common/palloc.h"
 #include "common/moduleinit.h"
-#include "log.h"
+#include <openorbit/log.h>
 // Note that these are molar weights for all elements, this does not take into
 // account that some elements appear in molecules (i.e. H2)
 // TODO: Set all elements that are -0.0 to NAN, but this cannot be done until

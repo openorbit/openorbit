@@ -282,6 +282,7 @@
 		ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
 		ECC909A41175A14B00E8D477 /* shader-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909A21175A14B00E8D477 /* shader-manager.c */; };
 		ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909AF1175A65A00E8D477 /* mapped-file.c */; };
+		ECCE40B31541B52000CA2B54 /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = ECCE40B21541B52000CA2B54 /* log.h */; };
 		ECCED4E011CFD8EB00F20D07 /* config.i in Sources */ = {isa = PBXBuildFile; fileRef = ECCED4DF11CFD8EB00F20D07 /* config.i */; };
 		ECDA4BBF1539FCCB00B78FED /* moduleinit.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDA4BBE1539FCCB00B78FED /* moduleinit.c */; };
 		ECDA4BC01539FCCB00B78FED /* moduleinit.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDA4BBE1539FCCB00B78FED /* moduleinit.c */; };
@@ -555,7 +556,6 @@
 		EC34BBF51079EE080011B76E /* object-manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "object-manager.c"; sourceTree = "<group>"; };
 		EC34BBF61079EE080011B76E /* object-manager2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "object-manager2.c"; sourceTree = "<group>"; };
 		EC34BBF71079EE080011B76E /* log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = log.c; sourceTree = "<group>"; };
-		EC34BBF81079EE080011B76E /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
 		EC34BBF91079EE080011B76E /* startup.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = startup.c; sourceTree = "<group>"; };
 		EC34BBFB1079EE080011B76E /* 3ds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = 3ds.c; sourceTree = "<group>"; };
 		EC34BBFC1079EE080011B76E /* 3ds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = 3ds.h; sourceTree = "<group>"; };
@@ -745,6 +745,7 @@
 		ECC909A31175A14B00E8D477 /* shader-manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "shader-manager.h"; sourceTree = "<group>"; };
 		ECC909AF1175A65A00E8D477 /* mapped-file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "mapped-file.c"; sourceTree = "<group>"; };
 		ECC909B01175A65A00E8D477 /* mapped-file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mapped-file.h"; sourceTree = "<group>"; };
+		ECCE40B21541B52000CA2B54 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
 		ECCED4DF11CFD8EB00F20D07 /* config.i */ = {isa = PBXFileReference; explicitFileType = sourcecode; fileEncoding = 4; path = config.i; sourceTree = "<group>"; };
 		ECDA4BBE1539FCCB00B78FED /* moduleinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = moduleinit.c; sourceTree = "<group>"; };
 		ECDC29FB111498100066AF2D /* particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particles.h; sourceTree = "<group>"; };
@@ -957,6 +958,7 @@
 		EC34BBD71079EDE90011B76E /* openorbit */ = {
 			isa = PBXGroup;
 			children = (
+				ECCE40B21541B52000CA2B54 /* log.h */,
 				EC34BBD81079EDE90011B76E /* ifaces */,
 				EC34BBDB1079EDE90011B76E /* openorbit.h */,
 				EC34BBDC1079EDE90011B76E /* plugin.h */,
@@ -984,7 +986,6 @@
 				EC34BBE91079EE080011B76E /* io-manager.h */,
 				EC34BBEA1079EE080011B76E /* libgencds */,
 				EC34BBF71079EE080011B76E /* log.c */,
-				EC34BBF81079EE080011B76E /* log.h */,
 				EC34BBF91079EE080011B76E /* startup.c */,
 				EC34BBFA1079EE080011B76E /* parsers */,
 				EC34BC0E1079EE080011B76E /* physics */,
@@ -1679,6 +1680,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ECBF174F108C568900D3E412 /* image.h in Headers */,
+				ECCE40B31541B52000CA2B54 /* log.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

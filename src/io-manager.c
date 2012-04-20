@@ -25,7 +25,7 @@
 #include "io-manager.h"
 //#include "SDL.h"
 //#include <SDL/SDL.h>
-#include "log.h"
+#include <openorbit/log.h>
 #include "parsers/hrml.h"
 #include "settings.h"
 

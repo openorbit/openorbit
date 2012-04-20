@@ -25,7 +25,7 @@
 #include <GL/gl.h>
 #endif
 
-#include "log.h"
+#include <openorbit/log.h>
 #include "text.h"
 #include "texture.h"
 #include "res-manager.h"

@@ -31,7 +31,7 @@
 #include <GL/glu.h>
 #endif
 
-#include "log.h"
+#include <openorbit/log.h>
 #include "texture.h"
 #include <imgload/image.h>
 

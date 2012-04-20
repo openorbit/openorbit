@@ -24,7 +24,7 @@
 
 #include "sim/simevent.h"
 #include "sim/simtime.h"
-#include "log.h"
+#include <openorbit/log.h>
 
 #define OO_EVENT_QUEUE_INIT_LEN 100
 

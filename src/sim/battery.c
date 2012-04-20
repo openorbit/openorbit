@@ -18,7 +18,7 @@
  */
 
 #include "battery.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include <gencds/array.h>
 static void
 PowerOverloadLog(SIMpowerbus *pb)

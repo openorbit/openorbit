@@ -30,7 +30,7 @@
 
 #include "res-manager.h"
 #include "parsers/hrml.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "common/moduleinit.h"
 #include "common/mapped-file.h"
 

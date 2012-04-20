@@ -20,7 +20,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
-#include "log.h"
+#include <openorbit/log.h>
 
 #include "collision.h"
 #include "common/lwcoord.h"

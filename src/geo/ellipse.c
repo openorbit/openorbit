@@ -29,7 +29,7 @@
 
 
 #include "ellipse.h"
-#include "../log.h"
+#include <openorbit/log.h>
 
 void
 ooGeoEllipseDraw(OOellipse *e)
@@ -100,7 +100,7 @@ ooVecArraySet(OOvecarray *vec, size_t i, float3 obj)
   if (vec->length <= i)
     ooLogFatal("vector out of bounds length = %d idx = %d", vec->length, i);
   else
-    vec->elems[i] = obj;  
+    vec->elems[i] = obj;
 }
 
 #define ITERSTOP 100000
@@ -222,7 +222,7 @@ ooGeoEllipseSegPoint(OOellipse *e, double t)
   double pos = fmod(t, (double)(e->vec.length));
   size_t i = (size_t) pos;
 
-  float3 a = (float3) e->vec.elems[(i + 1) % e->vec.length];  
+  float3 a = (float3) e->vec.elems[(i + 1) % e->vec.length];
   float3 b = (float3) e->vec.elems[i % e->vec.length];
 
   double frac = pos - floor(pos);

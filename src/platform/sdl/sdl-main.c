@@ -25,7 +25,7 @@
 #include "io-manager.h"
 #include "sim/pubsub.h"
 #include "rendering/render.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "settings.h"
 #include "sdl-window.h"
 #include "sdl-events.h"
