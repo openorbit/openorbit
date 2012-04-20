@@ -1,0 +1,11 @@
+This file is supposed to list the public API functions and headers.
+
+The public API exists in order to let 3rd parties write additional
+spacecraft simulation modules (adding spacecrafts and components of
+such systems to the simulator).
+
+At present (2012-04-20), the public API is not ready or even close
+to being finished, the files forming the API are listed below:
+
+Public API headers (TODO):
+       include/openorbit/log.h: Logging functions.

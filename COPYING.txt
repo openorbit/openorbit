@@ -19,6 +19,11 @@ You should assume that all source code is licensed according to the GPL unless
 otherwise explicitly stated otherwise. Exception are given on a file by file
 basis.
 
+Note, that an additional exception is given to dynamically linked plugins
+directly using only the API specified in the public includes. What constitutes
+the public includes will be documented in the file PUBLICAPI. Dynamically linked
+plugins utilizing this API do not need to fall under the GPL as specified here.
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
