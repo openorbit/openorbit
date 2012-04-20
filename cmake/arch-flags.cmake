@@ -3,10 +3,6 @@ set(CMAKE_C_FLAGS_DEBUG "-g -std=gnu99")
 set(CMAKE_C_FLAGS_RELEASE "-std=gnu99 -O2")
 set(CMAKE_C_FLAGS_ANALYSE "-g -std=gnu99")
 
-# We should probably pick this by looking for the clang analyser, but for now, lets just hard
-# code it
-set(CMAKE_C_COMPILER_ANALYSE "ccc-analyzer")
-
 set(ARCH_FLAGS_DEBUG "")
 set(ARCH_FLAGS_RELEASE "")
 set(ARCH_FLAGS_ANALYSE "")

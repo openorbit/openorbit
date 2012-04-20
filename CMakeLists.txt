@@ -28,11 +28,18 @@ endif (ENABLE_DOCS)
 find_package(SDL REQUIRED)
 find_package(SDL_ttf QUIET)
 find_package(OpenGL REQUIRED)
+find_package(OpenAL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
+find_package(SWIG REQUIRED)
+find_package(freetype REQUIRED)
+find_package(libxml2 REQUIRED)
 
-
+find_library(LIBJANSSON jansson)
+if (not $LIBJANSSON)
+  message(FATAL_ERROR "cannot find libjansson")
+endif (not $LIBJANSSON)
 # TODO: Download missing packages, i.e. sdl, ode et.al.
 # file(DOWNLOAD url file [TIMEOUT timeout] [STATUS status] [LOG log])
 
@@ -45,7 +52,6 @@ test_big_endian(BIG_ENDIAN)
 
 # Need python libraries, and also the pyrexc compiler
 find_package(PythonLibs REQUIRED)
-include(cmake/Pyrex.txt)
 
 if (APPLE)
     include(cmake/InstallMacRes.txt)
@@ -53,22 +59,22 @@ endif (APPLE)
 
 option(WITH_GUILE "Enable Scheme Scripting with Guile (DEPRECATED)" off)
 
-find_program(FLEX flex)
-if (NOT FLEX)
-    message(FATAL_ERROR "Could not locate flex")
-endif (NOT FLEX)
+#find_program(FLEX flex)
+#if (NOT FLEX)
+#    message(FATAL_ERROR "Could not locate flex")
+#endif (NOT FLEX)
 
 # It is possible to build supporting both single and double math,
 # note that binary plugins will need to match the precision of the
 # open orbit application
-option(WITH_DOUBLE_PRECISION "Select fp precision as double" off)
-if (WITH_DOUBLE_PRECISION)
-    add_definitions(-DUSE_DOUBLE_FP_MATH)
-else (WITH_DOUBLE_PRECISION)
-    add_definitions(-DUSE_SINGLE_FP_MATH)
-endif (WITH_DOUBLE_PRECISION)
+#option(WITH_DOUBLE_PRECISION "Select fp precision as double" off)
+#if (WITH_DOUBLE_PRECISION)
+#    add_definitions(-DUSE_DOUBLE_FP_MATH)
+#else (WITH_DOUBLE_PRECISION)
+#    add_definitions(-DUSE_SINGLE_FP_MATH)
+#endif (WITH_DOUBLE_PRECISION)
 
-option(ENABLE_VECTORISE "Enable SIMD vectorisation" on)
+#option(ENABLE_VECTORISE "Enable SIMD vectorisation" on)
 
 
 # Turn on testing system, our tests are located in the test directory
@@ -79,13 +85,7 @@ endif (ENABLE_TESTS)
 
 # TODO: Support more compilers
 # TODO: Move compiler flags to file in cmake/arch-flags.cmake
-if (CMAKE_COMPILER_IS_GNUCC)
-    include(cmake/arch-flags.cmake)
-else (CMAKE_COMPILER_IS_GNUCC)
-    message(FATAL_ERROR "Only GCC supported for the moment")
-endif (CMAKE_COMPILER_IS_GNUCC)
-
-
+include(cmake/arch-flags.cmake)
 
 # Support command when working with Xcode
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/AddCMakeList.txt)
@@ -96,10 +96,12 @@ endif (HAVE_ALTIVEC)
 
 
 # Build tools first
-add_subdirectory(tools)
-include(cmake/Autowrap.cmake)
+#add_subdirectory(tools)
+#include(cmake/Autowrap.cmake)
 
 include_directories(include)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+include_directories(${LIBXML2_INCLUDE_DIR})
 add_subdirectory(lib)
 add_subdirectory(scripts)
 add_subdirectory(src)
