@@ -1,39 +1,29 @@
 /*
- Copyright 2011 Mattias Holm <mattias.holm(at)openorbit.org>
-
+ Copyright 2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ 
  This file is part of Open Orbit.
-
+ 
  Open Orbit is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
-
+ 
  Open Orbit is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
-
+ 
  You should have received a copy of the GNU General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef orbit_terminal_h
+#define orbit_terminal_h
 
-#import <Cocoa/Cocoa.h>
+void terminal_start(void);
+void terminal_stop(void);
 
-#import "terminal.h"
-#import "common/moduleinit.h"
-
-void hidInit(void);
-
-int
-main(int argc, const char *argv[argc])
-{
-  module_initialize(); // Initialize all openorbit modules
-
-  // Start up secondary stdio thread
-  terminal_start();
-
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  hidInit();
-  [pool release];
-  return NSApplicationMain(argc, argv);
-}
+void terminal_add_command(const char *cmd,
+                          int (*cmd_func)(int argc, const char* argv[]),
+                          const char *short_help,
+                          const char *help);
+#endif /* !orbit_terminal_h */

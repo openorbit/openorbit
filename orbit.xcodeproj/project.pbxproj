@@ -145,11 +145,14 @@
 		EC4C8A13137D5D0A007AC0DF /* object-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF51079EE080011B76E /* object-manager.c */; };
 		EC4C8A14137D5D0A007AC0DF /* object-manager2.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BBF61079EE080011B76E /* object-manager2.c */; };
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
+		EC564723156B8E8300D6A871 /* terminal.c in Sources */ = {isa = PBXBuildFile; fileRef = EC564722156B8E8300D6A871 /* terminal.c */; };
+		EC564724156B8E8300D6A871 /* terminal.c in Sources */ = {isa = PBXBuildFile; fileRef = EC564722156B8E8300D6A871 /* terminal.c */; };
 		EC571BE61443675D002CA003 /* cgbitmaps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC571BE51443675D002CA003 /* cgbitmaps.c */; };
 		EC571BE71443675D002CA003 /* cgbitmaps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC571BE51443675D002CA003 /* cgbitmaps.c */; };
 		EC5F72531154E10D00FBE08B /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
 		EC5F725A1154E27400FBE08B /* light.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72591154E27400FBE08B /* light.c */; };
 		EC5F72881155240B00FBE08B /* drawable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72871155240B00FBE08B /* drawable.c */; };
+		EC6CA8AC156BAD650052D56E /* libedit.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC6CA8AB156BAD650052D56E /* libedit.dylib */; };
 		EC6DFCAB126DCF850029D5E3 /* mfd.c in Sources */ = {isa = PBXBuildFile; fileRef = EC6DFCAA126DCF850029D5E3 /* mfd.c */; };
 		EC75350914176FEB000A7CB4 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EC75350314176FEB000A7CB4 /* MainMenu.xib */; };
 		EC75350A14176FEB000A7CB4 /* OOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EC75350514176FEB000A7CB4 /* OOAppDelegate.m */; };
@@ -674,6 +677,8 @@
 		EC4FCC6210748F4B00EB6DDF /* libpng.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng.dylib; path = /usr/X11/lib/libpng.dylib; sourceTree = "<absolute>"; };
 		EC51E6E110BBE766009FA70D /* mass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mass.h; sourceTree = "<group>"; };
 		EC51E6E210BBE766009FA70D /* mass.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mass.c; sourceTree = "<group>"; };
+		EC564722156B8E8300D6A871 /* terminal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = terminal.c; sourceTree = "<group>"; };
+		EC564725156B8EB700D6A871 /* terminal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = terminal.h; sourceTree = "<group>"; };
 		EC571BE51443675D002CA003 /* cgbitmaps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cgbitmaps.c; sourceTree = "<group>"; };
 		EC5F72511154E10D00FBE08B /* material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
 		EC5F72521154E10D00FBE08B /* material.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = material.c; sourceTree = "<group>"; };
@@ -682,6 +687,7 @@
 		EC5F72871155240B00FBE08B /* drawable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = drawable.c; sourceTree = "<group>"; };
 		EC62624E1125545C001C0684 /* reftypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reftypes.h; sourceTree = "<group>"; };
 		EC6262571125556C001C0684 /* drawable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drawable.h; sourceTree = "<group>"; };
+		EC6CA8AB156BAD650052D56E /* libedit.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libedit.dylib; path = usr/lib/libedit.dylib; sourceTree = SDKROOT; };
 		EC6DFCA9126DCF850029D5E3 /* mfd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mfd.h; sourceTree = "<group>"; };
 		EC6DFCAA126DCF850029D5E3 /* mfd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mfd.c; sourceTree = "<group>"; };
 		EC745D4B143CA05A00310C29 /* io-system.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "io-system.txt"; sourceTree = "<group>"; };
@@ -843,6 +849,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC6CA8AC156BAD650052D56E /* libedit.dylib in Frameworks */,
 				EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */,
 				ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */,
 				EC2386F814F7849400C59F16 /* OpenAL.framework in Frameworks */,
@@ -1002,6 +1009,8 @@
 				EC34BC531079EE080011B76E /* sim.c */,
 				EC34BC541079EE080011B76E /* sim.h */,
 				EC34BC571079EE080011B76E /* vessel */,
+				EC564722156B8E8300D6A871 /* terminal.c */,
+				EC564725156B8EB700D6A871 /* terminal.h */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -1339,6 +1348,7 @@
 		EC4476740CCBFEDB001C88AD = {
 			isa = PBXGroup;
 			children = (
+				EC6CA8AB156BAD650052D56E /* libedit.dylib */,
 				EC4C89F5137D4E5B007AC0DF /* tools */,
 				ECA5F8AF109D8FB3004278EC /* docs */,
 				EC34BDB1107B2C480011B76E /* lib */,
@@ -2206,6 +2216,7 @@
 				EC9351EF14F94D9100962391 /* console.c in Sources */,
 				EC9351F414FB701900962391 /* class.c in Sources */,
 				ECDA4BBF1539FCCB00B78FED /* moduleinit.c in Sources */,
+				EC564723156B8E8300D6A871 /* terminal.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2314,6 +2325,7 @@
 				EC9351F014F94D9100962391 /* console.c in Sources */,
 				EC9351F514FB701900962391 /* class.c in Sources */,
 				ECDA4BC01539FCCB00B78FED /* moduleinit.c in Sources */,
+				EC564724156B8E8300D6A871 /* terminal.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
