@@ -574,115 +574,6 @@ sgNewCylinder(const char *name,
 
 
 void
-drawModel(SGmodel *sgmod, model_object_t *model)
-{
-  SG_CHECK_ERROR;
-  //glColor3f(1.0, 1.0, 1.0);
-  glEnable(GL_CULL_FACE);
-  glFrontFace(GL_CCW);
-  //glShadeModel(GL_SMOOTH);
-
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
-  sgBindMaterial(model->model->materials[model->materialId]);
-
-  glPushMatrix();
-
-  glTranslatef(model->trans[0], model->trans[1], model->trans[2]);
-  glMultMatrixf((GLfloat*)model->rot);
-
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
-
-  GLfloat modelview[16], projection[16];
-  glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
-  glGetFloatv(GL_PROJECTION_MATRIX, projection);
-
-  glUniformMatrix4fv(sgmod->super.modelview_id, 1, GL_FALSE, modelview);
-  glUniformMatrix4fv(sgmod->super.projection_id, 1, GL_FALSE, projection);
-
-  glVertexPointer(3, GL_FLOAT, 0, model->vertices.elems);
-  glTexCoordPointer(2, GL_FLOAT, 0, model->texCoords.elems);
-  glNormalPointer(GL_FLOAT, 0, model->normals.elems);
-
-  glDrawArrays(GL_TRIANGLES, 0, model->vertexCount);
-
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_NORMAL_ARRAY);
-
-#if 0
-  // DEBUG: Draw normals, do not delete
-  glDisable(GL_BLEND);
-  glDisable(GL_LIGHTING);
-  glBegin(GL_LINES);
-  glColor3f(1.0, 0.0, 0.0);
-  int vertices = model->vertexCount;
-  for (int i = 0 ; i < vertices ; ++ i) {
-    glVertex3fv(&model->vertices.elems[i*3]);
-    glVertex3f(model->vertices.elems[i*3 + 0] + model->normals.elems[i*3 + 0],
-               model->vertices.elems[i*3 + 1] + model->normals.elems[i*3 + 1],
-               model->vertices.elems[i*3 + 2] + model->normals.elems[i*3 + 2]);
-  }
-  glEnd();
-
-  glPointSize(2.0);
-  glBegin(GL_POINTS);
-  glColor3f(1.0, 1.0, 0.0);
-  for (int i = 0 ; i < vertices ; ++ i) {
-    glVertex3fv(&model->vertices.elems[i*3]);
-  }
-  glEnd();
-
-  glEnable(GL_BLEND);
-  glEnable(GL_LIGHTING);
-#endif
-
-  for (int i = 0 ; i < model->children.length ; ++ i) {
-    drawModel(sgmod, model->children.elems[i]);
-  }
-
-  glPopMatrix();
-  SG_CHECK_ERROR;
-}
-
-void
-sgDrawModel(SGmodel *model)
-{
-  SG_CHECK_ERROR;
-
-  glEnable(GL_LIGHTING);
-  drawModel(model, model->modelData->objs.elems[0]);
-
-  SG_CHECK_ERROR;
-}
-
-SGdrawable*
-sgLoadModel(const char *file)
-{
-  SG_CHECK_ERROR;
-
-  char *path = ooResGetPath(file);
-
-  SGmodel *model = malloc(sizeof(SGmodel));
-  sgInitDrawable(&model->super);
-
-  model->modelData = model_load(path);
-  free(path);
-  if (model->modelData == NULL) {
-    ooLogError("loading model '%s', returned NULL model data", file);
-    free(model);
-    return NULL;
-  }
-  SG_CHECK_ERROR;
-
-  return sgNewDrawable((SGdrawable*)model, "unnamed",
-                       (SGdrawfunc)sgDrawModel);
-}
-
-void
 draw_modeldata(SGmodel2 *sgmod, SGmodeldata *mod)
 {
   SG_CHECK_ERROR;
@@ -730,7 +621,7 @@ draw_modeldata(SGmodel2 *sgmod, SGmodeldata *mod)
 }
 
 void
-sgDrawModel2(SGmodel2 *mod)
+sgDrawModel(SGmodel2 *mod)
 {
   ARRAY_FOR_EACH(i, mod->roots) {
     draw_modeldata(mod, ARRAY_ELEM(mod->roots, i));
@@ -789,7 +680,7 @@ handle_model_obj(model_object_t *obj)
 }
 
 SGdrawable*
-sgLoadModel2(const char *file)
+sgLoadModel(const char *file)
 {
   SG_CHECK_ERROR;
 
@@ -815,7 +706,7 @@ sgLoadModel2(const char *file)
   SG_CHECK_ERROR;
 
   return sgNewDrawable((SGdrawable*)model, "unnamed",
-                       (SGdrawfunc)sgDrawModel2);
+                       (SGdrawfunc)sgDrawModel);
 }
 
 
