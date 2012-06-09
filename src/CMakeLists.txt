@@ -204,7 +204,9 @@ target_link_libraries(openorbit
                       ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY}
 		      ${SDL_LIBRARY}
 		      ${GLUT_LIBRARIES} ${LIBXML2_LIBRARIES}
-		      ${PYTHON_LIBRARIES} ${FREETYPE_LIBRARIES})
+		      ${PYTHON_LIBRARIES} ${FREETYPE_LIBRARIES}
+		      ${IOKIT}
+		      )
 
 if (${SDLTTF_FOUND})
   target_link_libraries(openorbit ${SDLTTF_LIBRARY})

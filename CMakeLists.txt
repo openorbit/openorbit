@@ -1,12 +1,8 @@
 # Root CMakeList file
 
-option(USE_CLANG "Use clang as compiler" off)
-option(ANALYSIS "Run clang static analyser on the source" off)
-if (USE_CLANG OR ANALYSIS)
-  set(CMAKE_C_COMPILER_INIT "clang")
-  set(CMAKE_CXX_COMPILER_INIT "clang")
-endif(USE_CLANG OR ANALYSIS)
-
+# Force use of clang for vector extensions
+set(CMAKE_C_COMPILER_INIT "clang")
+set(CMAKE_CXX_COMPILER_INIT "clang")
 
 project(openorbit)
 cmake_minimum_required(VERSION 2.6)
@@ -24,9 +20,19 @@ if (ENABLE_DOCS)
     find_package(LATEX)	
 endif (ENABLE_DOCS)
 
-# Require SDL and OpenGL
-find_package(SDL REQUIRED)
-find_package(SDL_ttf QUIET)
+# Require SDL and OpenGL on non OS X targets
+if (NOT APPLE)
+  find_package(SDL REQUIRED)
+  find_package(SDL_ttf QUIET)
+endif (NOT APPLE)
+
+if (APPLE)
+  find_library(IOKIT IOKit)
+  if (NOT IOKIT)
+    message(FATAL_ERROR "cannot find IOKit.framework")
+  endif (NOT IOKIT)
+endif (APPLE)
+
 find_package(OpenGL REQUIRED)
 find_package(OpenAL REQUIRED)
 find_package(GLUT REQUIRED)
@@ -37,9 +43,9 @@ find_package(freetype REQUIRED)
 find_package(libxml2 REQUIRED)
 
 find_library(LIBJANSSON jansson)
-if (not $LIBJANSSON)
+if (NOT LIBJANSSON)
   message(FATAL_ERROR "cannot find libjansson")
-endif (not $LIBJANSSON)
+endif (NOT LIBJANSSON)
 # TODO: Download missing packages, i.e. sdl, ode et.al.
 # file(DOWNLOAD url file [TIMEOUT timeout] [STATUS status] [LOG log])
 
