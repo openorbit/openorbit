@@ -670,23 +670,31 @@ void mf4_mul2(float4x4 a, const float4x4 b);
 
 // Common opengl replacements
 /*! Create ortho projection matrix */
-void mf4_ortho(float4x4 m, float left, float right, float bottom, float top,
-               float near, float far);
+void mf4_ortho(float4x4 m,
+               float left, float right,
+               float bottom, float top,
+               float nearVal, float farVal);
 
 /*! Create 2d ortho projection matrix */
-void mf4_ortho2D(float4x4 m, float left, float right, float bottom, float top);
+void mf4_ortho2D(float4x4 m,
+                 float left, float right,
+                 float bottom, float top);
 
 /*! Create fustum matrix for perspective correction */
-void mf4_fustum(float4x4 m, float left, float right, float bottom, float top,
-                float near, float far);
+void mf4_fustum(float4x4 m,
+                float left, float right,
+                float bottom, float top,
+                float nearVal, float farVal);
 
 /*! Create perspective correction matrix the easy way */
-void mf4_perspective(float4x4 m, float fovy, float aspect,
-                     float near, float far);
+void mf4_perspective(float4x4 m,
+                     float fovy, float aspect, float zNear, float zFar);
 
 /*! Create matrix that point the camera at a specific position. */
-void mf4_lookat(float4x4 m, float ex, float ey, float ez,
-                float cx, float cy, float cz, float ux, float uy, float uz);
+void mf4_lookat(float4x4 m,
+                float eyeX, float eyeY, float eyeZ,
+                float centerX, float centerY, float centerZ,
+                float upX, float upY, float upZ);
 
 #ifdef __cplusplus
 }

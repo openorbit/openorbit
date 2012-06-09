@@ -845,95 +845,81 @@ mf4_mul2(float4x4 a, const float4x4 b)
 }
 
 
-// Replacement for glOrtho needed in OpenGL 3
+// Replacement routinse for OpenGL 3
 // Note that this is a row major matrix
+
 void
-mf4_ortho(float4x4 m, float left, float right, float bottom, float top,
-          float near, float far)
+mf4_lookat(float4x4 m,
+           float eyeX, float eyeY, float eyeZ,
+           float centerX, float centerY, float centerZ,
+           float upX, float upY, float upZ)
 {
-  memset(m, 0, sizeof(float4x4));
+  float3 f = vf3_sub(vf3_set(centerX, centerY, centerZ),
+                     vf3_set(eyeX, eyeY, eyeZ));
+  float3 up = vf3_set(upX, upY, upZ);
+  f = vf3_normalise(f);
+  up = vf3_normalise(up);
+  float3 s = vf3_cross(f, up);
+  float3 u = vf3_cross(s, f);
+  m[0] = s;
+  m[1] = u;
+  m[2] = vf3_neg(f);
+  m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
+}
 
-  // diagonals
-  m[0][0] = 2.0f/(right-left);
-  m[1][1] = 2.0f/(top-bottom);
-  m[2][2] = -2.0f/(far-near);
-  m[3][3] = 1.0f;
 
-  m[0][3] = (right+left)/(right-left);
-  m[1][3] = (top+bottom)/(top-bottom);
-  m[2][3] = (far+near)/(far-near);
+void
+mf4_perspective(float4x4 m,
+                float fovy, float aspect, float zNear, float zFar)
+{
+  float f = 1.0f/tan(fovy/2.0f); // Cotan
+  m[0] = vf4_set(f/aspect, 0.0f, 0.0f, 0.0f);
+  m[1] = vf4_set(0.0f, f, 0.0f, 0.0f);
+  m[2] = vf4_set(0.0f, 0.0f, (zFar+zNear)/(zNear-zFar),
+                 (2.0f*zFar*zNear)/(zNear-zFar));
+  m[3] = vf4_set(0.0f, 0.0f, -1.0f, 0.0f);
 }
 
 void
-mf4_ortho2D(float4x4 m, float left, float right, float bottom, float top)
+mf4_frustum(float4x4 m,
+            float left, float right,
+            float bottom, float top,
+            float nearVal, float farVal)
+{
+  float a = (right+left)/(right-left);
+  float b = (top+bottom)/(top-bottom);
+  float c = -(farVal+nearVal)/(farVal-nearVal);
+  float d = -(2.0f*farVal*nearVal)/(farVal-nearVal);
+  m[0] = vf4_set(2.0*nearVal/(right-left), 0.0, a, 0.0f);
+  m[1] = vf4_set(0.0, 2.0*nearVal/(top-bottom), b, 0.0f);
+  m[2] = vf4_set(0.0, 0.0, c, d);
+  m[3] = vf4_set(0.0, 0.0, -1.0, 0.0f);
+}
+
+
+void
+mf4_ortho(float4x4 m,
+          float left, float right,
+          float bottom, float top,
+          float nearVal, float farVal)
+{
+  float tx = (right+left)/(right-left);
+  float ty = (top+bottom)/(top-bottom);
+  float tz = (farVal+nearVal)/(farVal-nearVal);
+  m[0] = vf4_set(2.0/(right-left), 0.0f, 0.0f, tx);
+  m[1] = vf4_set(0.0f, 2.0/(top-bottom), 0.0f, ty);
+  m[2] = vf4_set(0.0f, 0.0f, -2.0/(farVal-nearVal), tz);
+  m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
+}
+
+
+void
+mf4_ortho2D(float4x4 m,
+            float left, float right,
+            float bottom, float top)
 {
   mf4_ortho(m, left, right, bottom, top, -1.0f, 1.0f);
 }
 
 
-void
-mf4_fustum(float4x4 m, float left, float right, float bottom, float top,
-           float near, float far)
-{
-  memset(m, 0, sizeof(float4x4));
 
-  // diagonals
-  m[0][0] = 2.0f*near/(right-left);
-  m[1][1] = 2.0f*near/(top-bottom);
-  m[2][2] = (far+near)/(far-near); // C
-  m[3][3] = 0.0f;
-
-  m[0][2] = (right+left)/(right-left); // A
-  m[1][2] = (top+bottom)/(top-bottom); // B
-  m[2][3] = (2.0f*far*near)/(far-near); // D
-  m[3][2] = 1.0f;
-
-}
-
-void
-mf4_perspective(float4x4 m, float fovy, float aspect, float near, float far)
-{
-  memset(m, 0, sizeof(float4x4));
-
-  float f = 1.0f/tanf(fovy/2.0f); // Cotan
-
-  m[0][0] = f/aspect;
-  m[1][1] = f;
-  m[2][2] = (far+near)/(near-far);
-  m[3][3] = 0.0f;
-
-  m[2][3] = (2.0f*far*near)/(near-far);
-  m[3][2] = -1.0f;
-}
-
-void
-mf4_lookat(float4x4 m, float ex, float ey, float ez,
-           float cx, float cy, float cz, float ux, float uy, float uz)
-{
-  memset(m, 0, sizeof(float4x4));
-  float3 F = {cx-ex, cy-ey, cz-ez};
-  float3 U = {ux, uy, uz};
-
-  float F_abs = vf3_abs(F);
-  float U_abs = vf3_abs(U);
-
-  float3 f = F/F_abs;
-  float3 UP = U/U_abs;
-
-  float3 s = vf3_cross(f, UP);
-  float3 u = vf3_cross(s, f);
-
-  m[0].xyz = s.xyz;
-  m[1].xyz = u.xyz;
-  m[2].xyz = -f.xyz;
-  m[3][3] = 1.0f;
-
-  // Finally, translate to ey pos
-  float4x4 T;
-  mf4_ident(T);
-  T[0][3] = -ex;
-  T[1][3] = -ey;
-  T[2][3] = -ez;
-
-  mf4_mul2(m, T);
-}
