@@ -1348,7 +1348,6 @@
 		EC4476740CCBFEDB001C88AD = {
 			isa = PBXGroup;
 			children = (
-				EC6CA8AB156BAD650052D56E /* libedit.dylib */,
 				EC4C89F5137D4E5B007AC0DF /* tools */,
 				ECA5F8AF109D8FB3004278EC /* docs */,
 				EC34BDB1107B2C480011B76E /* lib */,
@@ -1392,6 +1391,7 @@
 		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EC6CA8AB156BAD650052D56E /* libedit.dylib */,
 				EC9351D314F7989900962391 /* libpython2.7.a */,
 				EC2386FD14F7851F00C59F16 /* libjansson.a */,
 				EC2386F714F7849400C59F16 /* OpenAL.framework */,
