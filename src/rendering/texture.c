@@ -51,6 +51,7 @@ GLuint
 ooTexLoad(const char *key, const char *name)
 {
   SG_CHECK_ERROR;
+  if (!key) return 0;
 
   OOtexture *tex = NULL;
   if ((tex = hashtable_lookup(gOOtexDict, key))) {
