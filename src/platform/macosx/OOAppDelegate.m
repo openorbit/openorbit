@@ -19,6 +19,7 @@
 
 
 #import "OOAppDelegate.h"
+void menu_init(void);
 
 @implementation OOAppDelegate
 @synthesize mainWindow;
@@ -28,6 +29,7 @@
 {
   [mainWindow setInitialFirstResponder:openGLView];
   [mainWindow makeFirstResponder:openGLView];
+  menu_init();
 }
 
 @end

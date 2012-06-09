@@ -292,6 +292,7 @@
 		ECDC29FD111498100066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC29FC111498100066AF2D /* particles.c */; };
 		ECDC2BA4111ACD900066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC2BA3111ACD900066AF2D /* particles.c */; };
 		ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
+		ECE369B2157F78A400AC4945 /* menu-manager.m in Sources */ = {isa = PBXBuildFile; fileRef = ECE369B1157F78A400AC4945 /* menu-manager.m */; };
 		ECE3C1EE14363D85001C1F32 /* mouse.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE3C1ED14363D85001C1F32 /* mouse.c */; };
 		ECE3C1F014363DCB001C1F32 /* sdl-mouse.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE3C1EF14363DCB001C1F32 /* sdl-mouse.c */; };
 		ECE6A8441167CAB400003CBD /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
@@ -735,6 +736,7 @@
 		ECA0639A13A54D7100D720F1 /* apollo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = apollo.c; sourceTree = "<group>"; };
 		ECA27D7B1433BDD60074B04C /* hid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = hid.m; sourceTree = "<group>"; };
 		ECA27D8414360CBE0074B04C /* default-conf.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "default-conf.json"; sourceTree = "<group>"; };
+		ECA5CC26157F85C70060A678 /* menu-manager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "menu-manager.h"; sourceTree = "<group>"; };
 		ECA5F8B1109D8FE7004278EC /* Hrml Manual */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Hrml Manual"; sourceTree = "<group>"; };
 		ECB81B3615317079006E8EAC /* test-avltree.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "test-avltree.c"; sourceTree = "<group>"; };
 		ECB81B3B153170AE006E8EAC /* t010_avltree */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t010_avltree; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -760,6 +762,7 @@
 		ECDC2BA3111ACD900066AF2D /* particles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = particles.c; sourceTree = "<group>"; };
 		ECE17A871079DE71006B6A37 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		ECE17AB21079E043006B6A37 /* ooscript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ooscript.c; sourceTree = "<group>"; };
+		ECE369B1157F78A400AC4945 /* menu-manager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "menu-manager.m"; sourceTree = "<group>"; };
 		ECE3C1ED14363D85001C1F32 /* mouse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mouse.c; sourceTree = "<group>"; };
 		ECE3C1EF14363DCB001C1F32 /* sdl-mouse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-mouse.c"; sourceTree = "<group>"; };
 		ECE6A8421167CAB400003CBD /* pubsub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pubsub.h; sourceTree = "<group>"; };
@@ -1011,6 +1014,7 @@
 				EC34BC571079EE080011B76E /* vessel */,
 				EC564722156B8E8300D6A871 /* terminal.c */,
 				EC564725156B8EB700D6A871 /* terminal.h */,
+				ECA5CC26157F85C70060A678 /* menu-manager.h */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -1128,6 +1132,7 @@
 				ECA27D7B1433BDD60074B04C /* hid.m */,
 				ECE3C1ED14363D85001C1F32 /* mouse.c */,
 				EC571BE51443675D002CA003 /* cgbitmaps.c */,
+				ECE369B1157F78A400AC4945 /* menu-manager.m */,
 			);
 			path = macosx;
 			sourceTree = "<group>";
@@ -2217,6 +2222,7 @@
 				EC9351F414FB701900962391 /* class.c in Sources */,
 				ECDA4BBF1539FCCB00B78FED /* moduleinit.c in Sources */,
 				EC564723156B8E8300D6A871 /* terminal.c in Sources */,
+				ECE369B2157F78A400AC4945 /* menu-manager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
