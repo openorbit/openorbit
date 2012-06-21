@@ -28,6 +28,7 @@
 #include "rendering/texture.h"
 #include <openorbit/log.h>
 #include "shader-manager.h"
+#include "rendering/location.h"
 
 void
 sgInitDrawable(SGdrawable *obj)

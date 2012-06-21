@@ -111,14 +111,6 @@ typedef struct SGmodel2 {
   obj_array_t roots;
 } SGmodel2;
 
-typedef struct SGmodel {
-  SGdrawable super;
-  GLint pos_loc;
-  GLint norm_loc;
-  GLint tex0_coord_loc;
-  model_t *modelData;
-} SGmodel;
-
 struct SGsphere {
   SGdrawable super;
   SGmaterial mat;
@@ -201,7 +193,7 @@ SGdrawable* sgNewEllipsis(const char *name,
                           float r, float g, float b,
                           size_t vertCount);
 
-SGdrawable* sgLoadModel(const char *file, const char *shader);
+SGdrawable* sgLoadModel(const char *file);
 
 void sgDrawableAddChild(SGdrawable * restrict parent, SGdrawable * restrict child,
                         float3 t, quaternion_t q);
