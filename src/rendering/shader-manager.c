@@ -32,7 +32,7 @@
 
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
-#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 #else
 #include <GL/gl.h>
 #endif
@@ -180,6 +180,8 @@ sgLoadProgram(const char *key,
   }
 
   // Ignore geometry shaders for now...
+  // Set the output fragment name
+  glBindFragDataLocation(shaderProgram, 0, "oo_FragColor");
 
   glLinkProgram(shaderProgram);
   GLint linkStatus = 0;

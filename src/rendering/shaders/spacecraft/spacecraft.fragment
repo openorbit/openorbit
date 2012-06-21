@@ -31,7 +31,7 @@ in vec4 Diffuse, Ambient, AmbientGlob;
 in vec3 N, Ld, Eye;
 in float Dist;
 
-out vec4 FragColor;
+out vec4 oo_FragColor;
 
 void
 main()
@@ -55,5 +55,5 @@ main()
     color += att * Spec;
   }
 
-  FragColor = color;
+  oo_FragColor = color;
 }

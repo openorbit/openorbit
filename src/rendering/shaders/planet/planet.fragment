@@ -39,7 +39,7 @@ in float Dist;
 const float twilightZone = 0.25;
 const float invTwilightZone = 1.0 / (2.0 * twilightZone);
 
-out vec4 FragColor;
+out vec4 oo_FragColor;
 void
 main()
 {
@@ -93,5 +93,5 @@ main()
     }
   }
 
-  FragColor = color;
+  oo_FragColor = color;
 }

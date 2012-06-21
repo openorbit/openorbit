@@ -4,10 +4,10 @@ uniform sampler2D tex;
 in vec2 FragTexCoord;
 in vec4 FragColor;
 
-out vec4 out_FragColor;
+out vec4 oo_FragColor;
 
 void
 main()
 {
-  out_FragColor = FragColor * texture(tex, FragTexCoord);
+  oo_FragColor = FragColor * texture(tex, FragTexCoord);
 }
