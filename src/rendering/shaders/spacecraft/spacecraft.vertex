@@ -1,34 +1,61 @@
-#version 120
+#version 150
+
+struct material_t {
+  vec4 emission;
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  float shininess;
+};
+
+struct light_t {
+  vec3 pos;
+  vec4 ambient;
+  vec4 specular;
+  vec4 diffuse;
+  vec3 dir; // Only used for spotlights
+  
+  float constantAttenuation;
+  float linearAttenuation;
+  float quadraticAttenuation;
+
+  vec4 globAmbient;
+};
+
+uniform light_t Light[1];
+uniform material_t Material;
 
 uniform mat4 ModelViewMatrix;
 uniform mat4 ProjectionMatrix;
+uniform mat3 NormalMatrix;
 
-attribute vec3 Position;
-attribute vec3 Normal;
-attribute vec2 Tex0Coord;
+in vec3 Position;
+in vec3 Normal;
+in vec2 TexCoord0;
 
-varying vec4 Diffuse, Ambient, AmbientGlob;
-varying vec3 N, Ld, Eye;
-varying float Dist;
+out vec4 Diffuse, Ambient, AmbientGlob;
+out vec3 N, Ld, Eye;
+out float Dist;
 
 void
 main()
 {
-  N = normalize(gl_NormalMatrix * Normal);//gl_Normal);
+  N = normalize(NormalMatrix * Normal);//gl_Normal);
 
-  vec3 Lv = vec3(gl_LightSource[0].position - ModelViewMatrix * Position);//gl_Vertex);
+  vec4 tmp = vec4(Position.xyz, 1.0);
+  vec3 Lv = vec3(Light[0].pos - (ModelViewMatrix * tmp).xyz);//gl_Vertex);
   Dist = length(Lv);
   Ld = normalize(Lv);
-  Eye = -vec3(ModelViewMatrix * Position);//gl_Vertex);
+  Eye = -vec3(ModelViewMatrix * tmp);//gl_Vertex);
 
   // Diffuse light
   float NdotL = max(dot(N, Ld), 0.0);
-  Diffuse = (gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse) * NdotL;
+  Diffuse = (Material.diffuse * Light[0].diffuse) * NdotL;
 
   // Ambient light
-  AmbientGlob = gl_LightModel.ambient * gl_FrontMaterial.ambient;
-  Ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
+  AmbientGlob = Light[0].globAmbient * Material.ambient;
+  Ambient = Material.ambient * Light[0].ambient;
 
   //gl_FrontColor = Diffuse + Ambient + Spec;
-  gl_Position = ProjectionMatrix * ModelViewMatrix * Position;//gl_Vertex;
+  gl_Position = ProjectionMatrix * ModelViewMatrix * tmp;//gl_Vertex;
 }

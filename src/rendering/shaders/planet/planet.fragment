@@ -1,21 +1,45 @@
-#version 120
+#version 150
+
+struct material_t {
+  vec4 emission;
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  float shininess;
+};
+
+struct light_t {
+  vec3 pos;
+  vec4 ambient;
+  vec4 specular;
+  vec4 diffuse;
+  vec3 dir; // Only used for spotlights
+  
+  float constantAttenuation;
+  float linearAttenuation;
+  float quadraticAttenuation;
+  
+  vec4 globAmbient; // TODO Move out of light type
+};
+
+uniform light_t Light[1];
+uniform material_t Material;
 
 uniform bool UseNightTexture;
 uniform bool UseSpecMap;
 
-uniform sampler2D Tex0; // Normal texture
-uniform sampler2D Tex1; // Specular map
-uniform sampler2D Tex3; // Night texture
+uniform sampler2D Tex[3]; // Normal texture, specular map, night texture
 //uniform sampler2D Tex2; // Bump map
 
-varying vec2 TexCoord;
+in vec2 TexCoord;
 
-varying vec3 N, Ld, Eye;
-varying float Dist;
+in vec3 N, Ld, Eye;
+in float Dist;
 
 const float twilightZone = 0.25;
 const float invTwilightZone = 1.0 / (2.0 * twilightZone);
 
+out vec4 FragColor;
 void
 main()
 {
@@ -24,33 +48,33 @@ main()
 
   vec4 Ambient, AmbientGlob;
 
-  vec4 diffuseTexel = texture2D(Tex0, TexCoord);
-  vec4 diffuseNightTexel = texture2D(Tex3, TexCoord);
-  vec4 diffuse = diffuseTexel * gl_LightSource[0].diffuse;
-  vec4 diffuseNight = diffuseNightTexel * gl_LightSource[0].diffuse;
+  vec4 diffuseTexel = texture(Tex[0], TexCoord);
+  vec4 diffuseNightTexel = texture(Tex[2], TexCoord);
+  vec4 diffuse = diffuseTexel * Light[0].diffuse;
+  vec4 diffuseNight = diffuseNightTexel * Light[0].diffuse;
 
   // Ambient light
-  AmbientGlob = gl_LightModel.ambient * diffuseNightTexel;
-  Ambient = diffuseNightTexel * gl_LightSource[0].ambient;
+  AmbientGlob = Light[0].globAmbient * diffuseNightTexel;
+  Ambient = diffuseNightTexel * Light[0].ambient;
 
   vec4 color = AmbientGlob;
 
   if (NdotL > 0.0) {
-    float att = 1.0 / (gl_LightSource[0].constantAttenuation +
-                      Dist * gl_LightSource[0].linearAttenuation +
-                      Dist * Dist * gl_LightSource[0].quadraticAttenuation);
+    float att = 1.0 / (Light[0].constantAttenuation +
+                      Dist * Light[0].linearAttenuation +
+                      Dist * Dist * Light[0].quadraticAttenuation);
 
     color += att * (diffuse * NdotL + Ambient);
     float RdotE = max(dot(reflect(-Ld, Normal), normalize(Eye)), 0.0);
 
     //vec4 specColor = diffuseTexel;
-    vec4 specColor = gl_FrontMaterial.specular;
+    vec4 specColor = Material.specular;
     vec4 specIntensity = vec4(0.0,0.0,0.0,0.0);
 
     // Note: Grayscale spec map texture
-    if (UseSpecMap && (texture2D(Tex1, TexCoord).r > 0.1) || !UseSpecMap) {
-      specIntensity = gl_LightSource[0].specular *
-                      pow(RdotE, gl_FrontMaterial.shininess);
+    if (UseSpecMap && (texture(Tex[1], TexCoord).r > 0.1) || !UseSpecMap) {
+      specIntensity = Light[0].specular *
+                      pow(RdotE, Material.shininess);
     }
 
     color += att * specColor * specIntensity;
@@ -69,5 +93,5 @@ main()
     }
   }
 
-  gl_FragColor = color;
+  FragColor = color;
 }

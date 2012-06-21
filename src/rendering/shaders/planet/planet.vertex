@@ -1,23 +1,55 @@
-#version 120
+#version 150
+
+
+struct material_t {
+  vec4 emission;
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  float shininess;
+};
+
+struct light_t {
+  vec3 pos;
+  vec4 ambient;
+  vec4 specular;
+  vec4 diffuse;
+  vec3 dir; // Only used for spotlights
+  
+  float constantAttenuation;
+  float linearAttenuation;
+  float quadraticAttenuation;
+  
+  vec4 globAmbient; // TODO Move out of light type
+};
+
+
+uniform light_t Light[1];
+uniform material_t Material;
 
 uniform mat4 ModelViewMatrix;
 uniform mat4 ProjectionMatrix;
+uniform mat3 NormalMatrix;
 
-varying vec2 TexCoord;
+in vec4 Vertex;
+in vec3 Normal;
 
-varying vec3 N, Ld, Eye;
-varying float Dist;
+in vec2 oo_TexCoord0;
+
+out vec2 TexCoord;
+out vec3 N, Ld, Eye;
+out float Dist;
 
 void
 main()
 {
-  N = normalize(gl_NormalMatrix * gl_Normal);
+  N = normalize(NormalMatrix * Normal);
 
-  vec3 Lv = vec3(gl_LightSource[0].position - ModelViewMatrix * gl_Vertex);
+  vec3 Lv = vec3(Light[0].pos - (ModelViewMatrix * Vertex).xyz);
   Dist = length(Lv);
   Ld = normalize(Lv);
-  Eye = -vec3(ModelViewMatrix * gl_Vertex);
+  Eye = -vec3(ModelViewMatrix * Vertex);
 
-  gl_Position = ProjectionMatrix * ModelViewMatrix * gl_Vertex;
-  TexCoord = gl_MultiTexCoord0.st;
+  gl_Position = ProjectionMatrix * ModelViewMatrix * Vertex;
+  TexCoord = oo_TexCoord0;
 }

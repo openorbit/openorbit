@@ -1,9 +1,21 @@
-#version 120
+#version 150
+
+
+
+uniform mat4 ModelViewMatrix;
+uniform mat4 ProjectionMatrix;
+
+in vec4 Vertex;
+in vec2 TexCoord;
+in vec4 Color;
+
+out vec2 FragTexCoord;
+out vec4 FragColor;
 
 void
 main()
 {
-  gl_TexCoord[0] = gl_MultiTexCoord0;
-  gl_FrontColor = gl_Color;
-  gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
+  FragTexCoord = TexCoord;
+  FragColor = Color;
+  gl_Position = ProjectionMatrix * ModelViewMatrix * Vertex;
 }

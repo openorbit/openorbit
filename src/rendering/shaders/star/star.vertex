@@ -1,13 +1,16 @@
-#version 120
+#version 150
 
 uniform mat4 ModelViewMatrix;
 uniform mat4 ProjectionMatrix;
 
-varying vec2 TexCoord;
+in vec4 Vertex;
+in vec2 TexCoord0;
+
+out vec2 TexCoord;
 
 void
 main()
 {
-  gl_Position = ProjectionMatrix * ModelViewMatrix * gl_Vertex;
-  TexCoord = gl_MultiTexCoord0.st;
+  gl_Position = ProjectionMatrix * ModelViewMatrix * Vertex;
+  TexCoord = TexCoord;
 }
