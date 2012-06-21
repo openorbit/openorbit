@@ -36,17 +36,30 @@ void sgDisableProgram(void);
 GLuint sgShaderFromKey(const char *key);
 
 typedef enum {
-  SG_VERTEX0 = 0,
-  SG_TEX_COORD0,
-  SG_COLOR0,
-  SG_TEX0,
-  SG_TEX1,
-  SG_TEX2,
-  SG_TEX3,
-  SG_LIGHT0,
-  SG_LIGHT1,
-  SG_LIGHT2,
-  SG_LIGHT3,
+  SG_VERTEX = 0,
+  SG_NORMAL,
+  SG_TEX_COORD,
+  SG_COLOR,
+  SG_TEX,
+  
+  SG_LIGHT,
+  SG_LIGHT_AMB,
+  SG_LIGHT_POS,
+  SG_LIGHT_SPEC,
+  SG_LIGHT_DIFF,
+  SG_LIGHT_DIR,
+  SG_LIGHT_CONST_ATTEN,
+  SG_LIGHT_LINEAR_ATTEN,
+  SG_LIGHT_QUAD_ATTEN,
+
+  SG_LIGHT_MOD_GLOB_AMB,
+  
+  SG_MATERIAL_EMIT,
+  SG_MATERIAL_AMB,
+  SG_MATERIAL_DIFF,
+  SG_MATERIAL_SPEC,
+  SG_MATERIAL_SHINE,
+
   SG_MODELVIEW,
   SG_PROJECTION,
   SG_PARAM_COUNT,
@@ -54,5 +67,9 @@ typedef enum {
 
 GLint sgGetLocationForParam(GLuint program, sg_param_id_t param);
 void sgSetShaderTex(GLuint program, sg_param_id_t param, GLuint tex);
+
+GLint
+sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
+                              unsigned index);
 
 #endif /* !RENDERING_SHADER_MANAGER_H */

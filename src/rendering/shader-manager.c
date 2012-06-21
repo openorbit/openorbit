@@ -240,20 +240,34 @@ sgShaderFromKey(const char *key)
 }
 
 static const char* param_names[SG_PARAM_COUNT] = {
-  [SG_VERTEX0] = "Position",
-  [SG_TEX_COORD0] = "TexCoord[0]",
-  [SG_COLOR0] = "Color",
-  [SG_TEX0] = "Tex[0]",
-  [SG_TEX1] = "Tex[1]",
-  [SG_TEX2] = "Tex[2]",
-  [SG_TEX3] = "Tex[3]",
-  [SG_LIGHT0] = "Light[0]",
-  [SG_LIGHT1] = "Light[1]",
-  [SG_LIGHT2] = "Light[2]",
-  [SG_LIGHT3] = "Light[3]",
-  [SG_MODELVIEW] = "ModelView",
-  [SG_PROJECTION] = "Projection",
+  [SG_VERTEX] = "Position",
+  [SG_NORMAL] = "Normal",
+  [SG_TEX_COORD] = "TexCoord[%u]",
+  [SG_COLOR] = "Color",
+  [SG_TEX] = "Tex[%u]",
+
+  [SG_LIGHT] = "Light[%u]",
+
+  [SG_LIGHT_AMB] = "Light[%u].ambient",
+  [SG_LIGHT_POS] = "Light[%u].pos",
+  [SG_LIGHT_SPEC] = "Light[%u].specular",
+  [SG_LIGHT_DIFF] = "Light[%u].diffuse",
+  [SG_LIGHT_DIR] = "Light[%u].dir",
+  [SG_LIGHT_CONST_ATTEN] = "Light[%u].constantAttenuation",
+  [SG_LIGHT_LINEAR_ATTEN] = "Light[%u].linearAttenuation",
+  [SG_LIGHT_QUAD_ATTEN] = "Light[%u].quadraticAttenuation",
+  [SG_LIGHT_MOD_GLOB_AMB] = "Light[%u].globAmbient",
+  
+  [SG_MATERIAL_EMIT] = "Material.emission",
+  [SG_MATERIAL_AMB] = "Material.ambient",
+  [SG_MATERIAL_DIFF] = "Material.diffuse",
+  [SG_MATERIAL_SPEC] = "Material.specular",
+  [SG_MATERIAL_SHINE] = "Material.shininess",
+  
+  [SG_MODELVIEW] = "ModelViewMatrix",
+  [SG_PROJECTION] = "ProjectionMatrix",
 };
+
 
 GLint
 sgGetLocationForParam(GLuint program, sg_param_id_t param)
@@ -262,12 +276,22 @@ sgGetLocationForParam(GLuint program, sg_param_id_t param)
   return loc;
 }
 
-void
-sgSetShaderTex(GLuint program, sg_param_id_t param, GLuint tex)
+GLint
+sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
+                              unsigned index)
 {
-  assert(SG_TEX0 <= param && param <= SG_TEX3);
-  glActiveTexture(GL_TEXTURE0 + param - SG_TEX0);
+  char locName[strlen(param_names[param])];
+  snprintf(locName, sizeof(locName), param_names[param], index);
+  GLint loc = glGetUniformLocation(program, locName);
+  return loc;
+}
+
+
+void
+sgSetShaderTex(GLuint program, unsigned index, GLuint tex)
+{
+  glActiveTexture(GL_TEXTURE0 + index);
   glBindTexture(GL_TEXTURE_2D, tex);
-  GLint loc = sgGetLocationForParam(program, param);
-  glUniform1i(loc, param - SG_TEX0);
+  GLint loc = sgGetLocationForParamAndIndex(program, SG_TEX, index);
+  glUniform1i(loc, index); // Uniform value is texture unit id
 }
