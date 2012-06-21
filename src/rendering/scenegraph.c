@@ -62,12 +62,9 @@ sgNewSceneGraph()
   sg->overlay_shader = sgGetProgram("overlay");
   glUseProgram(sg->overlay_shader);
 
-  sg->modelview_id = glGetUniformLocation(sg->overlay_shader,
-                                          "ModelViewMatrix");
-  sg->projection_id = glGetUniformLocation(sg->overlay_shader,
-                                           "ProjectionMatrix");
-  sg->tex_id = glGetUniformLocation(sg->overlay_shader,
-                                    "Tex");
+  sg->modelview_id = sgGetLocationForParam(sg->overlay_shader, SG_MODELVIEW);
+  sg->projection_id = sgGetLocationForParam(sg->overlay_shader, SG_PROJECTION);
+  sg->tex_id = sgGetLocationForParamAndIndex(sg->overlay_shader, SG_TEX, 0);
 
   assert(sg->modelview_id != -1);
   assert(sg->projection_id != -1);
@@ -485,3 +482,92 @@ sgCheckGLError(const char *file, int line)
     ooLogError("unknown GL error at %s:%d", file, line);
   }
 }
+
+typedef struct {
+  SGcam *cam;
+  SGdrawable *bg;
+  obj_array_t objects;
+} SGscene2;
+
+typedef struct {
+  SGscene2 *scene;
+  obj_array_t overlays;
+  unsigned x, y;
+  unsigned w, h;
+} SGviewport;
+
+typedef struct {
+  obj_array_t viewports;
+  unsigned w, h;
+} SGwindow;
+
+
+void
+sgSetShaderParams(SGcam *cam, SGdrawable *drawable)
+{
+  
+  glUniformMatrix4fv(drawable->projection_id, 1, GL_TRUE,
+                     (GLfloat*)cam->projection);
+  glUniformMatrix4fv(drawable->modelview_id, 1, GL_TRUE,
+                     (GLfloat*)drawable->modelview);
+}
+
+void
+sgPaintDrawable2(SGdrawable *drawable)
+{
+  sgEnableProgram(drawable->shader);
+  sgSetShaderParams(NULL, drawable);
+}
+
+//
+//void
+//sgSetViewport(SGviewport *viewport)
+//{
+//  glViewport(viewport->x, viewport->y, viewport->w, viewport->h);
+//}
+
+//void
+//sgAnimateDrawable(SGdrawable *obj)
+//{
+//}
+
+//void
+//sgRenderScene(SGscene2 *scene)
+//{
+//  sgCamMove(scene->cam);
+//  sgPaintDrawable(scene->bg);
+//  ARRAY_FOR_EACH(i, scene->objects) {
+//   sgAnimateDrawable(ARRAY_ELEM(scene->objects, i));
+//  sgPaintDrawable(ARRAY_ELEM(scene->objects, i));
+//}
+//}
+
+//void
+//sgRenderWindow(SGwindow *window)
+//{
+// ARRAY_FOR_EACH(i, window->viewports) {
+    //    sgSetViewport(ARRAY_ELEM(window->viewports, i));
+    //  sgRenderScene(((SGviewport*)ARRAY_ELEM(window->viewports, i))->scene);
+    //sgDrawOverlays(NULL);
+    //  }
+#if 0
+  for all viewPorts:
+    setViewPort()
+    renderScene()
+      moveCamera()
+      renderBackground()
+      renderObjects()
+        for all objects:
+          animate() // Also interpolates position et.c.
+          renderObject()
+          setShader()
+          setShaderParams()
+          drawObject()
+      
+          for all subobjects:
+            animate()
+            renderObject()
+
+#endif
+    
+//}
