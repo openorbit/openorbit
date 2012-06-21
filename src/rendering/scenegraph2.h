@@ -20,7 +20,7 @@
 #ifndef orbit_scenegraph2_h
 #define orbit_scenegraph2_h
 
-#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 #include <gencds/array.h>
 #include <vmath/vmath.h>
 

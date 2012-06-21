@@ -23,7 +23,7 @@
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
 #else
-#include <GL/gl.h>
+#include <GL3/gl3.h>
 #endif
 
 #include <vmath/vmath.h>

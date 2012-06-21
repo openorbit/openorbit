@@ -23,13 +23,14 @@
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
 #else
-#include <GL/gl.h>
+#include <GL3/gl3.h>
 #endif
 #include <gencds/array.h>
 #include "scenegraph.h"
 
 static GLenum sgLightNumberMap[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3,
                                     GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
+
 struct SGscene {
   char *name;
 

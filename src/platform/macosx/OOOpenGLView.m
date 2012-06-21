@@ -19,7 +19,7 @@
 
 #import "OOOpenGLView.h"
 #import <OpenGL/OpenGL.h>
-#import <OpenGL/gl.h>
+#import <OpenGL/gl3.h>
 
 #import "rendering/render.h"
 #import "rendering/scenegraph.h"

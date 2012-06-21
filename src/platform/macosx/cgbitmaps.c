@@ -17,7 +17,7 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 #include <ApplicationServices/ApplicationServices.h>
 #include <stdlib.h>
 #include "res-manager.h"

@@ -23,7 +23,7 @@
 #include "scenegraph2.h"
 #include "shader-manager.h"
 
-#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 
 
 void
