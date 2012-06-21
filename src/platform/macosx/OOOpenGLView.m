@@ -167,9 +167,17 @@ static io_keycode_t keymap [256] = {
     return self;
 }
 
-
 - (void) awakeFromNib
 {
+
+  NSLog(@"AWAKE FROM NIB");
+  NSOpenGLPixelFormatAttribute attributes [] = {
+    NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+    NSOpenGLPFADoubleBuffer, 0};
+  
+  NSOpenGLPixelFormat *pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
+  self.openGLContext = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
+
 }
 
 - (void)simTicker:(NSTimer*)theTimer
