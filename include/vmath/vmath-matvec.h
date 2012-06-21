@@ -668,6 +668,14 @@ void mf4_ident(float4x4 m);
 void mf4_cpy(float4x4 a, const float4x4 b);
 void mf4_mul2(float4x4 a, const float4x4 b);
 
+static inline void
+mf4_translate(float4x4 a, float3 v)
+{
+  mf4_ident(a);
+  a[0].w = v.x;
+  a[1].w = v.y;
+  a[2].w = v.z;
+}
 // Common opengl replacements
 /*! Create ortho projection matrix */
 void mf4_ortho(float4x4 m,
