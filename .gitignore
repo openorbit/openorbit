@@ -6,3 +6,6 @@ orbit.xcodeproj/*.perspective
 .DS_Store
 xcuserdata
 deps/*
+*.bak
+*.orig
+
