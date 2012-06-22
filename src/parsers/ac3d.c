@@ -20,7 +20,6 @@
 
 #include "ac3d.h"
 #include "model.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -28,6 +27,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <vmath/vmath-convert.h>
 
 #define BUFF_SIZE 1024
 
@@ -210,9 +210,6 @@ ac3d_delete(struct ac3d_file_t *ac3d)
   free(ac3d->materials);
   free(ac3d);
 }
-
-#define DEG_TO_RAD(d) ((d) * M_PI/180.0f)
-#define RAD_TO_DEG(d) ((d) * 180.0f/M_PI)
 
 float vecangle(float a[3], float b[3])
 {
