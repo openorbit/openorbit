@@ -246,7 +246,7 @@
 		EC7CA612143AF4B500E22F4E /* stringextras.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7CA611143AF4B500E22F4E /* stringextras.c */; };
 		EC7CA613143AF4B500E22F4E /* stringextras.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7CA611143AF4B500E22F4E /* stringextras.c */; };
 		EC7D093510EE160700D9D28E /* flightrecorder.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7D093410EE160700D9D28E /* flightrecorder.c */; };
-		EC7F68AF159326BC00B4E8EF /* scenegraph2.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7F68AE159326BC00B4E8EF /* scenegraph2.c */; };
+		EC7F68AF159326BC00B4E8EF /* gl3drawable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7F68AE159326BC00B4E8EF /* gl3drawable.c */; };
 		EC823729113140E100A725B1 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
@@ -705,8 +705,8 @@
 		EC7CA614143AF50B00E22F4E /* stringextras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringextras.h; sourceTree = "<group>"; };
 		EC7D093310EE160700D9D28E /* flightrecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightrecorder.h; sourceTree = "<group>"; };
 		EC7D093410EE160700D9D28E /* flightrecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightrecorder.c; sourceTree = "<group>"; };
-		EC7F68AD159326A700B4E8EF /* scenegraph2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = scenegraph2.h; sourceTree = "<group>"; };
-		EC7F68AE159326BC00B4E8EF /* scenegraph2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scenegraph2.c; sourceTree = "<group>"; };
+		EC7F68AD159326A700B4E8EF /* gl3drawable.h */ = {isa = PBXFileReference; path = gl3drawable.h; sourceTree = "<group>"; };
+		EC7F68AE159326BC00B4E8EF /* gl3drawable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gl3drawable.c; sourceTree = "<group>"; };
 		EC823727113140E000A725B1 /* cmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmod.h; sourceTree = "<group>"; };
 		EC823728113140E000A725B1 /* cmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmod.c; sourceTree = "<group>"; };
 		EC88CF8E10A2B1D700A11B1D /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
@@ -1205,8 +1205,8 @@
 				EC5F72581154E27400FBE08B /* light.h */,
 				EC5F72591154E27400FBE08B /* light.c */,
 				ECF60B4D140F75DD00EAD012 /* location.h */,
-				EC7F68AD159326A700B4E8EF /* scenegraph2.h */,
-				EC7F68AE159326BC00B4E8EF /* scenegraph2.c */,
+				EC7F68AD159326A700B4E8EF /* gl3drawable.h */,
+				EC7F68AE159326BC00B4E8EF /* gl3drawable.c */,
 			);
 			path = rendering;
 			sourceTree = "<group>";
@@ -2223,7 +2223,7 @@
 				ECDA4BBF1539FCCB00B78FED /* moduleinit.c in Sources */,
 				EC564723156B8E8300D6A871 /* terminal.c in Sources */,
 				ECE369B2157F78A400AC4945 /* menu-manager.m in Sources */,
-				EC7F68AF159326BC00B4E8EF /* scenegraph2.c in Sources */,
+				EC7F68AF159326BC00B4E8EF /* gl3drawable.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -26,7 +26,7 @@
 #include <GL3/gl3.h>
 #endif
 
-#include "rendering/scenegraph2.h"
+#include "rendering/gl3drawable.h"
 #include "rendering/location.h"
 
 

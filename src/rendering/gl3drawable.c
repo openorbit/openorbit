@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "scenegraph2.h"
+#include "gl3drawable.h"
 #include "shader-manager.h"
 
 #include <OpenGL/gl3.h>
