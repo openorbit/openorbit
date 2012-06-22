@@ -24,15 +24,15 @@ struct light_t {
 };
 
 
-uniform light_t Light[1];
-uniform material_t Material;
+uniform light_t oo_Light[1];
+uniform material_t oo_Material;
 
-uniform mat4 ModelViewMatrix;
-uniform mat4 ProjectionMatrix;
-uniform mat3 NormalMatrix;
+uniform mat4 oo_ModelViewMatrix;
+uniform mat4 oo_ProjectionMatrix;
+uniform mat3 oo_NormalMatrix;
 
-in vec4 Vertex;
-in vec3 Normal;
+in vec4 oo_Vertex;
+in vec3 oo_Normal;
 
 in vec2 oo_TexCoord0;
 
@@ -43,13 +43,13 @@ out float Dist;
 void
 main()
 {
-  N = normalize(NormalMatrix * Normal);
+  N = normalize(oo_NormalMatrix * oo_Normal);
 
-  vec3 Lv = vec3(Light[0].pos - (ModelViewMatrix * Vertex).xyz);
+  vec3 Lv = vec3(oo_Light[0].pos - (oo_ModelViewMatrix * oo_Vertex).xyz);
   Dist = length(Lv);
   Ld = normalize(Lv);
-  Eye = -vec3(ModelViewMatrix * Vertex);
+  Eye = -vec3(oo_ModelViewMatrix * oo_Vertex);
 
-  gl_Position = ProjectionMatrix * ModelViewMatrix * Vertex;
+  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex;
   TexCoord = oo_TexCoord0;
 }

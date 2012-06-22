@@ -2,12 +2,12 @@
 
 
 
-uniform mat4 ModelViewMatrix;
-uniform mat4 ProjectionMatrix;
+uniform mat4 oo_ModelViewMatrix;
+uniform mat4 oo_ProjectionMatrix;
 
-in vec4 Vertex;
-in vec2 TexCoord;
-in vec4 Color;
+in vec4 oo_Vertex0;
+in vec2 oo_TexCoord0;
+in vec4 oo_Color0;
 
 out vec2 FragTexCoord;
 out vec4 FragColor;
@@ -15,7 +15,7 @@ out vec4 FragColor;
 void
 main()
 {
-  FragTexCoord = TexCoord;
-  FragColor = Color;
-  gl_Position = ProjectionMatrix * ModelViewMatrix * Vertex;
+  FragTexCoord = oo_TexCoord0;
+  FragColor = oo_Color;
+  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex;
 }

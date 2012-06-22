@@ -1,11 +1,12 @@
 #version 150
 
-uniform sampler2D Tex0;
+uniform sampler2D oo_Texture[1];
+
 in vec2 TexCoord;
 out vec4 oo_FragColor;
 void
 main()
 {
-  vec4 texel0 = texture(Tex0, TexCoord);
+  vec4 texel0 = texture(oo_Texture[0], TexCoord);
   oo_FragColor = texel0;
 }

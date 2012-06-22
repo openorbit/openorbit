@@ -1,11 +1,11 @@
 #version 150
 
-uniform mat4 ModelViewMatrix;
-uniform mat4 ProjectionMatrix;
+uniform mat4 oo_ModelViewMatrix;
+uniform mat4 oo_ProjectionMatrix;
 
-in vec4 Position;
-in vec2 TexCoord;
-in vec4 VertexColor;
+in vec4 oo_Vertex;
+in vec2 oo_TexCoord0;
+in vec4 oo_Color;
 
 out vec4 FragColor;
 out vec2 FragTexCoord;
@@ -13,7 +13,7 @@ out vec2 FragTexCoord;
 void
 main()
 {
-  gl_Position = ProjectionMatrix * ModelViewMatrix * Position;
-  FragColor = VertexColor;
-  FragTexCoord = TexCoord;
+  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Position;
+  FragColor = oo_Color;
+  FragTexCoord = oo_TexCoord0;
 }

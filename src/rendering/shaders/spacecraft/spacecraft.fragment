@@ -42,15 +42,15 @@ main()
   float NdotL = max(dot(Normal, Ld), 0.0);
 
   if (NdotL > 0.0) {
-    float att = 1.0 / (Light[0].constantAttenuation +
-                 Dist * Light[0].linearAttenuation +
-                 Dist * Dist * Light[0].quadraticAttenuation);
+    float att = 1.0 / (oo_Light[0].constantAttenuation +
+                 Dist * oo_Light[0].linearAttenuation +
+                 Dist * Dist * oo_Light[0].quadraticAttenuation);
 
     color += att * (Diffuse * NdotL + Ambient);
     float RdotE = max(dot(reflect(-Ld, Normal), normalize(Eye)), 0.0);
 
-    vec4 Spec = Material.specular * Light[0].specular *
-                pow(RdotE, Material.shininess);
+    vec4 Spec = oo_Material.specular * oo_Light[0].specular *
+                pow(RdotE, oo_Material.shininess);
 
     color += att * Spec;
   }

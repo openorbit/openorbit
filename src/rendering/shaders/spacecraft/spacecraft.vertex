@@ -22,16 +22,16 @@ struct light_t {
   vec4 globAmbient;
 };
 
-uniform light_t Light[1];
-uniform material_t Material;
+uniform light_t oo_Light[1];
+uniform material_t oo_Material;
 
-uniform mat4 ModelViewMatrix;
-uniform mat4 ProjectionMatrix;
-uniform mat3 NormalMatrix;
+uniform mat4 oo_ModelViewMatrix;
+uniform mat4 oo_ProjectionMatrix;
+uniform mat3 oo_NormalMatrix;
 
-in vec3 Position;
-in vec3 Normal;
-in vec2 TexCoord0;
+in vec3 oo_Vertex;
+in vec3 oo_Normal;
+in vec2 oo_TexCoord0;
 
 out vec4 Diffuse, Ambient, AmbientGlob;
 out vec3 N, Ld, Eye;
@@ -40,22 +40,22 @@ out float Dist;
 void
 main()
 {
-  N = normalize(NormalMatrix * Normal);//gl_Normal);
+  N = normalize(oo_NormalMatrix * oo_Normal);//gl_Normal);
 
-  vec4 tmp = vec4(Position.xyz, 1.0);
-  vec3 Lv = vec3(Light[0].pos - (ModelViewMatrix * tmp).xyz);//gl_Vertex);
+  vec4 tmp = vec4(oo_Vertex.xyz, 1.0);
+  vec3 Lv = vec3(oo_Light[0].pos - (oo_ModelViewMatrix * tmp).xyz);//gl_Vertex);
   Dist = length(Lv);
   Ld = normalize(Lv);
-  Eye = -vec3(ModelViewMatrix * tmp);//gl_Vertex);
+  Eye = -vec3(oo_ModelViewMatrix * tmp);//gl_Vertex);
 
   // Diffuse light
   float NdotL = max(dot(N, Ld), 0.0);
-  Diffuse = (Material.diffuse * Light[0].diffuse) * NdotL;
+  Diffuse = (oo_Material.diffuse * oo_Light[0].diffuse) * NdotL;
 
   // Ambient light
-  AmbientGlob = Light[0].globAmbient * Material.ambient;
-  Ambient = Material.ambient * Light[0].ambient;
+  AmbientGlob = oo_Light[0].globAmbient * oo_Material.ambient;
+  Ambient = oo_Material.ambient * oo_Light[0].ambient;
 
   //gl_FrontColor = Diffuse + Ambient + Spec;
-  gl_Position = ProjectionMatrix * ModelViewMatrix * tmp;//gl_Vertex;
+  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * tmp;//gl_Vertex;
 }
