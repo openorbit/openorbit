@@ -22,7 +22,7 @@
 #include <assert.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
 #endif
@@ -39,6 +39,7 @@
 #include "parsers/model.h"
 #include "render.h"
 #include "shader-manager.h"
+#include "rendering/camera.h"
 
 SGcam*
 sgGetCam(SGscenegraph *sg)
@@ -53,18 +54,21 @@ SGscenegraph*
 sgNewSceneGraph()
 {
   SGscenegraph *sg = malloc(sizeof(SGscenegraph));
-  glGetIntegerv(GL_MAX_LIGHTS, &sg->maxLights);
+  //glGetIntegerv(GL_MAX_LIGHTS, &sg->maxLights);
   sg->usedLights = 0;
   obj_array_init(&sg->cams);
   obj_array_init(&sg->overlays);
   obj_array_init(&sg->scenes);
 
   sg->overlay_shader = sgGetProgram("overlay");
-  glUseProgram(sg->overlay_shader);
+  glUseProgram(sg->overlay_shader->shaderId);
 
-  sg->modelview_id = sgGetLocationForParam(sg->overlay_shader, SG_MODELVIEW);
-  sg->projection_id = sgGetLocationForParam(sg->overlay_shader, SG_PROJECTION);
-  sg->tex_id = sgGetLocationForParamAndIndex(sg->overlay_shader, SG_TEX, 0);
+  sg->modelview_id = sgGetLocationForParam(sg->overlay_shader->shaderId,
+                                           SG_MODELVIEW);
+  sg->projection_id = sgGetLocationForParam(sg->overlay_shader->shaderId,
+                                            SG_PROJECTION);
+  sg->tex_id = sgGetLocationForParamAndIndex(sg->overlay_shader->shaderId,
+                                             SG_TEX, 0);
 
   assert(sg->modelview_id != -1);
   assert(sg->projection_id != -1);
@@ -197,18 +201,18 @@ void
 sgDrawOverlays(SGscenegraph *sg)
 {
   SG_CHECK_ERROR;
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  glOrtho(0.0, sgRenderInfo.w, 0.0, sgRenderInfo.h, -1.0, 1.0);
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
+  //glMatrixMode(GL_PROJECTION);
+  //glPushMatrix();
+  //glLoadIdentity();
+  //glOrtho(0.0, sgRenderInfo.w, 0.0, sgRenderInfo.h, -1.0, 1.0);
+  //glMatrixMode(GL_MODELVIEW);
+  //glPushMatrix();
+  //glLoadIdentity();
 
-  glPushAttrib(GL_ENABLE_BIT);
+  //glPushAttrib(GL_ENABLE_BIT);
 
   glDisable(GL_DEPTH_TEST);
-  glDisable(GL_LIGHTING);
+  //glDisable(GL_LIGHTING);
   glDisable(GL_CULL_FACE);
 
   for (size_t i = 0 ; i < sg->overlays.length ; i ++) {
@@ -218,7 +222,7 @@ sgDrawOverlays(SGscenegraph *sg)
       glUseProgram(0); // No shader for now
       // Bind the fbo texture so that the mfd rendering ends up in the texture
       glBindFramebuffer(GL_FRAMEBUFFER, overlay->fbo);
-      glPushAttrib(GL_VIEWPORT_BIT);
+      //glPushAttrib(GL_VIEWPORT_BIT);
 
       glViewport(0,0, overlay->w, overlay->h);
 
@@ -226,11 +230,11 @@ sgDrawOverlays(SGscenegraph *sg)
       // Here we draw the overlay into a texture
       overlay->draw(overlay);
 
-      glPopAttrib();
+      //glPopAttrib();
 
       // Re-attach the real framebuffer as rendering target, and draw the
       // texture using a quad.
-      glUseProgram(sg->overlay_shader);
+      glUseProgram(sg->overlay_shader->shaderId);
 
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -238,8 +242,8 @@ sgDrawOverlays(SGscenegraph *sg)
 
       // Set shader arguments
       GLfloat modelview[16], projection[16];
-      glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
-      glGetFloatv(GL_PROJECTION_MATRIX , projection);
+      //glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
+      //glGetFloatv(GL_PROJECTION_MATRIX , projection);
 
       glUniformMatrix4fv(sg->modelview_id, 1, GL_FALSE, modelview);
       glUniformMatrix4fv(sg->projection_id, 1, GL_FALSE, projection);
@@ -250,28 +254,29 @@ sgDrawOverlays(SGscenegraph *sg)
       glUniform1i(sg->tex_id, 0);
 
       GLint shaderIsValid;
-      glValidateProgram(sg->overlay_shader);
-      glGetProgramiv(sg->overlay_shader, GL_VALIDATE_STATUS, &shaderIsValid);
+      glValidateProgram(sg->overlay_shader->shaderId);
+      glGetProgramiv(sg->overlay_shader->shaderId, GL_VALIDATE_STATUS,
+                     &shaderIsValid);
       assert(shaderIsValid);
 
       SG_CHECK_ERROR;
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glBegin(GL_QUADS);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+      //glBegin(GL_QUADS);
+      //  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f (overlay->x, overlay->y, 0.0);
+      // glTexCoord2f(0.0f, 0.0f);
+      // glVertex3f (overlay->x, overlay->y, 0.0);
 
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(overlay->x, overlay->y + overlay->h, 0.0);
+      //glTexCoord2f(0.0f, 1.0f);
+      //glVertex3f(overlay->x, overlay->y + overlay->h, 0.0);
 
-        glTexCoord2f(1.0, 1.0);
-        glVertex3f(overlay->x + overlay->w, overlay->y + overlay->h, 0.0);
+      //glTexCoord2f(1.0, 1.0);
+      //glVertex3f(overlay->x + overlay->w, overlay->y + overlay->h, 0.0);
 
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(overlay->x + overlay->w, overlay->y, 0.0);
-      glEnd();
+      //glTexCoord2f(1.0f, 0.0f);
+      //glVertex3f(overlay->x + overlay->w, overlay->y, 0.0);
+      //glEnd();
 
       SG_CHECK_ERROR;
 
@@ -280,12 +285,12 @@ sgDrawOverlays(SGscenegraph *sg)
   }
 
 
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
+  //  glMatrixMode(GL_PROJECTION);
+  //glPopMatrix();
+  //glMatrixMode(GL_MODELVIEW);
+  //glPopMatrix();
 
-  glPopAttrib();
+  //glPopAttrib();
   SG_CHECK_ERROR;
 }
 
@@ -310,20 +315,20 @@ sgSceneDraw(SGscene *sc)
   SG_CHECK_ERROR;
 
   glClear(GL_DEPTH_BUFFER_BIT);
-  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, sc->amb);
+  //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, sc->amb);
   glDepthFunc(GL_LEQUAL);
 
   // Apply scene transforms
-  glPushAttrib(GL_ENABLE_BIT);
-  glPushMatrix();
+  //glPushAttrib(GL_ENABLE_BIT);
+  //glPushMatrix();
   int localLights = 0;
   for (int i = 0 ; i < sc->sg->maxLights ; ++ i) {
     if (sc->lights[i] != NULL) {
      if (sc->sg->usedLights < sc->sg->maxLights) {
-       GLenum lightId = sgLightNumberMap[sc->sg->usedLights];
+       //   GLenum lightId = sgLightNumberMap[sc->sg->usedLights];
        SGlight *light = sc->lights[i];
 
-       light->enable(light, lightId);
+       //      light->enable(light, lightId);
 
        sc->sg->usedLights ++;
        localLights ++;
@@ -344,8 +349,8 @@ sgSceneDraw(SGscene *sc)
   SG_CHECK_ERROR;
 
   // Pop scene transform
-  glPopAttrib();
-  glPopMatrix();
+  //glPopAttrib();
+  //glPopMatrix();
 
 
   for (int i = 0 ; i < localLights ; ++ i) {
@@ -384,37 +389,37 @@ sgPaint(SGscenegraph *sg)
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
-  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
+  //glMatrixMode(GL_PROJECTION);
+  //glLoadIdentity();
   // Near clipping 1 m away, far clipping 20 au away
-  gluPerspective(sgRenderInfo.fovy, sgRenderInfo.aspect,
-                 /*near*/0.9, /*far*/149598000000.0*20.0);
+  //gluPerspective(sgRenderInfo.fovy, sgRenderInfo.aspect,
+  //               /*near*/0.9, /*far*/149598000000.0*20.0);
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  //glMatrixMode(GL_MODELVIEW);
+  //glLoadIdentity();
 
-  glPushMatrix();
-  glPushAttrib(GL_ENABLE_BIT);
+  //glPushMatrix();
+  //glPushAttrib(GL_ENABLE_BIT);
   sgCamRotate(sg->currentCam);
   // Draw the sky
   sg->sky->draw(sg->sky);
-  glPopAttrib();
-  glPopMatrix();
+  //glPopAttrib();
+  //glPopMatrix();
 
-  glPushMatrix();
+  //glPushMatrix();
 
   sgCamRotate(sg->currentCam);
   sgCamMove(sg->currentCam);
   sgSceneDraw(sg->currentCam->scene);
 
-  glPopMatrix();
+  //glPopMatrix();
 
   // Draw overlays
-  glPushAttrib(GL_ENABLE_BIT);
+  //glPushAttrib(GL_ENABLE_BIT);
   sgDrawOverlays(sg);
-  glPopAttrib();
+  //glPopAttrib();
 }
 
 void
@@ -466,108 +471,78 @@ sgCheckGLError(const char *file, int line)
   case GL_INVALID_OPERATION:
     ooLogError("GL invalid operation at %s:%d", file, line);
     break;
-  case GL_STACK_OVERFLOW:
-    ooLogError("GL stack overflow at %s:%d", file, line);
-    break;
-  case GL_STACK_UNDERFLOW:
-    ooLogError("GL stack underflow at %s:%d", file, line);
-    break;
+      //  case GL_STACK_OVERFLOW:
+      //ooLogError("GL stack overflow at %s:%d", file, line);
+      //break;
+      //case GL_STACK_UNDERFLOW:
+      // ooLogError("GL stack underflow at %s:%d", file, line);
+      //break;
   case GL_OUT_OF_MEMORY:
     ooLogError("GL out of memory at %s:%d", file, line);
     break;
-  case GL_TABLE_TOO_LARGE:
-    ooLogError("GL invalid enum at %s:%d", file, line);
-    break;
+      //case GL_TABLE_TOO_LARGE:
+      //ooLogError("GL invalid enum at %s:%d", file, line);
+      //break;
   default:
     ooLogError("unknown GL error at %s:%d", file, line);
   }
 }
 
-typedef struct {
-  SGcam *cam;
-  SGdrawable *bg;
-  obj_array_t objects;
-} SGscene2;
 
-typedef struct {
-  SGscene2 *scene;
-  obj_array_t overlays;
-  unsigned x, y;
-  unsigned w, h;
-} SGviewport;
 
-typedef struct {
-  obj_array_t viewports;
-  unsigned w, h;
-} SGwindow;
 
 
 void
-sgSetShaderParams(SGcam *cam, SGdrawable *drawable)
+sgRenderScene(SGscene2 *scene, float dt)
 {
-  
-  glUniformMatrix4fv(drawable->projection_id, 1, GL_TRUE,
-                     (GLfloat*)cam->projection);
-  glUniformMatrix4fv(drawable->modelview_id, 1, GL_TRUE,
-                     (GLfloat*)drawable->modelview);
+  sgDrawBackground(scene->bg);
+  sgMoveCam(scene->cam);
+  ARRAY_FOR_EACH(i, scene->objects) {
+    sgRecomputeModelViewMatrix(ARRAY_ELEM(scene->objects, i));
+    sgAnimateObject(ARRAY_ELEM(scene->objects, i), dt);
+    sgDrawObject(ARRAY_ELEM(scene->objects, i));
+  }
 }
 
 void
-sgPaintDrawable2(SGdrawable *drawable)
+sgRenderWindow(SGwindow *window, float dt)
 {
-  sgEnableProgram(drawable->shader);
-  sgSetShaderParams(NULL, drawable);
+  ARRAY_FOR_EACH(i, window->viewports) {
+    sgSetViewport(ARRAY_ELEM(window->viewports, i));
+    sgRenderScene(((SGviewport*)ARRAY_ELEM(window->viewports, i))->scene, dt);
+  }
 }
 
-//
-//void
-//sgSetViewport(SGviewport *viewport)
-//{
-//  glViewport(viewport->x, viewport->y, viewport->w, viewport->h);
-//}
 
-//void
-//sgAnimateDrawable(SGdrawable *obj)
-//{
-//}
 
-//void
-//sgRenderScene(SGscene2 *scene)
-//{
-//  sgCamMove(scene->cam);
-//  sgPaintDrawable(scene->bg);
-//  ARRAY_FOR_EACH(i, scene->objects) {
-//   sgAnimateDrawable(ARRAY_ELEM(scene->objects, i));
-//  sgPaintDrawable(ARRAY_ELEM(scene->objects, i));
-//}
-//}
+SGwindow*
+sgCreateWindow(void)
+{
+  SGwindow *window = malloc(sizeof(SGwindow));
+  memset(window, 0, sizeof(SGwindow));
+  return window;
+}
 
-//void
-//sgRenderWindow(SGwindow *window)
-//{
-// ARRAY_FOR_EACH(i, window->viewports) {
-    //    sgSetViewport(ARRAY_ELEM(window->viewports, i));
-    //  sgRenderScene(((SGviewport*)ARRAY_ELEM(window->viewports, i))->scene);
-    //sgDrawOverlays(NULL);
-    //  }
-#if 0
-  for all viewPorts:
-    setViewPort()
-    renderScene()
-      moveCamera()
-      renderBackground()
-      renderObjects()
-        for all objects:
-          animate() // Also interpolates position et.c.
-          renderObject()
-          setShader()
-          setShaderParams()
-          drawObject()
-      
-          for all subobjects:
-            animate()
-            renderObject()
 
-#endif
-    
-//}
+void
+sgSetViewport(SGviewport *viewport)
+{
+  glViewport(viewport->x, viewport->y, viewport->w, viewport->h);
+}
+
+SGviewport*
+sgCreateViewport(SGwindow *window, unsigned x, unsigned y,
+                 unsigned w, unsigned h)
+{
+  SGviewport *viewport = malloc(sizeof(SGviewport));
+  memset(viewport, 0, sizeof(SGviewport));
+  return viewport;
+}
+
+SGscene2*
+sgCreateScene(void)
+{
+  SGscene2 *scene = malloc(sizeof(SGscene2));
+  memset(scene, 0, sizeof(SGscene2));
+  return scene;
+}

@@ -80,14 +80,14 @@ sgEnablePointLight(SGpointlight *light, GLenum lightId)
 {
   SG_CHECK_ERROR;
 
-  glEnable(GL_LIGHTING);
+  //glEnable(GL_LIGHTING);
   glEnable(lightId);
   light->super.lightId = lightId;
 
-  glLightfv(lightId, GL_POSITION, light->super.pos);
-  glLightfv(lightId, GL_AMBIENT, light->super.ambient);
-  glLightfv(lightId, GL_DIFFUSE, light->super.diffuse);
-  glLightfv(lightId, GL_SPECULAR, light->super.specular);
+  //glLightfv(lightId, GL_POSITION, (GLfloat*)&light->super.pos);
+  //glLightfv(lightId, GL_AMBIENT, (GLfloat*)&light->super.ambient);
+  //glLightfv(lightId, GL_DIFFUSE, (GLfloat*)&light->super.diffuse);
+  //glLightfv(lightId, GL_SPECULAR, (GLfloat*)&light->super.specular);
   //  glLightf(light->super.lightId, GL_CONSTANT_ATTENUATION, 1.0f);
   //  glLightf(light->super.lightId, GL_LINEAR_ATTENUATION, 0.2f);
   //  glLightf(light->super.lightId, GL_QUADRATIC_ATTENUATION, 0.08f);

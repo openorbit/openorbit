@@ -25,18 +25,17 @@
 #include <assert.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
-#include <GLUT/glut.h>
+#include <OpenGL/gl3.h>
+//#include <GLUT/glut.h>
 #else
 #include <GL3/gl3.h>
-#include <GL/glut.h>
+//#include <GL3/glut.h>
 #endif
 
 #include "settings.h"
 #include "camera.h"
 #include "sky.h"
 #include "texture.h"
-#include "planet.h"
 #include <openorbit/log.h>
 #include "common/moduleinit.h"
 #include "io-manager.h"
@@ -81,15 +80,15 @@ ooResizeScreen(int x, int y, int width, int height, bool fullscreen)
 void
 ooSetPerspective(float fovy, int width, int height)
 {
-  glMatrixMode(GL_PROJECTION);
+  //  glMatrixMode(GL_PROJECTION);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glLoadIdentity();
+  //glLoadIdentity();
   // Near clipping 1 m away, far clipping 20 au away
-  gluPerspective(fovy, (double)width / (double)height,
-                 /*near*/0.9, /*far*/149598000000.0*20.0);
+  //gluPerspective(fovy, (double)width / (double)height,
+  //              /*near*/0.9, /*far*/149598000000.0*20.0);
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  //glMatrixMode(GL_MODELVIEW);
+  //glLoadIdentity();
 }
 
 

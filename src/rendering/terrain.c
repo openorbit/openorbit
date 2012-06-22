@@ -23,7 +23,6 @@
 #include <sys/mman.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
 #include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
@@ -61,7 +60,7 @@ struct SGterrain {
 /*
   Loads a terrain object from file the terrain consist of a meta-document
   detailing the terrain structure and the actual terrain directory.
-  
+
   terraindir/
     metadata.hrml
     chunks/
@@ -93,9 +92,9 @@ void
 sgTerrainDrawChunk(SGterrainchunk *chunk)
 {
   assert(chunk != NULL);
-  
+
   // Determine which lod level to draw this at
-  
+
   // Draw the lod chunk
 }
 

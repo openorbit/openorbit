@@ -21,7 +21,6 @@
 #include <math.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
 #include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
@@ -34,11 +33,12 @@
 void
 ooGeoEllipseDraw(OOellipse *e)
 {
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, sizeof(float3), e->vec.elems);
-  glColor3f(1.0, 0.0, 0.0);
-  glDrawArrays(GL_LINE_LOOP, 0,  e->vec.length);
-  glDisableClientState(GL_VERTEX_ARRAY);
+  // TODO: Elipses in GL3
+  //glEnableClientState(GL_VERTEX_ARRAY);
+  //glVertexPointer(3, GL_FLOAT, sizeof(float3), e->vec.elems);
+  //glColor3f(1.0, 0.0, 0.0);
+  //glDrawArrays(GL_LINE_LOOP, 0,  e->vec.length);
+  //glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 

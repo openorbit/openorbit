@@ -85,6 +85,14 @@ extern "C" {
   void sgCamStep(SGcam *cam, float dt);
   void sgCamAxisUpdate(SGcam *cam);
 
+
+  struct SGcamera {
+    float4x4 projMatrix;
+    float4x4 viewMatrix;
+  };
+
+  void sgMoveCam(SGcamera *cam);
+
 #ifdef __cplusplus
 }
 #endif

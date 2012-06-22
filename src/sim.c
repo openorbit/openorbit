@@ -33,7 +33,6 @@
 #include "res-manager.h"
 #include "physics/orbit.h"
 #include "rendering/sky.h"
-#include "rendering/planet.h"
 #include "settings.h"
 #include "io-manager.h"
 

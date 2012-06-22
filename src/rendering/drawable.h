@@ -24,11 +24,11 @@
 #include <stdbool.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
-#include <OpenGL/glu.h>
+#include <OpenGL/gl3.h>
+//#include <OpenGL/glu.h>
 #else
 #include <GL3/gl3.h>
-#include <GL/glu.h>
+//#include <GL3/glu.h>
 #endif
 
 
@@ -37,6 +37,7 @@
 #include "rendering/light.h"
 #include "parsers/model.h"
 #include "rendering/material.h"
+#include "rendering/shader-manager.h"
 #include "common/lwcoord.h"
 #include <gencds/list.h>
 
@@ -56,7 +57,7 @@ struct SGdrawable {
   SGdrawfunc draw; // Draw function for this object
 
   SGlight *lights[8];
-  GLuint shader;
+  SGshader *shader;
   GLint modelview_id;
   GLint projection_id;
   GLint tex_id[4];
@@ -120,7 +121,7 @@ struct SGsphere {
   GLint use_spec_map_id;
   GLboolean use_spec_map_val;
 
-  GLUquadricObj *quadratic;
+  //  GLUquadricObj *quadratic;
 
   GLuint northPoleIdx;
   GLuint northPoleCount;
@@ -143,7 +144,7 @@ struct SGcylinder {
   SGdrawable super;
   //  GLuint texId;
   GLbyte col[3];
-  GLUquadricObj *quadratic;
+  //GLUquadricObj *quadratic;
   GLfloat bottonRadius;
   GLfloat topRadius;
   GLfloat height;

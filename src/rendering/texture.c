@@ -23,12 +23,11 @@
 #include <assert.h>
 #include <gencds/hashtable.h>
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
 #include <OpenGL/gl3.h>
-#include <OpenGL/glu.h>
+//#include <OpenGL/glu.h>
 #else
 #include <GL3/gl3.h>
-#include <GL/glu.h>
+//#include <GL/glu.h>
 #endif
 
 #include <openorbit/log.h>
@@ -72,23 +71,30 @@ ooTexLoad(const char *key, const char *name)
   tex->path = strdup(fname);
   switch (img.kind) {
   case IMG_BGRA:
+    tex->internalType = GL_RGBA8;
     tex->texType = GL_BGRA;
     tex->bytesPerTex = 4;
     break;
   case IMG_BGR:
+    tex->internalType = GL_RGB8;
     tex->texType = GL_BGR;
     tex->bytesPerTex = 3;
     break;
   case IMG_RGB:
+    tex->internalType = GL_RGB8;
     tex->texType = GL_RGB;
     tex->bytesPerTex = 3;
     break;
   case IMG_RGBA:
+    tex->internalType = GL_RGBA8;
     tex->texType = GL_RGBA;
     tex->bytesPerTex = 4;
     break;
   case IMG_GRAY8:
-    tex->texType = GL_LUMINANCE;
+    // IN GL < 3 we could use Luminance for grayscale images, but not anymore
+    //  we need shader support to handle this mess now...
+    tex->internalType = GL_R8;
+    tex->texType = GL_RED;
     tex->bytesPerTex = 1;
     break;
   default:
@@ -103,25 +109,28 @@ ooTexLoad(const char *key, const char *name)
   glGenTextures(1, &tex->texId);
   glBindTexture(GL_TEXTURE_2D, tex->texId);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-  GLint err;
-  if ((err = gluBuild2DMipmaps(GL_TEXTURE_2D,
-                              tex->bytesPerTex,
-                              tex->width, tex->height,
-                              tex->texType,
-                              GL_UNSIGNED_BYTE,
-                              tex->data)))
-  {
-    ooLogFatal("failed mipmap generation %s", gluErrorString(err));
-  }
-
+  glTexImage2D(GL_TEXTURE_2D, 0, tex->internalType,
+               tex->width, tex->height, 0,
+               tex->texType, GL_UNSIGNED_BYTE, tex->data);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                   GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                   GL_LINEAR_MIPMAP_LINEAR);
-  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+  glGenerateMipmap(GL_TEXTURE_2D);
+  //if ((err = gluBuild2DMipmaps(GL_TEXTURE_2D,
+  //                            tex->bytesPerTex,
+  //                            tex->width, tex->height,
+  //                            tex->texType,
+  //                            GL_UNSIGNED_BYTE,
+  //                            tex->data)))
+  //{
+  //  ooLogFatal("failed mipmap generation %s", gluErrorString(err));
+  //}
+
 
   // Do not retain texture, is is loaded into GL texture memory
   free(tex->data);

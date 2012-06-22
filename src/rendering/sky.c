@@ -178,29 +178,29 @@ ooSkyDrawStars(OOstars *stars)
   SG_CHECK_ERROR;
 
   ooLogTrace("draw %d stars", stars->n_stars);
-  glMatrixMode(GL_MODELVIEW);
-  glPushAttrib(GL_ENABLE_BIT);
-  glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+  //glMatrixMode(GL_MODELVIEW);
+  //glPushAttrib(GL_ENABLE_BIT);
+  //glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
-  glDisable(GL_TEXTURE_2D);
-  glDisable(GL_LIGHTING);
+  //glDisable(GL_TEXTURE_2D);
+  //glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glBindBuffer(GL_ARRAY_BUFFER, stars->vbo);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
+  //glEnableClientState(GL_VERTEX_ARRAY);
+  //glEnableClientState(GL_COLOR_ARRAY);
 
   glPointSize(2.0f);
-  glVertexPointer(3, GL_FLOAT, sizeof(OOstar), (GLvoid*)offsetof(OOstar, x));
-  glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(OOstar), (GLvoid*)offsetof(OOstar, r));
+  //glVertexPointer(3, GL_FLOAT, sizeof(OOstar), (GLvoid*)offsetof(OOstar, x));
+  //glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(OOstar), (GLvoid*)offsetof(OOstar, r));
 
   glDrawArrays(GL_POINTS, 0, stars->n_stars);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glPopAttrib();
-  glPopClientAttrib();
+  //glPopAttrib();
+  //glPopClientAttrib();
   SG_CHECK_ERROR;
 }
 
@@ -213,5 +213,12 @@ ooSkyNewDrawable(const char *file)
   SGdrawable *drawable = sgNewDrawable((SGdrawable*)sky, "sky", (SGdrawfunc)ooSkyDrawStars);
 
   return drawable;
+}
+
+
+void
+sgDrawBackground(SGbackground *bg)
+{
+
 }
 

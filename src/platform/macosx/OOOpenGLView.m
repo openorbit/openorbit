@@ -18,6 +18,7 @@
  */
 
 #import "OOOpenGLView.h"
+
 #import <OpenGL/OpenGL.h>
 #import <OpenGL/gl3.h>
 
@@ -174,7 +175,7 @@ static io_keycode_t keymap [256] = {
   NSOpenGLPixelFormatAttribute attributes [] = {
     NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
     NSOpenGLPFADoubleBuffer, 0};
-  
+
   NSOpenGLPixelFormat *pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
   self.openGLContext = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
 

@@ -38,7 +38,6 @@
 #include "light.h"
 #include "drawable.h"
 
-
 typedef void (*SGdrawoverlay)(SGoverlay *);
 
 struct SGoverlay {
@@ -49,6 +48,34 @@ struct SGoverlay {
   GLuint tex;
   SGdrawoverlay draw;
 };
+
+
+struct SGscenegraph2 {
+  obj_array_t scenes;
+};
+
+struct SGscene2 {
+  SGscenegraph2 *sg;
+  SGcamera *cam;
+  SGbackground *bg;
+  obj_array_t objects;
+  obj_array_t lights;
+  obj_array_t shaders;
+};
+
+struct SGviewport {
+  SGscene2 *scene;
+  obj_array_t overlays;
+  unsigned x, y;
+  unsigned w, h;
+};
+
+struct SGwindow {
+  obj_array_t viewports;
+  unsigned w, h;
+};
+
+
 
 
 void sgSetScenePos3f(SGscene *sc, float x, float y, float z);
@@ -103,5 +130,18 @@ void sgInitOverlay(SGoverlay *overlay, SGdrawoverlay drawfunc,
                    float x, float y,
                    float w, float h,
                    unsigned rw, unsigned rh);
+
+
+
+SGscene2* sgCreateScene(void);
+void sgRenderScene(SGscene2 *scene, float dt);
+
+void sgRenderWindow(SGwindow *window, float dt);
+SGwindow* sgCreateWindow(void);
+
+void sgSetViewport(SGviewport *viewport);
+SGviewport* sgCreateViewport(SGwindow *window, unsigned x, unsigned y,
+                             unsigned w, unsigned h);
+
 
 #endif /* SCENEGRAPH_H_ */

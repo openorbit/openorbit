@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
 #endif
@@ -33,11 +33,17 @@ extern "C" {
 typedef struct {
   GLint width, height;
   GLuint texId;
+  GLenum internalType;
   GLenum texType;
   GLint bytesPerTex;
   const char *path;
   void *data;
 } OOtexture;
+
+  struct SGtexture {
+    GLuint texId;
+  };
+
 
 /*! \brief Loads a named resource texture file
  *

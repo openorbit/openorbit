@@ -19,7 +19,7 @@
 
 #include "particles.h"
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
 #endif
@@ -30,22 +30,22 @@ void
 sgDrawParticles(SGparticles *sp)
 {
   if (!sp->ps->enabled) return;
-  glPushMatrix();
+  //  glPushMatrix();
 
   // Draw particle system, each particle is a textured quad.
   glBindTexture(GL_TEXTURE_2D, sp->texture);
   glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
   glPointSize(1.0);
-  glDisable(GL_LIGHTING);
-  glBegin(GL_POINTS);
-  glColor3f(sp->ps->rgb.x, sp->ps->rgb.y, sp->ps->rgb.z);
-  for (int i = 0 ; i < sp->ps->particleCount ; ++ i) {
-    if (sp->ps->particles[i].active) {
-      glVertex3f(sp->ps->particles[i].p.x, sp->ps->particles[i].p.y, sp->ps->particles[i].p.z);
-    }
-  }
-  glEnd();
-  glPopMatrix();
+  // glDisable(GL_LIGHTING);
+  //  glBegin(GL_POINTS);
+  //glColor3f(sp->ps->rgb.x, sp->ps->rgb.y, sp->ps->rgb.z);
+  //for (int i = 0 ; i < sp->ps->particleCount ; ++ i) {
+  //  if (sp->ps->particles[i].active) {
+  //    glVertex3f(sp->ps->particles[i].p.x, sp->ps->particles[i].p.y, sp->ps->particles[i].p.z);
+  // }
+  //}
+  //glEnd();
+  //glPopMatrix();
 }
 
 SGdrawable* sgNewParticleSystem(const char *name, const char *tex,

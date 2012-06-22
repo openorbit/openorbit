@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
 #endif
@@ -170,16 +170,16 @@ void
 sgCamRotate(SGcam *cam)
 {
   assert(cam != NULL && "cam not set");
-  glMatrixMode(GL_MODELVIEW);
+  //glMatrixMode(GL_MODELVIEW);
   switch (cam->kind) {
   case SGCam_Orbit:
     {
       SGorbitcam* ocam = (SGorbitcam*)cam;
-      gluLookAt(0.0, 0.0, 0.0,
-                -ocam->r*cos(ocam->dec),
-                -ocam->r*sin(ocam->dec),
-                -ocam->r*sin(ocam->ra),
-                0.0, 0.0, 1.0);
+      //gluLookAt(0.0, 0.0, 0.0,
+      //          -ocam->r*cos(ocam->dec),
+      //          -ocam->r*sin(ocam->dec),
+      //          -ocam->r*sin(ocam->ra),
+      //          0.0, 0.0, 1.0);
     }
     break;
   case SGCam_Fixed:
@@ -191,7 +191,7 @@ sgCamRotate(SGcam *cam)
       q_m_convert(&m, q);
       matrix_t mt;
       m_transpose(&mt, &m);
-      glMultMatrixf((GLfloat*)&mt);
+      //glMultMatrixf((GLfloat*)&mt);
     }
     break;
   case SGCam_Free:
@@ -203,7 +203,7 @@ sgCamRotate(SGcam *cam)
       //      matrix_t mt;
       //m_transpose(&mt, &m);
 
-      glMultMatrixf((GLfloat*)&m);
+      //glMultMatrixf((GLfloat*)&m);
     }
     break;
   default:
@@ -252,7 +252,7 @@ sgCamMove(SGcam *cam)
 {
   assert(cam != NULL && "cam not set");
 //    glPushMatrix();
-  glMatrixMode(GL_MODELVIEW);
+//glMatrixMode(GL_MODELVIEW);
   switch (cam->kind) {
   case SGCam_Orbit:
     {
@@ -261,9 +261,9 @@ sgCamMove(SGcam *cam)
                     ocam->r*sin(ocam->dec),
                     ocam->r*sin(ocam->ra)};
       float3 cogOffset = mf3_v_mul(ocam->body->R, ocam->body->m.cog);
-      glTranslatef(-(p[0] + cogOffset.x),
-                   -(p[1] + cogOffset.y),
-                   -(p[2] + cogOffset.z));
+      //glTranslatef(-(p[0] + cogOffset.x),
+      //             -(p[1] + cogOffset.y),
+      //             -(p[2] + cogOffset.z));
     }
     break;
   case SGCam_Fixed:
@@ -279,8 +279,8 @@ sgCamMove(SGcam *cam)
       //      matrix_t mt;
       //      m_transpose(&mt, &m);
 
-      glMultMatrixf((GLfloat*)&m);
-      glTranslatef(-vf3_x(p), -vf3_y(p), -vf3_z(p));
+      //glMultMatrixf((GLfloat*)&m);
+      //glTranslatef(-vf3_x(p), -vf3_y(p), -vf3_z(p));
     }
     break;
   case SGCam_Free:
@@ -517,4 +517,12 @@ sgCamPitchUp(int state, void *data)
       fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.00f);
     }
   }
+}
+
+
+
+void
+sgMoveCam(SGcamera *cam)
+{
+
 }

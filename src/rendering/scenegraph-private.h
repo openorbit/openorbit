@@ -21,15 +21,13 @@
 #define SCENEGRAPH_PRIVATE_H_8YHHHPCN
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
 #endif
 #include <gencds/array.h>
 #include "scenegraph.h"
-
-static GLenum sgLightNumberMap[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3,
-                                    GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
+#include "rendering/shader-manager.h"
 
 struct SGscene {
   char *name;
@@ -59,7 +57,7 @@ struct SGscenegraph {
 
   SGdrawable *sky;
 
-  GLuint overlay_shader;
+  SGshader *overlay_shader;
   GLint modelview_id;
   GLint projection_id;
   GLint tex_id;

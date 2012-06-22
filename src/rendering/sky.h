@@ -22,20 +22,20 @@
 #define __SKY_H__
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 #include <vmath/vmath.h>
 
 #include "scenegraph.h"
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
 #endif
-  
+
 #define STAR_CNT 5000
-    
+
 typedef struct {
     unsigned char r, g, b, a;
     float x, y, z;
@@ -49,6 +49,9 @@ typedef struct {
   OOstar *data;
 } OOstars;
 
+struct SGbackground {
+  SGcamera *cam;
+};
 
 /*!
     @function   equ_cart_convert
@@ -62,17 +65,18 @@ typedef struct {
 float3 ooEquToCart(float ra, float dec);
 OOstars* ooSkyInitStars(int starCount);
 OOstars *ooSkyRandomStars(void);
-    
+
 void ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv);
-    
+
 void ooSkyDrawStars(OOstars *stars);
 OOstars* ooSkyLoadStars(const char *file);
 
 SGdrawable *ooSkyNewDrawable(const char *file);
 
+void sgDrawBackground(SGbackground *bg);
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif

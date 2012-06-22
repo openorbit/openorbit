@@ -21,7 +21,7 @@
 #include <string.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
 #endif
@@ -186,7 +186,7 @@ test_hud_draw(SGoverlay *overlay)
   // Hud should adopt to whether it is used in space or not.
   // Hud need to be able to select reference object in space as data is always
   // relative.
-  glPushAttrib(GL_ENABLE_BIT);
+  //glPushAttrib(GL_ENABLE_BIT);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -194,27 +194,27 @@ test_hud_draw(SGoverlay *overlay)
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_LINE_SMOOTH);
 
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  gluOrtho2D(-1.0*sgRenderInfo.aspect, 1.0*sgRenderInfo.aspect,
-             -1.0, 1.0); // TODO: Fix to viewport aspect
+  //glMatrixMode(GL_PROJECTION);
+  //glPushMatrix();
+  //glLoadIdentity();
+  //gluOrtho2D(-1.0*sgRenderInfo.aspect, 1.0*sgRenderInfo.aspect,
+  //           -1.0, 1.0); // TODO: Fix to viewport aspect
 
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
+  //glMatrixMode(GL_MODELVIEW);
+  //glPushMatrix();
+  //glLoadIdentity();
 
   glLineWidth(1.0);
 
-  glBegin(GL_LINES);
-  glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-  glVertex2f(-0.5f, 0.0f);
-  glVertex2f(0.5f, 0.0f);
+  //glBegin(GL_LINES);
+  //glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+  //glVertex2f(-0.5f, 0.0f);
+  //glVertex2f(0.5f, 0.0f);
 
-  glVertex2f(0.0f, -0.5f);
-  glVertex2f(0.0f, 0.5f);
+  //glVertex2f(0.0f, -0.5f);
+  // glVertex2f(0.0f, 0.5f);
 
-  glEnd();
+  //glEnd();
 
   glEnable(GL_TEXTURE_2D);
   //glEnable(GL_POINT_SPRITE);
@@ -225,33 +225,33 @@ test_hud_draw(SGoverlay *overlay)
   //GLuint tex_num = glGetUniformLocation(, )
   //glUniform1i(, 0);
   //sgBindTextBuffer(hud->text);
-  glDisable(GL_LIGHTING);
-  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+  //glDisable(GL_LIGHTING);
+  //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 
-  glColor4f(0.0, 1.0, 0.0, 0.0);
-  glBegin(GL_QUADS);
+  //glColor4f(0.0, 1.0, 0.0, 0.0);
+  //glBegin(GL_QUADS);
 
-  glTexCoord2f(0.0, 0.0);
-  glVertex2f(-0.025f, 0.025f);
+  //glTexCoord2f(0.0, 0.0);
+  //glVertex2f(-0.025f, 0.025f);
 
-  glTexCoord2f(1.0, 0.0);
-  glVertex2f(0.025f, 0.025f);
+  //glTexCoord2f(1.0, 0.0);
+  //glVertex2f(0.025f, 0.025f);
 
-  glTexCoord2f(1.0, 1.0);
-  glVertex2f(0.025f, -0.025f);
+  //glTexCoord2f(1.0, 1.0);
+  //glVertex2f(0.025f, -0.025f);
 
-  glTexCoord2f(0.0, 1.0);
-  glVertex2f(-0.025f, -0.025f);
+  //glTexCoord2f(0.0, 1.0);
+  //glVertex2f(-0.025f, -0.025f);
 
-  glEnd();
+  //glEnd();
 
   glDisable(GL_TEXTURE_2D);
 
-  glPopMatrix();
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  glPopAttrib();
+  //glPopMatrix();
+  // glMatrixMode(GL_PROJECTION);
+  //glPopMatrix();
+  // glMatrixMode(GL_MODELVIEW);
+  //glPopAttrib();
 }
 
 

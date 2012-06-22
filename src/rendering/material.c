@@ -20,7 +20,7 @@
 #include "material.h"
 #include "scenegraph.h"
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
 #include <GL3/gl3.h>
 #endif
@@ -29,11 +29,11 @@ void
 sgBindMaterial(SGmaterial *mat)
 {
   SG_CHECK_ERROR;
-  glMaterialfv(GL_FRONT, GL_AMBIENT, mat->ambient);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat->diffuse);
-  glMaterialfv(GL_FRONT, GL_SPECULAR, mat->specular);
-  glMaterialfv(GL_FRONT, GL_EMISSION, mat->emission);
-  glMaterialf(GL_FRONT, GL_SHININESS, mat->shininess);
+  //glMaterialfv(GL_FRONT, GL_AMBIENT, (GLfloat*)&mat->ambient);
+  //glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat*)&mat->diffuse);
+  //glMaterialfv(GL_FRONT, GL_SPECULAR, (GLfloat*)&mat->specular);
+  //glMaterialfv(GL_FRONT, GL_EMISSION, (GLfloat*)&mat->emission);
+  //glMaterialf(GL_FRONT, GL_SHININESS, mat->shininess);
   SG_CHECK_ERROR;
 }
 

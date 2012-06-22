@@ -51,17 +51,17 @@ sgDrawableLoadShader(SGdrawable *obj, const char *shader)
 {
   if (shader) {
     obj->shader = sgLoadProgram(shader, shader, shader, shader);
-    obj->modelview_id = glGetUniformLocation(obj->shader,
+    obj->modelview_id = glGetUniformLocation(obj->shader->shaderId,
                                              SG_MODELVIEW_NAME);
-    obj->projection_id = glGetUniformLocation(obj->shader,
+    obj->projection_id = glGetUniformLocation(obj->shader->shaderId,
                                               SG_PROJECTION_NAME);
-    obj->tex_uni_id[0] = glGetUniformLocation(obj->shader,
+    obj->tex_uni_id[0] = glGetUniformLocation(obj->shader->shaderId,
                                               SG_TEX0_NAME);
-    obj->tex_uni_id[1] = glGetUniformLocation(obj->shader,
+    obj->tex_uni_id[1] = glGetUniformLocation(obj->shader->shaderId,
                                               SG_TEX1_NAME);
-    obj->tex_uni_id[2] = glGetUniformLocation(obj->shader,
+    obj->tex_uni_id[2] = glGetUniformLocation(obj->shader->shaderId,
                                               SG_TEX2_NAME);
-    obj->tex_uni_id[3] = glGetUniformLocation(obj->shader,
+    obj->tex_uni_id[3] = glGetUniformLocation(obj->shader->shaderId,
                                               SG_TEX3_NAME);
   } else {
     obj->shader = 0; // Fixed functionality
@@ -222,13 +222,13 @@ sgDrawSphere(SGsphere *sp)
   glEnable(GL_TEXTURE_2D);
   glDepthFunc(GL_LEQUAL);
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_LIGHTING);
+  //glEnable(GL_LIGHTING);
 
   sgBindMaterial(&sp->mat);
 
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
-  glColor3f(1.0f, 1.0f, 1.0f);
+  //glColor3f(1.0f, 1.0f, 1.0f);
   glUniform1i(sp->use_spec_map_id, sp->use_spec_map_val);
   glUniform1i(sp->use_night_tex_id, sp->use_night_tex_val);
 
@@ -239,11 +239,11 @@ sgDrawSphere(SGsphere *sp)
   double angularDiameter = 2.0 * atan(0.5*sp->radius/vf3_abs(sp->super.p));
   //double angularDiameter = sp->radius/vf3_abs(sp->super.p);// Quicker estimate
   if (angularDiameter > DEG_TO_RAD(5.0)) {
-    gluSphere(sp->quadratic, sp->radius, 128, 128);
+    //  gluSphere(sp->quadratic, sp->radius, 128, 128);
   } else if (angularDiameter > DEG_TO_RAD(1.0)) {
-    gluSphere(sp->quadratic, sp->radius, 32, 32);
+    // gluSphere(sp->quadratic, sp->radius, 32, 32);
   } else {
-    gluSphere(sp->quadratic, sp->radius, 16, 16);
+    // gluSphere(sp->quadratic, sp->radius, 16, 16);
   }
 
   SG_CHECK_ERROR;
@@ -251,34 +251,34 @@ sgDrawSphere(SGsphere *sp)
   // Draw point on the sphere in solid colour and size
   glDisable (GL_BLEND);
   glDisable(GL_TEXTURE_2D);
-  glDisable(GL_LIGHTING);
+  //glDisable(GL_LIGHTING);
   glDepthFunc(GL_LEQUAL);
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_TEXTURE_2D); // Lines are not textured...
 
   SG_CHECK_ERROR;
 
-  glBegin(GL_LINES);
-  glColor3f(1.0, 1.0, 0.0);
-  glVertex3f(0.0, 0.0, -2.0*sp->radius);
-  glVertex3f(0.0, 0.0, -sp->radius);
-  glEnd();
+  //glBegin(GL_LINES);
+  //glColor3f(1.0, 1.0, 0.0);
+  //glVertex3f(0.0, 0.0, -2.0*sp->radius);
+  //glVertex3f(0.0, 0.0, -sp->radius);
+  //glEnd();
 
   SG_CHECK_ERROR;
 
 
-  glBegin(GL_LINES);
-  glColor3f(1.0, 1.0, 0.0);
-  glVertex3f(0.0, 0.0, +2.0*sp->radius);
-  glVertex3f(0.0, 0.0, sp->radius);
-  glEnd();
-  SG_CHECK_ERROR;
+  //glBegin(GL_LINES);
+  //glColor3f(1.0, 1.0, 0.0);
+  //glVertex3f(0.0, 0.0, +2.0*sp->radius);
+  //glVertex3f(0.0, 0.0, sp->radius);
+  //glEnd();
+  //SG_CHECK_ERROR;
 
-  glPointSize(5.0);
-  glBegin(GL_POINTS);
-  glColor3f(1.0, 0.0, 0.0);
-  glVertex3f(0.0, 0.0, 0.0);
-  glEnd();
+  //glPointSize(5.0);
+  //glBegin(GL_POINTS);
+  //glColor3f(1.0, 0.0, 0.0);
+  //glVertex3f(0.0, 0.0, 0.0);
+  //glEnd();
   SG_CHECK_ERROR;
 }
 
@@ -301,18 +301,18 @@ sgNewSphere(const char *name, const char* shader, float radius,
   if (specMap) sp->super.tex_id[1] = ooTexLoad(specMap, specMap);
   if (nightTex) sp->super.tex_id[3] = ooTexLoad(nightTex, nightTex);
 
-  sp->quadratic = gluNewQuadric();
-  gluQuadricOrientation(sp->quadratic, GLU_OUTSIDE);
-  gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
-  gluQuadricTexture(sp->quadratic, GL_TRUE);
-  gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
+  //  sp->quadratic = gluNewQuadric();
+  //gluQuadricOrientation(sp->quadratic, GLU_OUTSIDE);
+  //gluQuadricNormals(sp->quadratic, GLU_SMOOTH);
+  //gluQuadricTexture(sp->quadratic, GL_TRUE);
+  //gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
 
 
-  sp->use_night_tex_id = glGetUniformLocation(sp->super.shader,
+  sp->use_night_tex_id = glGetUniformLocation(sp->super.shader->shaderId,
                                               "UseNightTexture");
   sp->use_night_tex_val = (nightTex != NULL);
 
-  sp->use_spec_map_id = glGetUniformLocation(sp->super.shader,
+  sp->use_spec_map_id = glGetUniformLocation(sp->super.shader->shaderId,
                                              "UseSpecMap");
   sp->use_spec_map_val = (specMap != NULL);
 
@@ -415,28 +415,28 @@ sgDrawSphere2(SGsphere *sp)
 {
   //glEnable(GL_TEXTURE_2D); // Lines are not textured...
   //glBindTexture(GL_TEXTURE_2D, sp->texId);
-  glEnable(GL_LIGHTING); // Lines are not lit, just colored
+  //glEnable(GL_LIGHTING); // Lines are not lit, just colored
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
+  //glEnableClientState(GL_VERTEX_ARRAY);
+  //glEnableClientState(GL_NORMAL_ARRAY);
 
-  glVertexPointer(3, GL_FLOAT, 0, &sp->vertices[sp->northPoleIdx]);
-  glNormalPointer(GL_FLOAT, 0, &sp->normals[sp->northPoleIdx]);
-  glDrawArrays(GL_TRIANGLE_FAN, 0, sp->sliceCount+1);
+  //glVertexPointer(3, GL_FLOAT, 0, &sp->vertices[sp->northPoleIdx]);
+  //glNormalPointer(GL_FLOAT, 0, &sp->normals[sp->northPoleIdx]);
+  //glDrawArrays(GL_TRIANGLE_FAN, 0, sp->sliceCount+1);
 
-  glVertexPointer(3, GL_FLOAT, 0, &sp->vertices[sp->southPoleIdx]);
-  glNormalPointer(GL_FLOAT, 0, &sp->normals[sp->southPoleIdx]);
-  glDrawArrays(GL_TRIANGLE_FAN, 0, sp->sliceCount+1);
+  //glVertexPointer(3, GL_FLOAT, 0, &sp->vertices[sp->southPoleIdx]);
+  //glNormalPointer(GL_FLOAT, 0, &sp->normals[sp->southPoleIdx]);
+  //glDrawArrays(GL_TRIANGLE_FAN, 0, sp->sliceCount+1);
 
-  for (int i = 0 ; i < sp->stackCount - 2 ; ++ i) {
-    glVertexPointer(3, GL_FLOAT, 0, &sp->vertices[sp->stripIdx + i * sp->sliceCount * 2]);
-    glNormalPointer(GL_FLOAT, 0, &sp->normals[sp->southPoleIdx]);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, sp->sliceCount * 2);
-  }
+  //for (int i = 0 ; i < sp->stackCount - 2 ; ++ i) {
+  //  glVertexPointer(3, GL_FLOAT, 0, &sp->vertices[sp->stripIdx + i * sp//->sliceCount * 2]);
+  // glNormalPointer(GL_FLOAT, 0, &sp->normals[sp->southPoleIdx]);
+  //  glDrawArrays(GL_TRIANGLE_STRIP, 0, sp->sliceCount * 2);
+  //}
 
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_NORMAL_ARRAY);
+  //glDisableClientState(GL_VERTEX_ARRAY);
+  //glDisableClientState(GL_NORMAL_ARRAY);
 
 }
 
@@ -463,24 +463,24 @@ sgDrawEllipsis(SGellipsis *el)
   //glShadeModel (GL_FLAT);
 
   glDisable(GL_TEXTURE_2D); // Lines are not textured...
-  glDisable(GL_LIGHTING); // Lines are not lit, just colored
+                            //glDisable(GL_LIGHTING); // Lines are not lit, just colored
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
-  glPushMatrix();
+  //  glPushMatrix();
   glLineWidth(1.0);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 0, el->verts);
-  glColor3f(el->colour[0], el->colour[1], el->colour[2]);
+  //glEnableClientState(GL_VERTEX_ARRAY);
+  //glVertexPointer(3, GL_FLOAT, 0, el->verts);
+  //glColor3f(el->colour[0], el->colour[1], el->colour[2]);
   glDrawArrays(GL_LINE_LOOP, 0, el->vertCount);
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glPopMatrix();
+  //glDisableClientState(GL_VERTEX_ARRAY);
+  //  glPopMatrix();
 
   // Place dot at periapsis
   glPointSize(10.0);
-  glBegin(GL_POINTS);
-  glColor3f(1.0-el->colour[0], 1.0-el->colour[1], 1.0-el->colour[2]);
-  glVertex3f(el->verts[0], el->verts[1], el->verts[2]);
-  glEnd();
+  //glBegin(GL_POINTS);
+  //glColor3f(1.0-el->colour[0], 1.0-el->colour[1], 1.0-el->colour[2]);
+  //glVertex3f(el->verts[0], el->verts[1], el->verts[2]);
+  //glEnd();
 
   SG_CHECK_ERROR;
 }
@@ -545,10 +545,10 @@ sgDrawCylinder(SGcylinder *cyl)
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
-  glColor3bv(cyl->col);
-  gluCylinder(cyl->quadratic,
-              cyl->bottonRadius, cyl->topRadius, cyl->height,
-              4, 2);
+  //glColor3bv(cyl->col);
+  //gluCylinder(cyl->quadratic,
+  //            cyl->bottonRadius, cyl->topRadius, cyl->height,
+  //            4, 2);
   SG_CHECK_ERROR;
 }
 
@@ -584,40 +584,40 @@ draw_modeldata(SGmodel2 *sgmod, SGmodeldata *mod)
 
   sgBindMaterial(&mod->material);
 
-  glPushMatrix();
-  glPushAttrib(GL_ENABLE_BIT);
-  glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+  // glPushMatrix();
+  //glPushAttrib(GL_ENABLE_BIT);
+  //glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
-  glTranslatef(mod->trans[0], mod->trans[1], mod->trans[2]);
-  glMultMatrixf((GLfloat*)mod->rot);
+  //glTranslatef(mod->trans[0], mod->trans[1], mod->trans[2]);
+  //glMultMatrixf((GLfloat*)mod->rot);
 
   glBindBuffer(GL_ARRAY_BUFFER, mod->vbo);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
+  //glEnableClientState(GL_VERTEX_ARRAY);
+  //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  //glEnableClientState(GL_NORMAL_ARRAY);
 
   GLfloat modelview[16], projection[16];
-  glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
-  glGetFloatv(GL_PROJECTION_MATRIX, projection);
+  //glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+  //glGetFloatv(GL_PROJECTION_MATRIX, projection);
 
   glUniformMatrix4fv(sgmod->super.modelview_id, 1, GL_FALSE, modelview);
   glUniformMatrix4fv(sgmod->super.projection_id, 1, GL_FALSE, projection);
 
-  glVertexPointer(3, GL_FLOAT, 0, 0);
-  glTexCoordPointer(2, GL_FLOAT, 0, (GLvoid*)mod->tex_coord_offset);
-  glNormalPointer(GL_FLOAT, 0, (GLvoid*)mod->normal_offset);
+  //glVertexPointer(3, GL_FLOAT, 0, 0);
+  //glTexCoordPointer(2, GL_FLOAT, 0, (GLvoid*)mod->tex_coord_offset);
+  //glNormalPointer(GL_FLOAT, 0, (GLvoid*)mod->normal_offset);
 
   glDrawArrays(GL_TRIANGLES, 0, mod->vertex_count);
 
-  glPopClientAttrib();
-  glPopAttrib();
+  //glPopClientAttrib();
+  //glPopAttrib();
 
   ARRAY_FOR_EACH(i, mod->children) {
     draw_modeldata(sgmod, ARRAY_ELEM(mod->children, i));
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glPopMatrix();
+  // glPopMatrix();
   SG_CHECK_ERROR;
 }
 
@@ -744,7 +744,7 @@ void
 sgPaintDrawable(SGdrawable *drawable)
 {
   SG_CHECK_ERROR;
-  glPushAttrib(GL_ENABLE_BIT);
+  //glPushAttrib(GL_ENABLE_BIT);
 
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
@@ -755,24 +755,24 @@ sgPaintDrawable(SGdrawable *drawable)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
-  glEnable(GL_LIGHTING);
+  //glEnable(GL_LIGHTING);
 
   SG_CHECK_ERROR;
 
-  glUseProgram(drawable->shader);
-  glPushMatrix();
-  glTranslatef(drawable->p.x, drawable->p.y, drawable->p.z);
-  glMultMatrixf(drawable->R);
+  glUseProgram(drawable->shader->shaderId);
+  //glPushMatrix();
+  //glTranslatef(drawable->p.x, drawable->p.y, drawable->p.z);
+  //glMultMatrixf(drawable->R);
 
   SG_CHECK_ERROR;
 
   if (drawable->shader) {
     GLfloat modelview[16], projection[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
-    glGetFloatv(GL_PROJECTION_MATRIX, projection);
+    //glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+    //glGetFloatv(GL_PROJECTION_MATRIX, projection);
 
-    glUniformMatrix4fv(drawable->modelview_id, 1, GL_FALSE, modelview);
-    glUniformMatrix4fv(drawable->projection_id, 1, GL_FALSE, projection);
+    //glUniformMatrix4fv(drawable->modelview_id, 1, GL_FALSE, modelview);
+    //glUniformMatrix4fv(drawable->projection_id, 1, GL_FALSE, projection);
     SG_CHECK_ERROR;
 
     for (int i = 0 ; i < 4 ; i ++) {
@@ -786,8 +786,8 @@ sgPaintDrawable(SGdrawable *drawable)
     SG_CHECK_ERROR;
 
     GLint shaderIsValid;
-    glValidateProgram(drawable->shader);
-    glGetProgramiv(drawable->shader, GL_VALIDATE_STATUS, &shaderIsValid);
+    glValidateProgram(drawable->shader->shaderId);
+    glGetProgramiv(drawable->shader->shaderId, GL_VALIDATE_STATUS, &shaderIsValid);
     assert(shaderIsValid);
 
     SG_CHECK_ERROR;
@@ -802,8 +802,8 @@ sgPaintDrawable(SGdrawable *drawable)
     sgPaintDrawable(child);
   }
 
-  glPopMatrix();
-  glPopAttrib();
+  //glPopMatrix();
+  //glPopAttrib();
 
 
   glUseProgram(0);
@@ -817,17 +817,17 @@ sgDrawVector(SGvector *vec)
   SG_CHECK_ERROR;
 
   glDisable(GL_TEXTURE_2D); // Lines are not textured...
-  glDisable(GL_LIGHTING); // Lines are not lit, just colored
+                            //glDisable(GL_LIGHTING); // Lines are not lit, just colored
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
 
   glLineWidth(1.0);
 
-  glColor3f(vec->col[0], vec->col[1], vec->col[2]);
-  glBegin(GL_LINES);
-  glVertex3f(0.0, 0.0, 0.0);
-  glVertex3f(vec->v.x, vec->v.y, vec->v.z);
-  glEnd();
+  //  glColor3f(vec->col[0], vec->col[1], vec->col[2]);
+  //glBegin(GL_LINES);
+  //glVertex3f(0.0, 0.0, 0.0);
+  //glVertex3f(vec->v.x, vec->v.y, vec->v.z);
+  //glEnd();
 
   SG_CHECK_ERROR;
 }
@@ -899,28 +899,28 @@ sgDrawEllipsoid(SGellipsoid *el)
   //glShadeModel (GL_FLAT);
 
   glDisable(GL_TEXTURE_2D);
-  glDisable(GL_LIGHTING); // Fully lit, i.e. just colored
+  //glDisable(GL_LIGHTING); // Fully lit, i.e. just colored
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
-  glPushMatrix();
-  glColor4fv(el->colour);
+  //glPushMatrix();
+  // glColor4fv(el->colour);
 
-  glEnableClientState(GL_VERTEX_ARRAY);
+  // glEnableClientState(GL_VERTEX_ARRAY);
 
   //glPrimitiveRestartIndex(0xffffffff)
   //glDrawElements(	GL_TRIANGLE_STRIP, el->vertexCount, GL_UINT, el->indices);
 
   // TODO: glMultiDrawArrays
   for (unsigned i = 0 ; i < el->stacks ; ++i) {
-    glVertexPointer(3, GL_FLOAT, 0, &el->verts[el->vertCountPerStack*i]);
+    //   glVertexPointer(3, GL_FLOAT, 0, &el->verts[el->vertCountPerStack*i]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, el->vertCountPerStack);
   }
 
-  glVertexPointer(3, GL_FLOAT, 0, &el->verts[el->vertCountPerStack*el->stacks]);
+  //glVertexPointer(3, GL_FLOAT, 0, &el->verts[el->vertCountPerStack*el->stacks]);
   glDrawArrays(GL_TRIANGLE_FAN, 0, el->slices + 1);
 
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glPopMatrix();
+  //glDisableClientState(GL_VERTEX_ARRAY);
+  //glPopMatrix();
 
   SG_CHECK_ERROR;
 }
