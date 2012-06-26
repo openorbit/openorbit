@@ -68,7 +68,7 @@ SGlight* sgNewPointlight(SGscene *sc, float3 p);
 SGlight* sgNewPointlight3f(SGscene *sc, float x, float y, float z);
 void sgSetLightPos3f(SGlight *light, float x, float y, float z);
 void sgSetLightPosv(SGlight *light, float3 v);
-void sgSetLightPosLW(SGlight *light, OOlwcoord *lwc);
+void sgSetLightPosLW(SGlight *light, lwcoord_t *lwc);
 
 
 #endif /* !SG_LIGHT_H__ */

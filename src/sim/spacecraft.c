@@ -536,7 +536,7 @@ simGetAltitude(sim_spacecraft_t *sc)
 float3
 simGetRelPos(sim_spacecraft_t *sc)
 {
-  return ooLwcDist(&sc->obj->p, &sc->obj->sys->orbitalBody->obj.p);
+  return lwc_dist(&sc->obj->p, &sc->obj->sys->orbitalBody->obj.p);
 }
 
 float3

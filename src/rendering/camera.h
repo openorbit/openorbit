@@ -42,7 +42,7 @@ extern "C" {
 
   struct SGfreecam {
     SGcam super;
-    OOlwcoord lwc;
+    lwcoord_t lwc;
     float3 dp;
     quaternion_t q;
     quaternion_t dq;
@@ -95,12 +95,12 @@ extern "C" {
   struct SGcamera {
     float4x4 projMatrix;
     float4x4 viewMatrix;
-    
+
     SGcameratype type;
-    
+
     union {
       struct {
-        OOlwcoord lwc;
+        lwcoord_t lwc;
         float3 dp;
         quaternion_t q;
         quaternion_t dq;
@@ -120,6 +120,7 @@ extern "C" {
     };
   };
 
+  void sgAnimateCam(SGcamera *cam, float dt);
   void sgMoveCam(SGcamera *cam);
 
 #ifdef __cplusplus

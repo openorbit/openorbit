@@ -175,8 +175,8 @@ void sgDrawableLoadShader(SGdrawable *obj, const char *shader);
 
 void sgSetObjectQuat4f(SGdrawable *obj, float x, float y, float z, float w);
 void sgSetObjectQuatv(SGdrawable *obj, quaternion_t q);
-void sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset);
-void sgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw);
+void sgSetObjectPosLWAndOffset(SGdrawable *obj, const lwcoord_t *lw, float3 offset);
+void sgSetObjectPosLW(SGdrawable *obj, const lwcoord_t *lw);
 void sgSetObjectPos3f(SGdrawable *obj, float x, float y, float z);
 //void ooSgSetObjectScale(SGdrawable *obj, float s);
 void sgSetObjectSpeed(SGdrawable *obj, float dx, float dy, float dz);

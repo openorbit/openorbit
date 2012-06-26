@@ -30,7 +30,7 @@
 
 struct PLrecgrid {
   struct PLrecgrid *parent;
-  OOlwcoord centre;
+  lwcoord_t centre;
   double size;
   obj_array_t objs;
   struct PLrecgrid *children[8];

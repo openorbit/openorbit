@@ -80,7 +80,7 @@ struct SGwindow {
 
 void sgSetScenePos3f(SGscene *sc, float x, float y, float z);
 
-void sgSetScenePosLW(SGscene *sc, const OOlwcoord *lwc);
+void sgSetScenePosLW(SGscene *sc, const lwcoord_t *lwc);
 
 void sgDrawOverlays(SGscenegraph *sg);
 

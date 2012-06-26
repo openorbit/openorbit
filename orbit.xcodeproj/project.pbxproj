@@ -705,7 +705,7 @@
 		EC7CA614143AF50B00E22F4E /* stringextras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringextras.h; sourceTree = "<group>"; };
 		EC7D093310EE160700D9D28E /* flightrecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightrecorder.h; sourceTree = "<group>"; };
 		EC7D093410EE160700D9D28E /* flightrecorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightrecorder.c; sourceTree = "<group>"; };
-		EC7F68AD159326A700B4E8EF /* gl3drawable.h */ = {isa = PBXFileReference; path = gl3drawable.h; sourceTree = "<group>"; };
+		EC7F68AD159326A700B4E8EF /* gl3drawable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gl3drawable.h; sourceTree = "<group>"; };
 		EC7F68AE159326BC00B4E8EF /* gl3drawable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gl3drawable.c; sourceTree = "<group>"; };
 		EC823727113140E000A725B1 /* cmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmod.h; sourceTree = "<group>"; };
 		EC823728113140E000A725B1 /* cmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cmod.c; sourceTree = "<group>"; };

@@ -344,7 +344,7 @@ plComputeAirpressure(PLobject *obj)
 {
   PLsystem *sys = obj->sys;
   PLatmosphere *atm = obj->sys->orbitalBody->atm;
-  float3 dist = ooLwcDist(&obj->p, &sys->orbitalBody->obj.p);
+  float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
   //float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
   double pressure = plAtmospherePressure(atm, h);//plComputeSimpleAirpressure(atm, h);
@@ -358,7 +358,7 @@ double
 plComputeAltitude(PLobject *obj)
 {
   PLsystem *sys = obj->sys;
-  float3 dist = ooLwcDist(&obj->p, &sys->orbitalBody->obj.p);
+  float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad;
   return h;
 }
@@ -368,7 +368,7 @@ plComputeAirdensity(PLobject *obj)
 {
   PLsystem *sys = obj->sys;
   PLatmosphere *atm = obj->sys->orbitalBody->atm;
-  float3 dist = ooLwcDist(&obj->p, &sys->orbitalBody->obj.p);
+  float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
   float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
   //double pressure = plComputeSimpleAirpressure(atm, h);

@@ -69,7 +69,7 @@ sgDrawableLoadShader(SGdrawable *obj, const char *shader)
 }
 
 void
-sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset)
+sgSetObjectPosLWAndOffset(SGdrawable *obj, const lwcoord_t *lw, float3 offset)
 {
   assert(obj != NULL);
   assert(lw != NULL);
@@ -79,21 +79,21 @@ sgSetObjectPosLWAndOffset(SGdrawable *obj, const OOlwcoord *lw, float3 offset)
   SGcam *cam = sg->currentCam;
 
   if (cam->kind == SGCam_Free) {
-    float3 relPos = ooLwcDist(lw, &((SGfreecam*)cam)->lwc);
+    float3 relPos = lwc_dist(lw, &((SGfreecam*)cam)->lwc);
     obj->p = relPos + offset;
   } else if (cam->kind == SGCam_Fixed) {
     SGfixedcam *fix = (SGfixedcam*)cam;
-    float3 relPos = ooLwcDist(lw, &fix->body->p) - (mf3_v_mul(fix->body->R, fix->r));
+    float3 relPos = lwc_dist(lw, &fix->body->p) - (mf3_v_mul(fix->body->R, fix->r));
     obj->p = relPos + offset;
   } else if (cam->kind == SGCam_Orbit) {
     SGorbitcam *orb = (SGorbitcam*)cam;
-    float3 relPos = ooLwcDist(lw, &orb->body->p);
+    float3 relPos = lwc_dist(lw, &orb->body->p);
     obj->p = relPos + offset;
   }
 }
 
 void
-sgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
+sgSetObjectPosLW(SGdrawable *obj, const lwcoord_t *lw)
 {
   // Get camera position and translate the lw coord with respect to the camera
   SGscene *sc = obj->scene;
@@ -102,13 +102,13 @@ sgSetObjectPosLW(SGdrawable *obj, const OOlwcoord *lw)
 
   float3 relPos;
   if (cam->kind == SGCam_Free) {
-    relPos = ooLwcDist(lw, &((SGfreecam*)cam)->lwc);
+    relPos = lwc_dist(lw, &((SGfreecam*)cam)->lwc);
   } else if (cam->kind == SGCam_Fixed) {
     SGfixedcam *fix = (SGfixedcam*)cam;
-    relPos = ooLwcDist(lw, &fix->body->p) - (mf3_v_mul(fix->body->R, fix->r));
+    relPos = lwc_dist(lw, &fix->body->p) - (mf3_v_mul(fix->body->R, fix->r));
   } else if (cam->kind == SGCam_Orbit) {
     SGorbitcam *orb = (SGorbitcam*)cam;
-    relPos = ooLwcDist(lw, &orb->body->p);
+    relPos = lwc_dist(lw, &orb->body->p);
   } else {
     assert(0 && "invalid camera type");
   }

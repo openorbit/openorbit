@@ -289,7 +289,7 @@ plGetObject(PLworld *world, const char *name)
 float3
 plGetPos(const PLastrobody *obj)
 {
-  return ooLwcGlobal(&obj->obj.p);
+  return lwc_global(&obj->obj.p);
 }
 
 float3
@@ -318,7 +318,7 @@ plGetPosForName3f(const PLworld *world, const char *name,
 void
 plNormaliseObject__(PLastrobody *obj)
 {
-  ooLwcNormalise(&obj->obj.p);
+  lwc_normalise(&obj->obj.p);
 }
 
 void
@@ -335,7 +335,7 @@ plSysUpdateCurrentPos(PLsystem *sys, double dt)
     double t = simTimeGetJD();
 
     if (sys->orbitalBody->tUpdate > 0) {
-      ooLwcTranslate3fv(&sys->orbitalBody->obj.p,
+      lwc_translate3fv(&sys->orbitalBody->obj.p,
                         vf3_s_mul(sys->orbitalBody->obj.v, dt));
       sys->orbitalBody->tUpdate --;
     } else {
@@ -351,7 +351,7 @@ plSysUpdateCurrentPos(PLsystem *sys, double dt)
                              (double)sys->orbitalBody->orbitFixationPeriod * dt);
 
       sys->orbitalBody->obj.p = sys->parent->orbitalBody->obj.p;
-      ooLwcTranslate3fv(&sys->orbitalBody->obj.p, newPos);
+      lwc_translate3fv(&sys->orbitalBody->obj.p, newPos);
 
       sys->orbitalBody->obj.v = sys->parent->orbitalBody->obj.v + vel;
       // Reset tUpdate;
@@ -359,7 +359,7 @@ plSysUpdateCurrentPos(PLsystem *sys, double dt)
     }
     sys->orbitalBody->obj.q = plSideralRotationAtTime(sys->orbitalBody, t);
   } else {
-    ooLwcSet(&sys->orbitalBody->obj.p, 0.0, 0.0, 0.0);
+    lwc_set(&sys->orbitalBody->obj.p, 0.0, 0.0, 0.0);
   }
 }
 
@@ -374,7 +374,7 @@ plSysSetCurrentPos(PLsystem *sys)
                                      sys->parent->orbitalBody->GM,
                                      t*PL_SEC_PER_DAY);
     sys->orbitalBody->obj.p = sys->parent->orbitalBody->obj.p;
-    ooLwcTranslate3fv(&sys->orbitalBody->obj.p, newPos);
+    lwc_translate3fv(&sys->orbitalBody->obj.p, newPos);
 
     sys->orbitalBody->obj.q = plSideralRotationAtTime(sys->orbitalBody, t);
     sys->orbitalBody->tUpdate = 0;
@@ -423,7 +423,7 @@ plSetDrawable(PLastrobody *obj, SGdrawable *drawable)
  */
 PLastrobody*
 plNewObj(PLworld*world, const char *name, double m, double gm,
-         OOlwcoord * coord,
+         lwcoord_t * coord,
          quaternion_t q, double siderealPeriod, double obliquity,
          double radius, double flattening)
 {
@@ -467,7 +467,7 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
 
 PLastrobody*
 plNewObjInSys(PLsystem *sys, const char *name, double m, double gm,
-              OOlwcoord *coord, quaternion_t q, double siderealPeriod, double obliquity,
+              lwcoord_t *coord, quaternion_t q, double siderealPeriod, double obliquity,
               double radius, double flattening)
 {
   PLastrobody *obj = plNewObj(sys->world, name, m, gm, coord,
@@ -528,8 +528,8 @@ plCreateOrbitalObject(PLworld *world, SGscene *scene, const char *name,
   strcpy(orbitName, name); // safe as size is checked in allocation
   strcat(orbitName, " Orbit");
 
-  OOlwcoord p;
-  ooLwcSet(&p, 0.0, 0.0, 0.0);
+  lwcoord_t p;
+  lwc_set(&p, 0.0, 0.0, 0.0);
 
   // TODO: Cleanup this quaternion
   quaternion_t q = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(ascendingNode));
@@ -568,8 +568,8 @@ plNewRootSystem(PLworld *world, SGscene *sc, const char *name, double m, double 
   sys->world = world;
   sys->parent = NULL;
   sys->scene = sc;
-  OOlwcoord p;
-  ooLwcSet(&p, 0.0, 0.0, 0.0);
+  lwcoord_t p;
+  lwc_set(&p, 0.0, 0.0, 0.0);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(obliquity));
 
   sys->orbitalBody = plNewObj(world, name, m, gm, &p, q, siderealPeriod, obliquity,
@@ -647,7 +647,7 @@ plWorldClear(PLworld *world)
 float3
 plComputeGravity(PLastrobody *a, PLobject *b)
 {
-  float3 dist = ooLwcDist(&b->p, &a->obj.p);
+  float3 dist = lwc_dist(&b->p, &a->obj.p);
   double r12 = vf3_abs_square(dist);
   float3 ndist = vf3_normalise(dist);
   float3 f12 = vf3_s_mul(ndist,

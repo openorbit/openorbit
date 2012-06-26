@@ -36,7 +36,7 @@ struct PLobject {
   SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
 
-  OOlwcoord p; // Large world coordinates
+  lwcoord_t p; // Large world coordinates
   quaternion_t q; // Rotation quaternion
   float3 p_offset; // Only for use by subobjects
 

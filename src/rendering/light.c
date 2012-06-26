@@ -43,21 +43,21 @@ sgSetLightPosv(SGlight *light, float3 v)
 }
 
 void
-sgSetLightPosLW(SGlight *light, OOlwcoord *lwc)
+sgSetLightPosLW(SGlight *light, lwcoord_t *lwc)
 {
   SGscene *sc = light->scene;
   SGscenegraph *sg = sc->sg;
   SGcam *cam = sg->currentCam;
 
   if (cam->kind == SGCam_Free) {
-    float3 relPos = ooLwcRelVec(lwc, ((SGfreecam*)cam)->lwc.seg);
+    float3 relPos = lwc_relvec(lwc, ((SGfreecam*)cam)->lwc.seg);
 
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);
     light->pos[2] = vf3_z(relPos);
     light->pos[3] = 1.0;
   } else if (cam->kind == SGCam_Orbit) {
-    float3 relPos = ooLwcRelVec(lwc, ((SGorbitcam*)cam)->body->p.seg);
+    float3 relPos = lwc_relvec(lwc, ((SGorbitcam*)cam)->body->p.seg);
 
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);
