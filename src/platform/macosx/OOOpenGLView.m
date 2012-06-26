@@ -1,5 +1,5 @@
 /*
- Copyright 2011 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2011,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -170,8 +170,6 @@ static io_keycode_t keymap [256] = {
 
 - (void) awakeFromNib
 {
-
-  NSLog(@"AWAKE FROM NIB");
   NSOpenGLPixelFormatAttribute attributes [] = {
     NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
     NSOpenGLPFADoubleBuffer, 0};

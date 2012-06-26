@@ -535,7 +535,7 @@ sgCreateFixedCamera(SGobject *obj, float3 dp, float3 dir)
   SGcamera *cam = malloc(sizeof(SGobject));
   cam->type = SG_CAMERA_FIXED;
   cam->fixed.obj = obj;
-  return cam;  
+  return cam;
 }
 
 SGcamera*
@@ -559,7 +559,7 @@ sgAnimateCam(SGcamera *cam, float dt)
       float4x4 a;
       mf4_make_translate(a, cam->fixed.r);
       float3x3 R;
-      
+
       quaternion_t q = q_s_mul(cam->fixed.dq, dt);
       cam->fixed.q = q_mul(cam->fixed.q, q);
       q_mf4_convert(R, cam->fixed.q);
@@ -596,7 +596,14 @@ sgAnimateCam(SGcamera *cam, float dt)
       cam->orbiting.dec += cam->orbiting.ddec * dt;
       cam->orbiting.r += cam->orbiting.dr * dt;
 
+      mf4_lookat(cam->viewMatrix,
+                 0.0f, 0.0f, 0.0f,
+                 -cam->orbiting.r * cosf(cam->orbiting.dec),
+                 -cam->orbiting.r * sinf(cam->orbiting.dec),
+                 -cam->orbiting.r * sinf(cam->orbiting.ra),
+                 0.0f, 0.0f, 1.0f);
       //SGorbitcam* ocam = (SGorbitcam*)cam;
+
       //gluLookAt(0.0, 0.0, 0.0,
       //          -ocam->r*cos(ocam->dec),
       //          -ocam->r*sin(ocam->dec),
@@ -623,7 +630,7 @@ sgMoveCam(SGcamera *cam)
     //q_mf4_convert(m, q);
     //      matrix_t mt;
     //      m_transpose(&mt, &m);
-    
+
     //glMultMatrixf((GLfloat*)&m);
     //glTranslatef(-vf3_x(p), -vf3_y(p), -vf3_z(p));
 
