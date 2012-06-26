@@ -35,7 +35,7 @@
 #include "rendering/scenegraph.h"
 #include "rendering/scenegraph-private.h"
 
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 
 /*
  NOTE: Coordinate system are specified in the normal convention used for mission

@@ -1025,8 +1025,6 @@
 				EC16BDEF1227A764009F4574 /* bitutils.h */,
 				ECC909AF1175A65A00E8D477 /* mapped-file.c */,
 				ECC909B01175A65A00E8D477 /* mapped-file.h */,
-				EC34BBE11079EE080011B76E /* lwcoord.c */,
-				EC34BBE21079EE080011B76E /* lwcoord.h */,
 				EC204D5210CAFA2300F0A450 /* palloc.h */,
 				EC204D5310CAFA2300F0A450 /* palloc.c */,
 				EC0FBA4A11A563E000CEF95A /* moduleinit.h */,
@@ -1299,6 +1297,7 @@
 		EC34BDA6107B2C2B0011B76E /* vmath */ = {
 			isa = PBXGroup;
 			children = (
+				EC34BBE21079EE080011B76E /* lwcoord.h */,
 				EC34BDA7107B2C2B0011B76E /* vmath-constants.h */,
 				EC34BDA8107B2C2B0011B76E /* vmath-convert.h */,
 				EC34BDA9107B2C2B0011B76E /* vmath-fixed.h */,
@@ -1327,6 +1326,7 @@
 		EC34BDB2107B2C480011B76E /* vmath */ = {
 			isa = PBXGroup;
 			children = (
+				EC34BBE11079EE080011B76E /* lwcoord.c */,
 				EC34BDB3107B2C480011B76E /* arch */,
 				EC34BDB6107B2C480011B76E /* CMakeLists.txt */,
 				EC34BDB7107B2C480011B76E /* vmath-matvec.c */,

@@ -18,7 +18,7 @@
 */
 
 #include "physics.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 
 
 // Computes whether two lines with radius w both having their origin in some LW coord

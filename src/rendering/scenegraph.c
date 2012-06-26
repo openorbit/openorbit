@@ -35,7 +35,7 @@
 #include "geo/geo.h"
 #include "physics/orbit.h"
 #include "texture.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include "parsers/model.h"
 #include "render.h"
 #include "shader-manager.h"
@@ -496,7 +496,8 @@ void
 sgRenderScene(SGscene2 *scene, float dt)
 {
   sgDrawBackground(scene->bg);
-  sgMoveCam(scene->cam);
+  sgAnimateCam(scene->cam, dt);
+  //sgMoveCam(scene->cam);
   ARRAY_FOR_EACH(i, scene->objects) {
     sgRecomputeModelViewMatrix(ARRAY_ELEM(scene->objects, i));
     sgAnimateObject(ARRAY_ELEM(scene->objects, i), dt);

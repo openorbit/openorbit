@@ -20,7 +20,7 @@
 
 #include "physics.h"
 #include "object.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include <openorbit/log.h>
 #include <assert.h>
 #include <stdlib.h>

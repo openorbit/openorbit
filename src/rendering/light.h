@@ -28,7 +28,7 @@
 
 #include <vmath/vmath.h>
 #include "rendering/reftypes.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 
 typedef void (*SGenable_light_func)(SGlight *light, GLenum lightId);
 typedef void (*SGdisable_light_func)(SGlight *light);

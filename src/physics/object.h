@@ -26,7 +26,7 @@
 #include "physics/mass.h"
 #include "physics/reftypes.h"
 
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include "rendering/reftypes.h"
 struct PLobject {
   PLsystem *sys;

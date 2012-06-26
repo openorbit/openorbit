@@ -27,7 +27,7 @@ extern "C" {
 #include <vmath/vmath.h>
 #include "physics/reftypes.h"
 #include "rendering/reftypes.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 
   enum SGcamtype {
     SGCam_Free,

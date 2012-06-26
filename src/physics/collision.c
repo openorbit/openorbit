@@ -23,7 +23,7 @@
 #include <openorbit/log.h>
 
 #include "collision.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include "physics/object.h"
 
 #define THRESHOLD 10

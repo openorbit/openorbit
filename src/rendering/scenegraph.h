@@ -28,7 +28,7 @@
 //#include <openorbit/openorbit.h>
 //#include "physics/orbit.h"
 #include "sim/simtime.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include "rendering/reftypes.h"
 #include "rendering/drawable.h"
 

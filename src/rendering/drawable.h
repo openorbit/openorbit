@@ -38,7 +38,7 @@
 #include "parsers/model.h"
 #include "rendering/material.h"
 #include "rendering/shader-manager.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include <gencds/list.h>
 
 struct SGdrawable {

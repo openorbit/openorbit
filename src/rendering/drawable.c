@@ -22,7 +22,7 @@
 
 #include "rendering/scenegraph-private.h"
 #include "drawable.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include "parsers/model.h"
 #include "res-manager.h"
 #include "rendering/texture.h"

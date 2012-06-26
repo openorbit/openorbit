@@ -105,7 +105,7 @@ sgNewFreeCam(SGscenegraph *sg, SGscene *sc,
   cam->dp = vf3_set(0.0,0.0,0.0);
   cam->dq = q_rot(rx,ry,rz, 0.0f);
 
-  ooLwcSet(&cam->lwc, x, y, z);
+  lwc_set(&cam->lwc, x, y, z);
 
   obj_array_push(&sg->cams, cam);
   return (SGcam*)cam;
@@ -238,7 +238,7 @@ sgCamStep(SGcam *cam, float dt)
       SGfreecam *freecam = (SGfreecam*)cam;
       sgCamAxisUpdate(cam);
 
-      ooLwcTranslate3fv(&freecam->lwc, freecam->dp);
+      lwc_translate3fv(&freecam->lwc, freecam->dp);
       freecam->q = q_mul(freecam->q, freecam->dq);
     }
     break;
@@ -579,7 +579,7 @@ sgAnimateCam(SGcamera *cam, float dt)
       quaternion_t q = q_s_mul(cam->free.dq, dt);
       cam->free.q = q_mul(cam->free.q, q);
       float3 dp = vf3_s_mul(cam->free.dp, dt);
-      ooLwcTranslate3fv(&cam->free.lwc, dp);
+      lwc_translate3fv(&cam->free.lwc, dp);
 
       //      SGfreecam* freec = (SGfreecam*)cam;
       //quaternion_t q = freec->q;

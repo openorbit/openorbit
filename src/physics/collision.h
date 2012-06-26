@@ -24,7 +24,7 @@
 #include <gencds/array.h>
 #include "physics/physics.h"
 #include "physics/reftypes.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include "common/palloc.h"
 
 

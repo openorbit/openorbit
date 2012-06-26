@@ -31,7 +31,7 @@
 
 #include "geo/geo.h"
 #include "rendering/scenegraph.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include "rendering/reftypes.h"
 
 #include "physics/reftypes.h"

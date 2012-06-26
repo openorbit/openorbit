@@ -44,8 +44,8 @@
 #define PHYSICS_H_MW8CHG7V
 
 #include <vmath/vmath.h>
+#include <vmath/lwcoord.h>
 
-#include "common/lwcoord.h"
 #include "physics/reftypes.h"
 
 #include "rendering/scenegraph.h"
