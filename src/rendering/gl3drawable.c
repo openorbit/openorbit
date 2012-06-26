@@ -106,7 +106,7 @@ sgRecomputeModelViewMatrix(SGobject *obj)
 
   mf4_mul2(obj->modelViewMatrix, obj->R);
   float4x4 t;
-  mf4_translate(t, obj->pos);
+  mf4_make_translate(t, obj->pos);
   mf4_mul2(obj->modelViewMatrix, t);
 
   ARRAY_FOR_EACH(i, obj->subObjects) {

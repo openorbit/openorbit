@@ -86,9 +86,38 @@ extern "C" {
   void sgCamAxisUpdate(SGcam *cam);
 
 
+  typedef enum {
+    SG_CAMERA_FREE, // Free moving camera
+    SG_CAMERA_FIXED, // Fixed at location relative to obj, local rotation allowed
+    SG_CAMERA_ORBITING // Rotating around target object
+  } SGcameratype;
+
   struct SGcamera {
     float4x4 projMatrix;
     float4x4 viewMatrix;
+    
+    SGcameratype type;
+    
+    union {
+      struct {
+        OOlwcoord lwc;
+        float3 dp;
+        quaternion_t q;
+        quaternion_t dq;
+      } free;
+      struct {
+        SGobject *obj;
+        float3 r; // With this offset
+        quaternion_t q; // and this rotation (rotate before translation)
+        quaternion_t dq; // Delta rotation
+      } fixed;
+      struct {
+        SGobject *obj;
+        float ra, dec;
+        float dra, ddec, dr;
+        float r, zoom;
+      } orbiting;
+    };
   };
 
   void sgMoveCam(SGcamera *cam);

@@ -633,6 +633,45 @@ mf3_transpose2(float3x3 a, const float3x3 b)
   }
 }
 
+float4
+mf4_colvec(const float4x4 m, int col)
+{
+  return vf4_set(m[0][col], m[1][col], m[2][col], m[3][col]);
+}
+
+void
+mf4_set_colvec(const float4x4 m, int col, float4 v)
+{
+  m[0][col] = v.x;
+  m[1][col] = v.y;
+  m[2][col] = v.z;
+  m[3][col] = v.w;
+}
+
+void
+mf4_transpose1(float4x4 a)
+{
+#if ! __has_feature(attribute_ext_vector_type)
+#error "Compiler must support clang ext vectors"
+#endif
+  float4x4 tmp;
+  mf4_cpy(tmp, a);
+  for (int i = 0 ; i < 4 ; ++ i) {
+    a[i] = mf4_colvec(tmp, i);
+  }
+}
+
+void
+mf4_transpose2(float4x4 a, const float4x4 b)
+{
+#if ! __has_feature(attribute_ext_vector_type)
+#error "Compiler must support clang ext vectors"
+#endif
+  for (int i = 0 ; i < 4 ; ++ i) {
+    a[i] = mf4_colvec(b, i);
+  }
+}
+
 void
 mf3_mul2(float3x3 a, const float3x3 b)
 {
@@ -809,22 +848,6 @@ mf4_cpy(float4x4 a, const float4x4 b)
 }
 
 void
-mf4_transpose2(float4x4 a, const float4x4 b)
-{
-  for (int i = 0 ; i < 4 ; ++ i) {
-    for (int j = 0 ; j < 4 ; ++ j) {
-#if __has_feature(attribute_ext_vector_type)
-      a[i][j] = b[j][i];
-#else
-      vf4_seti(&a[i], j, b[j][i]);
-#endif
-    }
-  }
-
-}
-
-
-void
 mf4_mul2(float4x4 a, const float4x4 b)
 {
   float4x4 atmp;
@@ -845,7 +868,7 @@ mf4_mul2(float4x4 a, const float4x4 b)
 }
 
 
-// Replacement routinse for OpenGL 3
+// Replacement routines for OpenGL 3
 // Note that this is a row major matrix
 
 void
@@ -865,6 +888,8 @@ mf4_lookat(float4x4 m,
   m[1] = u;
   m[2] = vf3_neg(f);
   m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
+  
+  mf4_translate(m, vf4_set(-eyeX, -eyeY, -eyeZ, 0.0f));
 }
 
 
@@ -921,5 +946,25 @@ mf4_ortho2D(float4x4 m,
   mf4_ortho(m, left, right, bottom, top, -1.0f, 1.0f);
 }
 
-
+void
+mf4_make_rotate(float4x4 m, float rads, float4 v)
+{
+  float c = cosf(rads);
+  float s = sinf(rads);
+  v.w = 0.0f;
+  float4 v2 = vf3_normalise(v);
+  m[0] = vf4_set(v2.x*v2.x*(1.0f-c)+c,
+                 v2.x*v2.y*(1.0f-c)-v2.z*s,
+                 v2.x*v2.z*(1.0f-c)+v2.y*s,
+                 0.0f);
+  m[1] = vf4_set(v2.y*v2.x*(1.0f-c)+v2.z*s,
+                 v2.y*v2.y*(1.0f-c)+c,
+                 v2.y*v2.z*(1.0f-c)-v2.x*s,
+                 0.0f);
+  m[2] = vf4_set(v2.x*v2.z*(1.0f-c)-v2.y*s,
+                 v2.y*v2.z*(1.0f-c)+v2.x*s,
+                 v2.z*v2.z*(1.0f-c)+c,
+                 0.0f);
+  m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
+}
 

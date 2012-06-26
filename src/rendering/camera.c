@@ -521,8 +521,138 @@ sgCamPitchUp(int state, void *data)
 
 
 
+SGcamera*
+sgCreateFreeCamera()
+{
+  SGcamera *cam = malloc(sizeof(SGobject));
+  cam->type = SG_CAMERA_FREE;
+  return cam;
+}
+
+SGcamera*
+sgCreateFixedCamera(SGobject *obj, float3 dp, float3 dir)
+{
+  SGcamera *cam = malloc(sizeof(SGobject));
+  cam->type = SG_CAMERA_FIXED;
+  cam->fixed.obj = obj;
+  return cam;  
+}
+
+SGcamera*
+sgCreateOrbitingCamera(SGobject *obj)
+{
+  SGcamera *cam = malloc(sizeof(SGobject));
+  cam->type = SG_CAMERA_ORBITING;
+  cam->orbiting.obj = obj;
+  return cam;
+}
+
+void
+sgAnimateCam(SGcamera *cam, float dt)
+{
+  switch (cam->type) {
+    case SG_CAMERA_FIXED: {
+      // Camera is pegged to object, not much to do here
+      // object animation takes care of moving the camera
+      float4 np = vf4_add(cam->fixed.obj->pos, cam->fixed.r);
+      mf4_ident(cam->viewMatrix);
+      float4x4 a;
+      mf4_make_translate(a, cam->fixed.r);
+      float3x3 R;
+      
+      quaternion_t q = q_s_mul(cam->fixed.dq, dt);
+      cam->fixed.q = q_mul(cam->fixed.q, q);
+      q_mf4_convert(R, cam->fixed.q);
+
+      //      SGfixedcam* fix = (SGfixedcam*)cam;
+      //quaternion_t q = fix->body->q;
+      //q = q_mul(q, fix->q);
+      //matrix_t m;
+      //q_m_convert(&m, q);
+      //matrix_t mt;
+      //m_transpose(&mt, &m);
+      //glMultMatrixf((GLfloat*)&mt);
+
+      break;
+    }
+    case SG_CAMERA_FREE: {
+      quaternion_t q = q_s_mul(cam->free.dq, dt);
+      cam->free.q = q_mul(cam->free.q, q);
+      float3 dp = vf3_s_mul(cam->free.dp, dt);
+      ooLwcTranslate3fv(&cam->free.lwc, dp);
+
+      //      SGfreecam* freec = (SGfreecam*)cam;
+      //quaternion_t q = freec->q;
+      float4x4 m;
+      q_mf4_convert(m, cam->free.q);
+      float4x4 mt;
+      mf4_transpose2(mt, m);
+      //glMultMatrixf((GLfloat*)&m);
+
+      break;
+    }
+    case SG_CAMERA_ORBITING: {
+      cam->orbiting.ra += cam->orbiting.dra * dt;
+      cam->orbiting.dec += cam->orbiting.ddec * dt;
+      cam->orbiting.r += cam->orbiting.dr * dt;
+
+      //SGorbitcam* ocam = (SGorbitcam*)cam;
+      //gluLookAt(0.0, 0.0, 0.0,
+      //          -ocam->r*cos(ocam->dec),
+      //          -ocam->r*sin(ocam->dec),
+      //          -ocam->r*sin(ocam->ra),
+      //          0.0, 0.0, 1.0);
+
+      break;
+    }
+  }
+}
+
+
+
 void
 sgMoveCam(SGcamera *cam)
 {
+  switch (cam->type) {
+  case SG_CAMERA_FIXED: {
+    //float3 p = cam->fixed.obj->p.offs;
+    //p = vf3_add(p, cam->fixed.r);
+    //quaternion_t q = cam->fixed.body->q;
+    //q = q_mul(q, cam->fixed.q);
+    //float4x4 m;
+    //q_mf4_convert(m, q);
+    //      matrix_t mt;
+    //      m_transpose(&mt, &m);
+    
+    //glMultMatrixf((GLfloat*)&m);
+    //glTranslatef(-vf3_x(p), -vf3_y(p), -vf3_z(p));
 
+    //  float4x4 t;
+    //  mf4_translate(t, -cam->fixed.lwc.offs);
+    //  mf4_mul2(cam->viewMatrix, t);
+
+    break;}
+  case SG_CAMERA_FREE: {
+    //      SGfreecam *freecam = (SGfreecam*)cam;
+    float4x4 t;
+    mf4_make_translate(t, -cam->free.lwc.offs);
+    mf4_mul2(cam->viewMatrix, t);
+    //      glTranslatef(-vf3_x(freecam->lwc.offs),
+    //                   -vf3_y(freecam->lwc.offs),
+    //                   -vf3_z(freecam->lwc.offs));
+
+    break;}
+  case SG_CAMERA_ORBITING: {
+    float3 p = vf3_set(cam->orbiting.r*cos(cam->orbiting.dec),
+                       cam->orbiting.r*sin(cam->orbiting.dec),
+                       cam->orbiting.r*sin(cam->orbiting.ra));
+    //float3 cogOffset = mf3_v_mul(cam->orbiting.obj->R, cam->orbiting.obj->m.cog);
+    //glTranslatef(-(p[0] + cogOffset.x),
+    //             -(p[1] + cogOffset.y),
+    //             -(p[2] + cogOffset.z));
+    float4x4 t;
+    mf4_make_translate(t, -p);
+    mf4_mul2(cam->viewMatrix, t);
+    break; }
+  }
 }

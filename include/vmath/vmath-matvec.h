@@ -53,6 +53,7 @@ extern "C" {
 #include <stdbool.h>
 #include <math.h>
 #include <vmath/vmath-types.h>
+#include <string.h>
   //#include <vmath/vmath-matvec.inl>
 
 void vf3_outprod(float3x3 m, float3 a, float3 b);
@@ -164,7 +165,7 @@ static inline float3
 vf3_set(float x, float y, float z)
 {
 #if __has_feature(attribute_ext_vector_type)
-  float3 v = {x, y, z};
+  float3 v = {x, y, z, 0.0f};
   return v;
 #else
   float3_u uc = {.a = {x,y,z,0.0}};
@@ -267,14 +268,14 @@ static inline float
 vf3_abs(float3 v)
 {
   float3 res = v * v;
-  return sqrt(vf3_get(res, 0) + vf3_get(res, 1) + vf3_get(res, 2));
+  return sqrtf(res.x + res.y + res.z);
 }
 
 static inline float
 vf4_abs(float4 v)
 {
   float4 res = v * v;
-  return sqrt(vf4_get(res, 0) + vf4_get(res, 1) + vf4_get(res, 2) + vf4_get(res, 3));
+  return sqrtf(res.x + res.y + res.z + res.w);
 }
 
 
@@ -664,18 +665,41 @@ void mf3_s_mul(float3x3 res, const float3x3 m, float s);
 
 void mf3_basis(float3x3 res, const float3x3 m, const float3x3 b);
 
+void mf4_set_colvec(const float4x4 m, int col, float4 v);
+float4 mf4_colvec(const float4x4 m, int col);
+
+void mf4_transpose1(float4x4 a);
+void mf4_transpose2(float4x4 a, const float4x4 b);
+
 void mf4_ident(float4x4 m);
 void mf4_cpy(float4x4 a, const float4x4 b);
 void mf4_mul2(float4x4 a, const float4x4 b);
 
 static inline void
-mf4_translate(float4x4 a, float3 v)
+mf4_zero(float4x4 a)
+{
+  memset(a, 0, sizeof(float4x4));
+}
+
+static inline void
+mf4_make_translate(float4x4 a, float3 v)
 {
   mf4_ident(a);
-  a[0].w = v.x;
-  a[1].w = v.y;
-  a[2].w = v.z;
+  float4 v2 = {v.x, v.y, v.z, 1.0f};
+  mf4_set_colvec(a, 3, v2);
 }
+
+void mf4_make_rotate(float4x4 m, float rads, float4 v);
+
+
+static inline void
+mf4_translate(float4x4 a, float3 v)
+{
+  float4x4 tmp;
+  mf4_make_translate(tmp, v);
+  mf4_mul2(a, tmp);
+}
+
 // Common opengl replacements
 /*! Create ortho projection matrix */
 void mf4_ortho(float4x4 m,
