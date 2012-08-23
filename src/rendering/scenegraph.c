@@ -55,6 +55,7 @@ sgNewSceneGraph()
 {
   SGscenegraph *sg = malloc(sizeof(SGscenegraph));
   //glGetIntegerv(GL_MAX_LIGHTS, &sg->maxLights);
+  sg->maxLights = 4; // TODO: Fix lights
   sg->usedLights = 0;
   obj_array_init(&sg->cams);
   obj_array_init(&sg->overlays);
@@ -114,7 +115,7 @@ sgNewScene(SGscenegraph *sg, const char *name)
 
   sc->sg = sg;
   sc->lights = calloc(sg->maxLights, sizeof(SGlight*));
-
+  
   obj_array_init(&sc->objs);
   obj_array_push(&sg->scenes, sc);
 
@@ -495,8 +496,8 @@ sgCheckGLError(const char *file, int line)
 void
 sgRenderScene(SGscene2 *scene, float dt)
 {
-  sgDrawBackground(scene->bg);
   sgAnimateCam(scene->cam, dt);
+  sgDrawBackground(scene->bg);
   //sgMoveCam(scene->cam);
   ARRAY_FOR_EACH(i, scene->objects) {
     sgRecomputeModelViewMatrix(ARRAY_ELEM(scene->objects, i));
