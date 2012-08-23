@@ -10,6 +10,15 @@ development. This means that some code might not be consequent with these guide
 lines, if you find such an item, please notify the authors and the code will
 hopefully be re-factored.
 
+THIS DOCUMENT IS OUT OF DATE, BEWARE!!!
+
+CONTRIBUTIONS
+-------------
+For now, contributions to Open Orbit must be in public domain or signed over to
+the main author. If you wish to sign a copyright release form, please contact
+Mattias Holm (lorrden @ openorbit . org), but best is if you release your code
+as public domain.
+
 ARCHITECTURE
 ------------
 

@@ -307,15 +307,15 @@ sgNewSphere(const char *name, const char* shader, float radius,
   //gluQuadricTexture(sp->quadratic, GL_TRUE);
   //gluQuadricDrawStyle(sp->quadratic, GLU_FILL);
 
-
-  sp->use_night_tex_id = glGetUniformLocation(sp->super.shader->shaderId,
+  if (sp->super.shader) {
+    sp->use_night_tex_id = glGetUniformLocation(sp->super.shader->shaderId,
                                               "UseNightTexture");
-  sp->use_night_tex_val = (nightTex != NULL);
+    sp->use_night_tex_val = (nightTex != NULL);
 
-  sp->use_spec_map_id = glGetUniformLocation(sp->super.shader->shaderId,
+    sp->use_spec_map_id = glGetUniformLocation(sp->super.shader->shaderId,
                                              "UseSpecMap");
-  sp->use_spec_map_val = (specMap != NULL);
-
+    sp->use_spec_map_val = (specMap != NULL);
+  }
 
   return sgNewDrawable((SGdrawable*)sp, name, (SGdrawfunc) sgDrawSphere);
 }
