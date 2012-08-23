@@ -215,10 +215,110 @@ ooSkyNewDrawable(const char *file)
   return drawable;
 }
 
+void
+sgAddStar(SGbackground *stars, double ra, double dec, double mag, double bv)
+{
+  float3 cart;
+  cart = ooEquToCart(ra, dec);
 
+  // star list full, then extend block?
+  if (stars->a_len <= stars->n_stars) {
+    OOstar *newData = realloc(stars->data, stars->a_len * 2 * sizeof(OOstar));
+    stars->data = newData;
+    stars->a_len *= 2;
+    return;
+  }
+
+  double temp = bv_to_temp(bv);
+  if (temp < 1000.0) temp = 1000.0;
+  if (temp > 40000.0) temp = 40000.0;
+  const uint8_t *tempRGB = get_temp_colour((int)temp);
+
+  stars->data[stars->n_stars].x = 100.0*vf3_x(cart);
+  stars->data[stars->n_stars].y = 100.0*vf3_y(cart);
+  stars->data[stars->n_stars].z = 100.0*vf3_z(cart);
+  stars->data[stars->n_stars].r = *tempRGB;
+  stars->data[stars->n_stars].g = *(tempRGB+1);
+  stars->data[stars->n_stars].b = *(tempRGB+2);
+  stars->data[stars->n_stars].a = ooVmagToAlpha(mag) * 255;
+  if (stars->data[stars->n_stars].a < 40) stars->data[stars->n_stars].a = 40;
+
+  stars->n_stars ++;
+}
+
+
+#define STAR_COUNT 4096
+SGbackground*
+sgCreateBackgroundFromFile(const char *file)
+{
+  SGbackground *stars = malloc(sizeof(SGbackground));
+  stars->data = calloc(STAR_COUNT, sizeof(OOstar));
+  stars->a_len = STAR_COUNT;
+  stars->n_stars = 0;
+
+  FILE *f = ooResGetFile(file);
+  assert(f != NULL);
+  double vmag, ra, dec, btmag, vtmag, bv, vi;
+  while (fscanf(f, "%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+                &vmag, &ra, &dec, &btmag, &vtmag, &bv, &vi) == 7) {
+    sgAddStar(stars, deg2rad(ra), deg2rad(dec), vmag, bv);
+  }
+
+
+  ooLogInfo("loaded %d stars from %s", stars->n_stars, file);
+  glGenVertexArrays(1, &stars->vba);
+  glBindVertexArray(stars->vba);
+
+  glGenBuffers(1, &stars->vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, stars->vbo);
+  glBufferData(GL_ARRAY_BUFFER, stars->n_stars*sizeof(OOstar), stars->data,
+               GL_STATIC_DRAW);
+  glVertexAttribPointer(SG_VERTEX_LOC, 3, GL_FLOAT, GL_FALSE,
+                        sizeof(OOstar), (void*)offsetof(OOstar, x));
+  glVertexAttribPointer(SG_COLOUR_LOC, 4, GL_UNSIGNED_BYTE,
+                        GL_TRUE, // Yes normalize
+                        sizeof(OOstar), offsetof(OOstar, r));
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  free(stars->data); // GL has copied arrays over
+  stars->data = NULL;
+
+  SG_CHECK_ERROR;
+
+  return stars;
+
+}
 void
 sgDrawBackground(SGbackground *bg)
 {
+  // Background drawing needs to shortcut the normal camera, as the bg
+  // is at infinite distance (e.g. regarding translation)
+  // Here we rotate the camera as needed
+  SGcamera *cam = bg->cam;
+  float4x4 rotMatrix;
+  switch (bg->cam->type) {
+    case SG_CAMERA_FIXED: {
+      quaternion_t q = q_mul(cam->fixed.obj->q, cam->fixed.q);
+      q_mf4_convert(rotMatrix, q);
+      break;}
+    case SG_CAMERA_FREE: {
+      q_mf4_convert(rotMatrix, cam->free.q);
+      break;}
+    case SG_CAMERA_ORBITING: {
+      mf4_lookat(rotMatrix,
+                 0.0f, 0.0f, 0.0f,
+                 -cam->orbiting.r * cosf(cam->orbiting.dec),
+                 -cam->orbiting.r * sinf(cam->orbiting.dec),
+                 -cam->orbiting.r * sinf(cam->orbiting.ra),
+                 0.0f, 0.0f, 1.0f);
 
+      break;}
+  }
+
+  glUseProgram(bg->shader->shaderId);
+  glUniformMatrix4fv(bg->shader->uniforms.projectionId, 1, GL_TRUE,
+                     (GLfloat*)bg->cam->projMatrix);
+  glUniformMatrix4fv(bg->shader->uniforms.modelViewId, 1, GL_TRUE,
+                     (GLfloat*)rotMatrix);
+  
 }
-

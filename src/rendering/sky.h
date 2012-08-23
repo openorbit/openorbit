@@ -51,6 +51,14 @@ typedef struct {
 
 struct SGbackground {
   SGcamera *cam;
+  SGshader *shader;
+
+  GLuint vbo;
+  GLuint vba;
+
+  size_t a_len;
+  size_t n_stars;
+  OOstar *data;
 };
 
 /*!
