@@ -13,7 +13,7 @@ out vec2 FragTexCoord;
 void
 main()
 {
-  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Position;
+  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex;
   FragColor = oo_Color;
   FragTexCoord = oo_TexCoord0;
 }

@@ -322,6 +322,7 @@ static const char* param_names[SG_PARAM_COUNT] = {
 
   [SG_MODELVIEW] = "oo_ModelViewMatrix",
   [SG_PROJECTION] = "oo_ProjectionMatrix",
+  [SG_NORMAL_MATRIX] = "oo_NormalMatrix",
 };
 
 GLint

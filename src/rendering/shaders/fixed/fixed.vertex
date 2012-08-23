@@ -16,6 +16,6 @@ void
 main()
 {
   FragTexCoord = oo_TexCoord0;
-  FragColor = oo_Color;
-  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex;
+  FragColor = oo_Color0;
+  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex0;
 }

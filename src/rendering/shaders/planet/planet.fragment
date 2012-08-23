@@ -68,7 +68,7 @@ main()
     float RdotE = max(dot(reflect(-Ld, Normal), normalize(Eye)), 0.0);
 
     //vec4 specColor = diffuseTexel;
-    vec4 specColor = Material.specular;
+    vec4 specColor = oo_Material.specular;
     vec4 specIntensity = vec4(0.0,0.0,0.0,0.0);
 
     // Note: Grayscale spec map texture

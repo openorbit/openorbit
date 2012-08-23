@@ -23,8 +23,8 @@ struct light_t {
 };
 
 
-uniform light_t Light[1];
-uniform material_t Material;
+uniform light_t oo_Light[1];
+uniform material_t oo_Material;
 
 
 in vec4 Diffuse, Ambient, AmbientGlob;
