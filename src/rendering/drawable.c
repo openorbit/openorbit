@@ -51,18 +51,18 @@ sgDrawableLoadShader(SGdrawable *obj, const char *shader)
 {
   if (shader) {
     obj->shader = sgLoadProgram(shader, shader, shader, shader);
-    obj->modelview_id = glGetUniformLocation(obj->shader->shaderId,
-                                             SG_MODELVIEW_NAME);
-    obj->projection_id = glGetUniformLocation(obj->shader->shaderId,
-                                              SG_PROJECTION_NAME);
-    obj->tex_uni_id[0] = glGetUniformLocation(obj->shader->shaderId,
-                                              SG_TEX0_NAME);
-    obj->tex_uni_id[1] = glGetUniformLocation(obj->shader->shaderId,
-                                              SG_TEX1_NAME);
-    obj->tex_uni_id[2] = glGetUniformLocation(obj->shader->shaderId,
-                                              SG_TEX2_NAME);
-    obj->tex_uni_id[3] = glGetUniformLocation(obj->shader->shaderId,
-                                              SG_TEX3_NAME);
+    obj->modelview_id = sgGetLocationForParam(obj->shader->shaderId,
+                                              SG_MODELVIEW);
+    obj->projection_id = sgGetLocationForParam(obj->shader->shaderId,
+                                              SG_PROJECTION);
+    obj->tex_uni_id[0] = sgGetLocationForParamAndIndex(obj->shader->shaderId,
+                                                       SG_TEX, 0);
+    obj->tex_uni_id[1] = sgGetLocationForParamAndIndex(obj->shader->shaderId,
+                                                       SG_TEX, 1);
+    obj->tex_uni_id[2] = sgGetLocationForParamAndIndex(obj->shader->shaderId,
+                                                       SG_TEX, 2);
+    obj->tex_uni_id[3] = sgGetLocationForParamAndIndex(obj->shader->shaderId,
+                                                       SG_TEX, 3);
   } else {
     obj->shader = 0; // Fixed functionality
   }

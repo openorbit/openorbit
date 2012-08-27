@@ -1,5 +1,5 @@
 /*
- Copyright 2011 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2011,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -19,59 +19,67 @@
 
 #ifndef orbit_location_h
 #define orbit_location_h
+#ifdef __APPLE__
+#include <OpenGL/gl3.h>
+#else
+#include <GL/gl3.h>
+#endif
 
 /*!
   OpenGL 3.3 location ids, these will be used whenever
   GL_ARB_explicit_attrib_location is well supported on the Mac.
  */
+#define SG_MAX_TEXTURES 4
+#define SG_MAX_LIGHTS 4
+#define SG_OUT_FRAGMENT "oo_FragColor"
+
 typedef enum {
-  SG_MODELVIEW_LOC = 0,
-  SG_PROJECTION_LOC,
-  SG_VERTEX_LOC,
-  SG_NORMAL_LOC,
-  SG_COLOUR_LOC,
+  SG_VERTEX = 0,
+  SG_NORMAL,
+  SG_COLOR,
 
-  SG_TEX0_COORD_LOC,
-  SG_TEX1_COORD_LOC,
+  SG_TEX_COORD,
 
-  SG_TEX_LOC,
-  SG_LIGHT_LOC,
+  SG_ATTRIBUTE_END = SG_TEX_COORD + SG_MAX_TEXTURES,
 
-  SG_TEX0_LOC,
-  SG_TEX1_LOC,
-  SG_TEX2_LOC,
-  SG_TEX3_LOC,
-  SG_LIGHT0_LOC,
-  SG_LIGHT1_LOC,
-  SG_LIGHT2_LOC,
-  SG_LIGHT3_LOC
-} SGlocation;
+  SG_LIGHT,
+  SG_LIGHT_AMB,
+  SG_LIGHT_POS,
+  SG_LIGHT_SPEC,
+  SG_LIGHT_DIFF,
+  SG_LIGHT_DIR,
+  SG_LIGHT_CONST_ATTEN,
+  SG_LIGHT_LINEAR_ATTEN,
+  SG_LIGHT_QUAD_ATTEN,
 
-/*!
-  In the meanwhile, without GL_ARB_explicit_attrib_location, we use these
-  symbols with the glGetAttribLocation() functions to determine location.
- */
-#define SG_MODELVIEW_NAME "oo_ModelViewMatrix"
-#define SG_PROJECTION_NAME "oo_ProjectionMatrix"
+  SG_LIGHT_MOD_GLOB_AMB,
 
-#define SG_VERTEX_NAME "oo_Vertex"
-#define SG_NORMAL_NAME "oo_Normal"
-#define SG_COLOUR_NAME "oo_Colour"
+  SG_MATERIAL_EMIT,
+  SG_MATERIAL_AMB,
+  SG_MATERIAL_DIFF,
+  SG_MATERIAL_SPEC,
+  SG_MATERIAL_SHINE,
 
-#define SG_TEX0_COORD_NAME "oo_TexCoord0"
-#define SG_TEX1_COORD_NAME "oo_TexCoord1"
 
-#define SG_TEX_NAME "oo_Texture[]"
-#define SG_TEX0_NAME "Tex0"
-#define SG_TEX1_NAME "Tex1"
-#define SG_TEX2_NAME "Tex2"
-#define SG_TEX3_NAME "Tex3"
+  SG_TEX,
 
-#define SG_LIGHT_NAME "oo_Light[]"
+  SG_MODELVIEW = SG_TEX + SG_MAX_TEXTURES,
+  SG_PROJECTION,
+  SG_NORMAL_MATRIX,
 
-#define SG_LIGHT0_NAME "Light0"
-#define SG_LIGHT1_NAME "Light1"
-#define SG_LIGHT2_NAME "Light2"
-#define SG_LIGHT3_NAME "Light3"
+  SG_PARAM_COUNT,
+} sg_param_id_t;
+
+
+void sgBindLocation(GLuint prog, sg_param_id_t param);
+void sgBindLocationAtIndex(GLuint prog, sg_param_id_t param, unsigned index);
+
+GLint sgGetLocationForParam(GLuint program, sg_param_id_t param);
+void sgSetShaderTex(GLuint program, sg_param_id_t param, GLuint tex);
+
+GLint
+sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
+                              unsigned index);
+
 
 #endif /* !orbit_location_h */

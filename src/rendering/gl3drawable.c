@@ -25,7 +25,6 @@
 
 #include <OpenGL/gl3.h>
 
-
 void
 sgDrawGeometry(SGgeometry *geo)
 {
@@ -216,20 +215,23 @@ sgCreateGeometry(SGobject *obj, size_t vertexCount,
 
 
   glBufferSubData(GL_ARRAY_BUFFER, 0, vertexDataSize, vertices);
-  glVertexAttribPointer(SG_VERTEX_LOC, 4, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(SG_VERTEX_LOC);
+
+  SGshader *shader = obj->shader;
+
+  glVertexAttribPointer(sgGetLocationForParam(shader->shaderId, SG_VERTEX), 4, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(sgGetLocationForParam(shader->shaderId, SG_VERTEX));
   if (normals) {
     glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize, normalDataSize, normals);
-    glVertexAttribPointer(SG_NORMAL_LOC, 3, GL_FLOAT, GL_FALSE, 0,
+    glVertexAttribPointer(sgGetLocationForParam(shader->shaderId, SG_NORMAL), 3, GL_FLOAT, GL_FALSE, 0,
                           (void*)vertexDataSize);
-    glEnableVertexAttribArray(SG_NORMAL_LOC);
+    glEnableVertexAttribArray(sgGetLocationForParam(shader->shaderId, SG_NORMAL));
   }
   if (texCoords) {
     glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize + normalDataSize,
                     texCoordDataSize, texCoords);
-    glVertexAttribPointer(SG_TEX0_COORD_LOC, 2, GL_FLOAT, GL_FALSE, 0,
+    glVertexAttribPointer(sgGetLocationForParamAndIndex(shader->shaderId, SG_TEX, 0), 2, GL_FLOAT, GL_FALSE, 0,
                           (void*)vertexDataSize + normalDataSize);
-    glEnableVertexAttribArray(SG_TEX0_COORD_LOC);
+    glEnableVertexAttribArray(sgGetLocationForParamAndIndex(shader->shaderId, SG_TEX, 0));
   }
 
   glBindVertexArray(0); // Done

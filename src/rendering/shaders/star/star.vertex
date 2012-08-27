@@ -5,7 +5,7 @@ uniform mat4 oo_ProjectionMatrix;
 
 in vec4 oo_Vertex;
 in vec4 oo_Color;
-in vec2 oo_TexCoord0;
+in vec2 oo_TexCoord[1];
 
 out vec2 TexCoord;
 
@@ -13,5 +13,5 @@ void
 main()
 {
   gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex;
-  TexCoord = oo_TexCoord0;
+  TexCoord = oo_TexCoord[0];
 }

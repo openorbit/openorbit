@@ -295,6 +295,8 @@
 		ECE3C1EE14363D85001C1F32 /* mouse.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE3C1ED14363D85001C1F32 /* mouse.c */; };
 		ECE3C1F014363DCB001C1F32 /* sdl-mouse.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE3C1EF14363DCB001C1F32 /* sdl-mouse.c */; };
 		ECE6A8441167CAB400003CBD /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
+		ECF322B015E8DF520063AC74 /* location.c in Sources */ = {isa = PBXBuildFile; fileRef = ECF322AF15E8DF520063AC74 /* location.c */; };
+		ECF322B115E8DF520063AC74 /* location.c in Sources */ = {isa = PBXBuildFile; fileRef = ECF322AF15E8DF520063AC74 /* location.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -766,6 +768,8 @@
 		ECE3C1EF14363DCB001C1F32 /* sdl-mouse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-mouse.c"; sourceTree = "<group>"; };
 		ECE6A8421167CAB400003CBD /* pubsub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pubsub.h; sourceTree = "<group>"; };
 		ECE6A8431167CAB400003CBD /* pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pubsub.c; sourceTree = "<group>"; };
+		ECF322AF15E8DF520063AC74 /* location.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = location.c; sourceTree = "<group>"; };
+		ECF322B715EA106A0063AC74 /* shader-types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "shader-types.h"; path = "src/rendering/shaders/shared/shader-types.h"; sourceTree = "<group>"; };
 		ECF6011F118D53B600332A94 /* spacecraft-control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spacecraft-control.h"; sourceTree = "<group>"; };
 		ECF60B4D140F75DD00EAD012 /* location.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = location.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1202,6 +1206,7 @@
 				EC5F72521154E10D00FBE08B /* material.c */,
 				EC5F72581154E27400FBE08B /* light.h */,
 				EC5F72591154E27400FBE08B /* light.c */,
+				ECF322AF15E8DF520063AC74 /* location.c */,
 				ECF60B4D140F75DD00EAD012 /* location.h */,
 				EC7F68AD159326A700B4E8EF /* gl3drawable.h */,
 				EC7F68AE159326BC00B4E8EF /* gl3drawable.c */,
@@ -1354,6 +1359,7 @@
 		EC4476740CCBFEDB001C88AD = {
 			isa = PBXGroup;
 			children = (
+				ECF322B715EA106A0063AC74 /* shader-types.h */,
 				EC4C89F5137D4E5B007AC0DF /* tools */,
 				ECA5F8AF109D8FB3004278EC /* docs */,
 				EC34BDB1107B2C480011B76E /* lib */,
@@ -1969,7 +1975,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0440;
 			};
 			buildConfigurationList = EC4476770CCBFEDB001C88AD /* Build configuration list for PBXProject "orbit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -2224,6 +2230,7 @@
 				EC564723156B8E8300D6A871 /* terminal.c in Sources */,
 				ECE369B2157F78A400AC4945 /* menu-manager.m in Sources */,
 				EC7F68AF159326BC00B4E8EF /* gl3drawable.c in Sources */,
+				ECF322B015E8DF520063AC74 /* location.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2332,6 +2339,7 @@
 				EC9351F514FB701900962391 /* class.c in Sources */,
 				ECDA4BC01539FCCB00B78FED /* moduleinit.c in Sources */,
 				EC564724156B8E8300D6A871 /* terminal.c in Sources */,
+				ECF322B115E8DF520063AC74 /* location.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2430,6 +2438,7 @@
 		EC0C0218144174AE00A2AE5E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2453,6 +2462,7 @@
 		EC0C0219144174AE00A2AE5E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				EXECUTABLE_PREFIX = lib;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2496,6 +2506,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2512,6 +2523,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2557,6 +2569,7 @@
 		EC44768B0CCBFF3A001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -2568,6 +2581,7 @@
 		EC44768C0CCBFF3A001C88AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				PRODUCT_NAME = tests;
@@ -2866,6 +2880,7 @@
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2913,6 +2928,7 @@
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3008,6 +3024,7 @@
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3060,6 +3077,7 @@
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3162,6 +3180,7 @@
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -3186,6 +3205,7 @@
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;

@@ -30,39 +30,6 @@
 #include "rendering/location.h"
 
 
-typedef enum {
-  SG_VERTEX = 0,
-  SG_NORMAL,
-  SG_TEX_COORD,
-  SG_COLOR,
-  SG_TEX,
-
-  SG_LIGHT,
-  SG_LIGHT_AMB,
-  SG_LIGHT_POS,
-  SG_LIGHT_SPEC,
-  SG_LIGHT_DIFF,
-  SG_LIGHT_DIR,
-  SG_LIGHT_CONST_ATTEN,
-  SG_LIGHT_LINEAR_ATTEN,
-  SG_LIGHT_QUAD_ATTEN,
-
-  SG_LIGHT_MOD_GLOB_AMB,
-
-  SG_MATERIAL_EMIT,
-  SG_MATERIAL_AMB,
-  SG_MATERIAL_DIFF,
-  SG_MATERIAL_SPEC,
-  SG_MATERIAL_SHINE,
-
-  SG_MODELVIEW,
-  SG_PROJECTION,
-  SG_NORMAL_MATRIX,
-
-  SG_PARAM_COUNT,
-} sg_param_id_t;
-
-
 struct SGlightids {
   GLint pos;
   GLint ambient;
@@ -102,8 +69,7 @@ struct SGshader {
     GLuint vertexId;
     GLuint normalId;
     GLuint colourId;
-    GLuint texCoord0Id;
-    GLuint texCoord1Id;
+    GLuint texCoordId[SG_MAX_TEXTURES];
   } attribs;
 };
 
@@ -118,11 +84,5 @@ void sgDisableProgram(void);
 SGshader* sgShaderFromKey(const char *key);
 
 
-GLint sgGetLocationForParam(GLuint program, sg_param_id_t param);
-void sgSetShaderTex(GLuint program, sg_param_id_t param, GLuint tex);
-
-GLint
-sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
-                              unsigned index);
 
 #endif /* !RENDERING_SHADER_MANAGER_H */

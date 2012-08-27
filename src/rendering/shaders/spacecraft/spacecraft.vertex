@@ -31,7 +31,7 @@ uniform mat3 oo_NormalMatrix;
 
 in vec3 oo_Vertex;
 in vec3 oo_Normal;
-in vec2 oo_TexCoord0;
+in vec2 oo_TexCoord[1];
 
 out vec4 Diffuse, Ambient, AmbientGlob;
 out vec3 N, Ld, Eye;

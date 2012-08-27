@@ -4,6 +4,7 @@ uniform sampler2D oo_Texture[1];
 
 in vec2 TexCoord;
 out vec4 oo_FragColor;
+
 void
 main()
 {

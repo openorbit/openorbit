@@ -18,6 +18,7 @@
  */
 
 #include "shader-manager.h"
+#include "location.h"
 #include "common/mapped-file.h"
 #include "common/moduleinit.h"
 #include <gencds/hashtable.h>
@@ -45,6 +46,77 @@ MODULE_INIT(shadermanager, NULL)
   shaderKeyMap = hashtable_new_with_str_keys(64);
 }
 
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
+char_array_t
+sgShaderPreprocess(mapped_file_t mf)
+{
+  char_array_t shader;
+  char_array_init(&shader);
+
+  for (int i = 0 ; i < mf.fileLenght ; i ++) {
+    if (((char*)mf.data)[i] == '#') {
+      ooLogInfo("found preprocessor directive");
+      int j = i + 1;
+      // Skip ws after '#'
+      while (j < mf.fileLenght && (((char*)mf.data)[j] == ' ' || ((char*)mf.data)[j] == '\t')) {
+        j ++;
+      }
+      if (strncmp(&(((char*)mf.data)[j]), "include", MIN(sizeof("include")-1, mf.fileLenght-j)) == 0) {
+        ooLogInfo("found include directive");
+
+        j += sizeof("include") - 1;
+
+        // Skip ws after include dir
+        while (j < mf.fileLenght && (((char*)mf.data)[j] == ' ' || ((char*)mf.data)[j] == '\t')) {
+          j ++;
+        }
+
+        if (((char*)mf.data)[j] == '"') {
+          j ++; // Skip quote
+          int incfile_start = j;
+          while (j < mf.fileLenght && (((char*)mf.data)[j] != '"' && ((char*)mf.data)[j] != '\n')) {
+            j ++;
+          }
+          if (((char*)mf.data)[j] != '"') {
+            fprintf(stderr, "syntax error for include directive\n");
+            // TODO: Return error code
+          }
+
+          int incfile_end = j-1;
+
+          // Valid include file path (probably)
+          if (incfile_start < incfile_end) {
+            char incfile[incfile_end - incfile_start + 1];
+            memset(incfile, incfile_end-incfile_start + 1, 0);
+            strncpy(incfile, &(((char*)mf.data)[incfile_start]), incfile_end - incfile_start + 1);
+            FILE *file = ooResGetFile(incfile);
+            if (file) {
+              size_t bytes = 0;
+              printf("found include file '%s'\n", incfile);
+              char byte;
+              while (fread(&byte, sizeof(char), 1, file)) {
+                char_array_push(&shader, byte);
+                bytes ++;
+              }
+            } else {
+              fprintf(stderr, "include file '%s' not found\n", incfile);
+            }
+          }
+        }
+        i = j;
+        continue;
+      }
+    }
+    char_array_push(&shader, ((char*)mf.data)[i]);
+  }
+  char_array_push(&shader, '\0');
+
+  printf("shader: %s", shader.elems);
+  return shader;
+}
+
+
 void
 sgLoadAllShaders(void)
 {
@@ -58,8 +130,12 @@ sgLoadAllShaders(void)
       if (entry->d_name[0] == '.') continue; // ignore parent and hidden dirs
 
       strcpy(fullpath, "shaders/");
-      strcat(fullpath, entry->d_name);
-      sgLoadProgram(entry->d_name, fullpath, fullpath, fullpath);
+
+      // Hardcoded ignore of shared directory
+      if (strcmp(entry->d_name, "shared")) {
+        strcat(fullpath, entry->d_name);
+        sgLoadProgram(entry->d_name, fullpath, fullpath, fullpath);
+      }
     }
 
     closedir(dir);
@@ -76,6 +152,7 @@ sgLoadProgram(const char *key,
   assert(vspath != NULL);
   assert(fspath != NULL);
 
+  ooLogInfo("compiling '%s'", key);
 
   SGshader *tmp = hashtable_lookup(shaderKeyMap, key);
   if (tmp) return tmp;
@@ -103,9 +180,11 @@ sgLoadProgram(const char *key,
     for (int i = 0 ; i < shaders.gl_matchc ; ++ i) {
       mf = map_file(shaders.gl_pathv[i]);
       if (mf.fd == -1) return 0;
+      char_array_t vshader = sgShaderPreprocess(mf);
+
       shaderId = glCreateShader(GL_VERTEX_SHADER);
-      GLint len = mf.fileLenght;
-      glShaderSource(shaderId, 1, (const GLchar**)&mf.data, &len);
+      GLint len = vshader.length;
+      glShaderSource(shaderId, 1, (const GLchar**)&vshader.elems, &len);
       unmap_file(&mf);
       glCompileShader(shaderId);
 
@@ -127,6 +206,8 @@ sgLoadProgram(const char *key,
         // No globfree as this is a fatal error
         ooLogFatal("vertex shader '%s' did not compile", shaders.gl_pathv[i]);
       }
+
+      char_array_dispose(&vshader);
       glAttachShader(shaderProgram, shaderId);
       ooLogTrace("loaded vertex shader '%s'", shaders.gl_pathv[i]);
     }
@@ -178,19 +259,12 @@ sgLoadProgram(const char *key,
   }
 
   // Ignore geometry shaders for now...
-  glBindAttribLocation(shaderProgram, SG_VERTEX_LOC, SG_VERTEX_NAME);
-  glBindAttribLocation(shaderProgram, SG_NORMAL_LOC, SG_NORMAL_NAME);
-  glBindAttribLocation(shaderProgram, SG_COLOUR_LOC, SG_COLOUR_NAME);
-  glBindAttribLocation(shaderProgram, SG_TEX0_COORD_LOC, SG_TEX0_COORD_NAME);
-  glBindAttribLocation(shaderProgram, SG_TEX1_COORD_LOC, SG_TEX1_COORD_NAME);
-  si->attribs.vertexId = SG_VERTEX_LOC;
-  si->attribs.normalId = SG_NORMAL_LOC;
-  si->attribs.colourId = SG_COLOUR_LOC;
-  si->attribs.texCoord0Id = SG_TEX0_COORD_LOC;
-  si->attribs.texCoord1Id = SG_TEX1_COORD_LOC;
+  //TODO: Fix attrib loc caching
+  //si->attribs.texCoord0Id = SG_TEX0_COORD_LOC;
+  //si->attribs.texCoord1Id = SG_TEX1_COORD_LOC;
 
   // Set the output fragment name
-  glBindFragDataLocation(shaderProgram, 0, "oo_FragColor");
+  glBindFragDataLocation(shaderProgram, 0, SG_OUT_FRAGMENT);
 
   glLinkProgram(shaderProgram);
   GLint linkStatus = 0;
@@ -220,8 +294,16 @@ sgLoadProgram(const char *key,
     return 0;
   }
 
-  // After linking, we have valid uniform locations, we build up the location
+  // After linking, we have valid uniform and attribute locations, we build up the location
   // table here.
+
+  si->attribs.vertexId = sgGetLocationForParam(shaderProgram, SG_VERTEX);
+  si->attribs.normalId = sgGetLocationForParam(shaderProgram, SG_NORMAL);
+  si->attribs.colourId = sgGetLocationForParam(shaderProgram, SG_COLOR);
+  for (int i = 0 ; i < SG_OBJ_MAX_TEXTURES ; i++) {
+    si->attribs.texCoordId[i] = sgGetLocationForParamAndIndex(shaderProgram, SG_TEX_COORD, i);
+  }
+
   si->uniforms.modelViewId = sgGetLocationForParam(shaderProgram, SG_MODELVIEW);
   si->uniforms.projectionId = sgGetLocationForParam(shaderProgram,
                                                     SG_PROJECTION);
@@ -263,7 +345,6 @@ sgLoadProgram(const char *key,
                                                            SG_TEX, i);
   }
 
-
   return si;
 }
 
@@ -295,59 +376,4 @@ sgShaderFromKey(const char *key)
   return si;
 }
 
-static const char* param_names[SG_PARAM_COUNT] = {
-  [SG_VERTEX] = "oo_Vertex",
-  [SG_NORMAL] = "oo_Normal",
-  [SG_TEX_COORD] = "oo_TexCoord[%u]",
-  [SG_COLOR] = "oo_Color",
-  [SG_TEX] = "oo_Texture[%u]",
 
-  [SG_LIGHT] = "oo_Light[%u]",
-
-  [SG_LIGHT_AMB] = "oo_Light[%u].ambient",
-  [SG_LIGHT_POS] = "oo_Light[%u].pos",
-  [SG_LIGHT_SPEC] = "oo_Light[%u].specular",
-  [SG_LIGHT_DIFF] = "oo_Light[%u].diffuse",
-  [SG_LIGHT_DIR] = "oo_Light[%u].dir",
-  [SG_LIGHT_CONST_ATTEN] = "oo_Light[%u].constantAttenuation",
-  [SG_LIGHT_LINEAR_ATTEN] = "oo_Light[%u].linearAttenuation",
-  [SG_LIGHT_QUAD_ATTEN] = "oo_Light[%u].quadraticAttenuation",
-  [SG_LIGHT_MOD_GLOB_AMB] = "oo_Light[%u].globAmbient",
-
-  [SG_MATERIAL_EMIT] = "oo_Material.emission",
-  [SG_MATERIAL_AMB] = "oo_Material.ambient",
-  [SG_MATERIAL_DIFF] = "oo_Material.diffuse",
-  [SG_MATERIAL_SPEC] = "oo_Material.specular",
-  [SG_MATERIAL_SHINE] = "oo_Material.shininess",
-
-  [SG_MODELVIEW] = "oo_ModelViewMatrix",
-  [SG_PROJECTION] = "oo_ProjectionMatrix",
-  [SG_NORMAL_MATRIX] = "oo_NormalMatrix",
-};
-
-GLint
-sgGetLocationForParam(GLuint program, sg_param_id_t param)
-{
-  GLint loc = glGetUniformLocation(program, param_names[param]);
-  return loc;
-}
-
-GLint
-sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
-                              unsigned index)
-{
-  char locName[strlen(param_names[param])];
-  snprintf(locName, sizeof(locName), param_names[param], index);
-  GLint loc = glGetUniformLocation(program, locName);
-  return loc;
-}
-
-
-void
-sgSetShaderTex(GLuint program, unsigned index, GLuint tex)
-{
-  glActiveTexture(GL_TEXTURE0 + index);
-  glBindTexture(GL_TEXTURE_2D, tex);
-  GLint loc = sgGetLocationForParamAndIndex(program, SG_TEX, index);
-  glUniform1i(loc, index); // Uniform value is texture unit id
-}
