@@ -207,8 +207,8 @@ sgObjectSetPos(sg_object_t *obj, float4 pos)
 }
 
 sg_geometry_t*
-sgCreateGeometry(sg_object_t *obj, size_t vertexCount,
-                 float *vertices, float *normals, float *texCoords)
+sg_geometry_create(sg_object_t *obj, size_t vertexCount,
+                   float *vertices, float *normals, float *texCoords)
 {
   sg_geometry_t *geo = malloc(sizeof(sg_geometry_t));
   memset(geo, 0, sizeof(sg_geometry_t));
@@ -265,13 +265,13 @@ sgCreateGeometry(sg_object_t *obj, size_t vertexCount,
   supports the explicit attrib loc extensions.
  */
 void
-sgObjectLoadShader(sg_object_t *obj, const char *name)
+sg_object_load_shader(sg_object_t *obj, const char *name)
 {
   obj->shader = sgLoadProgram(name, name, name, NULL);
 }
 
 void
-sgObjectSetRigidBody(sg_object_t *obj, PLobject *rigidBody)
+sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody)
 {
   if (obj->parent) {
     ooLogWarn("setting rigid body for sg object that is not root");
@@ -282,14 +282,14 @@ sgObjectSetRigidBody(sg_object_t *obj, PLobject *rigidBody)
 
 
 sg_object_t*
-sgLoadObject(const char *file)
+sg_load_object(const char *file)
 {
   // TODO: Fill in code
   return NULL;
 }
 
 sg_object_t*
-sgCreateSphere(const char *name, GLuint shader, float radius,
+sg_create_sphere(const char *name, GLuint shader, float radius,
                GLuint tex, GLuint nightTex, float spec,
                sg_material_t *mat)
 {
@@ -297,7 +297,7 @@ sgCreateSphere(const char *name, GLuint shader, float radius,
 }
 
 sg_object_t*
-sgCreateEllipse(const char *name, float semiMajor,
+sg_create_ellipse(const char *name, float semiMajor,
                 float semiMinor, float asc,
                 float inc, float argOfPeriapsis,
                 float dec, float ra, int segments)

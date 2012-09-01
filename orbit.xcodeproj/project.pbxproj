@@ -248,6 +248,12 @@
 		EC823729113140E100A725B1 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
 		EC88CF9010A2B1D700A11B1D /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC88CF8F10A2B1D700A11B1D /* collada.c */; };
 		EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
+		EC8CC1D415F1FA5800FC71F4 /* window.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1D315F1FA5800FC71F4 /* window.c */; };
+		EC8CC1D515F1FA5800FC71F4 /* window.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1D315F1FA5800FC71F4 /* window.c */; };
+		EC8CC1D915F1FB2A00FC71F4 /* viewport.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1D815F1FB2A00FC71F4 /* viewport.c */; };
+		EC8CC1DA15F1FB2A00FC71F4 /* viewport.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1D815F1FB2A00FC71F4 /* viewport.c */; };
+		EC8CC1DD15F1FBB100FC71F4 /* scene.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1DC15F1FBB000FC71F4 /* scene.c */; };
+		EC8CC1DE15F1FBB100FC71F4 /* scene.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1DC15F1FBB000FC71F4 /* scene.c */; };
 		EC8E74A114F7732F0052BBE6 /* pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8E749E14F773240052BBE6 /* pcm.c */; };
 		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
 		EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9351D314F7989900962391 /* libpython2.7.a */; };
@@ -710,6 +716,12 @@
 		EC88CF8E10A2B1D700A11B1D /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
 		EC88CF8F10A2B1D700A11B1D /* collada.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = collada.c; sourceTree = "<group>"; };
 		EC88CFC010A2B8F100A11B1D /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
+		EC8CC1D315F1FA5800FC71F4 /* window.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = window.c; sourceTree = "<group>"; };
+		EC8CC1D615F1FA7F00FC71F4 /* window.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = window.h; sourceTree = "<group>"; };
+		EC8CC1D715F1FB1D00FC71F4 /* viewport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = viewport.h; sourceTree = "<group>"; };
+		EC8CC1D815F1FB2A00FC71F4 /* viewport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = viewport.c; sourceTree = "<group>"; };
+		EC8CC1DB15F1FBA400FC71F4 /* scene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = scene.h; sourceTree = "<group>"; };
+		EC8CC1DC15F1FBB000FC71F4 /* scene.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scene.c; sourceTree = "<group>"; };
 		EC8E749E14F773240052BBE6 /* pcm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcm.c; sourceTree = "<group>"; };
 		EC8E749F14F773240052BBE6 /* pcm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcm.h; sourceTree = "<group>"; };
 		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
@@ -1203,6 +1215,12 @@
 				EC7F68AD159326A700B4E8EF /* gl3drawable.h */,
 				EC7F68AE159326BC00B4E8EF /* gl3drawable.c */,
 				EC29003215F0DD0A00357A02 /* types.h */,
+				EC8CC1D315F1FA5800FC71F4 /* window.c */,
+				EC8CC1D615F1FA7F00FC71F4 /* window.h */,
+				EC8CC1D715F1FB1D00FC71F4 /* viewport.h */,
+				EC8CC1D815F1FB2A00FC71F4 /* viewport.c */,
+				EC8CC1DB15F1FBA400FC71F4 /* scene.h */,
+				EC8CC1DC15F1FBB000FC71F4 /* scene.c */,
 			);
 			path = rendering;
 			sourceTree = "<group>";
@@ -2222,6 +2240,9 @@
 				ECE369B2157F78A400AC4945 /* menu-manager.m in Sources */,
 				EC7F68AF159326BC00B4E8EF /* gl3drawable.c in Sources */,
 				ECF322B015E8DF520063AC74 /* location.c in Sources */,
+				EC8CC1D415F1FA5800FC71F4 /* window.c in Sources */,
+				EC8CC1D915F1FB2A00FC71F4 /* viewport.c in Sources */,
+				EC8CC1DD15F1FBB100FC71F4 /* scene.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2330,6 +2351,9 @@
 				ECDA4BC01539FCCB00B78FED /* moduleinit.c in Sources */,
 				EC564724156B8E8300D6A871 /* terminal.c in Sources */,
 				ECF322B115E8DF520063AC74 /* location.c in Sources */,
+				EC8CC1D515F1FA5800FC71F4 /* window.c in Sources */,
+				EC8CC1DA15F1FB2A00FC71F4 /* viewport.c in Sources */,
+				EC8CC1DE15F1FBB100FC71F4 /* scene.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

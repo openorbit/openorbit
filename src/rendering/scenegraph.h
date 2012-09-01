@@ -57,16 +57,4 @@ void sgInitOverlay(sg_overlay_t *overlay, sg_draw_overlay_t drawfunc,
                    unsigned rw, unsigned rh);
 
 
-
-sg_scene_t* sg_new_scene(void);
-void sg_scene_render(sg_scene_t *scene, float dt);
-void sg_scene_set_background(sg_scene_t *sc, sg_background_t *bg);
-void sg_window_render(sg_window_t *window, float dt);
-sg_window_t* sg_new_window(void);
-
-void sg_set_viewport(sg_viewport_t *viewport);
-sg_viewport_t* sg_new_viewport(sg_window_t *window, unsigned x, unsigned y,
-                             unsigned w, unsigned h);
-
-
 #endif /* SCENEGRAPH_H_ */

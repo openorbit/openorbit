@@ -39,7 +39,7 @@
 
 #include <openorbit/log.h>
 
-SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL};
+SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL, NULL};
 
 void
 ooSimInit(void)

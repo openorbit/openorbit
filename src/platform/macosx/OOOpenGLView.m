@@ -262,7 +262,8 @@ static io_keycode_t keymap [256] = {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  sgPaint(gSIM_state.sg);
+  sg_window_render(gSIM_state.win, 0.0);
+  //sgPaint(gSIM_state.sg);
 
   [self.openGLContext flushBuffer];
 }

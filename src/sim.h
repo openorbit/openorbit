@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include "rendering/types.h"
 #include "physics/physics.h"
 #include "physics/orbit.h"
 #include "rendering/scenegraph.h"
@@ -38,6 +39,7 @@ typedef struct {
   PLsystem *orbSys;   //!< Root orbit system, this will be the sun initially
   PLworld *world;
   sg_scenegraph_t *sg;   //!< Scenegraph of the world
+  sg_window_t *win;
 } SIMstate;
 
 void ooSimInit(void);

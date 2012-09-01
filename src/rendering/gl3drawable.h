@@ -38,23 +38,24 @@ void sgObjectSetPos(sg_object_t *obj, float4 pos);
 void sgObjectLoadShader(sg_object_t *obj, const char *name);
 
 sg_geometry_t*
-sgCreateGeometry(sg_object_t *obj, size_t vertexCount,
-                 float *vertices, float *normals, float *texCoords);
+sg_geometry_create(sg_object_t *obj, size_t vertexCount,
+                   float *vertices, float *normals, float *texCoords);
 
-sg_object_t* sgCreateEllipse(const char *name, float semiMajor,
-                          float semiMinor, float asc,
-                          float inc, float argOfPeriapsis,
-                          float dec, float ra, int segments);
+sg_object_t* sg_create_ellipse(const char *name, float semiMajor,
+                                      float semiMinor, float asc,
+                                      float inc, float argOfPeriapsis,
+                                      float dec, float ra, int segments);
 
-sg_object_t* sgCreateSphere(const char *name, GLuint shader, float radius,
-                         GLuint tex, GLuint nightTex, float spec,
-                         sg_material_t *mat);
+sg_object_t* sg_create_sphere(const char *name, GLuint shader, float radius,
+                              GLuint tex, GLuint nightTex, float spec,
+                              sg_material_t *mat);
 void sgAnimateObject(sg_object_t *obj, float dt); // Linear interpolation between frames
 void sgUpdateObject(sg_object_t *obj); // Pull from physis system
 
 void sgRecomputeModelViewMatrix(sg_object_t *obj);
 void sgDrawObject(sg_object_t *obj);
 void sgDrawGeometry(sg_geometry_t *geo);
-void sgObjectSetRigidBody(sg_object_t *obj, PLobject *rigidBody);
-sg_object_t* sgLoadObject(const char *file);
+void sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody);
+sg_object_t* sg_load_object(const char *file);
+
 #endif
