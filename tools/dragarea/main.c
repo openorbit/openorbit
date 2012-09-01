@@ -27,10 +27,10 @@
 #include <unistd.h>
 
 #ifdef __APPLE__
-#include <OpenGL/gl3.h>
+#include <OpenGL/gl.h>
 #include <GLUT/GLUT.h>
 #else
-#include <GL3/gl3.h>
+#include <GL3/gl.h>
 #include <GL3/glut.h>
 #endif
 

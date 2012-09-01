@@ -73,7 +73,8 @@ simNewSpacecraft(const char *className, const char *scName)
   cls->init(cls, sc, &args);
 
   plUpdateMass(sc->obj);
-  ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
+  // TODO: Update sg properties.
+  //       ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
 
   //  char *axises;
   // asprintf(&axises, "/sc/%s/axis", scName);
@@ -176,7 +177,7 @@ simScInit(sim_spacecraft_t *sc, const char *name)
   sc->rec = simPubsubCreateRecord(sckey);
   free(sckey);
 
-  SGscenegraph *sg = simGetSg();
+  sg_scenegraph_t *sg = simGetSg();
   PLworld *world = simGetWorld();
 
   obj_array_init(&sc->stages);
@@ -190,7 +191,7 @@ simScInit(sim_spacecraft_t *sc, const char *name)
   sc->detatchStage = simDefaultDetatch;
   sc->detatchSequence = 0;
   sc->obj = plObject(world, name);
-  sc->scene = sgGetScene(sg, "main"); // Just use any of the existing ones
+  sc->scene = NULL;//sgGetScene(sg, "main"); // Just use any of the existing ones
   sc->expendedMass = 0.0;
   sc->mainEngineOn = false;
   sc->toggleMainEngine = simDefaultEngineToggle;
@@ -202,7 +203,7 @@ simScInit(sim_spacecraft_t *sc, const char *name)
 // TODO: Pass on PLsystem instead of PLworld to ensure that object has valid
 //       systems at all times.
 sim_spacecraft_t*
-ooScNew(PLworld *world, SGscene *scene, const char *name)
+ooScNew(PLworld *world, sg_scene_t *scene, const char *name)
 {
   sim_spacecraft_t *sc = malloc(sizeof(sim_spacecraft_t));
 
@@ -294,11 +295,11 @@ ooScForce(sim_spacecraft_t *sc, float rx, float ry, float rz)
 
 
 void
-ooScSetStageMesh(sim_stage_t *stage, SGdrawable *mesh)
+ooScSetStageMesh(sim_stage_t *stage, sg_object_t *mesh)
 {
   assert(stage != NULL);
   assert(mesh != NULL);
-  stage->obj->drawable = mesh;
+  //stage->obj->drawable = mesh;
 }
 
 void
@@ -374,7 +375,7 @@ simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
   obj_array_push(&sc->stages, stage);
 
   // Load stage model
-  SGdrawable *model = sgLoadModel(mesh);
+  sg_object_t *model = sgLoadModel(mesh);
   sgDrawableLoadShader(model, "spacecraft");
   ooScSetStageMesh(stage, model);
   sgSceneAddObj(sgGetScene(simGetSg(), "main"), model);
@@ -397,14 +398,15 @@ scStageSetOffset3fv(sim_stage_t *stage, float3 p)
 }
 
 void
-ooScSetScene(sim_spacecraft_t *spacecraft, SGscene *scene)
+ooScSetScene(sim_spacecraft_t *spacecraft, sg_scene_t *scene)
 {
   for (int i = 0 ; i < spacecraft->stages.length ; ++i) {
     sim_stage_t *stage = spacecraft->stages.elems[i];
 
-    if (stage->state != OO_Stage_Detatched) {
-      sgSceneAddObj(scene, stage->obj->drawable);
-    }
+    // TODO: Fixme
+    //if (stage->state != OO_Stage_Detatched) {
+    //  sgSceneAddObj(scene, stage->obj->drawable);
+    //}
   }
 }
 
@@ -608,7 +610,7 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
 
   sc->super.name = strdup(args->name);
 
-  SGscenegraph *sg = simGetSg();
+  sg_scenegraph_t *sg = simGetSg();
   PLworld *world = simGetWorld();
 
   obj_array_init(&sc->stages);

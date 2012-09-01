@@ -32,7 +32,7 @@
 #include "geo/geo.h"
 #include "rendering/scenegraph.h"
 #include <vmath/lwcoord.h>
-#include "rendering/reftypes.h"
+#include "rendering/types.h"
 
 #include "physics/reftypes.h"
 #include "physics/areodynamics.h"
@@ -57,9 +57,9 @@ struct PLastrobody {
   double GM;
   PLatmosphere *atm;
   PL_keplerian_elements *kepler;
-  SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
+  sg_object_t *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
-  SGlight *lightSource; //!< Light source if the object emits light
+  sg_light_t *lightSource; //!< Light source if the object emits light
 
   // These parameters are used for positioning of objects, they assist
   // calculations where astronomical bodies are assumed to be spheroids. These
@@ -79,7 +79,7 @@ struct PLastrobody {
 struct PLsystem {
   PLworld *world;
   PLsystem *parent;
-  SGscene *scene;
+  sg_scene_t *scene;
 
   const char *name;
   double effectiveRadius; //!< Radius of the entire system, i.e how far away
@@ -97,7 +97,7 @@ struct PLsystem {
 
   PLastrobody *orbitalBody; // The body actually orbiting at this point, note that it is
   double orbitalPeriod;
-  SGdrawable *orbitDrawable; // Pointer to the drawable representing the ellipsis
+  sg_object_t *orbitDrawable; // Pointer to the drawable representing the ellipsis
 };
 
 
@@ -109,23 +109,23 @@ struct PLworld {
   obj_array_t partSys; // All particle systems in world
 };
 
-PLworld* plNewWorld(const char *name, SGscene *sc,
+PLworld* plNewWorld(const char *name, sg_scene_t *sc,
                     double m, double gm, double radius,
                     double siderealPeriod, double obliquity,
                     double eqRadius, double flattening);
 
-PLsystem* plNewRootSystem(PLworld *world, SGscene *sc, const char *name,
+PLsystem* plNewRootSystem(PLworld *world, sg_scene_t *sc, const char *name,
                           double m, double gm, double obliquity, double siderealPeriod,
                           double eqRadius, double flattening);
 
 
-PLsystem* plNewOrbit(PLworld *world, SGscene *sc, const char *name, double m, double gm,
+PLsystem* plNewOrbit(PLworld *world, sg_scene_t *sc, const char *name, double m, double gm,
                      double orbitPeriod, double obliquity, double siderealPeriod,
                      double semiMaj, double semiMin,
                      double inc, double ascendingNode, double argOfPeriapsis,
                      double meanAnomaly,
                      double eqRadius, double flattening);
-PLsystem* plNewSubOrbit(PLsystem *orb, SGscene *sc, const char *name, double m, double gm,
+PLsystem* plNewSubOrbit(PLsystem *orb, sg_scene_t *sc, const char *name, double m, double gm,
                         double orbitPeriod, double obliquity, double siderealPeriod,
                         double semiMaj, double semiMin,
                         double inc, double ascendingNode, double argOfPeriapsis,
@@ -146,7 +146,7 @@ void plWorldStep(PLworld *world, double dt);
 void plWorldClear(PLworld *world);
 
 double plOrbitalPeriod(double a, double GM);
-void plSetDrawable(PLastrobody *obj, SGdrawable *drawable);
+void plSetDrawable(PLastrobody *obj, sg_object_t *drawable);
 void plSysInit(PLsystem *sys);
 
 

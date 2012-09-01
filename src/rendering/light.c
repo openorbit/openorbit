@@ -17,15 +17,15 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "rendering/types.h"
 
 #include "light.h"
-#include "rendering/reftypes.h"
 #include "scenegraph-private.h"
 #include "camera.h"
 #include "physics/object.h"
 #include <stdlib.h>
 void
-sgSetLightPos3f(SGlight *light, float x, float y, float z)
+sgSetLightPos3f(sg_light_t *light, float x, float y, float z)
 {
   light->pos[0] = vf3_x(x);
   light->pos[1] = vf3_y(y);
@@ -34,7 +34,7 @@ sgSetLightPos3f(SGlight *light, float x, float y, float z)
 }
 
 void
-sgSetLightPosv(SGlight *light, float3 v)
+sgSetLightPosv(sg_light_t *light, float3 v)
 {
   light->pos[0] = vf3_x(v);
   light->pos[1] = vf3_y(v);
@@ -43,21 +43,20 @@ sgSetLightPosv(SGlight *light, float3 v)
 }
 
 void
-sgSetLightPosLW(SGlight *light, lwcoord_t *lwc)
+sgSetLightPosLW(sg_light_t *light, lwcoord_t *lwc)
 {
-  SGscene *sc = light->scene;
-  SGscenegraph *sg = sc->sg;
-  SGcam *cam = sg->currentCam;
+  sg_scene_t *sc = light->scene;
+  sg_camera_t *cam = sc->cam;
 
-  if (cam->kind == SGCam_Free) {
-    float3 relPos = lwc_relvec(lwc, ((SGfreecam*)cam)->lwc.seg);
+  if (cam->type == SG_CAMERA_FREE) {
+    float3 relPos = lwc_relvec(lwc, cam->free.lwc.seg);
 
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);
     light->pos[2] = vf3_z(relPos);
     light->pos[3] = 1.0;
-  } else if (cam->kind == SGCam_Orbit) {
-    float3 relPos = lwc_relvec(lwc, ((SGorbitcam*)cam)->body->p.seg);
+  } else if (cam->type == SG_CAMERA_ORBITING) {
+    float3 relPos = lwc_relvec(lwc, cam->orbiting.obj->rigidBody->p.seg);
 
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);
@@ -67,42 +66,8 @@ sgSetLightPosLW(SGlight *light, lwcoord_t *lwc)
 }
 
 
-SGlight*
-sgNewSpotlight(SGscenegraph *sg, float3 p, float3 dir)
-{
-  SGspotlight *light = malloc(sizeof(SGspotlight));
-
-  return (SGlight*)light;
-}
-
 void
-sgEnablePointLight(SGpointlight *light, GLenum lightId)
-{
-  SG_CHECK_ERROR;
-
-  //glEnable(GL_LIGHTING);
-  glEnable(lightId);
-  light->super.lightId = lightId;
-
-  //glLightfv(lightId, GL_POSITION, (GLfloat*)&light->super.pos);
-  //glLightfv(lightId, GL_AMBIENT, (GLfloat*)&light->super.ambient);
-  //glLightfv(lightId, GL_DIFFUSE, (GLfloat*)&light->super.diffuse);
-  //glLightfv(lightId, GL_SPECULAR, (GLfloat*)&light->super.specular);
-  //  glLightf(light->super.lightId, GL_CONSTANT_ATTENUATION, 1.0f);
-  //  glLightf(light->super.lightId, GL_LINEAR_ATTENUATION, 0.2f);
-  //  glLightf(light->super.lightId, GL_QUADRATIC_ATTENUATION, 0.08f);
-
-  SG_CHECK_ERROR;
-}
-
-void
-sgDisablePointLight(SGpointlight *light)
-{
-  glDisable(light->super.lightId);
-}
-
-void
-sgLightSetAmbient4f(SGlight *light, float r, float g, float b, float a)
+sgLightSetAmbient4f(sg_light_t *light, float r, float g, float b, float a)
 {
   light->ambient[0] = r;
   light->ambient[1] = g;
@@ -111,7 +76,7 @@ sgLightSetAmbient4f(SGlight *light, float r, float g, float b, float a)
 
 }
 void
-sgLightSetSpecular4f(SGlight *light, float r, float g, float b, float a)
+sgLightSetSpecular4f(sg_light_t *light, float r, float g, float b, float a)
 {
   light->specular[0] = r;
   light->specular[1] = g;
@@ -121,7 +86,7 @@ sgLightSetSpecular4f(SGlight *light, float r, float g, float b, float a)
 }
 
 void
-sgLightSetDiffuse4f(SGlight *light, float r, float g, float b, float a)
+sgLightSetDiffuse4f(sg_light_t *light, float r, float g, float b, float a)
 {
   light->diffuse[0] = r;
   light->diffuse[1] = g;
@@ -131,41 +96,39 @@ sgLightSetDiffuse4f(SGlight *light, float r, float g, float b, float a)
 
 
 
-SGlight*
-sgNewPointlight3f(SGscene *sc, float x, float y, float z)
+sg_light_t*
+sgNewPointlight3f(sg_scene_t *sc, float x, float y, float z)
 {
-  SGpointlight *light = malloc(sizeof(SGpointlight));
-  light->super.enable = (SGenable_light_func)sgEnablePointLight;
-  light->super.disable = (SGdisable_light_func)sgDisablePointLight;
-  light->super.scene = sc;
+  sg_light_t *light = malloc(sizeof(sg_light_t));
+  light->scene = sc;
 
-  light->super.pos[0] = x;
-  light->super.pos[1] = y;
-  light->super.pos[2] = z;
-  light->super.pos[3] = 1.0;
+  light->pos[0] = x;
+  light->pos[1] = y;
+  light->pos[2] = z;
+  light->pos[3] = 1.0;
 
-  light->super.ambient[0] = 0.0;
-  light->super.ambient[1] = 0.0;
-  light->super.ambient[2] = 0.0;
-  light->super.ambient[3] = 1.0;
+  light->ambient[0] = 0.0;
+  light->ambient[1] = 0.0;
+  light->ambient[2] = 0.0;
+  light->ambient[3] = 1.0;
 
-  light->super.specular[0] = 1.0;
-  light->super.specular[1] = 1.0;
-  light->super.specular[2] = 1.0;
-  light->super.specular[3] = 1.0;
+  light->specular[0] = 1.0;
+  light->specular[1] = 1.0;
+  light->specular[2] = 1.0;
+  light->specular[3] = 1.0;
 
-  light->super.diffuse[0] = 1.0;
-  light->super.diffuse[1] = 1.0;
-  light->super.diffuse[2] = 1.0;
-  light->super.diffuse[3] = 1.0;
+  light->diffuse[0] = 1.0;
+  light->diffuse[1] = 1.0;
+  light->diffuse[2] = 1.0;
+  light->diffuse[3] = 1.0;
 
-  sgSceneAddLight(sc, &light->super);
+  sgSceneAddLight(sc, light);
 
-  return (SGlight*)light;
+  return light;
 }
 
-SGlight*
-sgNewPointlight(SGscene *sc, float3 p)
+sg_light_t*
+sgNewPointlight(sg_scene_t *sc, float3 p)
 {
   return sgNewPointlight3f(sc, vf3_x(p), vf3_y(p), vf3_z(p));
 }

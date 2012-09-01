@@ -27,7 +27,7 @@
 #include "rendering/material.h"
 
 typedef struct model_t model_t;
-typedef SGmaterial material_t;
+typedef sg_material_t material_t;
 typedef struct model_object_t model_object_t;
 
 struct model_object_t {

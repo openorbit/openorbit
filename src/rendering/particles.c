@@ -26,6 +26,7 @@
 #include "texture.h"
 #include <vmath/vmath.h>
 
+#if 0
 void
 sgDrawParticles(SGparticles *sp)
 {
@@ -61,3 +62,4 @@ SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
 
   return sgNewDrawable((SGdrawable*)drawable, name, (SGdrawfunc)sgDrawParticles);
 }
+#endif

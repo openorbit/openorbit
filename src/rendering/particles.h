@@ -32,9 +32,9 @@
 #include "physics/particles.h"
 
 #include "physics/reftypes.h"
-#include "rendering/reftypes.h"
-#include "rendering/drawable.h"
+#include "rendering/types.h"
 
+#if 0
 struct SGparticles {
   SGdrawable super;
   GLuint texture;
@@ -43,6 +43,6 @@ struct SGparticles {
 
 SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
                                 PLparticles *ps);
-
+#endif
 
 #endif /* !SG_PARTICLES_H */

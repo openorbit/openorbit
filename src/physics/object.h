@@ -27,13 +27,13 @@
 #include "physics/reftypes.h"
 
 #include <vmath/lwcoord.h>
-#include "rendering/reftypes.h"
+
 struct PLobject {
   PLsystem *sys;
   struct PLobject *parent;
   char *name;
   PLmass m;
-  SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
+  //SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
 
   lwcoord_t p; // Large world coordinates
@@ -87,7 +87,7 @@ void plDetatchObject(PLobject *obj);
 void plUpdateMass(PLobject *obj);
 
 /*! Assigns an SGdrawable pointer to the object. */
-void plSetDrawableForObject(PLobject *obj, SGdrawable *drawable);
+//void plSetDrawableForObject(PLobject *obj, SGdrawable *drawable);
 
 /*! Apply force vector xyz on object */
 void plForce3f(PLobject *obj, float x, float y, float z);
@@ -130,9 +130,11 @@ void plNormaliseObject(PLobject *obj);
 /*! Clear object accumulators */
 void plClearObject(PLobject *obj);
 
+float3 plGetVel(PLobject *obj);
 void plSetVel3f(PLobject *obj, float dx, float dy, float dz);
 void plSetVel3fv(PLobject *obj, float3 dp);
 
+float3 plGetAngularVel(PLobject *obj);
 void plSetAngularVel3f(PLobject *obj, float rx, float ry, float rz);
 void plSetAngularVel3fv(PLobject *obj, float3 r);
 

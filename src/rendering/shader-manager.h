@@ -29,59 +29,14 @@
 #include "rendering/gl3drawable.h"
 #include "rendering/location.h"
 
-
-struct SGlightids {
-  GLint pos;
-  GLint ambient;
-  GLint specular;
-  GLint diffuse;
-  GLint dir;
-
-  GLint constantAttenuation;
-  GLint linearAttenuation;
-  GLint quadraticAttenuation;
-  GLint globAmbient;
-};
-
-struct SGmaterialids {
-  GLint emission;
-  GLint ambient;
-  GLint diffuse;
-  GLint specular;
-  GLint shininess;
-};
-
-
-struct SGshader {
-  GLuint shaderId;
-
-  // Uniform IDs
-  struct {
-    GLuint modelViewId;
-    GLuint projectionId;
-    GLuint normalMatrixId;
-    GLuint texIds[SG_OBJ_MAX_TEXTURES];
-    SGlightids lightIds[SG_OBJ_MAX_LIGHTS];
-    SGmaterialids materialId;
-  } uniforms;
-  // Attribute IDs
-  struct {
-    GLuint vertexId;
-    GLuint normalId;
-    GLuint colourId;
-    GLuint texCoordId[SG_MAX_TEXTURES];
-  } attribs;
-};
-
-
 void sgLoadAllShaders(void);
 
-SGshader* sgLoadProgram(const char *key, const char *vspath, const char *fspath,
+sg_shader_t* sgLoadProgram(const char *key, const char *vspath, const char *fspath,
                         const char *gspath);
-SGshader* sgGetProgram(const char *key);
+sg_shader_t* sgGetProgram(const char *key);
 void sgEnableProgram(GLuint programId);
 void sgDisableProgram(void);
-SGshader* sgShaderFromKey(const char *key);
+sg_shader_t* sgShaderFromKey(const char *key);
 
 
 

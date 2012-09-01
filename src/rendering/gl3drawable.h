@@ -23,62 +23,38 @@
 #include <OpenGL/gl3.h>
 #include <gencds/array.h>
 #include <vmath/vmath.h>
+#include "rendering/types.h"
 #include "rendering/material.h"
 #include "rendering/light.h"
 #include "rendering/scenegraph.h"
+#include "physics/reftypes.h"
 
 
-struct SGgeometry {
-  SGobject *obj;
-  int vertexCount;
 
-  GLuint vba;
-  GLuint vbo;
+sg_object_t* sgCreateObject(sg_scene_t *scene);
+sg_object_t* sgCreateSubObject(sg_object_t *parent);
 
-  bool hasNormals;
-  bool hasTexCoords;
-  GLsizei normalOffset;
-  GLsizei texCoordOffset;
-};
+void sgObjectSetPos(sg_object_t *obj, float4 pos);
+void sgObjectLoadShader(sg_object_t *obj, const char *name);
 
-struct SGobject {
-  SGobject *parent;
-  SGscene2 *scene;
-  float3 pos;
-  float3 dp; // delta pos per time step
-  float3 dr; // delta rot per time step
-  quaternion_t q; // Quaternion
-
-  float4x4 R;
-  float4x4 modelViewMatrix;
-
-  size_t lightCount;
-  SGlight *lights[SG_OBJ_MAX_LIGHTS];
-
-  size_t texCount;
-  GLuint textures[SG_OBJ_MAX_TEXTURES];
-
-  SGmaterial material;
-
-  SGshader *shader;
-  SGgeometry *geometry;
-  obj_array_t subObjects;
-};
-
-
-SGobject* sgCreateObject(SGscene2 *scene);
-SGobject* sgCreateSubObject(SGobject *parent);
-
-void sgObjectSetPos(SGobject *obj, float4 pos);
-void sgObjectLoadShader(SGobject *obj, const char *name);
-
-SGgeometry*
-sgCreateGeometry(SGobject *obj, size_t vertexCount,
+sg_geometry_t*
+sgCreateGeometry(sg_object_t *obj, size_t vertexCount,
                  float *vertices, float *normals, float *texCoords);
-void sgAnimateObject(SGobject *obj, float dt);
-void sgRecomputeModelViewMatrix(SGobject *obj);
-void sgDrawObject(SGobject *obj);
-void sgDrawGeometry(SGgeometry *geo);
 
+sg_object_t* sgCreateEllipse(const char *name, float semiMajor,
+                          float semiMinor, float asc,
+                          float inc, float argOfPeriapsis,
+                          float dec, float ra, int segments);
 
+sg_object_t* sgCreateSphere(const char *name, GLuint shader, float radius,
+                         GLuint tex, GLuint nightTex, float spec,
+                         sg_material_t *mat);
+void sgAnimateObject(sg_object_t *obj, float dt); // Linear interpolation between frames
+void sgUpdateObject(sg_object_t *obj); // Pull from physis system
+
+void sgRecomputeModelViewMatrix(sg_object_t *obj);
+void sgDrawObject(sg_object_t *obj);
+void sgDrawGeometry(sg_geometry_t *geo);
+void sgObjectSetRigidBody(sg_object_t *obj, PLobject *rigidBody);
+sg_object_t* sgLoadObject(const char *file);
 #endif

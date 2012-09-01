@@ -49,7 +49,7 @@ MODULE_INIT(mfd, NULL) {
 }
 
 static void
-mfd_draw(SGoverlay *overlay)
+mfd_draw(sg_overlay_t *overlay)
 {
   SIMmfd *mfd = (SIMmfd*)overlay;
 
@@ -157,7 +157,7 @@ simSelectMfd(SIMmfd *mfd, unsigned mfdId)
 }
 
 void
-test_hud_draw(SGoverlay *overlay)
+test_hud_draw(sg_overlay_t *overlay)
 {
   SIMhud *hud = (SIMhud*)overlay;
 
@@ -265,7 +265,7 @@ simHudDraw(SIMhud *hud)
 
 
 void
-simMfdInitAll(SGscenegraph *sg)
+simMfdInitAll(sg_scenegraph_t *sg)
 {
   mfd0.page_no = 0;
   mfd1.page_no = 0;

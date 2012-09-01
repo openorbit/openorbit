@@ -142,7 +142,7 @@ sgLoadAllShaders(void)
   }
 }
 
-SGshader*
+sg_shader_t*
 sgLoadProgram(const char *key,
               const char *vspath,
               const char *fspath,
@@ -154,11 +154,11 @@ sgLoadProgram(const char *key,
 
   ooLogInfo("compiling '%s'", key);
 
-  SGshader *tmp = hashtable_lookup(shaderKeyMap, key);
+  sg_shader_t *tmp = hashtable_lookup(shaderKeyMap, key);
   if (tmp) return tmp;
 
 
-  SGshader *si = malloc(sizeof(SGshader));
+  sg_shader_t *si = malloc(sizeof(sg_shader_t));
 
   GLuint shaderProgram = glCreateProgram();
   si->shaderId = shaderProgram;
@@ -228,9 +228,12 @@ sgLoadProgram(const char *key,
     for (int i = 0 ; i < shaders.gl_matchc ; ++ i) {
       mf = map_file(shaders.gl_pathv[i]);
       if (mf.fd == -1) return 0;
+      char_array_t fshader = sgShaderPreprocess(mf);
+
       shaderId = glCreateShader(GL_FRAGMENT_SHADER);
-      GLint len = mf.fileLenght;
-      glShaderSource(shaderId, 1, (const GLchar**)&mf.data, &len);
+
+      GLint len = fshader.length;
+      glShaderSource(shaderId, 1, (const GLchar**)&fshader.elems, &len);
       unmap_file(&mf);
       glCompileShader(shaderId);
 
@@ -252,6 +255,8 @@ sgLoadProgram(const char *key,
         // No globfree as this is a fatal error
         ooLogFatal("fragment shader '%s' did not compile", shaders.gl_pathv[i]);
       }
+
+      char_array_dispose(&fshader);
       glAttachShader(shaderProgram, shaderId);
       ooLogTrace("loaded fragment shader '%s'", shaders.gl_pathv[i]);
     }
@@ -348,10 +353,10 @@ sgLoadProgram(const char *key,
   return si;
 }
 
-SGshader*
+sg_shader_t*
 sgGetProgram(const char *key)
 {
-  SGshader *tmp = hashtable_lookup(shaderKeyMap, key);
+  sg_shader_t *tmp = hashtable_lookup(shaderKeyMap, key);
   if (tmp) return tmp;
   else ooLogWarn("no such shader '%s'", key);
   return 0;
@@ -369,10 +374,10 @@ sgDisableProgram(void)
   glUseProgram(0); // Return to fixed functionality
 }
 
-SGshader*
+sg_shader_t*
 sgShaderFromKey(const char *key)
 {
-  SGshader *si = hashtable_lookup(shaderKeyMap, key);
+  sg_shader_t *si = hashtable_lookup(shaderKeyMap, key);
   return si;
 }
 

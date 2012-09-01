@@ -26,7 +26,10 @@ extern "C" {
 
 #include <vmath/vmath.h>
 
+#include "rendering/types.h"
+
 #include "scenegraph.h"
+#include "shader-manager.h"
 
 #ifdef __APPLE__
 #include <OpenGL/gl3.h>
@@ -35,31 +38,6 @@ extern "C" {
 #endif
 
 #define STAR_CNT 5000
-
-typedef struct {
-    unsigned char r, g, b, a;
-    float x, y, z;
-} OOstar;
-
-typedef struct {
-  SGdrawable super;
-  GLuint vbo;
-  size_t n_stars; //!< Number of stars loaded
-  size_t a_len; //!< Length of data
-  OOstar *data;
-} OOstars;
-
-struct SGbackground {
-  SGcamera *cam;
-  SGshader *shader;
-
-  GLuint vbo;
-  GLuint vba;
-
-  size_t a_len;
-  size_t n_stars;
-  OOstar *data;
-};
 
 /*!
     @function   equ_cart_convert
@@ -71,17 +49,9 @@ struct SGbackground {
     @param      dec Declination in radians
 */
 float3 ooEquToCart(float ra, float dec);
-OOstars* ooSkyInitStars(int starCount);
-OOstars *ooSkyRandomStars(void);
 
-void ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv);
-
-void ooSkyDrawStars(OOstars *stars);
-OOstars* ooSkyLoadStars(const char *file);
-
-SGdrawable *ooSkyNewDrawable(const char *file);
-
-void sgDrawBackground(SGbackground *bg);
+void sgDrawBackground(sg_background_t *bg);
+sg_background_t* sgCreateBackgroundFromFile(const char *file);
 
 #ifdef __cplusplus
 }

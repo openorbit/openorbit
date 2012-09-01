@@ -37,12 +37,12 @@ typedef struct {
   sim_spacecraft_t *currentSc; //!< Current active spacecraft
   PLsystem *orbSys;   //!< Root orbit system, this will be the sun initially
   PLworld *world;
-  SGscenegraph *sg;   //!< Scenegraph of the world
+  sg_scenegraph_t *sg;   //!< Scenegraph of the world
 } SIMstate;
 
 void ooSimInit(void);
 
-void ooSimSetSg(SGscenegraph *sg);
+void ooSimSetSg(sg_scenegraph_t *sg);
 
 void ooSimSetOrbSys(PLsystem *osys);
 void ooSimSetOrbWorld(PLworld *world);
@@ -52,7 +52,7 @@ void ooSimStep(float dt);
 void simSetSpacecraft(sim_spacecraft_t *sc);
 sim_spacecraft_t* simGetSpacecraft(void);
 OOeventqueue* simGetEventQueue(void);
-SGscenegraph* simGetSg(void);
+sg_scenegraph_t* simGetSg(void);
 PLworld* simGetWorld(void);
 
 #ifdef __cplusplus

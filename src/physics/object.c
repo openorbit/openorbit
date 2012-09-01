@@ -55,7 +55,7 @@ plInitObject(PLobject *obj)
   obj->sys = NULL;
   obj->name = NULL;
   obj->parent = NULL;
-  obj->drawable = NULL;
+  //obj->drawable = NULL;
   obj->f_ack = vf3_set(0.0, 0.0, 0.0);
   obj->t_ack = vf3_set(0.0, 0.0, 0.0);
   obj->g_ack = vf3_set(0.0, 0.0, 0.0);
@@ -157,14 +157,6 @@ plUpdateMass(PLobject *obj)
   plComputeDerived(obj);
 }
 
-
-void
-plSetDrawableForObject(PLobject *obj, SGdrawable *drawable)
-{
-  assert(obj != NULL);
-
-  obj->drawable = drawable;
-}
 
 void
 plSetObjectPos3d(PLobject *obj, double x, double y, double z)
@@ -471,6 +463,19 @@ void
 plSetAngularVel3fv(PLobject *obj, float3 r)
 {
   obj->angVel = r;
+}
+
+
+float3
+plGetVel(PLobject *obj)
+{
+  return obj->v;
+}
+
+float3
+plGetAngularVel(PLobject *obj)
+{
+  return obj->angVel;
 }
 
 quaternion_t

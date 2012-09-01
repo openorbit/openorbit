@@ -150,7 +150,6 @@
 		EC571BE71443675D002CA003 /* cgbitmaps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC571BE51443675D002CA003 /* cgbitmaps.c */; };
 		EC5F72531154E10D00FBE08B /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
 		EC5F725A1154E27400FBE08B /* light.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72591154E27400FBE08B /* light.c */; };
-		EC5F72881155240B00FBE08B /* drawable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72871155240B00FBE08B /* drawable.c */; };
 		EC6CA8AC156BAD650052D56E /* libedit.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC6CA8AB156BAD650052D56E /* libedit.dylib */; };
 		EC6DFCAB126DCF850029D5E3 /* mfd.c in Sources */ = {isa = PBXBuildFile; fileRef = EC6DFCAA126DCF850029D5E3 /* mfd.c */; };
 		EC75350914176FEB000A7CB4 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EC75350314176FEB000A7CB4 /* MainMenu.xib */; };
@@ -217,7 +216,6 @@
 		EC75355914177EA6000A7CB4 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC823728113140E000A725B1 /* cmod.c */; };
 		EC75355A14177EA6000A7CB4 /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
 		EC75355B14177EA6000A7CB4 /* light.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72591154E27400FBE08B /* light.c */; };
-		EC75355C14177EA6000A7CB4 /* drawable.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72871155240B00FBE08B /* drawable.c */; };
 		EC75355D14177EA6000A7CB4 /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
 		EC75355E14177EA6000A7CB4 /* shader-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909A21175A14B00E8D477 /* shader-manager.c */; };
 		EC75355F14177EA6000A7CB4 /* mapped-file.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909AF1175A65A00E8D477 /* mapped-file.c */; };
@@ -531,6 +529,7 @@
 		EC239D1311843C5E00C1A5B9 /* world-loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "world-loader.h"; sourceTree = "<group>"; };
 		EC239D1411843C5E00C1A5B9 /* world-loader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "world-loader.c"; sourceTree = "<group>"; };
 		EC239D731184406900C1A5B9 /* script */ = {isa = PBXFileReference; lastKnownFileType = folder; path = script; sourceTree = "<group>"; };
+		EC29003215F0DD0A00357A02 /* types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
 		EC34BBD01079EDE90011B76E /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = array.h; sourceTree = "<group>"; };
 		EC34BBD11079EDE90011B76E /* avl-tree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "avl-tree.h"; sourceTree = "<group>"; };
 		EC34BBD21079EDE90011B76E /* hashtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hashtable.h; sourceTree = "<group>"; };
@@ -684,9 +683,6 @@
 		EC5F72521154E10D00FBE08B /* material.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = material.c; sourceTree = "<group>"; };
 		EC5F72581154E27400FBE08B /* light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = light.h; sourceTree = "<group>"; };
 		EC5F72591154E27400FBE08B /* light.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = light.c; sourceTree = "<group>"; };
-		EC5F72871155240B00FBE08B /* drawable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = drawable.c; sourceTree = "<group>"; };
-		EC62624E1125545C001C0684 /* reftypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reftypes.h; sourceTree = "<group>"; };
-		EC6262571125556C001C0684 /* drawable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drawable.h; sourceTree = "<group>"; };
 		EC6CA8AB156BAD650052D56E /* libedit.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libedit.dylib; path = usr/lib/libedit.dylib; sourceTree = SDKROOT; };
 		EC6DFCA9126DCF850029D5E3 /* mfd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mfd.h; sourceTree = "<group>"; };
 		EC6DFCAA126DCF850029D5E3 /* mfd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mfd.c; sourceTree = "<group>"; };
@@ -1198,9 +1194,6 @@
 				EC34BC3C1079EE080011B76E /* texture.h */,
 				ECDC29FB111498100066AF2D /* particles.h */,
 				ECDC29FC111498100066AF2D /* particles.c */,
-				EC62624E1125545C001C0684 /* reftypes.h */,
-				EC5F72871155240B00FBE08B /* drawable.c */,
-				EC6262571125556C001C0684 /* drawable.h */,
 				EC5F72511154E10D00FBE08B /* material.h */,
 				EC5F72521154E10D00FBE08B /* material.c */,
 				EC5F72581154E27400FBE08B /* light.h */,
@@ -1209,6 +1202,7 @@
 				ECF60B4D140F75DD00EAD012 /* location.h */,
 				EC7F68AD159326A700B4E8EF /* gl3drawable.h */,
 				EC7F68AE159326BC00B4E8EF /* gl3drawable.c */,
+				EC29003215F0DD0A00357A02 /* types.h */,
 			);
 			path = rendering;
 			sourceTree = "<group>";
@@ -2199,7 +2193,6 @@
 				EC823729113140E100A725B1 /* cmod.c in Sources */,
 				EC5F72531154E10D00FBE08B /* material.c in Sources */,
 				EC5F725A1154E27400FBE08B /* light.c in Sources */,
-				EC5F72881155240B00FBE08B /* drawable.c in Sources */,
 				ECE6A8441167CAB400003CBD /* pubsub.c in Sources */,
 				ECC909A41175A14B00E8D477 /* shader-manager.c in Sources */,
 				ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */,
@@ -2311,7 +2304,6 @@
 				EC75355914177EA6000A7CB4 /* cmod.c in Sources */,
 				EC75355A14177EA6000A7CB4 /* material.c in Sources */,
 				EC75355B14177EA6000A7CB4 /* light.c in Sources */,
-				EC75355C14177EA6000A7CB4 /* drawable.c in Sources */,
 				EC75355D14177EA6000A7CB4 /* pubsub.c in Sources */,
 				EC75355E14177EA6000A7CB4 /* shader-manager.c in Sources */,
 				EC75355F14177EA6000A7CB4 /* mapped-file.c in Sources */,

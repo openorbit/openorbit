@@ -27,48 +27,18 @@
 #endif
 
 #include <vmath/vmath.h>
-#include "rendering/reftypes.h"
+#include "rendering/types.h"
 #include <vmath/lwcoord.h>
 
-typedef void (*SGenable_light_func)(SGlight *light, GLenum lightId);
-typedef void (*SGdisable_light_func)(SGlight *light);
+//typedef void (*SGenable_light_func)(SGlight *light, GLenum lightId);
+//typedef void (*SGdisable_light_func)(SGlight *light);
 
 
-struct SGlight {
-  struct SGscene *scene;
-  int lightId;
-
-  float4 pos;
-  float4 ambient;
-  float4 specular;
-  float4 diffuse;
-  float3 dir; // Only used for spotlights
-
-  float constantAttenuation;
-  float linearAttenuation;
-  float quadraticAttenuation;
-
-  float4 globAmbient;
-
-
-  SGenable_light_func enable;
-  SGdisable_light_func disable;
-};
-
-struct SGspotlight {
-  SGlight super;
-  float dir[3];
-};
-
-struct SGpointlight {
-  SGlight super;
-};
-
-SGlight* sgNewPointlight(SGscene *sc, float3 p);
-SGlight* sgNewPointlight3f(SGscene *sc, float x, float y, float z);
-void sgSetLightPos3f(SGlight *light, float x, float y, float z);
-void sgSetLightPosv(SGlight *light, float3 v);
-void sgSetLightPosLW(SGlight *light, lwcoord_t *lwc);
+sg_light_t* sgNewPointlight(sg_scene_t *sc, float3 p);
+sg_light_t* sgNewPointlight3f(sg_scene_t *sc, float x, float y, float z);
+void sgSetLightPos3f(sg_light_t *light, float x, float y, float z);
+void sgSetLightPosv(sg_light_t *light, float3 v);
+void sgSetLightPosLW(sg_light_t *light, lwcoord_t *lwc);
 
 
 #endif /* !SG_LIGHT_H__ */

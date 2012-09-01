@@ -50,9 +50,10 @@ ooSimInit(void)
   //gSIM_state.evQueue = simNewEventQueue();
 
 
-  SGdrawable *sky = ooSkyNewDrawable("data/stars.csv");
-  gSIM_state.sg = sgNewSceneGraph();
-  sgSetSky(gSIM_state.sg, sky);
+  sg_background_t *sky = sgCreateBackgroundFromFile("data/stars.csv");
+  //gSIM_state.sg = sgNewSceneGraph();
+  //sgSetSky(gSIM_state.sg, sky);
+  //sgSceneSetBackground(sc, sky);
 
   gSIM_state.world = ooOrbitLoad(gSIM_state.sg, "data/solsystem.hrml");
 
@@ -65,20 +66,13 @@ ooSimInit(void)
                       250.0e3 /*altitude*/);
   simSetSpacecraft(sc);
 
-  SGscene *scene = sgGetScene(gSIM_state.sg, "main");
+  //SGscene *scene = sgGetScene(gSIM_state.sg, "main");
 
-  SGcam *cam = sgNewOrbitCam(gSIM_state.sg, scene, ooScGetPLObjForSc(sc),
-                             0.0, 0.0, 20.0);
-  sgSetCam(gSIM_state.sg, cam);
+  //SGcam *cam = sgNewOrbitCam(gSIM_state.sg, scene, ooScGetPLObjForSc(sc),
+  //                         0.0, 0.0, 20.0);
+  //sgSetCam(gSIM_state.sg, cam);
 
   simMfdInitAll(gSIM_state.sg);
-}
-
-
-void
-ooSimSetSg(SGscenegraph *sg)
-{
-  gSIM_state.sg = sg;
 }
 
 
@@ -129,7 +123,7 @@ ooSimStep(float dt)
   gettimeofday(&start, NULL);
 
   simAxisPush();
-  sgCamStep(sgGetCam(gSIM_state.sg), dt);
+  //sgCamStep(sgGetCam(gSIM_state.sg), dt);
 
   plWorldClear(gSIM_state.world);
 
@@ -166,7 +160,7 @@ simGetSpacecraft(void)
   return gSIM_state.currentSc;
 }
 
-SGscenegraph*
+sg_scenegraph_t*
 simGetSg(void)
 {
   return gSIM_state.sg;

@@ -203,14 +203,14 @@ simNewEngine(char *name, sim_stage_t *stage, SIMenginekind kind,
 
   // Create particle system for engine
   PLparticles *psys = plNewParticleSystem(name, 1000);
-  engine->psys = (SGparticles*) sgNewParticleSystem(name,
-                                                    "textures/particle-alpha.png",
-                                                    psys);
+  //engine->psys = (SGparticles*) sgNewParticleSystem(name,
+  //                                                "textures/particle-alpha.png",
+  //                                                psys);
   // TODO: Make particle shader
-  sgDrawableLoadShader(&engine->psys->super, "fixed");
+  //sgDrawableLoadShader(&engine->psys->super, "fixed");
 
-  sgDrawableAddChild(stage->obj->drawable, (SGdrawable*)engine->psys,
-                     pos, q_rot(1.0f, 0.0f, 0.0f, 0.0f));
+  //sgDrawableAddChild(stage->obj->drawable, (SGdrawable*)engine->psys,
+  //                   pos, q_rot(1.0f, 0.0f, 0.0f, 0.0f));
   obj_array_push(&stage->engines, engine);
   obj_array_push(&stage->sc->engines, engine);
 

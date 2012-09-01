@@ -40,37 +40,37 @@
 
 
 void
-loadMaterial(SGmaterial *mat, HRMLobject *obj)
+loadMaterial(sg_material_t *mat, HRMLobject *obj)
 {
-  sgInitMaterial(mat);
+  sg_init_material(mat);
 
   for (HRMLobject *matEntry = obj->children; matEntry != NULL;
        matEntry = matEntry->next) {
     if (!strcmp(matEntry->name, "emission")) {
       assert(hrmlGetRealArrayLen(matEntry) == 4);
       const double *vec = hrmlGetRealArray(matEntry);
-      sgSetMaterialEmiss4f(mat, vec[0], vec[1], vec[2], vec[3]);
+      sg_set_material_emiss4f(mat, vec[0], vec[1], vec[2], vec[3]);
     } else if (!strcmp(matEntry->name, "ambient")) {
       assert(hrmlGetRealArrayLen(matEntry) == 4);
       const double *vec = hrmlGetRealArray(matEntry);
-      sgSetMaterialAmb4f(mat, vec[0], vec[1], vec[2], vec[3]);
+      sg_set_material_amb4f(mat, vec[0], vec[1], vec[2], vec[3]);
     } else if (!strcmp(matEntry->name, "diffuse")) {
       assert(hrmlGetRealArrayLen(matEntry) == 4);
       const double *vec = hrmlGetRealArray(matEntry);
-      sgSetMaterialDiff4f(mat, vec[0], vec[1], vec[2], vec[3]);
+      sg_set_material_diff4f(mat, vec[0], vec[1], vec[2], vec[3]);
     } else if (!strcmp(matEntry->name, "specular")) {
       assert(hrmlGetRealArrayLen(matEntry) == 4);
       const double *vec = hrmlGetRealArray(matEntry);
-      sgSetMaterialSpec4f(mat, vec[0], vec[1], vec[2], vec[3]);
+      sg_set_material_spec4f(mat, vec[0], vec[1], vec[2], vec[3]);
     } else if (!strcmp(matEntry->name, "shininess")) {
       float shininess = hrmlGetReal(matEntry);
-      sgSetMaterialShininess(mat, shininess);
+      sg_set_material_shininess(mat, shininess);
     }
   }
 }
 
 void
-ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
+ooLoadMoon__(PLsystem *sys, HRMLobject *obj, sg_scene_t *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -85,8 +85,8 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
   const char *spec = NULL;
   const char *bump = NULL;
   const char *nightTex = NULL;
-  SGmaterial mat;
-  sgInitMaterial(&mat);
+  sg_material_t mat;
+  sg_init_material(&mat);
 
   double flattening = 0.0;
   HRMLobject *sats = NULL;
@@ -159,7 +159,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, SGscene *sc)
   double period = plOrbitalPeriod(semiMajor, sys->orbitalBody->GM * gm) / PL_SEC_PER_DAY;
 
   //  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
-  SGdrawable *drawable = sgNewSphere(moonName.u.str, shader, radius,
+  sg_object_t *drawable = sgNewSphere(moonName.u.str, shader, radius,
                                      tex, nightTex, spec, &mat);
 
 
@@ -245,7 +245,7 @@ load_atm(HRMLobject *obj)
 }
 
 void
-ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
+ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -262,8 +262,8 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
   const char *bump = NULL;
   const char *nightTex = NULL;
   HRMLobject *sats = NULL;
-  SGmaterial mat;
-  sgInitMaterial(&mat);
+  sg_material_t mat;
+  sg_init_material(&mat);
 
   double flattening = 0.0;
 
@@ -337,7 +337,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
   // NOTE: At present, all planets must be specified with AUs as parameters
   double period = plOrbitalPeriod(plAuToMetres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
 
-  SGdrawable *drawable = sgNewSphere(planetName.u.str, shader, radius,
+  sg_object_t *drawable = sgNewSphere(planetName.u.str, shader, radius,
                                      tex, nightTex, spec, &mat);
 
   sgSceneAddObj(sc, drawable); // TODO: scale to radius
@@ -364,7 +364,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, SGscene *sc)
 
 
 PLworld*
-ooLoadStar__(HRMLobject *obj, SGscene *sc)
+ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -375,8 +375,8 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
   const char *tex = NULL;
   const char *shader = NULL;
   const char *bump = NULL;
-  SGmaterial mat;
-  sgInitMaterial(&mat);
+  sg_material_t mat;
+  sg_init_material(&mat);
 
   double flattening = 0.0;
 
@@ -422,11 +422,11 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
   }
 
   sgSetSceneAmb4f(sc, 0.2, 0.2, 0.2, 1.0);
-  sgSetMaterialEmiss4f(&mat, 1.0, 1.0, 1.0, 1.0);
-  SGdrawable *drawable = sgNewSphere(starName.u.str, shader, radius,
+  sg_set_material_emiss4f(&mat, 1.0, 1.0, 1.0, 1.0);
+  sg_object_t *drawable = sgNewSphere(starName.u.str, shader, radius,
                                      tex, NULL, NULL, &mat);
 
-  SGlight *starLightSource = sgNewPointlight3f(sc, 0.0f, 0.0f, 0.0f);
+  sg_light_t *starLightSource = sgNewPointlight3f(sc, 0.0f, 0.0f, 0.0f);
 
 
   sgSceneAddObj(sc, drawable); // TODO: scale to radius
@@ -454,7 +454,7 @@ ooLoadStar__(HRMLobject *obj, SGscene *sc)
   return world;
 }
 PLworld*
-ooOrbitLoad(SGscenegraph *sg, const char *fileName)
+ooOrbitLoad(sg_scenegraph_t *sg, const char *fileName)
 {
   char *file = ooResGetPath(fileName);
   HRMLdocument *solarSys = hrmlParse(file);
@@ -468,7 +468,7 @@ ooOrbitLoad(SGscenegraph *sg, const char *fileName)
 
   PLworld *world = NULL;
   // Go through the document and handle each entry in the document
-  SGscene *sc = sgNewScene(sg, "main");
+  sg_scene_t *sc = sg_new_scene(); //TODO FIX ARGS sg, "main");
   for (HRMLobject *node = hrmlGetRoot(solarSys); node != NULL; node = node->next) {
     if (!strcmp(node->name, "openorbit")) {
       for (HRMLobject *star = node->children; star != NULL; star = star->next) {

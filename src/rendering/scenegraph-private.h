@@ -29,42 +29,6 @@
 #include "scenegraph.h"
 #include "rendering/shader-manager.h"
 
-struct SGscene {
-  char *name;
-
-  float amb[4]; ///< Ambient light for this scene, initially [0.2,0.2,0.2,1.0]
-
-  SGlight **lights;
-
-  SGscenegraph *sg;
-
-  obj_array_t objs;   // Objects in this scene
-};
-
-struct SGoctreescene {
-  SGscene super;
-
-};
-
-struct SGscenegraph {
-  SGcam *currentCam;
-  obj_array_t cams;
-  obj_array_t scenes;   // All scenes in the scene graph
-
-  GLint maxLights;
-
-  int usedLights;
-
-  SGdrawable *sky;
-
-  SGshader *overlay_shader;
-  GLint modelview_id;
-  GLint projection_id;
-  GLint tex_id;
-
-  obj_array_t overlays; // TODO: Consolidate OOobjvector and obj_array_t
-};
-
 
 
 #endif /* end of include guard: SCENEGRAPH_PRIVATE_H_8YHHHPCN */

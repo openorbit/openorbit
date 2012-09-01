@@ -21,6 +21,7 @@
 #define SIM_MFD_MFD_H
 
 #include <gencds/array.h>
+#include "rendering/types.h"
 #include "rendering/scenegraph.h"
 #include "rendering/text.h"
 
@@ -36,13 +37,13 @@ struct SIMmfdpage {
 };
 
 struct SIMmfd {
-  SGoverlay super;
+  sg_overlay_t super;
   unsigned page_no;
 };
 
 void simMfdPageRegister(SIMmfdpage *page);
 
-void simMfdInitAll(SGscenegraph *sg);
+void simMfdInitAll(sg_scenegraph_t *sg);
 
 // Draw top level MFD and the MFD screen
 void simMfdDraw(SIMmfd *mfd);
@@ -58,7 +59,7 @@ typedef void (*SIMhuddraw)(SIMhud *hud);
 #define SIM_HUD_MARKS (360/SIM_HUD_STEP)
 
 struct SIMhud {
-  SGoverlay super;
+  sg_overlay_t super;
 
   // drawing context
   SIMhuddraw draw;

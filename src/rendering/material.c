@@ -26,7 +26,7 @@
 #endif
 
 void
-sgBindMaterial(SGmaterial *mat)
+sg_bind_material(sg_material_t *mat)
 {
   SG_CHECK_ERROR;
   //glMaterialfv(GL_FRONT, GL_AMBIENT, (GLfloat*)&mat->ambient);
@@ -38,7 +38,7 @@ sgBindMaterial(SGmaterial *mat)
 }
 
 void
-sgInitMaterial(SGmaterial *mat)
+sg_init_material(sg_material_t *mat)
 {
   mat->ambient[0] = 0.2;
   mat->ambient[1] = 0.2;
@@ -64,7 +64,7 @@ sgInitMaterial(SGmaterial *mat)
 }
 
 void
-sgSetMaterialAmb4f(SGmaterial *mat, float r, float g, float b, float a)
+sg_set_material_amb4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->ambient[0] = r;
   mat->ambient[1] = g;
@@ -73,7 +73,7 @@ sgSetMaterialAmb4f(SGmaterial *mat, float r, float g, float b, float a)
 }
 
 void
-sgSetMaterialDiff4f(SGmaterial *mat, float r, float g, float b, float a)
+sg_set_material_diff4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->diffuse[0] = r;
   mat->diffuse[1] = g;
@@ -82,7 +82,7 @@ sgSetMaterialDiff4f(SGmaterial *mat, float r, float g, float b, float a)
 }
 
 void
-sgSetMaterialSpec4f(SGmaterial *mat, float r, float g, float b, float a)
+sg_set_material_spec4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->specular[0] = r;
   mat->specular[1] = g;
@@ -91,7 +91,7 @@ sgSetMaterialSpec4f(SGmaterial *mat, float r, float g, float b, float a)
 }
 
 void
-sgSetMaterialEmiss4f(SGmaterial *mat, float r, float g, float b, float a)
+sg_set_material_emiss4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->emission[0] = r;
   mat->emission[1] = g;
@@ -100,7 +100,7 @@ sgSetMaterialEmiss4f(SGmaterial *mat, float r, float g, float b, float a)
 }
 
 void
-sgSetMaterialShininess(SGmaterial *mat, float s)
+sg_set_material_shininess(sg_material_t *mat, float s)
 {
   mat->shininess = s;
 }

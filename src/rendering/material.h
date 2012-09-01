@@ -21,25 +21,16 @@
 #define SG_MATERIAL_H__
 
 #include <vmath/vmath.h>
-#include "rendering/reftypes.h"
+#include "rendering/types.h"
 
-struct SGmaterial {
-  float4 emission;
-  float4 ambient;
-  float4 diffuse;
-  float4 specular;
-  float shininess;
-};
+void sg_init_material(sg_material_t *mat);
+void sg_bind_material(sg_material_t *mat);
 
-
-void sgInitMaterial(SGmaterial *mat);
-void sgBindMaterial(SGmaterial *mat);
-
-void sgSetMaterialAmb4f(SGmaterial *mat, float r, float g, float b, float a);
-void sgSetMaterialDiff4f(SGmaterial *mat, float r, float g, float b, float a);
-void sgSetMaterialSpec4f(SGmaterial *mat, float r, float g, float b, float a);
-void sgSetMaterialEmiss4f(SGmaterial *mat, float r, float g, float b, float a);
-void sgSetMaterialShininess(SGmaterial *mat, float s);
+void sg_set_material_amb4f(sg_material_t *mat, float r, float g, float b, float a);
+void sg_set_material_diff4f(sg_material_t *mat, float r, float g, float b, float a);
+void sg_set_material_spec4f(sg_material_t *mat, float r, float g, float b, float a);
+void sg_set_material_emiss4f(sg_material_t *mat, float r, float g, float b, float a);
+void sg_set_material_shininess(sg_material_t *mat, float s);
 
 
 

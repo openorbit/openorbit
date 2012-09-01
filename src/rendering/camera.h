@@ -25,103 +25,12 @@ extern "C" {
 
 #include <stdbool.h>
 #include <vmath/vmath.h>
-#include "physics/reftypes.h"
-#include "rendering/reftypes.h"
 #include <vmath/lwcoord.h>
-
-  enum SGcamtype {
-    SGCam_Free,
-    SGCam_Fixed,
-    SGCam_Orbit
-  };
-
-  struct SGcam {
-    SGcamtype kind;
-    SGscene *scene;
-  };
-
-  struct SGfreecam {
-    SGcam super;
-    lwcoord_t lwc;
-    float3 dp;
-    quaternion_t q;
-    quaternion_t dq;
-  };
-
-  struct SGfixedcam {
-    SGcam super;
-    PLobject *body;
-    float3 r; // With this offset
-    quaternion_t q; // and this rotation (rotate before translation)
-  };
-
-  struct SGorbitcam {
-    SGcam super;
-    PLobject *body;
-
-    float ra, dec;
-    float dra, ddec, dr;
-    float r, zoom;
-  };
+#include "rendering/types.h"
 
 
-  void sgCamInit(void);
-
-  SGcam* sgNewFreeCam(SGscenegraph *sg, SGscene *sc,
-                        float x, float y, float z,
-                        float rx, float ry, float rz);
-
-  SGcam* sgNewFixedCam(SGscenegraph *sg, SGscene *sc, PLobject *body,
-                         float dx, float dy, float dz,
-                         float rx, float ry, float rz);
-
-  SGcam* sgNewOrbitCam(SGscenegraph *sg, SGscene *sc, PLobject *body,
-                         float ra, float dec, float r);
-
-  void sgSetCamTarget(SGcam *cam, PLobject *body);
-
-  void sgCamMove(SGcam *cam);
-  void sgCamRotate(SGcam *cam);
-  void sgCamStep(SGcam *cam, float dt);
-  void sgCamAxisUpdate(SGcam *cam);
-
-
-  typedef enum {
-    SG_CAMERA_FREE, // Free moving camera
-    SG_CAMERA_FIXED, // Fixed at location relative to obj, local rotation allowed
-    SG_CAMERA_ORBITING // Rotating around target object
-  } SGcameratype;
-
-  struct SGcamera {
-    float4x4 projMatrix;
-    float4x4 viewMatrix;
-
-    SGcameratype type;
-
-    union {
-      struct {
-        lwcoord_t lwc;
-        float3 dp;
-        quaternion_t q;
-        quaternion_t dq;
-      } free;
-      struct {
-        SGobject *obj;
-        float3 r; // With this offset
-        quaternion_t q; // and this rotation (rotate before translation)
-        quaternion_t dq; // Delta rotation
-      } fixed;
-      struct {
-        SGobject *obj;
-        float ra, dec;
-        float dra, ddec, dr;
-        float r, zoom;
-      } orbiting;
-    };
-  };
-
-  void sgAnimateCam(SGcamera *cam, float dt);
-  void sgMoveCam(SGcamera *cam);
+  void sgAnimateCam(sg_camera_t *cam, float dt);
+  void sgMoveCam(sg_camera_t *cam);
 
 #ifdef __cplusplus
 }

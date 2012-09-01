@@ -22,11 +22,12 @@
 #include <stdbool.h>
 #include "gl3drawable.h"
 #include "shader-manager.h"
-
+#include "physics/physics.h"
 #include <OpenGL/gl3.h>
+#include <openorbit/log.h>
 
 void
-sgDrawGeometry(SGgeometry *geo)
+sgDrawGeometry(sg_geometry_t *geo)
 {
   //  SG_CHECK_ERROR;
 
@@ -45,13 +46,13 @@ sgDrawGeometry(SGgeometry *geo)
 }
 
 void
-sgDrawObject(SGobject *obj)
+sgDrawObject(sg_object_t *obj)
 {
   // Set model matrix for current object, we transpose this
   glUseProgram(obj->shader->shaderId);
 
   glUniformMatrix4fv(obj->shader->uniforms.projectionId, 1, GL_TRUE,
-                     (GLfloat*)obj->scene->cam->projMatrix);
+                     (GLfloat*)obj->scene->cam->proj_matrix);
 
   glUniformMatrix4fv(obj->shader->uniforms.modelViewId, 1, GL_TRUE,
                      (GLfloat*)obj->modelViewMatrix);
@@ -95,12 +96,12 @@ sgDrawObject(SGobject *obj)
 }
 
 void
-sgRecomputeModelViewMatrix(SGobject *obj)
+sgRecomputeModelViewMatrix(sg_object_t *obj)
 {
   if (obj->parent) {
     mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
   } else {
-    mf4_cpy(obj->modelViewMatrix, obj->scene->cam->viewMatrix);
+    mf4_cpy(obj->modelViewMatrix, obj->scene->cam->view_matrix);
   }
 
   mf4_mul2(obj->modelViewMatrix, obj->R);
@@ -114,19 +115,38 @@ sgRecomputeModelViewMatrix(SGobject *obj)
 }
 
 void
-sgAnimateObject(SGobject *obj, float dt)
+sgAnimateObject(sg_object_t *obj, float dt)
 {
+  obj->q = q_normalise(q_vf3_rot(obj->q, obj->dr, dt));
+  q_mf3_convert(obj->R, obj->q);
+  obj->pos += obj->dp;
+
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sgAnimateObject(ARRAY_ELEM(obj->subObjects, i), dt);
   }
 }
 
-
-SGobject*
-sgCreateObject(SGscene2 *scene)
+void
+sgUpdateObject(sg_object_t *obj)
 {
-  SGobject *obj = malloc(sizeof(SGobject));
-  memset(obj, 0, sizeof(SGobject));
+  if (obj->rigidBody) {
+    obj->dp = plGetVel(obj->rigidBody);
+    obj->dr = plGetAngularVel(obj->rigidBody);
+    obj->q = plGetQuat(obj->rigidBody);
+  }
+
+  //ARRAY_FOR_EACH(i, obj->subObjects) {
+  //  sgUpdateObject(ARRAY_ELEM(obj->subObjects, i));
+  //}
+}
+
+
+
+sg_object_t*
+sgCreateObject(sg_scene_t *scene)
+{
+  sg_object_t *obj = malloc(sizeof(sg_object_t));
+  memset(obj, 0, sizeof(sg_object_t));
 
   obj->parent = NULL;
   obj->scene = scene;
@@ -151,11 +171,11 @@ sgCreateObject(SGscene2 *scene)
   return obj;
 }
 
-SGobject*
-sgCreateSubObject(SGobject *parent)
+sg_object_t*
+sgCreateSubObject(sg_object_t *parent)
 {
-  SGobject *obj = malloc(sizeof(SGobject));
-  memset(obj, 0, sizeof(SGobject));
+  sg_object_t *obj = malloc(sizeof(sg_object_t));
+  memset(obj, 0, sizeof(sg_object_t));
 
   obj->parent = parent;
   obj->scene = parent->scene;
@@ -181,17 +201,17 @@ sgCreateSubObject(SGobject *parent)
 }
 
 void
-sgObjectSetPos(SGobject *obj, float4 pos)
+sgObjectSetPos(sg_object_t *obj, float4 pos)
 {
   obj->pos = pos;
 }
 
-SGgeometry*
-sgCreateGeometry(SGobject *obj, size_t vertexCount,
+sg_geometry_t*
+sgCreateGeometry(sg_object_t *obj, size_t vertexCount,
                  float *vertices, float *normals, float *texCoords)
 {
-  SGgeometry *geo = malloc(sizeof(SGgeometry));
-  memset(geo, 0, sizeof(SGgeometry));
+  sg_geometry_t *geo = malloc(sizeof(sg_geometry_t));
+  memset(geo, 0, sizeof(sg_geometry_t));
   obj->geometry = geo;
 
   if (normals) geo->hasNormals = true;
@@ -216,7 +236,7 @@ sgCreateGeometry(SGobject *obj, size_t vertexCount,
 
   glBufferSubData(GL_ARRAY_BUFFER, 0, vertexDataSize, vertices);
 
-  SGshader *shader = obj->shader;
+  sg_shader_t *shader = obj->shader;
 
   glVertexAttribPointer(sgGetLocationForParam(shader->shaderId, SG_VERTEX), 4, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(sgGetLocationForParam(shader->shaderId, SG_VERTEX));
@@ -245,7 +265,43 @@ sgCreateGeometry(SGobject *obj, size_t vertexCount,
   supports the explicit attrib loc extensions.
  */
 void
-sgObjectLoadShader(SGobject *obj, const char *name)
+sgObjectLoadShader(sg_object_t *obj, const char *name)
 {
   obj->shader = sgLoadProgram(name, name, name, NULL);
 }
+
+void
+sgObjectSetRigidBody(sg_object_t *obj, PLobject *rigidBody)
+{
+  if (obj->parent) {
+    ooLogWarn("setting rigid body for sg object that is not root");
+    return;
+  }
+  obj->rigidBody = rigidBody;
+}
+
+
+sg_object_t*
+sgLoadObject(const char *file)
+{
+  // TODO: Fill in code
+  return NULL;
+}
+
+sg_object_t*
+sgCreateSphere(const char *name, GLuint shader, float radius,
+               GLuint tex, GLuint nightTex, float spec,
+               sg_material_t *mat)
+{
+  return NULL;
+}
+
+sg_object_t*
+sgCreateEllipse(const char *name, float semiMajor,
+                float semiMinor, float asc,
+                float inc, float argOfPeriapsis,
+                float dec, float ra, int segments)
+{
+  return NULL;
+}
+

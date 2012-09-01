@@ -403,7 +403,7 @@ plDeleteWorld(PLworld *world)
 }
 
 void
-plSetDrawable(PLastrobody *obj, SGdrawable *drawable)
+plSetDrawable(PLastrobody *obj, sg_object_t *drawable)
 {
   obj->drawable = drawable;
 }
@@ -481,7 +481,7 @@ plNewObjInSys(PLsystem *sys, const char *name, double m, double gm,
 
 
 PLworld*
-plNewWorld(const char *name, SGscene *sc,
+plNewWorld(const char *name, sg_scene_t *sc,
            double m, double gm, double radius, double siderealPeriod,
            double obliquity, double eqRadius, double flattening)
 {
@@ -500,7 +500,7 @@ plNewWorld(const char *name, SGscene *sc,
 }
 
 PLsystem*
-plCreateOrbitalObject(PLworld *world, SGscene *scene, const char *name,
+plCreateOrbitalObject(PLworld *world, sg_scene_t *scene, const char *name,
                       double m, double gm,
                       double orbitPeriod,
                       double obliquity, double siderealPeriod,
@@ -544,17 +544,17 @@ plCreateOrbitalObject(PLworld *world, SGscene *scene, const char *name,
                                                  semiMaj, inc, ascendingNode,
                                                  argOfPeriapsis, meanAnomaly);
 
-  sys->orbitDrawable = sgNewEllipsis(orbitName, semiMaj, semiMin,
-                                     ascendingNode, inc, argOfPeriapsis,
-                                     0.0, 0.0, 1.0,
-                                     1024);
+  //sys->orbitDrawable = sgNewEllipsis(orbitName, semiMaj, semiMin,
+  //                                   ascendingNode, inc, argOfPeriapsis,
+  //                                   0.0, 0.0, 1.0,
+  //                                   1024);
   sgSceneAddObj(sys->scene, sys->orbitDrawable);
 
   return sys;
 }
 
 PLsystem*
-plNewRootSystem(PLworld *world, SGscene *sc, const char *name, double m, double gm, double obliquity, double siderealPeriod,
+plNewRootSystem(PLworld *world, sg_scene_t *sc, const char *name, double m, double gm, double obliquity, double siderealPeriod,
                 double eqRadius, double flattening)
 {
   assert(world);
@@ -587,7 +587,7 @@ plNewRootSystem(PLworld *world, SGscene *sc, const char *name, double m, double 
 
 
 PLsystem*
-plNewOrbit(PLworld *world, SGscene *sc, const char *name,
+plNewOrbit(PLworld *world, sg_scene_t *sc, const char *name,
            double m, double gm,
            double orbitPeriod, double obliquity, double siderealPeriod,
            double semiMaj, double semiMin,
@@ -603,7 +603,7 @@ plNewOrbit(PLworld *world, SGscene *sc, const char *name,
 }
 
 PLsystem*
-plNewSubOrbit(PLsystem *parent, SGscene *sc, const char *name,
+plNewSubOrbit(PLsystem *parent, sg_scene_t *sc, const char *name,
               double m, double gm,
               double orbitPeriod, double obliquity, double siderealPeriod,
               double semiMaj, double semiMin,
@@ -713,7 +713,6 @@ plSysInit(PLsystem *sys)
   }
 }
 
-
 void
 plSysUpdateSg(PLsystem *sys)
 {
@@ -721,9 +720,10 @@ plSysUpdateSg(PLsystem *sys)
     sgSetLightPosLW(sys->orbitalBody->lightSource, &sys->orbitalBody->obj.p);
 
   quaternion_t q = plGetQuat(&sys->orbitalBody->obj);
-  sgSetObjectQuatv(sys->orbitalBody->drawable, q);
+  // TODO: Ensure this is pulled from SG
+  //sgSetObjectQuatv(sys->orbitalBody->drawable, q);
 
-  sgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
+  //sgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
 
   // Update orbital path base
   if (sys->parent) {
@@ -743,13 +743,13 @@ plWorldStep(PLworld *world, double dt)
 
   plSysUpdateSg(world->rootSys);
 
-  for (size_t i = 0; i < world->objs.length ; i ++) {
-    PLobject *obj = world->objs.elems[i];
-    if (obj->drawable) {
-      sgSetObjectPosLW(obj->drawable, &obj->p);
-      sgSetObjectQuatv(obj->drawable, obj->q);
-    }
-  }
+  //for (size_t i = 0; i < world->objs.length ; i ++) {
+  //  PLobject *obj = world->objs.elems[i];
+    //if (obj->drawable) {
+    //  sgSetObjectPosLW(obj->drawable, &obj->p);
+    //  sgSetObjectQuatv(obj->drawable, obj->q);
+    //}
+    //}
 
   for (size_t i = 0; i < world->partSys.length ; ++ i) {
     PLparticles *psys = world->partSys.elems[i];
