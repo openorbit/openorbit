@@ -48,7 +48,12 @@ void sgClearGLError(void);
 #include "rendering/overlay.h"
 #include "rendering/object.h"
 
+
 sg_scene_t* sg_scenegraph_get_scene(sg_scenegraph_t *sg, const char *name);
+sg_scenegraph_t* sg_new_scenegraph();
+
+void sg_scenegraph_add_scene(sg_scenegraph_t *sg, sg_scene_t *sc);
+void sg_scenegraph_add_window(sg_scenegraph_t *sg, sg_window_t *win);
 
 
 #endif /* SCENEGRAPH_H_ */

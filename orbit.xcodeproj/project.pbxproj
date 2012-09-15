@@ -244,8 +244,6 @@
 		EC8CC1EE15F1FE0E00FC71F4 /* cmod.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1E315F1FE0B00FC71F4 /* cmod.c */; };
 		EC8CC1EF15F1FE0E00FC71F4 /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1E515F1FE0C00FC71F4 /* collada.c */; };
 		EC8CC1F015F1FE0E00FC71F4 /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1E515F1FE0C00FC71F4 /* collada.c */; };
-		EC8CC1F115F1FE0E00FC71F4 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1E715F1FE0E00FC71F4 /* model.c */; };
-		EC8CC1F215F1FE0E00FC71F4 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1E715F1FE0E00FC71F4 /* model.c */; };
 		EC8CC1F515F2003E00FC71F4 /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F415F2003D00FC71F4 /* overlay.c */; };
 		EC8CC1F615F2003E00FC71F4 /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F415F2003D00FC71F4 /* overlay.c */; };
 		EC8CC1F815F4B50700FC71F4 /* render-info.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F715F4B50700FC71F4 /* render-info.c */; };
@@ -714,8 +712,6 @@
 		EC8CC1E415F1FE0B00FC71F4 /* cmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmod.h; sourceTree = "<group>"; };
 		EC8CC1E515F1FE0C00FC71F4 /* collada.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = collada.c; sourceTree = "<group>"; };
 		EC8CC1E615F1FE0D00FC71F4 /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
-		EC8CC1E715F1FE0E00FC71F4 /* model.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = model.c; sourceTree = "<group>"; };
-		EC8CC1E815F1FE0E00FC71F4 /* model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = model.h; sourceTree = "<group>"; };
 		EC8CC1F315F2003400FC71F4 /* overlay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = overlay.h; sourceTree = "<group>"; };
 		EC8CC1F415F2003D00FC71F4 /* overlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay.c; sourceTree = "<group>"; };
 		EC8CC1F715F4B50700FC71F4 /* render-info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "render-info.c"; sourceTree = "<group>"; };
@@ -1175,8 +1171,6 @@
 				EC8CC1E415F1FE0B00FC71F4 /* cmod.h */,
 				EC8CC1E515F1FE0C00FC71F4 /* collada.c */,
 				EC8CC1E615F1FE0D00FC71F4 /* collada.h */,
-				EC8CC1E715F1FE0E00FC71F4 /* model.c */,
-				EC8CC1E815F1FE0E00FC71F4 /* model.h */,
 				EC9351E914F9443C00962391 /* ui */,
 				EC13F0F011762C7900E39B89 /* shaders */,
 				EC34BC281079EE080011B76E /* camera.c */,
@@ -2241,7 +2235,6 @@
 				EC8CC1EB15F1FE0E00FC71F4 /* ac3d.c in Sources */,
 				EC8CC1ED15F1FE0E00FC71F4 /* cmod.c in Sources */,
 				EC8CC1EF15F1FE0E00FC71F4 /* collada.c in Sources */,
-				EC8CC1F115F1FE0E00FC71F4 /* model.c in Sources */,
 				EC8CC1F515F2003E00FC71F4 /* overlay.c in Sources */,
 				EC8CC1F815F4B50700FC71F4 /* render-info.c in Sources */,
 			);
@@ -2347,7 +2340,6 @@
 				EC8CC1EC15F1FE0E00FC71F4 /* ac3d.c in Sources */,
 				EC8CC1EE15F1FE0E00FC71F4 /* cmod.c in Sources */,
 				EC8CC1F015F1FE0E00FC71F4 /* collada.c in Sources */,
-				EC8CC1F215F1FE0E00FC71F4 /* model.c in Sources */,
 				EC8CC1F615F2003E00FC71F4 /* overlay.c in Sources */,
 				EC8CC1F915F4B50700FC71F4 /* render-info.c in Sources */,
 			);

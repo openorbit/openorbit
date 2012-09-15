@@ -84,13 +84,17 @@ sg_scene_draw(sg_scene_t *scene, float dt)
 }
 
 sg_scene_t*
-sg_new_scene(void)
+sg_new_scene(sg_scenegraph_t *sg, const char *name)
 {
   sg_scene_t *scene = malloc(sizeof(sg_scene_t));
   memset(scene, 0, sizeof(sg_scene_t));
+  scene->name = strdup(name);
   obj_array_init(&scene->objects);
   obj_array_init(&scene->lights);
   obj_array_init(&scene->shaders);
+
+  sg_scenegraph_add_scene(sg, scene);
+  scene->sg = sg;
   return scene;
 }
 

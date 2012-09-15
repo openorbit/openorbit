@@ -19,7 +19,6 @@
 
 
 #include "ac3d.h"
-#include "model.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -227,11 +226,12 @@ float vecangle(float3 a, float3 b)
 // data, the imgload lib steals the buffers and transfers their ownership
 // instead
 sg_object_t*
-ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj)
+ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
+                  sg_shader_t *shader)
 {
   bool has_warned_for_materials = false;
   assert(obj != NULL);
-  sg_object_t *model = sg_new_object();
+  sg_object_t *model = sg_new_object(shader);
 
   // Transfer rotation matrix, but ensure it is transposed for GL
   // Note, no longer applicable for GL 3, we simply flag matrix uniforms as
@@ -400,7 +400,7 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj)
   }
 
   for (int i = 0 ; i < obj->num_childs ; ++ i) {
-    sg_object_add_child(model, ac3d_obj_to_model(ac3d, obj->children[i]));
+    sg_object_add_child(model, ac3d_obj_to_model(ac3d, obj->children[i], shader));
   }
 
   //  model->texture = (obj->texture) ? strdup(obj->texture) : NULL;
@@ -416,17 +416,17 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj)
 }
 
 sg_object_t*
-ac3d_to_model(struct ac3d_file_t *ac3d)
+ac3d_to_model(struct ac3d_file_t *ac3d, sg_shader_t *shader)
 {
   sg_object_t *model = NULL;
 
   if (ac3d->obj_count > 1) {
-    model = sg_new_object();
+    model = sg_new_object(shader);
     for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
-      sg_object_add_child(model, ac3d_obj_to_model(ac3d, ac3d->objs[i]));
+      sg_object_add_child(model, ac3d_obj_to_model(ac3d, ac3d->objs[i], shader));
     }
   } else {
-    model = ac3d_obj_to_model(ac3d, ac3d->objs[0]);
+    model = ac3d_obj_to_model(ac3d, ac3d->objs[0], shader);
   }
 
   return model;
@@ -538,7 +538,7 @@ error:
 }
 
 sg_object_t*
-ac3d_load(const char *path)
+ac3d_load(const char *path, sg_shader_t *shader)
 {
   FILE *fp = fopen(path, "r");
   if (!fp) {
@@ -596,7 +596,7 @@ ac3d_load(const char *path)
     return NULL;
   }
 
-  sg_object_t *model = ac3d_to_model(ac3d);
+  sg_object_t *model = ac3d_to_model(ac3d, shader);
   ac3d_delete(ac3d);
 
   return model;

@@ -20,7 +20,7 @@
 #ifndef CMOD_H
 #define CMOD_H
 
-#include "model.h"
+#include "rendering/object.h"
 
 sg_object_t* cmod_load(const char *path);
 

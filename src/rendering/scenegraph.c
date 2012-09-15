@@ -45,6 +45,7 @@
 #include "rendering/camera.h"
 
 struct sg_scenegraph_t {
+  obj_array_t windows;
   obj_array_t scenes;
 };
 
@@ -109,4 +110,26 @@ sg_scenegraph_get_scene(sg_scenegraph_t *sg, const char *name)
     }
   }
   return NULL;
+}
+
+void
+sg_scenegraph_add_scene(sg_scenegraph_t *sg, sg_scene_t *sc)
+{
+  obj_array_push(&sg->scenes, sc);
+}
+
+void
+sg_scenegraph_add_window(sg_scenegraph_t *sg, sg_window_t *win)
+{
+  obj_array_push(&sg->windows, win);
+}
+
+sg_scenegraph_t*
+sg_new_scenegraph()
+{
+  sg_scenegraph_t *sg = malloc(sizeof(sg_scenegraph_t));
+  memset(sg, 0, sizeof(sg_scenegraph_t));
+  obj_array_init(&sg->scenes);
+  obj_array_init(&sg->windows);
+  return sg;
 }

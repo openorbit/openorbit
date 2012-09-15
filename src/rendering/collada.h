@@ -19,7 +19,7 @@
 
 #ifndef COLLADA_H
 #define COLLADA_H
-#include "model.h"
+#include "rendering/object.h"
 
 sg_object_t* collada_load(const char *path);
 

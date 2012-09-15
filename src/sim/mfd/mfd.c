@@ -266,7 +266,7 @@ simHudDraw(SIMhud *hud)
 
 
 void
-simMfdInitAll(sg_scenegraph_t *sg)
+simMfdInitAll(sg_viewport_t *vp)
 {
   mfd0.page_no = 0;
   mfd1.page_no = 0;
@@ -311,7 +311,6 @@ simMfdInitAll(sg_scenegraph_t *sg)
   glBufferData(GL_ARRAY_BUFFER, hud.lines*4*sizeof(GLfloat), hud.lineVerts,
                GL_STATIC_DRAW);
 
-  sg_viewport_t *vp = NULL;
   sg_viewport_add_overlay(vp, overlay0);
   sg_viewport_add_overlay(vp, overlay1);
   sg_viewport_add_overlay(vp, overlay2);

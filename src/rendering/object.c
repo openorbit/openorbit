@@ -31,6 +31,7 @@
 #include "rendering/object.h"
 #include "rendering/shader-manager.h"
 #include "physics/physics.h"
+#include "res-manager.h"
 #include <openorbit/log.h>
 
 #include "3ds.h"
@@ -393,10 +394,11 @@ sg_object_get_rigid_body(const sg_object_t *obj)
 }
 
 sg_object_t*
-sg_new_object(void)
+sg_new_object(sg_shader_t *shader)
 {
   sg_object_t *obj = malloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
+  obj->shader = shader;
   return obj;
 }
 
@@ -411,21 +413,22 @@ sg_object_set_geo(sg_object_t *obj, int gl_primitive, size_t vertexCount,
 
 
 sg_object_t*
-sg_new_object_with_geo(int gl_primitive, size_t vertexCount,
+sg_new_object_with_geo(sg_shader_t *shader, int gl_primitive, size_t vertexCount,
                        float *vertices, float *normals, float *texCoords)
 {
   sg_object_t *obj = malloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
+  obj->shader = shader;
   obj->geometry = sg_new_geometry(obj, gl_primitive,
                                   vertexCount, vertices, normals, texCoords,
                                   0, NULL);
 }
 
 sg_object_t*
-sg_load_object(const char *file)
+sg_load_object(const char *file, sg_shader_t *shader)
 {
   assert(file && "not null");
-
+  char *fullpath = ooResGetPath(file);
   sg_object_t *model = NULL;
 
   char *dot = strrchr(file, '.');
@@ -439,11 +442,13 @@ sg_load_object(const char *file)
     } else if (!strcmp(dot, ".3ds")) {
 
     } else if (!strcmp(dot, ".dae")) {
-      model = collada_load(file);
+      model = collada_load(fullpath);
     } else if (!strcmp(dot, ".ac")) {
-      model = ac3d_load(file);
+      model = ac3d_load(fullpath, shader);
     }
   }
+
+  if (model) sg_object_set_shader(model, shader);
   return model;
 }
 
@@ -453,8 +458,7 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
               sg_material_t *mat)
 {
   // NOTE: Z points upwards
-  sg_object_t *sphere = sg_new_object();
-  sg_object_set_shader(sphere, shader);
+  sg_object_t *sphere = sg_new_object(shader);
   float_array_t verts, texc, normals;
   float_array_init(&verts);
   float_array_init(&normals);
@@ -521,7 +525,7 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
 }
 
 sg_object_t*
-sg_new_ellipse(const char *name, float semiMajor,
+sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
                float semiMinor, float asc,
                float inc, float argOfPeriapsis,
                float dec, float ra, int segments)
@@ -530,12 +534,12 @@ sg_new_ellipse(const char *name, float semiMajor,
 }
 
 sg_object_t*
-sg_new_axises(const char *name, float length)
+sg_new_axises(const char *name, sg_shader_t *shader, float length)
 {
   float axis[] = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
                   0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
                   0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f};
-  sg_object_t *obj = sg_new_object_with_geo(GL_LINE, 6, axis, NULL, NULL);
+  sg_object_t *obj = sg_new_object_with_geo(shader, GL_LINE, 6, axis, NULL, NULL);
   return obj;
 }
 

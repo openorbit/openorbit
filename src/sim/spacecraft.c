@@ -376,11 +376,10 @@ simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
   obj_array_push(&sc->stages, stage);
 
   // Load stage model
-  sg_object_t *model = sg_load_object(mesh);
-  sg_object_set_shader(model, sg_get_shader("spacecraft"));
+  sg_object_t *model = sg_load_object(mesh, sg_get_shader("spacecraft"));
 
   ooScSetStageMesh(stage, model);
-  sg_scene_t *scene = NULL; // TODO: FIX
+  sg_scene_t *scene = sc->scene; // TODO: FIX
   sg_scene_add_object(scene, model);
 
   return stage;

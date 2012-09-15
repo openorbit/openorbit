@@ -23,6 +23,6 @@
 #include "rendering/types.h"
 
 void sg_window_draw(sg_window_t *window, float dt);
-sg_window_t* sg_new_window(void);
+sg_window_t* sg_new_window(sg_scenegraph_t *sg);
 
 #endif

@@ -44,7 +44,7 @@ struct SIMmfd {
 
 void simMfdPageRegister(SIMmfdpage *page);
 
-void simMfdInitAll(sg_scenegraph_t *sg);
+void simMfdInitAll(sg_viewport_t *vp);
 
 // Draw top level MFD and the MFD screen
 void simMfdDraw(SIMmfd *mfd);

@@ -33,6 +33,8 @@
 #include "res-manager.h"
 #include "physics/orbit.h"
 #include "rendering/sky.h"
+#include "rendering/window.h"
+#include "rendering/scenegraph.h"
 #include "settings.h"
 #include "io-manager.h"
 
@@ -48,7 +50,11 @@ ooSimInit(void)
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   gSIM_state.stepSize = 1.0 / freq; // Period in s
   //gSIM_state.evQueue = simNewEventQueue();
-
+  gSIM_state.sg = sg_new_scenegraph();
+  gSIM_state.win = sg_new_window(gSIM_state.sg);
+  sg_viewport_t *vp = sg_new_viewport(gSIM_state.win, 0, 0, 640, 480);
+  sg_scene_t *scene = sg_new_scene(gSIM_state.sg, "main");
+  sg_viewport_set_scene(vp, scene);
 
   sg_background_t *sky = sgCreateBackgroundFromFile("data/stars.csv");
   //gSIM_state.sg = sgNewSceneGraph();
@@ -72,7 +78,7 @@ ooSimInit(void)
   //                         0.0, 0.0, 20.0);
   //sgSetCam(gSIM_state.sg, cam);
 
-  simMfdInitAll(gSIM_state.sg);
+  simMfdInitAll(vp);
 }
 
 

@@ -82,6 +82,12 @@ sg_viewport_add_overlay(sg_viewport_t *vp, sg_overlay_t *ov)
 {
   obj_array_push(&vp->overlays, ov);
 }
+void
+sg_viewport_set_scene(sg_viewport_t *vp, sg_scene_t *sc)
+{
+  vp->scene = sc;
+}
+
 
 void
 sg_viewport_draw(sg_viewport_t *vp, float dt)

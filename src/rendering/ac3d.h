@@ -21,8 +21,9 @@
 #ifndef AC3D_H
 #define AC3D_H
 
-#include "model.h"
+#include "rendering/object.h"
+#include "rendering/shader-manager.h"
 
-sg_object_t* ac3d_load(const char *path);
+sg_object_t* ac3d_load(const char *path, sg_shader_t *shader);
 
 #endif /* ! AC3D_H */

@@ -55,7 +55,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                 float *vertices, float *normals, float *texCoords,
                 size_t index_count, int *indices);
 
-sg_object_t* sg_new_ellipse(const char *name, float semiMajor,
+sg_object_t* sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
                                       float semiMinor, float asc,
                                       float inc, float argOfPeriapsis,
                                       float dec, float ra, int segments);
@@ -65,9 +65,10 @@ sg_object_t* sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
                            sg_texture_t *spec,
                            sg_material_t *mat);
 
-sg_object_t* sg_new_object_with_geo(int gl_primitive, size_t vertexCount,
-                           float *vertices, float *normals, float *texCoords);
-sg_object_t* sg_new_object(void);
+sg_object_t* sg_new_object_with_geo(sg_shader_t *shader,
+                                    int gl_primitive, size_t vertexCount,
+                                    float *vertices, float *normals, float *texCoords);
+sg_object_t* sg_new_object(sg_shader_t *shader);
 
 void sg_object_animate(sg_object_t *obj, float dt); // Linear interpolation between frames
 void sg_object_update(sg_object_t *obj); // Pull from physis system
@@ -80,7 +81,7 @@ void sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody);
 PLobject* sg_object_get_rigid_body(const sg_object_t *obj);
 
 
-sg_object_t* sg_load_object(const char *file);
+sg_object_t* sg_load_object(const char *file, sg_shader_t *shader);
 
 void sg_object_set_shader(sg_object_t *obj, sg_shader_t *shader);
 void sg_object_set_shader_by_name(sg_object_t *obj, const char *shname);
