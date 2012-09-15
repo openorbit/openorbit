@@ -50,7 +50,8 @@ extern "C" {
 */
 float3 ooEquToCart(float ra, float dec);
 
-void sgDrawBackground(sg_background_t *bg);
+void sg_background_draw(sg_background_t *bg);
+
 sg_background_t* sgCreateBackgroundFromFile(const char *file);
 
 #ifdef __cplusplus

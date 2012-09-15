@@ -38,6 +38,17 @@
 #include "rendering/scenegraph.h"
 #include <string.h>
 
+struct sg_texture_t {
+  GLint width, height;
+  GLuint texId;
+  GLenum internalType;
+  GLenum texType;
+  GLint bytesPerTex;
+  char *path;
+  void *data;
+};
+
+
 static hashtable_t *gOOtexDict;
 
 static void __attribute__((constructor))
@@ -46,29 +57,29 @@ texInit(void)
     gOOtexDict = hashtable_new_with_str_keys(128);
 }
 
-GLuint
-ooTexLoad(const char *key, const char *name)
+sg_texture_t*
+sg_load_texture(const char *key)
 {
   SG_CHECK_ERROR;
-  if (!key) return 0;
+  if (!key) return NULL;
 
-  OOtexture *tex = NULL;
+  sg_texture_t *tex = NULL;
   if ((tex = hashtable_lookup(gOOtexDict, key))) {
     // Don't reload textures, return memoized value
-    return tex->texId;
+    return tex;
   }
 
-  char *fname = ooResGetPath(name);
+  char *fname = ooResGetPath(key);
   if (fname == NULL) return 0;
 
   image_t img;
 
-  tex = malloc(sizeof(OOtexture));
+  tex = malloc(sizeof(sg_texture_t));
   if (tex == NULL) {free(fname); return 0;}
 
   int res = img_load(&img, fname);
   if (res != 0) {free(fname);free(tex);return 0;}
-  tex->path = strdup(fname);
+  tex->path = strdup(key);
   switch (img.kind) {
   case IMG_BGRA:
     tex->internalType = GL_RGBA8;
@@ -142,54 +153,28 @@ ooTexLoad(const char *key, const char *name)
 
   SG_CHECK_ERROR;
 
-  return tex->texId;
-}
-
-int
-ooTexBind(const char *key)
-{
-  OOtexture *tex = hashtable_lookup(gOOtexDict, key);
-  if (tex != NULL) {
-    glBindTexture(GL_TEXTURE_2D, tex->texId);
-    return 0;
-  }
-
-  return -1;
+  return tex;
 }
 
 GLuint
-ooTexNum(const char *key)
+sg_texture_get_id(sg_texture_t *tex)
 {
-  OOtexture *tex = hashtable_lookup(gOOtexDict, key);
-
-  if (tex != NULL) {
-    return tex->texId;
-  }
-
-  return 0;
+  return tex->texId;
 }
 
-int
-ooTexUnload(const char *key)
+void
+sg_texture_unload(sg_texture_t *tex)
 {
-  OOtexture *tex = hashtable_lookup(gOOtexDict, key);
-
-  if (tex == NULL) {
-      return -1;
-  }
-
-  hashtable_remove(gOOtexDict, key);
+  hashtable_remove(gOOtexDict, tex->path);
   glDeleteTextures(1, &tex->texId);
 
   free(tex->data);
+  free(tex->path);
   free(tex);
-
-  return 0;
 }
 
-OOtexture*
-ooTexGet(const char *key)
+sg_texture_t*
+sg_find_texture(const char *key)
 {
   return hashtable_lookup(gOOtexDict, key);
 }
-

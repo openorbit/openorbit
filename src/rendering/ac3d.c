@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <math.h>
 #include <vmath/vmath-convert.h>
+#include "rendering/object.h"
 
 #define BUFF_SIZE 1024
 
@@ -211,11 +212,11 @@ ac3d_delete(struct ac3d_file_t *ac3d)
   free(ac3d);
 }
 
-float vecangle(float a[3], float b[3])
+float vecangle(float3 a, float3 b)
 {
-  float dotprod = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-  float anorm = sqrtf(a[0]*a[0] + a[1]*a[1]+a[2]*a[2]);
-  float bnorm = sqrtf(b[0]*b[0] + b[1]*b[1]+b[2]*b[2]);
+  float dotprod = vf3_dot(a, b);
+  float anorm = vf3_abs(a);
+  float bnorm = vf3_abs(b);
 
   float cosang = dotprod/(anorm*bnorm);
   float acos = acosf(cosang);
@@ -225,31 +226,47 @@ float vecangle(float a[3], float b[3])
 // This is maybe not the most efficient way, since it makes copys of all the
 // data, the imgload lib steals the buffers and transfers their ownership
 // instead
-model_object_t*
-ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *obj)
+sg_object_t*
+ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj)
 {
   bool has_warned_for_materials = false;
   assert(obj != NULL);
-  model_object_t *model = model_object_new();
+  sg_object_t *model = sg_new_object();
 
   // Transfer rotation matrix, but ensure it is transposed for GL
-  memset(model->rot, 0, sizeof(float)*16);
-  model->rot[3][3] = 1.0;
+  // Note, no longer applicable for GL 3, we simply flag matrix uniforms as
+  // needing transposition.
+  float4x4 rot;
+  memset(rot, 0, sizeof(float4x4));
+  rot[3][3] = 1.0;
 
+  // Does not transpose anymore
   for (int i = 0 ; i < 3 ; ++ i) {
     for (int j = 0 ; j < 3 ; ++ j) {
-      model->rot[j][i] = obj->rot[i][j];
+      rot[i][j] = obj->rot[i][j];
     }
   }
-  memcpy(model->trans, obj->pos, 3*sizeof(float));
+  sg_object_set_rot(model, &rot);
+  sg_object_set_pos(model, vf3_set(obj->pos[0], obj->pos[1], obj->pos[2]));
 
   // BUG: assume this object has the same material for all faces, this is not
   //      correct, and we should ensure that a face with its own material
   //      is placed in its own vertex array, for now this is most likelly OK
   //      but we should address it ASAP.
 
+  sg_material_t *mat = sg_new_material();
+  sg_object_set_material(model, mat);
+
   if (obj->num_surfs > 0) {
-    model->materialId = obj->surfs[0].material_idx;
+    struct ac3d_material_t *acmat = &ac3d->materials[obj->surfs[0].material_idx];
+    sg_material_set_diff4f(mat, acmat->r, acmat->g, acmat->b, 1.0-acmat->trans);
+    sg_material_set_emiss4f(mat, acmat->emis_r, acmat->emis_g, acmat->emis_b,
+                            1.0-acmat->trans);
+    sg_material_set_spec4f(mat, acmat->spec_r, acmat->spec_g, acmat->spec_b,
+                           1.0-acmat->trans);
+    sg_material_set_amb4f(mat, acmat->amb_r, acmat->amb_g, acmat->amb_b,
+                          1.0-acmat->trans);
+    sg_material_set_shininess(mat, acmat->shi);
   }
 
   float_array_t face_normals;
@@ -273,18 +290,9 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
     float *p1 = &obj->verts[obj->surfs[i].ref_lines[1].vert_idx*3];
     float *p2 = &obj->verts[obj->surfs[i].ref_lines[2].vert_idx*3];
 
-    float vb[3] = {p0[0] - p1[0], p0[1] - p1[1], p0[2] - p1[2]};
-    float va[3] = {p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]};
-    float vc[3];
-    vc[0] = va[1]*vb[2]-va[2]*vb[1];
-    vc[1] = va[2]*vb[0]-va[0]*vb[2];
-    vc[2] = va[0]*vb[1]-va[1]*vb[0];
-
-    // Normalise face normal
-    float absvc = sqrtf(vc[0]*vc[0] + vc[1]*vc[1] + vc[2]*vc[2]);
-    vc[0] /= absvc;
-    vc[1] /= absvc;
-    vc[2] /= absvc;
+    float3 vb = vf3_set(p0[0] - p1[0], p0[1] - p1[1], p0[2] - p1[2]);
+    float3 va = vf3_set(p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]);
+    float3 vc = vf3_normalise(vf3_cross(va, vb));
 
     float_array_push(&face_normals, vc[0]);
     float_array_push(&face_normals, vc[1]);
@@ -299,6 +307,12 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
       }
     }
   }
+
+  float_array_t normals, vertices, texcoords, colours;
+  float_array_init(&normals);
+  float_array_init(&vertices);
+  float_array_init(&texcoords);
+  float_array_init(&colours);
 
   // Go through each face again and add the vertices
   for (int i = 0 ; i < obj->num_surfs ; ++ i) {
@@ -318,15 +332,13 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
     }
 
     for (int j = 0 ; j < idx_seq_len ; ++ j) {
-      float normal[3];
-      float faceNormal[3];
+      float3 normal;
+      float3 faceNormal;
       faceNormal[0] = face_normals.elems[i*3+0];
       faceNormal[1] = face_normals.elems[i*3+1];
       faceNormal[2] = face_normals.elems[i*3+2];
 
-      normal[0] = faceNormal[0];
-      normal[1] = faceNormal[1];
-      normal[2] = faceNormal[2];
+      normal = faceNormal;
 
       int vertexId = obj->surfs[i].ref_lines[idxseq[j]].vert_idx;
 
@@ -336,52 +348,50 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
         int faceId = vertex_sharing[vertexId].elems[k];
 
         if (faceId != i) {
-          float nextFaceNormal[3];
+          float3 nextFaceNormal;
           nextFaceNormal[0] = face_normals.elems[faceId*3+0];
           nextFaceNormal[1] = face_normals.elems[faceId*3+1];
           nextFaceNormal[2] = face_normals.elems[faceId*3+2];
 
           if (vecangle(faceNormal, nextFaceNormal) < DEG_TO_RAD(45.0f)) {
-            normal[0] += nextFaceNormal[0];
-            normal[1] += nextFaceNormal[1];
-            normal[2] += nextFaceNormal[2];
+            normal += nextFaceNormal;
           }
         }
       }
 
-      float absn = sqrtf(normal[0]*normal[0] +
-                         normal[1]*normal[1] +
-                         normal[2]*normal[2]);
-      normal[0] /= absn;
-      normal[1] /= absn;
-      normal[2] /= absn;
+      normal = vf3_normalise(normal);
+      
+      float_array_push(&normals, normal[0]);
+      float_array_push(&normals, normal[1]);
+      float_array_push(&normals, normal[2]);
 
-      float_array_push(&model->normals, normal[0]);
-      float_array_push(&model->normals, normal[1]);
-      float_array_push(&model->normals, normal[2]);
-
-      float_array_push(&model->vertices,
+      float_array_push(&vertices,
                        obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+0]);
-      float_array_push(&model->vertices,
+      float_array_push(&vertices,
                        obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+1]);
-      float_array_push(&model->vertices,
+      float_array_push(&vertices,
                        obj->verts[3*obj->surfs[i].ref_lines[idxseq[j]].vert_idx+2]);
 
-      float_array_push(&model->texCoords,
+      float_array_push(&texcoords,
                        obj->surfs[i].ref_lines[idxseq[j]].tex_x);
-      float_array_push(&model->texCoords,
+      float_array_push(&texcoords,
                        obj->surfs[i].ref_lines[idxseq[j]].tex_y);
 
-      float_array_push(&model->colours,
+      float_array_push(&colours,
                        ac3d->materials[obj->surfs[i].material_idx].r);
-      float_array_push(&model->colours,
+      float_array_push(&colours,
                        ac3d->materials[obj->surfs[i].material_idx].g);
-      float_array_push(&model->colours,
+      float_array_push(&colours,
                        ac3d->materials[obj->surfs[i].material_idx].b);
     }
   }
-  model->vertexCount = (uint32_t)model->vertices.length / 3;
 
+  float *verts = vertices.elems;
+  float *texc = texcoords.length ? texcoords.elems : NULL;
+  float *norm = normals.length ? normals.elems : NULL;
+
+  sg_object_set_geo(model, GL_TRIANGLES, vertices.length / 3,
+                    verts, norm, texc);
 
 
   free(face_normals.elems);
@@ -390,58 +400,35 @@ ac3d_obj_to_model(model_t *mod, struct ac3d_file_t *ac3d, struct ac3d_object_t *
   }
 
   for (int i = 0 ; i < obj->num_childs ; ++ i) {
-    obj_array_push(&model->children,
-                   ac3d_obj_to_model(mod, ac3d, obj->children[i]));
+    sg_object_add_child(model, ac3d_obj_to_model(ac3d, obj->children[i]));
   }
 
-  model->texture = (obj->texture) ? strdup(obj->texture) : NULL;
+  //  model->texture = (obj->texture) ? strdup(obj->texture) : NULL;
 
-  model->model = mod;
+  //model->model = mod;
+
+  float_array_dispose(&normals);
+  float_array_dispose(&vertices);
+  float_array_dispose(&texcoords);
+  float_array_dispose(&colours);
+
   return model;
 }
 
-model_t*
+sg_object_t*
 ac3d_to_model(struct ac3d_file_t *ac3d)
 {
-  model_t *model = malloc(sizeof(model_t));
-  memset(model, 0, sizeof(model_t));
-  obj_array_init(&model->objs);
+  sg_object_t *model = NULL;
 
-  model->materialCount = ac3d->mat_count;
-  model->materials = calloc(ac3d->mat_count, sizeof(material_t*));
-
-  for (int i = 0 ; i < ac3d->mat_count ; ++ i) {
-    model->materials[i] = material_create();
-
-    model->materials[i]->diffuse[0] = ac3d->materials[i].r;
-    model->materials[i]->diffuse[1] = ac3d->materials[i].g;
-    model->materials[i]->diffuse[2] = ac3d->materials[i].b;
-    model->materials[i]->diffuse[3] = 1.0 - ac3d->materials[i].trans;
-
-    model->materials[i]->ambient[0] = ac3d->materials[i].amb_r;
-    model->materials[i]->ambient[1] = ac3d->materials[i].amb_g;
-    model->materials[i]->ambient[2] = ac3d->materials[i].amb_b;
-    model->materials[i]->ambient[3] = 1.0 - ac3d->materials[i].trans;
-
-    model->materials[i]->emission[0] = ac3d->materials[i].emis_r;
-    model->materials[i]->emission[1] = ac3d->materials[i].emis_g;
-    model->materials[i]->emission[2] = ac3d->materials[i].emis_b;
-    model->materials[i]->emission[3] = 1.0 - ac3d->materials[i].trans;
-
-    model->materials[i]->specular[0] = ac3d->materials[i].spec_r;
-    model->materials[i]->specular[1] = ac3d->materials[i].spec_g;
-    model->materials[i]->specular[2] = ac3d->materials[i].spec_b;
-    model->materials[i]->specular[3] = 1.0 - ac3d->materials[i].trans;
-
-    model->materials[i]->shininess = ac3d->materials[i].shi;
-
+  if (ac3d->obj_count > 1) {
+    model = sg_new_object();
+    for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
+      sg_object_add_child(model, ac3d_obj_to_model(ac3d, ac3d->objs[i]));
+    }
+  } else {
+    model = ac3d_obj_to_model(ac3d, ac3d->objs[0]);
   }
 
-  for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
-    obj_array_push(&model->objs, ac3d_obj_to_model(model, ac3d, ac3d->objs[i]));
-  }
-
-  //((model_object_t*)model->objs.elems[0])->trans[0] = 5.0;
   return model;
 }
 
@@ -550,7 +537,7 @@ error:
   return NULL;
 }
 
-model_t*
+sg_object_t*
 ac3d_load(const char *path)
 {
   FILE *fp = fopen(path, "r");
@@ -609,7 +596,7 @@ ac3d_load(const char *path)
     return NULL;
   }
 
-  model_t *model = ac3d_to_model(ac3d);
+  sg_object_t *model = ac3d_to_model(ac3d);
   ac3d_delete(ac3d);
 
   return model;

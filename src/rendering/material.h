@@ -23,15 +23,15 @@
 #include <vmath/vmath.h>
 #include "rendering/types.h"
 
-void sg_init_material(sg_material_t *mat);
-void sg_bind_material(sg_material_t *mat);
+sg_material_t* sg_new_material(void);
 
-void sg_set_material_amb4f(sg_material_t *mat, float r, float g, float b, float a);
-void sg_set_material_diff4f(sg_material_t *mat, float r, float g, float b, float a);
-void sg_set_material_spec4f(sg_material_t *mat, float r, float g, float b, float a);
-void sg_set_material_emiss4f(sg_material_t *mat, float r, float g, float b, float a);
-void sg_set_material_shininess(sg_material_t *mat, float s);
+void sg_material_init(sg_material_t *mat);
+void sg_material_bind(sg_material_t *mat, sg_shader_t *shader);
 
-
+void sg_material_set_amb4f(sg_material_t *mat, float r, float g, float b, float a);
+void sg_material_set_diff4f(sg_material_t *mat, float r, float g, float b, float a);
+void sg_material_set_spec4f(sg_material_t *mat, float r, float g, float b, float a);
+void sg_material_set_emiss4f(sg_material_t *mat, float r, float g, float b, float a);
+void sg_material_set_shininess(sg_material_t *mat, float s);
 
 #endif /* !SG_MATERIAL_H__ */

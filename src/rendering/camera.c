@@ -35,6 +35,195 @@
 #include "scenegraph.h"
 #include "scenegraph-private.h"
 
+struct sg_camera_t {
+  float4x4 proj_matrix;
+  float4x4 view_matrix;
+
+  sg_camera_type_t type;
+
+  union {
+    struct {
+      lwcoord_t lwc;
+      float3 dp;
+      quaternion_t q;
+      quaternion_t dq;
+    } free;
+    struct {
+      sg_object_t *obj;
+      float3 r; // With this offset
+      quaternion_t q; // and this rotation (rotate before translation)
+      quaternion_t dq; // Delta rotation
+    } fixed;
+    struct {
+      sg_object_t *obj;
+      float ra, dec;
+      float dra, ddec, dr;
+      float r, zoom;
+    } orbiting;
+  };
+};
+
+sg_camera_t*
+sg_new_free_camera(const lwcoord_t *pos)
+{
+  sg_camera_t *cam = malloc(sizeof(sg_camera_t));
+  cam->type = SG_CAMERA_FREE;
+  cam->free.lwc = *pos;
+  return cam;
+}
+
+sg_camera_t*
+sg_new_fixed_camera(sg_object_t *obj)
+{
+  sg_camera_t *cam = malloc(sizeof(sg_camera_t));
+  cam->type = SG_CAMERA_FIXED;
+  cam->fixed.obj = obj;
+  return cam;
+}
+
+sg_camera_t*
+sg_new_orbiting_camera(sg_object_t *obj)
+{
+  sg_camera_t *cam = malloc(sizeof(sg_camera_t));
+  cam->type = SG_CAMERA_ORBITING;
+  cam->orbiting.obj = obj;
+  return cam;
+}
+
+
+sg_camera_type_t
+sg_camera_get_type(sg_camera_t *cam)
+{
+  return cam->type;
+}
+
+const float4x4*
+sg_camera_get_projection(sg_camera_t *cam)
+{
+  return &cam->proj_matrix;
+}
+
+const float4x4*
+sg_camera_get_view(sg_camera_t *cam)
+{
+  return &cam->view_matrix;
+}
+
+lwcoord_t
+sg_camera_free_get_lwc(sg_camera_t *cam)
+{
+  return cam->free.lwc;
+}
+
+float3
+sg_camera_free_get_velocity(sg_camera_t *cam)
+{
+  return cam->free.dp;
+}
+
+void
+sg_camera_free_set_velocity(sg_camera_t *cam, float3 v)
+{
+  cam->free.dp = v;
+}
+
+void
+sg_camera_free_increase_velocity(sg_camera_t *cam, float3 dv)
+{
+  cam->free.dp += dv;
+}
+
+
+quaternion_t
+sg_camera_free_get_quaternion(sg_camera_t *cam)
+{
+  return cam->free.q;
+}
+
+quaternion_t
+sg_camera_free_get_delta_quaternion(sg_camera_t *cam)
+{
+  return cam->free.dq;
+}
+
+sg_object_t*
+sg_camera_fixed_get_obj(sg_camera_t *cam)
+{
+  return cam->fixed.obj;
+}
+
+void
+sg_camera_fixed_set_obj(sg_camera_t *cam, sg_object_t *obj)
+{
+  cam->fixed.obj = obj;
+}
+
+float3
+sg_camera_fixed_get_offset(sg_camera_t *cam)
+{
+  return cam->fixed.r;
+}
+
+quaternion_t
+sg_camera_fixed_get_quaternion(sg_camera_t *cam)
+{
+  return cam->fixed.q;
+}
+quaternion_t
+sg_camera_fixed_get_delta_quaternion(sg_camera_t *cam)
+{
+  return cam->fixed.dq;
+}
+
+sg_object_t*
+sg_camera_orbiting_get_obj(sg_camera_t *cam)
+{
+  return cam->orbiting.obj;
+}
+void
+sg_camera_orbiting_set_obj(sg_camera_t *cam, sg_object_t *obj)
+{
+  cam->orbiting.obj = obj;
+}
+
+float
+sg_camera_orbiting_get_ra(const sg_camera_t *cam)
+{
+  return cam->orbiting.ra;
+}
+float
+sg_camera_orbiting_get_dec(const sg_camera_t *cam)
+{
+  return cam->orbiting.dec;
+}
+float
+sg_camera_orbiting_get_delta_ra(const sg_camera_t *cam)
+{
+  return cam->orbiting.dra;
+}
+float
+sg_camera_orbiting_get_delta_dec(const sg_camera_t *cam)
+{
+  return cam->orbiting.ddec;
+}
+
+float
+sg_camera_orbiting_get_delta_radius(const sg_camera_t *cam)
+{
+  return cam->orbiting.dr;
+}
+float
+sg_camera_orbiting_get_radius(const sg_camera_t *cam)
+{
+  return cam->orbiting.r;
+}
+float
+sg_camera_orbiting_get_zoom(const sg_camera_t *cam)
+{
+  return cam->orbiting.zoom;
+}
+
+
 /* Camera actions, registered as action handlers */
 
 
@@ -95,13 +284,13 @@ sgCamInit(void)
 
 
 void
-sgAnimateCam(sg_camera_t *cam, float dt)
+sg_camera_animate(sg_camera_t *cam, float dt)
 {
   switch (cam->type) {
     case SG_CAMERA_FIXED: {
       // Camera is pegged to object, not much to do here
       // object animation takes care of moving the camera
-      float4 np = vf4_add(cam->fixed.obj->pos, cam->fixed.r);
+      float4 np = vf4_add(sg_object_get_pos(cam->fixed.obj), cam->fixed.r);
       mf4_ident(cam->view_matrix);
       float4x4 a;
       mf4_make_translate(a, cam->fixed.r);
@@ -165,7 +354,7 @@ sgAnimateCam(sg_camera_t *cam, float dt)
 
 
 void
-sgMoveCam(sg_camera_t *cam)
+sg_camera_move(sg_camera_t *cam)
 {
   switch (cam->type) {
   case SG_CAMERA_FIXED: {

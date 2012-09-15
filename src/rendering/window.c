@@ -21,12 +21,16 @@
 #include "rendering/viewport.h"
 #include "rendering/scene.h"
 
+struct sg_window_t {
+  obj_array_t viewports;
+  unsigned w, h;
+};
+
 void
-sg_window_render(sg_window_t *window, float dt)
+sg_window_draw(sg_window_t *window, float dt)
 {
   ARRAY_FOR_EACH(i, window->viewports) {
-    sg_set_viewport(ARRAY_ELEM(window->viewports, i));
-    sg_scene_render(((sg_viewport_t*)ARRAY_ELEM(window->viewports, i))->scene, dt);
+    sg_viewport_draw(ARRAY_ELEM(window->viewports, i), dt);
   }
 }
 

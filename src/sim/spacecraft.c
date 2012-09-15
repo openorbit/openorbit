@@ -31,6 +31,7 @@
 #include "actuator.h"
 #include "io-manager.h"
 #include "sim/pubsub.h"
+#include "rendering/object.h"
 
 extern SIMstate gSIM_state;
 
@@ -375,10 +376,12 @@ simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
   obj_array_push(&sc->stages, stage);
 
   // Load stage model
-  sg_object_t *model = sgLoadModel(mesh);
-  sgDrawableLoadShader(model, "spacecraft");
+  sg_object_t *model = sg_load_object(mesh);
+  sg_object_set_shader(model, sg_get_shader("spacecraft"));
+
   ooScSetStageMesh(stage, model);
-  sgSceneAddObj(sgGetScene(simGetSg(), "main"), model);
+  sg_scene_t *scene = NULL; // TODO: FIX
+  sg_scene_add_object(scene, model);
 
   return stage;
 }
@@ -624,7 +627,7 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
   sc->detatchStage = simDefaultDetatch;
   sc->detatchSequence = 0;
   sc->obj = plObject(world, args->name);
-  sc->scene = sgGetScene(sg, "main"); // Just use any of the existing ones
+  sc->scene = sg_scenegraph_get_scene(sg, "main"); // Just use any of the existing ones
   sc->expendedMass = 0.0;
   sc->mainEngineOn = false;
   sc->toggleMainEngine = simDefaultEngineToggle;

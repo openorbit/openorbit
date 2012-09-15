@@ -19,13 +19,33 @@
 
 #include "rendering/types.h"
 
-#include "light.h"
-#include "scenegraph-private.h"
-#include "camera.h"
+#include "rendering/light.h"
+#include "rendering/scenegraph-private.h"
+#include "rendering/camera.h"
+
 #include "physics/object.h"
 #include <stdlib.h>
+
+struct sg_light_t {
+  sg_scene_t *scene;
+  int lightId;
+
+  float4 pos;
+  float4 ambient;
+  float4 specular;
+  float4 diffuse;
+  float3 dir; // Only used for spotlights
+
+  float constantAttenuation;
+  float linearAttenuation;
+  float quadraticAttenuation;
+
+  float4 globAmbient;
+};
+
+
 void
-sgSetLightPos3f(sg_light_t *light, float x, float y, float z)
+sg_light_set_pos3f(sg_light_t *light, float x, float y, float z)
 {
   light->pos[0] = vf3_x(x);
   light->pos[1] = vf3_y(y);
@@ -34,7 +54,7 @@ sgSetLightPos3f(sg_light_t *light, float x, float y, float z)
 }
 
 void
-sgSetLightPosv(sg_light_t *light, float3 v)
+sg_light_set_posv(sg_light_t *light, float3 v)
 {
   light->pos[0] = vf3_x(v);
   light->pos[1] = vf3_y(v);
@@ -42,21 +62,47 @@ sgSetLightPosv(sg_light_t *light, float3 v)
   light->pos[3] = 1.0;
 }
 
+float3
+sg_light_get_pos(const sg_light_t *light)
+{
+  return light->pos;
+}
+
+float4
+sg_light_get_ambient(const sg_light_t *light)
+{
+  return light->ambient;
+}
+
+float4
+sg_light_get_specular(const sg_light_t *light)
+{
+  return light->specular;
+}
+
+float4
+sg_light_get_diffuse(const sg_light_t *light)
+{
+  return light->diffuse;
+}
+
 void
-sgSetLightPosLW(sg_light_t *light, lwcoord_t *lwc)
+sg_light_set_poslw(sg_light_t *light, lwcoord_t *lwc)
 {
   sg_scene_t *sc = light->scene;
-  sg_camera_t *cam = sc->cam;
+  sg_camera_t *cam = sg_scene_get_cam(sc);
 
-  if (cam->type == SG_CAMERA_FREE) {
-    float3 relPos = lwc_relvec(lwc, cam->free.lwc.seg);
+  if (sg_camera_get_type(cam) == SG_CAMERA_FREE) {
+    float3 relPos = lwc_relvec(lwc, sg_camera_free_get_lwc(cam).seg);
 
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);
     light->pos[2] = vf3_z(relPos);
     light->pos[3] = 1.0;
-  } else if (cam->type == SG_CAMERA_ORBITING) {
-    float3 relPos = lwc_relvec(lwc, cam->orbiting.obj->rigidBody->p.seg);
+  } else if (sg_camera_get_type(cam) == SG_CAMERA_ORBITING) {
+    sg_object_t *obj = sg_camera_orbiting_get_obj(cam);
+    PLobject *pobj = sg_object_get_rigid_body(obj);
+    float3 relPos = lwc_relvec(lwc, pobj->p.seg);
 
     light->pos[0] = vf3_x(relPos);
     light->pos[1] = vf3_y(relPos);
@@ -67,7 +113,7 @@ sgSetLightPosLW(sg_light_t *light, lwcoord_t *lwc)
 
 
 void
-sgLightSetAmbient4f(sg_light_t *light, float r, float g, float b, float a)
+sg_light_set_ambient4f(sg_light_t *light, float r, float g, float b, float a)
 {
   light->ambient[0] = r;
   light->ambient[1] = g;
@@ -76,7 +122,7 @@ sgLightSetAmbient4f(sg_light_t *light, float r, float g, float b, float a)
 
 }
 void
-sgLightSetSpecular4f(sg_light_t *light, float r, float g, float b, float a)
+sg_light_set_specular4f(sg_light_t *light, float r, float g, float b, float a)
 {
   light->specular[0] = r;
   light->specular[1] = g;
@@ -86,7 +132,7 @@ sgLightSetSpecular4f(sg_light_t *light, float r, float g, float b, float a)
 }
 
 void
-sgLightSetDiffuse4f(sg_light_t *light, float r, float g, float b, float a)
+sg_light_set_diffuse4f(sg_light_t *light, float r, float g, float b, float a)
 {
   light->diffuse[0] = r;
   light->diffuse[1] = g;
@@ -94,10 +140,19 @@ sgLightSetDiffuse4f(sg_light_t *light, float r, float g, float b, float a)
   light->diffuse[3] = a;
 }
 
+void
+sg_light_set_attenuation(sg_light_t *light, float const_att, float lin_att,
+                         float quad_att)
+{
+  light->constantAttenuation = const_att;
+  light->linearAttenuation = lin_att;
+  light->quadraticAttenuation = quad_att;
+}
+
 
 
 sg_light_t*
-sgNewPointlight3f(sg_scene_t *sc, float x, float y, float z)
+sg_new_light3f(sg_scene_t *sc, float x, float y, float z)
 {
   sg_light_t *light = malloc(sizeof(sg_light_t));
   light->scene = sc;
@@ -122,13 +177,61 @@ sgNewPointlight3f(sg_scene_t *sc, float x, float y, float z)
   light->diffuse[2] = 1.0;
   light->diffuse[3] = 1.0;
 
-  sgSceneAddLight(sc, light);
+  sg_scene_add_light(sc, light);
 
   return light;
 }
 
 sg_light_t*
-sgNewPointlight(sg_scene_t *sc, float3 p)
+sg_new_light(sg_scene_t *sc, float3 p)
 {
-  return sgNewPointlight3f(sc, vf3_x(p), vf3_y(p), vf3_z(p));
+  return sg_new_light3f(sc, vf3_x(p), vf3_y(p), vf3_z(p));
 }
+
+void
+sg_light_bind(sg_light_t *sc, sg_shader_t *shader)
+{
+#if 0
+  glUniform3fv(obj->shader->uniforms.lightIds[i].pos, 1,
+               (GLfloat*)&obj->lights[i]->pos);
+  glUniform4fv(obj->shader->uniforms.lightIds[i].ambient, 1,
+               (GLfloat*)&obj->lights[i]->ambient);
+  glUniform4fv(obj->shader->uniforms.lightIds[i].specular, 1,
+               (GLfloat*)&obj->lights[i]->specular);
+  glUniform4fv(obj->shader->uniforms.lightIds[i].diffuse, 1,
+               (GLfloat*)&obj->lights[i]->diffuse);
+  glUniform3fv(obj->shader->uniforms.lightIds[i].dir, 1,
+               (GLfloat*)&obj->lights[i]->dir);
+
+  glUniform1f(obj->shader->uniforms.lightIds[i].constantAttenuation,
+              obj->lights[i]->constantAttenuation);
+  glUniform1f(obj->shader->uniforms.lightIds[i].linearAttenuation,
+              obj->lights[i]->linearAttenuation);
+  glUniform1f(obj->shader->uniforms.lightIds[i].quadraticAttenuation,
+              obj->lights[i]->quadraticAttenuation);
+
+  glUniform4fv(obj->shader->uniforms.lightIds[i].globAmbient, 1,
+               (GLfloat*)&obj->lights[i]->globAmbient);
+#endif
+}
+
+float
+sg_light_get_const_attenuation(const sg_light_t *light)
+{
+  return light->constantAttenuation;
+}
+
+float
+sg_light_get_linear_attenuation(const sg_light_t *light)
+{
+  return light->linearAttenuation;
+}
+
+
+float
+sg_light_get_quadratic_attenuation(const sg_light_t *light)
+{
+  return light->quadraticAttenuation;
+}
+
+

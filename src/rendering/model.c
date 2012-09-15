@@ -1,5 +1,5 @@
 /*
-  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -24,63 +24,16 @@
 #include "collada.h"
 #include <gencds/array.h>
 
-model_object_t*
-model_object_new(void)
-{
-  model_object_t *model = malloc(sizeof(model_object_t));
-  memset(model, 0, sizeof(model_object_t));
+#include "rendering/object.h"
+#include "rendering/material.h"
+#include "rendering/types.h"
 
-  model->rot[0][0] = 1.0;
-  model->rot[1][1] = 1.0;
-  model->rot[2][2] = 1.0;
-  model->rot[3][3] = 1.0;
-
-  obj_array_init(&model->children);
-  float_array_init(&model->vertices);
-  float_array_init(&model->texCoords);
-  float_array_init(&model->normals);
-  float_array_init(&model->colours);
-
-  return model;
-}
-
-material_t*
-material_create(void)
-{
-  // Initialise the default material to what opengl has as default
-  material_t *m = malloc(sizeof(material_t));
-
-  m->ambient[0] = 0.2;
-  m->ambient[1] = 0.2;
-  m->ambient[2] = 0.2;
-  m->ambient[3] = 1.0;
-
-  m->diffuse[0] = 0.8;
-  m->diffuse[1] = 0.8;
-  m->diffuse[2] = 0.8;
-  m->diffuse[3] = 1.0;
-
-  m->specular[0] = 0.0;
-  m->specular[1] = 0.0;
-  m->specular[2] = 0.0;
-  m->specular[3] = 1.0;
-
-  m->emission[0] = 0.0;
-  m->emission[1] = 0.0;
-  m->emission[2] = 0.0;
-  m->emission[3] = 1.0;
-
-  m->shininess = 0.0;
-
-
-  return m;
-}
-model_t*
+sg_object_t*
 model_load(const char * restrict fileName)
 {
   assert(fileName && "not null");
 
-  model_t *model = NULL;
+  sg_object_t *model = NULL;
 
   char *dot = strrchr(fileName, '.');
   if (dot) {
@@ -99,34 +52,4 @@ model_load(const char * restrict fileName)
     }
   }
   return model;
-}
-
-void
-model_obj_dispose(model_object_t * model)
-{
-  free(model->texture);
-
-  ARRAY_FOR_EACH(i, model->children) {
-    model_obj_dispose(ARRAY_ELEM(model->children, i));
-  }
-  obj_array_dispose(&model->children);
-
-  float_array_dispose(&model->vertices);
-  float_array_dispose(&model->texCoords);
-  float_array_dispose(&model->normals);
-  float_array_dispose(&model->colours);
-
-  free(model);
-}
-
-int
-model_dispose(model_t * model)
-{
-  ARRAY_FOR_EACH(i, model->objs) {
-    model_obj_dispose(ARRAY_ELEM(model->objs, i));
-  }
-  obj_array_dispose(&model->objs);
-  free(model->materials);
-  free(model);
-  return -1;
 }

@@ -33,6 +33,7 @@
 #include "common/palloc.h"
 #include "io-manager.h"
 #include "rendering/render.h"
+#include "rendering/overlay.h"
 #include "sim.h"
 
 void simMfdInit(SIMmfd *mfd, unsigned orig_x, unsigned orig_y,
@@ -49,9 +50,9 @@ MODULE_INIT(mfd, NULL) {
 }
 
 static void
-mfd_draw(sg_overlay_t *overlay)
+mfd_draw(sg_overlay_t *overlay, void *obj)
 {
-  SIMmfd *mfd = (SIMmfd*)overlay;
+  SIMmfd *mfd = (SIMmfd*)obj;
 
   if (mfd_pages.length > 0) {
     SIMmfdpage *page = ARRAY_ELEM(mfd_pages, mfd->page_no);
@@ -113,7 +114,7 @@ mfdToggle(int state, void *data)
 {
   if (state) {
     SIMmfd *mfd = data;
-    mfd->super.enabled = !mfd->super.enabled;
+    //mfd->super.enabled = !mfd->super.enabled;
   }
 }
 
@@ -157,9 +158,9 @@ simSelectMfd(SIMmfd *mfd, unsigned mfdId)
 }
 
 void
-test_hud_draw(sg_overlay_t *overlay)
+test_hud_draw(sg_overlay_t *overlay, void *obj)
 {
-  SIMhud *hud = (SIMhud*)overlay;
+  SIMhud *hud = (SIMhud*)obj;
 
   sim_spacecraft_t *sc = simGetSpacecraft();
   float3 gv = simGetGravityVector(sc);
@@ -272,16 +273,22 @@ simMfdInitAll(sg_scenegraph_t *sg)
   mfd2.page_no = 0;
   mfd3.page_no = 0;
 
-  sgInitOverlay(&mfd0.super, mfd_draw,   0.0,   0.0, 128.0, 128.0, 128, 128);
-  sgInitOverlay(&mfd1.super, mfd_draw, sgRenderInfo.w - 128.0,   0.0,
-                128.0, 128.0, 128, 128);
-  sgInitOverlay(&mfd2.super, mfd_draw, sgRenderInfo.w - 128.0,
-                sgRenderInfo.h - 128.0, 128.0, 128.0, 128, 128);
-  sgInitOverlay(&mfd3.super, mfd_draw,   0.0, sgRenderInfo.h - 128.0,
+  sg_overlay_t *overlay0    = sg_new_overlay(),
+               *overlay1    = sg_new_overlay(),
+               *overlay2    = sg_new_overlay(),
+               *overlay3    = sg_new_overlay(),
+               *overlay_hud = sg_new_overlay();
+
+  sg_overlay_init(overlay0, mfd_draw, &mfd0, 0.0,   0.0, 128.0, 128.0, 128, 128);
+  sg_overlay_init(overlay1, mfd_draw, &mfd1, sgRenderInfo.w - 128.0,   0.0,
+                  128.0, 128.0, 128, 128);
+  sg_overlay_init(overlay2, mfd_draw, &mfd2, sgRenderInfo.w - 128.0,
+                 sgRenderInfo.h - 128.0, 128.0, 128.0, 128, 128);
+  sg_overlay_init(overlay3, mfd_draw, &mfd3, 0.0, sgRenderInfo.h - 128.0,
                 128.0, 128.0, 128, 128);
 
-  sgInitOverlay(&hud.super, test_hud_draw,   0.0, 0.0,
-                sgRenderInfo.w, sgRenderInfo.h, sgRenderInfo.w, sgRenderInfo.h);
+  sg_overlay_init(overlay_hud, test_hud_draw, &hud,  0.0, 0.0,
+                  sgRenderInfo.w, sgRenderInfo.h, sgRenderInfo.w, sgRenderInfo.h);
 
   hud.text = sgNewTextLabel("Helvetica", 14.0, "20");
   SG_CHECK_ERROR;
@@ -303,11 +310,13 @@ simMfdInitAll(sg_scenegraph_t *sg)
   SG_CHECK_ERROR;
   glBufferData(GL_ARRAY_BUFFER, hud.lines*4*sizeof(GLfloat), hud.lineVerts,
                GL_STATIC_DRAW);
-  sgAddOverlay(sg, &mfd0.super);
-  sgAddOverlay(sg, &mfd1.super);
-  sgAddOverlay(sg, &mfd2.super);
-  sgAddOverlay(sg, &mfd3.super);
-  sgAddOverlay(sg, &hud.super);
+
+  sg_viewport_t *vp = NULL;
+  sg_viewport_add_overlay(vp, overlay0);
+  sg_viewport_add_overlay(vp, overlay1);
+  sg_viewport_add_overlay(vp, overlay2);
+  sg_viewport_add_overlay(vp, overlay3);
+  sg_viewport_add_overlay(vp, overlay_hud);
 }
 
 MODULE_INIT(mfdio, "mfd", "iomanager", NULL) {

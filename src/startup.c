@@ -70,7 +70,7 @@ init_graphics(void)
 {
   // Init GL state
   ooSetVideoDefaults();
-  sgLoadAllShaders();
+  sg_load_all_shaders();
   //sgCamInit();
 }
 

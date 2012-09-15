@@ -27,13 +27,17 @@
 #include <GL3/gl3.h>
 #endif
 
+#include <assert.h>
 #include "rendering/viewport.h"
+#include "rendering/scene.h"
+#include "rendering/overlay.h"
 
-void
-sg_set_viewport(sg_viewport_t *viewport)
-{
-  glViewport(viewport->x, viewport->y, viewport->w, viewport->h);
-}
+struct sg_viewport_t {
+  sg_scene_t *scene;
+  obj_array_t overlays;
+  unsigned x, y;
+  unsigned w, h;
+};
 
 sg_viewport_t*
 sg_new_viewport(sg_window_t *window, unsigned x, unsigned y,
@@ -41,5 +45,55 @@ sg_new_viewport(sg_window_t *window, unsigned x, unsigned y,
 {
   sg_viewport_t *viewport = malloc(sizeof(sg_viewport_t));
   memset(viewport, 0, sizeof(sg_viewport_t));
+  obj_array_init(&viewport->overlays);
+  viewport->x = x;
+  viewport->y = y;
+  viewport->w = w;
+  viewport->h = h;
   return viewport;
+}
+
+void
+sg_viewport_reshape(sg_viewport_t *viewport, unsigned x, unsigned y,
+                    unsigned w, unsigned h)
+{
+  viewport->x = x;
+  viewport->y = y;
+  viewport->w = w;
+  viewport->h = h;
+}
+
+void
+sg_viewport_bind(sg_viewport_t *viewport)
+{
+  glViewport(viewport->x, viewport->y, viewport->w, viewport->h);
+}
+
+sg_camera_t*
+sg_viewport_get_cam(sg_viewport_t *vp)
+{
+  assert(vp != NULL);
+
+  return sg_scene_get_cam(vp->scene);
+}
+
+void
+sg_viewport_add_overlay(sg_viewport_t *vp, sg_overlay_t *ov)
+{
+  obj_array_push(&vp->overlays, ov);
+}
+
+void
+sg_viewport_draw(sg_viewport_t *vp, float dt)
+{
+  sg_viewport_bind(vp);
+
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+  sg_scene_draw(vp->scene, dt);
+
+  ARRAY_FOR_EACH(i, vp->overlays) {
+    sg_overlay_draw(ARRAY_ELEM(vp->overlays, i));
+  }
 }

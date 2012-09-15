@@ -34,11 +34,32 @@
 //typedef void (*SGdisable_light_func)(SGlight *light);
 
 
-sg_light_t* sgNewPointlight(sg_scene_t *sc, float3 p);
-sg_light_t* sgNewPointlight3f(sg_scene_t *sc, float x, float y, float z);
-void sgSetLightPos3f(sg_light_t *light, float x, float y, float z);
-void sgSetLightPosv(sg_light_t *light, float3 v);
-void sgSetLightPosLW(sg_light_t *light, lwcoord_t *lwc);
+sg_light_t* sg_new_light(sg_scene_t *sc, float3 p);
+sg_light_t* sg_new_light3f(sg_scene_t *sc, float x, float y, float z);
+
+void sg_light_bind(sg_light_t *sc, sg_shader_t *shader);
+
+void sg_light_set_pos3f(sg_light_t *light, float x, float y, float z);
+void sg_light_set_posv(sg_light_t *light, float3 v);
+void sg_light_set_poslw(sg_light_t *light, lwcoord_t *lwc);
+float3 sg_light_get_pos(const sg_light_t *light);
+
+void sg_light_set_ambient4f(sg_light_t *light,
+                            float r, float g, float b, float a);
+float4 sg_light_get_ambient(const sg_light_t *light);
 
 
+void sg_light_set_specular4f(sg_light_t *light,
+                             float r, float g, float b, float a);
+float4 sg_light_get_specular(const sg_light_t *light);
+
+void sg_light_set_diffuse4f(sg_light_t *light,
+                            float r, float g, float b, float a);
+float4 sg_light_get_diffuse(const sg_light_t *light);
+
+void sg_light_set_attenuation(sg_light_t *light,
+                              float const_att, float lin_att, float quad_att);
+float sg_light_get_const_attenuation(const sg_light_t *light);
+float sg_light_get_linear_attenuation(const sg_light_t *light);
+float sg_light_get_quadratic_attenuation(const sg_light_t *light);
 #endif /* !SG_LIGHT_H__ */

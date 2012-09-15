@@ -22,7 +22,7 @@
 
 #include "model.h"
 
-model_t* cmod_load(const char *path);
+sg_object_t* cmod_load(const char *path);
 
 
 #endif /* !CMOD_H */

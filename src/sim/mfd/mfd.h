@@ -24,6 +24,7 @@
 #include "rendering/types.h"
 #include "rendering/scenegraph.h"
 #include "rendering/text.h"
+#include "rendering/overlay.h"
 
 typedef struct SIMmfd SIMmfd;
 typedef struct SIMmfdpage SIMmfdpage;
@@ -37,7 +38,7 @@ struct SIMmfdpage {
 };
 
 struct SIMmfd {
-  sg_overlay_t super;
+  //sg_overlay_t super;
   unsigned page_no;
 };
 
@@ -59,7 +60,7 @@ typedef void (*SIMhuddraw)(SIMhud *hud);
 #define SIM_HUD_MARKS (360/SIM_HUD_STEP)
 
 struct SIMhud {
-  sg_overlay_t super;
+  //sg_overlay_t super;
 
   // drawing context
   SIMhuddraw draw;

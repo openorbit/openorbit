@@ -25,12 +25,12 @@
 #include <libxml/tree.h>
 #include <libxml/xmlreader.h>
 
-model_t*
+sg_object_t*
 collada_load(const char *path)
 {
   LIBXML_TEST_VERSION
   
-  model_t *model = NULL;
+  sg_object_t *model = NULL;
   xmlTextReaderPtr reader = xmlReaderForFile(path, NULL, 0);
   if (reader == NULL) {
     fprintf(stderr, "no such file: '%s'\n", path);

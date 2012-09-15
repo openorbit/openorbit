@@ -20,10 +20,22 @@
 #ifndef orbit_scene_h
 #define orbit_scene_h
 
+#include <stdbool.h>
+
 #include "rendering/types.h"
 
 sg_scene_t* sg_new_scene(void);
 void sg_scene_render(sg_scene_t *scene, float dt);
-void sg_scene_set_background(sg_scene_t *sc, sg_background_t *bg);
+void sg_scene_draw(sg_scene_t *scene, float dt);
 
+void sg_scene_set_bg(sg_scene_t *sc, sg_background_t *bg);
+
+void sg_scene_set_cam(sg_scene_t *sc, sg_camera_t *cam);
+sg_camera_t* sg_scene_get_cam(sg_scene_t *sc);
+
+void sg_scene_add_object(sg_scene_t *sc, sg_object_t *obj);
+void sg_scene_add_light(sg_scene_t *sc, sg_light_t *light);
+void sg_scene_set_amb4f(sg_scene_t *sc, float r, float g, float b, float a);
+
+bool sg_scene_has_name(sg_scene_t *sc, const char *name);
 #endif

@@ -21,6 +21,6 @@
 #define COLLADA_H
 #include "model.h"
 
-model_t* collada_load(const char *path);
+sg_object_t* collada_load(const char *path);
 
 #endif /* !COLLADA_H */

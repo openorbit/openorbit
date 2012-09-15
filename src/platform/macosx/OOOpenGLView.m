@@ -23,6 +23,7 @@
 #import <OpenGL/gl3.h>
 
 #import "rendering/render.h"
+#import "rendering/window.h"
 #import "rendering/scenegraph.h"
 #import "sim.h"
 #import "io-manager.h"
@@ -262,7 +263,7 @@ static io_keycode_t keymap [256] = {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  sg_window_render(gSIM_state.win, 0.0);
+  sg_window_draw(gSIM_state.win, 0.0);
   //sgPaint(gSIM_state.sg);
 
   [self.openGLContext flushBuffer];

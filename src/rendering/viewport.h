@@ -24,9 +24,12 @@
 
 #include "rendering/types.h"
 
-void sg_set_viewport(sg_viewport_t *viewport);
+void sg_viewport_bind(sg_viewport_t *viewport);
 sg_viewport_t* sg_new_viewport(sg_window_t *window, unsigned x, unsigned y,
                                unsigned w, unsigned h);
 
+sg_camera_t* sg_viewport_get_cam(sg_viewport_t *vp);
+void sg_viewport_add_overlay(sg_viewport_t *vp, sg_overlay_t *ov);
+void sg_viewport_draw(sg_viewport_t *vp, float dt);
 
 #endif

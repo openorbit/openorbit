@@ -25,11 +25,9 @@
 #include <gencds/array.h>
 
 #include "rendering/material.h"
+#include "rendering/object.h"
 
-typedef struct model_t model_t;
-typedef sg_material_t material_t;
-typedef struct model_object_t model_object_t;
-
+#if 0
 struct model_object_t {
   model_t *model;
   int materialId;
@@ -51,12 +49,12 @@ struct model_t {
   size_t materialCount;
   material_t **materials;
 };
+#endif
 
-
-model_t * model_load(const char * restrict fileName);
-int model_dispose(model_t * restrict model);
-material_t* material_create(void);
-model_object_t* model_object_new(void);
+sg_object_t * model_load(const char * restrict fileName);
+int model_dispose(sg_object_t * restrict model);
+sg_material_t* material_create(void);
+sg_object_t* model_object_new(void);
 
 #endif /* end of include guard: MODEL_H */
 

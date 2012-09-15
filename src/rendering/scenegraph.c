@@ -39,61 +39,14 @@
 #include "physics/orbit.h"
 #include "texture.h"
 #include <vmath/lwcoord.h>
-#include "parsers/model.h"
+
 #include "render.h"
 #include "shader-manager.h"
 #include "rendering/camera.h"
 
-sg_camera_t*
-sg_get_cam(sg_viewport_t *vp)
-{
-  assert(vp != NULL);
-
-  return vp->scene->cam;
-}
-
-void
-sg_init_overlay(sg_overlay_t *overlay, sg_draw_overlay_t drawfunc,
-                float x, float y, float w, float h, unsigned rw, unsigned rh)
-{
-  overlay->enabled = true;
-  overlay->draw = drawfunc;
-  overlay->x = x;
-  overlay->y = y;
-  overlay->w = w;
-  overlay->h = h;
-
-  glGenFramebuffers(1, &overlay->fbo);
-  glBindFramebuffer(GL_FRAMEBUFFER, overlay->fbo);
-  glGenTextures(1, &overlay->tex);
-  glBindTexture(GL_TEXTURE_2D, overlay->tex);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, rw, rh, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, NULL);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-  SG_CHECK_ERROR;
-
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         overlay->tex, 0);
-  SG_CHECK_ERROR;
-
-  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-  assert(status == GL_FRAMEBUFFER_COMPLETE);
-
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-int
-compareDistances(sg_object_t const **o0, sg_object_t const **o1)
-{
-  bool gt = vf3_gt((*o0)->pos, (*o1)->pos);
-
-  if (gt) return -1;
-  else return 1;
-}
+struct sg_scenegraph_t {
+  obj_array_t scenes;
+};
 
 
 // Drawing is done as follows:
@@ -146,4 +99,14 @@ sgCheckGLError(const char *file, int line)
   }
 }
 
-
+sg_scene_t*
+sg_scenegraph_get_scene(sg_scenegraph_t *sg, const char *name)
+{
+  ARRAY_FOR_EACH(i, sg->scenes) {
+    sg_scene_t *sc = ARRAY_ELEM(sg->scenes, i);
+    if (sg_scene_has_name(sc, name)) {
+      return sc;
+    }
+  }
+  return NULL;
+}

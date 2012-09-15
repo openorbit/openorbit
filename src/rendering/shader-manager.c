@@ -1,5 +1,5 @@
 /*
- Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -36,6 +36,79 @@
 #else
 #include <GL3/gl3.h>
 #endif
+
+struct sg_light_ids_t {
+  GLint pos;
+  GLint ambient;
+  GLint specular;
+  GLint diffuse;
+  GLint dir;
+
+  GLint constantAttenuation;
+  GLint linearAttenuation;
+  GLint quadraticAttenuation;
+  GLint globAmbient;
+} ;
+
+struct sg_material_ids_t {
+  GLint emission;
+  GLint ambient;
+  GLint diffuse;
+  GLint specular;
+  GLint shininess;
+};
+
+struct sg_shader_t {
+  GLuint shaderId;
+
+  // Uniform IDs
+  struct {
+    GLuint modelViewId;
+    GLuint projectionId;
+    GLuint normalMatrixId;
+    GLuint texIds[SG_OBJ_MAX_TEXTURES];
+    sg_light_ids_t lightIds[SG_OBJ_MAX_LIGHTS];
+    sg_material_ids_t materialId;
+  } uniforms;
+  // Attribute IDs
+  struct {
+    GLuint vertexId;
+    GLuint normalId;
+    GLuint colourId;
+    GLuint texCoordId[SG_OBJ_MAX_TEXTURES];
+  } attribs;
+};
+
+
+static const char* param_names[SG_PARAM_COUNT] = {
+  [SG_VERTEX] = "oo_Vertex",
+  [SG_NORMAL] = "oo_Normal",
+  [SG_TEX_COORD] = "oo_TexCoord[%u]",
+  [SG_COLOR] = "oo_Color",
+  [SG_TEX] = "oo_Texture[%u]",
+
+  [SG_LIGHT] = "oo_Light[%u]",
+
+  [SG_LIGHT_AMB] = "oo_Light[%u].ambient",
+  [SG_LIGHT_POS] = "oo_Light[%u].pos",
+  [SG_LIGHT_SPEC] = "oo_Light[%u].specular",
+  [SG_LIGHT_DIFF] = "oo_Light[%u].diffuse",
+  [SG_LIGHT_DIR] = "oo_Light[%u].dir",
+  [SG_LIGHT_CONST_ATTEN] = "oo_Light[%u].constantAttenuation",
+  [SG_LIGHT_LINEAR_ATTEN] = "oo_Light[%u].linearAttenuation",
+  [SG_LIGHT_QUAD_ATTEN] = "oo_Light[%u].quadraticAttenuation",
+  [SG_LIGHT_MOD_GLOB_AMB] = "oo_Light[%u].globAmbient",
+
+  [SG_MATERIAL_EMIT] = "oo_Material.emission",
+  [SG_MATERIAL_AMB] = "oo_Material.ambient",
+  [SG_MATERIAL_DIFF] = "oo_Material.diffuse",
+  [SG_MATERIAL_SPEC] = "oo_Material.specular",
+  [SG_MATERIAL_SHINE] = "oo_Material.shininess",
+
+  [SG_MODELVIEW] = "oo_ModelViewMatrix",
+  [SG_PROJECTION] = "oo_ProjectionMatrix",
+  [SG_NORMAL_MATRIX] = "oo_NormalMatrix",
+};
 
 static hashtable_t *shaderKeyMap = NULL;
 
@@ -118,7 +191,7 @@ sgShaderPreprocess(mapped_file_t mf)
 
 
 void
-sgLoadAllShaders(void)
+sg_load_all_shaders(void)
 {
   const char *path = ooResGetPath("shaders");
 
@@ -134,7 +207,7 @@ sgLoadAllShaders(void)
       // Hardcoded ignore of shared directory
       if (strcmp(entry->d_name, "shared")) {
         strcat(fullpath, entry->d_name);
-        sgLoadProgram(entry->d_name, fullpath, fullpath, fullpath);
+        sg_load_shader(entry->d_name, fullpath, fullpath, fullpath);
       }
     }
 
@@ -143,10 +216,10 @@ sgLoadAllShaders(void)
 }
 
 sg_shader_t*
-sgLoadProgram(const char *key,
-              const char *vspath,
-              const char *fspath,
-              const char *gspath)
+sg_load_shader(const char *key,
+               const char *vspath,
+               const char *fspath,
+               const char *gspath)
 {
   assert(key != NULL);
   assert(vspath != NULL);
@@ -302,28 +375,26 @@ sgLoadProgram(const char *key,
   // After linking, we have valid uniform and attribute locations, we build up the location
   // table here.
 
-  si->attribs.vertexId = sgGetLocationForParam(shaderProgram, SG_VERTEX);
-  si->attribs.normalId = sgGetLocationForParam(shaderProgram, SG_NORMAL);
-  si->attribs.colourId = sgGetLocationForParam(shaderProgram, SG_COLOR);
+  si->attribs.vertexId = sg_shader_get_location(si, SG_VERTEX);
+  si->attribs.normalId = sg_shader_get_location(si, SG_NORMAL);
+  si->attribs.colourId = sg_shader_get_location(si, SG_COLOR);
   for (int i = 0 ; i < SG_OBJ_MAX_TEXTURES ; i++) {
     si->attribs.texCoordId[i] = sgGetLocationForParamAndIndex(shaderProgram, SG_TEX_COORD, i);
   }
 
-  si->uniforms.modelViewId = sgGetLocationForParam(shaderProgram, SG_MODELVIEW);
-  si->uniforms.projectionId = sgGetLocationForParam(shaderProgram,
-                                                    SG_PROJECTION);
-  si->uniforms.normalMatrixId = sgGetLocationForParam(shaderProgram,
-                                                      SG_NORMAL_MATRIX);
-  si->uniforms.materialId.ambient = sgGetLocationForParam(shaderProgram,
-                                                          SG_MATERIAL_AMB);
-  si->uniforms.materialId.emission = sgGetLocationForParam(shaderProgram,
-                                                          SG_MATERIAL_EMIT);
-  si->uniforms.materialId.diffuse = sgGetLocationForParam(shaderProgram,
-                                                          SG_MATERIAL_DIFF);
-  si->uniforms.materialId.specular = sgGetLocationForParam(shaderProgram,
-                                                          SG_MATERIAL_SPEC);
-  si->uniforms.materialId.shininess = sgGetLocationForParam(shaderProgram,
-                                                            SG_MATERIAL_SHINE);
+  si->uniforms.modelViewId = sg_shader_get_location(si, SG_MODELVIEW);
+  si->uniforms.projectionId = sg_shader_get_location(si, SG_PROJECTION);
+  si->uniforms.normalMatrixId = sg_shader_get_location(si, SG_NORMAL_MATRIX);
+  si->uniforms.materialId.ambient = sg_shader_get_location(si, SG_MATERIAL_AMB);
+  si->uniforms.materialId.emission
+    = sg_shader_get_location(si, SG_MATERIAL_EMIT);
+  si->uniforms.materialId.diffuse
+    = sg_shader_get_location(si, SG_MATERIAL_DIFF);
+  si->uniforms.materialId.specular
+    = sg_shader_get_location(si, SG_MATERIAL_SPEC);
+  si->uniforms.materialId.shininess
+    = sg_shader_get_location(si, SG_MATERIAL_SHINE);
+
   for (int i = 0 ; i < SG_OBJ_MAX_LIGHTS ; i++) {
     si->uniforms.lightIds[i].pos =
       sgGetLocationForParamAndIndex(shaderProgram, SG_LIGHT_POS, i);
@@ -341,6 +412,8 @@ sgLoadProgram(const char *key,
       sgGetLocationForParamAndIndex(shaderProgram, SG_LIGHT_LINEAR_ATTEN, i);
     si->uniforms.lightIds[i].quadraticAttenuation =
       sgGetLocationForParamAndIndex(shaderProgram, SG_LIGHT_QUAD_ATTEN, i);
+
+    // Glob amb should be outside of light struct...
     si->uniforms.lightIds[i].globAmbient =
       sgGetLocationForParamAndIndex(shaderProgram, SG_LIGHT_MOD_GLOB_AMB, i);
   }
@@ -354,7 +427,7 @@ sgLoadProgram(const char *key,
 }
 
 sg_shader_t*
-sgGetProgram(const char *key)
+sg_get_shader(const char *key)
 {
   sg_shader_t *tmp = hashtable_lookup(shaderKeyMap, key);
   if (tmp) return tmp;
@@ -362,23 +435,167 @@ sgGetProgram(const char *key)
   return 0;
 }
 
-void
-sgEnableProgram(GLuint programId)
-{
-  glUseProgram(programId);
-}
-
-void
-sgDisableProgram(void)
-{
-  glUseProgram(0); // Return to fixed functionality
-}
-
 sg_shader_t*
-sgShaderFromKey(const char *key)
+sg_get_shader_without_warnings(const char *key)
 {
   sg_shader_t *si = hashtable_lookup(shaderKeyMap, key);
   return si;
 }
 
+GLint
+sg_shader_get_location(sg_shader_t *program, sg_param_id_t param)
+{
+  // Handle both attributes and uniforms
+  if (param < SG_ATTRIBUTE_END) {
+    return glGetAttribLocation (program->shaderId, param_names[param]);
+  }
+  return glGetUniformLocation(program->shaderId, param_names[param]);
+}
 
+void
+sg_shader_bind(sg_shader_t *program)
+{
+  if (program) {
+    glUseProgram(program->shaderId);
+  } else {
+    glUseProgram(0);
+  }
+}
+
+void
+sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj)
+{
+  sg_shader_bind(shader);
+  glUniformMatrix4fv(shader->uniforms.projectionId, 1, GL_TRUE,
+                     (GLfloat*)proj);
+}
+
+void
+sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
+{
+  sg_shader_bind(shader);
+  glUniformMatrix4fv(shader->uniforms.modelViewId, 1, GL_TRUE,
+                     (GLfloat*)modelview);
+}
+
+void
+sg_shader_bind_param_3fv(sg_shader_t *shader, sg_param_id_t param, float3 p)
+{
+  sg_shader_bind(shader);
+  glUniform3fv(sg_shader_get_location(shader, param), 1, (float*)&p);
+}
+
+void
+sg_shader_bind_param_4fv(sg_shader_t *shader, sg_param_id_t param, float4 p)
+{
+  sg_shader_bind(shader);
+  glUniform4fv(sg_shader_get_location(shader, param), 1, (float*)&p);
+}
+
+void
+sg_shader_bind_texture(sg_shader_t *shader, unsigned tex_num, sg_texture_t *tex)
+{
+  sg_shader_bind(shader);
+  glUniform1i(shader->uniforms.texIds[tex_num], sg_texture_get_id(tex));
+}
+
+void
+sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
+                     sg_light_t *light)
+{
+  sg_shader_bind(shader);
+
+  float3 pos = sg_light_get_pos(light);
+  float4 amb = sg_light_get_ambient(light);
+  float4 diffuse = sg_light_get_diffuse(light);
+  float4 specular = sg_light_get_specular(light);
+
+  glUniform3fv(shader->uniforms.lightIds[light_num].pos, 1,
+               (float*)&pos);
+  glUniform4fv(shader->uniforms.lightIds[light_num].ambient, 1,
+               (float*)&amb);
+  glUniform4fv(shader->uniforms.lightIds[light_num].diffuse, 1,
+               (float*)&diffuse);
+  glUniform4fv(shader->uniforms.lightIds[light_num].specular, 1,
+               (float*)&specular);
+  glUniform1f(shader->uniforms.lightIds[light_num].constantAttenuation,
+              sg_light_get_const_attenuation(light));
+  glUniform1f(shader->uniforms.lightIds[light_num].linearAttenuation,
+              sg_light_get_linear_attenuation(light));
+  glUniform1f(shader->uniforms.lightIds[light_num].quadraticAttenuation,
+              sg_light_get_quadratic_attenuation(light));
+
+  // shader->uniforms.lightIds[light_num].globAmbient =
+  // sgGetLocationForParamAndIndex(shaderProgram, SG_LIGHT_MOD_GLOB_AMB, i);
+
+}
+
+
+
+void
+sg_location_bind(GLuint prog, sg_param_id_t param)
+{
+  glBindAttribLocation(prog, param, param_names[param]);
+}
+
+void
+sg_location_bind_at_index(GLuint prog, sg_param_id_t param, unsigned index)
+{
+  glBindAttribLocation(prog, param, param_names[param] + index);
+}
+
+
+GLint
+sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
+                              unsigned index)
+{
+  assert(index < 100);
+
+  char locName[strlen(param_names[param])];
+  snprintf(locName, sizeof(locName), param_names[param], index);
+
+  if (param < SG_ATTRIBUTE_END) {
+    return glGetAttribLocation (program, locName);
+  }
+  return glGetUniformLocation(program, locName);
+}
+
+void
+sgSetShaderTex(GLuint program, unsigned index, GLuint tex)
+{
+  glActiveTexture(GL_TEXTURE0 + index);
+  glBindTexture(GL_TEXTURE_2D, tex);
+  GLint loc = sgGetLocationForParamAndIndex(program, SG_TEX, index);
+  glUniform1i(loc, index); // Uniform value is texture unit id
+}
+
+void
+sg_location_bind_matrix(sg_shader_t *prog, sg_param_id_t param)
+{
+  
+}
+
+
+GLint
+sg_shader_get_vertex_attrib(sg_shader_t *program)
+{
+  return program->attribs.vertexId;
+}
+
+GLint
+sg_shader_get_normal_attrib(sg_shader_t *program)
+{
+  return program->attribs.normalId;
+}
+
+GLint
+sg_shader_get_color_attrib(sg_shader_t *program)
+{
+  return program->attribs.colourId;
+}
+
+GLint
+sg_shader_get_texcoord_attrib(sg_shader_t *program, unsigned tex_idx)
+{
+  return program->attribs.texCoordId[tex_idx];
+}

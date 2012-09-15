@@ -24,7 +24,7 @@
 #else
 #include <GL/gl3.h>
 #endif
-
+#include "rendering/types.h"
 /*!
   OpenGL 3.3 location ids, these will be used whenever
   GL_ARB_explicit_attrib_location is well supported on the Mac.
@@ -71,10 +71,10 @@ typedef enum {
 } sg_param_id_t;
 
 
-void sgBindLocation(GLuint prog, sg_param_id_t param);
-void sgBindLocationAtIndex(GLuint prog, sg_param_id_t param, unsigned index);
+void sg_location_bind(GLuint prog, sg_param_id_t param);
+void sg_location_bind_at_index(GLuint prog, sg_param_id_t param, unsigned index);
 
-GLint sgGetLocationForParam(GLuint program, sg_param_id_t param);
+GLint sg_shader_get_location(sg_shader_t *program, sg_param_id_t param);
 void sgSetShaderTex(GLuint program, sg_param_id_t param, GLuint tex);
 
 GLint

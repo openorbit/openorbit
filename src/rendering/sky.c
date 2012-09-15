@@ -32,6 +32,25 @@
 
 #include "scenegraph-private.h"
 #include "scenegraph.h"
+
+struct sg_star_t {
+  unsigned char r, g, b, a;
+  float x, y, z;
+};
+
+struct sg_background_t {
+  sg_camera_t *cam;
+  sg_shader_t *shader;
+
+  GLuint vbo;
+  GLuint vba;
+
+  size_t a_len;
+  size_t n_stars;
+  sg_star_t *data;
+};
+
+
 float3
 ooEquToCart(float ra, float dec)
 {
@@ -122,11 +141,11 @@ sgCreateBackgroundFromFile(const char *file)
   glBufferData(GL_ARRAY_BUFFER, stars->n_stars*sizeof(sg_star_t), stars->data,
                GL_STATIC_DRAW);
 
-  sg_shader_t *shader = sgGetProgram("stars");
-  glVertexAttribPointer(sgGetLocationForParam(shader->shaderId, SG_VERTEX),
+  sg_shader_t *shader = sg_get_shader("stars");
+  glVertexAttribPointer(sg_shader_get_location(shader, SG_VERTEX),
                         3, GL_FLOAT, GL_FALSE,
                         sizeof(sg_star_t), (void*)offsetof(sg_star_t, x));
-  glVertexAttribPointer(sgGetLocationForParam(shader->shaderId, SG_COLOR),
+  glVertexAttribPointer(sg_shader_get_location(shader, SG_COLOR),
                         4, GL_UNSIGNED_BYTE,
                         GL_TRUE, // Yes normalize
                         sizeof(sg_star_t), offsetof(sg_star_t, r));
@@ -141,36 +160,36 @@ sgCreateBackgroundFromFile(const char *file)
 
 }
 void
-sgDrawBackground(sg_background_t *bg)
+sg_background_draw(sg_background_t *bg)
 {
   // Background drawing needs to shortcut the normal camera, as the bg
   // is at infinite distance (e.g. regarding translation)
   // Here we rotate the camera as needed
   sg_camera_t *cam = bg->cam;
   float4x4 rotMatrix;
-  switch (bg->cam->type) {
+  switch (sg_camera_get_type(bg->cam)) {
     case SG_CAMERA_FIXED: {
-      quaternion_t q = q_mul(cam->fixed.obj->q, cam->fixed.q);
+
+      quaternion_t q = q_mul(sg_object_get_quat(sg_camera_fixed_get_obj(cam)),
+                             sg_camera_fixed_get_quaternion(cam));
       q_mf4_convert(rotMatrix, q);
       break;}
     case SG_CAMERA_FREE: {
-      q_mf4_convert(rotMatrix, cam->free.q);
+      q_mf4_convert(rotMatrix, sg_camera_free_get_quaternion(cam));
       break;}
     case SG_CAMERA_ORBITING: {
       mf4_lookat(rotMatrix,
                  0.0f, 0.0f, 0.0f,
-                 -cam->orbiting.r * cosf(cam->orbiting.dec),
-                 -cam->orbiting.r * sinf(cam->orbiting.dec),
-                 -cam->orbiting.r * sinf(cam->orbiting.ra),
+                 -sg_camera_orbiting_get_radius(cam) * cosf(sg_camera_orbiting_get_dec(cam)),
+                 -sg_camera_orbiting_get_radius(cam) * sinf(sg_camera_orbiting_get_dec(cam)),
+                 -sg_camera_orbiting_get_radius(cam) * sinf(sg_camera_orbiting_get_ra(cam)),
                  0.0f, 0.0f, 1.0f);
 
       break;}
   }
 
-  glUseProgram(bg->shader->shaderId);
-  glUniformMatrix4fv(bg->shader->uniforms.projectionId, 1, GL_TRUE,
-                     (GLfloat*)bg->cam->proj_matrix);
-  glUniformMatrix4fv(bg->shader->uniforms.modelViewId, 1, GL_TRUE,
-                     (GLfloat*)rotMatrix);
-  
+  sg_shader_bind(bg->shader);
+  sg_shader_set_projection(bg->shader, *sg_camera_get_projection(bg->cam));
+  sg_shader_set_model_view(bg->shader, rotMatrix);
 }
+

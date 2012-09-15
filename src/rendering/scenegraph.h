@@ -20,6 +20,12 @@
 #ifndef SCENEGRAPH_H_
 #define SCENEGRAPH_H_
 
+void sgAssertNoGLError(void);
+void sgCheckGLError(const char *file, int line);
+void sgClearGLError(void);
+
+#define SG_CHECK_ERROR sgCheckGLError(__FILE__, __LINE__)
+
 #include <vmath/vmath.h>
 #include <gencds/array.h>
 
@@ -27,34 +33,22 @@
 
 //#include <openorbit/openorbit.h>
 //#include "physics/orbit.h"
-#include "sim/simtime.h"
+//#include "sim/simtime.h"
 #include <vmath/lwcoord.h>
+
 #include "rendering/types.h"
-#include "camera.h"
-#include "particles.h"
-#include "material.h"
-#include "light.h"
-#include "sky.h"
+#include "rendering/camera.h"
+#include "rendering/particles.h"
+#include "rendering/material.h"
+#include "rendering/light.h"
+#include "rendering/sky.h"
+#include "rendering/window.h"
+#include "rendering/viewport.h"
+#include "rendering/scene.h"
+#include "rendering/overlay.h"
+#include "rendering/object.h"
 
-void sgSetSceneAmb4f(sg_scene_t *sc, float r, float g, float b, float a);
-
-sg_scene_t* sgSceneGetParent(sg_scene_t *sc);
-
-void sgSceneAddChild(sg_scene_t *parent, sg_scene_t *child);
-void sgSceneAddObj(sg_scene_t *sc, sg_scene_t *object);
-
-void sgSceneAddLight(sg_scene_t *sc, sg_light_t *light);
-
-void sgAssertNoGLError(void);
-void sgCheckGLError(const char *file, int line);
-void sgClearGLError(void);
-
-#define SG_CHECK_ERROR sgCheckGLError(__FILE__, __LINE__)
-
-void sgInitOverlay(sg_overlay_t *overlay, sg_draw_overlay_t drawfunc,
-                   float x, float y,
-                   float w, float h,
-                   unsigned rw, unsigned rh);
+sg_scene_t* sg_scenegraph_get_scene(sg_scenegraph_t *sg, const char *name);
 
 
 #endif /* SCENEGRAPH_H_ */

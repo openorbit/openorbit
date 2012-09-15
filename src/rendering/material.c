@@ -25,10 +25,28 @@
 #include <GL3/gl3.h>
 #endif
 
+struct sg_material_t {
+  float4 emission;
+  float4 ambient;
+  float4 diffuse;
+  float4 specular;
+  float shininess;
+};
+
+sg_material_t*
+sg_new_material(void)
+{
+  sg_material_t *mat = malloc(sizeof(sg_material_t));
+  memset(mat, 0, sizeof(sg_material_t));
+  sg_material_init(mat);
+  return mat;
+}
+
 void
-sg_bind_material(sg_material_t *mat)
+sg_material_bind(sg_material_t *mat, sg_shader_t *shader)
 {
   SG_CHECK_ERROR;
+  
   //glMaterialfv(GL_FRONT, GL_AMBIENT, (GLfloat*)&mat->ambient);
   //glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat*)&mat->diffuse);
   //glMaterialfv(GL_FRONT, GL_SPECULAR, (GLfloat*)&mat->specular);
@@ -38,7 +56,7 @@ sg_bind_material(sg_material_t *mat)
 }
 
 void
-sg_init_material(sg_material_t *mat)
+sg_material_init(sg_material_t *mat)
 {
   mat->ambient[0] = 0.2;
   mat->ambient[1] = 0.2;
@@ -64,7 +82,7 @@ sg_init_material(sg_material_t *mat)
 }
 
 void
-sg_set_material_amb4f(sg_material_t *mat, float r, float g, float b, float a)
+sg_material_set_amb4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->ambient[0] = r;
   mat->ambient[1] = g;
@@ -73,7 +91,7 @@ sg_set_material_amb4f(sg_material_t *mat, float r, float g, float b, float a)
 }
 
 void
-sg_set_material_diff4f(sg_material_t *mat, float r, float g, float b, float a)
+sg_material_set_diff4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->diffuse[0] = r;
   mat->diffuse[1] = g;
@@ -82,7 +100,7 @@ sg_set_material_diff4f(sg_material_t *mat, float r, float g, float b, float a)
 }
 
 void
-sg_set_material_spec4f(sg_material_t *mat, float r, float g, float b, float a)
+sg_material_set_spec4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->specular[0] = r;
   mat->specular[1] = g;
@@ -91,7 +109,7 @@ sg_set_material_spec4f(sg_material_t *mat, float r, float g, float b, float a)
 }
 
 void
-sg_set_material_emiss4f(sg_material_t *mat, float r, float g, float b, float a)
+sg_material_set_emiss4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->emission[0] = r;
   mat->emission[1] = g;
@@ -100,7 +118,7 @@ sg_set_material_emiss4f(sg_material_t *mat, float r, float g, float b, float a)
 }
 
 void
-sg_set_material_shininess(sg_material_t *mat, float s)
+sg_material_set_shininess(sg_material_t *mat, float s)
 {
   mat->shininess = s;
 }

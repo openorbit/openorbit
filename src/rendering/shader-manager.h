@@ -1,5 +1,5 @@
 /*
- Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -26,18 +26,35 @@
 #include <GL3/gl3.h>
 #endif
 
-#include "rendering/gl3drawable.h"
+#include "rendering/object.h"
 #include "rendering/location.h"
+#include "rendering/texture.h"
+#include "rendering/light.h"
 
-void sgLoadAllShaders(void);
+void sg_load_all_shaders(void);
 
-sg_shader_t* sgLoadProgram(const char *key, const char *vspath, const char *fspath,
-                        const char *gspath);
-sg_shader_t* sgGetProgram(const char *key);
-void sgEnableProgram(GLuint programId);
-void sgDisableProgram(void);
-sg_shader_t* sgShaderFromKey(const char *key);
+sg_shader_t* sg_load_shader(const char *key, const char *vspath, const char *fspath,
+                            const char *gspath);
+sg_shader_t* sg_get_shader(const char *key);
+sg_shader_t* sg_get_shader_without_warnings(const char *key);
+
+GLint sg_shader_get_location(sg_shader_t *program, sg_param_id_t param);
+
+GLint sg_shader_get_vertex_attrib(sg_shader_t *program);
+GLint sg_shader_get_normal_attrib(sg_shader_t *program);
+GLint sg_shader_get_color_attrib(sg_shader_t *program);
+GLint sg_shader_get_texcoord_attrib(sg_shader_t *program, unsigned tex_idx);
 
 
+void sg_shader_bind(sg_shader_t *program);
+
+void sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj);
+void sg_shader_set_model_view(sg_shader_t *shader, const float4x4 proj);
+
+void sg_shader_bind_texture(sg_shader_t *shader, unsigned tex_num,
+                            sg_texture_t *tex);
+
+void sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
+                          sg_light_t *light);
 
 #endif /* !RENDERING_SHADER_MANAGER_H */

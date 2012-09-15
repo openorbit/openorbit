@@ -544,11 +544,12 @@ plCreateOrbitalObject(PLworld *world, sg_scene_t *scene, const char *name,
                                                  semiMaj, inc, ascendingNode,
                                                  argOfPeriapsis, meanAnomaly);
 
+  // TODO: Ensure elipsises are created outside of pl
   //sys->orbitDrawable = sgNewEllipsis(orbitName, semiMaj, semiMin,
   //                                   ascendingNode, inc, argOfPeriapsis,
   //                                   0.0, 0.0, 1.0,
   //                                   1024);
-  sgSceneAddObj(sys->scene, sys->orbitDrawable);
+  //sgSceneAddObj(sys->scene, sys->orbitDrawable);
 
   return sys;
 }
@@ -716,8 +717,8 @@ plSysInit(PLsystem *sys)
 void
 plSysUpdateSg(PLsystem *sys)
 {
-  if (sys->orbitalBody->lightSource)
-    sgSetLightPosLW(sys->orbitalBody->lightSource, &sys->orbitalBody->obj.p);
+  //if (sys->orbitalBody->lightSource)
+  //  sgSetLightPosLW(sys->orbitalBody->lightSource, &sys->orbitalBody->obj.p);
 
   quaternion_t q = plGetQuat(&sys->orbitalBody->obj);
   // TODO: Ensure this is pulled from SG
@@ -726,9 +727,9 @@ plSysUpdateSg(PLsystem *sys)
   //sgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
 
   // Update orbital path base
-  if (sys->parent) {
-    sgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->obj.p);
-  }
+  //if (sys->parent) {
+  //  sgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->obj.p);
+  //}
 
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysUpdateSg(sys->orbits.elems[i]);
