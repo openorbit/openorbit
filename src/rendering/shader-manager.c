@@ -130,14 +130,14 @@ sgShaderPreprocess(mapped_file_t mf)
 
   for (int i = 0 ; i < mf.fileLenght ; i ++) {
     if (((char*)mf.data)[i] == '#') {
-      ooLogInfo("found preprocessor directive");
+      ooLogTrace("found preprocessor directive");
       int j = i + 1;
       // Skip ws after '#'
       while (j < mf.fileLenght && (((char*)mf.data)[j] == ' ' || ((char*)mf.data)[j] == '\t')) {
         j ++;
       }
       if (strncmp(&(((char*)mf.data)[j]), "include", MIN(sizeof("include")-1, mf.fileLenght-j)) == 0) {
-        ooLogInfo("found include directive");
+        ooLogTrace("found include directive");
 
         j += sizeof("include") - 1;
 
@@ -153,7 +153,7 @@ sgShaderPreprocess(mapped_file_t mf)
             j ++;
           }
           if (((char*)mf.data)[j] != '"') {
-            fprintf(stderr, "syntax error for include directive\n");
+            ooLogError("syntax error for include directive\n");
             // TODO: Return error code
           }
 
@@ -161,20 +161,20 @@ sgShaderPreprocess(mapped_file_t mf)
 
           // Valid include file path (probably)
           if (incfile_start < incfile_end) {
-            char incfile[incfile_end - incfile_start + 1];
-            memset(incfile, incfile_end-incfile_start + 1, 0);
+            char incfile[incfile_end - incfile_start + 2];
+            memset(incfile, 0, incfile_end-incfile_start + 2);
             strncpy(incfile, &(((char*)mf.data)[incfile_start]), incfile_end - incfile_start + 1);
             FILE *file = ooResGetFile(incfile);
             if (file) {
               size_t bytes = 0;
-              printf("found include file '%s'\n", incfile);
+              ooLogTrace("found include file");
               char byte;
               while (fread(&byte, sizeof(char), 1, file)) {
                 char_array_push(&shader, byte);
                 bytes ++;
               }
             } else {
-              fprintf(stderr, "include file '%s' not found\n", incfile);
+              ooLogError("include file '%s' not found\n", incfile);
             }
           }
         }
@@ -237,6 +237,7 @@ sg_load_shader(const char *key,
   si->name = strdup(key);
 
   GLuint shaderProgram = glCreateProgram();
+
   si->shaderId = shaderProgram;
   hashtable_insert(shaderKeyMap, key, si); // Memoize if loaded again
 

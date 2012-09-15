@@ -1,0 +1,12 @@
+#version 150
+
+uniform sampler2D oo_Texture[1];
+
+in vec4 VertColor;
+out vec4 oo_FragColor;
+
+void
+main()
+{
+  oo_FragColor = VertColor;
+}

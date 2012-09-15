@@ -57,6 +57,7 @@ ooSimInit(void)
   sg_viewport_set_scene(vp, scene);
 
   sg_background_t *sky = sgCreateBackgroundFromFile("data/stars.csv");
+  sg_scene_set_bg(scene, sky);
   //gSIM_state.sg = sgNewSceneGraph();
   //sgSetSky(gSIM_state.sg, sky);
   //sgSceneSetBackground(sc, sky);

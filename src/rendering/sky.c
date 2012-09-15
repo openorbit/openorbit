@@ -118,6 +118,8 @@ sgAddStar(sg_background_t *stars, double ra, double dec, double mag, double bv)
 sg_background_t*
 sgCreateBackgroundFromFile(const char *file)
 {
+  SG_CHECK_ERROR;
+
   sg_background_t *stars = malloc(sizeof(sg_background_t));
   stars->data = calloc(STAR_COUNT, sizeof(sg_star_t));
   stars->a_len = STAR_COUNT;
@@ -140,15 +142,19 @@ sgCreateBackgroundFromFile(const char *file)
   glBindBuffer(GL_ARRAY_BUFFER, stars->vbo);
   glBufferData(GL_ARRAY_BUFFER, stars->n_stars*sizeof(sg_star_t), stars->data,
                GL_STATIC_DRAW);
+  SG_CHECK_ERROR;
 
-  sg_shader_t *shader = sg_get_shader("star");
+  sg_shader_t *shader = sg_get_shader("sky");
   glVertexAttribPointer(sg_shader_get_location(shader, SG_VERTEX, true),
                         3, GL_FLOAT, GL_FALSE,
                         sizeof(sg_star_t), (void*)offsetof(sg_star_t, x));
+  SG_CHECK_ERROR;
+
   glVertexAttribPointer(sg_shader_get_location(shader, SG_COLOR, true),
                         4, GL_UNSIGNED_BYTE,
                         GL_TRUE, // Yes normalize
                         sizeof(sg_star_t), offsetof(sg_star_t, r));
+  SG_CHECK_ERROR;
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   free(stars->data); // GL has copied arrays over

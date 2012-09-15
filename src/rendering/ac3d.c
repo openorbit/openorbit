@@ -394,7 +394,7 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
                     verts, norm, texc);
 
 
-  free(face_normals.elems);
+  float_array_dispose(&face_normals);
   for (int i = 0 ; i < obj->num_verts ; ++ i) {
     free(vertex_sharing[i].elems);
   }
