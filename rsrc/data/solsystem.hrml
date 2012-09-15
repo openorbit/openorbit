@@ -364,6 +364,7 @@ openorbit {
         rendering {
           model: "sphere";
           texture: "textures/saturn.jpg";
+          shader: "planet";
           // albedo: 0.342 bond, 0.47 geom
         }
         // Titan: adiabatic-lapse-rate: 1.301e-3 K/m;

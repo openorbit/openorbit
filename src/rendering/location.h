@@ -74,7 +74,6 @@ typedef enum {
 void sg_location_bind(GLuint prog, sg_param_id_t param);
 void sg_location_bind_at_index(GLuint prog, sg_param_id_t param, unsigned index);
 
-GLint sg_shader_get_location(sg_shader_t *program, sg_param_id_t param);
 void sgSetShaderTex(GLuint program, sg_param_id_t param, GLuint tex);
 
 GLint

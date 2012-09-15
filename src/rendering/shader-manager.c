@@ -59,6 +59,7 @@ struct sg_material_ids_t {
 };
 
 struct sg_shader_t {
+  const char *name;
   GLuint shaderId;
 
   // Uniform IDs
@@ -185,7 +186,7 @@ sgShaderPreprocess(mapped_file_t mf)
   }
   char_array_push(&shader, '\0');
 
-  printf("shader: %s", shader.elems);
+  //printf("shader: %s", shader.elems);
   return shader;
 }
 
@@ -232,6 +233,8 @@ sg_load_shader(const char *key,
 
 
   sg_shader_t *si = malloc(sizeof(sg_shader_t));
+  memset(si, 0, sizeof(sg_shader_t));
+  si->name = strdup(key);
 
   GLuint shaderProgram = glCreateProgram();
   si->shaderId = shaderProgram;
@@ -375,25 +378,25 @@ sg_load_shader(const char *key,
   // After linking, we have valid uniform and attribute locations, we build up the location
   // table here.
 
-  si->attribs.vertexId = sg_shader_get_location(si, SG_VERTEX);
-  si->attribs.normalId = sg_shader_get_location(si, SG_NORMAL);
-  si->attribs.colourId = sg_shader_get_location(si, SG_COLOR);
+  si->attribs.vertexId = sg_shader_get_location(si, SG_VERTEX, true);
+  si->attribs.normalId = sg_shader_get_location(si, SG_NORMAL, false);
+  si->attribs.colourId = sg_shader_get_location(si, SG_COLOR, false);
   for (int i = 0 ; i < SG_OBJ_MAX_TEXTURES ; i++) {
     si->attribs.texCoordId[i] = sgGetLocationForParamAndIndex(shaderProgram, SG_TEX_COORD, i);
   }
 
-  si->uniforms.modelViewId = sg_shader_get_location(si, SG_MODELVIEW);
-  si->uniforms.projectionId = sg_shader_get_location(si, SG_PROJECTION);
-  si->uniforms.normalMatrixId = sg_shader_get_location(si, SG_NORMAL_MATRIX);
-  si->uniforms.materialId.ambient = sg_shader_get_location(si, SG_MATERIAL_AMB);
+  si->uniforms.modelViewId = sg_shader_get_location(si, SG_MODELVIEW, false);
+  si->uniforms.projectionId = sg_shader_get_location(si, SG_PROJECTION, false);
+  si->uniforms.normalMatrixId = sg_shader_get_location(si, SG_NORMAL_MATRIX, false);
+  si->uniforms.materialId.ambient = sg_shader_get_location(si, SG_MATERIAL_AMB, false);
   si->uniforms.materialId.emission
-    = sg_shader_get_location(si, SG_MATERIAL_EMIT);
+    = sg_shader_get_location(si, SG_MATERIAL_EMIT, false);
   si->uniforms.materialId.diffuse
-    = sg_shader_get_location(si, SG_MATERIAL_DIFF);
+    = sg_shader_get_location(si, SG_MATERIAL_DIFF, false);
   si->uniforms.materialId.specular
-    = sg_shader_get_location(si, SG_MATERIAL_SPEC);
+    = sg_shader_get_location(si, SG_MATERIAL_SPEC, false);
   si->uniforms.materialId.shininess
-    = sg_shader_get_location(si, SG_MATERIAL_SHINE);
+    = sg_shader_get_location(si, SG_MATERIAL_SHINE, false);
 
   for (int i = 0 ; i < SG_OBJ_MAX_LIGHTS ; i++) {
     si->uniforms.lightIds[i].pos =
@@ -443,13 +446,24 @@ sg_get_shader_without_warnings(const char *key)
 }
 
 GLint
-sg_shader_get_location(sg_shader_t *program, sg_param_id_t param)
+sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required)
 {
   // Handle both attributes and uniforms
   if (param < SG_ATTRIBUTE_END) {
-    return glGetAttribLocation (program->shaderId, param_names[param]);
+    GLint attrib_loc = glGetAttribLocation (program->shaderId, param_names[param]);
+    if (required && (attrib_loc == -1)) {
+      ooLogError("shader '%s' missing attribute: '%s'",
+                 program->name, param_names[param]);
+    }
+    return attrib_loc;
   }
-  return glGetUniformLocation(program->shaderId, param_names[param]);
+
+  GLint uniform_loc = glGetUniformLocation(program->shaderId, param_names[param]);
+  if (required && (uniform_loc == -1)) {
+    ooLogError("shader '%s' missing uniform: '%s'",
+               program->name, param_names[param]);
+  }
+  return uniform_loc;
 }
 
 void
@@ -482,14 +496,14 @@ void
 sg_shader_bind_param_3fv(sg_shader_t *shader, sg_param_id_t param, float3 p)
 {
   sg_shader_bind(shader);
-  glUniform3fv(sg_shader_get_location(shader, param), 1, (float*)&p);
+  glUniform3fv(sg_shader_get_location(shader, param, true), 1, (float*)&p);
 }
 
 void
 sg_shader_bind_param_4fv(sg_shader_t *shader, sg_param_id_t param, float4 p)
 {
   sg_shader_bind(shader);
-  glUniform4fv(sg_shader_get_location(shader, param), 1, (float*)&p);
+  glUniform4fv(sg_shader_get_location(shader, param, true), 1, (float*)&p);
 }
 
 void

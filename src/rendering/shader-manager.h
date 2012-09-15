@@ -26,6 +26,8 @@
 #include <GL3/gl3.h>
 #endif
 
+#include <stdbool.h>
+
 #include "rendering/object.h"
 #include "rendering/location.h"
 #include "rendering/texture.h"
@@ -38,7 +40,7 @@ sg_shader_t* sg_load_shader(const char *key, const char *vspath, const char *fsp
 sg_shader_t* sg_get_shader(const char *key);
 sg_shader_t* sg_get_shader_without_warnings(const char *key);
 
-GLint sg_shader_get_location(sg_shader_t *program, sg_param_id_t param);
+GLint sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required);
 
 GLint sg_shader_get_vertex_attrib(sg_shader_t *program);
 GLint sg_shader_get_normal_attrib(sg_shader_t *program);

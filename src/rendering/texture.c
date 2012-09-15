@@ -57,6 +57,12 @@ texInit(void)
     gOOtexDict = hashtable_new_with_str_keys(128);
 }
 
+void
+sg_texture_bind(sg_texture_t *tex, sg_shader_t *shader)
+{
+  sg_shader_bind_texture(shader, tex->texId, tex);
+}
+
 sg_texture_t*
 sg_load_texture(const char *key)
 {

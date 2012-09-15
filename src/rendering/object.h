@@ -52,7 +52,8 @@ void sgObjectLoadShader(sg_object_t *obj, const char *name);
 
 sg_geometry_t*
 sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
-                float *vertices, float *normals, float *texCoords);
+                float *vertices, float *normals, float *texCoords,
+                size_t index_count, int *indices);
 
 sg_object_t* sg_new_ellipse(const char *name, float semiMajor,
                                       float semiMinor, float asc,

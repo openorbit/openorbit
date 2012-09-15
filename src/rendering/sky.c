@@ -141,11 +141,11 @@ sgCreateBackgroundFromFile(const char *file)
   glBufferData(GL_ARRAY_BUFFER, stars->n_stars*sizeof(sg_star_t), stars->data,
                GL_STATIC_DRAW);
 
-  sg_shader_t *shader = sg_get_shader("stars");
-  glVertexAttribPointer(sg_shader_get_location(shader, SG_VERTEX),
+  sg_shader_t *shader = sg_get_shader("star");
+  glVertexAttribPointer(sg_shader_get_location(shader, SG_VERTEX, true),
                         3, GL_FLOAT, GL_FALSE,
                         sizeof(sg_star_t), (void*)offsetof(sg_star_t, x));
-  glVertexAttribPointer(sg_shader_get_location(shader, SG_COLOR),
+  glVertexAttribPointer(sg_shader_get_location(shader, SG_COLOR, true),
                         4, GL_UNSIGNED_BYTE,
                         GL_TRUE, // Yes normalize
                         sizeof(sg_star_t), offsetof(sg_star_t, r));

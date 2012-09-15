@@ -227,20 +227,7 @@ sg_camera_orbiting_get_zoom(const sg_camera_t *cam)
 /* Camera actions, registered as action handlers */
 
 
-void sgCamFwd(int state, void *data);
-void sgCamBack(int state, void *data);
-void sgCamLeft(int state, void *data);
-void sgCamRight(int state, void *data);
-void sgCamUp(int state, void *data);
-void sgCamDown(int state, void *data);
-void sgCamRollLeft(int state, void *data);
-void sgCamRollRight(int state, void *data);
-void sgCamYawLeft(int state, void *data);
-void sgCamYawRight(int state, void *data);
-void sgCamPitchDown(int state, void *data);
-void sgCamPitchUp(int state, void *data);
-
-void sgCamRotateHat(int state, void *data);
+void sg_camera_rotate_hat(int state, void *data);
 
 struct str_action_triplet {
   const char *confKey;
@@ -252,29 +239,17 @@ MODULE_INIT(camera, "iomanager", NULL) {
   ooLogTrace("initialising 'camera' module");
   const char *key;
   static const struct str_action_triplet keyBindings[] = {
-    {"openorbit/controls/hat/cam-rotate", "cam-rotate", sgCamRotateHat},
-    {"openorbit/controls/keyboard/cam-fwd", "cam-fwd", sgCamFwd},
-    {"openorbit/controls/keyboard/cam-back", "cam-back", sgCamBack},
-    {"openorbit/controls/keyboard/cam-left", "cam-left", sgCamLeft},
-    {"openorbit/controls/keyboard/cam-right", "cam-right", sgCamRight},
-    {"openorbit/controls/keyboard/cam-up", "cam-up", sgCamUp},
-    {"openorbit/controls/keyboard/cam-down", "cam-down", sgCamDown},
-    {"openorbit/controls/keyboard/cam-roll-left", "cam-roll-left", sgCamRollLeft},
-    {"openorbit/controls/keyboard/cam-roll-right", "cam-roll-right", sgCamRollRight},
-    {"openorbit/controls/keyboard/cam-yaw-left", "cam-yaw-left", sgCamYawLeft},
-    {"openorbit/controls/keyboard/cam-yaw-right", "cam-yaw-right", sgCamYawRight},
-    {"openorbit/controls/keyboard/cam-pitch-down", "cam-pitch-down", sgCamPitchDown},
-    {"openorbit/controls/keyboard/cam-pitch-up", "cam-pitch-up", sgCamPitchUp}
+    {"openorbit/controls/hat/cam-rotate", "cam-rotate", sg_camera_rotate_hat},
   };
 
   ioRegActionHandler(keyBindings[0].ioKey, keyBindings[0].action,
                      IO_BUTTON_HAT, NULL);
 
   // Register camera actions
-  for (int i = 1 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
-    ioRegActionHandler(keyBindings[i].ioKey, keyBindings[i].action,
-                       IO_BUTTON_PUSH, NULL);
-  }
+  //for (int i = 1 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
+  //  ioRegActionHandler(keyBindings[i].ioKey, keyBindings[i].action,
+  //                    IO_BUTTON_PUSH, NULL);
+  //}
 }
 
 void
@@ -398,4 +373,10 @@ sg_camera_move(sg_camera_t *cam)
     mf4_mul2(cam->view_matrix, t);
     break; }
   }
+}
+
+void
+sg_camera_rotate_hat(int buttonVal, void *data)
+{
+
 }

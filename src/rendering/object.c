@@ -50,6 +50,10 @@ struct sg_geometry_t {
   bool hasTexCoords;
   GLsizei normalOffset;
   GLsizei texCoordOffset;
+
+  bool hasIndices;
+  GLsizei index_count;
+  GLuint ibo;
 };
 
 struct sg_object_t {
@@ -139,8 +143,11 @@ sg_geometry_draw(sg_geometry_t *geo)
   glBindVertexArray(geo->vba);
   glEnableVertexAttribArray(geo->vba);
 
-  glDrawArrays(GL_TRIANGLES, 0, geo->vertexCount);
-
+  if (geo->hasIndices) {
+    glDrawElements(geo->gl_primitive_type, geo->index_count, GL_INT, 0);
+  } else {
+    glDrawArrays(geo->gl_primitive_type, 0, geo->vertexCount);
+  }
   glDisableVertexAttribArray(geo->vba);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   //SG_CHECK_ERROR;
@@ -296,7 +303,8 @@ sgObjectSetPos(sg_object_t *obj, float4 pos)
 
 sg_geometry_t*
 sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
-                float *vertices, float *normals, float *texCoords)
+                float *vertices, float *normals, float *texCoords,
+                size_t index_count, int *indices)
 {
   sg_geometry_t *geo = malloc(sizeof(sg_geometry_t));
   memset(geo, 0, sizeof(sg_geometry_t));
@@ -345,6 +353,14 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
     glEnableVertexAttribArray(sg_shader_get_texcoord_attrib(shader, 0));
   }
 
+  if (indices) {
+    geo->hasIndices = true;
+    glGenBuffers(1, &geo->ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geo->ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 index_count*sizeof(int), indices, GL_STATIC_DRAW);
+    geo->index_count = index_count;
+  }
   glBindVertexArray(0); // Done
 
   return geo;
@@ -389,7 +405,8 @@ sg_object_set_geo(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                   float *vertices, float *normals, float *texCoords)
 {
   obj->geometry = sg_new_geometry(obj, gl_primitive,
-                                  vertexCount, vertices, normals, texCoords);
+                                  vertexCount, vertices, normals, texCoords,
+                                  0, NULL);
 }
 
 
@@ -400,7 +417,8 @@ sg_new_object_with_geo(int gl_primitive, size_t vertexCount,
   sg_object_t *obj = malloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
   obj->geometry = sg_new_geometry(obj, gl_primitive,
-                                  vertexCount, vertices, normals, texCoords);
+                                  vertexCount, vertices, normals, texCoords,
+                                  0, NULL);
 }
 
 sg_object_t*
@@ -434,7 +452,72 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
               sg_texture_t *tex, sg_texture_t *nightTex, sg_texture_t *spec,
               sg_material_t *mat)
 {
-  return NULL;
+  // NOTE: Z points upwards
+  sg_object_t *sphere = sg_new_object();
+  sg_object_set_shader(sphere, shader);
+  float_array_t verts, texc, normals;
+  float_array_init(&verts);
+  float_array_init(&normals);
+  float_array_init(&texc);
+  // 10.0 degree blocks, note,
+  // Outer pass for the stacks, as in latitude, inner pass for the longitude
+
+  // Push north pole first
+  
+  // Texture coordinates for vertex http://en.wikipedia.org/wiki/UV_mapping
+  // u = 0.5 - atan2(dz, dx)/2pi  (note assumption is poles on y axis)
+  // v = 0.5 - 2 * asin(dy)/2pi
+  // Allthouhg, we would like to use a single pole vertex, this is not
+  // practical with respect to uv mapping of textures. Therefore we
+  // Generate multiple pole coordinates
+
+  int vert_count = 0;
+  for (int i = 90 ; i >= -90 ; i -= 10) {
+    for (int j = -180 ; j <= 180 ; j += 10) {
+      float3 p;
+      p.x = radius * sin(DEG_TO_RAD((float)i)) * cos(DEG_TO_RAD((float)j));
+      p.y = radius * sin(DEG_TO_RAD((float)i)) * sin(DEG_TO_RAD((float)j));
+      p.z = radius * cos(DEG_TO_RAD((float)i));
+      float_array_push(&verts, p.x);
+      float_array_push(&verts, p.y);
+      float_array_push(&verts, p.z);
+
+      float3 n = vf3_normalise(p);
+      float_array_push(&normals, n.x);
+      float_array_push(&normals, n.y);
+      float_array_push(&normals, n.z);
+
+      float u = 0.5 - atan2(-n.x, -n.y) / (2.0 * M_PI);
+      float v = 0.5 - 2.0 * asin(-n.z) / (2.0 * M_PI);
+      float_array_push(&texc, u); // X
+      float_array_push(&texc, v); // Y
+      vert_count ++;
+    }
+  }
+
+  int_array_t indices;
+  int_array_init(&indices);
+  // For every stack and every slice, we bouild one big triangle strip with
+  // degenerate triangles.
+  for (int i = 0 ; i < 18; i ++) {
+    int_array_push(&indices, ((i + 1)* 18) + 0);
+    for (int j = 0 ; j < 36 ; j ++) {
+      int_array_push(&indices, ((i + 1)* 18) + j);
+      int_array_push(&indices, (i * 18) + j);
+    }
+    int_array_push(&indices, (i * 18) + 35);
+  }
+
+
+  sg_geometry_t *geo = sg_new_geometry(sphere, GL_TRIANGLE_STRIP, vert_count,
+                                       verts.elems, normals.elems, texc.elems,
+                                       indices.length, indices.elems);
+
+  float_array_dispose(&verts);
+  float_array_dispose(&normals);
+  float_array_dispose(&texc);
+  int_array_dispose(&indices);
+  return sphere;
 }
 
 sg_object_t*
