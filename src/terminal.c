@@ -23,10 +23,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <openorbit/log.h>
+#include <gencds/avl-tree.h>
+
 #include "terminal.h"
-#include "log.h"
 #include "res-manager.h"
-#include "avl-tree.h"
 
 // Length of terminal buffer
 #define TERM_BUFF_LEN 1000

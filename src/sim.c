@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2010 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2010,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
