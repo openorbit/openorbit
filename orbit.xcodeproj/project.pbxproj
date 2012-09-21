@@ -578,7 +578,6 @@
 		EC34BC2B1079EE080011B76E /* colour.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = colour.h; sourceTree = "<group>"; };
 		EC34BC2C1079EE080011B76E /* gui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gui.c; sourceTree = "<group>"; };
 		EC34BC2D1079EE080011B76E /* gui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gui.h; sourceTree = "<group>"; };
-		EC34BC321079EE080011B76E /* scenegraph-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "scenegraph-private.h"; sourceTree = "<group>"; };
 		EC34BC331079EE080011B76E /* scenegraph.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scenegraph.c; sourceTree = "<group>"; };
 		EC34BC341079EE080011B76E /* scenegraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scenegraph.h; sourceTree = "<group>"; };
 		EC34BC351079EE080011B76E /* sky.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sky.c; sourceTree = "<group>"; };
@@ -1187,7 +1186,6 @@
 				EC8CC1DC15F1FBB000FC71F4 /* scene.c */,
 				EC34BC331079EE080011B76E /* scenegraph.c */,
 				EC34BC341079EE080011B76E /* scenegraph.h */,
-				EC34BC321079EE080011B76E /* scenegraph-private.h */,
 				ECC909A21175A14B00E8D477 /* shader-manager.c */,
 				ECC909A31175A14B00E8D477 /* shader-manager.h */,
 				EC34BC351079EE080011B76E /* sky.c */,

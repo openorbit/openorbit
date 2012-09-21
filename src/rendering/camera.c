@@ -33,7 +33,6 @@
 #include "camera.h"
 #include "settings.h"
 #include "scenegraph.h"
-#include "scenegraph-private.h"
 #include "palloc.h"
 struct sg_camera_t {
   float4x4 proj_matrix;

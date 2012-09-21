@@ -20,7 +20,6 @@
 #include "rendering/types.h"
 
 #include "rendering/light.h"
-#include "rendering/scenegraph-private.h"
 #include "rendering/camera.h"
 
 #include "physics/object.h"

@@ -29,7 +29,6 @@
 
 #include "rendering/types.h"
 #include "scenegraph.h"
-#include "scenegraph-private.h"
 #include "sky.h"
 #include "types.h"
 

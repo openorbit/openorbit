@@ -482,7 +482,7 @@ PLatmosphereTemplate*
 plAtmospheref(size_t layers, float g0, float M, float *p_b, float *P_b,
              float *T_b, float *h_b, float *L_b)
 {
-  PLatmosphereTemplate *atm = malloc(sizeof(PLatmosphereTemplate) +
+  PLatmosphereTemplate *atm = smalloc(sizeof(PLatmosphereTemplate) +
                                      sizeof(PLatmosphereLayer) * layers);
   atm->layer_count = layers;
   for (int i = 0 ; i < layers ; i++) {
@@ -511,7 +511,7 @@ plAtmosphered(size_t layers, double g0, double M, const double *p_b,
               const double *P_b, const double *T_b, const double *h_b,
               const double *L_b)
 {
-  PLatmosphereTemplate *atm = malloc(sizeof(PLatmosphereTemplate) +
+  PLatmosphereTemplate *atm = smalloc(sizeof(PLatmosphereTemplate) +
                                      sizeof(PLatmosphereLayer) * layers);
   atm->layer_count = layers;
   for (int i = 0 ; i < layers ; i++) {

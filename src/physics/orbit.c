@@ -33,7 +33,6 @@
 #include "parsers/hrml.h"
 #include "res-manager.h"
 #include "rendering/scenegraph.h"
-#include "rendering/scenegraph-private.h"
 
 #include <vmath/lwcoord.h>
 

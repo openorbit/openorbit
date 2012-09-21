@@ -30,7 +30,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 
-#include "scenegraph-private.h"
 #include "scenegraph.h"
 
 struct sg_star_t {
