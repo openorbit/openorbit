@@ -34,7 +34,7 @@
 #include "settings.h"
 #include "scenegraph.h"
 #include "scenegraph-private.h"
-
+#include "palloc.h"
 struct sg_camera_t {
   float4x4 proj_matrix;
   float4x4 view_matrix;
@@ -66,7 +66,7 @@ struct sg_camera_t {
 sg_camera_t*
 sg_new_free_camera(const lwcoord_t *pos)
 {
-  sg_camera_t *cam = malloc(sizeof(sg_camera_t));
+  sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
   cam->type = SG_CAMERA_FREE;
   cam->free.lwc = *pos;
   return cam;
@@ -75,7 +75,7 @@ sg_new_free_camera(const lwcoord_t *pos)
 sg_camera_t*
 sg_new_fixed_camera(sg_object_t *obj)
 {
-  sg_camera_t *cam = malloc(sizeof(sg_camera_t));
+  sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
   cam->type = SG_CAMERA_FIXED;
   cam->fixed.obj = obj;
   return cam;
@@ -84,7 +84,7 @@ sg_new_fixed_camera(sg_object_t *obj)
 sg_camera_t*
 sg_new_orbiting_camera(sg_object_t *obj)
 {
-  sg_camera_t *cam = malloc(sizeof(sg_camera_t));
+  sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
   cam->type = SG_CAMERA_ORBITING;
   cam->orbiting.obj = obj;
   return cam;
@@ -261,6 +261,7 @@ sgCamInit(void)
 void
 sg_camera_animate(sg_camera_t *cam, float dt)
 {
+  assert(cam && "cannot animate non existant camera");
   switch (cam->type) {
     case SG_CAMERA_FIXED: {
       // Camera is pegged to object, not much to do here

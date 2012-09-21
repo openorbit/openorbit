@@ -1,5 +1,5 @@
 /*
- Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2009,2010,2012 Mattias Holm <mattias.holm(at)openorbit.org>
  
  This file is part of Open Orbit. Open Orbit is free software: you can
  redistribute it and/or modify it under the terms of the GNU General Public
@@ -41,6 +41,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <pthread.h>
@@ -198,6 +199,7 @@ smalloc(size_t sz)
 
   if (data == NULL) abort();
 
+  memset(data, 0, sz);
   return data;
 }
 

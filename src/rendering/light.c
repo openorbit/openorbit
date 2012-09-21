@@ -188,33 +188,6 @@ sg_new_light(sg_scene_t *sc, float3 p)
   return sg_new_light3f(sc, vf3_x(p), vf3_y(p), vf3_z(p));
 }
 
-void
-sg_light_bind(sg_light_t *sc, sg_shader_t *shader)
-{
-#if 0
-  glUniform3fv(obj->shader->uniforms.lightIds[i].pos, 1,
-               (GLfloat*)&obj->lights[i]->pos);
-  glUniform4fv(obj->shader->uniforms.lightIds[i].ambient, 1,
-               (GLfloat*)&obj->lights[i]->ambient);
-  glUniform4fv(obj->shader->uniforms.lightIds[i].specular, 1,
-               (GLfloat*)&obj->lights[i]->specular);
-  glUniform4fv(obj->shader->uniforms.lightIds[i].diffuse, 1,
-               (GLfloat*)&obj->lights[i]->diffuse);
-  glUniform3fv(obj->shader->uniforms.lightIds[i].dir, 1,
-               (GLfloat*)&obj->lights[i]->dir);
-
-  glUniform1f(obj->shader->uniforms.lightIds[i].constantAttenuation,
-              obj->lights[i]->constantAttenuation);
-  glUniform1f(obj->shader->uniforms.lightIds[i].linearAttenuation,
-              obj->lights[i]->linearAttenuation);
-  glUniform1f(obj->shader->uniforms.lightIds[i].quadraticAttenuation,
-              obj->lights[i]->quadraticAttenuation);
-
-  glUniform4fv(obj->shader->uniforms.lightIds[i].globAmbient, 1,
-               (GLfloat*)&obj->lights[i]->globAmbient);
-#endif
-}
-
 float
 sg_light_get_const_attenuation(const sg_light_t *light)
 {

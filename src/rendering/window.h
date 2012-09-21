@@ -23,6 +23,9 @@
 #include "rendering/types.h"
 
 void sg_window_draw(sg_window_t *window, float dt);
-sg_window_t* sg_new_window(sg_scenegraph_t *sg);
+sg_window_t* sg_new_window(void);
+sg_scene_t* sg_window_get_scene(sg_window_t *win, int idx);
+void sg_window_add_viewport(sg_window_t *win, sg_viewport_t *vp);
+sg_viewport_t* sg_window_get_viewport(sg_window_t *win, int idx);
 
 #endif

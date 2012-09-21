@@ -45,7 +45,6 @@ typedef struct sg_overlay_t sg_overlay_t;
 typedef struct sg_camera_t sg_camera_t;
 typedef struct sg_light_ids_t sg_light_ids_t;
 typedef struct sg_material_ids_t sg_material_ids_t;
-typedef struct sg_scenegraph_t sg_scenegraph_t;
 typedef struct sg_shader_t sg_shader_t;
 typedef struct sg_star_t sg_star_t;
 typedef struct sg_background_t sg_background_t;

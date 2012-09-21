@@ -37,6 +37,8 @@
 #include <GL3/gl3.h>
 #endif
 
+#include "rendering/scenegraph.h"
+
 struct sg_light_ids_t {
   GLint pos;
   GLint ambient;
@@ -194,6 +196,7 @@ sgShaderPreprocess(mapped_file_t mf)
 void
 sg_load_all_shaders(void)
 {
+  SG_CHECK_ERROR;
   const char *path = ooResGetPath("shaders");
 
   DIR *dir = opendir(path);
@@ -214,6 +217,7 @@ sg_load_all_shaders(void)
 
     closedir(dir);
   }
+  SG_CHECK_ERROR;
 }
 
 sg_shader_t*
@@ -226,6 +230,7 @@ sg_load_shader(const char *key,
   assert(vspath != NULL);
   assert(fspath != NULL);
 
+  SG_CHECK_ERROR;
   ooLogInfo("compiling '%s'", key);
 
   sg_shader_t *tmp = hashtable_lookup(shaderKeyMap, key);
@@ -449,6 +454,7 @@ sg_get_shader_without_warnings(const char *key)
 GLint
 sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required)
 {
+  SG_CHECK_ERROR;
   // Handle both attributes and uniforms
   if (param < SG_ATTRIBUTE_END) {
     GLint attrib_loc = glGetAttribLocation (program->shaderId, param_names[param]);
@@ -470,11 +476,13 @@ sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required)
 void
 sg_shader_bind(sg_shader_t *program)
 {
+  SG_CHECK_ERROR;
   if (program) {
     glUseProgram(program->shaderId);
   } else {
     glUseProgram(0);
   }
+  SG_CHECK_ERROR;
 }
 
 void
@@ -483,6 +491,7 @@ sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj)
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.projectionId, 1, GL_TRUE,
                      (GLfloat*)proj);
+  SG_CHECK_ERROR;
 }
 
 void
@@ -491,6 +500,7 @@ sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.modelViewId, 1, GL_TRUE,
                      (GLfloat*)modelview);
+  SG_CHECK_ERROR;
 }
 
 void
@@ -498,6 +508,7 @@ sg_shader_bind_param_3fv(sg_shader_t *shader, sg_param_id_t param, float3 p)
 {
   sg_shader_bind(shader);
   glUniform3fv(sg_shader_get_location(shader, param, true), 1, (float*)&p);
+  SG_CHECK_ERROR;
 }
 
 void
@@ -505,6 +516,7 @@ sg_shader_bind_param_4fv(sg_shader_t *shader, sg_param_id_t param, float4 p)
 {
   sg_shader_bind(shader);
   glUniform4fv(sg_shader_get_location(shader, param, true), 1, (float*)&p);
+  SG_CHECK_ERROR;
 }
 
 void
@@ -512,6 +524,7 @@ sg_shader_bind_texture(sg_shader_t *shader, unsigned tex_num, sg_texture_t *tex)
 {
   sg_shader_bind(shader);
   glUniform1i(shader->uniforms.texIds[tex_num], sg_texture_get_id(tex));
+  SG_CHECK_ERROR;
 }
 
 void
@@ -539,7 +552,7 @@ sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
               sg_light_get_linear_attenuation(light));
   glUniform1f(shader->uniforms.lightIds[light_num].quadraticAttenuation,
               sg_light_get_quadratic_attenuation(light));
-
+  SG_CHECK_ERROR;
   // shader->uniforms.lightIds[light_num].globAmbient =
   // sgGetLocationForParamAndIndex(shaderProgram, SG_LIGHT_MOD_GLOB_AMB, i);
 
@@ -551,12 +564,14 @@ void
 sg_location_bind(GLuint prog, sg_param_id_t param)
 {
   glBindAttribLocation(prog, param, param_names[param]);
+  SG_CHECK_ERROR;
 }
 
 void
 sg_location_bind_at_index(GLuint prog, sg_param_id_t param, unsigned index)
 {
   glBindAttribLocation(prog, param, param_names[param] + index);
+  SG_CHECK_ERROR;
 }
 
 
@@ -564,6 +579,7 @@ GLint
 sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
                               unsigned index)
 {
+  SG_CHECK_ERROR;
   assert(index < 100);
 
   char locName[strlen(param_names[param])];
@@ -582,12 +598,13 @@ sgSetShaderTex(GLuint program, unsigned index, GLuint tex)
   glBindTexture(GL_TEXTURE_2D, tex);
   GLint loc = sgGetLocationForParamAndIndex(program, SG_TEX, index);
   glUniform1i(loc, index); // Uniform value is texture unit id
+  SG_CHECK_ERROR;
 }
 
 void
 sg_location_bind_matrix(sg_shader_t *prog, sg_param_id_t param)
 {
-  
+  SG_CHECK_ERROR;
 }
 
 

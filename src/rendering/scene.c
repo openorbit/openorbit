@@ -25,7 +25,6 @@
 
 struct sg_scene_t {
   char *name;
-  sg_scenegraph_t *sg;
   sg_camera_t *cam;
   sg_background_t *bg;
   obj_array_t objects;
@@ -38,6 +37,7 @@ void
 sg_scene_set_bg(sg_scene_t *sc, sg_background_t *bg)
 {
   sc->bg = bg;
+  sg_background_set_scene(bg, sc);
 }
 
 void
@@ -73,6 +73,7 @@ sg_scene_set_amb4f(sg_scene_t *sc, float r, float g, float b, float a)
 void
 sg_scene_draw(sg_scene_t *scene, float dt)
 {
+  SG_CHECK_ERROR;
   sg_camera_animate(scene->cam, dt);
   sg_background_draw(scene->bg);
   //sgMoveCam(scene->cam);
@@ -81,10 +82,11 @@ sg_scene_draw(sg_scene_t *scene, float dt)
     sg_object_animate(ARRAY_ELEM(scene->objects, i), dt);
     sg_object_draw(ARRAY_ELEM(scene->objects, i));
   }
+  SG_CHECK_ERROR;
 }
 
 sg_scene_t*
-sg_new_scene(sg_scenegraph_t *sg, const char *name)
+sg_new_scene(const char *name)
 {
   sg_scene_t *scene = malloc(sizeof(sg_scene_t));
   memset(scene, 0, sizeof(sg_scene_t));
@@ -92,9 +94,6 @@ sg_new_scene(sg_scenegraph_t *sg, const char *name)
   obj_array_init(&scene->objects);
   obj_array_init(&scene->lights);
   obj_array_init(&scene->shaders);
-
-  sg_scenegraph_add_scene(sg, scene);
-  scene->sg = sg;
   return scene;
 }
 

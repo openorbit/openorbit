@@ -30,6 +30,7 @@
 #include "rendering/types.h"
 #include "rendering/shader-manager.h"
 #include "rendering/scenegraph.h"
+#include "log.h"
 
 struct sg_overlay_t {
   bool enabled;
@@ -68,6 +69,8 @@ sg_overlay_init(sg_overlay_t *overlay, sg_draw_overlay_t drawfunc, void *obj,
   overlay->y = y;
   overlay->w = w;
   overlay->h = h;
+
+  SG_CHECK_ERROR;
   glGenFramebuffers(1, &overlay->fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, overlay->fbo);
   glGenTextures(1, &overlay->tex);
@@ -86,9 +89,35 @@ sg_overlay_init(sg_overlay_t *overlay, sg_draw_overlay_t drawfunc, void *obj,
   SG_CHECK_ERROR;
 
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  switch (status) {
+  case GL_FRAMEBUFFER_COMPLETE:
+    break; // A-OK
+  case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+    ooLogInfo("incomplete attachment for framebuffer (rw = %d rh = %d)",
+              rw, rh);
+    break;
+  case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+    ooLogInfo("missing attachment for framebuffer (rw = %d rh = %d)",
+              rw, rh);
+    break;
+  case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+    ooLogInfo("incomplete draw buffer for framebuffer (rw = %d rh = %d)",
+              rw, rh);
+    break;
+  case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+    ooLogInfo("incomplete read buffer for framebuffer (rw = %d rh = %d)",
+              rw, rh);
+    break;
+  default:
+    ooLogInfo("other framebuffer error: %d", (int)status);
+  }
+  SG_CHECK_ERROR;
+
+
   assert(status == GL_FRAMEBUFFER_COMPLETE);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  SG_CHECK_ERROR;
 
   // TODO: Create vbo and vba
 }
@@ -102,20 +131,28 @@ sg_overlay_set_clear_color(sg_overlay_t *overlay, float4 col)
 void
 sg_overlay_draw(sg_overlay_t *overlay)
 {
+  SG_CHECK_ERROR;
+
   // First render the texture that we place in the overlay
   sg_shader_bind(overlay->shader);
   glBindFramebuffer(GL_FRAMEBUFFER, overlay->fbo);
+  SG_CHECK_ERROR;
   glClearColor(overlay->clear_color[0], overlay->clear_color[1],
                overlay->clear_color[2], overlay->clear_color[3]);
+  SG_CHECK_ERROR;
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  SG_CHECK_ERROR;
   overlay->draw(overlay, overlay->obj);
+  SG_CHECK_ERROR;
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  SG_CHECK_ERROR;
 
   // Render the overlay using the given texture
   glBindBuffer(GL_ARRAY_BUFFER, overlay->vbo);
+  SG_CHECK_ERROR;
   glBindVertexArray(overlay->vba);
-
+  SG_CHECK_ERROR;
   //glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 

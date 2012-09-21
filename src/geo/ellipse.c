@@ -28,6 +28,7 @@
 
 
 #include "ellipse.h"
+#include "palloc.h"
 #include <openorbit/log.h>
 
 void
@@ -107,7 +108,7 @@ ooVecArraySet(OOvecarray *vec, size_t i, float3 obj)
 #define STEPSIZE 20.0
 OOellipse* ooGeoEllipseAreaSeg(size_t segs, float semiMajor, float semiMinor)
 {
-  OOellipse *e = malloc(sizeof(OOellipse));
+  OOellipse *e = smalloc(sizeof(OOellipse));
   ooVecArrayInit(&e->vec);
   //uint64_t totalIterations = 0;
   e->semiMajor = semiMajor;

@@ -37,8 +37,6 @@
 sg_light_t* sg_new_light(sg_scene_t *sc, float3 p);
 sg_light_t* sg_new_light3f(sg_scene_t *sc, float x, float y, float z);
 
-void sg_light_bind(sg_light_t *sc, sg_shader_t *shader);
-
 void sg_light_set_pos3f(sg_light_t *light, float x, float y, float z);
 void sg_light_set_posv(sg_light_t *light, float3 v);
 void sg_light_set_poslw(sg_light_t *light, lwcoord_t *lwc);

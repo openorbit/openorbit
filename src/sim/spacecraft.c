@@ -32,6 +32,7 @@
 #include "io-manager.h"
 #include "sim/pubsub.h"
 #include "rendering/object.h"
+#include "palloc.h"
 
 extern SIMstate gSIM_state;
 
@@ -178,7 +179,6 @@ simScInit(sim_spacecraft_t *sc, const char *name)
   sc->rec = simPubsubCreateRecord(sckey);
   free(sckey);
 
-  sg_scenegraph_t *sg = simGetSg();
   PLworld *world = simGetWorld();
 
   obj_array_init(&sc->stages);
@@ -357,7 +357,7 @@ ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt) {
 sim_stage_t*
 simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
 {
-  sim_stage_t *stage = malloc(sizeof(sim_stage_t));
+  sim_stage_t *stage = smalloc(sizeof(sim_stage_t));
   stage->state = OO_Stage_Idle;
   stage->sc = sc;
   stage->expendedMass = 0.0;
@@ -612,7 +612,6 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
 
   sc->super.name = strdup(args->name);
 
-  sg_scenegraph_t *sg = simGetSg();
   PLworld *world = simGetWorld();
 
   obj_array_init(&sc->stages);
@@ -626,7 +625,7 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
   sc->detatchStage = simDefaultDetatch;
   sc->detatchSequence = 0;
   sc->obj = plObject(world, args->name);
-  sc->scene = sg_scenegraph_get_scene(sg, "main"); // Just use any of the existing ones
+  sc->scene = sim_get_scene(); // Just use any of the existing ones
   sc->expendedMass = 0.0;
   sc->mainEngineOn = false;
   sc->toggleMainEngine = simDefaultEngineToggle;

@@ -57,31 +57,12 @@
 #include "sim.h"
 #include "sim/pubsub.h"
 #include "sim/spacecraft-control.h"
-#include "rendering/render.h"
 #include "rendering/camera.h"
 #include "rendering/sky.h"
 #include "scripting/scripting.h"
 #include "rendering/texture.h"
 #include "physics/physics.h"
 #include "rendering/shader-manager.h"
-
-void
-init_graphics(void)
-{
-  // Init GL state
-  ooSetVideoDefaults();
-  sg_load_all_shaders();
-  //sgCamInit();
-}
-
-void
-init_plugins(void)
-{
-  ooPluginInit();
-  ooPluginLoadAll();
-  ooPluginPrintAll();
-}
-
 
 void
 init_al(void)
@@ -106,43 +87,12 @@ init_al(void)
 int
 init_sim(int argc, char*argv[])
 {
-  simScCtrlInit();
-
-  // Set log level, need to do that here
-  const char *levStr = NULL;
-  ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
-  ooLogSetLevel(ooLogGetLevFromStr(levStr));
-
-  // Load and run initialisation script
-  ooScriptingInit();
-
-  if (!ooScriptingRunFile("script/init.py")) {
-    ooLogFatal("script/init.py missing");
-  }
   // Initialise SDL, GL and AL
   init_al();
 
-  // Setup IO-tables, must be done after joystick system has been initialised
-  ioInit();
-
-//  if (TTF_Init() == -1) {
-//    ooLogFatal("Couldn't initialize SDL_ttf: %s", TTF_GetError());
-//  }
-
-  init_graphics();
+  sim_init();
 
 
-  //ooIoPrintJoystickNames();
-
-  ooSimInit();
-
-  init_plugins();
-
-  if (!ooScriptingRunFile("script/postinit.py")) {
-    ooLogFatal("script/postinit.py missing");
-  }
-
-//  ooLogInfo("Shutting down normally...");
   return 0;
 }
 

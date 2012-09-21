@@ -22,7 +22,6 @@
 #import <OpenGL/OpenGL.h>
 #import <OpenGL/gl3.h>
 
-#import "rendering/render.h"
 #import "rendering/window.h"
 #import "rendering/scenegraph.h"
 #import "sim.h"
@@ -253,7 +252,11 @@ static io_keycode_t keymap [256] = {
 - (void) reshape
 {
   NSRect r = self.bounds;
-  ooResizeScreen(r.origin.x, r.origin.y, r.size.width, r.size.height, false);
+  extern SIMstate gSIM_state;
+  //sg_window_resize(gSIM_state.win, r.origin.x, r.origin.y, r.size.width, r.size.height);
+  sg_viewport_t *vp = sg_window_get_viewport(gSIM_state.win, 0);
+  sg_viewport_reshape(vp, r.origin.x, r.origin.y, r.size.width, r.size.height);
+
   [self setNeedsDisplay:YES];
 }
 

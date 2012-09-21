@@ -32,7 +32,6 @@
 #include "common/moduleinit.h"
 #include "common/palloc.h"
 #include "io-manager.h"
-#include "rendering/render.h"
 #include "rendering/overlay.h"
 #include "sim.h"
 
@@ -52,6 +51,7 @@ MODULE_INIT(mfd, NULL) {
 static void
 mfd_draw(sg_overlay_t *overlay, void *obj)
 {
+  SG_CHECK_ERROR;
   SIMmfd *mfd = (SIMmfd*)obj;
 
   if (mfd_pages.length > 0) {
@@ -61,6 +61,7 @@ mfd_draw(sg_overlay_t *overlay, void *obj)
     glClearColor(0.0, 1.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
   }
+  SG_CHECK_ERROR;
 }
 
 
@@ -70,11 +71,13 @@ mfd_draw(sg_overlay_t *overlay, void *obj)
 static void
 samplemfddraw(SIMmfdpage *mfd)
 {
-  glDisable(GL_BLEND);
-  glDisable(GL_TEXTURE_2D);
+  SG_CHECK_ERROR;
 
+  glDisable(GL_BLEND);
   glClearColor(0.0625, 0.05078125, 0.2265625, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  SG_CHECK_ERROR;
 }
 
 static SIMmfdpage sampleMfdPage = {"sample-mfd", samplemfddraw};
@@ -160,6 +163,8 @@ simSelectMfd(SIMmfd *mfd, unsigned mfdId)
 void
 test_hud_draw(sg_overlay_t *overlay, void *obj)
 {
+  SG_CHECK_ERROR;
+
   SIMhud *hud = (SIMhud*)obj;
 
   sim_spacecraft_t *sc = simGetSpacecraft();
@@ -189,10 +194,10 @@ test_hud_draw(sg_overlay_t *overlay, void *obj)
   // relative.
   //glPushAttrib(GL_ENABLE_BIT);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
   glClear(GL_COLOR_BUFFER_BIT);
 
   glDisable(GL_BLEND);
-  glDisable(GL_TEXTURE_2D);
   glDisable(GL_LINE_SMOOTH);
 
   //glMatrixMode(GL_PROJECTION);
@@ -216,12 +221,13 @@ test_hud_draw(sg_overlay_t *overlay, void *obj)
   // glVertex2f(0.0f, 0.5f);
 
   //glEnd();
+  SG_CHECK_ERROR;
 
-  glEnable(GL_TEXTURE_2D);
-  //glEnable(GL_POINT_SPRITE);
-  //glPointSize(10.0);
   glActiveTexture(GL_TEXTURE0);
+  SG_CHECK_ERROR;
+
   glBindTexture(GL_TEXTURE_2D, sgTextTexture(hud->text));
+
   SG_CHECK_ERROR;
   //GLuint tex_num = glGetUniformLocation(, )
   //glUniform1i(, 0);
@@ -246,13 +252,12 @@ test_hud_draw(sg_overlay_t *overlay, void *obj)
 
   //glEnd();
 
-  glDisable(GL_TEXTURE_2D);
-
   //glPopMatrix();
   // glMatrixMode(GL_PROJECTION);
   //glPopMatrix();
   // glMatrixMode(GL_MODELVIEW);
   //glPopAttrib();
+  SG_CHECK_ERROR;
 }
 
 
@@ -280,15 +285,16 @@ simMfdInitAll(sg_viewport_t *vp)
                *overlay_hud = sg_new_overlay();
 
   sg_overlay_init(overlay0, mfd_draw, &mfd0, 0.0,   0.0, 128.0, 128.0, 128, 128);
-  sg_overlay_init(overlay1, mfd_draw, &mfd1, sgRenderInfo.w - 128.0,   0.0,
+  sg_overlay_init(overlay1, mfd_draw, &mfd1, sg_viewport_get_width(vp) - 128.0,   0.0,
                   128.0, 128.0, 128, 128);
-  sg_overlay_init(overlay2, mfd_draw, &mfd2, sgRenderInfo.w - 128.0,
-                 sgRenderInfo.h - 128.0, 128.0, 128.0, 128, 128);
-  sg_overlay_init(overlay3, mfd_draw, &mfd3, 0.0, sgRenderInfo.h - 128.0,
+  sg_overlay_init(overlay2, mfd_draw, &mfd2, sg_viewport_get_width(vp)- 128.0,
+                 sg_viewport_get_height(vp) - 128.0, 128.0, 128.0, 128, 128);
+  sg_overlay_init(overlay3, mfd_draw, &mfd3, 0.0, sg_viewport_get_height(vp) - 128.0,
                 128.0, 128.0, 128, 128);
 
   sg_overlay_init(overlay_hud, test_hud_draw, &hud,  0.0, 0.0,
-                  sgRenderInfo.w, sgRenderInfo.h, sgRenderInfo.w, sgRenderInfo.h);
+                  sg_viewport_get_width(vp), sg_viewport_get_height(vp),
+                  sg_viewport_get_width(vp), sg_viewport_get_height(vp));
 
   hud.text = sgNewTextLabel("Helvetica", 14.0, "20");
   SG_CHECK_ERROR;

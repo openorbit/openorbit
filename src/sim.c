@@ -37,32 +37,90 @@
 #include "rendering/scenegraph.h"
 #include "settings.h"
 #include "io-manager.h"
-
+#include "scripting/scripting.h"
+#include "plugin-handler.h"
 
 #include <openorbit/log.h>
 
-SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL, NULL};
+SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL};
+
+sg_scene_t*
+sim_get_scene(void)
+{
+  return sg_window_get_scene(gSIM_state.win, 0);
+}
+
+sg_viewport_t*
+sim_get_main_viewport(void)
+{
+  return sg_window_get_viewport(gSIM_state.win, 0);
+}
+
+sg_camera_t*
+sim_get_current_camera(void)
+{
+  sg_viewport_t* vp = sim_get_main_viewport();
+  return sg_viewport_get_cam(vp);
+}
 
 void
-ooSimInit(void)
+sim_init_graphics(void)
 {
-  float freq;
-  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
-  gSIM_state.stepSize = 1.0 / freq; // Period in s
-  //gSIM_state.evQueue = simNewEventQueue();
-  gSIM_state.sg = sg_new_scenegraph();
-  gSIM_state.win = sg_new_window(gSIM_state.sg);
-  sg_viewport_t *vp = sg_new_viewport(gSIM_state.win, 0, 0, 640, 480);
-  sg_scene_t *scene = sg_new_scene(gSIM_state.sg, "main");
+  sg_load_all_shaders();
+  gSIM_state.win = sg_new_window();
+
+  int width, height;
+  float fovy;
+  ooConfGetIntDef("openorbit/video/width", &width, 640);
+  ooConfGetIntDef("openorbit/video/height", &height, 480);
+  ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
+  sg_viewport_t *vp = sg_new_viewport(gSIM_state.win, 0, 0, width, height);
+  sg_scene_t *scene = sg_new_scene("main");
   sg_viewport_set_scene(vp, scene);
 
   sg_background_t *sky = sgCreateBackgroundFromFile("data/stars.csv");
   sg_scene_set_bg(scene, sky);
-  //gSIM_state.sg = sgNewSceneGraph();
-  //sgSetSky(gSIM_state.sg, sky);
-  //sgSceneSetBackground(sc, sky);
+  sg_camera_t *cam = sg_new_free_camera();
+  sg_scene_set_cam(scene, cam);
 
-  gSIM_state.world = ooOrbitLoad(gSIM_state.sg, "data/solsystem.hrml");
+}
+
+void
+sim_init_plugins(void)
+{
+  ooPluginInit();
+  ooPluginLoadAll();
+  ooPluginPrintAll();
+}
+
+
+void
+sim_init(void)
+{
+  simScCtrlInit();
+
+  // Set log level, need to do that here
+  const char *levStr = NULL;
+  ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
+  ooLogSetLevel(ooLogGetLevFromStr(levStr));
+
+  // Load and run initialisation script
+  ooScriptingInit();
+
+  if (!ooScriptingRunFile("script/init.py")) {
+    ooLogFatal("script/init.py missing");
+  }
+
+  sim_init_graphics();
+
+  float freq;
+  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
+  gSIM_state.stepSize = 1.0 / freq; // Period in s
+  
+  // Setup IO-tables, must be done after joystick system has been initialised
+  ioInit();
+
+  gSIM_state.world = ooOrbitLoad(sim_get_scene(), "data/solsystem.hrml");
 
 
 
@@ -73,13 +131,15 @@ ooSimInit(void)
                       250.0e3 /*altitude*/);
   simSetSpacecraft(sc);
 
-  //SGscene *scene = sgGetScene(gSIM_state.sg, "main");
 
-  //SGcam *cam = sgNewOrbitCam(gSIM_state.sg, scene, ooScGetPLObjForSc(sc),
-  //                         0.0, 0.0, 20.0);
-  //sgSetCam(gSIM_state.sg, cam);
+  simMfdInitAll(sim_get_main_viewport());
 
-  simMfdInitAll(vp);
+  sim_init_plugins();
+
+  if (!ooScriptingRunFile("script/postinit.py")) {
+    ooLogFatal("script/postinit.py missing");
+  }
+
 }
 
 
@@ -165,12 +225,6 @@ sim_spacecraft_t*
 simGetSpacecraft(void)
 {
   return gSIM_state.currentSc;
-}
-
-sg_scenegraph_t*
-simGetSg(void)
-{
-  return gSIM_state.sg;
 }
 
 PLworld*

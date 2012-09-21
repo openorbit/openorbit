@@ -53,6 +53,7 @@ float3 ooEquToCart(float ra, float dec);
 void sg_background_draw(sg_background_t *bg);
 
 sg_background_t* sgCreateBackgroundFromFile(const char *file);
+void sg_background_set_scene(sg_background_t *bg, sg_scene_t *sc);
 
 #ifdef __cplusplus
 }

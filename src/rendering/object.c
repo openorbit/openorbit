@@ -135,7 +135,7 @@ sg_object_set_material(sg_object_t *obj, sg_material_t *mat)
 void
 sg_geometry_draw(sg_geometry_t *geo)
 {
-  //  SG_CHECK_ERROR;
+  SG_CHECK_ERROR;
 
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
@@ -151,12 +151,14 @@ sg_geometry_draw(sg_geometry_t *geo)
   }
   glDisableVertexAttribArray(geo->vba);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  //SG_CHECK_ERROR;
+  SG_CHECK_ERROR;
 }
 
 void
 sg_object_draw(sg_object_t *obj)
 {
+  SG_CHECK_ERROR;
+
   // Set model matrix for current object, we transpose this
   sg_shader_bind(obj->shader);
 
@@ -173,12 +175,12 @@ sg_object_draw(sg_object_t *obj)
   // Set light params for object
   // TODO: Global ambient light as well...
   for (int i = 0 ; i < obj->lightCount ; i ++) {
-    sg_light_bind(obj->lights[i], obj->shader);
+    sg_shader_bind_light(obj->shader, i, obj->lights[i]);
   }
 
   // Set texture params
   for (int i = 0 ; i < obj->texCount ; i ++) {
-    sg_texture_bind(obj->textures[i], obj->shader);
+    sg_shader_bind_texture(obj->shader, i, obj->textures[i]);
   }
   //glUniform1iv(obj->shader->texArrayId, SG_OBJ_MAX_TEXTURES, obj->textures);
   // Set material params
@@ -188,6 +190,7 @@ sg_object_draw(sg_object_t *obj)
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_draw(ARRAY_ELEM(obj->subObjects, i));
   }
+  SG_CHECK_ERROR;
 }
 
 void
@@ -307,6 +310,8 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                 float *vertices, float *normals, float *texCoords,
                 size_t index_count, int *indices)
 {
+  SG_CHECK_ERROR;
+
   sg_geometry_t *geo = malloc(sizeof(sg_geometry_t));
   memset(geo, 0, sizeof(sg_geometry_t));
   obj->geometry = geo;
@@ -322,6 +327,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   glGenVertexArrays(1, &geo->vba);
   glBindVertexArray(geo->vba);
   glGenBuffers(1, &geo->vbo);
+  SG_CHECK_ERROR;
 
   glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
   glBufferData(GL_ARRAY_BUFFER,
@@ -329,6 +335,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                NULL, // Just allocate, will copy with subdata
                GL_STATIC_DRAW);
 
+  SG_CHECK_ERROR;
 
 
   glBufferSubData(GL_ARRAY_BUFFER, 0, vertexDataSize, vertices);
@@ -338,20 +345,27 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   glVertexAttribPointer(sg_shader_get_vertex_attrib(shader),
                         4, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(sg_shader_get_vertex_attrib(shader));
-  if (normals) {
+  SG_CHECK_ERROR;
+  if (normals && sg_shader_get_normal_attrib(shader) != -1) {
     glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize, normalDataSize, normals);
+    SG_CHECK_ERROR;
     glVertexAttribPointer(sg_shader_get_normal_attrib(shader),
                           3, GL_FLOAT, GL_FALSE, 0, (void*)vertexDataSize);
+    SG_CHECK_ERROR;
     glEnableVertexAttribArray(sg_shader_get_normal_attrib(shader));
+    SG_CHECK_ERROR;
   }
 
-  if (texCoords) {
+  if (texCoords && sg_shader_get_texcoord_attrib(shader, 0) != -1) {
     glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize + normalDataSize,
                     texCoordDataSize, texCoords);
+    SG_CHECK_ERROR;
     glVertexAttribPointer(sg_shader_get_texcoord_attrib(shader, 0),
                           2, GL_FLOAT, GL_FALSE, 0,
                           (void*)vertexDataSize + normalDataSize);
+    SG_CHECK_ERROR;
     glEnableVertexAttribArray(sg_shader_get_texcoord_attrib(shader, 0));
+    SG_CHECK_ERROR;
   }
 
   if (indices) {
@@ -361,8 +375,10 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  index_count*sizeof(int), indices, GL_STATIC_DRAW);
     geo->index_count = index_count;
+    SG_CHECK_ERROR;
   }
   glBindVertexArray(0); // Done
+  SG_CHECK_ERROR;
 
   return geo;
 }

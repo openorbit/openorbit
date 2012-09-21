@@ -468,7 +468,7 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
   return world;
 }
 PLworld*
-ooOrbitLoad(sg_scenegraph_t *sg, const char *fileName)
+ooOrbitLoad(sg_scene_t *sc, const char *fileName)
 {
   char *file = ooResGetPath(fileName);
   HRMLdocument *solarSys = hrmlParse(file);
@@ -482,7 +482,6 @@ ooOrbitLoad(sg_scenegraph_t *sg, const char *fileName)
 
   PLworld *world = NULL;
   // Go through the document and handle each entry in the document
-  sg_scene_t *sc = sg_new_scene(sg, "main"); //TODO FIX ARGS sg, "main");
 
   for (HRMLobject *node = hrmlGetRoot(solarSys); node != NULL; node = node->next) {
     if (!strcmp(node->name, "openorbit")) {

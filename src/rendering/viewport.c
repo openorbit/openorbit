@@ -29,8 +29,10 @@
 
 #include <assert.h>
 #include "rendering/viewport.h"
+#include "rendering/scenegraph.h"
 #include "rendering/scene.h"
 #include "rendering/overlay.h"
+#include "rendering/window.h"
 
 struct sg_viewport_t {
   sg_scene_t *scene;
@@ -50,6 +52,7 @@ sg_new_viewport(sg_window_t *window, unsigned x, unsigned y,
   viewport->y = y;
   viewport->w = w;
   viewport->h = h;
+  sg_window_add_viewport(window, viewport);
   return viewport;
 }
 
@@ -87,19 +90,43 @@ sg_viewport_set_scene(sg_viewport_t *vp, sg_scene_t *sc)
 {
   vp->scene = sc;
 }
+sg_scene_t*
+sg_viewport_get_scene(sg_viewport_t *vp)
+{
+  return vp->scene;
+}
 
 
 void
 sg_viewport_draw(sg_viewport_t *vp, float dt)
 {
+  SG_CHECK_ERROR;
+
   sg_viewport_bind(vp);
 
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+  SG_CHECK_ERROR;
+
   sg_scene_draw(vp->scene, dt);
+
+  SG_CHECK_ERROR;
 
   ARRAY_FOR_EACH(i, vp->overlays) {
     sg_overlay_draw(ARRAY_ELEM(vp->overlays, i));
+    SG_CHECK_ERROR;
   }
+}
+
+int
+sg_viewport_get_width(sg_viewport_t *vp)
+{
+  return vp->w;
+}
+
+int
+sg_viewport_get_height(sg_viewport_t *vp)
+{
+  return vp->h;
 }

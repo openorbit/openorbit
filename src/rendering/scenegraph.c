@@ -40,14 +40,9 @@
 #include "texture.h"
 #include <vmath/lwcoord.h>
 
-#include "render.h"
 #include "shader-manager.h"
 #include "rendering/camera.h"
 
-struct sg_scenegraph_t {
-  obj_array_t windows;
-  obj_array_t scenes;
-};
 
 
 // Drawing is done as follows:
@@ -98,38 +93,4 @@ sgCheckGLError(const char *file, int line)
   default:
     ooLogError("unknown GL error at %s:%d", file, line);
   }
-}
-
-sg_scene_t*
-sg_scenegraph_get_scene(sg_scenegraph_t *sg, const char *name)
-{
-  ARRAY_FOR_EACH(i, sg->scenes) {
-    sg_scene_t *sc = ARRAY_ELEM(sg->scenes, i);
-    if (sg_scene_has_name(sc, name)) {
-      return sc;
-    }
-  }
-  return NULL;
-}
-
-void
-sg_scenegraph_add_scene(sg_scenegraph_t *sg, sg_scene_t *sc)
-{
-  obj_array_push(&sg->scenes, sc);
-}
-
-void
-sg_scenegraph_add_window(sg_scenegraph_t *sg, sg_window_t *win)
-{
-  obj_array_push(&sg->windows, win);
-}
-
-sg_scenegraph_t*
-sg_new_scenegraph()
-{
-  sg_scenegraph_t *sg = malloc(sizeof(sg_scenegraph_t));
-  memset(sg, 0, sizeof(sg_scenegraph_t));
-  obj_array_init(&sg->scenes);
-  obj_array_init(&sg->windows);
-  return sg;
 }

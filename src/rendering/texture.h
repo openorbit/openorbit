@@ -42,13 +42,7 @@ extern "C" {
  * \result Returns the texture number. Will return 0 on a failed load.
  */
 sg_texture_t* sg_load_texture(const char *key);
-/*! \brief binds the texture specified by key as the current texture
 
-    Do not use the bind function to much, it is acceptable to use it in non
-    performant rendering code (e.g. user interfaces). In normal cases, use
-    tex_num and cache the texid.
- */
-void sg_texture_bind(sg_texture_t *tex, sg_shader_t *shader);
 
   /*! \brief Get the OpenGL texture name associated with the key */
 GLuint sg_texture_get_id(sg_texture_t *tex);

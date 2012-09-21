@@ -39,7 +39,7 @@ struct sg_star_t {
 };
 
 struct sg_background_t {
-  sg_camera_t *cam;
+  sg_scene_t *scene;
   sg_shader_t *shader;
 
   GLuint vbo;
@@ -50,6 +50,11 @@ struct sg_background_t {
   sg_star_t *data;
 };
 
+void
+sg_background_set_scene(sg_background_t *bg, sg_scene_t *sc)
+{
+  bg->scene = sc;
+}
 
 float3
 ooEquToCart(float ra, float dec)
@@ -121,6 +126,8 @@ sgCreateBackgroundFromFile(const char *file)
   SG_CHECK_ERROR;
 
   sg_background_t *stars = malloc(sizeof(sg_background_t));
+  memset(stars, 0, sizeof(sg_background_t));
+
   stars->data = calloc(STAR_COUNT, sizeof(sg_star_t));
   stars->a_len = STAR_COUNT;
   stars->n_stars = 0;
@@ -145,6 +152,7 @@ sgCreateBackgroundFromFile(const char *file)
   SG_CHECK_ERROR;
 
   sg_shader_t *shader = sg_get_shader("sky");
+  stars->shader = shader;
   glVertexAttribPointer(sg_shader_get_location(shader, SG_VERTEX, true),
                         3, GL_FLOAT, GL_FALSE,
                         sizeof(sg_star_t), (void*)offsetof(sg_star_t, x));
@@ -159,7 +167,6 @@ sgCreateBackgroundFromFile(const char *file)
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   free(stars->data); // GL has copied arrays over
   stars->data = NULL;
-
   SG_CHECK_ERROR;
 
   return stars;
@@ -171,9 +178,9 @@ sg_background_draw(sg_background_t *bg)
   // Background drawing needs to shortcut the normal camera, as the bg
   // is at infinite distance (e.g. regarding translation)
   // Here we rotate the camera as needed
-  sg_camera_t *cam = bg->cam;
+  sg_camera_t *cam = sg_scene_get_cam(bg->scene);
   float4x4 rotMatrix;
-  switch (sg_camera_get_type(bg->cam)) {
+  switch (sg_camera_get_type(cam)) {
     case SG_CAMERA_FIXED: {
 
       quaternion_t q = q_mul(sg_object_get_quat(sg_camera_fixed_get_obj(cam)),
@@ -195,7 +202,7 @@ sg_background_draw(sg_background_t *bg)
   }
 
   sg_shader_bind(bg->shader);
-  sg_shader_set_projection(bg->shader, *sg_camera_get_projection(bg->cam));
+  sg_shader_set_projection(bg->shader, *sg_camera_get_projection(cam));
   sg_shader_set_model_view(bg->shader, rotMatrix);
 }
 

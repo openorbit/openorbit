@@ -71,7 +71,6 @@
 		EC34BC931079EE080011B76E /* camera.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC281079EE080011B76E /* camera.c */; };
 		EC34BC941079EE080011B76E /* colour.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC2A1079EE080011B76E /* colour.c */; };
 		EC34BC951079EE080011B76E /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC2C1079EE080011B76E /* gui.c */; };
-		EC34BC971079EE080011B76E /* render.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC301079EE080011B76E /* render.c */; };
 		EC34BC981079EE080011B76E /* scenegraph.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC331079EE080011B76E /* scenegraph.c */; };
 		EC34BC991079EE080011B76E /* sky.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC351079EE080011B76E /* sky.c */; };
 		EC34BC9A1079EE080011B76E /* terrain.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC371079EE080011B76E /* terrain.c */; };
@@ -176,7 +175,6 @@
 		EC75353D14177EA6000A7CB4 /* camera.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC281079EE080011B76E /* camera.c */; };
 		EC75353E14177EA6000A7CB4 /* colour.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC2A1079EE080011B76E /* colour.c */; };
 		EC75353F14177EA6000A7CB4 /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC2C1079EE080011B76E /* gui.c */; };
-		EC75354114177EA6000A7CB4 /* render.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC301079EE080011B76E /* render.c */; };
 		EC75354214177EA6000A7CB4 /* scenegraph.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC331079EE080011B76E /* scenegraph.c */; };
 		EC75354314177EA6000A7CB4 /* sky.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC351079EE080011B76E /* sky.c */; };
 		EC75354414177EA6000A7CB4 /* terrain.c in Sources */ = {isa = PBXBuildFile; fileRef = EC34BC371079EE080011B76E /* terrain.c */; };
@@ -246,8 +244,6 @@
 		EC8CC1F015F1FE0E00FC71F4 /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1E515F1FE0C00FC71F4 /* collada.c */; };
 		EC8CC1F515F2003E00FC71F4 /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F415F2003D00FC71F4 /* overlay.c */; };
 		EC8CC1F615F2003E00FC71F4 /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F415F2003D00FC71F4 /* overlay.c */; };
-		EC8CC1F815F4B50700FC71F4 /* render-info.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F715F4B50700FC71F4 /* render-info.c */; };
-		EC8CC1F915F4B50700FC71F4 /* render-info.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F715F4B50700FC71F4 /* render-info.c */; };
 		EC8E74A114F7732F0052BBE6 /* pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8E749E14F773240052BBE6 /* pcm.c */; };
 		EC91C3DB1100628F00011177 /* vmath-convert.c in Sources */ = {isa = PBXBuildFile; fileRef = EC91C3DA1100628F00011177 /* vmath-convert.c */; };
 		EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9351D314F7989900962391 /* libpython2.7.a */; };
@@ -582,8 +578,6 @@
 		EC34BC2B1079EE080011B76E /* colour.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = colour.h; sourceTree = "<group>"; };
 		EC34BC2C1079EE080011B76E /* gui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gui.c; sourceTree = "<group>"; };
 		EC34BC2D1079EE080011B76E /* gui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gui.h; sourceTree = "<group>"; };
-		EC34BC301079EE080011B76E /* render.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = render.c; sourceTree = "<group>"; };
-		EC34BC311079EE080011B76E /* render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
 		EC34BC321079EE080011B76E /* scenegraph-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "scenegraph-private.h"; sourceTree = "<group>"; };
 		EC34BC331079EE080011B76E /* scenegraph.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scenegraph.c; sourceTree = "<group>"; };
 		EC34BC341079EE080011B76E /* scenegraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scenegraph.h; sourceTree = "<group>"; };
@@ -714,8 +708,6 @@
 		EC8CC1E615F1FE0D00FC71F4 /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
 		EC8CC1F315F2003400FC71F4 /* overlay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = overlay.h; sourceTree = "<group>"; };
 		EC8CC1F415F2003D00FC71F4 /* overlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay.c; sourceTree = "<group>"; };
-		EC8CC1F715F4B50700FC71F4 /* render-info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "render-info.c"; sourceTree = "<group>"; };
-		EC8CC1FA15F4B52100FC71F4 /* render-info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "render-info.h"; sourceTree = "<group>"; };
 		EC8E749E14F773240052BBE6 /* pcm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcm.c; sourceTree = "<group>"; };
 		EC8E749F14F773240052BBE6 /* pcm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcm.h; sourceTree = "<group>"; };
 		EC91C3DA1100628F00011177 /* vmath-convert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-convert.c"; sourceTree = "<group>"; };
@@ -1191,10 +1183,6 @@
 				EC8CC1F415F2003D00FC71F4 /* overlay.c */,
 				ECDC29FB111498100066AF2D /* particles.h */,
 				ECDC29FC111498100066AF2D /* particles.c */,
-				EC34BC301079EE080011B76E /* render.c */,
-				EC34BC311079EE080011B76E /* render.h */,
-				EC8CC1F715F4B50700FC71F4 /* render-info.c */,
-				EC8CC1FA15F4B52100FC71F4 /* render-info.h */,
 				EC8CC1DB15F1FBA400FC71F4 /* scene.h */,
 				EC8CC1DC15F1FBB000FC71F4 /* scene.c */,
 				EC34BC331079EE080011B76E /* scenegraph.c */,
@@ -1979,7 +1967,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 0440;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = EC4476770CCBFEDB001C88AD /* Build configuration list for PBXProject "orbit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -2175,7 +2163,6 @@
 				EC34BC931079EE080011B76E /* camera.c in Sources */,
 				EC34BC941079EE080011B76E /* colour.c in Sources */,
 				EC34BC951079EE080011B76E /* gui.c in Sources */,
-				EC34BC971079EE080011B76E /* render.c in Sources */,
 				EC34BC981079EE080011B76E /* scenegraph.c in Sources */,
 				EC34BC991079EE080011B76E /* sky.c in Sources */,
 				EC34BC9A1079EE080011B76E /* terrain.c in Sources */,
@@ -2236,7 +2223,6 @@
 				EC8CC1ED15F1FE0E00FC71F4 /* cmod.c in Sources */,
 				EC8CC1EF15F1FE0E00FC71F4 /* collada.c in Sources */,
 				EC8CC1F515F2003E00FC71F4 /* overlay.c in Sources */,
-				EC8CC1F815F4B50700FC71F4 /* render-info.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2283,7 +2269,6 @@
 				EC75353D14177EA6000A7CB4 /* camera.c in Sources */,
 				EC75353E14177EA6000A7CB4 /* colour.c in Sources */,
 				EC75353F14177EA6000A7CB4 /* gui.c in Sources */,
-				EC75354114177EA6000A7CB4 /* render.c in Sources */,
 				EC75354214177EA6000A7CB4 /* scenegraph.c in Sources */,
 				EC75354314177EA6000A7CB4 /* sky.c in Sources */,
 				EC75354414177EA6000A7CB4 /* terrain.c in Sources */,
@@ -2341,7 +2326,6 @@
 				EC8CC1EE15F1FE0E00FC71F4 /* cmod.c in Sources */,
 				EC8CC1F015F1FE0E00FC71F4 /* collada.c in Sources */,
 				EC8CC1F615F2003E00FC71F4 /* overlay.c in Sources */,
-				EC8CC1F915F4B50700FC71F4 /* render-info.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

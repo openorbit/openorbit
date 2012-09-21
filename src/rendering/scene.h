@@ -24,7 +24,7 @@
 
 #include "rendering/types.h"
 
-sg_scene_t* sg_new_scene(sg_scenegraph_t *sg, const char *name);
+sg_scene_t* sg_new_scene(const char *name);
 
 void sg_scene_draw(sg_scene_t *scene, float dt);
 

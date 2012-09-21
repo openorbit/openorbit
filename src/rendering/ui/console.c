@@ -19,11 +19,12 @@
 
 #include <stdio.h>
 #include "console.h"
+#include "palloc.h"
 
 ui_console_t*
 ui_new_console(void)
 {
-  ui_console_t *console = malloc(sizeof(ui_console_t));
+  ui_console_t *console = smalloc(sizeof(ui_console_t));
   console->bottom = NULL;
   console->commands = hashtable_new_with_str_keys(1024);
 }

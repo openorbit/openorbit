@@ -68,7 +68,8 @@ ooGetThrottleForActuatorGroup(unsigned groupId)
 OOactuatorgroup*
 ooScNewActuatorGroup(const char *name)
 {
-  OOactuatorgroup *eg = malloc(sizeof(OOactuatorgroup));
+  OOactuatorgroup *eg = smalloc(sizeof(OOactuatorgroup));
+  memset(eg, 0, sizeof(OOactuatorgroup));
   obj_array_init(&eg->actuators);
   eg->groupName = strdup(name);
   return eg;

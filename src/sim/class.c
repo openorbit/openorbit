@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <complex.h>
+#include "palloc.h"
 
 #include "class.h"
 
@@ -82,7 +83,7 @@ sim_register_class_(const char *super, const char *name,
                     void (*dealloc)(void *obj),
                     void (*restored)(void *obj))
 {
-  sim_class_t *cls = malloc(sizeof(sim_class_t));
+  sim_class_t *cls = smalloc(sizeof(sim_class_t));
 
   if (super)  cls->super = sim_class_get(super);
   else cls->super = NULL;
@@ -106,7 +107,7 @@ sim_register_class_(const char *super, const char *name,
 static void*
 def_alloc(sim_class_t *cls)
 {
-  sim_object_t* obj = malloc(cls->obj_size);
+  sim_object_t* obj = smalloc(cls->obj_size);
   memset(obj, 0, cls->obj_size);
   obj->cls = cls;
   return obj;
@@ -127,7 +128,7 @@ void
 sim_class_add_field(sim_class_t *class, sim_type_id_t type,
                     const char *key, off_t offset)
 {
-  sim_field_t *field = malloc(sizeof(sim_field_t));
+  sim_field_t *field = smalloc(sizeof(sim_field_t));
   field->name = strdup(key);
   field->typ = type;
   field->offs = offset;

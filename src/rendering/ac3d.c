@@ -28,6 +28,7 @@
 #include <math.h>
 #include <vmath/vmath-convert.h>
 #include "rendering/object.h"
+#include "palloc.h"
 
 #define BUFF_SIZE 1024
 
@@ -131,7 +132,9 @@ push_object(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj)
 struct ac3d_file_t*
 make_file(void)
 {
-  struct ac3d_file_t *ac3d = malloc(sizeof(struct ac3d_file_t));
+  struct ac3d_file_t *ac3d = smalloc(sizeof(struct ac3d_file_t));
+  memset(ac3d, 0, sizeof(struct ac3d_file_t));
+  
   ac3d->mat_alen = 8;
   ac3d->mat_count = 0;
   ac3d->materials = calloc(8, sizeof(struct ac3d_material_t));
@@ -176,7 +179,9 @@ make_object(void)
       NULL // parent
     };
 
-  struct ac3d_object_t *newObj = malloc(sizeof(struct ac3d_object_t));
+  struct ac3d_object_t *newObj = smalloc(sizeof(struct ac3d_object_t));
+  memset(newObj, 0, sizeof(struct ac3d_object_t));
+
   *newObj = obj;
   return newObj;
 }

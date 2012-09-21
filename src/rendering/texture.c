@@ -57,12 +57,6 @@ texInit(void)
     gOOtexDict = hashtable_new_with_str_keys(128);
 }
 
-void
-sg_texture_bind(sg_texture_t *tex, sg_shader_t *shader)
-{
-  sg_shader_bind_texture(shader, tex->texId, tex);
-}
-
 sg_texture_t*
 sg_load_texture(const char *key)
 {
@@ -122,13 +116,18 @@ sg_load_texture(const char *key)
   tex->height = img.h;
   tex->data = img.data;
 
-  glEnable(GL_TEXTURE_2D);
+  SG_CHECK_ERROR;
+
   glGenTextures(1, &tex->texId);
+  SG_CHECK_ERROR;
   glBindTexture(GL_TEXTURE_2D, tex->texId);
+  SG_CHECK_ERROR;
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  SG_CHECK_ERROR;
   glTexImage2D(GL_TEXTURE_2D, 0, tex->internalType,
                tex->width, tex->height, 0,
                tex->texType, GL_UNSIGNED_BYTE, tex->data);
+  SG_CHECK_ERROR;
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
@@ -136,6 +135,7 @@ sg_load_texture(const char *key)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                   GL_LINEAR_MIPMAP_LINEAR);
   //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  SG_CHECK_ERROR;
 
   glGenerateMipmap(GL_TEXTURE_2D);
   //if ((err = gluBuild2DMipmaps(GL_TEXTURE_2D,

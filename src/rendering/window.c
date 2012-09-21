@@ -23,7 +23,6 @@
 #include "rendering/scenegraph.h"
 
 struct sg_window_t {
-  sg_scenegraph_t *sg;
   obj_array_t viewports;
   unsigned w, h;
 };
@@ -39,14 +38,30 @@ sg_window_draw(sg_window_t *window, float dt)
 
 
 sg_window_t*
-sg_new_window(sg_scenegraph_t *sg)
+sg_new_window(void)
 {
   sg_window_t *window = malloc(sizeof(sg_window_t));
   memset(window, 0, sizeof(sg_window_t));
   obj_array_init(&window->viewports);
 
-  window->sg = sg;
-  sg_scenegraph_add_window(sg, window);
-
   return window;
 }
+sg_viewport_t*
+sg_window_get_viewport(sg_window_t *win, int idx)
+{
+  return obj_array_get(&win->viewports, idx);
+}
+
+void
+sg_window_add_viewport(sg_window_t *win, sg_viewport_t *vp)
+{
+  obj_array_push(&win->viewports, vp);
+}
+
+
+sg_scene_t*
+sg_window_get_scene(sg_window_t *win, int idx)
+{
+  sg_viewport_get_scene(sg_window_get_viewport(win, idx));
+}
+
