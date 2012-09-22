@@ -19,10 +19,12 @@
 
 #include "propellant-tank.h"
 #include "spacecraft.h"
+#include "palloc.h"
+
 SIMtank*
 simNewTank(sim_stage_t *stage, const char *tankName, float p, float v, float t)
 {
-  SIMtank *tank = malloc(sizeof(SIMtank));
+  SIMtank *tank = smalloc(sizeof(SIMtank));
 
   tank->rec = simPubsubMakeRecord(stage->rec, tankName);
 

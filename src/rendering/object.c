@@ -33,6 +33,7 @@
 #include "physics/physics.h"
 #include "res-manager.h"
 #include <openorbit/log.h>
+#include "palloc.h"
 
 #include "3ds.h"
 #include "ac3d.h"
@@ -244,7 +245,7 @@ sg_object_update(sg_object_t *obj)
 sg_object_t*
 sgCreateObject(sg_scene_t *scene)
 {
-  sg_object_t *obj = malloc(sizeof(sg_object_t));
+  sg_object_t *obj = smalloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
 
   obj->parent = NULL;
@@ -273,7 +274,7 @@ sgCreateObject(sg_scene_t *scene)
 sg_object_t*
 sgCreateSubObject(sg_object_t *parent)
 {
-  sg_object_t *obj = malloc(sizeof(sg_object_t));
+  sg_object_t *obj = smalloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
 
   obj->parent = parent;
@@ -312,7 +313,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
 {
   SG_CHECK_ERROR;
 
-  sg_geometry_t *geo = malloc(sizeof(sg_geometry_t));
+  sg_geometry_t *geo = smalloc(sizeof(sg_geometry_t));
   memset(geo, 0, sizeof(sg_geometry_t));
   obj->geometry = geo;
   geo->gl_primitive_type = gl_primitive;
@@ -412,7 +413,7 @@ sg_object_get_rigid_body(const sg_object_t *obj)
 sg_object_t*
 sg_new_object(sg_shader_t *shader)
 {
-  sg_object_t *obj = malloc(sizeof(sg_object_t));
+  sg_object_t *obj = smalloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
   obj->shader = shader;
   return obj;
@@ -432,7 +433,7 @@ sg_object_t*
 sg_new_object_with_geo(sg_shader_t *shader, int gl_primitive, size_t vertexCount,
                        float *vertices, float *normals, float *texCoords)
 {
-  sg_object_t *obj = malloc(sizeof(sg_object_t));
+  sg_object_t *obj = smalloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
   obj->shader = shader;
   obj->geometry = sg_new_geometry(obj, gl_primitive,

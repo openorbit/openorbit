@@ -38,6 +38,7 @@
 #endif
 
 #include "rendering/scenegraph.h"
+#include "palloc.h"
 
 struct sg_light_ids_t {
   GLint pos;
@@ -237,7 +238,7 @@ sg_load_shader(const char *key,
   if (tmp) return tmp;
 
 
-  sg_shader_t *si = malloc(sizeof(sg_shader_t));
+  sg_shader_t *si = smalloc(sizeof(sg_shader_t));
   memset(si, 0, sizeof(sg_shader_t));
   si->name = strdup(key);
 
@@ -278,7 +279,7 @@ sg_load_shader(const char *key,
 
         glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logLen);
 
-        char *tmp = malloc(logLen);
+        char *tmp = smalloc(logLen);
 
         glGetShaderInfoLog(shaderId, logLen, &retrievedLen, tmp);
         fputs(tmp, stderr);
@@ -327,7 +328,7 @@ sg_load_shader(const char *key,
 
         glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logLen);
 
-        char *tmp = malloc(logLen);
+        char *tmp = smalloc(logLen);
 
         glGetShaderInfoLog(shaderId, logLen, &retrievedLen, tmp);
         fputs(tmp, stderr);
@@ -362,7 +363,7 @@ sg_load_shader(const char *key,
 
     glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &logLen);
 
-    char *tmp = malloc(logLen);
+    char *tmp = smalloc(logLen);
 
     glGetProgramInfoLog(shaderProgram, logLen, &retrievedLen, tmp);
     fputs(tmp, stderr);

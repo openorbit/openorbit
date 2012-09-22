@@ -25,6 +25,7 @@
 #include "collision.h"
 #include <vmath/lwcoord.h>
 #include "physics/object.h"
+#include "palloc.h"
 
 #define THRESHOLD 10
 #define TOLERANCE 0.1
@@ -55,7 +56,7 @@ plDeleteRecgrid(PLrecgrid *grid)
 PLcollisioncontext*
 plNewCollisionContext(void)
 {
-  PLcollisioncontext *ctxt = malloc(sizeof(PLcollisioncontext));
+  PLcollisioncontext *ctxt = smalloc(sizeof(PLcollisioncontext));
   ctxt->pool = pool_create(sizeof(PLrecgrid));
   obj_array_init(&ctxt->colls);
   ctxt->otree = plNewRecgrid(ctxt, plAuToMetres(100.0)); // Roughly the heliospause

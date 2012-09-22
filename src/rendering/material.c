@@ -24,6 +24,7 @@
 #else
 #include <GL3/gl3.h>
 #endif
+#include "palloc.h"
 
 struct sg_material_t {
   float4 emission;
@@ -36,8 +37,8 @@ struct sg_material_t {
 sg_material_t*
 sg_new_material(void)
 {
-  sg_material_t *mat = malloc(sizeof(sg_material_t));
-  memset(mat, 0, sizeof(sg_material_t));
+  sg_material_t *mat = smalloc(sizeof(sg_material_t));
+
   sg_material_init(mat);
   return mat;
 }

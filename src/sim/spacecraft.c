@@ -48,7 +48,7 @@ void
 simNewSpacecraftClass(const char *name, sim_spacecraft_t *(*alloc)(void),
                       void (*init)(sim_spacecraft_t *sc))
 {
-  SCclass *cls = malloc(sizeof(SCclass));
+  SCclass *cls = smalloc(sizeof(SCclass));
 
   cls->name = strdup(name);
   cls->alloc = alloc;
@@ -206,7 +206,7 @@ simScInit(sim_spacecraft_t *sc, const char *name)
 sim_spacecraft_t*
 ooScNew(PLworld *world, sg_scene_t *scene, const char *name)
 {
-  sim_spacecraft_t *sc = malloc(sizeof(sim_spacecraft_t));
+  sim_spacecraft_t *sc = smalloc(sizeof(sim_spacecraft_t));
 
   simScInit(sc, name);
 

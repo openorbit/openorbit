@@ -24,6 +24,7 @@
 
 #include "physics/object.h"
 #include <stdlib.h>
+#include "palloc.h"
 
 struct sg_light_t {
   sg_scene_t *scene;
@@ -153,7 +154,7 @@ sg_light_set_attenuation(sg_light_t *light, float const_att, float lin_att,
 sg_light_t*
 sg_new_light3f(sg_scene_t *sc, float x, float y, float z)
 {
-  sg_light_t *light = malloc(sizeof(sg_light_t));
+  sg_light_t *light = smalloc(sizeof(sg_light_t));
   light->scene = sc;
 
   light->pos[0] = x;

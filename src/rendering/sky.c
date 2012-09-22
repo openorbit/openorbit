@@ -31,6 +31,7 @@
 #include <stddef.h>
 
 #include "scenegraph.h"
+#include "palloc.h"
 
 struct sg_star_t {
   unsigned char r, g, b, a;
@@ -124,7 +125,7 @@ sgCreateBackgroundFromFile(const char *file)
 {
   SG_CHECK_ERROR;
 
-  sg_background_t *stars = malloc(sizeof(sg_background_t));
+  sg_background_t *stars = smalloc(sizeof(sg_background_t));
   memset(stars, 0, sizeof(sg_background_t));
 
   stars->data = calloc(STAR_COUNT, sizeof(sg_star_t));

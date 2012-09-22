@@ -22,6 +22,7 @@
 #include "rendering/scene.h"
 #include "rendering/camera.h"
 #include "rendering/object.h"
+#include "palloc.h"
 
 struct sg_scene_t {
   char *name;
@@ -88,7 +89,7 @@ sg_scene_draw(sg_scene_t *scene, float dt)
 sg_scene_t*
 sg_new_scene(const char *name)
 {
-  sg_scene_t *scene = malloc(sizeof(sg_scene_t));
+  sg_scene_t *scene = smalloc(sizeof(sg_scene_t));
   memset(scene, 0, sizeof(sg_scene_t));
   scene->name = strdup(name);
   obj_array_init(&scene->objects);

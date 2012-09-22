@@ -33,6 +33,7 @@
 #include "rendering/scene.h"
 #include "rendering/overlay.h"
 #include "rendering/window.h"
+#include "palloc.h"
 
 struct sg_viewport_t {
   sg_scene_t *scene;
@@ -45,7 +46,7 @@ sg_viewport_t*
 sg_new_viewport(sg_window_t *window, unsigned x, unsigned y,
                 unsigned w, unsigned h)
 {
-  sg_viewport_t *viewport = malloc(sizeof(sg_viewport_t));
+  sg_viewport_t *viewport = smalloc(sizeof(sg_viewport_t));
   memset(viewport, 0, sizeof(sg_viewport_t));
   obj_array_init(&viewport->overlays);
   viewport->x = x;

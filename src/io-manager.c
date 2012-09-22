@@ -28,6 +28,7 @@
 #include <openorbit/log.h>
 #include "parsers/hrml.h"
 #include "settings.h"
+#include "palloc.h"
 
 static const char * gIoSdlMouseStringMap[7];
 static hashtable_t *gIoButtonHandlers; // of type OObuttonhandler
@@ -709,7 +710,7 @@ ioRegActionHandler(const char *name, IObuttonhandlerfunc handlerFunc, io_button_
     return;
   }
 
-  handler = malloc(sizeof(IObuttonhandler));
+  handler = smalloc(sizeof(IObuttonhandler));
   handler->isScript = false;
   handler->cHandler = handlerFunc;
   handler->data = data;
@@ -728,7 +729,7 @@ ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc)
     return;
   }
 
-  handler = malloc(sizeof(IObuttonhandler));
+  handler = smalloc(sizeof(IObuttonhandler));
   handler->isScript = true;
   handler->pyHandler = handlerFunc;
 
@@ -912,7 +913,7 @@ ioRegisterDevice(int vendorID, const char *vendorName,
                  int productID, const char *productName,
                  int buttonCount, int hatCount)
 {
-  io_device_info_t *dev = malloc(sizeof(io_device_info_t));
+  io_device_info_t *dev = smalloc(sizeof(io_device_info_t));
   dev->vendorName = strdup(vendorName);
   dev->productName = strdup(productName);
   dev->vendorID = vendorID;

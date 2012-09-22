@@ -31,6 +31,7 @@
 #include "rendering/shader-manager.h"
 #include "rendering/scenegraph.h"
 #include "log.h"
+#include "palloc.h"
 
 struct sg_overlay_t {
   bool enabled;
@@ -53,7 +54,7 @@ struct sg_overlay_t {
 sg_overlay_t*
 sg_new_overlay(void)
 {
-  sg_overlay_t *overlay = malloc(sizeof(sg_overlay_t));
+  sg_overlay_t *overlay = smalloc(sizeof(sg_overlay_t));
   memset(overlay, 0, sizeof(sg_overlay_t));
   return overlay;
 }

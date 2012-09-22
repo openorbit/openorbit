@@ -25,6 +25,7 @@
 #include "sim/simevent.h"
 #include "sim/simtime.h"
 #include <openorbit/log.h>
+#include "palloc.h"
 
 #define OO_EVENT_QUEUE_INIT_LEN 100
 
@@ -52,8 +53,8 @@ int64_t EventRank(OOevent *ev)
 OOeventqueue*
 simNewEventQueue(void)
 {
-  OOeventqueue *queue = malloc(sizeof(OOeventqueue));
-  queue->freeEvents = malloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
+  OOeventqueue *queue = smalloc(sizeof(OOeventqueue));
+  queue->freeEvents = smalloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
   queue->activeEventHeap = heap_new(8, (compute_rank_f)EventRank);
 
   for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
@@ -70,7 +71,7 @@ OOevent*
 simAllocEvent(void)
 {
   if (gQueue->freeEvents == NULL) {
-    gQueue->freeEvents = malloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
+    gQueue->freeEvents = smalloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
     if (gQueue->freeEvents == NULL) {
       ooLogFatal("out of memory %s:%d", __FILE__, __LINE__);
     }

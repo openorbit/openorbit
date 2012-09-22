@@ -37,6 +37,7 @@
 #include "res-manager.h"
 #include "rendering/scenegraph.h"
 #include <string.h>
+#include "palloc.h"
 
 struct sg_texture_t {
   GLint width, height;
@@ -74,7 +75,7 @@ sg_load_texture(const char *key)
 
   image_t img;
 
-  tex = malloc(sizeof(sg_texture_t));
+  tex = smalloc(sizeof(sg_texture_t));
   if (tex == NULL) {free(fname); return 0;}
 
   int res = img_load(&img, fname);

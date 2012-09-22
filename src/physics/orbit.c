@@ -33,7 +33,7 @@
 #include "parsers/hrml.h"
 #include "res-manager.h"
 #include "rendering/scenegraph.h"
-
+#include "palloc.h"
 #include <vmath/lwcoord.h>
 
 /*
@@ -209,7 +209,7 @@ PL_keplerian_elements*
 plNewKeplerElements(double ecc, double a, double inc, double longAsc,
                     double argOfPeriapsis, double meanAnomalyOfEpoch)
 {
-  PL_keplerian_elements *elems = malloc(sizeof(PL_keplerian_elements));
+  PL_keplerian_elements *elems = smalloc(sizeof(PL_keplerian_elements));
   elems->ecc = ecc;
   elems->a = a; // Semi-major
   elems->b = ooGeoComputeSemiMinor(a, ecc); // Auxillary semi-minor
@@ -426,7 +426,7 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
          quaternion_t q, double siderealPeriod, double obliquity,
          double radius, double flattening)
 {
-  PLastrobody *obj = malloc(sizeof(PLastrobody));
+  PLastrobody *obj = smalloc(sizeof(PLastrobody));
 
   plInitObject(&obj->obj);
   obj->obj.p.offs = coord->offs;
@@ -484,7 +484,7 @@ plNewWorld(const char *name, sg_scene_t *sc,
            double m, double gm, double radius, double siderealPeriod,
            double obliquity, double eqRadius, double flattening)
 {
-  PLworld *world = malloc(sizeof(PLworld));
+  PLworld *world = smalloc(sizeof(PLworld));
 
   world->name = strdup(name);
   world->collCtxt = plNewCollisionContext();
@@ -510,7 +510,7 @@ plCreateOrbitalObject(PLworld *world, sg_scene_t *scene, const char *name,
 {
   assert(world);
 
-  PLsystem *sys = malloc(sizeof(PLsystem));
+  PLsystem *sys = smalloc(sizeof(PLsystem));
   obj_array_init(&sys->orbits);
   obj_array_init(&sys->astroObjs);
   obj_array_init(&sys->rigidObjs);
@@ -559,7 +559,7 @@ plNewRootSystem(PLworld *world, sg_scene_t *sc, const char *name, double m, doub
 {
   assert(world);
 
-  PLsystem *sys = malloc(sizeof(PLsystem));
+  PLsystem *sys = smalloc(sizeof(PLsystem));
   obj_array_init(&sys->orbits);
   obj_array_init(&sys->astroObjs);
   obj_array_init(&sys->rigidObjs);

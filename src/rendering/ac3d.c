@@ -182,7 +182,7 @@ make_object(void)
   struct ac3d_object_t *newObj = smalloc(sizeof(struct ac3d_object_t));
   memset(newObj, 0, sizeof(struct ac3d_object_t));
 
-  *newObj = obj;
+  memcpy(newObj, &obj, sizeof(struct ac3d_object_t));
   return newObj;
 }
 

@@ -30,6 +30,7 @@
 #include "texture.h"
 #include "res-manager.h"
 #include "common/moduleinit.h"
+#include "palloc.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -70,7 +71,7 @@ sgLoadFont(const char *fontName, int sz)
   // FT_Set_Pixel_Size...
   free(fontFile);
 
-  SGfont *font = malloc(sizeof(SGfont));
+  SGfont *font = smalloc(sizeof(SGfont));
   font->face = face;
   font->size = sz;
 
@@ -121,7 +122,7 @@ sgNewStaticTextBuffer(const char *fontName, unsigned fontSize,
 SGtextbuffer*
 sgNewTextBuffer(const char *fontName, unsigned fontSize, unsigned width, unsigned rows)
 {
-//  SGtextbuffer *buff = malloc(sizeof(SGtextbuffer));
+//  SGtextbuffer *buff = smalloc(sizeof(SGtextbuffer));
 
 //  buff->font = sgLoadFont(fontName, fontSize);
 //  buff->h = rows * fontSize;

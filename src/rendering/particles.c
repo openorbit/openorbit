@@ -25,6 +25,7 @@
 #endif
 #include "texture.h"
 #include <vmath/vmath.h>
+#include "palloc.h"
 
 #if 0
 void
@@ -52,7 +53,7 @@ sgDrawParticles(SGparticles *sp)
 SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
                                 PLparticles *ps)
 {
-  SGparticles *drawable = malloc(sizeof(SGparticles));
+  SGparticles *drawable = smalloc(sizeof(SGparticles));
   drawable->ps = ps;
 
   if (ooTexGet(tex) == NULL) {
