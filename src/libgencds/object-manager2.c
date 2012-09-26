@@ -317,7 +317,7 @@ void*
 omObjGetIface(OOobject *obj, const char *iface)
 {
   OMobjdesc *desc = omTreeLookup(NULL, obj);
-
+  if (desc == NULL) return NULL;
   return omGetIface(desc->cls, iface);
 }
 
@@ -331,7 +331,7 @@ void*
 omNewObject(OMcontext *ctxt, const char *clsName)
 {
   OMclass *cls = omGetClassObject(clsName);
-
+  if (cls == NULL) return NULL;
   return malloc(cls->objSize);
 }
 

@@ -88,6 +88,7 @@ void
 sg_object_add_child(sg_object_t *obj, sg_object_t *child)
 {
   obj_array_push(&obj->subObjects, child);
+  child->scene = obj->scene;
 }
 int
 sg_objects_compare_dist(sg_object_t const **o0, sg_object_t const **o1)
@@ -131,6 +132,17 @@ void
 sg_object_set_material(sg_object_t *obj, sg_material_t *mat)
 {
   obj->material = mat;
+}
+void
+sg_object_set_scene(sg_object_t *obj, sg_scene_t *sc)
+{
+  assert(obj != NULL);
+
+  obj->scene = sc;
+
+  ARRAY_FOR_EACH(i, obj->subObjects) {
+    sg_object_set_scene(ARRAY_ELEM(obj->subObjects, i), sc);
+  }
 }
 
 void
@@ -416,6 +428,8 @@ sg_new_object(sg_shader_t *shader)
   sg_object_t *obj = smalloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
   obj->shader = shader;
+  obj_array_init(&obj->subObjects);
+
   return obj;
 }
 
@@ -436,6 +450,8 @@ sg_new_object_with_geo(sg_shader_t *shader, int gl_primitive, size_t vertexCount
   sg_object_t *obj = smalloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
   obj->shader = shader;
+  obj_array_init(&obj->subObjects);
+
   obj->geometry = sg_new_geometry(obj, gl_primitive,
                                   vertexCount, vertices, normals, texCoords,
                                   0, NULL);
@@ -533,6 +549,7 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
   sg_geometry_t *geo = sg_new_geometry(sphere, GL_TRIANGLE_STRIP, vert_count,
                                        verts.elems, normals.elems, texc.elems,
                                        indices.length, indices.elems);
+  sphere->geometry = geo;
 
   float_array_dispose(&verts);
   float_array_dispose(&normals);

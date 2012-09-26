@@ -47,7 +47,8 @@ SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL};
 sg_scene_t*
 sim_get_scene(void)
 {
-  return sg_window_get_scene(gSIM_state.win, 0);
+  sg_scene_t *sc = sg_window_get_scene(gSIM_state.win, 0);
+  return sc;
 }
 
 sg_viewport_t*

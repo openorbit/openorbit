@@ -40,6 +40,7 @@ quaternion_t sg_object_get_quat(sg_object_t *obj);
 void sg_object_set_quat(sg_object_t *obj, quaternion_t q);
 
 void sg_object_set_rot(sg_object_t *obj, const float4x4 *r);
+void sg_object_set_scene(sg_object_t *obj, sg_scene_t *sc);
 
 void sg_object_set_material(sg_object_t *obj, sg_material_t *mat);
 void sg_object_set_geo(sg_object_t *obj, int gl_primitive, size_t vertexCount,

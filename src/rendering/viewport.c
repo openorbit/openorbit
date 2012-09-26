@@ -49,6 +49,7 @@ sg_new_viewport(sg_window_t *window, unsigned x, unsigned y,
   sg_viewport_t *viewport = smalloc(sizeof(sg_viewport_t));
   memset(viewport, 0, sizeof(sg_viewport_t));
   obj_array_init(&viewport->overlays);
+
   viewport->x = x;
   viewport->y = y;
   viewport->w = w;

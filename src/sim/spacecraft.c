@@ -407,7 +407,7 @@ ooScSetScene(sim_spacecraft_t *spacecraft, sg_scene_t *scene)
 
     // TODO: Fixme
     //if (stage->state != OO_Stage_Detatched) {
-    //  sgSceneAddObj(scene, stage->obj->drawable);
+    //  sg_scene_add_object(scene, stage->);
     //}
   }
 }

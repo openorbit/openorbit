@@ -63,6 +63,6 @@ sg_window_add_viewport(sg_window_t *win, sg_viewport_t *vp)
 sg_scene_t*
 sg_window_get_scene(sg_window_t *win, int idx)
 {
-  sg_viewport_get_scene(sg_window_get_viewport(win, idx));
+  return sg_viewport_get_scene(sg_window_get_viewport(win, idx));
 }
 

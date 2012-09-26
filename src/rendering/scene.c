@@ -57,6 +57,7 @@ void
 sg_scene_add_object(sg_scene_t *sc, sg_object_t *obj)
 {
   obj_array_push(&sc->objects, obj);
+  sg_object_set_scene(obj, sc);
 }
 
 void

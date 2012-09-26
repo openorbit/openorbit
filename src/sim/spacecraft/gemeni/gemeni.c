@@ -155,7 +155,7 @@ MainEngineToggle(sim_spacecraft_t *sc)
     case MERC_CAPSULE: {
       sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
       SIMengine *eng = ARRAY_ELEM(capsule->engines, THR_RETRO_0);
-      //if (eng->state == SIM_Armed) RetroFire_0(sc);
+      (void)eng;
       break;
     }
     default:
@@ -184,6 +184,7 @@ GemeniInit(sim_spacecraft_t *sc)
 
   sim_stage_t *launcher = simNewStage(sc, "Command-Module",
                                   "spacecrafts/mercury/gemeni.ac");
+  (void)launcher;
 
 #if 0
   plMassSet(&redstone->obj->m, 1.0f, // Default to 1.0 kg
@@ -257,5 +258,5 @@ MODULE_INIT(gemeni, "spacecraft", NULL)
   ooLogTrace("initialising 'gemeni' module");
   sim_class_t *cls = sim_register_class("Spacecraft", "Gemeni",
                                         GemeniInit2, sizeof(sim_spacecraft_t));
-
+  (void)cls;
 }

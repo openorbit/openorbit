@@ -179,13 +179,13 @@ test_hud_draw(sg_overlay_t *overlay, void *obj)
   float3 p = simGetRelPos(sc);
   float3 rv = simGetRelVel(sc);
 
-  float3 v_view = mf3_v_mul(R_inv, v);
-  float3 g_view = mf3_v_mul(R_inv, gv);
-  float3 rv_view = mf3_v_mul(R_inv, rv);
-  float3 as_view = mf3_v_mul(R_inv, as);
-  float3 p_view = mf3_v_mul(R_inv, p);
+  //float3 v_view = mf3_v_mul(R_inv, v);
+  //float3 g_view = mf3_v_mul(R_inv, gv);
+  //float3 rv_view = mf3_v_mul(R_inv, rv);
+  //float3 as_view = mf3_v_mul(R_inv, as);
+  //float3 p_view = mf3_v_mul(R_inv, p);
 
-  float h = simGetAltitude(sc);
+  //float h = simGetAltitude(sc);
   // The hud should display the following data: airspeed, altitude, horizon,
   // heading, turn / bank
   // Angle of attack, accelleration, boresight, flight path vector

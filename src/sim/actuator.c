@@ -203,7 +203,7 @@ simNewEngine(char *name, sim_stage_t *stage, SIMenginekind kind,
   engine->dir = vf3_normalise(dir);
 
   // Create particle system for engine
-  PLparticles *psys = plNewParticleSystem(name, 1000);
+  //PLparticles *psys = plNewParticleSystem(name, 1000);
   //engine->psys = (SGparticles*) sgNewParticleSystem(name,
   //                                                "textures/particle-alpha.png",
   //                                                psys);

@@ -455,6 +455,7 @@ sg_get_shader_without_warnings(const char *key)
 GLint
 sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required)
 {
+  assert(program != NULL);
   SG_CHECK_ERROR;
   // Handle both attributes and uniforms
   if (param < SG_ATTRIBUTE_END) {
@@ -489,6 +490,8 @@ sg_shader_bind(sg_shader_t *program)
 void
 sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj)
 {
+  assert(shader != NULL);
+
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.projectionId, 1, GL_TRUE,
                      (GLfloat*)proj);
@@ -498,6 +501,8 @@ sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj)
 void
 sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
 {
+  assert(shader != NULL);
+
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.modelViewId, 1, GL_TRUE,
                      (GLfloat*)modelview);

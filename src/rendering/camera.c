@@ -265,7 +265,7 @@ sg_camera_animate(sg_camera_t *cam, float dt)
     case SG_CAMERA_FIXED: {
       // Camera is pegged to object, not much to do here
       // object animation takes care of moving the camera
-      float4 np = vf4_add(sg_object_get_pos(cam->fixed.obj), cam->fixed.r);
+      //float4 np = vf4_add(sg_object_get_pos(cam->fixed.obj), cam->fixed.r);
       mf4_ident(cam->view_matrix);
       float4x4 a;
       mf4_make_translate(a, cam->fixed.r);

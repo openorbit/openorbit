@@ -21,6 +21,8 @@
 
 #include "rendering/light.h"
 #include "rendering/camera.h"
+#include "rendering/scene.h"
+#include "rendering/object.h"
 
 #include "physics/object.h"
 #include <stdlib.h>

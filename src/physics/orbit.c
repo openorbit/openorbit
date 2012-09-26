@@ -719,7 +719,7 @@ plSysUpdateSg(PLsystem *sys)
   //if (sys->orbitalBody->lightSource)
   //  sgSetLightPosLW(sys->orbitalBody->lightSource, &sys->orbitalBody->obj.p);
 
-  quaternion_t q = plGetQuat(&sys->orbitalBody->obj);
+  //quaternion_t q = plGetQuat(&sys->orbitalBody->obj);
   // TODO: Ensure this is pulled from SG
   //sgSetObjectQuatv(sys->orbitalBody->drawable, q);
 

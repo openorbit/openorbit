@@ -434,7 +434,7 @@ HRMLvalue makeIntegerArray(const int64_t *array, size_t len)
   HRMLvalue val;
   val.typ = HRMLIntArray;
   val.alen = len;
-  val.u.intArray = calloc(len, sizeof(int64_t));
+  val.u.intArray = calloc(len, sizeof(uint64_t));
   memcpy(val.u.intArray, array, len * sizeof(int64_t));
   return val;
 }

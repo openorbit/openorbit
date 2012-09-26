@@ -353,6 +353,7 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
         int faceId = vertex_sharing[vertexId].elems[k];
 
         if (faceId != i) {
+          assert(faceId >= 0);
           float3 nextFaceNormal;
           nextFaceNormal[0] = face_normals.elems[faceId*3+0];
           nextFaceNormal[1] = face_normals.elems[faceId*3+1];
@@ -428,7 +429,9 @@ ac3d_to_model(struct ac3d_file_t *ac3d, sg_shader_t *shader)
   if (ac3d->obj_count > 1) {
     model = sg_new_object(shader);
     for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
-      sg_object_add_child(model, ac3d_obj_to_model(ac3d, ac3d->objs[i], shader));
+      sg_object_t *child = ac3d_obj_to_model(ac3d, ac3d->objs[i], shader);
+      assert(child != NULL);
+      sg_object_add_child(model, child);
     }
   } else {
     model = ac3d_obj_to_model(ac3d, ac3d->objs[0], shader);
@@ -507,6 +510,7 @@ ac3d_read_obj(FILE *fp, const char *name)
         obj->children = calloc(obj->num_childs, sizeof(struct ac3d_object_t*));
         if (!obj->children) {
           fprintf(stderr, "alloc failed\n");
+          return NULL;
         }
 
         for (size_t i = 0 ; i < obj->num_childs ; ++ i) {

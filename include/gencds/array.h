@@ -138,6 +138,7 @@ void name##_array_init(name##_array_t *vec) {                             \
   vec->elems = calloc(vec->asize, sizeof(typ));                           \
 }                                                                         \
 void name##_array_push(name##_array_t *vec, typ obj) {                    \
+  if (!vec->elems) errx(EX_SOFTWARE, "push on non initialized array");\
   if (vec->length >= vec->asize) {                                          \
     void *newVec = realloc(vec->elems,                                        \
     vec->asize * sizeof(typ) * 2);                                          \

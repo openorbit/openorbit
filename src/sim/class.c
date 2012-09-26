@@ -281,6 +281,7 @@ void
 sim_set_field_by_index(sim_object_t *obj, const char *field_name,
                        size_t index, void *data)
 {
+  assert(obj != NULL);
   sim_field_t *field = sim_class_get_field(obj->cls, field_name);
   if (!field) {
     ooLogError("field '%s' is not a member of class '%s'",

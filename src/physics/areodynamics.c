@@ -300,7 +300,7 @@ plComputeDrag(float3 v, double p, double Cd, double A)
 float3
 plComputeLift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil)
 {
-  float3 vel = plComputeAirvelocity(obj);
+  //float3 vel = plComputeAirvelocity(obj);
   float speed = plComputeAirspeed(obj);
 
   // TODO: Compute alpha from rotation and velocity, obviously this should
@@ -308,7 +308,7 @@ plComputeLift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil)
   float alpha = 0.0f;
   float CL = foil->Ct0 + 2.0f * M_PI * alpha;
 
-  float lift = 0.5f * plComputeAirdensity(obj) * speed * speed * foil->area * CL;
+  //float lift = 0.5f * plComputeAirdensity(obj) * speed * speed * foil->area * CL;
 
   return vf3_set(0.0f, 0.0f, 0.0f);
 }
@@ -369,7 +369,7 @@ plComputeAirdensity(PLobject *obj)
   PLsystem *sys = obj->sys;
   PLatmosphere *atm = obj->sys->orbitalBody->atm;
   float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
-  float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
+  //float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
   //double pressure = plComputeSimpleAirpressure(atm, h);
 

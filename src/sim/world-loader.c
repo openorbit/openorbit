@@ -261,7 +261,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
 
   PLatmosphereTemplate *atm = NULL;
   double mass, radius, siderealPeriod, axialTilt = 0.0, gm = NAN;
-  double semiMajor, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
+  double semiMajor = NAN, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
   double pressure = 0.0, scale_height = 1.0;
   const char *tex = NULL;
   const char *shader = NULL;

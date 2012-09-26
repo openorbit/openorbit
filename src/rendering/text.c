@@ -68,6 +68,9 @@ sgLoadFont(const char *fontName, int sz)
   }
 
   error = FT_Set_Char_Size(face, 0, sz*64, 72, 72);
+  if (error) {
+    // TODO
+  }
   // FT_Set_Pixel_Size...
   free(fontFile);
 
