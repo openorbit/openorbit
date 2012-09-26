@@ -155,14 +155,19 @@ sg_geometry_draw(sg_geometry_t *geo)
 
   glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
   glBindVertexArray(geo->vba);
-  glEnableVertexAttribArray(geo->vba);
+
+  // ???
+  //glEnableVertexAttribArray(geo->vba);
+  //SG_CHECK_ERROR;
 
   if (geo->hasIndices) {
-    glDrawElements(geo->gl_primitive_type, geo->index_count, GL_INT, 0);
+    glDrawElements(geo->gl_primitive_type, geo->index_count, GL_UNSIGNED_INT, 0);
   } else {
     glDrawArrays(geo->gl_primitive_type, 0, geo->vertexCount);
+    SG_CHECK_ERROR;
   }
-  glDisableVertexAttribArray(geo->vba);
+  //???  glDisableVertexAttribArray(geo->vba);
+
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   SG_CHECK_ERROR;
 }
