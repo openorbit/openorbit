@@ -68,6 +68,9 @@ sg_new_free_camera(const lwcoord_t *pos)
   sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
   cam->type = SG_CAMERA_FREE;
   cam->free.lwc = *pos;
+  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
+  mf4_lookat(cam->view_matrix, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+
   return cam;
 }
 
@@ -77,6 +80,10 @@ sg_new_fixed_camera(sg_object_t *obj)
   sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
   cam->type = SG_CAMERA_FIXED;
   cam->fixed.obj = obj;
+
+  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
+  mf4_lookat(cam->view_matrix, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+
   return cam;
 }
 
@@ -86,6 +93,10 @@ sg_new_orbiting_camera(sg_object_t *obj)
   sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
   cam->type = SG_CAMERA_ORBITING;
   cam->orbiting.obj = obj;
+  
+  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
+  mf4_lookat(cam->view_matrix, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+
   return cam;
 }
 
