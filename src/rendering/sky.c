@@ -179,7 +179,7 @@ sgCreateBackgroundFromFile(const char *file)
 void
 sg_background_draw(sg_background_t *bg)
 {
-  ooLogInfo("draw background %d", (int)bg->n_stars);
+  //ooLogInfo("draw background %d", (int)bg->n_stars);
   SG_CHECK_ERROR;
 
   // Background drawing needs to shortcut the normal camera, as the bg
@@ -195,6 +195,8 @@ sg_background_draw(sg_background_t *bg)
     break;}
   case SG_CAMERA_FREE: {
     q_mf4_convert(rotMatrix, sg_camera_free_get_quaternion(cam));
+    mf4_transpose1(rotMatrix); // Take the inverse, we are rotating the world,
+                               // not the camera
     break;}
   case SG_CAMERA_ORBITING: {
     mf4_lookat(rotMatrix,
@@ -211,13 +213,10 @@ sg_background_draw(sg_background_t *bg)
   sg_shader_bind(bg->shader);
   sg_shader_set_projection(bg->shader, *sg_camera_get_projection(cam));
   sg_shader_set_model_view(bg->shader, rotMatrix);
-  SG_CHECK_ERROR;
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glBindVertexArray(bg->vba);
-  SG_CHECK_ERROR;
   glDrawArrays(GL_POINTS, 0, bg->n_stars);
-  SG_CHECK_ERROR;
   glBindVertexArray(0);
   SG_CHECK_ERROR;
 }

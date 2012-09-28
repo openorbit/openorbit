@@ -73,7 +73,7 @@ sg_new_free_camera(const lwcoord_t *pos)
   mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
   mf4_lookat(cam->view_matrix, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
   cam->free.q = q_rot(1.0, 0.0, 0.0, 0.0);
-  cam->free.dq = q_rot(1.0, 0.0, 0.0, 0.01);
+  cam->free.dq = q_rot(1.0, 0.0, 0.0, 0.0);
   return cam;
 }
 
@@ -302,17 +302,12 @@ sg_camera_animate(sg_camera_t *cam, float dt)
     }
     case SG_CAMERA_FREE: {
       quaternion_t q = q_s_mul(cam->free.dq, dt);
-      cam->free.q = q_mul(cam->free.q, q);
-      cam->free.q = q_normalise(cam->free.q);
+      cam->free.q = q_normalise(q_mul(cam->free.q, q));
       float3 dp = vf3_s_mul(cam->free.dp, dt);
       lwc_translate3fv(&cam->free.lwc, dp);
-      //      SGfreecam* freec = (SGfreecam*)cam;
-      //quaternion_t q = freec->q;
+
       float4x4 m;
       q_mf4_convert(m, cam->free.q);
-      float4x4 mt;
-      mf4_transpose2(mt, m);
-      //glMultMatrixf((GLfloat*)&m);
 
       break;
     }
@@ -389,9 +384,16 @@ sg_camera_move(sg_camera_t *cam)
   }
 }
 
+// TODO: Cleanup, move camera rotate io handler to sim module
+sg_scene_t* sim_get_scene(void);
+
 void
 sg_camera_rotate_hat(int buttonVal, void *data)
 {
+  //ooLogInfo("hat pushed %d", buttonVal);
+  sg_scene_t *sc = sim_get_scene();
+  sg_camera_t *cam = sg_scene_get_cam(sc);
+
   switch (buttonVal) {
   case 0: // Up
     break;
@@ -409,7 +411,29 @@ sg_camera_rotate_hat(int buttonVal, void *data)
     break;
   case 315: // Up-Left
     break;
-  default:
+  default: // Stop rotating
     break;
   }
+
+  switch (cam->type) {
+  case SG_CAMERA_FIXED:
+    break;
+  case SG_CAMERA_FREE:
+    if (buttonVal == -1) {
+      cam->free.dq = q_rot(1.0, 0.0, 0.0, 0.0);
+    } else {
+      cam->free.dq = q_rot(-cosf(DEG_TO_RAD(buttonVal)),
+                           -sinf(DEG_TO_RAD(buttonVal)), 0.0, 0.1);
+    }
+    break;
+  case SG_CAMERA_ORBITING:
+    break;
+  default:
+    assert(0 && "invalid camera");
+  }
+}
+
+// TODO: Should move to sim part, where we will keep all the io stuff
+MODULE_INIT(sgcamera, "iomanager", NULL) {
+  ioRegActionHandler("cam-rotate", sg_camera_rotate_hat, IO_BUTTON_HAT, NULL);
 }
