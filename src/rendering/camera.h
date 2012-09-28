@@ -28,9 +28,9 @@ extern "C" {
 #include <vmath/lwcoord.h>
 #include "rendering/types.h"
 
-sg_camera_t* sg_new_free_camera();
-sg_camera_t* sg_new_fixed_camera();
-sg_camera_t* sg_new_orbiting_camera();
+sg_camera_t* sg_new_free_camera(const lwcoord_t *pos);
+sg_camera_t* sg_new_fixed_camera(sg_object_t *obj);
+sg_camera_t* sg_new_orbiting_camera(sg_object_t *obj);
 
 sg_camera_type_t sg_camera_get_type(sg_camera_t *cam);
 

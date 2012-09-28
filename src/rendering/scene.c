@@ -76,14 +76,17 @@ void
 sg_scene_draw(sg_scene_t *scene, float dt)
 {
   SG_CHECK_ERROR;
-  sg_camera_animate(scene->cam, dt);
+  //sg_camera_animate(scene->cam, dt);
   sg_background_draw(scene->bg);
   //sgMoveCam(scene->cam);
+
+#if 0
   ARRAY_FOR_EACH(i, scene->objects) {
     sgRecomputeModelViewMatrix(ARRAY_ELEM(scene->objects, i));
     sg_object_animate(ARRAY_ELEM(scene->objects, i), dt);
     sg_object_draw(ARRAY_ELEM(scene->objects, i));
   }
+#endif
   SG_CHECK_ERROR;
 }
 

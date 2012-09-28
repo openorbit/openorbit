@@ -81,7 +81,7 @@ sim_init_graphics(void)
 
   sg_background_t *sky = sgCreateBackgroundFromFile("data/stars.csv");
   sg_scene_set_bg(scene, sky);
-  sg_camera_t *cam = sg_new_free_camera();
+  sg_camera_t *cam = sg_new_free_camera(NULL);
   sg_scene_set_cam(scene, cam);
 
 }

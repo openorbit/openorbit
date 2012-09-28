@@ -115,10 +115,12 @@ sg_viewport_draw(sg_viewport_t *vp, float dt)
 
   SG_CHECK_ERROR;
 
+#if 0
   ARRAY_FOR_EACH(i, vp->overlays) {
     sg_overlay_draw(ARRAY_ELEM(vp->overlays, i));
     SG_CHECK_ERROR;
   }
+#endif
 }
 
 int

@@ -156,13 +156,17 @@ sgCreateBackgroundFromFile(const char *file)
   glVertexAttribPointer(sg_shader_get_location(shader, SG_VERTEX, true),
                         3, GL_FLOAT, GL_FALSE,
                         sizeof(sg_star_t), (void*)offsetof(sg_star_t, x));
+  glEnableVertexAttribArray(sg_shader_get_location(shader, SG_VERTEX, true));
   SG_CHECK_ERROR;
 
   glVertexAttribPointer(sg_shader_get_location(shader, SG_COLOR, true),
                         4, GL_UNSIGNED_BYTE,
                         GL_TRUE, // Yes normalize
                         sizeof(sg_star_t), offsetof(sg_star_t, r));
+  glEnableVertexAttribArray(sg_shader_get_location(shader, SG_COLOR, true));
   SG_CHECK_ERROR;
+
+  glBindVertexArray(0);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   free(stars->data); // GL has copied arrays over
@@ -175,6 +179,9 @@ sgCreateBackgroundFromFile(const char *file)
 void
 sg_background_draw(sg_background_t *bg)
 {
+  ooLogInfo("draw background %d", (int)bg->n_stars);
+  SG_CHECK_ERROR;
+
   // Background drawing needs to shortcut the normal camera, as the bg
   // is at infinite distance (e.g. regarding translation)
   // Here we rotate the camera as needed
@@ -201,8 +208,16 @@ sg_background_draw(sg_background_t *bg)
       break;}
   }
 
+  mf4_ident(rotMatrix);
   sg_shader_bind(bg->shader);
   sg_shader_set_projection(bg->shader, *sg_camera_get_projection(cam));
   sg_shader_set_model_view(bg->shader, rotMatrix);
-}
+  SG_CHECK_ERROR;
 
+  glBindVertexArray(bg->vba);
+  SG_CHECK_ERROR;
+  glDrawArrays(GL_POINTS, 0, bg->n_stars);
+  SG_CHECK_ERROR;
+  glBindVertexArray(0);
+  SG_CHECK_ERROR;
+}

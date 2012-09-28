@@ -67,10 +67,13 @@ sg_new_free_camera(const lwcoord_t *pos)
 {
   sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
   cam->type = SG_CAMERA_FREE;
-  cam->free.lwc = *pos;
+  if (pos) {
+    cam->free.lwc = *pos;
+  }
   mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
   mf4_lookat(cam->view_matrix, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
-
+  cam->free.q = q_rot(1.0, 0.0, 0.0, 0.0);
+  cam->free.dq = q_rot(1.0, 0.0, 0.0, 0.0);
   return cam;
 }
 
@@ -262,11 +265,6 @@ MODULE_INIT(camera, "iomanager", NULL) {
   //}
 }
 
-void
-sgCamInit(void)
-{
-}
-
 
 void
 sg_camera_animate(sg_camera_t *cam, float dt)
@@ -274,7 +272,7 @@ sg_camera_animate(sg_camera_t *cam, float dt)
   assert(cam && "cannot animate non existant camera");
   switch (cam->type) {
     case SG_CAMERA_FIXED: {
-      // Camera is pegged to object, not much to do here
+      // Camera is pegged to object, not much to do here, except rotating it
       // object animation takes care of moving the camera
       //float4 np = vf4_add(sg_object_get_pos(cam->fixed.obj), cam->fixed.r);
       mf4_ident(cam->view_matrix);
@@ -389,5 +387,24 @@ sg_camera_move(sg_camera_t *cam)
 void
 sg_camera_rotate_hat(int buttonVal, void *data)
 {
-
+  switch (buttonVal) {
+  case 0: // Up
+    break;
+  case 45: // Up-right
+    break;
+  case 90: // Right
+    break;
+  case 135: // Down-right
+    break;
+  case 180: // Down
+    break;
+  case 225: // Down-left
+    break;
+  case 270: // Left
+    break;
+  case 315: // Up-Left
+    break;
+  default:
+    break;
+  }
 }
