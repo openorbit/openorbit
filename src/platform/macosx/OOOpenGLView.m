@@ -262,14 +262,16 @@ static io_keycode_t keymap [256] = {
 
 - (void) drawRect:(NSRect)dirtyRect
 {
+  NSTimeInterval current = [NSDate timeIntervalSinceReferenceDate];
   extern SIMstate gSIM_state;
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  sg_window_draw(gSIM_state.win, 0.0);
+  sg_window_draw(gSIM_state.win, current - last);
   //sgPaint(gSIM_state.sg);
 
   [self.openGLContext flushBuffer];
+  last = current;
 }
 
 @end

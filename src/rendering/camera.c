@@ -73,7 +73,7 @@ sg_new_free_camera(const lwcoord_t *pos)
   mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
   mf4_lookat(cam->view_matrix, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
   cam->free.q = q_rot(1.0, 0.0, 0.0, 0.0);
-  cam->free.dq = q_rot(1.0, 0.0, 0.0, 0.0);
+  cam->free.dq = q_rot(1.0, 0.0, 0.0, 0.01);
   return cam;
 }
 
@@ -103,6 +103,11 @@ sg_new_orbiting_camera(sg_object_t *obj)
   return cam;
 }
 
+void
+sg_camera_adjust_perspective(sg_camera_t *cam, float perspective)
+{
+  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), perspective, 0.1, 1000000000000.0);
+}
 
 sg_camera_type_t
 sg_camera_get_type(sg_camera_t *cam)
@@ -298,9 +303,9 @@ sg_camera_animate(sg_camera_t *cam, float dt)
     case SG_CAMERA_FREE: {
       quaternion_t q = q_s_mul(cam->free.dq, dt);
       cam->free.q = q_mul(cam->free.q, q);
+      cam->free.q = q_normalise(cam->free.q);
       float3 dp = vf3_s_mul(cam->free.dp, dt);
       lwc_translate3fv(&cam->free.lwc, dp);
-
       //      SGfreecam* freec = (SGfreecam*)cam;
       //quaternion_t q = freec->q;
       float4x4 m;

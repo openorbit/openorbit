@@ -76,7 +76,7 @@ void
 sg_scene_draw(sg_scene_t *scene, float dt)
 {
   SG_CHECK_ERROR;
-  //sg_camera_animate(scene->cam, dt);
+  sg_camera_animate(scene->cam, dt);
   sg_background_draw(scene->bg);
   //sgMoveCam(scene->cam);
 

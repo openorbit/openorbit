@@ -188,32 +188,32 @@ sg_background_draw(sg_background_t *bg)
   sg_camera_t *cam = sg_scene_get_cam(bg->scene);
   float4x4 rotMatrix;
   switch (sg_camera_get_type(cam)) {
-    case SG_CAMERA_FIXED: {
+  case SG_CAMERA_FIXED: {
+    quaternion_t q = q_mul(sg_object_get_quat(sg_camera_fixed_get_obj(cam)),
+                           sg_camera_fixed_get_quaternion(cam));
+    q_mf4_convert(rotMatrix, q);
+    break;}
+  case SG_CAMERA_FREE: {
+    q_mf4_convert(rotMatrix, sg_camera_free_get_quaternion(cam));
+    break;}
+  case SG_CAMERA_ORBITING: {
+    mf4_lookat(rotMatrix,
+                0.0f, 0.0f, 0.0f,
+                -sg_camera_orbiting_get_radius(cam) * cosf(sg_camera_orbiting_get_dec(cam)),
+                -sg_camera_orbiting_get_radius(cam) * sinf(sg_camera_orbiting_get_dec(cam)),
+                -sg_camera_orbiting_get_radius(cam) * sinf(sg_camera_orbiting_get_ra(cam)),
+                0.0f, 0.0f, 1.0f);
 
-      quaternion_t q = q_mul(sg_object_get_quat(sg_camera_fixed_get_obj(cam)),
-                             sg_camera_fixed_get_quaternion(cam));
-      q_mf4_convert(rotMatrix, q);
-      break;}
-    case SG_CAMERA_FREE: {
-      q_mf4_convert(rotMatrix, sg_camera_free_get_quaternion(cam));
-      break;}
-    case SG_CAMERA_ORBITING: {
-      mf4_lookat(rotMatrix,
-                 0.0f, 0.0f, 0.0f,
-                 -sg_camera_orbiting_get_radius(cam) * cosf(sg_camera_orbiting_get_dec(cam)),
-                 -sg_camera_orbiting_get_radius(cam) * sinf(sg_camera_orbiting_get_dec(cam)),
-                 -sg_camera_orbiting_get_radius(cam) * sinf(sg_camera_orbiting_get_ra(cam)),
-                 0.0f, 0.0f, 1.0f);
-
-      break;}
+    break;}
   }
 
-  mf4_ident(rotMatrix);
+  //mf4_ident(rotMatrix);
   sg_shader_bind(bg->shader);
   sg_shader_set_projection(bg->shader, *sg_camera_get_projection(cam));
   sg_shader_set_model_view(bg->shader, rotMatrix);
   SG_CHECK_ERROR;
 
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glBindVertexArray(bg->vba);
   SG_CHECK_ERROR;
   glDrawArrays(GL_POINTS, 0, bg->n_stars);

@@ -40,6 +40,8 @@ void sg_camera_move(sg_camera_t *cam);
 const float4x4* sg_camera_get_projection(sg_camera_t *cam);
 const float4x4* sg_camera_get_view(sg_camera_t *cam);
 
+void sg_camera_adjust_perspective(sg_camera_t *cam, float perspective);
+
 lwcoord_t sg_camera_free_get_lwc(sg_camera_t *cam);
 float3 sg_camera_free_get_velocity(sg_camera_t *cam);
 void sg_camera_free_set_velocity(sg_camera_t *cam, float3 v);
