@@ -29,6 +29,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		EC07C1291616F23300B4499B /* vmath-geo.c in Sources */ = {isa = PBXBuildFile; fileRef = EC07C1281616F23300B4499B /* vmath-geo.c */; };
 		EC0C021A144174D700A2AE5E /* wav.h in Headers */ = {isa = PBXBuildFile; fileRef = EC0C02111441745D00A2AE5E /* wav.h */; };
 		EC0C021B144174D700A2AE5E /* wav.c in Sources */ = {isa = PBXBuildFile; fileRef = EC0C020E1441744500A2AE5E /* wav.c */; };
 		EC0C021C1441753A00A2AE5E /* libauload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC0C0216144174AD00A2AE5E /* libauload.a */; };
@@ -501,6 +502,8 @@
 
 /* Begin PBXFileReference section */
 		EC030D6911084749004F3AD8 /* Simulation Design */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Simulation Design"; sourceTree = "<group>"; };
+		EC07C1281616F23300B4499B /* vmath-geo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "vmath-geo.c"; sourceTree = "<group>"; };
+		EC07C12A1616F63000B4499B /* vmath-geo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vmath-geo.h"; sourceTree = "<group>"; };
 		EC0C020E1441744500A2AE5E /* wav.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = wav.c; sourceTree = "<group>"; };
 		EC0C02111441745D00A2AE5E /* wav.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wav.h; sourceTree = "<group>"; };
 		EC0C0216144174AD00A2AE5E /* libauload.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libauload.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1305,6 +1308,7 @@
 				EC34BDAF107B2C2B0011B76E /* vmath-types.h */,
 				EC34BDB0107B2C2B0011B76E /* vmath.h */,
 				EC91C3DA1100628F00011177 /* vmath-convert.c */,
+				EC07C12A1616F63000B4499B /* vmath-geo.h */,
 			);
 			path = vmath;
 			sourceTree = "<group>";
@@ -1327,6 +1331,7 @@
 				EC34BDB6107B2C480011B76E /* CMakeLists.txt */,
 				EC34BDB7107B2C480011B76E /* vmath-matvec.c */,
 				EC34BDB8107B2C480011B76E /* vmath-quaternions.c */,
+				EC07C1281616F23300B4499B /* vmath-geo.c */,
 			);
 			path = vmath;
 			sourceTree = "<group>";
@@ -2064,6 +2069,7 @@
 			files = (
 				EC34BDC1107B2CBD0011B76E /* vmath-matvec.c in Sources */,
 				EC34BDC2107B2CBD0011B76E /* vmath-quaternions.c in Sources */,
+				EC07C1291616F23300B4499B /* vmath-geo.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
