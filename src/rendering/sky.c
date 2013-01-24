@@ -179,7 +179,6 @@ sgCreateBackgroundFromFile(const char *file)
 void
 sg_background_draw(sg_background_t *bg)
 {
-  //ooLogInfo("draw background %d", (int)bg->n_stars);
   SG_CHECK_ERROR;
 
   // Background drawing needs to shortcut the normal camera, as the bg
@@ -187,31 +186,12 @@ sg_background_draw(sg_background_t *bg)
   // Here we rotate the camera as needed
   sg_camera_t *cam = sg_scene_get_cam(bg->scene);
   float4x4 rotMatrix;
-  switch (sg_camera_get_type(cam)) {
-  case SG_CAMERA_FIXED: {
-    quaternion_t q = q_mul(sg_object_get_quat(sg_camera_fixed_get_obj(cam)),
-                           sg_camera_fixed_get_quaternion(cam));
-    q_mf4_convert(rotMatrix, q);
-    break;}
-  case SG_CAMERA_FREE: {
-    q_mf4_convert(rotMatrix, sg_camera_free_get_quaternion(cam));
-    mf4_transpose1(rotMatrix); // Take the inverse, we are rotating the world,
-                               // not the camera
-    break;}
-  case SG_CAMERA_ORBITING: {
-    mf4_lookat(rotMatrix,
-                0.0f, 0.0f, 0.0f,
-                -sg_camera_orbiting_get_radius(cam) * cosf(sg_camera_orbiting_get_dec(cam)),
-                -sg_camera_orbiting_get_radius(cam) * sinf(sg_camera_orbiting_get_dec(cam)),
-                -sg_camera_orbiting_get_radius(cam) * sinf(sg_camera_orbiting_get_ra(cam)),
-                0.0f, 0.0f, 1.0f);
 
-    break;}
-  }
+  quaternion_t q = sg_camera_quat(cam);
+  q_mf4_convert(rotMatrix, q);
 
-  //mf4_ident(rotMatrix);
   sg_shader_bind(bg->shader);
-  sg_shader_set_projection(bg->shader, *sg_camera_get_projection(cam));
+  sg_shader_set_projection(bg->shader, *sg_camera_project(cam));
   sg_shader_set_model_view(bg->shader, rotMatrix);
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

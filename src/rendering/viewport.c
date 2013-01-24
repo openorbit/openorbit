@@ -67,8 +67,8 @@ sg_viewport_reshape(sg_viewport_t *viewport, unsigned x, unsigned y,
   viewport->w = w;
   viewport->h = h;
 
-  sg_camera_adjust_perspective(sg_scene_get_cam(viewport->scene),
-                               (float)w/(float)h);
+  sg_camera_set_perspective(sg_scene_get_cam(viewport->scene),
+                            (float)w/(float)h);
 }
 
 void

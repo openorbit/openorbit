@@ -35,6 +35,9 @@ void sg_object_add_child(sg_object_t *obj, sg_object_t *child);
 
 void sg_object_set_pos(sg_object_t *obj, float3 pos);
 float3 sg_object_get_pos(sg_object_t *obj);
+void sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc);
+float3 sg_object_get_vel(sg_object_t *obj);
+
 
 quaternion_t sg_object_get_quat(sg_object_t *obj);
 void sg_object_set_quat(sg_object_t *obj, quaternion_t q);

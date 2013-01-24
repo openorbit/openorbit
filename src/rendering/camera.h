@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2009,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -28,48 +28,20 @@ extern "C" {
 #include <vmath/lwcoord.h>
 #include "rendering/types.h"
 
-sg_camera_t* sg_new_free_camera(const lwcoord_t *pos);
-sg_camera_t* sg_new_fixed_camera(sg_object_t *obj);
-sg_camera_t* sg_new_orbiting_camera(sg_object_t *obj);
+  sg_camera_t* sg_new_camera(void);
+  lwcoord_t sg_camera_pos(sg_camera_t *cam);
+  quaternion_t sg_camera_quat(sg_camera_t *cam);
+  const float4x4* sg_camera_project(sg_camera_t *cam);
+  const float4x4* sg_camera_modelview(sg_camera_t *cam);
 
-sg_camera_type_t sg_camera_get_type(sg_camera_t *cam);
+  void sg_camera_track_object(sg_camera_t *cam, sg_object_t *obj);
+  void sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj);
+  void sg_camera_set_perspective(sg_camera_t *cam, float perspective);
 
-void sg_camera_animate(sg_camera_t *cam, float dt);
-void sg_camera_move(sg_camera_t *cam);
+  void sg_camera_update_constraints(sg_camera_t *cam);
+  void sg_camera_update_modelview(sg_camera_t *cam);
 
-const float4x4* sg_camera_get_projection(sg_camera_t *cam);
-const float4x4* sg_camera_get_view(sg_camera_t *cam);
-
-void sg_camera_adjust_perspective(sg_camera_t *cam, float perspective);
-
-lwcoord_t sg_camera_free_get_lwc(sg_camera_t *cam);
-float3 sg_camera_free_get_velocity(sg_camera_t *cam);
-void sg_camera_free_set_velocity(sg_camera_t *cam, float3 v);
-void sg_camera_free_increase_velocity(sg_camera_t *cam, float3 dv);
-quaternion_t sg_camera_free_get_quaternion(sg_camera_t *cam);
-quaternion_t sg_camera_free_get_delta_quaternion(sg_camera_t *cam);
-
-sg_object_t* sg_camera_fixed_get_obj(sg_camera_t *cam);
-void sg_camera_fixed_set_obj(sg_camera_t *cam, sg_object_t *obj);
-float3 sg_camera_fixed_get_offset(sg_camera_t *cam);
-quaternion_t sg_camera_fixed_get_quaternion(sg_camera_t *cam);
-quaternion_t sg_camera_fixed_get_delta_quaternion(sg_camera_t *cam);
-
-sg_object_t* sg_camera_orbiting_get_obj(sg_camera_t *cam);
-void sg_camera_orbiting_set_obj(sg_camera_t *cam, sg_object_t *obj);
-
-float sg_camera_orbiting_get_ra(const sg_camera_t *cam) __attribute__((pure));
-float sg_camera_orbiting_get_dec(const sg_camera_t *cam) __attribute__((pure));
-float sg_camera_orbiting_get_delta_ra(const sg_camera_t *cam)
-  __attribute__((pure));
-float sg_camera_orbiting_get_delta_dec(const sg_camera_t *cam)
-  __attribute__((pure));
-float sg_camera_orbiting_get_delta_radius(const sg_camera_t *cam)
-  __attribute__((pure));
-float sg_camera_orbiting_get_radius(const sg_camera_t *cam)
-  __attribute__((pure));
-float sg_camera_orbiting_get_zoom(const sg_camera_t *cam)
-  __attribute__((pure));
+  void sg_camera_step(sg_camera_t * cam, float dt);
 
 #ifdef __cplusplus
 }

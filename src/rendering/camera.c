@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2009,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -34,216 +34,144 @@
 #include "settings.h"
 #include "scenegraph.h"
 #include "palloc.h"
+
+
 struct sg_camera_t {
   float4x4 proj_matrix;
   float4x4 view_matrix;
 
-  sg_camera_type_t type;
+  lwcoord_t p;        // Actual pos of camera (lwc + lwc_offset)
+  lwcoord_t lwc;      // Pos of camera, may be constrained by src object
+  float3 lwc_offset;  // Offset from target lwc (this is the thing moving)
 
-  union {
-    struct {
-      lwcoord_t lwc;
-      float3 dp;
-      quaternion_t q;
-      quaternion_t dq;
-    } free;
-    struct {
-      sg_object_t *obj;
-      float3 r; // With this offset
-      quaternion_t q; // and this rotation (rotate before translation)
-      quaternion_t dq; // Delta rotation
-    } fixed;
-    struct {
-      sg_object_t *obj;
-      float ra, dec;
-      float dra, ddec, dr;
-      float r, zoom;
-    } orbiting;
-  };
+  float3 dp;          // Velocity
+
+  quaternion_t aq;  // Actual quaternion (tq * rq)
+  quaternion_t tq;  // Rotation quaternion, this is the target direction
+  quaternion_t rq; // Relative rotation to tq
+  quaternion_t dq; // Rotation per time unit of rq
+
+  // If there is a target object, rotation is relative to that objects location
+  // the source object constrains the lwc variable.
+  sg_object_t *tgt; // Target object, must have rigid obj backing
+  sg_object_t *src; // Source object, must have rigid obj backing
+
+  float3 src_dir; // Source direction
+  float3 src_offset; // Source object, must have rigid obj backing
 };
 
-sg_camera_t*
-sg_new_free_camera(const lwcoord_t *pos)
+
+lwcoord_t
+sg_camera_pos(sg_camera_t *cam)
 {
-  sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
-  cam->type = SG_CAMERA_FREE;
-  if (pos) {
-    cam->free.lwc = *pos;
-  }
-  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
-  mf4_lookat(cam->view_matrix, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
-  cam->free.q = q_rot(1.0, 0.0, 0.0, 0.0);
-  cam->free.dq = q_rot(1.0, 0.0, 0.0, 0.0);
-  return cam;
+  return cam->p;
 }
 
-sg_camera_t*
-sg_new_fixed_camera(sg_object_t *obj)
+quaternion_t
+sg_camera_quat(sg_camera_t *cam)
 {
-  sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
-  cam->type = SG_CAMERA_FIXED;
-  cam->fixed.obj = obj;
-
-  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
-  mf4_lookat(cam->view_matrix, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
-
-  return cam;
-}
-
-sg_camera_t*
-sg_new_orbiting_camera(sg_object_t *obj)
-{
-  sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
-  cam->type = SG_CAMERA_ORBITING;
-  cam->orbiting.obj = obj;
-  
-  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
-  mf4_lookat(cam->view_matrix, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
-
-  return cam;
-}
-
-void
-sg_camera_adjust_perspective(sg_camera_t *cam, float perspective)
-{
-  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), perspective, 0.1, 1000000000000.0);
-}
-
-sg_camera_type_t
-sg_camera_get_type(sg_camera_t *cam)
-{
-  return cam->type;
+  return cam->aq;
 }
 
 const float4x4*
-sg_camera_get_projection(sg_camera_t *cam)
+sg_camera_project(sg_camera_t *cam)
 {
   return &cam->proj_matrix;
 }
 
+void
+sg_camera_update_modelview(sg_camera_t *cam)
+{
+  q_mf4_convert_inv(cam->view_matrix, cam->aq);
+}
+
 const float4x4*
-sg_camera_get_view(sg_camera_t *cam)
+sg_camera_modelview(sg_camera_t *cam)
 {
   return &cam->view_matrix;
 }
 
-lwcoord_t
-sg_camera_free_get_lwc(sg_camera_t *cam)
-{
-  return cam->free.lwc;
-}
 
-float3
-sg_camera_free_get_velocity(sg_camera_t *cam)
+void
+sg_camera_step(sg_camera_t * cam, float dt)
 {
-  return cam->free.dp;
+  cam->lwc_offset += cam->dp * dt;
+  cam->p = cam->lwc;
+  lwc_translate3fv(&cam->p, cam->lwc_offset);
+
+  quaternion_t q = q_s_mul(cam->dq, dt);
+  cam->rq = q_normalise(q_mul(q, cam->rq));
+  cam->aq = q_normalise(q_mul(cam->rq, cam->tq));
+  sg_camera_update_modelview(cam);
 }
 
 void
-sg_camera_free_set_velocity(sg_camera_t *cam, float3 v)
+sg_camera_update_constraints(sg_camera_t *cam)
 {
-  cam->free.dp = v;
+  // Update lwc for the object we follow
+  if (cam->src) {
+    sg_object_get_lwc(cam->src, &cam->lwc);
+    cam->p = cam->lwc;
+    lwc_translate3fv(&cam->p, cam->lwc_offset);
+  }
+
+  // Are we pointing somewhere, if so we need to get the target vector
+  if (cam->tgt) {
+    lwcoord_t target;
+
+    sg_object_get_lwc(cam->tgt, &target);
+    float3 dir = vf3_normalise(lwc_dist(&target, &cam->p)); // Points toward dir
+    cam->tq = q_rotv(dir, 0.0);
+    cam->aq = q_normalise(q_mul(cam->rq, cam->tq));
+  } else if (cam->src) {
+
+    // We are pointing relative to follow object
+    cam->tq = sg_object_get_quat(cam->src);
+    cam->aq = q_normalise(q_mul(cam->rq, cam->tq));
+  }
+  sg_camera_update_modelview(cam);
+}
+
+sg_camera_t*
+sg_new_camera(void)
+{
+  sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
+
+  cam->dq = q_rot(0.0, 0.0, 1.0, 0.0);
+  cam->rq = q_rot(0.0, 0.0, 1.0, 0.0);
+  cam->tq = q_rot(0.0, 0.0, 1.0, 0.0);
+  cam->aq = q_rot(0.0, 0.0, 1.0, 0.0);
+
+
+  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
+  sg_camera_update_modelview(cam);
+
+  return cam;
 }
 
 void
-sg_camera_free_increase_velocity(sg_camera_t *cam, float3 dv)
+sg_camera_track_object(sg_camera_t *cam, sg_object_t *obj)
 {
-  cam->free.dp += dv;
-}
-
-
-quaternion_t
-sg_camera_free_get_quaternion(sg_camera_t *cam)
-{
-  return cam->free.q;
-}
-
-quaternion_t
-sg_camera_free_get_delta_quaternion(sg_camera_t *cam)
-{
-  return cam->free.dq;
-}
-
-sg_object_t*
-sg_camera_fixed_get_obj(sg_camera_t *cam)
-{
-  return cam->fixed.obj;
+  cam->tgt = obj;
 }
 
 void
-sg_camera_fixed_set_obj(sg_camera_t *cam, sg_object_t *obj)
+sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj)
 {
-  cam->fixed.obj = obj;
+  cam->src = obj;
+
+  if (cam->tgt == NULL) {
+    cam->tq = sg_object_get_quat(obj);
+  }
 }
 
-float3
-sg_camera_fixed_get_offset(sg_camera_t *cam)
-{
-  return cam->fixed.r;
-}
-
-quaternion_t
-sg_camera_fixed_get_quaternion(sg_camera_t *cam)
-{
-  return cam->fixed.q;
-}
-quaternion_t
-sg_camera_fixed_get_delta_quaternion(sg_camera_t *cam)
-{
-  return cam->fixed.dq;
-}
-
-sg_object_t*
-sg_camera_orbiting_get_obj(sg_camera_t *cam)
-{
-  return cam->orbiting.obj;
-}
 void
-sg_camera_orbiting_set_obj(sg_camera_t *cam, sg_object_t *obj)
+sg_camera_set_perspective(sg_camera_t *cam, float perspective)
 {
-  cam->orbiting.obj = obj;
+  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), perspective, 0.1, 1000000000000.0);
 }
-
-float
-sg_camera_orbiting_get_ra(const sg_camera_t *cam)
-{
-  return cam->orbiting.ra;
-}
-float
-sg_camera_orbiting_get_dec(const sg_camera_t *cam)
-{
-  return cam->orbiting.dec;
-}
-float
-sg_camera_orbiting_get_delta_ra(const sg_camera_t *cam)
-{
-  return cam->orbiting.dra;
-}
-float
-sg_camera_orbiting_get_delta_dec(const sg_camera_t *cam)
-{
-  return cam->orbiting.ddec;
-}
-
-float
-sg_camera_orbiting_get_delta_radius(const sg_camera_t *cam)
-{
-  return cam->orbiting.dr;
-}
-float
-sg_camera_orbiting_get_radius(const sg_camera_t *cam)
-{
-  return cam->orbiting.r;
-}
-float
-sg_camera_orbiting_get_zoom(const sg_camera_t *cam)
-{
-  return cam->orbiting.zoom;
-}
-
 
 /* Camera actions, registered as action handlers */
-
 
 void sg_camera_rotate_hat(int state, void *data);
 
@@ -262,127 +190,8 @@ MODULE_INIT(camera, "iomanager", NULL) {
 
   ioRegActionHandler(keyBindings[0].ioKey, keyBindings[0].action,
                      IO_BUTTON_HAT, NULL);
-
-  // Register camera actions
-  //for (int i = 1 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
-  //  ioRegActionHandler(keyBindings[i].ioKey, keyBindings[i].action,
-  //                    IO_BUTTON_PUSH, NULL);
-  //}
 }
 
-
-void
-sg_camera_animate(sg_camera_t *cam, float dt)
-{
-  assert(cam && "cannot animate non existant camera");
-  switch (cam->type) {
-    case SG_CAMERA_FIXED: {
-      // Camera is pegged to object, not much to do here, except rotating it
-      // object animation takes care of moving the camera
-      //float4 np = vf4_add(sg_object_get_pos(cam->fixed.obj), cam->fixed.r);
-      mf4_ident(cam->view_matrix);
-      float4x4 a;
-      mf4_make_translate(a, cam->fixed.r);
-      float3x3 R;
-
-      quaternion_t q = q_s_mul(cam->fixed.dq, dt);
-      cam->fixed.q = q_mul(cam->fixed.q, q);
-      q_mf4_convert(R, cam->fixed.q);
-
-      //      SGfixedcam* fix = (SGfixedcam*)cam;
-      //quaternion_t q = fix->body->q;
-      //q = q_mul(q, fix->q);
-      //matrix_t m;
-      //q_m_convert(&m, q);
-      //matrix_t mt;
-      //m_transpose(&mt, &m);
-      //glMultMatrixf((GLfloat*)&mt);
-
-      break;
-    }
-    case SG_CAMERA_FREE: {
-      quaternion_t q = q_s_mul(cam->free.dq, dt);
-      cam->free.q = q_normalise(q_mul(cam->free.q, q));
-      float3 dp = vf3_s_mul(cam->free.dp, dt);
-      lwc_translate3fv(&cam->free.lwc, dp);
-
-      float4x4 m;
-      q_mf4_convert(m, cam->free.q);
-
-      break;
-    }
-    case SG_CAMERA_ORBITING: {
-      cam->orbiting.ra += cam->orbiting.dra * dt;
-      cam->orbiting.dec += cam->orbiting.ddec * dt;
-      cam->orbiting.r += cam->orbiting.dr * dt;
-
-      mf4_lookat(cam->view_matrix,
-                 0.0f, 0.0f, 0.0f,
-                 -cam->orbiting.r * cosf(cam->orbiting.dec),
-                 -cam->orbiting.r * sinf(cam->orbiting.dec),
-                 -cam->orbiting.r * sinf(cam->orbiting.ra),
-                 0.0f, 0.0f, 1.0f);
-      //SGorbitcam* ocam = (SGorbitcam*)cam;
-
-      //gluLookAt(0.0, 0.0, 0.0,
-      //          -ocam->r*cos(ocam->dec),
-      //          -ocam->r*sin(ocam->dec),
-      //          -ocam->r*sin(ocam->ra),
-      //          0.0, 0.0, 1.0);
-
-      break;
-    }
-  }
-}
-
-
-
-void
-sg_camera_move(sg_camera_t *cam)
-{
-  switch (cam->type) {
-  case SG_CAMERA_FIXED: {
-    //float3 p = cam->fixed.obj->p.offs;
-    //p = vf3_add(p, cam->fixed.r);
-    //quaternion_t q = cam->fixed.body->q;
-    //q = q_mul(q, cam->fixed.q);
-    //float4x4 m;
-    //q_mf4_convert(m, q);
-    //      matrix_t mt;
-    //      m_transpose(&mt, &m);
-
-    //glMultMatrixf((GLfloat*)&m);
-    //glTranslatef(-vf3_x(p), -vf3_y(p), -vf3_z(p));
-
-    //  float4x4 t;
-    //  mf4_translate(t, -cam->fixed.lwc.offs);
-    //  mf4_mul2(cam->viewMatrix, t);
-
-    break;}
-  case SG_CAMERA_FREE: {
-    //      SGfreecam *freecam = (SGfreecam*)cam;
-    float4x4 t;
-    mf4_make_translate(t, -cam->free.lwc.offs);
-    mf4_mul2(cam->view_matrix, t);
-    //      glTranslatef(-vf3_x(freecam->lwc.offs),
-    //                   -vf3_y(freecam->lwc.offs),
-    //                   -vf3_z(freecam->lwc.offs));
-
-    break;}
-  case SG_CAMERA_ORBITING: {
-    float3 p = vf3_set(cam->orbiting.r*cos(cam->orbiting.dec),
-                       cam->orbiting.r*sin(cam->orbiting.dec),
-                       cam->orbiting.r*sin(cam->orbiting.ra));
-    //float3 cogOffset = mf3_v_mul(cam->orbiting.obj->R, cam->orbiting.obj->m.cog);
-    //glTranslatef(-(p[0] + cogOffset.x),
-    //             -(p[1] + cogOffset.y),
-    //             -(p[2] + cogOffset.z));
-    float4x4 t;
-    mf4_make_translate(t, -p);
-    mf4_mul2(cam->view_matrix, t);
-    break; }
-  }
-}
 
 // TODO: Cleanup, move camera rotate io handler to sim module
 sg_scene_t* sim_get_scene(void);
@@ -394,43 +203,12 @@ sg_camera_rotate_hat(int buttonVal, void *data)
   sg_scene_t *sc = sim_get_scene();
   sg_camera_t *cam = sg_scene_get_cam(sc);
 
-  switch (buttonVal) {
-  case 0: // Up
-    break;
-  case 45: // Up-right
-    break;
-  case 90: // Right
-    break;
-  case 135: // Down-right
-    break;
-  case 180: // Down
-    break;
-  case 225: // Down-left
-    break;
-  case 270: // Left
-    break;
-  case 315: // Up-Left
-    break;
-  default: // Stop rotating
-    break;
-  }
-
-  switch (cam->type) {
-  case SG_CAMERA_FIXED:
-    break;
-  case SG_CAMERA_FREE:
-    if (buttonVal == -1) {
-      cam->free.dq = q_rot(1.0, 0.0, 0.0, 0.0);
+  if (buttonVal == -1) {
+      cam->dq = q_rot(0.0, 0.0, 1.0, 0.0);
     } else {
-      cam->free.dq = q_rot(-cosf(DEG_TO_RAD(buttonVal)),
-                           -sinf(DEG_TO_RAD(buttonVal)), 0.0, 0.1);
+      cam->dq = q_rot(cosf(DEG_TO_RAD(buttonVal)),
+                      sinf(DEG_TO_RAD(buttonVal)), 0.0, 0.1);
     }
-    break;
-  case SG_CAMERA_ORBITING:
-    break;
-  default:
-    assert(0 && "invalid camera");
-  }
 }
 
 // TODO: Should move to sim part, where we will keep all the io stuff

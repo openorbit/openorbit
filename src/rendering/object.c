@@ -29,6 +29,7 @@
 #endif
 
 #include "rendering/object.h"
+#include "rendering/camera.h"
 #include "rendering/shader-manager.h"
 #include "physics/physics.h"
 #include "res-manager.h"
@@ -105,11 +106,31 @@ sg_object_get_pos(sg_object_t *obj)
   return obj->pos;
 }
 
+float3
+sg_object_get_vel(sg_object_t *obj)
+{
+  return obj->dp;
+}
+
+
 void
 sg_object_set_pos(sg_object_t *obj, float3 pos)
 {
   obj->pos = pos;
 }
+
+void
+sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc)
+{
+  if (obj->rigidBody) {
+    *lwc = obj->rigidBody->p;
+    lwc_translate3fv(lwc, obj->rigidBody->p_offset);
+    return;
+  }
+
+  ooLogError("lwc queiried on object without physical backing");
+}
+
 
 quaternion_t
 sg_object_get_quat(sg_object_t *obj)
@@ -161,6 +182,7 @@ sg_geometry_draw(sg_geometry_t *geo)
   //SG_CHECK_ERROR;
 
   if (geo->hasIndices) {
+    //ooLogInfo("draw %d vertices", (int)geo->index_count);
     glDrawElements(geo->gl_primitive_type, geo->index_count, GL_UNSIGNED_INT, 0);
   } else {
     glDrawArrays(geo->gl_primitive_type, 0, geo->vertexCount);
@@ -180,15 +202,11 @@ sg_object_draw(sg_object_t *obj)
   // Set model matrix for current object, we transpose this
   sg_shader_bind(obj->shader);
 
-  sg_shader_set_projection(obj->shader,
-                           *sg_camera_get_projection(sg_scene_get_cam(obj->scene)));
-  //glUniformMatrix4fv(obj->shader->uniforms.projectionId, 1, GL_TRUE,
-  //                   (GLfloat*)obj->scene->cam->proj_matrix);
-  sg_shader_set_model_view(obj->shader,
-                           *sg_camera_get_view(sg_scene_get_cam(obj->scene)));
+  const float4x4 *pm = sg_camera_project(sg_scene_get_cam(obj->scene));
+  sg_shader_set_projection(obj->shader, *pm);
 
-  //glUniformMatrix4fv(obj->shader->uniforms.modelViewId, 1, GL_TRUE,
-  //                   (GLfloat*)obj->modelViewMatrix);
+  //const float4 *vm = sg_camera_get_view(sg_scene_get_cam(obj->scene));
+  sg_shader_set_model_view(obj->shader, obj->modelViewMatrix);
 
   // Set light params for object
   // TODO: Global ambient light as well...
@@ -218,7 +236,7 @@ sgRecomputeModelViewMatrix(sg_object_t *obj)
     mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
   } else {
     sg_camera_t *cam = sg_scene_get_cam(obj->scene);
-    mf4_cpy(obj->modelViewMatrix, *sg_camera_get_view(cam));
+    mf4_cpy(obj->modelViewMatrix, *sg_camera_modelview(cam));
   }
 
   mf4_mul2(obj->modelViewMatrix, obj->R);
@@ -238,23 +256,40 @@ sg_object_animate(sg_object_t *obj, float dt)
   q_mf3_convert(obj->R, obj->q);
   obj->pos += obj->dp;
 
+  mf4_make_translate(obj->modelViewMatrix, obj->pos);
+  mf3_mul2(obj->modelViewMatrix, obj->R);
+
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_animate(ARRAY_ELEM(obj->subObjects, i), dt);
   }
 }
 
+// Updatdes an object from the physics system
 void
 sg_object_update(sg_object_t *obj)
 {
   if (obj->rigidBody) {
+    //obj->pos =
     obj->dp = plGetVel(obj->rigidBody);
     obj->dr = plGetAngularVel(obj->rigidBody);
     obj->q = plGetQuat(obj->rigidBody);
-  }
 
-  //ARRAY_FOR_EACH(i, obj->subObjects) {
-  //  sg_object_update(ARRAY_ELEM(obj->subObjects, i));
-  //}
+    // Update position, this is based on where the camera is
+    sg_camera_t *cam = sg_scene_get_cam(obj->scene);
+    lwcoord_t pos = sg_camera_pos(cam);
+  }
+  q_mf3_convert(obj->R, obj->q);
+
+  if (obj->parent) {
+    mf3_mul2(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+  } else {
+    mf4_make_translate(obj->modelViewMatrix, obj->pos);
+  }
+  mf3_mul2(obj->modelViewMatrix, obj->R);
+
+  ARRAY_FOR_EACH(i, obj->subObjects) {
+    sg_object_update(ARRAY_ELEM(obj->subObjects, i));
+  }
 }
 
 
@@ -434,6 +469,9 @@ sg_new_object(sg_shader_t *shader)
   memset(obj, 0, sizeof(sg_object_t));
   obj->shader = shader;
   obj_array_init(&obj->subObjects);
+  obj->q = q_rot(1.0, 0.0, 0.0, 0.0);
+  mf4_ident(obj->R);
+  mf4_ident(obj->modelViewMatrix);
 
   return obj;
 }
@@ -456,6 +494,9 @@ sg_new_object_with_geo(sg_shader_t *shader, int gl_primitive, size_t vertexCount
   memset(obj, 0, sizeof(sg_object_t));
   obj->shader = shader;
   obj_array_init(&obj->subObjects);
+  obj->q = q_rot(1.0, 0.0, 0.0, 0.0);
+  mf4_ident(obj->R);
+  mf4_ident(obj->modelViewMatrix);
 
   obj->geometry = sg_new_geometry(obj, gl_primitive,
                                   vertexCount, vertices, normals, texCoords,
@@ -466,6 +507,8 @@ sg_object_t*
 sg_load_object(const char *file, sg_shader_t *shader)
 {
   assert(file && "not null");
+  assert(shader && "not null");
+
   char *fullpath = ooResGetPath(file);
   sg_object_t *model = NULL;
 
@@ -549,7 +592,6 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
     }
     int_array_push(&indices, (i * 18) + 35);
   }
-
 
   sg_geometry_t *geo = sg_new_geometry(sphere, GL_TRIANGLE_STRIP, vert_count,
                                        verts.elems, normals.elems, texc.elems,

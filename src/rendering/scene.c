@@ -23,6 +23,7 @@
 #include "rendering/camera.h"
 #include "rendering/object.h"
 #include "palloc.h"
+#include "log.h"
 
 struct sg_scene_t {
   char *name;
@@ -73,19 +74,36 @@ sg_scene_set_amb4f(sg_scene_t *sc, float r, float g, float b, float a)
 }
 
 void
+sg_scene_update(sg_scene_t *scene)
+{
+  sg_camera_update_constraints(scene->cam);
+  sg_camera_update_modelview(scene->cam);
+
+  ooLogInfo("scene update\n");
+  ARRAY_FOR_EACH(i, scene->objects) {
+    sg_object_update(ARRAY_ELEM(scene->objects, i));
+  }
+}
+
+void
 sg_scene_draw(sg_scene_t *scene, float dt)
 {
   SG_CHECK_ERROR;
-  sg_camera_animate(scene->cam, dt);
+  sg_camera_step(scene->cam, dt);
+
+  sg_camera_update_modelview(scene->cam);
   sg_background_draw(scene->bg);
-  //sgMoveCam(scene->cam);
+  //sg_camera_move(scene->cam);
 
 #if 0
+  ooLogInfo("==== Draw %d Objects ====", ARRAY_LEN(scene->objects));
+
   ARRAY_FOR_EACH(i, scene->objects) {
-    sgRecomputeModelViewMatrix(ARRAY_ELEM(scene->objects, i));
+    //sgRecomputeModelViewMatrix(ARRAY_ELEM(scene->objects, i));
     sg_object_animate(ARRAY_ELEM(scene->objects, i), dt);
     sg_object_draw(ARRAY_ELEM(scene->objects, i));
   }
+  ooLogInfo("========================");
 #endif
   SG_CHECK_ERROR;
 }

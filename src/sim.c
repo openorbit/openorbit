@@ -81,7 +81,8 @@ sim_init_graphics(void)
 
   sg_background_t *sky = sgCreateBackgroundFromFile("data/stars.csv");
   sg_scene_set_bg(scene, sky);
-  sg_camera_t *cam = sg_new_free_camera(NULL);
+
+  sg_camera_t *cam = sg_new_camera();
   sg_scene_set_cam(scene, cam);
 
 }
@@ -131,7 +132,9 @@ sim_init(void)
                       0.0 /*latitude*/,
                       250.0e3 /*altitude*/);
   simSetSpacecraft(sc);
-
+  sg_camera_t *cam = sg_scene_get_cam(sc->scene);
+  sim_stage_t *stage = ARRAY_ELEM(sc->stages, 0);
+  sg_camera_track_object(cam, stage->sgobj);
 
   simMfdInitAll(sim_get_main_viewport());
 
@@ -205,6 +208,9 @@ ooSimStep(float dt)
   simDispatchPendingEvents();
 
   plWorldStep(gSIM_state.world, dt);
+
+  ooLogInfo("sim step");
+  sg_scene_update(sim_get_scene());
 }
 
 void
