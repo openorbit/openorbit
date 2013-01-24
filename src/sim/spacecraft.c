@@ -43,6 +43,44 @@ typedef struct {
 
 //static hashtable_t *gSpacecraftClasses;
 
+sim_spacecraft_t*
+sim_new_spacecraft(const char *class_name, const char *sc_name)
+{
+  sim_class_t *cls = sim_class_get(class_name);
+  sim_spacecraft_t *sc = cls->alloc(cls);
+
+  InitScArgs args = {sc_name};
+  cls->init(cls, sc, &args);
+
+}
+
+sim_stage_t*
+sim_new_stage(sim_spacecraft_t *sc, const char *name, const char *mesh)
+{
+  sim_stage_t *stage = smalloc(sizeof(sim_stage_t));
+
+  stage->state = OO_Stage_Idle;
+  stage->sc = sc;
+  stage->expendedMass = 0.0;
+  stage->rec = simPubsubMakeRecord(sc->rec, name);
+
+  obj_array_init(&stage->engines);
+  obj_array_init(&stage->actuatorGroups);
+  obj_array_init(&stage->payload);
+
+  stage->obj = plSubObject3f(sc->world, sc->obj, name, 0.0, 0.0, 0.0);
+
+  obj_array_push(&sc->stages, stage);
+
+  // Load stage model
+  sg_object_t *model = sg_load_object(mesh, sg_get_shader("spacecraft"));
+  stage->sgobj = model;
+  sg_scene_t *scene = sc->scene; // TODO: FIX
+  sg_scene_add_object(scene, model);
+
+  return stage;
+}
+
 #if 0
 void
 simNewSpacecraftClass(const char *name, sim_spacecraft_t *(*alloc)(void),
@@ -300,7 +338,7 @@ ooScSetStageMesh(sim_stage_t *stage, sg_object_t *mesh)
 {
   assert(stage != NULL);
   assert(mesh != NULL);
-  //stage->obj->drawable = mesh;
+  stage->sgobj = mesh;
 }
 
 void
@@ -381,6 +419,7 @@ simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
   ooScSetStageMesh(stage, model);
   sg_scene_t *scene = sc->scene; // TODO: FIX
   sg_scene_add_object(scene, model);
+  sg_object_set_rigid_body(model, stage->obj);
 
   return stage;
 }

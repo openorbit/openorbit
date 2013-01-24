@@ -69,11 +69,14 @@ struct sim_stage_t {
   float3 pos;
   float expendedMass;
   sim_stage_state_t state;
+
   PLobject *obj; // Mass and inertia tensor of stage, unit is kg
                  //  obj_array_t actuators;
   obj_array_t engines;
   obj_array_t actuatorGroups;
   obj_array_t payload;
+
+  sg_object_t *sgobj;
 };
 
 typedef void (*OOscstepfunc)(sim_spacecraft_t*, double dt);
@@ -137,6 +140,7 @@ struct sim_spacecraft_t {
   float expendedMass;
 
   sg_scene_t *scene;
+  sg_object_t *sgobj;
 };
 
 typedef struct {
