@@ -82,6 +82,7 @@ void q_m_convert(matrix_t *m, const quaternion_t q)
 
 void q_mf3_convert(float3x3 m, quaternion_t q);
 void q_mf4_convert(float4x4 m, quaternion_t q);
+void q_mf4_convert_inv(float4x4 m, quaternion_t q);
 
 /*!
  * \brief Converts a rotation matrix to a quaternion.

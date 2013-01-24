@@ -189,6 +189,30 @@ q_mf4_convert(float4x4 m, quaternion_t q)
 }
 
 
+void
+q_mf4_convert_inv(float4x4 m, quaternion_t q)
+{
+#if ! __has_feature(attribute_ext_vector_type)
+#error "clang extended vector attributes required"
+#endif
+
+  float n = q_dot(q, q);
+  float a = (n > 0.0f) ? 2.0f / n : 0.0f;
+
+  float xa = q.x*a, ya = q.y*a, za = q.z*a;
+  float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
+  float yy = q.y*ya, yz = q.y*za, zz = q.z*za;
+  float wx = q.w*xa, wy = q.w*ya, wz = q.w*za;
+
+  m[0] = vf4_set(1.0f-(yy+zz), xy+wz, xz-wy, 0.0f);
+  m[1] = vf4_set(xy-wz, 1.0f-(xx+zz), yz+wx, 0.0f);
+  m[2] = vf4_set(xz+wy, yz-wx, 1.0f-(xx+yy), 0.0f);
+  m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
+
+}
+
+
+
 quaternion_t
 m_q_convert(matrix_t *m)
 {
