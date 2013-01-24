@@ -107,6 +107,22 @@ lwc_normalise(lwcoord_t *coord)
 }
 
 void
+lwc_mul(lwcoord_t *lwc, float b)
+{
+  float3 p = lwc_global(lwc);
+  p = p * b;
+  lwc_set(lwc, p.x, p.y, p.z);
+}
+
+void
+lwc_div(lwcoord_t *lwc, float b)
+{
+  float3 p = lwc_global(lwc);
+  p = p / b;
+  lwc_set(lwc, p.x, p.y, p.z);
+}
+
+void
 lwc_dump(const lwcoord_t *lwc)
 {
   fprintf(stderr, "lwc: [%d %d %d]/[%f %f %f]\n",
