@@ -234,22 +234,23 @@ sg_object_t*
 ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
                   sg_shader_t *shader)
 {
-  bool has_warned_for_materials = false;
+  assert(ac3d != NULL);
   assert(obj != NULL);
+  assert(shader != NULL);
+
+  bool has_warned_for_materials = false;
+
   sg_object_t *model = sg_new_object(shader);
 
   // Transfer rotation matrix, but ensure it is transposed for GL
   // Note, no longer applicable for GL 3, we simply flag matrix uniforms as
   // needing transposition.
   float4x4 rot;
-  memset(rot, 0, sizeof(float4x4));
-  rot[3][3] = 1.0;
+  mf4_ident(rot);
 
   // Does not transpose anymore
   for (int i = 0 ; i < 3 ; ++ i) {
-    for (int j = 0 ; j < 3 ; ++ j) {
-      rot[i][j] = obj->rot[i][j];
-    }
+    rot[i] = vf3_set(obj->rot[i][0], obj->rot[i][1], obj->rot[i][2]);
   }
   sg_object_set_rot(model, &rot);
   sg_object_set_pos(model, vf3_set(obj->pos[0], obj->pos[1], obj->pos[2]));
@@ -257,7 +258,7 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
   // BUG: assume this object has the same material for all faces, this is not
   //      correct, and we should ensure that a face with its own material
   //      is placed in its own vertex array, for now this is most likelly OK
-  //      but we should address it ASAP.
+  //      but we should address it at some point.
 
   sg_material_t *mat = sg_new_material();
   sg_object_set_material(model, mat);
@@ -405,6 +406,11 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
     free(vertex_sharing[i].elems);
   }
 
+  float_array_dispose(&normals);
+  float_array_dispose(&vertices);
+  float_array_dispose(&texcoords);
+  float_array_dispose(&colours);
+
   for (int i = 0 ; i < obj->num_childs ; ++ i) {
     sg_object_add_child(model, ac3d_obj_to_model(ac3d, obj->children[i], shader));
   }
@@ -412,11 +418,6 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
   //  model->texture = (obj->texture) ? strdup(obj->texture) : NULL;
 
   //model->model = mod;
-
-  float_array_dispose(&normals);
-  float_array_dispose(&vertices);
-  float_array_dispose(&texcoords);
-  float_array_dispose(&colours);
 
   return model;
 }
