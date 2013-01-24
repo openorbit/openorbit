@@ -25,8 +25,11 @@
 #include "rendering/object.h"
 
 #include "physics/object.h"
-#include <stdlib.h>
 #include "palloc.h"
+
+#include <assert.h>
+#include <stdlib.h>
+
 
 struct sg_light_t {
   sg_scene_t *scene;
@@ -94,6 +97,9 @@ sg_light_set_poslw(sg_light_t *light, lwcoord_t *lwc)
   sg_scene_t *sc = light->scene;
   sg_camera_t *cam = sg_scene_get_cam(sc);
 
+  assert(0 && "not implemented");
+
+#if 0
   if (sg_camera_get_type(cam) == SG_CAMERA_FREE) {
     float3 relPos = lwc_relvec(lwc, sg_camera_free_get_lwc(cam).seg);
 
@@ -111,6 +117,7 @@ sg_light_set_poslw(sg_light_t *light, lwcoord_t *lwc)
     light->pos[2] = vf3_z(relPos);
     light->pos[3] = 1.0;
   }
+#endif
 }
 
 
