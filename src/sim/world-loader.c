@@ -30,6 +30,7 @@
 #include "rendering/material.h"
 #include "rendering/shader-manager.h"
 
+#include <jansson.h>
 
 /*
  NOTE: G is defined as 6.67428 e-11 (m^3)/kg/(s^2), let's call that G_m. In AU,
@@ -185,7 +186,9 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, sg_scene_t *sc)
     sg_object_set_shader_by_name(drawable, shader);
   }
 
-  plSetDrawable(moonSys->orbitalBody, drawable);
+  sg_object_set_rigid_body(drawable, &moonSys->orbitalBody->obj);
+
+  //plSetDrawable(moonSys->orbitalBody, drawable);
 }
 
 PLatmosphereTemplate*
@@ -360,7 +363,10 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
                              inc, longAscNode, longPerihel, meanLong, radius, flattening);
   sys->orbitalBody->atm = NULL; // Init as vaccuum
   if (atm) sys->orbitalBody->atm = plAtmosphere(1000.0, 100000.0, atm);
-  plSetDrawable(sys->orbitalBody, drawable);
+
+  sg_object_set_rigid_body(drawable, &sys->orbitalBody->obj);
+
+  // plSetDrawable(sys->orbitalBody, drawable);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sg_object_set_quat(drawable, q);
 
@@ -449,7 +455,9 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
                               siderealPeriod, axialTilt, radius, flattening);
   world->rootSys->orbitalBody->lightSource = starLightSource;
   world->rootSys->orbitalBody->atm = NULL; // Init as vaccuum
-  plSetDrawable(world->rootSys->orbitalBody, drawable);
+
+  sg_object_set_rigid_body(drawable, &world->rootSys->orbitalBody->obj);
+  //plSetDrawable(world->rootSys->orbitalBody, drawable);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
   sg_object_set_quat(drawable, q);
 
