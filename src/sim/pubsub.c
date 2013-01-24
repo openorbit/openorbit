@@ -177,7 +177,7 @@ simPubsubGetRecord(const char *path)
     comp_start = strtcpy(key, comp_start+1, '/', sizeof(key));
     rec = simGetRecordByName(rec, key);
     if (!rec) {
-      ooLogError("could not find '%s'", path);
+      ooLogTrace("could not find '%s'", path);
       return NULL;
     }
   }
@@ -222,13 +222,13 @@ simPubsubGetValue(const char *path)
     if (*comp_start) {
       rec = simGetRecordByName(rec, key);
       if (!rec) {
-        ooLogError("could not find '%s'", path);
+        ooLogTrace("could not find '%s'", path);
         return NULL;
       }
     } else {
       val = simGetValueByName(rec, key);
       if (!val) {
-        ooLogError("could not find '%s'", path);
+        ooLogTrace("could not find '%s'", path);
         return NULL;
       }
     }
