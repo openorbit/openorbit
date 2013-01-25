@@ -101,6 +101,8 @@ sg_scene_draw(sg_scene_t *scene, float dt)
   sg_camera_update_modelview(scene->cam);
   sg_background_draw(scene->bg);
 
+  glEnable(GL_DEPTH_TEST);
+
 #if 1
   ooLogInfo("==== Draw %d Objects ====", ARRAY_LEN(scene->objects));
 
