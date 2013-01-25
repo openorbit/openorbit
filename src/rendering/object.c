@@ -1,5 +1,5 @@
 /*
- Copyright 2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -63,8 +63,9 @@ struct sg_object_t {
   struct sg_object_t *parent;
   sg_scene_t *scene;
 
+  lwcoord_t lwc; // Global position
   PLobject *rigidBody;
-  float3 pos;
+  float3 pos; // Relative to camera
   float3 dp; // delta pos per time step
   float3 dr; // delta rot per time step
   quaternion_t q; // Quaternion
@@ -84,6 +85,18 @@ struct sg_object_t {
   sg_geometry_t *geometry;
   obj_array_t subObjects;
 };
+
+void
+sg_object_print(sg_object_t *obj)
+{
+  ooLogInfo("** object");
+
+  ooLogInfo("\tlwc: [%d %d %d] + [%f %f %f]",
+            obj->lwc.seg.x, obj->lwc.seg.y, obj->lwc.seg.z,
+            obj->lwc.offs.x, obj->lwc.offs.y, obj->lwc.offs.z);
+  ooLogInfo("\tpos: [%f %f %f]", obj->pos.x, obj->pos.y, obj->pos.z);
+  ooLogInfo("\tdp:  [%f %f %f]", obj->dp.x, obj->dp.y, obj->dp.z);
+}
 
 void
 sg_object_add_child(sg_object_t *obj, sg_object_t *child)
@@ -250,14 +263,30 @@ sgRecomputeModelViewMatrix(sg_object_t *obj)
 }
 
 void
+sg_object_camera_moved(sg_object_t *obj, float3 cam_dp)
+{
+  obj->pos -= cam_dp;
+}
+
+void
 sg_object_animate(sg_object_t *obj, float dt)
 {
   obj->q = q_normalise(q_vf3_rot(obj->q, obj->dr, dt));
   q_mf3_convert(obj->R, obj->q);
-  obj->pos += obj->dp;
 
-  mf4_make_translate(obj->modelViewMatrix, obj->pos);
+  lwc_translate3fv(&obj->lwc, obj->dp * dt);
+  obj->pos += obj->dp * dt;
+
+  if (obj->parent) {
+    mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+  } else {
+    mf4_cpy(obj->modelViewMatrix, *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+  }
+
+  float4x4 translate;
+  mf4_make_translate(translate, obj->pos);
   mf3_mul2(obj->modelViewMatrix, obj->R);
+  mf3_mul2(obj->modelViewMatrix, translate);
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_animate(ARRAY_ELEM(obj->subObjects, i), dt);
@@ -269,7 +298,6 @@ void
 sg_object_update(sg_object_t *obj)
 {
   if (obj->rigidBody) {
-    //obj->pos =
     obj->dp = plGetVel(obj->rigidBody);
     obj->dr = plGetAngularVel(obj->rigidBody);
     obj->q = plGetQuat(obj->rigidBody);
@@ -277,6 +305,9 @@ sg_object_update(sg_object_t *obj)
     // Update position, this is based on where the camera is
     sg_camera_t *cam = sg_scene_get_cam(obj->scene);
     lwcoord_t pos = sg_camera_pos(cam);
+
+    obj->lwc = obj->rigidBody->p;
+    obj->pos = lwc_dist(&obj->lwc, &pos);
   }
   q_mf3_convert(obj->R, obj->q);
 
@@ -303,6 +334,7 @@ sgCreateObject(sg_scene_t *scene)
   obj->parent = NULL;
   obj->scene = scene;
 
+  lwc_set(&obj->lwc, 0.0, 0.0, 0.0);
   obj->pos = vf3_set(0.0, 0.0, 0.0);
   obj->dp = vf3_set(0.0, 0.0, 0.0); // delta pos per time step
   obj->dr = vf3_set(0.0, 0.0, 0.0); // delta rot per time step
@@ -363,6 +395,18 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                 float *vertices, float *normals, float *texCoords,
                 size_t index_count, int *indices)
 {
+  float3 maxvert = vf3_set(0.0, 0.0, 0.0);
+  for (size_t i = 0 ; i < vertexCount ; i ++) {
+    float3 vert = { vertices[i*3+0], vertices[i*3+1], vertices[i*3+2]};
+    if (vf3_abs(vert) > vf3_abs(maxvert)) {
+      maxvert = vert;
+    }
+  }
+
+  ooLogInfo("geometry: |[%f %f %f]| = %f", maxvert.x, maxvert.y, maxvert.z,
+            vf3_abs(maxvert));
+
+
   SG_CHECK_ERROR;
 
   sg_geometry_t *geo = smalloc(sizeof(sg_geometry_t));
@@ -509,6 +553,8 @@ sg_load_object(const char *file, sg_shader_t *shader)
   assert(file && "not null");
   assert(shader && "not null");
 
+  ooLogInfo("load object '%s'", file);
+
   char *fullpath = ooResGetPath(file);
   sg_object_t *model = NULL;
 
@@ -538,6 +584,7 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
               sg_texture_t *tex, sg_texture_t *nightTex, sg_texture_t *spec,
               sg_material_t *mat)
 {
+  ooLogInfo("sphere '%s' radius: %f", name, radius);
   // NOTE: Z points upwards
   sg_object_t *sphere = sg_new_object(shader);
   float_array_t verts, texc, normals;

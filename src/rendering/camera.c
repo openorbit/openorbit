@@ -37,11 +37,12 @@
 
 
 struct sg_camera_t {
+  sg_scene_t *scene;
   float4x4 proj_matrix;
   float4x4 view_matrix;
 
   lwcoord_t p;        // Actual pos of camera (lwc + lwc_offset)
-  lwcoord_t lwc;      // Pos of camera, may be constrained by src object
+  lwcoord_t lwc;      // Pos of camera source, may be constrained by src object
   float3 lwc_offset;  // Offset from target lwc (this is the thing moving)
 
   float3 dp;          // Velocity
@@ -98,6 +99,14 @@ sg_camera_step(sg_camera_t * cam, float dt)
   cam->lwc_offset += cam->dp * dt;
   cam->p = cam->lwc;
   lwc_translate3fv(&cam->p, cam->lwc_offset);
+  sg_scene_camera_moved(cam->scene, cam->dp * dt);
+
+  if ((cam->src == cam->tgt) && cam->src) {
+    // Orbiting object, this means that we do not rotate the rq quat, but move
+    // and ensure that the new tq points at the target
+
+  }
+
 
   quaternion_t q = q_s_mul(cam->dq, dt);
   cam->rq = q_normalise(q_mul(q, cam->rq));
@@ -113,6 +122,7 @@ sg_camera_update_constraints(sg_camera_t *cam)
     sg_object_get_lwc(cam->src, &cam->lwc);
     cam->p = cam->lwc;
     lwc_translate3fv(&cam->p, cam->lwc_offset);
+    cam->dp = sg_object_get_vel(cam->src);
   }
 
   // Are we pointing somewhere, if so we need to get the target vector
@@ -124,7 +134,6 @@ sg_camera_update_constraints(sg_camera_t *cam)
     cam->tq = q_rotv(dir, 0.0);
     cam->aq = q_normalise(q_mul(cam->rq, cam->tq));
   } else if (cam->src) {
-
     // We are pointing relative to follow object
     cam->tq = sg_object_get_quat(cam->src);
     cam->aq = q_normalise(q_mul(cam->rq, cam->tq));
@@ -133,7 +142,7 @@ sg_camera_update_constraints(sg_camera_t *cam)
 }
 
 sg_camera_t*
-sg_new_camera(void)
+sg_new_camera(sg_scene_t *scene)
 {
   sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
 
@@ -142,9 +151,13 @@ sg_new_camera(void)
   cam->tq = q_rot(0.0, 0.0, 1.0, 0.0);
   cam->aq = q_rot(0.0, 0.0, 1.0, 0.0);
 
-
   mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
   sg_camera_update_modelview(cam);
+
+  cam->scene = scene;
+  if (scene) {
+    sg_scene_set_cam(scene, cam);
+  }
 
   return cam;
 }
@@ -166,31 +179,22 @@ sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj)
 }
 
 void
+sg_camera_set_follow_offset(sg_camera_t *cam, float3 offs)
+{
+  if (cam->src) {
+    cam->lwc_offset = offs;
+  }
+}
+
+
+void
 sg_camera_set_perspective(sg_camera_t *cam, float perspective)
 {
-  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), perspective, 0.1, 1000000000000.0);
+  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), perspective,
+                  0.1, 1000000000000.0);
 }
 
 /* Camera actions, registered as action handlers */
-
-void sg_camera_rotate_hat(int state, void *data);
-
-struct str_action_triplet {
-  const char *confKey;
-  const char *ioKey;
-  IObuttonhandlerfunc action;
-};
-
-MODULE_INIT(camera, "iomanager", NULL) {
-  ooLogTrace("initialising 'camera' module");
-  const char *key;
-  static const struct str_action_triplet keyBindings[] = {
-    {"openorbit/controls/hat/cam-rotate", "cam-rotate", sg_camera_rotate_hat},
-  };
-
-  ioRegActionHandler(keyBindings[0].ioKey, keyBindings[0].action,
-                     IO_BUTTON_HAT, NULL);
-}
 
 
 // TODO: Cleanup, move camera rotate io handler to sim module
@@ -203,12 +207,22 @@ sg_camera_rotate_hat(int buttonVal, void *data)
   sg_scene_t *sc = sim_get_scene();
   sg_camera_t *cam = sg_scene_get_cam(sc);
 
-  if (buttonVal == -1) {
+  if ((cam->src == cam->tgt) && cam->src) {
+    // We are targeting our follow object this means orbiting it
+    if (buttonVal == -1) {
       cam->dq = q_rot(0.0, 0.0, 1.0, 0.0);
     } else {
       cam->dq = q_rot(cosf(DEG_TO_RAD(buttonVal)),
                       sinf(DEG_TO_RAD(buttonVal)), 0.0, 0.1);
     }
+  } else {
+    if (buttonVal == -1) {
+      cam->dq = q_rot(0.0, 0.0, 1.0, 0.0);
+    } else {
+      cam->dq = q_rot(cosf(DEG_TO_RAD(buttonVal)),
+                      sinf(DEG_TO_RAD(buttonVal)), 0.0, 0.1);
+    }
+  }
 }
 
 // TODO: Should move to sim part, where we will keep all the io stuff

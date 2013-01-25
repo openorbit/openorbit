@@ -32,6 +32,8 @@ void sg_scene_set_bg(sg_scene_t *sc, sg_background_t *bg);
 
 void sg_scene_set_cam(sg_scene_t *sc, sg_camera_t *cam);
 sg_camera_t* sg_scene_get_cam(sg_scene_t *sc);
+void sg_scene_camera_moved(sg_scene_t *scene, float3 cam_dp);
+
 
 void sg_scene_add_object(sg_scene_t *sc, sg_object_t *obj);
 void sg_scene_add_light(sg_scene_t *sc, sg_light_t *light);

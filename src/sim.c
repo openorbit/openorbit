@@ -82,9 +82,7 @@ sim_init_graphics(void)
   sg_background_t *sky = sgCreateBackgroundFromFile("data/stars.csv");
   sg_scene_set_bg(scene, sky);
 
-  sg_camera_t *cam = sg_new_camera();
-  sg_scene_set_cam(scene, cam);
-
+  sg_camera_t *cam = sg_new_camera(scene);
 }
 
 void
@@ -135,6 +133,8 @@ sim_init(void)
   sg_camera_t *cam = sg_scene_get_cam(sc->scene);
   sim_stage_t *stage = ARRAY_ELEM(sc->stages, 0);
   sg_camera_track_object(cam, stage->sgobj);
+  sg_camera_follow_object(cam, stage->sgobj);
+  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -100.0));
 
   simMfdInitAll(sim_get_main_viewport());
 

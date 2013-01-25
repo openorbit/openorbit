@@ -28,7 +28,7 @@ extern "C" {
 #include <vmath/lwcoord.h>
 #include "rendering/types.h"
 
-  sg_camera_t* sg_new_camera(void);
+  sg_camera_t* sg_new_camera(sg_scene_t *scene);
   lwcoord_t sg_camera_pos(sg_camera_t *cam);
   quaternion_t sg_camera_quat(sg_camera_t *cam);
   const float4x4* sg_camera_project(sg_camera_t *cam);
@@ -40,6 +40,7 @@ extern "C" {
 
   void sg_camera_update_constraints(sg_camera_t *cam);
   void sg_camera_update_modelview(sg_camera_t *cam);
+  void sg_camera_set_follow_offset(sg_camera_t *cam, float3 offs);
 
   void sg_camera_step(sg_camera_t * cam, float dt);
 

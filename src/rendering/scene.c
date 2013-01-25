@@ -86,6 +86,13 @@ sg_scene_update(sg_scene_t *scene)
 }
 
 void
+sg_scene_camera_moved(sg_scene_t *scene, float3 cam_dp)
+{
+  ARRAY_FOR_EACH(i, scene->objects) {
+    sg_object_camera_moved(ARRAY_ELEM(scene->objects, i), cam_dp);
+  }
+}
+void
 sg_scene_draw(sg_scene_t *scene, float dt)
 {
   SG_CHECK_ERROR;
@@ -93,15 +100,15 @@ sg_scene_draw(sg_scene_t *scene, float dt)
 
   sg_camera_update_modelview(scene->cam);
   sg_background_draw(scene->bg);
-  //sg_camera_move(scene->cam);
 
-#if 0
+#if 1
   ooLogInfo("==== Draw %d Objects ====", ARRAY_LEN(scene->objects));
 
   ARRAY_FOR_EACH(i, scene->objects) {
     //sgRecomputeModelViewMatrix(ARRAY_ELEM(scene->objects, i));
     sg_object_animate(ARRAY_ELEM(scene->objects, i), dt);
     sg_object_draw(ARRAY_ELEM(scene->objects, i));
+    sg_object_print(ARRAY_ELEM(scene->objects, i));
   }
   ooLogInfo("========================");
 #endif
