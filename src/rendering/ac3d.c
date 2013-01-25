@@ -29,6 +29,7 @@
 #include <vmath/vmath-convert.h>
 #include "rendering/object.h"
 #include "palloc.h"
+#include "log.h"
 
 #define BUFF_SIZE 1024
 
@@ -600,7 +601,7 @@ ac3d_load(const char *path, sg_shader_t *shader)
   }
 
   if (ferror(fp)) {
-    fprintf(fp, "error reading file '%s'\n", path);
+    ooLogError("error reading file '%s'\n", path);
     fclose(fp);
     ac3d_delete(ac3d);
     return NULL;
@@ -613,6 +614,7 @@ ac3d_load(const char *path, sg_shader_t *shader)
 error:
   fclose(fp);
   ac3d_delete(ac3d);
+  ooLogError("ac3d load failed");
 
   return NULL;
 }
