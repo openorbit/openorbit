@@ -285,8 +285,8 @@ sg_object_animate(sg_object_t *obj, float dt)
 
   float4x4 translate;
   mf4_make_translate(translate, obj->pos);
-  mf3_mul2(obj->modelViewMatrix, obj->R);
-  mf3_mul2(obj->modelViewMatrix, translate);
+  mf4_mul2(obj->modelViewMatrix, obj->R);
+  mf4_mul2(obj->modelViewMatrix, translate);
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_animate(ARRAY_ELEM(obj->subObjects, i), dt);
@@ -312,11 +312,15 @@ sg_object_update(sg_object_t *obj)
   q_mf3_convert(obj->R, obj->q);
 
   if (obj->parent) {
-    mf3_mul2(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+    mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
   } else {
-    mf4_make_translate(obj->modelViewMatrix, obj->pos);
+    mf4_cpy(obj->modelViewMatrix, *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
   }
-  mf3_mul2(obj->modelViewMatrix, obj->R);
+
+  float4x4 translate;
+  mf4_make_translate(translate, obj->pos);
+  mf4_mul2(obj->modelViewMatrix, obj->R);
+  mf4_mul2(obj->modelViewMatrix, translate);
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_update(ARRAY_ELEM(obj->subObjects, i));
