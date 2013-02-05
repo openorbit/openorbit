@@ -35,6 +35,8 @@ simNewTank(sim_stage_t *stage, const char *tankName, float p, float v, float t)
   SIM_VAL(tank->pressure) = p;
   SIM_VAL(tank->volume) = v;
   SIM_VAL(tank->pressure) = p;
+
+  return tank;
 }
 
 void

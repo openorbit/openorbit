@@ -27,6 +27,7 @@ ui_new_console(void)
   ui_console_t *console = smalloc(sizeof(ui_console_t));
   console->bottom = NULL;
   console->commands = hashtable_new_with_str_keys(1024);
+  return console;
 }
 
 
