@@ -117,6 +117,7 @@ mfdToggle(int state, void *data)
 {
   if (state) {
     SIMmfd *mfd = data;
+    (void)mfd; // TODO
     //mfd->super.enabled = !mfd->super.enabled;
   }
 }
@@ -167,17 +168,19 @@ test_hud_draw(sg_overlay_t *overlay, void *obj)
 
   SIMhud *hud = (SIMhud*)obj;
 
+  // TODO
   sim_spacecraft_t *sc = simGetSpacecraft();
-  float3 gv = simGetGravityVector(sc);
+  //float3 gv = simGetGravityVector(sc);
+
   //quaternion_t q = simGetQuaternion(sc);
   const float3x3 *R = simGetRotMat(sc);
   float3x3 R_inv;
   mf3_transpose2(R_inv, *R); // Invert rotation matrix, we need this to
                              // transform the vectors into view relative values
-  float3 v = simGetVelocityVector(sc);
-  float3 as = simGetAirspeedVector(sc);
-  float3 p = simGetRelPos(sc);
-  float3 rv = simGetRelVel(sc);
+  //float3 v = simGetVelocityVector(sc);
+  //float3 as = simGetAirspeedVector(sc);
+  //float3 p = simGetRelPos(sc);
+  //float3 rv = simGetRelVel(sc);
 
   //float3 v_view = mf3_v_mul(R_inv, v);
   //float3 g_view = mf3_v_mul(R_inv, gv);

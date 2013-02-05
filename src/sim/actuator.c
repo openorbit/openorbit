@@ -90,7 +90,7 @@ void
 liquid_rocket_step(SIMengine *engine, float dt)
 {
   SIMliquidrocketengine *lrocket = (SIMliquidrocketengine*)engine;
-
+  (void)lrocket; // TODO
   //  plForceRelativePos3fv(lrocket->super.stage->sc->obj,
   //                      lrocket->fMax * lrocket->super.throttle,
   //                      lrocket->super.pos);
@@ -124,7 +124,7 @@ void
 jet_step(SIMengine *engine, float dt)
 {
   SIMjetengine *jet = (SIMjetengine*)engine;
-
+  (void)jet; // TODO
 }
 
 void
@@ -140,6 +140,7 @@ void
 turboprop_step(SIMengine *engine, float dt)
 {
   SIMturbopropengine *tprop = (SIMturbopropengine*)engine;
+  (void)tprop; // TODO
 }
 
 

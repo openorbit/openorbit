@@ -414,7 +414,6 @@ m_inv(const matrix_t *M)
     matrix_t M_inv;
 
     if (det != S_CONST(0.0)) {
-        float sign = S_CONST(1.0);
         for (int i = 0 ; i < 4 ; i ++) {
             for (int j = 0 ; j < 4 ; j ++) {
                 MAT_ELEM(M_inv, i, j) = MAT_ELEM(M_adj, i, j) / det;
@@ -767,7 +766,6 @@ mf3_inv1(float3x3 mat)
   float det = mf3_det(mat);
   float3 reprDetVec = vf3_repr(vf3_set(det, det, det));
   float3x3 M_adj;
-  float3x3 M_inv;
 
   mf3_adj(M_adj, mat);
 

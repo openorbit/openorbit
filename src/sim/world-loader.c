@@ -95,7 +95,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, sg_scene_t *sc)
   sg_material_init(mat);
 
   double flattening = 0.0;
-  HRMLobject *sats = NULL;
+  //HRMLobject *sats = NULL;
 
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
     if (!strcmp(child->name, "physical")) {
@@ -265,7 +265,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
   PLatmosphereTemplate *atm = NULL;
   double mass, radius, siderealPeriod, axialTilt = 0.0, gm = NAN;
   double semiMajor = NAN, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
-  double pressure = 0.0, scale_height = 1.0;
+  //double pressure = 0.0, scale_height = 1.0; //TODO
   const char *tex = NULL;
   const char *shader = NULL;
   const char *spec = NULL;

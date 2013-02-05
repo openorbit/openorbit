@@ -19,7 +19,7 @@
 
 #import "OOOpenGLView.h"
 
-#import <OpenGL/OpenGL.h>
+//#import <OpenGL/OpenGL.h>
 #import <OpenGL/gl3.h>
 
 #import "rendering/window.h"
@@ -195,7 +195,7 @@ static io_keycode_t keymap [256] = {
 {
   init_sim(0, NULL);
 
-  extern SIMstate gSIM_state;
+  //extern SIMstate gSIM_state;
   float freq;
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s

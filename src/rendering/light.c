@@ -96,7 +96,7 @@ sg_light_set_poslw(sg_light_t *light, lwcoord_t *lwc)
 {
   sg_scene_t *sc = light->scene;
   sg_camera_t *cam = sg_scene_get_cam(sc);
-
+  (void)cam; // TODO
   assert(0 && "not implemented");
 
 #if 0

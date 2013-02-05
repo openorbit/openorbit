@@ -301,12 +301,12 @@ float3
 plComputeLift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil)
 {
   //float3 vel = plComputeAirvelocity(obj);
-  float speed = plComputeAirspeed(obj);
+  //float speed = plComputeAirspeed(obj);
 
   // TODO: Compute alpha from rotation and velocity, obviously this should
   //       somehow be adjusted for beta and gamma, but we skip that for now.
-  float alpha = 0.0f;
-  float CL = foil->Ct0 + 2.0f * M_PI * alpha;
+  //float alpha = 0.0f;
+  //float CL = foil->Ct0 + 2.0f * M_PI * alpha;
 
   //float lift = 0.5f * plComputeAirdensity(obj) * speed * speed * foil->area * CL;
 

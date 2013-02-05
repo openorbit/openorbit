@@ -287,6 +287,7 @@ int readTriangles(int fd, size_t maxBytes)
     case MESH_COLOR:
     {
       uint16_t color_index = readU16(fd);
+      (void)color_index; // TODO
       assert(chnk.chunkSize == CHUNK_HDR_SIZE + 2);
       fprintf(stderr, "...mesh colour index\n");
     }
@@ -294,11 +295,17 @@ int readTriangles(int fd, size_t maxBytes)
     case MESH_TEXTURE_INFO:
     {
       uint16_t map_type = readU16(fd);
+      (void)map_type; // TODO
       float x_tiling = readFloat(fd);
+      (void)x_tiling; // TODO
       float y_tiling = readFloat(fd);
+      (void)y_tiling; // TODO
       float icon_x = readFloat(fd);
+      (void)icon_x; // TODO
       float icon_y = readFloat(fd);
+      (void)icon_y; // TODO
       float icon_z = readFloat(fd);
+      (void)icon_z; // TODO
       float matrix[4][3];
       for (int i = 0 ; i < 4; i ++) {
         for (int j = 0 ; j < 3 ; j ++) {
@@ -307,9 +314,14 @@ int readTriangles(int fd, size_t maxBytes)
       }
 
       float scaling = readFloat(fd);
+      (void)scaling; // TODO
       float plan_icon_w = readFloat(fd);
+      (void)plan_icon_w; // TODO
       float plan_icon_h = readFloat(fd);
+      (void)plan_icon_h; // TODO
       float cyl_icon_h = readFloat(fd);
+      (void)cyl_icon_h; // TODO
+
       assert(chnk.chunkSize == CHUNK_HDR_SIZE + 2 + 5 * 4 + 4 * 3 * 4 + 4 * 4);
 
       fprintf(stderr, "...mesh texture info\n");

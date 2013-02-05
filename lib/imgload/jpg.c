@@ -53,7 +53,6 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;
   FILE * infile;  /* source file */
-  JSAMPARRAY buffer;  /* Output row buffer */
 
   if ((infile = fopen(filename, "rb")) == NULL) {
     ooLogError("can't open %s\n", filename);

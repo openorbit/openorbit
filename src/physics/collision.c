@@ -147,11 +147,12 @@ plCheckCollissions(PLrecgrid *grid)
 
   for (int i = 0 ; i < grid->objs.length ; ++i) {
     PLobject *obj_a = grid->objs.elems[i];
+    (void) obj_a; // TODO
 
     // Check against local objects
     for (int j = i ; j < grid->objs.length ; ++j) {
       PLobject *obj_b = grid->objs.elems[j];
-
+      (void) obj_b; // TODO
     }
 
     // Check against parent objects
@@ -160,7 +161,7 @@ plCheckCollissions(PLrecgrid *grid)
       // Check against local objects
       for (int j = 0 ; j < higher_grid->objs.length ; ++j) {
         PLobject *obj_b = higher_grid->objs.elems[j];
-
+        (void) obj_b; // TODO
       }
 
       higher_grid = higher_grid->parent;

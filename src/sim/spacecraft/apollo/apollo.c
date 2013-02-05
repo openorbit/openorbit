@@ -99,11 +99,12 @@ AxisUpdate(sim_spacecraft_t *sc)
     case APOLLO_SERVICE: {
       sim_stage_t *apollo_service = sc->stages.elems[APOLLO_SERVICE];
       SIMengine *eng = ARRAY_ELEM(apollo_service->engines, ENG_SERV_PROP);
-
+      (void)eng; // TODO
       break;
     }
     case APOLLO_COMMAND: {
       sim_stage_t *apollo_cmd = sc->stages.elems[APOLLO_COMMAND];
+      (void)apollo_cmd; // TODO
       break;
     }
     default:
@@ -174,22 +175,27 @@ MainEngineToggle(sim_spacecraft_t *sc)
   switch (sc->detatchSequence) {
     case SATURN_1C: {
       sim_stage_t *sat_1c = sc->stages.elems[SATURN_1C];
+      (void)sat_1c; // TODO
       break;
     }
     case SATURN_II: {
       sim_stage_t *sat_ii = sc->stages.elems[SATURN_II];
+      (void)sat_ii; // TODO
       break;
     }
     case SATURN_IVB: {
       sim_stage_t *sat_ivb = sc->stages.elems[SATURN_IVB];
+      (void)sat_ivb; // TODO
       break;
     }
     case APOLLO_SERVICE: {
       sim_stage_t *apollo_serv = sc->stages.elems[APOLLO_SERVICE];
+      (void)apollo_serv; // TODO
       break;
     }
     case APOLLO_COMMAND: {
       sim_stage_t *apollo_cmd = sc->stages.elems[APOLLO_COMMAND];
+      (void)apollo_cmd; // TODO
       break;
     }
     default:
@@ -218,13 +224,13 @@ ApolloInit(sim_spacecraft_t *sc)
 
   sim_stage_t *sat_1c = simNewStage(sc, "Saturn 1C",
                                 "spacecrafts/saturn/saturn_1c.ac");
-  sim_stage_t *sat_ii = simNewStage(sc, "Saturn II",
+  /*sim_stage_t *sat_ii =*/ simNewStage(sc, "Saturn II",
                                 "spacecrafts/saturn/saturn_ii.ac");
-  sim_stage_t *sat_ivb = simNewStage(sc, "Saturn IVB",
+  /*sim_stage_t *sat_ivb =*/ simNewStage(sc, "Saturn IVB",
                                  "spacecrafts/saturn/saturn_ivb.ac");
-  sim_stage_t *apollo_serv = simNewStage(sc, "Service Module",
+  /*sim_stage_t *apollo_serv =*/ simNewStage(sc, "Service Module",
                                      "spacecrafts/saturn/apollo_serv.ac");
-  sim_stage_t *apollo_cmd = simNewStage(sc, "Command Module",
+  /*sim_stage_t *apollo_cmd =*/ simNewStage(sc, "Command Module",
                                     "spacecrafts/saturn/apollo_cmd.ac");
 
 
@@ -265,5 +271,5 @@ MODULE_INIT(apollo, "spacecraft", NULL)
   ooLogTrace("initialising 'apollo' module");
   sim_class_t *cls = sim_register_class("Spacecraft", "Apollo",
                                         ApolloInit2, sizeof(sim_spacecraft_t));
-
+  (void)cls; // TODO
 }

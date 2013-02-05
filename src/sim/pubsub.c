@@ -570,12 +570,13 @@ simPubsubGetVal(sim_value_t *ref, sim_type_id_t type_id, void *val)
 
 #include <jansson.h>
 // JSON validation codes
-static const char *mat4x4_str = "[FFFF, FFFF, FFFF, FFFF!]";
-static const char *mat3x3_str = "[FFF, FFF, FFF!]";
-static const char *float4_str = "[FFFF!]";
-static const char *float3_str = "[FFF!]";
-static const char *float_str = "F";
-static const char *int_str = "I";
+// TODO
+//static const char *mat4x4_str = "[FFFF, FFFF, FFFF, FFFF!]";
+//static const char *mat3x3_str = "[FFF, FFF, FFF!]";
+//static const char *float4_str = "[FFFF!]";
+//static const char *float3_str = "[FFF!]";
+//static const char *float_str = "F";
+//static const char *int_str = "I";
 
 void
 simPackPubSubDB(void)

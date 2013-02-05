@@ -30,10 +30,7 @@
 #include "settings.h"
 #include "palloc.h"
 
-static const char * gIoSdlMouseStringMap[7];
 static hashtable_t *gIoButtonHandlers; // of type OObuttonhandler
-
-static hashtable_t *gIoAxisHandlers; // of type OOaxishandler
 
 
 #define SPEC_KEY_COUNT 8/* shft, cmd, ctrl, alt (left and right) */

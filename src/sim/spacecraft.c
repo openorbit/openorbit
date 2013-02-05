@@ -51,7 +51,7 @@ sim_new_spacecraft(const char *class_name, const char *sc_name)
 
   InitScArgs args = {sc_name};
   cls->init(cls, sc, &args);
-
+  return sc;
 }
 
 sim_stage_t*
@@ -362,11 +362,12 @@ ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt) {
   assert(axises != NULL);
 
   // Handle for all actuators call actuator handlers
-  const static char * axisKeys[] = {
-    "main-throttle",
-    "vertical-throttle", "horizontal-throttle", "distance-throttle",
-    "pitch", "roll", "yaw"
-  };
+  // FIXME
+  //const static char * axisKeys[] = {
+  //  "main-throttle",
+  //  "vertical-throttle", "horizontal-throttle", "distance-throttle",
+  //  "pitch", "roll", "yaw"
+  //};
   stage->expendedMass = 0.0f;
 
   for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
@@ -443,7 +444,7 @@ ooScSetScene(sim_spacecraft_t *spacecraft, sg_scene_t *scene)
 {
   for (int i = 0 ; i < spacecraft->stages.length ; ++i) {
     sim_stage_t *stage = spacecraft->stages.elems[i];
-
+    (void)stage;
     // TODO: Fixme
     //if (stage->state != OO_Stage_Detatched) {
     //  sg_scene_add_object(scene, stage->);
@@ -682,6 +683,7 @@ InitStage(sim_class_t *cls, void *obj, void *arg)
 {
   SIM_SUPER_INIT(cls, obj, arg);
   sim_stage_t *stage = obj;
+  (void)stage; // TODO
 }
 
 

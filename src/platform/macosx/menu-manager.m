@@ -110,14 +110,15 @@ print_foo(void)
 void
 menu_init(void)
 {
+  // TODO
   menu_t *spacecraftMenu = menu_new(NULL, "Spacecraft", NULL);
   NSLog(@"%p", spacecraftMenu);
-  menu_t *test = menu_new(spacecraftMenu, "Test Menu Item", print_foo);
+  /*menu_t *test =*/ menu_new(spacecraftMenu, "Test Menu Item", print_foo);
   menu_t *scenarioMenu = menu_new(NULL, "Scenario", NULL);
   NSLog(@"%p", scenarioMenu);
   menu_t *viewMenu = menu_get("View");
   NSLog(@"%p", viewMenu);
-  menu_t *test2 = menu_new(viewMenu, "Test Menu Item", print_foo);
+  /*menu_t *test2 =*/ menu_new(viewMenu, "Test Menu Item", print_foo);
   
 }
 

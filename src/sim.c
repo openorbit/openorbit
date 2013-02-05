@@ -83,6 +83,7 @@ sim_init_graphics(void)
   sg_scene_set_bg(scene, sky);
 
   sg_camera_t *cam = sg_new_camera(scene);
+  (void)cam; // TODO
 }
 
 void
