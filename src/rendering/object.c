@@ -44,15 +44,15 @@
 struct sg_geometry_t {
   sg_object_t *obj;
   int gl_primitive_type;
-  int vertexCount;
+  int vertex_count;
 
   GLuint vba;
   GLuint vbo;
 
-  bool hasNormals;
-  bool hasTexCoords;
-  GLsizei normalOffset;
-  GLsizei texCoordOffset;
+  bool has_normals;
+  bool has_tex_coords;
+  GLsizei normal_offset;
+  GLsizei tex_coord_offset;
 
   bool has_indices;
   GLenum index_type;
@@ -195,16 +195,18 @@ sg_geometry_draw(sg_geometry_t *geo)
   //glEnableVertexAttribArray(geo->vba);
   //SG_CHECK_ERROR;
 
-  if (geo->hasIndices) {
-    //ooLogInfo("draw %d vertices", (int)geo->index_count);
-    glDrawElements(geo->gl_primitive_type, geo->index_count, GL_UNSIGNED_INT, 0);
+  if (geo->has_indices) {
+    ooLogInfo("draw %d vertices", (int)geo->index_count);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geo->ibo);
+    glDrawElements(geo->gl_primitive_type, geo->index_count, geo->index_type, 0);
   } else {
-    glDrawArrays(geo->gl_primitive_type, 0, geo->vertexCount);
+    glDrawArrays(geo->gl_primitive_type, 0, geo->vertex_count);
     SG_CHECK_ERROR;
   }
   //???  glDisableVertexAttribArray(geo->vba);
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
   SG_CHECK_ERROR;
 }
 
@@ -423,8 +425,8 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   memset(geo, 0, sizeof(sg_geometry_t));
   obj->geometry = geo;
   geo->gl_primitive_type = gl_primitive;
-  if (normals) geo->hasNormals = true;
-  if (texCoords) geo->hasTexCoords = true;
+  if (normals) geo->has_normals = true;
+  if (texCoords) geo->has_tex_coords = true;
 
   size_t vertexDataSize = sizeof(float) * vertexCount * 3;
   size_t normalDataSize = normals ? sizeof(float) * vertexCount * 3 : 0;
