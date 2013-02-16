@@ -1,5 +1,5 @@
 /*
- Copyright 2006,2009,2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2006,2009,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit. Open Orbit is free software: you can
  redistribute it and/or modify it under the terms of the GNU General Public
@@ -127,6 +127,27 @@ mf3_v_mul(const float3x3 a, float3 v) {
 #endif
 	return res;
 }
+
+float4
+mf4_v_mul(const float4x4 a, float4 v) {
+  float4 res;
+#if __has_feature(attribute_ext_vector_type)
+  res.x = vf4_dot(a[0], v);
+  res.y = vf4_dot(a[1], v);
+  res.z = vf4_dot(a[2], v);
+  res.w = vf4_dot(a[3], v);
+#else
+  float3_u vu = { .v = v };
+  float3_u resu;
+  for (int i = 0 ; i < 4 ; i ++) {
+    resu.a[i] = a[i].x * vu.s.x + a[i].y * vu.s.y
+    + a->a[i].z * vu.s.z + a[i].w * vu.s.w;
+  }
+  res = resu.v;
+#endif
+  return res;
+}
+
 
 void
 mf3_add(float3x3 a, const float3x3 b, const float3x3 c)
@@ -317,119 +338,114 @@ v_normalise(float4 v)
 }
 
 float
-m_det(const matrix_t *m)
+mf4_det(const float4x4 m)
 {
-    // compute the four subdeterminants (Saurrus)
-    // note, this version has been written to work, not to be efficient in any
-    // way
-    float sub_det[4];
+  // compute the four subdeterminants (Saurrus)
+  // note, this version has been written to work, not to be efficient in any
+  // way
+  float sub_det[4];
 
-    sub_det[0] =  MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 3);
-    sub_det[0] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 1);
-    sub_det[0] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 2);
-    sub_det[0] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 3);
-    sub_det[0] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 1);
-    sub_det[0] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 2);
+  sub_det[0] =  m[1][1] * m[2][2] * m[3][3];
+  sub_det[0] += m[1][2] * m[2][3] * m[3][1];
+  sub_det[0] += m[1][3] * m[2][1] * m[3][2];
+  sub_det[0] -= m[3][1] * m[2][2] * m[1][3];
+  sub_det[0] -= m[3][2] * m[2][3] * m[1][1];
+  sub_det[0] -= m[3][3] * m[2][1] * m[1][2];
 
-    sub_det[1] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 3);
-    sub_det[1] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 0);
-    sub_det[1] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 2);
-    sub_det[1] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 3);
-    sub_det[1] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 0);
-    sub_det[1] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 2);
+  sub_det[1] =  m[1][0] * m[2][2] * m[3][3];
+  sub_det[1] += m[1][2] * m[2][3] * m[3][0];
+  sub_det[1] += m[1][3] * m[2][0] * m[3][2];
+  sub_det[1] -= m[3][0] * m[2][2] * m[1][3];
+  sub_det[1] -= m[3][2] * m[2][3] * m[1][0];
+  sub_det[1] -= m[3][3] * m[2][0] * m[1][2];
 
-    sub_det[2] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 3);
-    sub_det[2] += MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 3, 0);
-    sub_det[2] += MAT_ELEM(*m, 1, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 1);
-    sub_det[2] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 3);
-    sub_det[2] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 3) * MAT_ELEM(*m, 1, 0);
-    sub_det[2] -= MAT_ELEM(*m, 3, 3) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 1);
+  sub_det[2] =  m[1][0] * m[2][1] * m[3][3];
+  sub_det[2] += m[1][1] * m[2][3] * m[3][0];
+  sub_det[2] += m[1][3] * m[2][0] * m[3][1];
+  sub_det[2] -= m[3][0] * m[2][1] * m[1][3];
+  sub_det[2] -= m[3][1] * m[2][3] * m[1][0];
+  sub_det[2] -= m[3][3] * m[2][0] * m[1][1];
 
-    sub_det[3] =  MAT_ELEM(*m, 1, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 3, 2);
-    sub_det[3] += MAT_ELEM(*m, 1, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 3, 0);
-    sub_det[3] += MAT_ELEM(*m, 1, 2) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 3, 1);
-    sub_det[3] -= MAT_ELEM(*m, 3, 0) * MAT_ELEM(*m, 2, 1) * MAT_ELEM(*m, 1, 2);
-    sub_det[3] -= MAT_ELEM(*m, 3, 1) * MAT_ELEM(*m, 2, 2) * MAT_ELEM(*m, 1, 0);
-    sub_det[3] -= MAT_ELEM(*m, 3, 2) * MAT_ELEM(*m, 2, 0) * MAT_ELEM(*m, 1, 1);
+  sub_det[3] =  m[1][0] * m[2][1] * m[3][2];
+  sub_det[3] += m[1][1] * m[2][2] * m[3][0];
+  sub_det[3] += m[1][2] * m[2][0] * m[3][1];
+  sub_det[3] -= m[3][0] * m[2][1] * m[1][2];
+  sub_det[3] -= m[3][1] * m[2][2] * m[1][0];
+  sub_det[3] -= m[3][2] * m[2][0] * m[1][1];
 
-    float det = MAT_ELEM(*m, 0, 0) * sub_det[0]
-                 - MAT_ELEM(*m, 0, 1) * sub_det[1]
-                 + MAT_ELEM(*m, 0, 2) * sub_det[2]
-                 - MAT_ELEM(*m, 0, 3) * sub_det[3];
+  float det = m[0][0] * sub_det[0]
+            - m[0][1] * sub_det[1]
+            + m[0][2] * sub_det[2]
+            - m[0][3] * sub_det[3];
 
-    return det;
+  return det;
 }
 
 float
-m_subdet3(const matrix_t *m, int k, int l)
+mf4_subdet3(const float4x4 m, int k, int l)
 {
-    float acc = S_CONST(0.0);
-    matrix_t m_prim;
-    // copy the relevant matrix elements
-    for (int i0 = 0, i1 = 0 ; i0 < 4 ; i0 ++) {
-        if (k == i0) continue; // skip row for sub det
-        for(int j0 = 0, j1 = 0 ; j0 < 4 ; j0 ++) {
-            if (l == j0) continue; // skip col for subdet
-            MAT_ELEM(m_prim, i1, j1) = MAT_ELEM(*m, i0, j0);
-            j1 ++;
-        }
-        i1 ++;
+  float acc = 0.0;
+  float4x4 m_prim;
+  // copy the relevant matrix elements
+  for (int i0 = 0, i1 = 0 ; i0 < 4 ; i0 ++) {
+    if (k == i0) continue; // skip row for sub det
+    for(int j0 = 0, j1 = 0 ; j0 < 4 ; j0 ++) {
+      if (l == j0) continue; // skip col for subdet
+      m_prim[i1][j1] = m[i0][j0];
+      j1 ++;
     }
+    i1 ++;
+  }
 
 
-    // Apply Sarrus
-    for (int i = 0 ; i < 3 ; i ++) {
-        acc += MAT_ELEM(m_prim, 0, (0+i) % 3) * MAT_ELEM(m_prim, 1, (1+i) % 3)
-             * MAT_ELEM(m_prim, 2, (2+i) % 3);
+  // Apply Sarrus
+  for (int i = 0 ; i < 3 ; i ++) {
+    acc += m_prim[0][(0+i) % 3] * m_prim[1][(1+i) % 3]
+         * m_prim[2][(2+i) % 3];
 
-        acc -= MAT_ELEM(m_prim, 2, (0+i) % 3) * MAT_ELEM(m_prim, 1, (1+i) % 3)
-             * MAT_ELEM(m_prim, 0, (2+i) % 3);
-    }
+    acc -= m_prim[2][(0+i) % 3] * m_prim[1][(1+i) % 3]
+         * m_prim[0][(2+i) % 3];
+  }
 
-    return acc;
+  return acc;
 }
 
-matrix_t
-m_adj(const matrix_t *m)
+void
+mf4_adj(float4x4 M_adj, const float4x4 m)
 {
-    matrix_t M_adj;
-    float sign = S_CONST(1.0);
+  float sign = 1.0;
+  for (int i = 0 ; i < 4 ; i ++) {
+    for(int j = 0; j < 4 ; j ++) {
+      M_adj[j][i] = sign * mf4_subdet3(m, i, j);
+      sign *= -1.0;
+    }
+    sign *= -1.0;
+  }
+}
+
+void
+mf4_inv(float4x4 M_inv, const float4x4 M)
+{
+  // Very brute force, there are more efficient ways to do this
+  float det = mf4_det(M);
+  float4x4 M_adj;
+  mf4_adj(M_adj, M);
+
+  if (det != 0.0) {
     for (int i = 0 ; i < 4 ; i ++) {
-        for(int j = 0; j < 4 ; j ++) {
-            MAT_ELEM(M_adj, j, i) = sign * m_subdet3(m, i, j);
-            sign *= S_CONST(-1.0);
-        }
-        sign *= S_CONST(-1.0);
+      for (int j = 0 ; j < 4 ; j ++) {
+        M_inv[i][j] = M_adj[i][j] / det;
+      }
     }
-
-    return M_adj;
-}
-
-matrix_t
-m_inv(const matrix_t *M)
-{
-    // Very brute force, there are more efficient ways to do this
-    float det = m_det(M);
-    matrix_t M_adj = m_adj(M);
-    matrix_t M_inv;
-
-    if (det != S_CONST(0.0)) {
-        for (int i = 0 ; i < 4 ; i ++) {
-            for (int j = 0 ; j < 4 ; j ++) {
-                MAT_ELEM(M_inv, i, j) = MAT_ELEM(M_adj, i, j) / det;
-            }
-        }
-    } else {
-        // If the determinant is zero, then the matrix is not invertible
-        // thus, return NANs in all positions
-        for (int i = 0; i < 4; i ++) {
-            for (int j = 0; j < 4; j ++) {
-                MAT_ELEM(M_inv, i, j) = NAN;
-            }
-        }
+  } else {
+    // If the determinant is zero, then the matrix is not invertible
+    // thus, return NANs in all positions
+    for (int i = 0; i < 4; i ++) {
+      for (int j = 0; j < 4; j ++) {
+        M_inv[i][j] = NAN;
+      }
     }
-
-    return M_inv;
+  }
 }
 
 float
@@ -863,6 +879,15 @@ mf4_mul2(float4x4 a, const float4x4 b)
 #endif
     }
   }
+}
+
+void
+mf4_add(float3x3 a, const float3x3 b, const float3x3 c)
+{
+  a[0] = b[0] + c[0];
+  a[1] = b[1] + c[1];
+  a[2] = b[2] + c[2];
+  a[3] = b[3] + c[3];
 }
 
 

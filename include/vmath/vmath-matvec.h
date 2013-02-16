@@ -1,5 +1,5 @@
 /*
- Copyright 2006,2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2006,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit. Open Orbit is free software: you can
  redistribute it and/or modify it under the terms of the GNU General Public
@@ -340,9 +340,10 @@ static inline float
 vf4_dot(float4 a, float4 b)
 {
   float4 c = a * b;
-  float4_u uc = {.v = c};
+  //float4_u uc = {.v = c};
 
-  return uc.a[0] + uc.a[1] + uc.a[2] + uc.a[3];
+  return c.x + c.y + c.z + c.w;
+  //return uc.a[0] + uc.a[1] + uc.a[2] + uc.a[3];
 }
 
 
@@ -372,14 +373,7 @@ float4 m_v_mul(const matrix_t *a, float4 v);
 float3 m_v3_mulf(const matrix_t *a, float3 v);
 float3 mf3_v_mul(const float3x3 a, float3 v);
 
-void m_transpose(matrix_t *mt, const matrix_t *m) __attribute__ ((__nonnull__));
-
-
-void m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
-    __attribute__ ((__nonnull__));
-
-void m_add(matrix_t *res, matrix_t *a, matrix_t *b)
-    __attribute__ ((__nonnull__));
+void mf4_add(float3x3 a, const float3x3 b, const float3x3 c);
 
 void m_sub(matrix_t *res, matrix_t *a, matrix_t *b)
     __attribute__ ((__nonnull__));
@@ -557,12 +551,14 @@ float4 v_normalise(float4 v) __attribute__ ((__pure__));
     __attribute__ ((__pure__));
 
 /*! Compute determinant of 4x4 matrix M */
-float m_det(const matrix_t *M);
+float mf4_det(const float4x4 M);
 /*! Compute subdet with respect to position k, l */
-float m_subdet3(const matrix_t *M, int k, int l);
+float mf4_subdet3(const float4x4 m, int k, int l);
 
 /*! Compute inverse of 4x4 matrix M */
-matrix_t m_inv(const matrix_t *M);
+void mf4_inv(float4x4 M_inv, const float4x4 M);
+
+float mf3_det(const float3x3 m);
 
 
 /* creates rotation matrices, these are untested and might not work */
@@ -671,9 +667,12 @@ float4 mf4_colvec(const float4x4 m, int col);
 void mf4_transpose1(float4x4 a);
 void mf4_transpose2(float4x4 a, const float4x4 b);
 
+float4 mf4_v_mul(const float4x4 a, float4 v);
+
 void mf4_ident(float4x4 m);
 void mf4_cpy(float4x4 a, const float4x4 b);
 void mf4_mul2(float4x4 a, const float4x4 b);
+void mf4_add(float3x3 a, const float3x3 b, const float3x3 c);
 
 static inline void
 mf4_zero(float4x4 a)
