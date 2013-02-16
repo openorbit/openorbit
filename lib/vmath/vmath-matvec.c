@@ -683,7 +683,7 @@ mf3_mul2(float3x3 a, const float3x3 b)
   for (int i = 0 ; i < 3 ; ++ i) {
     for (int j = 0 ; j < 3 ; ++ j) {
 #if __has_feature(attribute_ext_vector_type)
-      a[i][j] = vf3_dot(atmp[i], b[j]);
+      a[i][j] = vf3_dot(atmp[i], btransp[j]);
 #else
 #error "Please fix for non clang compiler"
 #endif
@@ -857,7 +857,7 @@ mf4_mul2(float4x4 a, const float4x4 b)
   for (int i = 0 ; i < 4 ; ++ i) {
     for (int j = 0 ; j < 4 ; ++ j) {
 #if __has_feature(attribute_ext_vector_type)
-      a[i][j] = vf4_dot(atmp[i], b[j]);
+      a[i][j] = vf4_dot(atmp[i], btransp[j]);
 #else
 #error "Please fix for non clang compiler"
 #endif

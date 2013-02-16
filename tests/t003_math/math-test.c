@@ -77,20 +77,28 @@ END_TEST
 // TODO: M_MUL test
 START_TEST(test_m_mul)
 {
-    matrix_t a0, b0, c0;
-    matrix_t a1, b1, c1;
-    
-    for (int i = 0; i < 4 ; i ++) {
-        for (int j = 0; j < 4 ; j ++) {
-            b0.a[i][j] = (float)i*(float)j;
-            c0.a[i][j] = (float)i+(float)j;
-            b1.a[i][j] = (float)i*(float)j;
-            c1.a[i][j] = (float)i+(float)j;
-        }
+  float4x4 a = {{ 1,  2,  3,  4},
+                { 5,  6,  7,  8},
+                { 9, 10, 11, 12},
+                {13, 14, 15, 16}};
+
+  float4x4 b = {{21, 22, 23, 24},
+                {25, 26, 27, 28},
+                {29, 30, 31, 32},
+                {33, 34, 35, 36}};
+
+  float4x4 exp = {{ 290,  300,  310,  320},
+                  { 722,  748,  774,  800},
+                  {1154, 1196, 1238, 1280},
+                  {1586, 1644, 1702, 1760}};
+
+  mf4_mul2(a, b);
+
+  for (int i = 0 ; i < 4 ; i ++) {
+    for (int j = 0; j < 4; j ++) {
+      fail_unless(ALMOST_EQUAL(exp[i][j], a[i][j], 0.01));
     }
-    
-    m_mul(&a0, &b0, &c0);
-        
+  }
 }
 END_TEST
 
