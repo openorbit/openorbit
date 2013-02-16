@@ -444,7 +444,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   sg_shader_t *shader = obj->shader;
 
   glVertexAttribPointer(sg_shader_get_vertex_attrib(shader),
-                        4, GL_FLOAT, GL_FALSE, 0, 0);
+                        3, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(sg_shader_get_vertex_attrib(shader));
   SG_CHECK_ERROR;
   if (normals && sg_shader_get_normal_attrib(shader) != -1) {
