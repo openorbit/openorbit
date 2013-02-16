@@ -70,6 +70,7 @@ sg_object_t* sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
                            sg_texture_t *tex, sg_texture_t *nightTex,
                            sg_texture_t *spec,
                            sg_material_t *mat);
+sg_object_t* sg_new_cube(const char *name, sg_shader_t *shader, float side);
 
 sg_object_t* sg_new_object_with_geo(sg_shader_t *shader,
                                     int gl_primitive, size_t vertexCount,

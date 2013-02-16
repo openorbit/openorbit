@@ -738,6 +738,73 @@ sg_new_axises(const char *name, sg_shader_t *shader, float length)
   return obj;
 }
 
+sg_object_t*
+sg_new_cube(const char *name, sg_shader_t *shader, float side)
+{
+  GLfloat cube_vertices[] = {
+    // front
+    -1.0, -1.0,  1.0,
+    1.0, -1.0,  1.0,
+    1.0,  1.0,  1.0,
+    -1.0,  1.0,  1.0,
+    // back
+    -1.0, -1.0, -1.0,
+    1.0, -1.0, -1.0,
+    1.0,  1.0, -1.0,
+    -1.0,  1.0, -1.0,
+  };
+
+  // TODO
+  GLfloat cube_colors[] = {
+    // front colors
+    1.0, 0.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 1.0,
+    0.0, 0.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0,
+    // back colors
+    1.0, 0.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 1.0,
+    0.0, 0.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0,
+  };
+  GLshort cube_elements[] = {
+    // front
+    0, 1, 2,
+    2, 3, 0,
+    // top
+    1, 5, 6,
+    6, 2, 1,
+    // back
+    7, 6, 5,
+    5, 4, 7,
+    // bottom
+    4, 0, 3,
+    3, 7, 4,
+    // left
+    4, 5, 1,
+    1, 0, 4,
+    // right
+    3, 2, 6,
+    6, 7, 3,
+  };
+
+  for (int i = 0 ; i < sizeof(cube_vertices)/sizeof(float) ; i ++) {
+    cube_vertices[i] *= side/2.0;
+  }
+
+  sg_object_t *obj = sg_new_object(sg_get_shader("flat"));
+  sg_geometry_t *geo = sg_new_geometry(obj, GL_TRIANGLES,
+                                       sizeof(cube_vertices)/(sizeof(float)*3),
+                                       cube_vertices, NULL, NULL,
+                                       sizeof(cube_elements)/sizeof(GLshort),
+                                       GL_UNSIGNED_SHORT,
+                                       cube_elements,
+                                       cube_colors);
+  sg_object_set_geometry(obj, geo);
+
+  return obj;
+}
+
 void
 sg_object_set_shader(sg_object_t *obj, sg_shader_t *shader)
 {
