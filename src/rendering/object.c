@@ -54,7 +54,8 @@ struct sg_geometry_t {
   GLsizei normalOffset;
   GLsizei texCoordOffset;
 
-  bool hasIndices;
+  bool has_indices;
+  GLenum index_type;
   GLsizei index_count;
   GLuint ibo;
 };
@@ -397,8 +398,13 @@ sgObjectSetPos(sg_object_t *obj, float4 pos)
 sg_geometry_t*
 sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                 float *vertices, float *normals, float *texCoords,
-                size_t index_count, int *indices)
+                size_t index_count, GLenum index_type, void *indices,
+                float *colours)
 {
+  assert((indices == NULL && index_type == 0) ||
+         (indices && ((index_type == GL_UNSIGNED_SHORT) ||
+                      (index_type == GL_UNSIGNED_INT))));
+
   float3 maxvert = vf3_set(0.0, 0.0, 0.0);
   for (size_t i = 0 ; i < vertexCount ; i ++) {
     float3 vert = { vertices[i*3+0], vertices[i*3+1], vertices[i*3+2]};
@@ -423,7 +429,10 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   size_t vertexDataSize = sizeof(float) * vertexCount * 3;
   size_t normalDataSize = normals ? sizeof(float) * vertexCount * 3 : 0;
   size_t texCoordDataSize = texCoords ? sizeof(float) * vertexCount * 2 : 0;
-  size_t buffSize = vertexDataSize + normalDataSize + texCoordDataSize;
+  size_t colour_size = (colours) ? sizeof(float) * vertexCount * 4 : 0;
+
+  size_t buffSize = vertexDataSize + normalDataSize + texCoordDataSize
+                  + colour_size;
 
   glGenVertexArrays(1, &geo->vba);
   glBindVertexArray(geo->vba);
@@ -469,13 +478,37 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
     SG_CHECK_ERROR;
   }
 
+  if (colours && sg_shader_get_color_attrib(shader)) {
+    glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize + normalDataSize
+                    + texCoordDataSize,
+                    colour_size, colours);
+    SG_CHECK_ERROR;
+    glVertexAttribPointer(sg_shader_get_color_attrib(shader),
+                          3, GL_FLOAT, GL_FALSE, 0,
+                          (void*)vertexDataSize + normalDataSize + texCoordDataSize);
+    SG_CHECK_ERROR;
+    glEnableVertexAttribArray(sg_shader_get_color_attrib(shader));
+    SG_CHECK_ERROR;
+
+  }
+
   if (indices) {
-    geo->hasIndices = true;
+    geo->has_indices = true;
     glGenBuffers(1, &geo->ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geo->ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 index_count*sizeof(int), indices, GL_STATIC_DRAW);
+    
+    if (index_type == GL_UNSIGNED_SHORT) {
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                   index_count*sizeof(short), indices, GL_STATIC_DRAW);
+
+    } else {
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                   index_count*sizeof(int), indices, GL_STATIC_DRAW);
+
+    }
+
     geo->index_count = index_count;
+    geo->index_type = index_type;
     SG_CHECK_ERROR;
   }
   glBindVertexArray(0); // Done
@@ -530,9 +563,16 @@ sg_object_set_geo(sg_object_t *obj, int gl_primitive, size_t vertexCount,
 {
   obj->geometry = sg_new_geometry(obj, gl_primitive,
                                   vertexCount, vertices, normals, texCoords,
-                                  0, NULL);
+                                  0, 0, NULL, NULL);
 }
 
+
+void
+sg_object_set_geometry(sg_object_t *obj, sg_geometry_t *geo)
+{
+  obj->geometry = geo;
+  geo->obj = obj;
+}
 
 sg_object_t*
 sg_new_object_with_geo(sg_shader_t *shader, int gl_primitive, size_t vertexCount,
@@ -548,7 +588,8 @@ sg_new_object_with_geo(sg_shader_t *shader, int gl_primitive, size_t vertexCount
 
   obj->geometry = sg_new_geometry(obj, gl_primitive,
                                   vertexCount, vertices, normals, texCoords,
-                                  0, NULL);
+                                  0, 0, NULL, NULL);
+  return obj;
 }
 
 sg_object_t*
@@ -646,7 +687,8 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
 
   sg_geometry_t *geo = sg_new_geometry(sphere, GL_TRIANGLE_STRIP, vert_count,
                                        verts.elems, normals.elems, texc.elems,
-                                       indices.length, indices.elems);
+                                       indices.length, GL_UNSIGNED_INT,
+                                       indices.elems, NULL);
   sphere->geometry = geo;
 
   float_array_dispose(&verts);
