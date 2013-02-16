@@ -59,12 +59,14 @@ void sgObjectLoadShader(sg_object_t *obj, const char *name);
 sg_geometry_t*
 sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                 float *vertices, float *normals, float *texCoords,
-                size_t index_count, int *indices);
+                size_t index_count, GLenum index_type, void *indices,
+                float *colours);
 
-sg_object_t* sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
-                                      float semiMinor, float asc,
-                                      float inc, float argOfPeriapsis,
-                                      float dec, float ra, int segments);
+sg_object_t* sg_new_ellipse(const char *name, sg_shader_t *shader,
+                            float semiMajor,
+                            float semiMinor, float asc,
+                            float inc, float argOfPeriapsis,
+                            float dec, float ra, int segments);
 
 sg_object_t* sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
                            sg_texture_t *tex, sg_texture_t *nightTex,
