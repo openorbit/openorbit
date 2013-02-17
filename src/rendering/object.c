@@ -480,7 +480,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
     SG_CHECK_ERROR;
   }
 
-  if (colours && sg_shader_get_color_attrib(shader)) {
+  if (colours && sg_shader_get_color_attrib(shader) != -1) {
     glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize + normalDataSize
                     + texCoordDataSize,
                     colour_size, colours);
