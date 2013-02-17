@@ -401,7 +401,7 @@ sg_geometry_t*
 sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                 float *vertices, float *normals, float *texCoords,
                 size_t index_count, GLenum index_type, void *indices,
-                float *colours)
+                uint8_t *colours)
 {
   assert((indices == NULL && index_type == 0) ||
          (indices && ((index_type == GL_UNSIGNED_SHORT) ||
@@ -431,7 +431,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   size_t vertexDataSize = sizeof(float) * vertexCount * 3;
   size_t normalDataSize = normals ? sizeof(float) * vertexCount * 3 : 0;
   size_t texCoordDataSize = texCoords ? sizeof(float) * vertexCount * 2 : 0;
-  size_t colour_size = (colours) ? sizeof(float) * vertexCount * 4 : 0;
+  size_t colour_size = (colours) ? vertexCount * 4 : 0;
 
   size_t buffSize = vertexDataSize + normalDataSize + texCoordDataSize
                   + colour_size;
@@ -485,8 +485,9 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                     + texCoordDataSize,
                     colour_size, colours);
     SG_CHECK_ERROR;
-    glVertexAttribPointer(sg_shader_get_color_attrib(shader),
-                          3, GL_FLOAT, GL_FALSE, 0,
+    glVertexAttribPointer(//sg_shader_get_location(shader, SG_COLOR, false),
+                          sg_shader_get_color_attrib(shader),
+                          4, GL_UNSIGNED_BYTE, GL_TRUE, 0,
                           (void*)vertexDataSize + normalDataSize + texCoordDataSize);
     SG_CHECK_ERROR;
     glEnableVertexAttribArray(sg_shader_get_color_attrib(shader));
@@ -799,17 +800,17 @@ sg_new_cube(const char *name, sg_shader_t *shader, float side)
   };
 
   // TODO
-  GLfloat cube_colors[] = {
+  GLubyte cube_colors[] = {
     // front colors
-    1.0, 0.0, 0.0, 1.0,
-    0.0, 1.0, 0.0, 1.0,
-    0.0, 0.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0,
+    255,   0,   0, 255,
+      0, 255,   0, 255,
+      0,   0, 255, 255,
+    255, 255, 255, 255,
     // back colors
-    1.0, 0.0, 0.0, 1.0,
-    0.0, 1.0, 0.0, 1.0,
-    0.0, 0.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0,
+    255,   0,   0, 255,
+      0, 255,   0, 255,
+      0,   0, 255, 255,
+    255, 255, 255, 255,
   };
   GLshort cube_elements[] = {
     // front

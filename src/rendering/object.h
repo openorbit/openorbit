@@ -60,7 +60,7 @@ sg_geometry_t*
 sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                 float *vertices, float *normals, float *texCoords,
                 size_t index_count, GLenum index_type, void *indices,
-                float *colours);
+                uint8_t *colours);
 
 sg_object_t* sg_new_ellipse(const char *name, sg_shader_t *shader,
                             float semiMajor,
