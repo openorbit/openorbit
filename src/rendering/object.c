@@ -492,14 +492,15 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
     SG_CHECK_ERROR;
     glEnableVertexAttribArray(sg_shader_get_color_attrib(shader));
     SG_CHECK_ERROR;
-
   }
 
   if (indices) {
     geo->has_indices = true;
     glGenBuffers(1, &geo->ibo);
+    SG_CHECK_ERROR;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geo->ibo);
-    
+    SG_CHECK_ERROR;
+
     if (index_type == GL_UNSIGNED_SHORT) {
       glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                    index_count*sizeof(short), indices, GL_STATIC_DRAW);
