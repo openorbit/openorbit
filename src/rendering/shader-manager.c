@@ -74,22 +74,21 @@ struct sg_shader_t {
     sg_light_ids_t lightIds[SG_OBJ_MAX_LIGHTS];
     sg_material_ids_t materialId;
   } uniforms;
-  // Attribute IDs
-  struct {
-    GLuint vertexId;
-    GLuint normalId;
-    GLuint colourId;
-    GLuint texCoordId[SG_OBJ_MAX_TEXTURES];
-  } attribs;
 };
 
 
 static const char* param_names[SG_PARAM_COUNT] = {
   [SG_VERTEX] = "oo_Vertex",
   [SG_NORMAL] = "oo_Normal",
-  [SG_TEX_COORD] = "oo_TexCoord[%u]",
+  [SG_TEX_COORD_0] = "oo_TexCoord0",
+  [SG_TEX_COORD_1] = "oo_TexCoord0",
+  [SG_TEX_COORD_2] = "oo_TexCoord0",
+  [SG_TEX_COORD_3] = "oo_TexCoord0",
   [SG_COLOR] = "oo_Color",
-  [SG_TEX] = "oo_Texture[%u]",
+  [SG_TEX_0] = "oo_Texture0",
+  [SG_TEX_1] = "oo_Texture1",
+  [SG_TEX_2] = "oo_Texture2",
+  [SG_TEX_3] = "oo_Texture3",
 
   [SG_LIGHT] = "oo_Light[%u]",
 
@@ -351,8 +350,17 @@ sg_load_shader(const char *key,
   //si->attribs.texCoord0Id = SG_TEX0_COORD_LOC;
   //si->attribs.texCoord1Id = SG_TEX1_COORD_LOC;
 
+
+  glBindAttribLocation(si->shaderId, SG_VERTEX, "oo_Vertex");
+  glBindAttribLocation(si->shaderId, SG_NORMAL, "oo_Normal");
+  glBindAttribLocation(si->shaderId, SG_COLOR, "oo_Color");
+  glBindAttribLocation(si->shaderId, SG_TEX_COORD_0, "oo_TexCoord0");
+  glBindAttribLocation(si->shaderId, SG_TEX_COORD_1, "oo_TexCoord1");
+  glBindAttribLocation(si->shaderId, SG_TEX_COORD_2, "oo_TexCoord2");
+  glBindAttribLocation(si->shaderId, SG_TEX_COORD_3, "oo_TexCoord3");
+
   // Set the output fragment name
-  glBindFragDataLocation(shaderProgram, 0, SG_OUT_FRAGMENT);
+  glBindFragDataLocation(shaderProgram, 0, "oo_FragColor");
 
   glLinkProgram(shaderProgram);
   GLint linkStatus = 0;
@@ -385,12 +393,6 @@ sg_load_shader(const char *key,
   // After linking, we have valid uniform and attribute locations, we build up the location
   // table here.
 
-  si->attribs.vertexId = sg_shader_get_location(si, SG_VERTEX, true);
-  si->attribs.normalId = sg_shader_get_location(si, SG_NORMAL, false);
-  si->attribs.colourId = sg_shader_get_location(si, SG_COLOR, false);
-  for (int i = 0 ; i < SG_OBJ_MAX_TEXTURES ; i++) {
-    si->attribs.texCoordId[i] = sgGetLocationForParamAndIndex(shaderProgram, SG_TEX_COORD, i);
-  }
 
   si->uniforms.modelViewId = sg_shader_get_location(si, SG_MODELVIEW, false);
   si->uniforms.projectionId = sg_shader_get_location(si, SG_PROJECTION, false);
@@ -428,10 +430,10 @@ sg_load_shader(const char *key,
       sgGetLocationForParamAndIndex(shaderProgram, SG_LIGHT_MOD_GLOB_AMB, i);
   }
 
-  for (int i = 0 ; i < SG_OBJ_MAX_TEXTURES ; i++) {
-    si->uniforms.texIds[i] = sgGetLocationForParamAndIndex(shaderProgram,
-                                                           SG_TEX, i);
-  }
+  si->uniforms.texIds[0] = glGetUniformLocation(shaderProgram, "oo_Texture0");
+  si->uniforms.texIds[1] = glGetUniformLocation(shaderProgram, "oo_Texture0");
+  si->uniforms.texIds[2] = glGetUniformLocation(shaderProgram, "oo_Texture0");
+  si->uniforms.texIds[3] = glGetUniformLocation(shaderProgram, "oo_Texture0");
 
   return si;
 }
@@ -459,7 +461,7 @@ sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required)
   SG_CHECK_ERROR;
   // Handle both attributes and uniforms
   if (param < SG_ATTRIBUTE_END) {
-    GLint attrib_loc = glGetAttribLocation (program->shaderId, param_names[param]);
+    GLint attrib_loc = glGetAttribLocation(program->shaderId, param_names[param]);
     if (required && (attrib_loc == -1)) {
       ooLogError("shader '%s' missing attribute: '%s'",
                  program->name, param_names[param]);
@@ -480,6 +482,7 @@ sg_shader_bind(sg_shader_t *program)
 {
   SG_CHECK_ERROR;
   if (program) {
+    ooLogInfo("bind shader '%s'", program->name);
     glUseProgram(program->shaderId);
   } else {
     glUseProgram(0);
@@ -495,6 +498,12 @@ sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj)
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.projectionId, 1, GL_TRUE,
                      (GLfloat*)proj);
+
+  for (int i = 0; i < 4; i++) {
+    ooLogInfo("project[%d]: [%f %f %f %f]",
+              i, proj[i].x, proj[i].y, proj[i].z, proj[i].w);
+  }
+
   SG_CHECK_ERROR;
 }
 
@@ -506,6 +515,12 @@ sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.modelViewId, 1, GL_TRUE,
                      (GLfloat*)modelview);
+
+  for (int i = 0; i < 4; i++) {
+    ooLogInfo("model[%d]: [%f %f %f %f]",
+              i, modelview[i].x, modelview[i].y, modelview[i].z, modelview[i].w);
+  }
+
   SG_CHECK_ERROR;
 }
 
@@ -566,21 +581,6 @@ sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
 
 
 
-void
-sg_location_bind(GLuint prog, sg_param_id_t param)
-{
-  glBindAttribLocation(prog, param, param_names[param]);
-  SG_CHECK_ERROR;
-}
-
-void
-sg_location_bind_at_index(GLuint prog, sg_param_id_t param, unsigned index)
-{
-  glBindAttribLocation(prog, param, param_names[param] + index);
-  SG_CHECK_ERROR;
-}
-
-
 GLint
 sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
                               unsigned index)
@@ -598,42 +598,7 @@ sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
 }
 
 void
-sgSetShaderTex(GLuint program, unsigned index, GLuint tex)
-{
-  glActiveTexture(GL_TEXTURE0 + index);
-  glBindTexture(GL_TEXTURE_2D, tex);
-  GLint loc = sgGetLocationForParamAndIndex(program, SG_TEX, index);
-  glUniform1i(loc, index); // Uniform value is texture unit id
-  SG_CHECK_ERROR;
-}
-
-void
 sg_location_bind_matrix(sg_shader_t *prog, sg_param_id_t param)
 {
   SG_CHECK_ERROR;
-}
-
-
-GLint
-sg_shader_get_vertex_attrib(sg_shader_t *program)
-{
-  return program->attribs.vertexId;
-}
-
-GLint
-sg_shader_get_normal_attrib(sg_shader_t *program)
-{
-  return program->attribs.normalId;
-}
-
-GLint
-sg_shader_get_color_attrib(sg_shader_t *program)
-{
-  return program->attribs.colourId;
-}
-
-GLint
-sg_shader_get_texcoord_attrib(sg_shader_t *program, unsigned tex_idx)
-{
-  return program->attribs.texCoordId[tex_idx];
 }

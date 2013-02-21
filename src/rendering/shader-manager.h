@@ -42,12 +42,6 @@ sg_shader_t* sg_get_shader_without_warnings(const char *key);
 
 GLint sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required);
 
-GLint sg_shader_get_vertex_attrib(sg_shader_t *program);
-GLint sg_shader_get_normal_attrib(sg_shader_t *program);
-GLint sg_shader_get_color_attrib(sg_shader_t *program);
-GLint sg_shader_get_texcoord_attrib(sg_shader_t *program, unsigned tex_idx);
-
-
 void sg_shader_bind(sg_shader_t *program);
 
 void sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj);

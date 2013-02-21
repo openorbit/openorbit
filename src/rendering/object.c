@@ -454,43 +454,40 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
 
   sg_shader_t *shader = obj->shader;
 
-  glVertexAttribPointer(sg_shader_get_vertex_attrib(shader),
-                        3, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(sg_shader_get_vertex_attrib(shader));
+  glVertexAttribPointer(SG_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(SG_VERTEX);
   SG_CHECK_ERROR;
-  if (normals && sg_shader_get_normal_attrib(shader) != -1) {
+  if (normals) {
     glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize, normalDataSize, normals);
     SG_CHECK_ERROR;
-    glVertexAttribPointer(sg_shader_get_normal_attrib(shader),
+    glVertexAttribPointer(SG_NORMAL,
                           3, GL_FLOAT, GL_FALSE, 0, (void*)vertexDataSize);
     SG_CHECK_ERROR;
-    glEnableVertexAttribArray(sg_shader_get_normal_attrib(shader));
+    glEnableVertexAttribArray(SG_NORMAL);
     SG_CHECK_ERROR;
   }
 
-  if (texCoords && sg_shader_get_texcoord_attrib(shader, 0) != -1) {
+  if (texCoords) {
     glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize + normalDataSize,
                     texCoordDataSize, texCoords);
     SG_CHECK_ERROR;
-    glVertexAttribPointer(sg_shader_get_texcoord_attrib(shader, 0),
+    glVertexAttribPointer(SG_TEX_COORD_0,
                           2, GL_FLOAT, GL_FALSE, 0,
                           (void*)vertexDataSize + normalDataSize);
     SG_CHECK_ERROR;
-    glEnableVertexAttribArray(sg_shader_get_texcoord_attrib(shader, 0));
+    glEnableVertexAttribArray(SG_TEX_COORD_0);
     SG_CHECK_ERROR;
   }
 
-  if (colours && sg_shader_get_color_attrib(shader) != -1) {
+  if (colours) {
     glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize + normalDataSize
                     + texCoordDataSize,
                     colour_size, colours);
     SG_CHECK_ERROR;
-    glVertexAttribPointer(//sg_shader_get_location(shader, SG_COLOR, false),
-                          sg_shader_get_color_attrib(shader),
-                          4, GL_UNSIGNED_BYTE, GL_TRUE, 0,
+    glVertexAttribPointer(SG_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0,
                           (void*)vertexDataSize + normalDataSize + texCoordDataSize);
     SG_CHECK_ERROR;
-    glEnableVertexAttribArray(sg_shader_get_color_attrib(shader));
+    glEnableVertexAttribArray(SG_COLOR);
     SG_CHECK_ERROR;
   }
 
