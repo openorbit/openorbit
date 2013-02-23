@@ -71,6 +71,7 @@ struct sg_shader_t {
     GLuint projectionId;
     GLuint normalMatrixId;
     GLuint texIds[SG_OBJ_MAX_TEXTURES];
+    GLboolean tex_validity[SG_OBJ_MAX_TEXTURES];
     sg_light_ids_t lightIds[SG_OBJ_MAX_LIGHTS];
     sg_material_ids_t materialId;
   } uniforms;
@@ -89,6 +90,11 @@ static const char* param_names[SG_PARAM_COUNT] = {
   [SG_TEX_1] = "oo_Texture1",
   [SG_TEX_2] = "oo_Texture2",
   [SG_TEX_3] = "oo_Texture3",
+
+  [SG_TEX_VALIDITY_0] = "oo_Texture0_valid",
+  [SG_TEX_VALIDITY_1] = "oo_Texture1_valid",
+  [SG_TEX_VALIDITY_2] = "oo_Texture2_valid",
+  [SG_TEX_VALIDITY_3] = "oo_Texture3_valid",
 
   [SG_LIGHT] = "oo_Light[%u]",
 
@@ -431,9 +437,18 @@ sg_load_shader(const char *key,
   }
 
   si->uniforms.texIds[0] = glGetUniformLocation(shaderProgram, "oo_Texture0");
-  si->uniforms.texIds[1] = glGetUniformLocation(shaderProgram, "oo_Texture0");
-  si->uniforms.texIds[2] = glGetUniformLocation(shaderProgram, "oo_Texture0");
-  si->uniforms.texIds[3] = glGetUniformLocation(shaderProgram, "oo_Texture0");
+  si->uniforms.texIds[1] = glGetUniformLocation(shaderProgram, "oo_Texture1");
+  si->uniforms.texIds[2] = glGetUniformLocation(shaderProgram, "oo_Texture2");
+  si->uniforms.texIds[3] = glGetUniformLocation(shaderProgram, "oo_Texture3");
+
+  si->uniforms.tex_validity[0] = glGetUniformLocation(shaderProgram,
+                                                      "oo_Texture0_valid");
+  si->uniforms.tex_validity[1] = glGetUniformLocation(shaderProgram,
+                                                      "oo_Texture1_valid");
+  si->uniforms.tex_validity[2] = glGetUniformLocation(shaderProgram,
+                                                      "oo_Texture2_valid");
+  si->uniforms.tex_validity[3] = glGetUniformLocation(shaderProgram,
+                                                      "oo_Texture3_valid");
 
   return si;
 }
@@ -541,11 +556,24 @@ sg_shader_bind_param_4fv(sg_shader_t *shader, sg_param_id_t param, float4 p)
 }
 
 void
-sg_shader_bind_texture(sg_shader_t *shader, unsigned tex_num, sg_texture_t *tex)
+sg_shader_bind_texture(sg_shader_t *shader, sg_texture_t *tex, unsigned tex_unit)
 {
   sg_shader_bind(shader);
-  glUniform1i(shader->uniforms.texIds[tex_num], sg_texture_get_id(tex));
-  SG_CHECK_ERROR;
+  glUniform1i(shader->uniforms.texIds[tex_unit], tex_unit);
+  glActiveTexture(GL_TEXTURE0 + tex_unit);
+  glBindTexture(GL_TEXTURE_2D, sg_texture_get_id(tex));
+  //glBindSampler(tex_unit, linearFiltering);
+
+  glUniform1i(shader->uniforms.tex_validity[tex_unit], 1);
+}
+
+void
+sg_shader_invalidate_textures(sg_shader_t *shader)
+{
+  glUniform1i(shader->uniforms.tex_validity[0], 0);
+  glUniform1i(shader->uniforms.tex_validity[1], 0);
+  glUniform1i(shader->uniforms.tex_validity[2], 0);
+  glUniform1i(shader->uniforms.tex_validity[3], 0);
 }
 
 void

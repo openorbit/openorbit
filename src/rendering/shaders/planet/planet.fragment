@@ -25,10 +25,13 @@ struct light_t {
 uniform light_t oo_Light[1];
 uniform material_t oo_Material;
 
-uniform bool UseNightTexture;
-uniform bool UseSpecMap;
+uniform bool oo_Texture0_valid; // Normal
+uniform bool oo_Texture1_valid; // Specular
+uniform bool oo_Texture2_valid; // Night
 
-uniform sampler2D oo_Texture[3]; // Normal texture, specular map, night texture
+uniform sampler2D oo_Texture0; // Normal texture
+uniform sampler2D oo_Texture1; // Specular map
+uniform sampler2D oo_Texture2; // Night texture
 //uniform sampler2D Tex2; // Bump map
 
 in vec2 TexCoord;
@@ -48,8 +51,8 @@ main()
 
   vec4 Ambient, AmbientGlob;
 
-  vec4 diffuseTexel = texture(oo_Texture[0], TexCoord);
-  vec4 diffuseNightTexel = texture(oo_Texture[2], TexCoord);
+  vec4 diffuseTexel = texture(oo_Texture0, TexCoord);
+  vec4 diffuseNightTexel = texture(oo_Texture2, TexCoord);
   vec4 diffuse = diffuseTexel * oo_Light[0].diffuse;
   vec4 diffuseNight = diffuseNightTexel * oo_Light[0].diffuse;
 
@@ -72,7 +75,7 @@ main()
     vec4 specIntensity = vec4(0.0,0.0,0.0,0.0);
 
     // Note: Grayscale spec map texture
-    if (UseSpecMap && (texture(oo_Texture[1], TexCoord).r > 0.1) || !UseSpecMap) {
+    if (oo_Texture1_valid && (texture(oo_Texture1, TexCoord).r > 0.1) || !oo_Texture1_valid) {
       specIntensity = oo_Light[0].specular *
                       pow(RdotE, oo_Material.shininess);
     }
@@ -80,7 +83,7 @@ main()
     color += att * specColor * specIntensity;
   }
 
-  if (UseNightTexture) {
+  if (oo_Texture2_valid) {
     // Mix day and night if we are in the twilight zone
     if (abs(NdotL) < twilightZone) {
       color = mix(diffuseNightTexel, color,

@@ -217,9 +217,10 @@ sg_object_draw(sg_object_t *obj)
 
   // Set model matrix for current object, we transpose this
   sg_shader_bind(obj->shader);
+  sg_shader_invalidate_textures(obj->shader);
 
   const float4x4 *pm = sg_camera_project(sg_scene_get_cam(obj->scene));
-  sg_shader_set_projection(obj->shader, *pm);
+  sg_shader_set_projection(obj->shader, &(*pm)[0]);
 
   //const float4 *vm = sg_camera_get_view(sg_scene_get_cam(obj->scene));
   sg_shader_set_model_view(obj->shader, obj->modelViewMatrix);
@@ -232,10 +233,11 @@ sg_object_draw(sg_object_t *obj)
 
   // Set texture params
   for (int i = 0 ; i < obj->texCount ; i ++) {
-    sg_shader_bind_texture(obj->shader, i, obj->textures[i]);
+    sg_shader_bind_texture(obj->shader, obj->textures[i], i);
   }
   //glUniform1iv(obj->shader->texArrayId, SG_OBJ_MAX_TEXTURES, obj->textures);
   // Set material params
+
   sg_geometry_draw(obj->geometry);
   sg_shader_bind(NULL);
 
@@ -696,6 +698,18 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
   float_array_dispose(&normals);
   float_array_dispose(&texc);
   int_array_dispose(&indices);
+
+  sphere->textures[0] = tex;
+  sphere->textures[1] = nightTex;
+  sphere->textures[2] = spec;
+  sphere->textures[3] = NULL;
+  sphere->material = mat;
+
+  sphere->texCount = 0;
+  if (tex) sphere->texCount ++;
+  if (nightTex) sphere->texCount ++;
+  if (spec) sphere->texCount ++;
+
   return sphere;
 }
 

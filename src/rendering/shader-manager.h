@@ -47,8 +47,9 @@ void sg_shader_bind(sg_shader_t *program);
 void sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj);
 void sg_shader_set_model_view(sg_shader_t *shader, const float4x4 proj);
 
-void sg_shader_bind_texture(sg_shader_t *shader, unsigned tex_num,
-                            sg_texture_t *tex);
+void sg_shader_invalidate_textures(sg_shader_t *shader);
+void sg_shader_bind_texture(sg_shader_t *shader, sg_texture_t *tex,
+                            unsigned tex_unit);
 
 void sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
                           sg_light_t *light);
