@@ -294,8 +294,8 @@ sg_object_animate(sg_object_t *obj, float dt)
 
   float4x4 translate;
   mf4_make_translate(translate, obj->pos);
-  mf4_mul2(obj->modelViewMatrix, obj->R);
   mf4_mul2(obj->modelViewMatrix, translate);
+  mf4_mul2(obj->modelViewMatrix, obj->R);
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_animate(ARRAY_ELEM(obj->subObjects, i), dt);
@@ -316,8 +316,10 @@ sg_object_update(sg_object_t *obj)
     lwcoord_t pos = sg_camera_pos(cam);
 
     obj->lwc = obj->rigidBody->p;
+    lwc_translate3fv(&obj->lwc, obj->rigidBody->p_offset);
     obj->pos = lwc_dist(&obj->lwc, &pos);
   }
+
   q_mf3_convert(obj->R, obj->q);
 
   if (obj->parent) {
@@ -328,79 +330,12 @@ sg_object_update(sg_object_t *obj)
 
   float4x4 translate;
   mf4_make_translate(translate, obj->pos);
-  mf4_mul2(obj->modelViewMatrix, obj->R);
   mf4_mul2(obj->modelViewMatrix, translate);
+  mf4_mul2(obj->modelViewMatrix, obj->R);
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_update(ARRAY_ELEM(obj->subObjects, i));
   }
-}
-
-
-
-sg_object_t*
-sgCreateObject(sg_scene_t *scene)
-{
-  sg_object_t *obj = smalloc(sizeof(sg_object_t));
-  memset(obj, 0, sizeof(sg_object_t));
-
-  obj->parent = NULL;
-  obj->scene = scene;
-
-  lwc_set(&obj->lwc, 0.0, 0.0, 0.0);
-  obj->pos = vf3_set(0.0, 0.0, 0.0);
-  obj->dp = vf3_set(0.0, 0.0, 0.0); // delta pos per time step
-  obj->dr = vf3_set(0.0, 0.0, 0.0); // delta rot per time step
-  obj->q = q_rot(1.0, 0.0, 0.0, 0.0); // Quaternion
-
-  mf4_ident(obj->R);
-  mf4_ident(obj->modelViewMatrix);
-
-  for (int i = 0 ; i < SG_OBJ_MAX_LIGHTS ; i++) {
-    obj->lights[i] = NULL;
-  }
-
-  obj->shader = NULL;
-  obj->geometry = NULL;
-
-  obj_array_init(&obj->subObjects);
-
-  return obj;
-}
-
-sg_object_t*
-sgCreateSubObject(sg_object_t *parent)
-{
-  sg_object_t *obj = smalloc(sizeof(sg_object_t));
-  memset(obj, 0, sizeof(sg_object_t));
-
-  obj->parent = parent;
-  obj->scene = parent->scene;
-
-  obj->pos = vf3_set(0.0, 0.0, 0.0);
-  obj->dp = vf3_set(0.0, 0.0, 0.0); // delta pos per time step
-  obj->dr = vf3_set(0.0, 0.0, 0.0); // delta rot per time step
-  obj->q = q_rot(1.0, 0.0, 0.0, 0.0); // Quaternion
-
-  mf4_ident(obj->R);
-  mf4_ident(obj->modelViewMatrix);
-
-  for (int i = 0 ; i < SG_OBJ_MAX_LIGHTS ; i++) {
-    obj->lights[i] = NULL;
-  }
-
-  obj->shader = NULL;
-  obj->geometry = NULL;
-
-  obj_array_init(&obj->subObjects);
-
-  return obj;
-}
-
-void
-sgObjectSetPos(sg_object_t *obj, float4 pos)
-{
-  obj->pos = pos;
 }
 
 sg_geometry_t*
