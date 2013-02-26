@@ -90,13 +90,15 @@ struct sg_object_t {
 void
 sg_object_print(sg_object_t *obj)
 {
-  ooLogInfo("** object");
+  if (obj->rigidBody) {
+    ooLogInfo("** object %s", obj->rigidBody->name);
 
-  ooLogInfo("\tlwc: [%d %d %d] + [%f %f %f]",
-            obj->lwc.seg.x, obj->lwc.seg.y, obj->lwc.seg.z,
-            obj->lwc.offs.x, obj->lwc.offs.y, obj->lwc.offs.z);
-  ooLogInfo("\tpos: [%f %f %f]", obj->pos.x, obj->pos.y, obj->pos.z);
-  ooLogInfo("\tdp:  [%f %f %f]", obj->dp.x, obj->dp.y, obj->dp.z);
+    ooLogInfo("\tlwc: [%d %d %d] + [%f %f %f]",
+              obj->lwc.seg.x, obj->lwc.seg.y, obj->lwc.seg.z,
+              obj->lwc.offs.x, obj->lwc.offs.y, obj->lwc.offs.z);
+    ooLogInfo("\tpos: [%f %f %f]", obj->pos.x, obj->pos.y, obj->pos.z);
+    ooLogInfo("\tdp:  [%f %f %f]", obj->dp.x, obj->dp.y, obj->dp.z);
+  }
 }
 
 void
