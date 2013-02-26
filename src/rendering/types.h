@@ -34,12 +34,6 @@
 #define SG_OBJ_MAX_TEXTURES 4
 #define SG_OBJ_MAX_LIGHTS 4
 
-typedef enum {
-  SG_CAMERA_FREE, // Free moving camera
-  SG_CAMERA_FIXED, // Fixed at location relative to obj, local rotation allowed
-  SG_CAMERA_ORBITING // Rotating around target object
-} sg_camera_type_t;
-
 typedef struct sg_render_info_t sg_render_info_t;
 typedef struct sg_overlay_t sg_overlay_t;
 typedef struct sg_camera_t sg_camera_t;
