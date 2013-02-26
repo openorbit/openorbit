@@ -635,75 +635,142 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
               sg_material_t *mat)
 {
   ooLogInfo("sphere '%s' radius: %f", name, radius);
-  // NOTE: Z points upwards
+
+  // NOTE: Z is up
   sg_object_t *sphere = sg_new_object(shader);
   float_array_t verts, texc, normals;
   float_array_init(&verts);
   float_array_init(&normals);
   float_array_init(&texc);
-  // 10.0 degree blocks, note,
-  // Outer pass for the stacks, as in latitude, inner pass for the longitude
 
-  // Push north pole first
-  
   // Texture coordinates for vertex http://en.wikipedia.org/wiki/UV_mapping
-  // u = 0.5 - atan2(dz, dx)/2pi  (note assumption is poles on y axis)
+  // u = 0.5 + atan2(dz, dx)/2pi  (note assumption is poles on y axis)
   // v = 0.5 - 2 * asin(dy)/2pi
-  // Allthouhg, we would like to use a single pole vertex, this is not
+  // Allthough, we would like to use a single pole vertex, this is not
   // practical with respect to uv mapping of textures. Therefore we
   // Generate multiple pole coordinates
 
-  int vert_count = 0;
-  for (int i = 90 ; i >= -90 ; i -= 10) {
-    for (int j = -180 ; j <= 180 ; j += 10) {
-      float3 p;
-      p.x = radius * sin(DEG_TO_RAD((float)i)) * cos(DEG_TO_RAD((float)j));
-      p.y = radius * sin(DEG_TO_RAD((float)i)) * sin(DEG_TO_RAD((float)j));
-      p.z = radius * cos(DEG_TO_RAD((float)i));
-      float_array_push(&verts, p.x);
-      float_array_push(&verts, p.y);
-      float_array_push(&verts, p.z);
+  // Build stacks of triangles and the polar caps which are triangle fans,
+  // Note that we waste space by replicating the vertices (and not using
+  // indices here). This is intentional as the code here should be replaced
+  // with a LOD mechanism later on.
 
-      float3 n = vf3_normalise(p);
+  // Default to 10 x 10 degree slices and stacks, note that the texture
+  // coordinates are messed up around the poles here.
+#define STACKS 18
+#define SLICES 36
+
+  // Azimuth is the longitude from [0,2pi]
+  // Inclination correspond to colatitude, i.e. latitude where 0 is the north
+  // pole and pi the south pole. This is obviously 90 - normal latitude.
+  double az_sz = (2.0 * M_PI) / (double)SLICES;
+  double inc_sz = M_PI / (double)STACKS;
+
+  // polar caps
+  for (int j = 0 ; j < SLICES ; j ++) {
+    double az = j * (2.0 * M_PI) / (double)SLICES;
+    double inc = M_PI / (double)STACKS;
+    // Triangle 1 and 2
+    float3 p[6];
+
+    p[0].x = radius * sin(0.0) * cos(az+az_sz/2.0);
+    p[0].y = radius * sin(0.0) * sin(az+az_sz/2.0);
+    p[0].z = radius * cos(0.0);
+    p[1].x = radius * sin(inc) * cos(az);
+    p[1].y = radius * sin(inc) * sin(az);
+    p[1].z = radius * cos(inc);
+    p[2].x = radius * sin(inc) * cos(az+az_sz);
+    p[2].y = radius * sin(inc) * sin(az+az_sz);
+    p[2].z = radius * cos(inc);
+
+    p[3].x = radius * sin(M_PI) * cos(az+az_sz/2.0);
+    p[3].y = radius * sin(M_PI) * sin(az+az_sz/2.0);
+    p[3].z = radius * cos(M_PI);
+    p[4].x = radius * sin(M_PI-inc_sz) * cos(az+az_sz);
+    p[4].y = radius * sin(M_PI-inc_sz) * sin(az+az_sz);
+    p[4].z = radius * cos(M_PI-inc_sz);
+    p[5].x = radius * sin(M_PI-inc_sz) * cos(az);
+    p[5].y = radius * sin(M_PI-inc_sz) * sin(az);
+    p[5].z = radius * cos(M_PI-inc_sz);
+
+    for (int k = 0 ; k < 6 ; k ++) {
+      float_array_push(&verts, p[k].x);
+      float_array_push(&verts, p[k].y);
+      float_array_push(&verts, p[k].z);
+
+      float3 n = vf3_normalise(p[k]);
       float_array_push(&normals, n.x);
       float_array_push(&normals, n.y);
       float_array_push(&normals, n.z);
 
-      float u = 0.5 - atan2(-n.x, -n.y) / (2.0 * M_PI);
+      float u = 0.5 + atan2(-n.x, -n.y) / (2.0 * M_PI);
       float v = 0.5 - 2.0 * asin(-n.z) / (2.0 * M_PI);
       float_array_push(&texc, u); // X
       float_array_push(&texc, v); // Y
-      vert_count ++;
+    }
+
+  }
+  // Handle non polar stacks
+  for (int i = 1 ; i < STACKS - 1 ; i ++) {
+    double inc = i * M_PI / (double)STACKS;
+
+    for (int j = 0 ; j < SLICES ; j ++) {
+      // For every slice we generate two triangles (ccw)
+      double az = j * (2.0 * M_PI) / (double)SLICES;
+
+      // Triangle 1 & 2
+      float3 p[6];
+      p[0].x = radius * sin(inc) * cos(az);
+      p[0].y = radius * sin(inc) * sin(az);
+      p[0].z = radius * cos(inc);
+
+      p[1].x = radius * sin(inc+inc_sz) * cos(az+az_sz);
+      p[1].y = radius * sin(inc+inc_sz) * sin(az+az_sz);
+      p[1].z = radius * cos(inc+inc_sz);
+
+      p[2].x = radius * sin(inc) * cos(az+az_sz);
+      p[2].y = radius * sin(inc) * sin(az+az_sz);
+      p[2].z = radius * cos(inc);
+
+      p[3].x = radius * sin(inc) * cos(az);
+      p[3].y = radius * sin(inc) * sin(az);
+      p[3].z = radius * cos(inc);
+
+      p[4].x = radius * sin(inc+inc_sz) * cos(az);
+      p[4].y = radius * sin(inc+inc_sz) * sin(az);
+      p[4].z = radius * cos(inc+inc_sz);
+
+      p[5].x = radius * sin(inc+inc_sz) * cos(az+az_sz);
+      p[5].y = radius * sin(inc+inc_sz) * sin(az+az_sz);
+      p[5].z = radius * cos(inc+inc_sz);
+
+      for (int k = 0 ; k < 6 ; k ++) {
+        float_array_push(&verts, p[k].x);
+        float_array_push(&verts, p[k].y);
+        float_array_push(&verts, p[k].z);
+
+        float3 n = vf3_normalise(p[k]);
+        float_array_push(&normals, n.x);
+        float_array_push(&normals, n.y);
+        float_array_push(&normals, n.z);
+
+        float u = 0.5 + atan2(-n.x, -n.y) / (2.0 * M_PI);
+        float v = 0.5 - 2.0 * asin(-n.z) / (2.0 * M_PI);
+        float_array_push(&texc, u); // X
+        float_array_push(&texc, v); // Y
+      }
     }
   }
 
-  int_array_t indices;
-  int_array_init(&indices);
-  // For every stack and every slice, we bouild one big triangle strip with
-  // degenerate triangles.
-  for (int i = 0 ; i < 18; i ++) {
-    int_array_push(&indices, ((i + 1)* 18) + 0);
-    for (int j = 0 ; j < 36 ; j ++) {
-      int_array_push(&indices, ((i + 1)* 18) + j);
-      int_array_push(&indices, (i * 18) + j);
-    }
-    int_array_push(&indices, (i * 18) + 35);
-  }
-
-  sg_geometry_t *geo = sg_new_geometry(sphere, GL_TRIANGLE_STRIP, vert_count,
+  sg_geometry_t *geo = sg_new_geometry(sphere, GL_TRIANGLES, ARRAY_LEN(verts)/3,
                                        verts.elems, normals.elems, texc.elems,
-                                       indices.length, GL_UNSIGNED_INT,
-                                       indices.elems, NULL);
-  sphere->geometry = geo;
+                                       0, 0, NULL, NULL);
 
-  float_array_dispose(&verts);
-  float_array_dispose(&normals);
-  float_array_dispose(&texc);
-  int_array_dispose(&indices);
+  sg_object_set_geometry(sphere, geo);
 
   sphere->textures[0] = tex;
-  sphere->textures[1] = nightTex;
-  sphere->textures[2] = spec;
+  sphere->textures[1] = spec;
+  sphere->textures[2] = nightTex;
   sphere->textures[3] = NULL;
   sphere->material = mat;
 
@@ -711,6 +778,11 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
   if (tex) sphere->texCount ++;
   if (nightTex) sphere->texCount ++;
   if (spec) sphere->texCount ++;
+
+  float_array_dispose(&verts);
+  float_array_dispose(&normals);
+  float_array_dispose(&texc);
+
 
   return sphere;
 }
