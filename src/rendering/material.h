@@ -34,4 +34,12 @@ void sg_material_set_spec4f(sg_material_t *mat, float r, float g, float b, float
 void sg_material_set_emiss4f(sg_material_t *mat, float r, float g, float b, float a);
 void sg_material_set_shininess(sg_material_t *mat, float s);
 
+
+float4 sg_material_get_amb(sg_material_t *mat);
+float4 sg_material_get_diff(sg_material_t *mat);
+float4 sg_material_get_spec(sg_material_t *mat);
+float4 sg_material_get_emiss(sg_material_t *mat);
+float sg_material_get_shininess(sg_material_t *mat);
+
+
 #endif /* !SG_MATERIAL_H__ */

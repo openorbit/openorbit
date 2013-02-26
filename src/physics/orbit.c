@@ -401,12 +401,6 @@ plDeleteWorld(PLworld *world)
   free(world);
 }
 
-void
-plSetDrawable(PLastrobody *obj, sg_object_t *drawable)
-{
-  obj->drawable = drawable;
-}
-
 /*!
   Creates a new object
   All objects, even the small ones have a GM value
@@ -436,13 +430,12 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
   obj->obj.name = obj->name = strdup(name);
   obj->sys = NULL;
   obj->world = world;
-  obj->lightSource = NULL;
+
   // TODO: Ensure quaternion is set for orbit
   //       asc * inc * obl ?
 
   plCollideInsertObject(world->collCtxt, &obj->obj);
 
-  obj->drawable = NULL;
   obj->obj.m.m = m;
 
   if (isnormal(gm)) {

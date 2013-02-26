@@ -50,8 +50,7 @@ struct sg_light_ids_t {
   GLint constantAttenuation;
   GLint linearAttenuation;
   GLint quadraticAttenuation;
-  GLint globAmbient;
-} ;
+};
 
 struct sg_material_ids_t {
   GLint emission;
@@ -73,6 +72,7 @@ struct sg_shader_t {
     GLuint texIds[SG_OBJ_MAX_TEXTURES];
     GLboolean tex_validity[SG_OBJ_MAX_TEXTURES];
     sg_light_ids_t lightIds[SG_OBJ_MAX_LIGHTS];
+    GLint globAmbient;
     sg_material_ids_t materialId;
   } uniforms;
 };
@@ -106,7 +106,8 @@ static const char* param_names[SG_PARAM_COUNT] = {
   [SG_LIGHT_CONST_ATTEN] = "oo_Light[%u].constantAttenuation",
   [SG_LIGHT_LINEAR_ATTEN] = "oo_Light[%u].linearAttenuation",
   [SG_LIGHT_QUAD_ATTEN] = "oo_Light[%u].quadraticAttenuation",
-  [SG_LIGHT_MOD_GLOB_AMB] = "oo_Light[%u].globAmbient",
+
+  [SG_LIGHT_MOD_GLOB_AMB] = "oo_LightGlobalAmbient",
 
   [SG_MATERIAL_EMIT] = "oo_Material.emission",
   [SG_MATERIAL_AMB] = "oo_Material.ambient",
@@ -431,10 +432,10 @@ sg_load_shader(const char *key,
     si->uniforms.lightIds[i].quadraticAttenuation =
       sgGetLocationForParamAndIndex(shaderProgram, SG_LIGHT_QUAD_ATTEN, i);
 
-    // Glob amb should be outside of light struct...
-    si->uniforms.lightIds[i].globAmbient =
-      sgGetLocationForParamAndIndex(shaderProgram, SG_LIGHT_MOD_GLOB_AMB, i);
   }
+  // Glob amb should be outside of light struct...
+  si->uniforms.globAmbient = glGetUniformLocation(shaderProgram,
+                                                  "oo_LightGlobalAmbient");
 
   si->uniforms.texIds[0] = glGetUniformLocation(shaderProgram, "oo_Texture0");
   si->uniforms.texIds[1] = glGetUniformLocation(shaderProgram, "oo_Texture1");
@@ -583,6 +584,9 @@ sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
   sg_shader_bind(shader);
 
   float3 pos = sg_light_get_pos(light);
+
+  ooLogInfo("light pos %f %f %f", pos.x, pos.y, pos.z);
+
   float4 amb = sg_light_get_ambient(light);
   float4 diffuse = sg_light_get_diffuse(light);
   float4 specular = sg_light_get_specular(light);
@@ -607,7 +611,13 @@ sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
 
 }
 
+void
+sg_shader_bind_amb(sg_shader_t *shader, float4 light)
+{
+  glUniform4fv(shader->uniforms.globAmbient, 1,
+               (float*)&light);
 
+}
 
 GLint
 sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
@@ -626,7 +636,17 @@ sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
 }
 
 void
-sg_location_bind_matrix(sg_shader_t *prog, sg_param_id_t param)
+sg_shader_bind_material(sg_shader_t *shader, sg_material_t *mat)
 {
-  SG_CHECK_ERROR;
+  float4 amb = sg_material_get_amb(mat);
+  float4 diff = sg_material_get_diff(mat);
+  float4 spec = sg_material_get_spec(mat);
+  float4 emiss = sg_material_get_emiss(mat);
+  float shine = sg_material_get_shininess(mat);
+
+  glUniform4fv(shader->uniforms.materialId.ambient, 1, (float*)&amb);
+  glUniform4fv(shader->uniforms.materialId.diffuse, 1, (float*)&diff);
+  glUniform4fv(shader->uniforms.materialId.specular, 1, (float*)&spec);
+  glUniform4fv(shader->uniforms.materialId.emission, 1, (float*)&emiss);
+  glUniform1f(shader->uniforms.materialId.shininess, shine);
 }

@@ -30,7 +30,7 @@ struct sg_scene_t {
   sg_camera_t *cam;
   sg_background_t *bg;
   obj_array_t objects;
-  obj_array_t lights;
+  obj_array_t lights; // Scene global lights
   float4 amb; // Ambient light for the scene
   obj_array_t shaders;
 };
@@ -67,10 +67,30 @@ sg_scene_add_light(sg_scene_t *sc, sg_light_t *light)
   obj_array_push(&sc->lights, light);
 }
 
+sg_light_t*
+sg_scene_get_light(sg_scene_t *sc, int i)
+{
+  return ARRAY_ELEM(sc->lights, i);
+}
+
+int
+sg_scene_get_num_lights(sg_scene_t *sc)
+{
+  return ARRAY_LEN(sc->lights);
+}
+
+
+
 void
 sg_scene_set_amb4f(sg_scene_t *sc, float r, float g, float b, float a)
 {
   sc->amb = vf4_set(r, g, b, a);
+}
+
+float4
+sg_scene_get_amb(sg_scene_t *sc)
+{
+  return sc->amb;
 }
 
 void
@@ -102,6 +122,8 @@ sg_scene_draw(sg_scene_t *scene, float dt)
   sg_background_draw(scene->bg);
 
   glEnable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_TEXTURE_2D);
 
 #if 1
   ooLogInfo("==== Draw %d Objects ====", ARRAY_LEN(scene->objects));

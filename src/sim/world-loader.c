@@ -447,13 +447,13 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
                                         NULL,
                                         mat);
 
-  sg_light_t *starLightSource = sg_new_light3f(sc, 0.0f, 0.0f, 0.0f);
-
-
   sg_scene_add_object(sc, drawable); // TODO: scale to radius
+  sg_light_t *starLightSource = sg_new_light3f(sc, 0.0f, 0.0f, 0.0f);
+  sg_object_add_light(drawable, starLightSource);
+
   PLworld *world = plNewWorld(starName.u.str, sc, mass, gm, radius,
                               siderealPeriod, axialTilt, radius, flattening);
-  world->rootSys->orbitalBody->lightSource = starLightSource;
+  //world->rootSys->orbitalBody->lightSource = starLightSource;
   world->rootSys->orbitalBody->atm = NULL; // Init as vaccuum
 
   sg_object_set_rigid_body(drawable, &world->rootSys->orbitalBody->obj);

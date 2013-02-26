@@ -57,9 +57,9 @@ struct PLastrobody {
   double GM;
   PLatmosphere *atm;
   PL_keplerian_elements *kepler;
-  sg_object_t *drawable; //!< Link to scenegraph drawable object representing this
-                        //!< object.
-  sg_light_t *lightSource; //!< Light source if the object emits light
+  //sg_object_t *drawable; //!< Link to scenegraph drawable object representing this
+  //                      //!< object.
+  //sg_light_t *lightSource; //!< Light source if the object emits light
 
   // These parameters are used for positioning of objects, they assist
   // calculations where astronomical bodies are assumed to be spheroids. These

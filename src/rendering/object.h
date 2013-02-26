@@ -95,4 +95,5 @@ sg_object_t* sg_load_object(const char *file, sg_shader_t *shader);
 void sg_object_set_shader(sg_object_t *obj, sg_shader_t *shader);
 void sg_object_set_shader_by_name(sg_object_t *obj, const char *shname);
 
+void sg_object_add_light(sg_object_t *obj, sg_light_t *light);
 #endif

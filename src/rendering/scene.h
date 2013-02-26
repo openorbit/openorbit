@@ -36,11 +36,18 @@ void sg_scene_camera_moved(sg_scene_t *scene, float3 cam_dp);
 
 
 void sg_scene_add_object(sg_scene_t *sc, sg_object_t *obj);
+
 void sg_scene_add_light(sg_scene_t *sc, sg_light_t *light);
 void sg_scene_set_amb4f(sg_scene_t *sc, float r, float g, float b, float a);
+float4 sg_scene_get_amb(sg_scene_t *sc);
+
+int sg_scene_get_num_lights(sg_scene_t *sc);
+sg_light_t* sg_scene_get_light(sg_scene_t *sc, int i);
+
 
 // Resynchronize all objects with physics system
 void sg_scene_update(sg_scene_t *scene);
 
 bool sg_scene_has_name(sg_scene_t *sc, const char *name);
+
 #endif

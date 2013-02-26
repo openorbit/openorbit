@@ -19,12 +19,11 @@ struct light_t {
   float constantAttenuation;
   float linearAttenuation;
   float quadraticAttenuation;
-  
-  vec4 globAmbient; // TODO Move out of light type
 };
 
 
 uniform light_t oo_Light[1];
+uniform vec4 oo_LightGlobalAmbient;
 uniform material_t oo_Material;
 
 uniform mat4 oo_ModelViewMatrix;

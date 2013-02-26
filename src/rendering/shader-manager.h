@@ -53,5 +53,7 @@ void sg_shader_bind_texture(sg_shader_t *shader, sg_texture_t *tex,
 
 void sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
                           sg_light_t *light);
+void sg_shader_bind_amb(sg_shader_t *shader, float4 light);
 
+void sg_shader_bind_material(sg_shader_t *shader, sg_material_t *mat);
 #endif /* !RENDERING_SHADER_MANAGER_H */

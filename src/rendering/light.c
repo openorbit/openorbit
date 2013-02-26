@@ -33,9 +33,11 @@
 
 struct sg_light_t {
   sg_scene_t *scene;
+  sg_object_t *obj;
+  float4 pos; // Global pos, relative to object position
+
   int lightId;
 
-  float4 pos;
   float4 ambient;
   float4 specular;
   float4 diffuse;
@@ -47,6 +49,18 @@ struct sg_light_t {
 
   float4 globAmbient;
 };
+
+void
+sg_light_set_obj(sg_light_t *light, sg_object_t *obj)
+{
+  light->obj = obj;
+}
+
+void
+sg_light_set_scene(sg_light_t *light, sg_scene_t *sc)
+{
+  light->scene = sc;
+}
 
 
 void
@@ -70,6 +84,15 @@ sg_light_set_posv(sg_light_t *light, float3 v)
 float3
 sg_light_get_pos(const sg_light_t *light)
 {
+  // Compute actual light pos, relative to camera
+  if (light->obj) {
+    lwcoord_t light_pos;
+    sg_object_get_lwc(light->obj, &light_pos);
+    sg_camera_t *cam = sg_scene_get_cam(light->scene);
+    lwcoord_t cam_pos = sg_camera_pos(cam);
+    float3 dist = lwc_dist(&light_pos, &cam_pos);
+    return dist + light->pos;
+  }
   return light->pos;
 }
 

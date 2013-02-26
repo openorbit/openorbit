@@ -47,7 +47,6 @@ void
 sg_material_bind(sg_material_t *mat, sg_shader_t *shader)
 {
   SG_CHECK_ERROR;
-  
   //glMaterialfv(GL_FRONT, GL_AMBIENT, (GLfloat*)&mat->ambient);
   //glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat*)&mat->diffuse);
   //glMaterialfv(GL_FRONT, GL_SPECULAR, (GLfloat*)&mat->specular);
@@ -122,4 +121,35 @@ void
 sg_material_set_shininess(sg_material_t *mat, float s)
 {
   mat->shininess = s;
+}
+
+
+float4
+sg_material_get_amb(sg_material_t *mat)
+{
+  return mat->ambient;
+}
+
+float4
+sg_material_get_diff(sg_material_t *mat)
+{
+  return mat->diffuse;
+}
+
+float4
+sg_material_get_spec(sg_material_t *mat)
+{
+  return mat->specular;
+}
+
+float4
+sg_material_get_emiss(sg_material_t *mat)
+{
+  return mat->emission;
+}
+
+float
+sg_material_get_shininess(sg_material_t *mat)
+{
+  return mat->shininess;
 }

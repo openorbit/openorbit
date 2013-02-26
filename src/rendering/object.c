@@ -74,6 +74,7 @@ struct sg_object_t {
   float4x4 R;
   float4x4 modelViewMatrix;
 
+  // Light sources associated with this object
   size_t lightCount;
   sg_light_t *lights[SG_OBJ_MAX_LIGHTS];
 
@@ -185,24 +186,24 @@ sg_object_set_scene(sg_object_t *obj, sg_scene_t *sc)
 void
 sg_geometry_draw(sg_geometry_t *geo)
 {
+  assert(geo != NULL);
   SG_CHECK_ERROR;
 
   glEnable(GL_CULL_FACE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glFrontFace(GL_CCW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
+  glCullFace(GL_BACK);
   glBindVertexArray(geo->vba);
 
-  // ???
-  //glEnableVertexAttribArray(geo->vba);
-  //SG_CHECK_ERROR;
+  SG_CHECK_ERROR;
 
   if (geo->has_indices) {
     ooLogInfo("draw %d vertices", (int)geo->index_count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geo->ibo);
     glDrawElements(geo->gl_primitive_type, geo->index_count, geo->index_type, 0);
+    SG_CHECK_ERROR;
   } else {
-    glDrawArrays(geo->gl_primitive_type, 0, geo->vertex_count);
+    if (geo->vertex_count) glDrawArrays(geo->gl_primitive_type, 0, geo->vertex_count);
     SG_CHECK_ERROR;
   }
   //???  glDisableVertexAttribArray(geo->vba);
@@ -218,30 +219,37 @@ sg_object_draw(sg_object_t *obj)
   SG_CHECK_ERROR;
 
   // Set model matrix for current object, we transpose this
-  sg_shader_bind(obj->shader);
-  sg_shader_invalidate_textures(obj->shader);
+  if (obj->geometry) {
+    sg_shader_bind(obj->shader);
+    sg_shader_invalidate_textures(obj->shader);
 
-  const float4x4 *pm = sg_camera_project(sg_scene_get_cam(obj->scene));
-  sg_shader_set_projection(obj->shader, &(*pm)[0]);
+    // TODO: Merge mvp
+    const float4x4 *pm = sg_camera_project(sg_scene_get_cam(obj->scene));
+    sg_shader_set_projection(obj->shader, &(*pm)[0]);
 
-  //const float4 *vm = sg_camera_get_view(sg_scene_get_cam(obj->scene));
-  sg_shader_set_model_view(obj->shader, obj->modelViewMatrix);
+    //const float4 *vm = sg_camera_get_view(sg_scene_get_cam(obj->scene));
+    sg_shader_set_model_view(obj->shader, obj->modelViewMatrix);
 
-  // Set light params for object
-  // TODO: Global ambient light as well...
-  for (int i = 0 ; i < obj->lightCount ; i ++) {
-    sg_shader_bind_light(obj->shader, i, obj->lights[i]);
+    // Set light params for object
+    // TODO: Global ambient light as well...
+    sg_scene_t *scene = obj->scene;
+    int num_lights = sg_scene_get_num_lights(scene);
+    for (int i = 0 ; i < num_lights ; i ++) {
+      sg_shader_bind_light(obj->shader, i, sg_scene_get_light(scene, i));
+    }
+    sg_shader_bind_amb(obj->shader, sg_scene_get_amb(obj->scene));
+    // Set material params
+    sg_shader_bind_material(obj->shader, obj->material);
+
+    // Set texture params
+    for (int i = 0 ; i < obj->texCount ; i ++) {
+      sg_shader_bind_texture(obj->shader, obj->textures[i], i);
+    }
+    //glUniform1iv(obj->shader->texArrayId, SG_OBJ_MAX_TEXTURES, obj->textures);
+
+    sg_geometry_draw(obj->geometry);
+    sg_shader_bind(NULL);
   }
-
-  // Set texture params
-  for (int i = 0 ; i < obj->texCount ; i ++) {
-    sg_shader_bind_texture(obj->shader, obj->textures[i], i);
-  }
-  //glUniform1iv(obj->shader->texArrayId, SG_OBJ_MAX_TEXTURES, obj->textures);
-  // Set material params
-
-  sg_geometry_draw(obj->geometry);
-  sg_shader_bind(NULL);
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_draw(ARRAY_ELEM(obj->subObjects, i));
@@ -418,17 +426,19 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
       maxvert = vert;
     }
   }
+  if (vertexCount == 0) return NULL;
 
   ooLogInfo("geometry: |[%f %f %f]| = %f", maxvert.x, maxvert.y, maxvert.z,
             vf3_abs(maxvert));
 
 
   SG_CHECK_ERROR;
-
   sg_geometry_t *geo = smalloc(sizeof(sg_geometry_t));
   memset(geo, 0, sizeof(sg_geometry_t));
   obj->geometry = geo;
+  geo->obj = obj;
   geo->gl_primitive_type = gl_primitive;
+  geo->vertex_count = vertexCount;
   if (normals) geo->has_normals = true;
   if (texCoords) geo->has_tex_coords = true;
 
@@ -455,8 +465,6 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
 
 
   glBufferSubData(GL_ARRAY_BUFFER, 0, vertexDataSize, vertices);
-
-  sg_shader_t *shader = obj->shader;
 
   glVertexAttribPointer(SG_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(SG_VERTEX);
@@ -524,7 +532,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
 
 /*
   Uses the shader manager to load the shader and then binds the variables
-  we have standardized on. This funciton will be simplified if OS X ever
+  we have standardized on. This function will be simplified if OS X ever
   supports the explicit attrib loc extensions.
  */
 void
@@ -558,6 +566,8 @@ sg_new_object(sg_shader_t *shader)
   obj->q = q_rot(1.0, 0.0, 0.0, 0.0);
   mf4_ident(obj->R);
   mf4_ident(obj->modelViewMatrix);
+
+  obj->material = sg_new_material();
 
   return obj;
 }
@@ -946,4 +956,14 @@ void
 sg_object_set_shader_by_name(sg_object_t *obj, const char *shname)
 {
   obj->shader = sg_get_shader(shname);
+}
+
+void
+sg_object_add_light(sg_object_t *obj, sg_light_t *light)
+{
+  assert(obj->lightCount < SG_MAX_LIGHTS);
+
+  obj->lights[obj->lightCount ++] = light;
+  sg_light_set_obj(light, obj);
+  sg_scene_add_light(obj->scene, light);
 }
