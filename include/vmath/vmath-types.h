@@ -172,12 +172,6 @@ typedef float ma4_t[4][4];
 
 typedef float mat_arr_t[4][4];
 
-typedef union {
-  float a[4][4];
-  float4x4 v;
-} matrix_t;
-
-
 
 #define MAT_ELEM(M, i, j) ((M).a[i][j])
 
