@@ -369,13 +369,13 @@ vd4_dot(double3 a, double3 b)
 
 
 
-float4 m_v_mul(const matrix_t *a, float4 v);
-float3 m_v3_mulf(const matrix_t *a, float3 v);
+float4 m_v_mul(const float4x4 a, float4 v);
+float3 m_v3_mulf(const float4x4 a, float3 v);
 float3 mf3_v_mul(const float3x3 a, float3 v);
 
 void mf4_add(float3x3 a, const float3x3 b, const float3x3 c);
 
-void m_sub(matrix_t *res, matrix_t *a, matrix_t *b)
+void m_sub(float4x4 res, float4x4 a, float4x4 b)
     __attribute__ ((__nonnull__));
 
 float4 v_s_add(float4 a, float b);
@@ -562,27 +562,27 @@ float mf3_det(const float3x3 m);
 
 
 /* creates rotation matrices, these are untested and might not work */
-void m_axis_rot_x(matrix_t *m, float a) __attribute__ ((__nonnull__));
-void m_axis_rot_y(matrix_t *m, float a) __attribute__ ((__nonnull__));
-void m_axis_rot_z(matrix_t *m, float a) __attribute__ ((__nonnull__));
+void m_axis_rot_x(float4x4 m, float a) __attribute__ ((__nonnull__));
+void m_axis_rot_y(float4x4 m, float a) __attribute__ ((__nonnull__));
+void m_axis_rot_z(float4x4 m, float a) __attribute__ ((__nonnull__));
 
-void m_vec_rot_x(matrix_t *m, float a) __attribute__ ((__nonnull__));
-void m_vec_rot_y(matrix_t *m, float a) __attribute__ ((__nonnull__));
-void m_vec_rot_z(matrix_t *m, float a) __attribute__ ((__nonnull__));
+void m_vec_rot_x(float4x4 m, float a) __attribute__ ((__nonnull__));
+void m_vec_rot_y(float4x4 m, float a) __attribute__ ((__nonnull__));
+void m_vec_rot_z(float4x4 m, float a) __attribute__ ((__nonnull__));
 
-void m_rot(matrix_t *m, float x, float y, float z, float alpha);
+void m_rot(float4x4 m, float x, float y, float z, float alpha);
 
 
 /* creates unit matrix */
 
-void m_unit(matrix_t *m) __attribute__ ((__nonnull__));
+void m_unit(float4x4 m) __attribute__ ((__nonnull__));
 
 /* creates zero matrix */
 
-void m_zero(matrix_t *m) __attribute__ ((__nonnull__));
+void m_zero(float4x4 m) __attribute__ ((__nonnull__));
 
 /* copying functions for duplicating matrices and vectors */
-void m_cpy(matrix_t * restrict dst, const matrix_t * restrict src)
+void m_cpy(float4x4 dst, const float4x4 src)
   __attribute__ ((__nonnull__));
 
 
@@ -614,11 +614,11 @@ vf3_gt(float3 a, float3 b)
 
 /*! Compares two matrices for elementvise equality, with a given absolute
  *  tolerance */
-bool m_eq(const matrix_t *a, const matrix_t *b, float tol)
+bool m_eq(const float4x4 a, const float4x4 b, float tol)
     __attribute__ ((__pure__, __nonnull__));
 
 
-void m_translate(matrix_t *m, float x, float y, float z, float w);
+void m_translate(float4x4 m, float x, float y, float z, float w);
 
 static inline float3
 vf3_normalise(float3 v)
@@ -635,13 +635,13 @@ vd3_normalise(double3 v)
 }
 
 static inline void
-m_s_mul(matrix_t *res, const matrix_t *a, float s)
+m_s_mul(float4x4 res, const float4x4 a, float s)
 {
   float4 vs = vf4_set(s, s, s, s);
-  res->v[0] = vf3_mul(a->v[0], vs);
-  res->v[1] = vf3_mul(a->v[1], vs);
-  res->v[2] = vf3_mul(a->v[2], vs);
-  res->v[3] = vf3_mul(a->v[3], vs);
+  res[0] = vf3_mul(a[0], vs);
+  res[1] = vf3_mul(a[1], vs);
+  res[2] = vf3_mul(a[2], vs);
+  res[3] = vf3_mul(a[3], vs);
 }
 
 void mf3_ident(float3x3 m);
@@ -670,6 +670,8 @@ void mf4_transpose2(float4x4 a, const float4x4 b);
 float4 mf4_v_mul(const float4x4 a, float4 v);
 
 void mf4_ident(float4x4 m);
+void mf4_ident_z_up(float4x4 m);
+
 void mf4_cpy(float4x4 a, const float4x4 b);
 void mf4_mul2(float4x4 a, const float4x4 b);
 void mf4_add(float3x3 a, const float3x3 b, const float3x3 c);

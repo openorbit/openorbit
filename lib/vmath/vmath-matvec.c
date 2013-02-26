@@ -70,12 +70,12 @@ v_neg(float4 v)
 #define VM_M4_V4_MUL
 
 float4
-m_v_mul(const matrix_t *a, float4 v) {
+m_v_mul(const float4x4 a, float4 v) {
 	float4 res;
 #if __has_feature(attribute_ext_vector_type)
 	for (int i = 0 ; i < 4 ; i ++) {
-    res[i] = a->a[i][0] * v.x + a->a[i][1] * v.y
-           + a->a[i][2] * v.z + a->a[i][3] * v.w;
+    res[i] = a[i][0] * v.x + a[i][1] * v.y
+           + a[i][2] * v.z + a[i][3] * v.w;
   }
 #else
   float4_u vu = { .v = v };
@@ -91,12 +91,12 @@ m_v_mul(const matrix_t *a, float4 v) {
 #endif /*VM_M4_V4_MUL*/
 
 float3
-m_v3_mulf(const matrix_t *a, float3 v) {
+m_v3_mulf(const float4x4 a, float3 v) {
 	float3 res;
 #if __has_feature(attribute_ext_vector_type)
-	res.x = vf3_dot(a->v[0], v);
-	res.y = vf3_dot(a->v[1], v);
-	res.z = vf3_dot(a->v[2], v);
+	res.x = vf3_dot(a[0], v);
+	res.y = vf3_dot(a[1], v);
+	res.z = vf3_dot(a[2], v);
 #else
   float3_u vu = { .v = v };
   float3_u resu;
@@ -188,34 +188,34 @@ mf3_s_mul(float3x3 res, const float3x3 m, float s)
 #define VM_M4_MUL
 
 void
-m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b) {
+m_mul(float4x4 res, const float4x4 a, const float4x4 b) {
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
-            res->a[i][j] = a->a[i][0]*b->a[0][j]
-                         + a->a[i][1]*b->a[1][j]
-                         + a->a[i][2]*b->a[2][j]
-                         + a->a[i][3]*b->a[3][j];
+            res[i][j] = a[i][0]*b[0][j]
+                         + a[i][1]*b[1][j]
+                         + a[i][2]*b[2][j]
+                         + a[i][3]*b[3][j];
         }
     }
 }
 #endif
 
 void
-m_add(matrix_t *res, matrix_t *a, matrix_t *b)
+m_add(float4x4 res, float4x4 a, float4x4 b)
 {
     for (int i = 0 ; i < 4 ; i ++) {
         for (int j = 0 ; j < 4 ; j ++) {
-            res->a[i][j] = a->a[i][j] + b->a[i][j];
+            res[i][j] = a[i][j] + b[i][j];
         }
     }
 }
 
 void
-m_sub(matrix_t *res, matrix_t *a, matrix_t *b)
+m_sub(float4x4 res, float4x4 a, float4x4 b)
 {
   for (int i = 0 ; i < 4 ; i ++) {
     for (int j = 0 ; j < 4 ; j ++) {
-      res->a[i][j] = a->a[i][j] - b->a[i][j];
+      res[i][j] = a[i][j] - b[i][j];
     }
   }
 }
@@ -316,7 +316,7 @@ v_s_div(float4 a, float s)
 }
 
 void
-m_lu(const matrix_t *a, matrix_t *l, matrix_t *u)
+m_lu(const float4x4 a, float4x4 l, float4x4 u)
 {
     // compute L, U in A=LU, where L, U are triangular
 //    m_cpy(u, a);
@@ -460,113 +460,113 @@ v_abs(float4 v)
 }
 
 void
-m_transpose(matrix_t *mt, const matrix_t *m)
+m_transpose(float4x4 mt, const float4x4 m)
 {
     for ( unsigned int i = 0; i < 4; i += 1 ) {
         for ( unsigned int j = 0; j < 4; j += 1 ) {
-            mt->a[j][i] = m->a[i][j];
+            mt[j][i] = m[i][j];
         }
     }
 }
 
 void
-m_axis_rot_x(matrix_t *m, float a)
+m_axis_rot_x(float4x4 m, float a)
 {
     float sin_a = sin(a);
     float cos_a = cos(a);
-    memset(m, 0, sizeof(matrix_t));
-    m->a[0][0] = S_ONE;
-    m->a[1][1] = cos_a; m->a[1][1] = sin_a;
-    m->a[2][1] = -sin_a; m->a[2][1] = cos_a;
-    m->a[3][3] = S_ONE;
+    memset(m, 0, sizeof(float4x4));
+    m[0][0] = 1.0;
+    m[1][1] = cos_a; m[1][1] = sin_a;
+    m[2][1] = -sin_a; m[2][1] = cos_a;
+    m[3][3] = 1.0;
 }
 
 void
-m_axis_rot_y(matrix_t *m, float a)
+m_axis_rot_y(float4x4 m, float a)
 {
     float sin_a = sin(a);
     float cos_a = cos(a);
-    memset(m, 0, sizeof(matrix_t));
-    m->a[0][0] = cos_a; m->a[0][2] = -sin_a;
-    m->a[1][1] = S_ONE;
-    m->a[2][0] = sin_a; m->a[2][2] = cos_a;
-    m->a[3][3] = S_ONE;
+    memset(m, 0, sizeof(float4x4));
+    m[0][0] = cos_a; m[0][2] = -sin_a;
+    m[1][1] = S_ONE;
+    m[2][0] = sin_a; m[2][2] = cos_a;
+    m[3][3] = S_ONE;
 }
 
 void
-m_axis_rot_z(matrix_t *m, float a)
+m_axis_rot_z(float4x4 m, float a)
 {
     float sin_a = sin(a);
     float cos_a = cos(a);
-    memset(m, 0, sizeof(matrix_t));
-    m->a[0][0] = cos_a; m->a[0][1] = sin_a;
-    m->a[1][0] = -sin_a; m->a[1][1] = cos_a;
-    m->a[2][2] = S_ONE;
-    m->a[3][3] = S_ONE;
+    memset(m, 0, sizeof(float4x4));
+    m[0][0] = cos_a; m[0][1] = sin_a;
+    m[1][0] = -sin_a; m[1][1] = cos_a;
+    m[2][2] = S_ONE;
+    m[3][3] = S_ONE;
 }
 
 
 void
-m_vec_rot_x(matrix_t *m, float a)
+m_vec_rot_x(float4x4 m, float a)
 {
     float sin_a = sin(a);
     float cos_a = cos(a);
-    memset(m, 0, sizeof(matrix_t));
-    m->a[0][0] = S_ONE;
-    m->a[1][1] = cos_a; m->a[1][1] = -sin_a;
-    m->a[2][1] = sin_a; m->a[2][1] = cos_a;
-    m->a[3][3] = S_ONE;
+    memset(m, 0, sizeof(float4x4));
+    m[0][0] = S_ONE;
+    m[1][1] = cos_a; m[1][1] = -sin_a;
+    m[2][1] = sin_a; m[2][1] = cos_a;
+    m[3][3] = S_ONE;
 }
 
 void
-m_vec_rot_y(matrix_t *m, float a)
+m_vec_rot_y(float4x4 m, float a)
 {
     float sin_a = sin(a);
     float cos_a = cos(a);
-    memset(m, 0, sizeof(matrix_t));
-    m->a[0][0] = cos_a; m->a[0][2] = sin_a;
-    m->a[1][1] = 1.0f;
-    m->a[2][0] = -sin_a; m->a[2][2] = cos_a;
-    m->a[3][3] = 1.0f;
+    memset(m, 0, sizeof(float4x4));
+    m[0][0] = cos_a; m[0][2] = sin_a;
+    m[1][1] = 1.0f;
+    m[2][0] = -sin_a; m[2][2] = cos_a;
+    m[3][3] = 1.0f;
 }
 
 void
-m_vec_rot_z(matrix_t *m, float a)
+m_vec_rot_z(float4x4 m, float a)
 {
     float sin_a = sin(a);
     float cos_a = cos(a);
-    memset(m, 0, sizeof(matrix_t));
-    m->a[0][0] = cos_a; m->a[0][1] = -sin_a;
-    m->a[1][0] = sin_a; m->a[1][1] = cos_a;
-    m->a[2][2] = S_ONE;
-    m->a[3][3] = S_ONE;
+    memset(m, 0, sizeof(float4x4));
+    m[0][0] = cos_a; m[0][1] = -sin_a;
+    m[1][0] = sin_a; m[1][1] = cos_a;
+    m[2][2] = S_ONE;
+    m[3][3] = S_ONE;
 }
 
 void
-m_unit(matrix_t *m)
+m_unit(float4x4 m)
 {
-    memset(m, 0, sizeof(matrix_t));
-    m->a[0][0] = S_ONE;
-    m->a[1][1] = S_ONE;
-    m->a[2][2] = S_ONE;
-    m->a[3][3] = S_ONE;
+    memset(m, 0, sizeof(float4x4));
+    m[0][0] = S_ONE;
+    m[1][1] = S_ONE;
+    m[2][2] = S_ONE;
+    m[3][3] = S_ONE;
 }
 
 void
-m_zero(matrix_t *m)
+m_zero(float4x4 m)
 {
-    memset(m, 0, sizeof(matrix_t));
+  memset(m, 0, sizeof(float4x4));
 }
 
 
 void
-m_cpy(matrix_t * restrict dst, const matrix_t * restrict src)
+m_cpy(float4x4 dst, const float4x4 src)
 {
     for (int i = 0 ; i < 4 ; i ++) {
-        dst->a[i][0] = src->a[i][0];
-        dst->a[i][1] = src->a[i][1];
-        dst->a[i][2] = src->a[i][2];
-        dst->a[i][3] = src->a[i][3];
+        dst[i][0] = src[i][0];
+        dst[i][1] = src[i][1];
+        dst[i][2] = src[i][2];
+        dst[i][3] = src[i][3];
     }
 }
 
@@ -591,15 +591,15 @@ v_eq(float4 a, float4  b, float tol)
 }
 
 void
-m_rot(matrix_t *m, float x, float y, float z, float alpha)
+m_rot(float4x4 m, float x, float y, float z, float alpha)
 {
   float c = cosf(alpha);
   float s = sinf(alpha);
 
-  m->v[0] = vf4_set(x*x+(1-x*x)*c, x*y*(1-c)-z*s, x*z*(1-c)+y*s, 0.0);
-  m->v[1] = vf4_set(x*y*(1-c)+z*s, y*y+(1-y*y)*c, y*z*(1-c)-x*s, 0.0);
-  m->v[2] = vf4_set(x*z*(1-c)-y*s, y*z*(1-c)+x*s, z*z+(1-z*z)*c, 0.0);
-  m->v[3] = vf4_set(0.0, 0.0, 0.0, 1.0);
+  m[0] = vf4_set(x*x+(1-x*x)*c, x*y*(1-c)-z*s, x*z*(1-c)+y*s, 0.0);
+  m[1] = vf4_set(x*y*(1-c)+z*s, y*y+(1-y*y)*c, y*z*(1-c)-x*s, 0.0);
+  m[2] = vf4_set(x*z*(1-c)-y*s, y*z*(1-c)+x*s, z*z+(1-z*z)*c, 0.0);
+  m[3] = vf4_set(0.0, 0.0, 0.0, 1.0);
 }
 
 void
@@ -817,31 +817,41 @@ mf4_ident(float4x4 m)
   m[3][3] = 1.0f;
 }
 
+void
+mf4_ident_z_up(float4x4 m)
+{
+  memset(m, 0, sizeof(float4x4));
+  m[0][1] = 1.0f;
+  m[1][2] = 1.0f;
+  m[2][0] = 1.0f;
+  m[3][3] = 1.0f;
+}
+
 
 bool
-m_eq(const matrix_t *a, const matrix_t *b, float tol)
+m_eq(const float4x4 a, const float4x4 b, float tol)
 {
-    for (int i = 0 ; i < 4 ; i ++) {
-        for (int j = 0 ; j < 4 ; j ++) {
-            if (!((a->a[i][j] <= b->a[i][j]+tol) && (a->a[i][j] >= b->a[i][j]-tol))) {
-                return false;
-            }
-        }
+  for (int i = 0 ; i < 4 ; i ++) {
+    for (int j = 0 ; j < 4 ; j ++) {
+      if (!((a[i][j] <= b[i][j]+tol) && (a[i][j] >= b[i][j]-tol))) {
+        return false;
+      }
     }
+  }
 
-    return true;
+  return true;
 }
 
 
 void
-m_translate(matrix_t *m, float x, float y, float z, float w)
+m_translate(float4x4 m, float x, float y, float z, float w)
 {
-    memset(m, 0, sizeof(mat_arr_t));
+    memset(m, 0, sizeof(float4x4));
 
-    m->a[0][0] = x;
-    m->a[1][1] = y;
-    m->a[2][2] = z;
-    m->a[3][3] = w;
+    m[0][0] = x;
+    m[1][1] = y;
+    m[2][2] = z;
+    m[3][3] = w;
 }
 
 

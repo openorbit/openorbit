@@ -58,10 +58,10 @@ q_scalar(quaternion_t q)
 float3
 v_q_rot(float3 v, quaternion_t q)
 {
-  matrix_t m;
-  q_m_convert(&m, q);
+  float4x4 m;
+  q_mf4_convert(m, q);
 
-  float3 res = m_v3_mulf(&m, v);
+  float3 res = m_v3_mulf(m, v);
   return res;
 }
 
@@ -77,50 +77,6 @@ q_vector(quaternion_t q)
   return ru.v;
 #endif
 
-}
-
-void
-q_m_convert(matrix_t *m, quaternion_t q)
-{
-  float n = q_dot(q, q);
-  float a = (n > 0.0f) ? S_TWO / n : 0.0f;
-
-#if __has_feature(attribute_ext_vector_type)
-  float xa = q.x*a, ya = q.y*a, za = q.z*a;
-  float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
-  float yy = q.y*ya, yz = q.y*za, zz = q.z*za;
-  float wx = q.w*xa, wy = q.w*ya, wz = q.w*za;
-#else
-  float4_u qu = { .v = q };
-  float xa = qu.s.x*a;
-  float ya = qu.s.y*a;
-  float za = qu.s.z*a;
-
-  float xy = qu.s.x*ya;
-  float xz = qu.s.x*za;
-  float yz = qu.s.y*za;
-
-  float wx = qu.s.w*xa;
-  float wy = qu.s.w*ya;
-  float wz = qu.s.w*za;
-
-  float xx = qu.s.x*xa;
-  float yy = qu.s.y*ya;
-  float zz = qu.s.z*za;
-
-#endif
-
-  m->a[0][0] = 1.0f-(yy+zz); m->a[0][1] =        xy-wz;
-  m->a[0][2] =        xz+wy; m->a[0][3] = 0.0f;
-
-  m->a[1][0] =        xy+wz; m->a[1][1] = 1.0f-(xx+zz);
-  m->a[1][2] =        yz-wx; m->a[1][3] = 0.0f;
-
-  m->a[2][0] =        xz-wy; m->a[2][1] =        yz+wx;
-  m->a[2][2] = 1.0f-(xx+yy); m->a[2][3] = 0.0f;
-
-  m->a[3][0] = 0.0f;         m->a[3][1] = 0.0f;
-  m->a[3][2] = 0.0f;         m->a[3][3] = 1.0f;
 }
 
 void
@@ -173,19 +129,41 @@ q_mf4_convert(float4x4 m, quaternion_t q)
 #if ! __has_feature(attribute_ext_vector_type)
 #error "clang extended vector attributes required"
 #endif
-  
+
   float n = q_dot(q, q);
   float a = (n > 0.0f) ? 2.0f / n : 0.0f;
-  
+
   float xa = q.x*a, ya = q.y*a, za = q.z*a;
   float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
   float yy = q.y*ya, yz = q.y*za, zz = q.z*za;
   float wx = q.w*xa, wy = q.w*ya, wz = q.w*za;
-  
+
   m[0] = vf4_set(1.0f-(yy+zz), xy-wz, xz+wy, 0.0f);
   m[1] = vf4_set(xy+wz, 1.0f-(xx+zz), yz-wx, 0.0f);
   m[2] = vf4_set(xz-wy, yz+wx, 1.0f-(xx+yy), 0.0f);
   m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
+}
+
+
+void
+q_mf4_convert_z_up(float4x4 m, quaternion_t q)
+{
+#if ! __has_feature(attribute_ext_vector_type)
+#error "clang extended vector attributes required"
+#endif
+
+  float n = q_dot(q, q);
+  float a = (n > 0.0f) ? 2.0f / n : 0.0f;
+
+  float xa = q.x*a, ya = q.y*a, za = q.z*a;
+  float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
+  float yy = q.y*ya, yz = q.y*za, zz = q.z*za;
+  float wx = q.w*xa, wy = q.w*ya, wz = q.w*za;
+
+  m[0] = vf4_set(1.0f-(yy+zz), xz+wy,         xy-wz,         0.0f);
+  m[1] = vf4_set(xy+wz,        yz-wx, 1.0f-(xx+zz),        0.0f);
+  m[2] = vf4_set(xz-wy,        1.0f-(xx+yy), yz+wx,         0.0f);
+  m[3] = vf4_set(0.0f,         0.0f,          0.0f,          1.0f);
 }
 
 
@@ -211,10 +189,30 @@ q_mf4_convert_inv(float4x4 m, quaternion_t q)
 
 }
 
+quaternion_t
+q_slerp(quaternion_t q0, quaternion_t q1, float t)
+{
+  // See http://en.wikipedia.org/wiki/Slerp
+  float qdot = q_dot(q0, q1);
+
+  quaternion_t q1prim;
+  if (qdot < 0.0) {
+    q1prim = -q0;
+  } else {
+    q1prim = q0;
+  }
+
+  float qang = acos(qdot);
+  float s0 = sin((1.0-t)*qang) / sin(qang);
+  float s1 = sin(t*qang) / sin(qang);
+
+  quaternion_t res = s0 * q0 + s1 * q1prim;
+  return res;
+}
 
 
 quaternion_t
-m_q_convert(matrix_t *m)
+mf4_q_convert(float4x4 m)
 {
 #if __has_feature(attribute_ext_vector_type)
   quaternion_t q;
@@ -238,26 +236,26 @@ m_q_convert(matrix_t *m)
 #endif
 
   float tr, s;
-  tr = m->a[0][0] + m->a[1][1] + m->a[2][2];
+  tr = m[0][0] + m[1][1] + m[2][2];
   if (tr >= 0.0f) {
-    s = sqrt(tr+m->a[3][3]);
-    QW(q) = s*S_POINT_FIVE;
-    s = S_POINT_FIVE / s;
-    QX(q) = (m->a[2][1] - m->a[1][2]) * s;
-    QY(q) = (m->a[0][2] - m->a[2][0]) * s;
-    QZ(q) = (m->a[1][0] - m->a[0][1]) * s;
+    s = sqrt(tr+m[3][3]);
+    QW(q) = s*0.5;
+    s = 0.5 / s;
+    QX(q) = (m[2][1] - m[1][2]) * s;
+    QY(q) = (m[0][2] - m[2][0]) * s;
+    QZ(q) = (m[1][0] - m[0][1]) * s;
   } else {
     int h = 0;
-    if (m->a[1][1] > m->a[0][0]) h = 1;
-    if (m->a[2][2] > m->a[h][h]) h = 2;
+    if (m[1][1] > m[0][0]) h = 1;
+    if (m[2][2] > m[h][h]) h = 2;
     switch (h) {
-#define CASE_MACRO(i,j,k,I,J,K)                                     \
-    case I:                                                     \
-      s = sqrt( (m->a[I][I] - (m->a[J][J]+m->a[K][K])) + m->a[3][3] );  \
+#define CASE_MACRO(i,j,k,I,J,K)                             \
+    case I:                                                 \
+      s = sqrt( (m[I][I] - (m[J][J]+m[K][K])) + m[3][3] );  \
       QIDX(q, i) = s*0.5f;                                  \
-      QIDX(q, j) = (m->a[I][J] + m->a[J][I]) * s;                         \
-      QIDX(q, k) = (m->a[K][I] + m->a[I][K]) * s;                         \
-      QW(q) = (m->a[K][J] - m->a[J][K]) * s;                       \
+      QIDX(q, j) = (m[I][J] + m[J][I]) * s;                 \
+      QIDX(q, k) = (m[K][I] + m[I][K]) * s;                 \
+      QW(q) = (m[K][J] - m[J][K]) * s;                      \
       break
     CASE_MACRO(Q_X, Q_Y, Q_Z, 0, 1, 2);
     CASE_MACRO(Q_Y, Q_Z, Q_X, 1, 2, 0);
@@ -269,8 +267,8 @@ m_q_convert(matrix_t *m)
   }
 
   // QUERY: Is the last ref to z correct?
-  if (m->a[3][3] != 0.0f) {
-    s = 1.0f / sqrt(m->a[3][3]);
+  if (m[3][3] != 0.0f) {
+    s = 1.0f / sqrt(m[3][3]);
     QX(q) *= s; QY(q) *= s; QZ(q) *= s; //QZ(q) *= s;
   }
 

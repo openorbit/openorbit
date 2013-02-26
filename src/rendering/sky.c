@@ -168,7 +168,7 @@ sgCreateBackgroundFromFile(const char *file)
 
   glBindVertexArray(0);
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
   free(stars->data); // GL has copied arrays over
   stars->data = NULL;
   SG_CHECK_ERROR;
@@ -181,6 +181,7 @@ sg_background_draw(sg_background_t *bg)
 {
   SG_CHECK_ERROR;
   glDisable(GL_DEPTH_TEST);
+  glDisable(GL_TEXTURE_2D);
   // Background drawing needs to shortcut the normal camera, as the bg
   // is at infinite distance (e.g. regarding translation)
   // Here we rotate the camera as needed
@@ -188,7 +189,10 @@ sg_background_draw(sg_background_t *bg)
   float4x4 rotMatrix;
 
   quaternion_t q = sg_camera_quat(cam);
-  q_mf4_convert(rotMatrix, q);
+  float4x4 qm;
+  q_mf4_convert(qm, q);
+  mf4_ident_z_up(rotMatrix);
+  mf4_mul2(rotMatrix, qm);
 
   sg_shader_bind(bg->shader);
   sg_shader_set_projection(bg->shader, *sg_camera_project(cam));

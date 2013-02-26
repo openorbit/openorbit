@@ -35,7 +35,14 @@
 #include "scenegraph.h"
 #include "palloc.h"
 
-
+/*
+ Note, due to the large world and floating point precision, when rotating the
+ camera, we are rotating the world around the camera, not the camera itself.
+ Second, which may be confusing, for the matrix math here, the y axis is up,
+ thus, this is not really what is used for planets and the physics system where
+ the z axis is up. We should perhaps fix this. One way would be to add an
+ identity matrix which shuffles the y and z axises.
+ */
 struct sg_camera_t {
   sg_scene_t *scene;
   float4x4 proj_matrix;
@@ -49,8 +56,8 @@ struct sg_camera_t {
 
   quaternion_t aq;  // Actual quaternion (tq * rq)
   quaternion_t tq;  // Rotation quaternion, this is the target direction
-  quaternion_t rq; // Relative rotation to tq
-  quaternion_t dq; // Rotation per time unit of rq
+  quaternion_t rq;  // Relative rotation to tq
+  quaternion_t dq;  // Rotation per time unit of rq
 
   // If there is a target object, rotation is relative to that objects location
   // the source object constrains the lwc variable.
@@ -83,7 +90,10 @@ sg_camera_project(sg_camera_t *cam)
 void
 sg_camera_update_modelview(sg_camera_t *cam)
 {
-  q_mf4_convert_inv(cam->view_matrix, cam->aq);
+  float4x4 qm;
+  q_mf4_convert(qm, cam->aq);
+  mf4_ident_z_up(cam->view_matrix);
+  mf4_mul2(cam->view_matrix, qm);
 }
 
 const float4x4*
@@ -92,25 +102,46 @@ sg_camera_modelview(sg_camera_t *cam)
   return &cam->view_matrix;
 }
 
-
 void
 sg_camera_step(sg_camera_t * cam, float dt)
 {
-  cam->lwc_offset += cam->dp * dt;
-  cam->p = cam->lwc;
-  lwc_translate3fv(&cam->p, cam->lwc_offset);
-  sg_scene_camera_moved(cam->scene, cam->dp * dt);
-
-  if ((cam->src == cam->tgt) && cam->src) {
-    // Orbiting object, this means that we do not rotate the rq quat, but move
-    // and ensure that the new tq points at the target
-
-  }
-
-
   quaternion_t q = q_s_mul(cam->dq, dt);
   cam->rq = q_normalise(q_mul(q, cam->rq));
   cam->aq = q_normalise(q_mul(cam->rq, cam->tq));
+
+  cam->lwc_offset += cam->dp * dt;
+
+  if (cam->src) {
+    sg_object_get_lwc(cam->src, &cam->lwc);
+  }
+  cam->p = cam->lwc;
+  lwc_translate3fv(&cam->p, cam->lwc_offset);
+
+  // Tracking the follow object
+  if ((cam->src == cam->tgt) && cam->src) {
+    lwcoord_t tgt_lwc;
+    sg_object_get_lwc(cam->tgt, &tgt_lwc);
+
+    // Old target vector
+    float3 target = vf3_normalise(lwc_dist(&tgt_lwc, &cam->p));
+    float4x4 matrix;
+
+    q_mf4_convert(matrix, cam->aq);
+    float4 v = mf4_v_mul(matrix, vf4_set(-1.0, 0.0, 0.0, 0.0));
+    v = vf4_s_mul(v, vf3_abs(target));
+    cam->lwc = tgt_lwc;
+    lwc_translate3fv(&cam->lwc, v);
+    cam->p = cam->lwc;
+    // We have the camera quaternion, we need to make a vector point in its
+    // direction
+    // Orbiting object, this means that we do not rotate the rq quat, but move
+    // and ensure that the new tq points at the target
+    //quaternion_t qtarget = q_rotv(target, 0.0);
+
+  }
+
+  sg_scene_camera_moved(cam->scene, cam->dp * dt);
+
   sg_camera_update_modelview(cam);
 }
 
@@ -122,7 +153,7 @@ sg_camera_update_constraints(sg_camera_t *cam)
     sg_object_get_lwc(cam->src, &cam->lwc);
     cam->p = cam->lwc;
     lwc_translate3fv(&cam->p, cam->lwc_offset);
-    cam->dp = sg_object_get_vel(cam->src);
+    //cam->dp = sg_object_get_vel(cam->src);
   }
 
   // Are we pointing somewhere, if so we need to get the target vector
@@ -146,12 +177,18 @@ sg_new_camera(sg_scene_t *scene)
 {
   sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
 
-  cam->dq = q_rot(0.0, 0.0, 1.0, 0.0);
-  cam->rq = q_rot(0.0, 0.0, 1.0, 0.0);
-  cam->tq = q_rot(0.0, 0.0, 1.0, 0.0);
-  cam->aq = q_rot(0.0, 0.0, 1.0, 0.0);
+  cam->dq = Q_IDENT;
+  cam->rq = q_mul(q_rot(0.0, 1.0, 0.0, M_PI_2), q_rot(1.0, 0.0, 0.0, M_PI_2));
+  cam->tq = Q_IDENT;
+  cam->aq = cam->rq;
 
-  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), 1.0, 0.1, 1000000000000.0);
+  mf4_perspective(cam->proj_matrix, M_PI_2, 1.0, 0.1, 1000000000000.0);
+  mf4_ident_z_up(cam->view_matrix);
+  float4x4 tmp;
+  mf4_lookat(tmp, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+  mf4_mul2(cam->view_matrix, tmp);
+
+
   sg_camera_update_modelview(cam);
 
   cam->scene = scene;
@@ -196,7 +233,6 @@ sg_camera_set_perspective(sg_camera_t *cam, float perspective)
 
 /* Camera actions, registered as action handlers */
 
-
 // TODO: Cleanup, move camera rotate io handler to sim module
 sg_scene_t* sim_get_scene(void);
 
@@ -210,17 +246,21 @@ sg_camera_rotate_hat(int buttonVal, void *data)
   if ((cam->src == cam->tgt) && cam->src) {
     // We are targeting our follow object this means orbiting it
     if (buttonVal == -1) {
-      cam->dq = q_rot(0.0, 0.0, 1.0, 0.0);
+      cam->dq = Q_IDENT;
     } else {
-      cam->dq = q_rot(cosf(DEG_TO_RAD(buttonVal)),
-                      sinf(DEG_TO_RAD(buttonVal)), 0.0, 0.1);
+      cam->dq = q_rot(0.0,
+                      -cosf(DEG_TO_RAD(buttonVal)),
+                      -sinf(DEG_TO_RAD(buttonVal)),
+                      0.1);
     }
   } else {
     if (buttonVal == -1) {
-      cam->dq = q_rot(0.0, 0.0, 1.0, 0.0);
+      cam->dq = Q_IDENT;
     } else {
-      cam->dq = q_rot(cosf(DEG_TO_RAD(buttonVal)),
-                      sinf(DEG_TO_RAD(buttonVal)), 0.0, 0.1);
+      cam->dq = q_rot(0.0,
+                      cosf(DEG_TO_RAD(buttonVal)),
+                      sinf(DEG_TO_RAD(buttonVal)),
+                      0.1);
     }
   }
 }
