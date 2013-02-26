@@ -178,16 +178,15 @@ sg_new_camera(sg_scene_t *scene)
   sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
 
   cam->dq = Q_IDENT;
-  cam->rq = q_mul(q_rot(0.0, 1.0, 0.0, M_PI_2), q_rot(1.0, 0.0, 0.0, M_PI_2));
+  cam->rq = Q_IDENT;
   cam->tq = Q_IDENT;
-  cam->aq = cam->rq;
+  cam->aq = Q_IDENT;
 
   mf4_perspective(cam->proj_matrix, M_PI_2, 1.0, 0.1, 1000000000000.0);
   mf4_ident_z_up(cam->view_matrix);
   float4x4 tmp;
   mf4_lookat(tmp, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
   mf4_mul2(cam->view_matrix, tmp);
-
 
   sg_camera_update_modelview(cam);
 
