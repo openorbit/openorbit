@@ -50,11 +50,6 @@ void sg_object_set_scene(sg_object_t *obj, sg_scene_t *sc);
 void sg_object_set_material(sg_object_t *obj, sg_material_t *mat);
 void sg_object_set_geo(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                        float *vertices, float *normals, float *texCoords);
-sg_object_t* sgCreateObject(sg_scene_t *scene);
-sg_object_t* sgCreateSubObject(sg_object_t *parent);
-
-void sgObjectSetPos(sg_object_t *obj, float4 pos);
-void sgObjectLoadShader(sg_object_t *obj, const char *name);
 
 sg_geometry_t*
 sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
@@ -82,7 +77,7 @@ sg_object_t* sg_new_object(sg_shader_t *shader);
 void sg_object_animate(sg_object_t *obj, float dt); // Linear interpolation between frames
 void sg_object_update(sg_object_t *obj); // Pull from physis system
 
-void sgRecomputeModelViewMatrix(sg_object_t *obj);
+void sg_object_recompute_modelviewmatrix(sg_object_t *obj);
 void sg_object_draw(sg_object_t *obj);
 void sg_geometry_draw(sg_geometry_t *geo);
 

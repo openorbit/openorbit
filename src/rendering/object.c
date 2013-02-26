@@ -139,13 +139,7 @@ sg_object_set_pos(sg_object_t *obj, float3 pos)
 void
 sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc)
 {
-  if (obj->rigidBody) {
-    *lwc = obj->rigidBody->p;
-    lwc_translate3fv(lwc, obj->rigidBody->p_offset);
-    return;
-  }
-
-  ooLogError("lwc queiried on object without physical backing");
+  *lwc = obj->lwc;
 }
 
 
@@ -258,7 +252,7 @@ sg_object_draw(sg_object_t *obj)
 }
 
 void
-sgRecomputeModelViewMatrix(sg_object_t *obj)
+sg_object_recompute_modelviewmatrix(sg_object_t *obj)
 {
   if (obj->parent) {
     mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
@@ -267,13 +261,13 @@ sgRecomputeModelViewMatrix(sg_object_t *obj)
     mf4_cpy(obj->modelViewMatrix, *sg_camera_modelview(cam));
   }
 
-  mf4_mul2(obj->modelViewMatrix, obj->R);
   float4x4 t;
   mf4_make_translate(t, obj->pos);
   mf4_mul2(obj->modelViewMatrix, t);
+  mf4_mul2(obj->modelViewMatrix, obj->R);
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
-    sgRecomputeModelViewMatrix(ARRAY_ELEM(obj->subObjects, i));
+    sg_object_recompute_modelviewmatrix(ARRAY_ELEM(obj->subObjects, i));
   }
 }
 
