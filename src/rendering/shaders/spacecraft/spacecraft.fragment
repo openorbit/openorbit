@@ -8,22 +8,23 @@ struct material_t {
   float shininess;
 };
 
+
 struct light_t {
   vec3 pos;
   vec4 ambient;
   vec4 specular;
   vec4 diffuse;
   vec3 dir; // Only used for spotlights
-  
+
   float constantAttenuation;
   float linearAttenuation;
   float quadraticAttenuation;
-
-  vec4 globAmbient;
 };
 
 
 uniform light_t oo_Light[1];
+uniform vec4 oo_LightGlobalAmbient;
+
 uniform material_t oo_Material;
 
 
