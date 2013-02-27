@@ -192,7 +192,7 @@ sg_geometry_draw(sg_geometry_t *geo)
   SG_CHECK_ERROR;
 
   if (geo->has_indices) {
-    ooLogInfo("draw %d vertices", (int)geo->index_count);
+    //ooLogInfo("draw %d vertices", (int)geo->index_count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geo->ibo);
     glDrawElements(geo->gl_primitive_type, geo->index_count, geo->index_type, 0);
     SG_CHECK_ERROR;
@@ -214,39 +214,57 @@ sg_object_draw(sg_object_t *obj)
 
   // Set model matrix for current object, we transpose this
   if (obj->geometry) {
+    SG_CHECK_ERROR;
     sg_shader_bind(obj->shader);
+    SG_CHECK_ERROR;
+
     sg_shader_invalidate_textures(obj->shader);
+    SG_CHECK_ERROR;
 
     // TODO: Merge mvp
     const float4x4 *pm = sg_camera_project(sg_scene_get_cam(obj->scene));
     sg_shader_set_projection(obj->shader, &(*pm)[0]);
-
+    SG_CHECK_ERROR;
     //const float4 *vm = sg_camera_get_view(sg_scene_get_cam(obj->scene));
     sg_shader_set_model_view(obj->shader, obj->modelViewMatrix);
-
+    SG_CHECK_ERROR;
     // Set light params for object
     // TODO: Global ambient light as well...
     sg_scene_t *scene = obj->scene;
     int num_lights = sg_scene_get_num_lights(scene);
     for (int i = 0 ; i < num_lights ; i ++) {
+      SG_CHECK_ERROR;
       sg_shader_bind_light(obj->shader, i, sg_scene_get_light(scene, i));
+      SG_CHECK_ERROR;
     }
+    SG_CHECK_ERROR;
+
     sg_shader_bind_amb(obj->shader, sg_scene_get_amb(obj->scene));
+    SG_CHECK_ERROR;
     // Set material params
     sg_shader_bind_material(obj->shader, obj->material);
-
+    SG_CHECK_ERROR;
     // Set texture params
     for (int i = 0 ; i < obj->texCount ; i ++) {
+      SG_CHECK_ERROR;
       sg_shader_bind_texture(obj->shader, obj->textures[i], i);
+      SG_CHECK_ERROR;
     }
     //glUniform1iv(obj->shader->texArrayId, SG_OBJ_MAX_TEXTURES, obj->textures);
 
+    SG_CHECK_ERROR;
+
     sg_geometry_draw(obj->geometry);
+    SG_CHECK_ERROR;
     sg_shader_bind(NULL);
+    SG_CHECK_ERROR;
   }
+  SG_CHECK_ERROR;
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
+    SG_CHECK_ERROR;
     sg_object_draw(ARRAY_ELEM(obj->subObjects, i));
+    SG_CHECK_ERROR;
   }
   SG_CHECK_ERROR;
 }

@@ -135,7 +135,9 @@ sg_overlay_draw(sg_overlay_t *overlay)
   SG_CHECK_ERROR;
 
   // First render the texture that we place in the overlay
+  SG_CHECK_ERROR;
   sg_shader_bind(overlay->shader);
+  SG_CHECK_ERROR;
   glBindFramebuffer(GL_FRAMEBUFFER, overlay->fbo);
   SG_CHECK_ERROR;
   glClearColor(overlay->clear_color[0], overlay->clear_color[1],

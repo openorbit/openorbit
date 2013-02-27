@@ -194,6 +194,7 @@ sg_background_draw(sg_background_t *bg)
   mf4_ident_z_up(rotMatrix);
   mf4_mul2(rotMatrix, qm);
 
+  SG_CHECK_ERROR;
   sg_shader_bind(bg->shader);
   sg_shader_set_projection(bg->shader, *sg_camera_project(cam));
   sg_shader_set_model_view(bg->shader, rotMatrix);

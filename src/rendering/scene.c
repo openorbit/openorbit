@@ -99,7 +99,7 @@ sg_scene_update(sg_scene_t *scene)
   sg_camera_update_constraints(scene->cam);
   sg_camera_update_modelview(scene->cam);
 
-  ooLogInfo("scene update\n");
+  ooLogTrace("scene update\n");
   ARRAY_FOR_EACH(i, scene->objects) {
     sg_object_update(ARRAY_ELEM(scene->objects, i));
   }
@@ -119,22 +119,26 @@ sg_scene_draw(sg_scene_t *scene, float dt)
   sg_camera_step(scene->cam, dt);
 
   sg_camera_update_modelview(scene->cam);
+  SG_CHECK_ERROR;
   sg_background_draw(scene->bg);
+  SG_CHECK_ERROR;
 
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
-  glEnable(GL_TEXTURE_2D);
+  SG_CHECK_ERROR;
 
 #if 1
-  ooLogInfo("==== Draw %d Objects ====", ARRAY_LEN(scene->objects));
+  ooLogTrace("==== Draw %d Objects ====", ARRAY_LEN(scene->objects));
 
   ARRAY_FOR_EACH(i, scene->objects) {
     //sgRecomputeModelViewMatrix(ARRAY_ELEM(scene->objects, i));
     sg_object_animate(ARRAY_ELEM(scene->objects, i), dt);
+    SG_CHECK_ERROR;
     sg_object_draw(ARRAY_ELEM(scene->objects, i));
-    sg_object_print(ARRAY_ELEM(scene->objects, i));
+    SG_CHECK_ERROR;
+    //sg_object_print(ARRAY_ELEM(scene->objects, i));
   }
-  ooLogInfo("========================");
+  ooLogTrace("========================");
 #endif
   SG_CHECK_ERROR;
 }
