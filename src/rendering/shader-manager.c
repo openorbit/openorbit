@@ -66,11 +66,11 @@ struct sg_shader_t {
 
   // Uniform IDs
   struct {
-    GLuint modelViewId;
-    GLuint projectionId;
-    GLuint normalMatrixId;
-    GLuint texIds[SG_OBJ_MAX_TEXTURES];
-    GLboolean tex_validity[SG_OBJ_MAX_TEXTURES];
+    GLint modelViewId;
+    GLint projectionId;
+    GLint normalMatrixId;
+    GLint texIds[SG_OBJ_MAX_TEXTURES];
+    GLint tex_validity[SG_OBJ_MAX_TEXTURES];
     sg_light_ids_t lightIds[SG_OBJ_MAX_LIGHTS];
     GLint globAmbient;
     sg_material_ids_t materialId;
@@ -451,6 +451,7 @@ sg_load_shader(const char *key,
   si->uniforms.tex_validity[3] = glGetUniformLocation(shaderProgram,
                                                       "oo_Texture3_valid");
 
+
   return si;
 }
 
@@ -498,7 +499,7 @@ sg_shader_bind(sg_shader_t *program)
 {
   SG_CHECK_ERROR;
   if (program) {
-    ooLogInfo("bind shader '%s'", program->name);
+    //ooLogInfo("bind shader '%s'", program->name);
     glUseProgram(program->shaderId);
   } else {
     glUseProgram(0);
@@ -510,39 +511,38 @@ void
 sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj)
 {
   assert(shader != NULL);
-
+  SG_CHECK_ERROR;
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.projectionId, 1, GL_TRUE,
                      (GLfloat*)proj);
-
-  for (int i = 0; i < 4; i++) {
-    ooLogInfo("project[%d]: [%f %f %f %f]",
-              i, proj[i].x, proj[i].y, proj[i].z, proj[i].w);
-  }
-
   SG_CHECK_ERROR;
+
+  //for (int i = 0; i < 4; i++) {
+  //  ooLogInfo("project[%d]: [%f %f %f %f]",
+  //            i, proj[i].x, proj[i].y, proj[i].z, proj[i].w);
+  //}
 }
 
 void
 sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
 {
   assert(shader != NULL);
-
+  SG_CHECK_ERROR;
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.modelViewId, 1, GL_TRUE,
                      (GLfloat*)modelview);
-
-  for (int i = 0; i < 4; i++) {
-    ooLogInfo("model[%d]: [%f %f %f %f]",
-              i, modelview[i].x, modelview[i].y, modelview[i].z, modelview[i].w);
-  }
-
   SG_CHECK_ERROR;
+
+  //for (int i = 0; i < 4; i++) {
+  //  ooLogInfo("model[%d]: [%f %f %f %f]",
+  //           i, modelview[i].x, modelview[i].y, modelview[i].z, modelview[i].w);
+  //}
 }
 
 void
 sg_shader_bind_param_3fv(sg_shader_t *shader, sg_param_id_t param, float3 p)
 {
+  SG_CHECK_ERROR;
   sg_shader_bind(shader);
   glUniform3fv(sg_shader_get_location(shader, param, true), 1, (float*)&p);
   SG_CHECK_ERROR;
@@ -551,6 +551,7 @@ sg_shader_bind_param_3fv(sg_shader_t *shader, sg_param_id_t param, float3 p)
 void
 sg_shader_bind_param_4fv(sg_shader_t *shader, sg_param_id_t param, float4 p)
 {
+  SG_CHECK_ERROR;
   sg_shader_bind(shader);
   glUniform4fv(sg_shader_get_location(shader, param, true), 1, (float*)&p);
   SG_CHECK_ERROR;
@@ -559,33 +560,54 @@ sg_shader_bind_param_4fv(sg_shader_t *shader, sg_param_id_t param, float4 p)
 void
 sg_shader_bind_texture(sg_shader_t *shader, sg_texture_t *tex, unsigned tex_unit)
 {
+  SG_CHECK_ERROR;
   sg_shader_bind(shader);
   glUniform1i(shader->uniforms.texIds[tex_unit], tex_unit);
   glActiveTexture(GL_TEXTURE0 + tex_unit);
   glBindTexture(GL_TEXTURE_2D, sg_texture_get_id(tex));
   //glBindSampler(tex_unit, linearFiltering);
+  SG_CHECK_ERROR;
 
-  glUniform1i(shader->uniforms.tex_validity[tex_unit], 1);
+  if (shader->uniforms.tex_validity[tex_unit] >= 0) {
+    glUniform1i(shader->uniforms.tex_validity[tex_unit], 1);
+    SG_CHECK_ERROR;
+  }
+  SG_CHECK_ERROR;
 }
 
 void
 sg_shader_invalidate_textures(sg_shader_t *shader)
 {
-  glUniform1i(shader->uniforms.tex_validity[0], 0);
-  glUniform1i(shader->uniforms.tex_validity[1], 0);
-  glUniform1i(shader->uniforms.tex_validity[2], 0);
-  glUniform1i(shader->uniforms.tex_validity[3], 0);
+  SG_CHECK_ERROR;
+  sg_shader_bind(shader);
+  if (shader->uniforms.tex_validity[0] >= 0) {
+    glUniform1i(shader->uniforms.tex_validity[0], 0);
+    SG_CHECK_ERROR;
+  }
+  if (shader->uniforms.tex_validity[1] >= 0) {
+    glUniform1i(shader->uniforms.tex_validity[1], 0);
+    SG_CHECK_ERROR;
+  }
+  if (shader->uniforms.tex_validity[2] >= 0) {
+    glUniform1i(shader->uniforms.tex_validity[2], 0);
+    SG_CHECK_ERROR;
+  }
+  if (shader->uniforms.tex_validity[3] >= 0) {
+    glUniform1i(shader->uniforms.tex_validity[3], 0);
+    SG_CHECK_ERROR;
+  }
 }
 
 void
 sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
                      sg_light_t *light)
 {
+  SG_CHECK_ERROR;
   sg_shader_bind(shader);
 
   float3 pos = sg_light_get_pos(light);
 
-  ooLogInfo("light pos %f %f %f", pos.x, pos.y, pos.z);
+  //ooLogInfo("light pos %f %f %f", pos.x, pos.y, pos.z);
 
   float4 amb = sg_light_get_ambient(light);
   float4 diffuse = sg_light_get_diffuse(light);
