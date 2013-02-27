@@ -181,7 +181,6 @@ sg_background_draw(sg_background_t *bg)
 {
   SG_CHECK_ERROR;
   glDisable(GL_DEPTH_TEST);
-  glDisable(GL_TEXTURE_2D);
   // Background drawing needs to shortcut the normal camera, as the bg
   // is at infinite distance (e.g. regarding translation)
   // Here we rotate the camera as needed
