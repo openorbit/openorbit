@@ -285,6 +285,8 @@
 		ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909AF1175A65A00E8D477 /* mapped-file.c */; };
 		ECCE40B31541B52000CA2B54 /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = ECCE40B21541B52000CA2B54 /* log.h */; };
 		ECCED4E011CFD8EB00F20D07 /* config.i in Sources */ = {isa = PBXBuildFile; fileRef = ECCED4DF11CFD8EB00F20D07 /* config.i */; };
+		ECD57DE316DFBE4200815416 /* monotonic-time.c in Sources */ = {isa = PBXBuildFile; fileRef = ECD57DE216DFBE4200815416 /* monotonic-time.c */; };
+		ECD57DE416DFBE4200815416 /* monotonic-time.c in Sources */ = {isa = PBXBuildFile; fileRef = ECD57DE216DFBE4200815416 /* monotonic-time.c */; };
 		ECDA4BBF1539FCCB00B78FED /* moduleinit.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDA4BBE1539FCCB00B78FED /* moduleinit.c */; };
 		ECDA4BC01539FCCB00B78FED /* moduleinit.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDA4BBE1539FCCB00B78FED /* moduleinit.c */; };
 		ECDC29FD111498100066AF2D /* particles.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDC29FC111498100066AF2D /* particles.c */; };
@@ -757,6 +759,8 @@
 		ECC909B01175A65A00E8D477 /* mapped-file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mapped-file.h"; sourceTree = "<group>"; };
 		ECCE40B21541B52000CA2B54 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
 		ECCED4DF11CFD8EB00F20D07 /* config.i */ = {isa = PBXFileReference; explicitFileType = sourcecode; fileEncoding = 4; path = config.i; sourceTree = "<group>"; };
+		ECD57DE216DFBE4200815416 /* monotonic-time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "monotonic-time.c"; sourceTree = "<group>"; };
+		ECD57DE516DFBEC300815416 /* monotonic-time.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "monotonic-time.h"; sourceTree = "<group>"; };
 		ECDA4BBE1539FCCB00B78FED /* moduleinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = moduleinit.c; sourceTree = "<group>"; };
 		ECDC29FB111498100066AF2D /* particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particles.h; sourceTree = "<group>"; };
 		ECDC29FC111498100066AF2D /* particles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = particles.c; sourceTree = "<group>"; };
@@ -1035,6 +1039,8 @@
 				ECDA4BBE1539FCCB00B78FED /* moduleinit.c */,
 				EC7CA611143AF4B500E22F4E /* stringextras.c */,
 				EC7CA614143AF50B00E22F4E /* stringextras.h */,
+				ECD57DE216DFBE4200815416 /* monotonic-time.c */,
+				ECD57DE516DFBEC300815416 /* monotonic-time.h */,
 			);
 			path = common;
 			sourceTree = "<group>";
@@ -2237,6 +2243,7 @@
 				EC8CC1ED15F1FE0E00FC71F4 /* cmod.c in Sources */,
 				EC8CC1EF15F1FE0E00FC71F4 /* collada.c in Sources */,
 				EC8CC1F515F2003E00FC71F4 /* overlay.c in Sources */,
+				ECD57DE316DFBE4200815416 /* monotonic-time.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2340,6 +2347,7 @@
 				EC8CC1EE15F1FE0E00FC71F4 /* cmod.c in Sources */,
 				EC8CC1F015F1FE0E00FC71F4 /* collada.c in Sources */,
 				EC8CC1F615F2003E00FC71F4 /* overlay.c in Sources */,
+				ECD57DE416DFBE4200815416 /* monotonic-time.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
