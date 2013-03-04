@@ -241,7 +241,7 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
 
   bool has_warned_for_materials = false;
 
-  sg_object_t *model = sg_new_object(shader);
+  sg_object_t *model = sg_new_object(shader, obj->name);
 
   // Transfer rotation matrix, but ensure it is transposed for GL
   // Note, no longer applicable for GL 3, we simply flag matrix uniforms as
@@ -429,7 +429,7 @@ ac3d_to_model(struct ac3d_file_t *ac3d, sg_shader_t *shader)
   sg_object_t *model = NULL;
 
   if (ac3d->obj_count > 1) {
-    model = sg_new_object(shader);
+    model = sg_new_object(shader, "");
     for (int i = 0 ; i < ac3d->obj_count ; ++ i) {
       sg_object_t *child = ac3d_obj_to_model(ac3d, ac3d->objs[i], shader);
       assert(child != NULL);

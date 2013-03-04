@@ -59,6 +59,26 @@ sg_scene_add_object(sg_scene_t *sc, sg_object_t *obj)
 {
   obj_array_push(&sc->objects, obj);
   sg_object_set_scene(obj, sc);
+
+  qsort_b(sc->objects.elems, sc->objects.length, sizeof(sg_object_t*),
+          ^int(const void *a, const void *b) {
+            const sg_object_t **ap = (const sg_object_t **)a;
+            const sg_object_t **bp = (const sg_object_t **)b;
+            return strcmp(sg_object_get_name(*ap), sg_object_get_name(*bp));
+          });
+}
+
+sg_object_t*
+sg_scene_get_object(sg_scene_t *sc, const char *name)
+{
+  sg_object_t **obj =
+    bsearch_b(name, sc->objects.elems, sc->objects.length, sizeof(sg_object_t*),
+              ^int(const void *a, const void *b) {
+                const sg_object_t **bp = (const sg_object_t **)b;
+                return strcmp(a, sg_object_get_name(*bp));
+              });
+
+  return (obj) ? *obj : NULL;
 }
 
 void

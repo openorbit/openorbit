@@ -45,6 +45,7 @@ quaternion_t sg_object_get_quat(sg_object_t *obj);
 void sg_object_set_quat(sg_object_t *obj, quaternion_t q);
 
 void sg_object_set_rot(sg_object_t *obj, const float4x4 *r);
+const char* sg_object_get_name(const sg_object_t *obj);
 void sg_object_set_scene(sg_object_t *obj, sg_scene_t *sc);
 
 void sg_object_set_material(sg_object_t *obj, sg_material_t *mat);
@@ -69,10 +70,10 @@ sg_object_t* sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
                            sg_material_t *mat);
 sg_object_t* sg_new_cube(const char *name, sg_shader_t *shader, float side);
 
-sg_object_t* sg_new_object_with_geo(sg_shader_t *shader,
+sg_object_t* sg_new_object_with_geo(sg_shader_t *shader, const char *name,
                                     int gl_primitive, size_t vertexCount,
                                     float *vertices, float *normals, float *texCoords);
-sg_object_t* sg_new_object(sg_shader_t *shader);
+sg_object_t* sg_new_object(sg_shader_t *shader, const char *name);
 
 void sg_object_animate(sg_object_t *obj, float dt); // Linear interpolation between frames
 void sg_object_update(sg_object_t *obj); // Pull from physis system

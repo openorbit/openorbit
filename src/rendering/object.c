@@ -61,6 +61,7 @@ struct sg_geometry_t {
 };
 
 struct sg_object_t {
+  const char *name;
   struct sg_object_t *parent;
   sg_scene_t *scene;
 
@@ -504,10 +505,11 @@ sg_object_get_rigid_body(const sg_object_t *obj)
 }
 
 sg_object_t*
-sg_new_object(sg_shader_t *shader)
+sg_new_object(sg_shader_t *shader, const char *name)
 {
   sg_object_t *obj = smalloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
+  obj->name = (name) ? strdup(name) : "";
   obj->shader = shader;
   obj_array_init(&obj->subObjects);
   obj->q = q_rot(1.0, 0.0, 0.0, 0.0);
@@ -537,11 +539,13 @@ sg_object_set_geometry(sg_object_t *obj, sg_geometry_t *geo)
 }
 
 sg_object_t*
-sg_new_object_with_geo(sg_shader_t *shader, int gl_primitive, size_t vertexCount,
+sg_new_object_with_geo(sg_shader_t *shader, const char *name,
+                       int gl_primitive, size_t vertexCount,
                        float *vertices, float *normals, float *texCoords)
 {
   sg_object_t *obj = smalloc(sizeof(sg_object_t));
   memset(obj, 0, sizeof(sg_object_t));
+  obj->name = strdup(name);
   obj->shader = shader;
   obj_array_init(&obj->subObjects);
   obj->q = q_rot(1.0, 0.0, 0.0, 0.0);
@@ -594,7 +598,7 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
   ooLogInfo("sphere '%s' radius: %f", name, radius);
 
   // NOTE: Z is up
-  sg_object_t *sphere = sg_new_object(shader);
+  sg_object_t *sphere = sg_new_object(shader, name);
   float_array_t verts, texc, normals;
   float_array_init(&verts);
   float_array_init(&normals);
@@ -803,7 +807,7 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
     newAngle = nextNewAngle;
   }
 
-  sg_object_t *obj = sg_new_object_with_geo(shader, GL_LINE, verts.length/3,
+  sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE, verts.length/3,
                                             verts.elems, NULL, NULL);
 
 
@@ -822,7 +826,7 @@ sg_new_axises(const char *name, sg_shader_t *shader, float length)
   float axis[] = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
                   0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
                   0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f};
-  sg_object_t *obj = sg_new_object_with_geo(shader, GL_LINE, 6, axis, NULL, NULL);
+  sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE, 6, axis, NULL, NULL);
   return obj;
 }
 
@@ -880,7 +884,7 @@ sg_new_cube(const char *name, sg_shader_t *shader, float side)
     cube_vertices[i] *= side/2.0;
   }
 
-  sg_object_t *obj = sg_new_object(sg_get_shader("flat"));
+  sg_object_t *obj = sg_new_object(sg_get_shader("flat"), name);
   sg_geometry_t *geo = sg_new_geometry(obj, GL_TRIANGLES,
                                        sizeof(cube_vertices)/(sizeof(float)*3),
                                        cube_vertices, NULL, NULL,
