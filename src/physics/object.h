@@ -140,6 +140,7 @@ void plSetAngularVel3fv(PLobject *obj, float3 r);
 
 quaternion_t plGetQuat(PLobject *obj);
 
+lwcoord_t plGetLwc(PLobject *obj);
 
 void plSetSystem(PLsystem *sys, PLobject *obj);
 

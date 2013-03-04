@@ -96,7 +96,8 @@ plObject(PLworld *world, const char *name)
 }
 
 PLobject*
-plSubObject3f(PLworld *world, PLobject *parent, const char * name, float x, float y, float z)
+plSubObject3f(PLworld *world, PLobject *parent, const char * name,
+              float x, float y, float z)
 {
   assert(parent != NULL);
 
@@ -358,7 +359,7 @@ plStepObjectf(PLobject *obj, float dt)
   lwc_translate3fv(&obj->p, dv); // Update position from velocity
 
   obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
-  obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt)); // Update quaternion with rotational velocity
+  obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt));    // Update quaternion with rotational velocity
 
   plComputeDerived(obj); // Compute derived data (world inverted inertia tensor etc)
 
@@ -521,4 +522,10 @@ plCheckObject(PLobject *obj, const char *file, int line)
   if (!isfinite(obj->v.x) || !isfinite(obj->v.y) || !isfinite(obj->v.z)) {
     ooLogAbort("%s:%d obj velocity not finite", file, line);
   }
+}
+
+lwcoord_t
+plGetLwc(PLobject *obj)
+{
+  return obj->p;
 }
