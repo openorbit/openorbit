@@ -59,13 +59,13 @@ extern "C" {
 typedef float vec_arr_t[4];
 
 #if __has_feature(attribute_ext_vector_type)
-  typedef float __attribute__((ext_vector_type (4))) float3;
+  typedef float __attribute__((ext_vector_type (3))) float3;
   typedef float __attribute__((ext_vector_type (4))) float4;
   typedef float __attribute__((ext_vector_type (16))) float16;
 
-  typedef float3 float3x3[4];
+  typedef float3 float3x3[3];
   typedef float4 float4x4[4];
-  typedef double __attribute__((ext_vector_type (4))) double3;
+  typedef double __attribute__((ext_vector_type (3))) double3;
   typedef double __attribute__((ext_vector_type (4))) double4;
   typedef double __attribute__((ext_vector_type (16))) double16;
 
@@ -93,7 +93,7 @@ typedef float vec_arr_t[4];
   typedef float __attribute__((vector_size (16))) float4;
   typedef float __attribute__((vector_size (64))) float16;
 
-  typedef float3 float3x3[4];
+  typedef float3 float3x3[3];
   typedef float4 float4x4[4];
   typedef double __attribute__((vector_size (32))) double3;
   typedef double __attribute__((vector_size (32))) double4;

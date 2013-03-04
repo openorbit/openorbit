@@ -93,7 +93,7 @@ sg_light_get_pos(const sg_light_t *light)
     float3 dist = lwc_dist(&light_pos, &cam_pos);
     return dist + light->pos;
   }
-  return light->pos;
+  return light->pos.xyz;
 }
 
 float4

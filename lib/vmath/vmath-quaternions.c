@@ -58,10 +58,10 @@ q_scalar(quaternion_t q)
 float3
 v_q_rot(float3 v, quaternion_t q)
 {
-  float4x4 m;
-  q_mf4_convert(m, q);
+  float3x3 m;
+  q_mf3_convert(m, q);
 
-  float3 res = m_v3_mulf(m, v);
+  float3 res = mf3_v_mul(m, v);
   return res;
 }
 
@@ -82,46 +82,23 @@ q_vector(quaternion_t q)
 void
 q_mf3_convert(float3x3 m, quaternion_t q)
 {
+#if ! __has_feature(attribute_ext_vector_type)
+#error "clang extended vector attributes required"
+#endif
+
   float n = q_dot(q, q);
   float a = (n > 0.0f) ? 2.0f / n : 0.0f;
 
-#if __has_feature(attribute_ext_vector_type)
   float xa = q.x*a, ya = q.y*a, za = q.z*a;
   float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
   float yy = q.y*ya, yz = q.y*za, zz = q.z*za;
   float wx = q.w*xa, wy = q.w*ya, wz = q.w*za;
-#else
-  float4_u qu = { .v = q };
-  float xa = qu.s.x*a;
-  float ya = qu.s.y*a;
-  float za = qu.s.z*a;
 
-  float xy = qu.s.x*ya;
-  float xz = qu.s.x*za;
-  float yz = qu.s.y*za;
-
-  float wx = qu.s.w*xa;
-  float wy = qu.s.w*ya;
-  float wz = qu.s.w*za;
-
-  float xx = qu.s.x*xa;
-  float yy = qu.s.y*ya;
-  float zz = qu.s.z*za;
-
-#endif
-
-  m[0][0] = 1.0f-(yy+zz); m[0][1] =        xy-wz;
-  m[0][2] =        xz+wy; m[0][3] = 0.0f;
-
-  m[1][0] =        xy+wz; m[1][1] = 1.0f-(xx+zz);
-  m[1][2] =        yz-wx; m[1][3] = 0.0f;
-
-  m[2][0] =        xz-wy; m[2][1] =        yz+wx;
-  m[2][2] = 1.0f-(xx+yy); m[2][3] = 0.0f;
-
-  m[3][0] = 0.0f;         m[3][1] = 0.0f;
-  m[3][2] = 0.0f;         m[3][3] = 1.0f;
+  m[0] = vf3_set(1.0f-(yy+zz), xy-wz, xz+wy);
+  m[1] = vf3_set(xy+wz, 1.0f-(xx+zz), yz-wx);
+  m[2] = vf3_set(xz-wy, yz+wx, 1.0f-(xx+yy));
 }
+
 
 void
 q_mf4_convert(float4x4 m, quaternion_t q)
@@ -144,29 +121,6 @@ q_mf4_convert(float4x4 m, quaternion_t q)
   m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-
-void
-q_mf4_convert_z_up(float4x4 m, quaternion_t q)
-{
-#if ! __has_feature(attribute_ext_vector_type)
-#error "clang extended vector attributes required"
-#endif
-
-  float n = q_dot(q, q);
-  float a = (n > 0.0f) ? 2.0f / n : 0.0f;
-
-  float xa = q.x*a, ya = q.y*a, za = q.z*a;
-  float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
-  float yy = q.y*ya, yz = q.y*za, zz = q.z*za;
-  float wx = q.w*xa, wy = q.w*ya, wz = q.w*za;
-
-  m[0] = vf4_set(1.0f-(yy+zz), xz+wy,         xy-wz,         0.0f);
-  m[1] = vf4_set(xy+wz,        yz-wx, 1.0f-(xx+zz),        0.0f);
-  m[2] = vf4_set(xz-wy,        1.0f-(xx+yy), yz+wx,         0.0f);
-  m[3] = vf4_set(0.0f,         0.0f,          0.0f,          1.0f);
-}
-
-
 void
 q_mf4_convert_inv(float4x4 m, quaternion_t q)
 {
@@ -186,28 +140,100 @@ q_mf4_convert_inv(float4x4 m, quaternion_t q)
   m[1] = vf4_set(xy-wz, 1.0f-(xx+zz), yz+wx, 0.0f);
   m[2] = vf4_set(xz+wy, yz-wx, 1.0f-(xx+yy), 0.0f);
   m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
-
 }
+
+void
+q_mf3_convert_inv(float3x3 m, quaternion_t q)
+{
+#if ! __has_feature(attribute_ext_vector_type)
+#error "clang extended vector attributes required"
+#endif
+
+  float n = q_dot(q, q);
+  float a = (n > 0.0f) ? 2.0f / n : 0.0f;
+
+  float xa = q.x*a, ya = q.y*a, za = q.z*a;
+  float xx = q.x*xa, xy = q.x*ya, xz = q.x*za;
+  float yy = q.y*ya, yz = q.y*za, zz = q.z*za;
+  float wx = q.w*xa, wy = q.w*ya, wz = q.w*za;
+
+  m[0] = vf3_set(1.0f-(yy+zz), xy+wz, xz-wy);
+  m[1] = vf3_set(xy-wz, 1.0f-(xx+zz), yz+wx);
+  m[2] = vf3_set(xz+wy, yz-wx, 1.0f-(xx+yy));
+}
+
 
 quaternion_t
 q_slerp(quaternion_t q0, quaternion_t q1, float t)
 {
   // See http://en.wikipedia.org/wiki/Slerp
+  if (t >= 1.0) return q1;
+  if (t <= 0.0) return q0;
+
   float qdot = q_dot(q0, q1);
 
   quaternion_t q1prim;
   if (qdot < 0.0) {
-    q1prim = -q0;
+    q1prim = -q1;
+    qdot = -qdot;
   } else {
-    q1prim = q0;
+    q1prim = q1;
   }
+
+  if (qdot < -1.0)  qdot = -1.0;
+  if (qdot > 1.0)  qdot = 1.0;
+  assert(qdot >= -1.0);
+  assert(qdot <= 1.0);
 
   float qang = acos(qdot);
   float s0 = sin((1.0-t)*qang) / sin(qang);
   float s1 = sin(t*qang) / sin(qang);
 
-  quaternion_t res = s0 * q0 + s1 * q1prim;
-  return res;
+  if (qang) { // If slerping between the same points, qang will be 0, so s0 will be NaN or Inf.
+    quaternion_t res = s0 * q0 + s1 * q1prim;
+    return res;
+  }
+
+  return q0;
+}
+
+
+quaternion_t
+mf3_q_convert(float3x3 m)
+{
+  quaternion_t q;
+  float tr, s;
+
+  tr = m[0][0] + m[1][1] + m[2][2];
+
+  if (tr >= 0.0f) {
+    s = sqrtf(tr+1.0f);
+    q.w = s*0.5f;
+    s = 0.5f / s;
+    q.x = (m[2][1] - m[1][2]) * s;
+    q.y = (m[0][2] - m[2][0]) * s;
+    q.z = (m[1][0] - m[0][1]) * s;
+  } else if (m[0][0] > m[1][1] && m[0][0] > m[2][2]) {
+    s =  .0f * sqrtf(m[0][0] - m[1][1] - m[2][2] + 1.0f);
+    q.x = 0.25f * s;
+    q.y = (m[0][1] + m[1][0] ) / s;
+    q.z = (m[0][2] + m[2][0] ) / s;
+    q.w = (m[2][1] - m[1][2] ) / s;
+  } else if (m[1][1] > m[2][2]) {
+    s = 2.0f * sqrtf(m[1][1] - m[0][0] - m[2][2] + 1.0f);
+    q.x = (m[0][1] + m[1][0] ) / s;
+    q.y = 0.25f * s;
+    q.z = (m[1][2] + m[2][1] ) / s;
+    q.w = (m[0][2] - m[2][0] ) / s;
+  } else {
+    s = 2.0f * sqrtf(m[2][2] - m[0][0] - m[1][1] + 1.0f);
+    q.x = (m[0][2] + m[2][0]) / s;
+    q.y = (m[1][2] + m[2][1]) / s;
+    q.z = 0.25f * s;
+    q.w = (m[1][0] - m[0][1]) / s;
+  }
+
+  return q;
 }
 
 
@@ -363,7 +389,7 @@ quaternion_t
 q_conj(const quaternion_t q)
 {
 #if __has_feature(attribute_ext_vector_type)
-	quaternion_t qp = {-q.x, -q.y, -q.z, q.w};
+  quaternion_t qp = {-q.x, -q.y, -q.z, q.w};
   return qp;
 #else
   float4_u qu = {.v = q};
@@ -375,29 +401,30 @@ q_conj(const quaternion_t q)
 quaternion_t
 q_repr(const quaternion_t q)
 {
-	quaternion_t res;
+  quaternion_t res;
   quaternion_t qp;
   qp = q_conj(q);
   float d = q_dot(q, q);
   res = q_s_div(qp, d);
-	return res;
+  return res;
 }
 
 quaternion_t
 q_div(quaternion_t a, quaternion_t b)
 {
-	quaternion_t res;
+  quaternion_t res;
   quaternion_t br;
+
   br = q_repr(b);
 
-	res = q_mul(a, br);
-	return res;
+  res = q_mul(a, br);
+  return res;
 }
 
 quaternion_t
 q_rotv(float3 axis, float alpha)
 {
-	quaternion_t q;
+  quaternion_t q;
   float Omega = alpha * S_POINT_FIVE;
   float sin_Omega = sin(Omega);
 #if __has_feature(attribute_ext_vector_type)

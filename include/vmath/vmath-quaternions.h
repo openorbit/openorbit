@@ -80,9 +80,10 @@ float3 v_q_rot(float3 v, quaternion_t q);
  */
 
 void q_mf3_convert(float3x3 m, quaternion_t q);
+void q_mf3_convert_inv(float3x3 m, quaternion_t q);
+
 void q_mf4_convert(float4x4 m, quaternion_t q);
 void q_mf4_convert_inv(float4x4 m, quaternion_t q);
-void q_mf4_convert_z_up(float4x4 m, quaternion_t q);
 quaternion_t q_slerp(quaternion_t q0, quaternion_t q1, float t);
 
 /*!
@@ -98,7 +99,8 @@ quaternion_t q_slerp(quaternion_t q0, quaternion_t q1, float t);
  */
 
 quaternion_t mf4_q_convert(float4x4 m) __attribute__ ((__nonnull__));
-    
+quaternion_t mf3_q_convert(float3x3 m) __attribute__ ((__nonnull__));
+
 quaternion_t q_add(const quaternion_t a, const quaternion_t b);
 
 

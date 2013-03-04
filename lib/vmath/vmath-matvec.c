@@ -66,49 +66,6 @@ v_neg(float4 v)
 
 #endif /* VM_V4_NEG */
 
-#ifndef VM_M4_V4_MUL
-#define VM_M4_V4_MUL
-
-float4
-m_v_mul(const float4x4 a, float4 v) {
-	float4 res;
-#if __has_feature(attribute_ext_vector_type)
-	for (int i = 0 ; i < 4 ; i ++) {
-    res[i] = a[i][0] * v.x + a[i][1] * v.y
-           + a[i][2] * v.z + a[i][3] * v.w;
-  }
-#else
-  float4_u vu = { .v = v };
-  float4_u resu;
-  for (int i = 0 ; i < 4 ; i ++) {
-    resu.a[i] = a->a[i][0] * vu.s.x + a->a[i][1] * vu.s.y
-    + a->a[i][2] * vu.s.z + a->a[i][3] * vu.s.w;
-  }
-  res = resu.v;
-#endif
-	return res;
-}
-#endif /*VM_M4_V4_MUL*/
-
-float3
-m_v3_mulf(const float4x4 a, float3 v) {
-	float3 res;
-#if __has_feature(attribute_ext_vector_type)
-	res.x = vf3_dot(a[0], v);
-	res.y = vf3_dot(a[1], v);
-	res.z = vf3_dot(a[2], v);
-#else
-  float3_u vu = { .v = v };
-  float3_u resu;
-  for (int i = 0 ; i < 3 ; i ++) {
-    resu.a[i] = a->a[i][0] * vu.s.x + a->a[i][1] * vu.s.y
-    + a->a[i][2] * vu.s.z;
-  }
-  res = resu.v;
-#endif
-	return res;
-}
-
 float3
 mf3_v_mul(const float3x3 a, float3 v) {
 	float3 res;
@@ -892,7 +849,7 @@ mf4_mul2(float4x4 a, const float4x4 b)
 }
 
 void
-mf4_add(float3x3 a, const float3x3 b, const float3x3 c)
+mf4_add(float4x4 a, const float4x4 b, const float4x4 c)
 {
   a[0] = b[0] + c[0];
   a[1] = b[1] + c[1];
@@ -917,12 +874,13 @@ mf4_lookat(float4x4 m,
   up = vf3_normalise(up);
   float3 s = vf3_cross(f, up);
   float3 u = vf3_cross(s, f);
-  m[0] = s;
-  m[1] = u;
-  m[2] = vf3_neg(f);
+  m[0] = vf4_setv(s.xyz, 0.0);
+  m[1] = vf4_setv(u.xyz, 0.0);
+  m[2] = vf4_setv(vf3_neg(f), 0.0);
   m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
 
-  mf4_translate(m, vf4_set(-eyeX, -eyeY, -eyeZ, 0.0f));
+  float3 eye = vf3_set(eyeX, eyeY, eyeZ);
+  mf4_translate(m, eye);
 }
 
 
@@ -980,12 +938,12 @@ mf4_ortho2D(float4x4 m,
 }
 
 void
-mf4_make_rotate(float4x4 m, float rads, float4 v)
+mf4_make_rotate(float4x4 m, float rads, float3 v)
 {
   float c = cosf(rads);
   float s = sinf(rads);
-  v.w = 0.0f;
-  float4 v2 = vf3_normalise(v);
+
+  float3 v2 = vf3_normalise(v);
   m[0] = vf4_set(v2.x*v2.x*(1.0f-c)+c,
                  v2.x*v2.y*(1.0f-c)-v2.z*s,
                  v2.x*v2.z*(1.0f-c)+v2.y*s,
@@ -999,5 +957,16 @@ mf4_make_rotate(float4x4 m, float rads, float4 v)
                  v2.z*v2.z*(1.0f-c)+c,
                  0.0f);
   m[3] = vf4_set(0.0f, 0.0f, 0.0f, 1.0f);
+}
+
+float4
+vf3_axis_angle(float3 a, float3 b)
+{
+  float3 na = vf3_normalise(a);
+  float3 nb = vf3_normalise(b);
+
+  float4 res = vf4_setv(vf3_normalise(vf3_cross(na, nb)),
+                        acos(vf3_dot(na, nb)));
+  return res;
 }
 

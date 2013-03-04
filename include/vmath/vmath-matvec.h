@@ -165,10 +165,10 @@ static inline float3
 vf3_set(float x, float y, float z)
 {
 #if __has_feature(attribute_ext_vector_type)
-  float3 v = {x, y, z, 0.0f};
+  float3 v = {x, y, z};
   return v;
 #else
-  float3_u uc = {.a = {x,y,z,0.0}};
+  float3_u uc = {.a = {x,y,z}};
   return uc.v;
 #endif
 }
@@ -189,6 +189,18 @@ vf4_set(float x, float y, float z, float w)
 {
 #if __has_feature(attribute_ext_vector_type)
   float4 v = {x, y, z, w};
+  return v;
+#else
+  float4_u uc = {.a = {x,y,z,w}};
+  return uc.v;
+#endif
+}
+
+static inline float4
+vf4_setv(float3 vec, float w)
+{
+#if __has_feature(attribute_ext_vector_type)
+  float4 v = {vec.x, vec.y, vec.z, w};
   return v;
 #else
   float4_u uc = {.a = {x,y,z,w}};
@@ -367,13 +379,9 @@ vd4_dot(double3 a, double3 b)
 
 
 
-
-
-float4 m_v_mul(const float4x4 a, float4 v);
-float3 m_v3_mulf(const float4x4 a, float3 v);
 float3 mf3_v_mul(const float3x3 a, float3 v);
 
-void mf4_add(float3x3 a, const float3x3 b, const float3x3 c);
+void mf4_add(float4x4 a, const float4x4 b, const float4x4 c);
 
 void m_sub(float4x4 res, float4x4 a, float4x4 b)
     __attribute__ ((__nonnull__));
@@ -482,6 +490,12 @@ vd3_sub(double3 a, double3 b)
 
 static inline float3
 vf3_mul(float3 a, float3 b)
+{
+  return a * b;
+}
+
+static inline float4
+vf4_mul(float4 a, float4 b)
 {
   return a * b;
 }
@@ -638,10 +652,10 @@ static inline void
 m_s_mul(float4x4 res, const float4x4 a, float s)
 {
   float4 vs = vf4_set(s, s, s, s);
-  res[0] = vf3_mul(a[0], vs);
-  res[1] = vf3_mul(a[1], vs);
-  res[2] = vf3_mul(a[2], vs);
-  res[3] = vf3_mul(a[3], vs);
+  res[0] = vf4_mul(a[0], vs);
+  res[1] = vf4_mul(a[1], vs);
+  res[2] = vf4_mul(a[2], vs);
+  res[3] = vf4_mul(a[3], vs);
 }
 
 void mf3_ident(float3x3 m);
@@ -674,7 +688,7 @@ void mf4_ident_z_up(float4x4 m);
 
 void mf4_cpy(float4x4 a, const float4x4 b);
 void mf4_mul2(float4x4 a, const float4x4 b);
-void mf4_add(float3x3 a, const float3x3 b, const float3x3 c);
+void mf4_add(float4x4 a, const float4x4 b, const float4x4 c);
 
 static inline void
 mf4_zero(float4x4 a)
@@ -690,7 +704,7 @@ mf4_make_translate(float4x4 a, float3 v)
   mf4_set_colvec(a, 3, v2);
 }
 
-void mf4_make_rotate(float4x4 m, float rads, float4 v);
+void mf4_make_rotate(float4x4 m, float rads, float3 v);
 
 
 static inline void
@@ -728,6 +742,15 @@ void mf4_lookat(float4x4 m,
                 float eyeX, float eyeY, float eyeZ,
                 float centerX, float centerY, float centerZ,
                 float upX, float upY, float upZ);
+
+/*!
+ * Compute normalised axis and angle for a rotation from a to b.
+ * \param a Vector to rotate from
+ * \param b Vector to rotate to
+ * \result Four element vector, where x,y,z correspond to the axis, and w the
+ *         angle.
+ */
+float4 vf3_axis_angle(float3 a, float3 b);
 
 #ifdef __cplusplus
 }

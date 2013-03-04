@@ -241,7 +241,7 @@ plForceRelative3f(PLobject *obj, float fx, float fy, float fz)
   while (obj->parent) obj = obj->parent;
   PL_CHECK_OBJ(obj);
 
-  float3 f = { fx, fy, fz, 0.0f };
+  float3 f = vf3_set(fx, fy, fz);
   float3 f_rot = mf3_v_mul(obj->R, f);
   obj->f_ack += f_rot;
 }
@@ -263,8 +263,8 @@ plForceRelativePos3f(PLobject *obj,
 {
   PL_CHECK_OBJ(obj);
 
-  float3 f = { fx, fy, fz, 0.0f };
-  float3 p = { px, py, pz, 0.0f };
+  float3 f = vf3_set(fx, fy, fz);
+  float3 p = vf3_set(px, py, pz);
 
   while (obj->parent) { p += obj->p_offset; obj = obj->parent; }
 

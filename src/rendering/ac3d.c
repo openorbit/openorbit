@@ -246,8 +246,8 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
   // Transfer rotation matrix, but ensure it is transposed for GL
   // Note, no longer applicable for GL 3, we simply flag matrix uniforms as
   // needing transposition.
-  float4x4 rot;
-  mf4_ident(rot);
+  float3x3 rot;
+  mf3_ident(rot);
 
   // Does not transpose anymore
   for (int i = 0 ; i < 3 ; ++ i) {

@@ -299,7 +299,7 @@ void
 sg_object_animate(sg_object_t *obj, float dt)
 {
   obj->q = q_normalise(q_vf3_rot(obj->q, obj->dr, dt));
-  q_mf3_convert(obj->R, obj->q);
+  q_mf4_convert(obj->R, obj->q);
 
   lwc_translate3fv(&obj->lwc, obj->dp * dt);
   obj->pos += obj->dp * dt;
