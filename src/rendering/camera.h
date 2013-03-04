@@ -38,11 +38,12 @@ extern "C" {
   void sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj);
   void sg_camera_set_perspective(sg_camera_t *cam, float perspective);
 
-  void sg_camera_update_constraints(sg_camera_t *cam);
   void sg_camera_update_modelview(sg_camera_t *cam);
   void sg_camera_set_follow_offset(sg_camera_t *cam, float3 offs);
 
-  void sg_camera_step(sg_camera_t * cam, float dt);
+  // Interpolate camera position and rotation based on WCT
+  void sg_camera_interpolate(sg_camera_t *cam, float t);
+  void sg_camera_sync(sg_camera_t *cam);
 
 #ifdef __cplusplus
 }

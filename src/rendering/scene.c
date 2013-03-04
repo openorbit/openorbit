@@ -22,8 +22,10 @@
 #include "rendering/scene.h"
 #include "rendering/camera.h"
 #include "rendering/object.h"
-#include "palloc.h"
+#include "common/palloc.h"
+#include "common/monotonic-time.h"
 #include "log.h"
+#include "settings.h"
 
 struct sg_scene_t {
   char *name;
@@ -33,6 +35,9 @@ struct sg_scene_t {
   obj_array_t lights; // Scene global lights
   float4 amb; // Ambient light for the scene
   obj_array_t shaders;
+
+  uint64_t sync_stamp;
+  uint64_t next_sync_estimate;
 };
 
 void
@@ -113,32 +118,79 @@ sg_scene_get_amb(sg_scene_t *sc)
   return sc->amb;
 }
 
+
+
+// Synchronises all objects with physics sim
+void
+sg_scene_sync(sg_scene_t *scene)
+{
+  scene->sync_stamp = getmonotimestamp();
+
+  // TODO: Instead of rereading the freq and period every step, we want to
+  //       listen for some type of event that the config variable was modified.
+  float freq;
+  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Hz
+
+  scene->next_sync_estimate = scene->sync_stamp + nstomonotime((1.0/freq)*1.0e9);
+
+  float t = 0.0; // Period
+  ooConfGetFloatDef("openorbit/sim/period", &t, 1.0/freq); // Seconds
+
+  ARRAY_FOR_EACH(i, scene->objects) {
+    sg_object_sync(ARRAY_ELEM(scene->objects, i), t);
+  }
+
+  sg_camera_sync(scene->cam);
+}
+
+void
+sg_scene_interpolate(sg_scene_t *scene)
+{
+  uint64_t ts = getmonotimestamp();
+  uint64_t ns = subtractmonotime(ts, scene->sync_stamp);
+  uint64_t T = subtractmonotime(scene->next_sync_estimate, scene->sync_stamp);
+  //double dt = ns / srt;
+
+  double normalised_time = (double)ns/(double)T;
+  if (normalised_time > 1.0) normalised_time = 1.0;
+  assert(normalised_time >= 0.0);
+
+  ooLogTrace("intepolate to: %f", normalised_time);
+
+  ARRAY_FOR_EACH(i, scene->objects) {
+    sg_object_interpolate(ARRAY_ELEM(scene->objects, i), normalised_time);
+  }
+
+  sg_camera_interpolate(scene->cam, normalised_time);
+}
+
+#if 0
 void
 sg_scene_update(sg_scene_t *scene)
 {
-  sg_camera_update_constraints(scene->cam);
-  sg_camera_update_modelview(scene->cam);
-
   ooLogTrace("scene update\n");
   ARRAY_FOR_EACH(i, scene->objects) {
     sg_object_update(ARRAY_ELEM(scene->objects, i));
   }
-}
 
-void
-sg_scene_camera_moved(sg_scene_t *scene, float3 cam_dp)
-{
+  // If a camera is tracking an object, it needs to know the objects location
+  // the location is known after the object update
+  sg_camera_update_constraints(scene->cam);
+  sg_camera_update_modelview(scene->cam);
+
   ARRAY_FOR_EACH(i, scene->objects) {
-    sg_object_camera_moved(ARRAY_ELEM(scene->objects, i), cam_dp);
+    sg_object_recompute_modelviewmatrix(ARRAY_ELEM(scene->objects, i));
   }
 }
+#endif
+
 void
 sg_scene_draw(sg_scene_t *scene, float dt)
 {
   SG_CHECK_ERROR;
-  sg_camera_step(scene->cam, dt);
-
+  sg_scene_interpolate(scene);
   sg_camera_update_modelview(scene->cam);
+
   SG_CHECK_ERROR;
   sg_background_draw(scene->bg);
   SG_CHECK_ERROR;
@@ -147,19 +199,13 @@ sg_scene_draw(sg_scene_t *scene, float dt)
   glDisable(GL_CULL_FACE);
   SG_CHECK_ERROR;
 
-#if 1
-  ooLogTrace("==== Draw %d Objects ====", ARRAY_LEN(scene->objects));
-
   ARRAY_FOR_EACH(i, scene->objects) {
-    //sgRecomputeModelViewMatrix(ARRAY_ELEM(scene->objects, i));
-    sg_object_animate(ARRAY_ELEM(scene->objects, i), dt);
+    sg_object_recompute_modelviewmatrix(ARRAY_ELEM(scene->objects, i));
     SG_CHECK_ERROR;
     sg_object_draw(ARRAY_ELEM(scene->objects, i));
     SG_CHECK_ERROR;
-    //sg_object_print(ARRAY_ELEM(scene->objects, i));
   }
-  ooLogTrace("========================");
-#endif
+
   SG_CHECK_ERROR;
 }
 
@@ -172,6 +218,7 @@ sg_new_scene(const char *name)
   obj_array_init(&scene->objects);
   obj_array_init(&scene->lights);
   obj_array_init(&scene->shaders);
+
   return scene;
 }
 

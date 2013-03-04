@@ -65,12 +65,22 @@ struct sg_object_t {
   struct sg_object_t *parent;
   sg_scene_t *scene;
 
-  lwcoord_t lwc; // Global position
+  lwcoord_t p0; // Global position
+  lwcoord_t p1; // Global position
+  lwcoord_t p;  // Global position
+
   PLobject *rigidBody;
-  float3 pos; // Relative to camera
-  float3 dp; // delta pos per time step
-  float3 dr; // delta rot per time step
-  quaternion_t q; // Quaternion
+
+  float3 camera_pos; // Relative to camera
+  float3 parent_offset; // Offset from parent
+
+  float3 dp; // Delta pos per time step
+  float3 dr; // Angular velocity
+
+  quaternion_t q;  // Slerped quaternion
+  quaternion_t q0; // Quaternion from
+  quaternion_t q1; // Quaternion to
+  quaternion_t dq; // Quaternion rot per time
 
   float4x4 R;
   float4x4 modelViewMatrix;
@@ -90,16 +100,17 @@ struct sg_object_t {
 };
 
 void
-sg_object_print(sg_object_t *obj)
+sg_object_print(const sg_object_t *obj)
 {
   if (obj->rigidBody) {
     ooLogInfo("** object %s", obj->rigidBody->name);
 
-    ooLogInfo("\tlwc: [%d %d %d] + [%f %f %f]",
-              obj->lwc.seg.x, obj->lwc.seg.y, obj->lwc.seg.z,
-              obj->lwc.offs.x, obj->lwc.offs.y, obj->lwc.offs.z);
-    ooLogInfo("\tpos: [%f %f %f]", obj->pos.x, obj->pos.y, obj->pos.z);
-    ooLogInfo("\tdp:  [%f %f %f]", obj->dp.x, obj->dp.y, obj->dp.z);
+    //    ooLogInfo("\tlwc: [%d %d %d] + [%f %f %f]",
+    //        obj->p.seg.x, obj->p.seg.y, obj->p.seg.z,
+    //        obj->p.offs.x, obj->p.offs.y, obj->p.offs.z);
+    ooLogInfo("\tcam pos: [%f %f %f]",
+              obj->camera_pos.x, obj->camera_pos.y, obj->camera_pos.z);
+    //ooLogInfo("\tdp:  [%f %f %f]", obj->dp.x, obj->dp.y, obj->dp.z);
   }
 }
 
@@ -112,17 +123,36 @@ sg_object_add_child(sg_object_t *obj, sg_object_t *child)
 int
 sg_objects_compare_dist(sg_object_t const **o0, sg_object_t const **o1)
 {
-  bool gt = vf3_gt((*o0)->pos, (*o1)->pos);
+  bool gt = vf3_gt((*o0)->camera_pos, (*o1)->camera_pos);
 
   if (gt) return -1;
   else return 1;
 }
 
 float3
-sg_object_get_pos(sg_object_t *obj)
+sg_object_get_camrea_pos(sg_object_t *obj)
 {
-  return obj->pos;
+  return obj->camera_pos;
 }
+
+void
+sg_object_set_camrea_pos(sg_object_t *obj, float3 cp)
+{
+  obj->camera_pos = cp;
+}
+
+void
+sg_object_set_parent_offset(sg_object_t *obj, float3 po)
+{
+  obj->parent_offset = po;
+}
+
+float3
+sg_object_get_parent_offset(sg_object_t *obj)
+{
+  return obj->parent_offset;
+}
+
 
 float3
 sg_object_get_vel(sg_object_t *obj)
@@ -132,34 +162,69 @@ sg_object_get_vel(sg_object_t *obj)
 
 
 void
-sg_object_set_pos(sg_object_t *obj, float3 pos)
-{
-  obj->pos = pos;
-}
-
-void
 sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc)
 {
-  *lwc = obj->lwc;
+  *lwc = obj->p;
 }
+
+lwcoord_t
+sg_object_get_p0(const sg_object_t *obj)
+{
+  return obj->p0;
+}
+
+lwcoord_t
+sg_object_get_p1(const sg_object_t *obj)
+{
+  return obj->p1;
+}
+
+lwcoord_t
+sg_object_get_p(const sg_object_t *obj)
+{
+  return obj->p;
+}
+
 
 
 quaternion_t
-sg_object_get_quat(sg_object_t *obj)
+sg_object_get_quat(const sg_object_t *obj)
 {
   return obj->q;
 }
+
+void
+sg_object_set_rot(sg_object_t *obj, float3x3 rot)
+{
+  obj->q = mf3_q_convert(rot);
+}
+
+
+
 void
 sg_object_set_quat(sg_object_t *obj, quaternion_t q)
 {
   obj->q = q;
 }
 
-void
-sg_object_set_rot(sg_object_t *obj, const float4x4 *r)
+
+quaternion_t
+sg_object_get_q0(const sg_object_t *obj)
 {
-  memcpy(obj->R, *r, sizeof(float4x4));
+  return obj->q0;
 }
+quaternion_t
+sg_object_get_q1(const sg_object_t *obj)
+{
+  return obj->q1;
+}
+
+const char*
+sg_object_get_name(const sg_object_t *obj)
+{
+  return obj->name;
+}
+
 
 void
 sg_object_set_material(sg_object_t *obj, sg_material_t *mat)
@@ -270,30 +335,11 @@ sg_object_draw(sg_object_t *obj)
   SG_CHECK_ERROR;
 }
 
-void
-sg_object_recompute_modelviewmatrix(sg_object_t *obj)
-{
-  if (obj->parent) {
-    mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
-  } else {
-    sg_camera_t *cam = sg_scene_get_cam(obj->scene);
-    mf4_cpy(obj->modelViewMatrix, *sg_camera_modelview(cam));
-  }
-
-  float4x4 t;
-  mf4_make_translate(t, obj->pos);
-  mf4_mul2(obj->modelViewMatrix, t);
-  mf4_mul2(obj->modelViewMatrix, obj->R);
-
-  ARRAY_FOR_EACH(i, obj->subObjects) {
-    sg_object_recompute_modelviewmatrix(ARRAY_ELEM(obj->subObjects, i));
-  }
-}
 
 void
 sg_object_camera_moved(sg_object_t *obj, float3 cam_dp)
 {
-  obj->pos -= cam_dp;
+  obj->camera_pos -= cam_dp;
 }
 
 void
@@ -302,8 +348,8 @@ sg_object_animate(sg_object_t *obj, float dt)
   obj->q = q_normalise(q_vf3_rot(obj->q, obj->dr, dt));
   q_mf4_convert(obj->R, obj->q);
 
-  lwc_translate3fv(&obj->lwc, obj->dp * dt);
-  obj->pos += obj->dp * dt;
+  lwc_translate3fv(&obj->p, obj->dp * dt);
+  obj->camera_pos += obj->dp * dt;
 
   if (obj->parent) {
     mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
@@ -312,7 +358,7 @@ sg_object_animate(sg_object_t *obj, float dt)
   }
 
   float4x4 translate;
-  mf4_make_translate(translate, obj->pos);
+  mf4_make_translate(translate, obj->camera_pos);
   mf4_mul2(obj->modelViewMatrix, translate);
   mf4_mul2(obj->modelViewMatrix, obj->R);
 
@@ -328,32 +374,48 @@ sg_object_update(sg_object_t *obj)
   if (obj->rigidBody) {
     obj->dp = plGetVel(obj->rigidBody);
     obj->dr = plGetAngularVel(obj->rigidBody);
-    obj->q = plGetQuat(obj->rigidBody);
+    obj->q0 = plGetQuat(obj->rigidBody);
+    obj->q1 = q_vf3_rot(obj->q0, obj->dr, 1.0);
+    obj->q = q_slerp(obj->q0, obj->q1, 0.0);
 
+    obj->parent_offset = obj->rigidBody->p_offset;
     // Update position, this is based on where the camera is
-    sg_camera_t *cam = sg_scene_get_cam(obj->scene);
-    lwcoord_t pos = sg_camera_pos(cam);
 
-    obj->lwc = obj->rigidBody->p;
-    lwc_translate3fv(&obj->lwc, obj->rigidBody->p_offset);
-    obj->pos = lwc_dist(&obj->lwc, &pos);
+    obj->p = obj->rigidBody->p;
+    lwc_translate3fv(&obj->p, obj->parent_offset);
+  } else {
+    if (obj->parent) obj->p = obj->parent->p;
+    lwc_translate3fv(&obj->p, obj->parent_offset);
   }
 
-  q_mf3_convert(obj->R, obj->q);
+  ARRAY_FOR_EACH(i, obj->subObjects) {
+    sg_object_update(ARRAY_ELEM(obj->subObjects, i));
+  }
+}
+
+void
+sg_object_recompute_modelviewmatrix(sg_object_t *obj)
+{
+  sg_camera_t *cam = sg_scene_get_cam(obj->scene);
+  lwcoord_t pos = sg_camera_pos(cam);
+  obj->camera_pos = lwc_dist(&obj->p, &pos);
+
+  q_mf4_convert(obj->R, obj->q);
 
   if (obj->parent) {
     mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
   } else {
-    mf4_cpy(obj->modelViewMatrix, *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+    mf4_cpy(obj->modelViewMatrix,
+            *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
   }
 
   float4x4 translate;
-  mf4_make_translate(translate, obj->pos);
+  mf4_make_translate(translate, obj->camera_pos);
   mf4_mul2(obj->modelViewMatrix, translate);
   mf4_mul2(obj->modelViewMatrix, obj->R);
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
-    sg_object_update(ARRAY_ELEM(obj->subObjects, i));
+    sg_object_recompute_modelviewmatrix(ARRAY_ELEM(obj->subObjects, i));
   }
 }
 
@@ -504,6 +566,49 @@ sg_object_get_rigid_body(const sg_object_t *obj)
   return obj->rigidBody;
 }
 
+void
+sg_object_sync(sg_object_t *obj, float t)
+{
+  if (obj->rigidBody) {
+    // Synchronise rotational velocity and quaternions
+    obj->dr = plGetAngularVel(obj->rigidBody);
+    obj->q0 = plGetQuat(obj->rigidBody);
+    obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
+    obj->q = q_slerp(obj->q0, obj->q1, 0.0);
+
+    // Synchronise world coordinates
+    obj->dp = plGetVel(obj->rigidBody);
+    obj->p0 = plGetLwc(obj->rigidBody);
+    obj->p1 = obj->p0;
+
+    lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
+    obj->p = obj->p0;
+  }
+
+  ARRAY_FOR_EACH(i, obj->subObjects) {
+    sg_object_sync(ARRAY_ELEM(obj->subObjects, i), t);
+  }
+
+}
+
+void
+sg_object_interpolate(sg_object_t *obj, float t)
+{
+  // Interpolate rotation quaternion.
+  obj->q = q_slerp(obj->q0, obj->q1, t);
+
+  // Approximate distance between physics frames
+  float3 dist = lwc_dist(&obj->p1, &obj->p0);
+  dist = vf3_s_mul(dist, t);
+  obj->p = obj->p0;
+  lwc_translate3fv(&obj->p, dist);
+
+  ARRAY_FOR_EACH(i, obj->subObjects) {
+    sg_object_interpolate(ARRAY_ELEM(obj->subObjects, i), t);
+  }
+}
+
+
 sg_object_t*
 sg_new_object(sg_shader_t *shader, const char *name)
 {
@@ -512,7 +617,12 @@ sg_new_object(sg_shader_t *shader, const char *name)
   obj->name = (name) ? strdup(name) : "";
   obj->shader = shader;
   obj_array_init(&obj->subObjects);
-  obj->q = q_rot(1.0, 0.0, 0.0, 0.0);
+
+  obj->q = Q_IDENT;
+  obj->q0 = Q_IDENT;
+  obj->q1 = Q_IDENT;
+  obj->dq = Q_IDENT;
+
   mf4_ident(obj->R);
   mf4_ident(obj->modelViewMatrix);
 
@@ -548,7 +658,12 @@ sg_new_object_with_geo(sg_shader_t *shader, const char *name,
   obj->name = strdup(name);
   obj->shader = shader;
   obj_array_init(&obj->subObjects);
-  obj->q = q_rot(1.0, 0.0, 0.0, 0.0);
+
+  obj->q = Q_IDENT;
+  obj->q0 = Q_IDENT;
+  obj->q1 = Q_IDENT;
+  obj->dq = Q_IDENT;
+
   mf4_ident(obj->R);
   mf4_ident(obj->modelViewMatrix);
 

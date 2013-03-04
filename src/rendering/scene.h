@@ -32,8 +32,6 @@ void sg_scene_set_bg(sg_scene_t *sc, sg_background_t *bg);
 
 void sg_scene_set_cam(sg_scene_t *sc, sg_camera_t *cam);
 sg_camera_t* sg_scene_get_cam(sg_scene_t *sc);
-void sg_scene_camera_moved(sg_scene_t *scene, float3 cam_dp);
-
 
 void sg_scene_add_object(sg_scene_t *sc, sg_object_t *obj);
 sg_object_t* sg_scene_get_object(sg_scene_t *sc, const char *name);
@@ -47,8 +45,12 @@ sg_light_t* sg_scene_get_light(sg_scene_t *sc, int i);
 
 
 // Resynchronize all objects with physics system
-void sg_scene_update(sg_scene_t *scene);
+//void sg_scene_update(sg_scene_t *scene);
 
 bool sg_scene_has_name(sg_scene_t *sc, const char *name);
+
+// Synchronise everything with physics system
+void sg_scene_sync(sg_scene_t *scene);
+void sg_scene_interpolate(sg_scene_t *scene);
 
 #endif

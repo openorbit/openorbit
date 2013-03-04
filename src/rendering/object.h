@@ -20,7 +20,11 @@
 #ifndef orbit_scenegraph2_h
 #define orbit_scenegraph2_h
 
+#ifdef __APPLE__
 #include <OpenGL/gl3.h>
+#else
+#include <GL/gl3.h>
+#endif
 #include <gencds/array.h>
 #include <vmath/vmath.h>
 #include "rendering/types.h"
@@ -33,18 +37,28 @@ int sg_objects_compare_dist(sg_object_t const **o0, sg_object_t const **o1);
 
 void sg_object_add_child(sg_object_t *obj, sg_object_t *child);
 
-void sg_object_set_pos(sg_object_t *obj, float3 pos);
-float3 sg_object_get_pos(sg_object_t *obj);
+void sg_object_set_camera_pos(sg_object_t *obj, float3 pos);
+float3 sg_object_get_camera_pos(sg_object_t *obj);
 void sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc);
 float3 sg_object_get_vel(sg_object_t *obj);
 void sg_object_camera_moved(sg_object_t *obj, float3 cam_dp);
 
-void sg_object_print(sg_object_t *obj);
+void sg_object_print(const sg_object_t *obj);
 
-quaternion_t sg_object_get_quat(sg_object_t *obj);
+quaternion_t sg_object_get_quat(const sg_object_t *obj);
+quaternion_t sg_object_get_q0(const sg_object_t *obj);
+quaternion_t sg_object_get_q1(const sg_object_t *obj);
+
+lwcoord_t sg_object_get_p0(const sg_object_t *obj);
+lwcoord_t sg_object_get_p1(const sg_object_t *obj);
+lwcoord_t sg_object_get_p(const sg_object_t *obj);
+
+void sg_object_set_rot(sg_object_t *obj, float3x3 rot);
 void sg_object_set_quat(sg_object_t *obj, quaternion_t q);
 
-void sg_object_set_rot(sg_object_t *obj, const float4x4 *r);
+float3 sg_object_get_parent_offset(sg_object_t *obj);
+void sg_object_set_parent_offset(sg_object_t *obj, float3 po);
+
 const char* sg_object_get_name(const sg_object_t *obj);
 void sg_object_set_scene(sg_object_t *obj, sg_scene_t *sc);
 
@@ -75,8 +89,11 @@ sg_object_t* sg_new_object_with_geo(sg_shader_t *shader, const char *name,
                                     float *vertices, float *normals, float *texCoords);
 sg_object_t* sg_new_object(sg_shader_t *shader, const char *name);
 
+// Synchronise with physics model
+void sg_object_sync(sg_object_t *obj, float t);
+
 void sg_object_animate(sg_object_t *obj, float dt); // Linear interpolation between frames
-void sg_object_update(sg_object_t *obj); // Pull from physis system
+void sg_object_update(sg_object_t *obj); // Pull from physics system
 
 void sg_object_recompute_modelviewmatrix(sg_object_t *obj);
 void sg_object_draw(sg_object_t *obj);
@@ -85,7 +102,12 @@ void sg_geometry_draw(sg_geometry_t *geo);
 void sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody);
 PLobject* sg_object_get_rigid_body(const sg_object_t *obj);
 
-
+// Interpolate object position and rotation between key frames.
+// Key frames is based on the physics system steps.
+// Note that the next physics frame is only estimated based on current
+// Velocities and angular velocities.
+// t is in the range of 0 to 1.
+void sg_object_interpolate(sg_object_t *obj, float t);
 sg_object_t* sg_load_object(const char *file, sg_shader_t *shader);
 
 void sg_object_set_shader(sg_object_t *obj, sg_shader_t *shader);

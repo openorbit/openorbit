@@ -185,18 +185,11 @@ sg_background_draw(sg_background_t *bg)
   // is at infinite distance (e.g. regarding translation)
   // Here we rotate the camera as needed
   sg_camera_t *cam = sg_scene_get_cam(bg->scene);
-  float4x4 rotMatrix;
-
-  quaternion_t q = sg_camera_quat(cam);
-  float4x4 qm;
-  q_mf4_convert(qm, q);
-  mf4_ident_z_up(rotMatrix);
-  mf4_mul2(rotMatrix, qm);
 
   SG_CHECK_ERROR;
   sg_shader_bind(bg->shader);
   sg_shader_set_projection(bg->shader, *sg_camera_project(cam));
-  sg_shader_set_model_view(bg->shader, rotMatrix);
+  sg_shader_set_model_view(bg->shader, *sg_camera_modelview(cam));
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glBindVertexArray(bg->vba);

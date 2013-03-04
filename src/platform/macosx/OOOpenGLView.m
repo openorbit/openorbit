@@ -202,6 +202,10 @@ static io_keycode_t keymap [256] = {
   float sim_period;
   ooConfGetFloatDef("openorbit/sim/period", &sim_period, wc_period);
 
+
+  // Step now to ensure physic system is in sync before drawing
+  ooSimStep(sim_period);
+
   timer = [NSTimer scheduledTimerWithTimeInterval:sim_period target:self selector:@selector(simTicker:) userInfo:nil repeats:YES];
 }
 
@@ -272,6 +276,11 @@ static io_keycode_t keymap [256] = {
 
   [self.openGLContext flushBuffer];
   last = current;
+
+  // Draw as often as possible
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self setNeedsDisplay:YES];
+  });
 }
 
 @end
