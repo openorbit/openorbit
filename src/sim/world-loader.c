@@ -179,8 +179,6 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, sg_scene_t *sc)
                                     inc, longAscNode, longPerihel, meanLong, radius, flattening);
 
   moonSys->orbitalBody->atm = NULL; // Init as vaccuum
-  quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
-  sg_object_set_quat(drawable, q);
 
   if (shader) {
     sg_object_set_shader_by_name(drawable, shader);
@@ -366,10 +364,6 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
 
   sg_object_set_rigid_body(drawable, &sys->orbitalBody->obj);
 
-  // plSetDrawable(sys->orbitalBody, drawable);
-  quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
-  sg_object_set_quat(drawable, q);
-
   if (sats) {
     for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {
       if (!strcmp(sat->name, "moon")) {
@@ -453,13 +447,9 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
 
   PLworld *world = plNewWorld(starName.u.str, sc, mass, gm, radius,
                               siderealPeriod, axialTilt, radius, flattening);
-  //world->rootSys->orbitalBody->lightSource = starLightSource;
-  world->rootSys->orbitalBody->atm = NULL; // Init as vaccuum
 
+  world->rootSys->orbitalBody->atm = NULL; // Init as vaccuum
   sg_object_set_rigid_body(drawable, &world->rootSys->orbitalBody->obj);
-  //plSetDrawable(world->rootSys->orbitalBody, drawable);
-  quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(axialTilt));
-  sg_object_set_quat(drawable, q);
 
   if (shader) {
     sg_object_set_shader_by_name(drawable, shader);

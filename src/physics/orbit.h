@@ -30,9 +30,7 @@
 #include <vmath/vmath.h>
 
 #include "geo/geo.h"
-#include "rendering/scenegraph.h"
 #include <vmath/lwcoord.h>
-#include "rendering/types.h"
 
 #include "physics/reftypes.h"
 #include "physics/areodynamics.h"
@@ -97,7 +95,6 @@ struct PLsystem {
 
   PLastrobody *orbitalBody; // The body actually orbiting at this point, note that it is
   double orbitalPeriod;
-  sg_object_t *orbitDrawable; // Pointer to the drawable representing the ellipsis
 };
 
 

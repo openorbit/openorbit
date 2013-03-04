@@ -568,7 +568,6 @@ plNewRootSystem(PLworld *world, sg_scene_t *sc, const char *name, double m, doub
   sys->orbitalBody = plNewObj(world, name, m, gm, &p, q, siderealPeriod, obliquity,
                               eqRadius, flattening);
   sys->orbitalBody->kepler = NULL;
-  sys->orbitDrawable = NULL;
 //  ooSgSceneAddObj(sys->world->scene,
 //                  sys->orbitDrawable);
 
