@@ -1033,3 +1033,24 @@ sg_object_add_light(sg_object_t *obj, sg_light_t *light)
   sg_light_set_obj(light, obj);
   sg_scene_add_light(obj->scene, light);
 }
+
+//typedef void (*sg_object_visitor_t)(sg_object_t obj);
+void
+sg_object_visit(sg_object_t *obj, sg_object_visitor_t visit, void *ctxt)
+{
+  visit(obj, ctxt);
+
+  ARRAY_FOR_EACH(i, obj->subObjects) {
+    sg_object_visit(ARRAY_ELEM(obj->subObjects, i), visit, ctxt);
+  }
+}
+
+void
+sg_object_visitb(sg_object_t *obj, void (^visit)(sg_object_t *obj))
+{
+  visit(obj);
+
+  ARRAY_FOR_EACH(i, obj->subObjects) {
+    sg_object_visitb(ARRAY_ELEM(obj->subObjects, i), visit);
+  }
+}

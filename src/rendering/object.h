@@ -114,4 +114,11 @@ void sg_object_set_shader(sg_object_t *obj, sg_shader_t *shader);
 void sg_object_set_shader_by_name(sg_object_t *obj, const char *shname);
 
 void sg_object_add_light(sg_object_t *obj, sg_light_t *light);
+
+typedef void (*sg_object_visitor_t)(sg_object_t *obj, void *ctxt);
+void sg_object_visit(sg_object_t *obj, sg_object_visitor_t visit, void *ctxt);
+
+void sg_object_visitb(sg_object_t *obj, void (^visit)(sg_object_t *obj));
+
+
 #endif
