@@ -705,6 +705,13 @@ sg_load_object(const char *file, sg_shader_t *shader)
   return model;
 }
 
+static void
+map_uv(float *u, float *v, float inc, float az)
+{
+  *u = az/(2.0*M_PI) - 0.5; // Shift as we expect textures centered on meridian
+  *v = 1.0 - inc/M_PI;
+}
+
 sg_object_t*
 sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
               sg_texture_t *tex, sg_texture_t *nightTex, sg_texture_t *spec,
@@ -748,26 +755,49 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
     double inc = M_PI / (double)STACKS;
     // Triangle 1 and 2
     float3 p[6];
-
+    float u, v;
     p[0].x = radius * sin(0.0) * cos(az+az_sz/2.0);
     p[0].y = radius * sin(0.0) * sin(az+az_sz/2.0);
     p[0].z = radius * cos(0.0);
+    map_uv(&u, &v, 0.0, az+az_sz/2.0);
+    float_array_push(&texc, u); // X
+    float_array_push(&texc, v); // Y
+
     p[1].x = radius * sin(inc) * cos(az);
     p[1].y = radius * sin(inc) * sin(az);
     p[1].z = radius * cos(inc);
+    map_uv(&u, &v, inc, az);
+    float_array_push(&texc, u); // X
+    float_array_push(&texc, v); // Y
+
+
     p[2].x = radius * sin(inc) * cos(az+az_sz);
     p[2].y = radius * sin(inc) * sin(az+az_sz);
     p[2].z = radius * cos(inc);
+    map_uv(&u, &v, inc, az+az_sz);
+    float_array_push(&texc, u); // X
+    float_array_push(&texc, v); // Y
 
     p[3].x = radius * sin(M_PI) * cos(az+az_sz/2.0);
     p[3].y = radius * sin(M_PI) * sin(az+az_sz/2.0);
     p[3].z = radius * cos(M_PI);
+    map_uv(&u, &v, M_PI, (az+az_sz)/2.0);
+    float_array_push(&texc, u); // X
+    float_array_push(&texc, v); // Y
+
     p[4].x = radius * sin(M_PI-inc_sz) * cos(az+az_sz);
     p[4].y = radius * sin(M_PI-inc_sz) * sin(az+az_sz);
     p[4].z = radius * cos(M_PI-inc_sz);
+    map_uv(&u, &v, M_PI-inc_sz, az+az_sz);
+    float_array_push(&texc, u); // X
+    float_array_push(&texc, v); // Y
+
     p[5].x = radius * sin(M_PI-inc_sz) * cos(az);
     p[5].y = radius * sin(M_PI-inc_sz) * sin(az);
     p[5].z = radius * cos(M_PI-inc_sz);
+    map_uv(&u, &v, M_PI-inc_sz, az);
+    float_array_push(&texc, u); // X
+    float_array_push(&texc, v); // Y
 
     for (int k = 0 ; k < 6 ; k ++) {
       float_array_push(&verts, p[k].x);
@@ -778,13 +808,7 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
       float_array_push(&normals, n.x);
       float_array_push(&normals, n.y);
       float_array_push(&normals, n.z);
-
-      float u = 0.5 + atan2(-n.x, -n.y) / (2.0 * M_PI);
-      float v = 0.5 - 2.0 * asin(-n.z) / (2.0 * M_PI);
-      float_array_push(&texc, u); // X
-      float_array_push(&texc, v); // Y
     }
-
   }
   // Handle non polar stacks
   for (int i = 1 ; i < STACKS - 1 ; i ++) {
@@ -793,32 +817,51 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
     for (int j = 0 ; j < SLICES ; j ++) {
       // For every slice we generate two triangles (ccw)
       double az = j * (2.0 * M_PI) / (double)SLICES;
-
+      float u, v;
       // Triangle 1 & 2
       float3 p[6];
       p[0].x = radius * sin(inc) * cos(az);
       p[0].y = radius * sin(inc) * sin(az);
       p[0].z = radius * cos(inc);
+      map_uv(&u, &v, inc, az);
+      float_array_push(&texc, u); // X
+      float_array_push(&texc, v); // Y
 
       p[1].x = radius * sin(inc+inc_sz) * cos(az+az_sz);
       p[1].y = radius * sin(inc+inc_sz) * sin(az+az_sz);
       p[1].z = radius * cos(inc+inc_sz);
+      map_uv(&u, &v, inc+inc_sz, az+az_sz);
+      float_array_push(&texc, u); // X
+      float_array_push(&texc, v); // Y
 
       p[2].x = radius * sin(inc) * cos(az+az_sz);
       p[2].y = radius * sin(inc) * sin(az+az_sz);
       p[2].z = radius * cos(inc);
+      map_uv(&u, &v, inc, az+az_sz);
+      float_array_push(&texc, u); // X
+      float_array_push(&texc, v); // Y
 
       p[3].x = radius * sin(inc) * cos(az);
       p[3].y = radius * sin(inc) * sin(az);
       p[3].z = radius * cos(inc);
+      map_uv(&u, &v, inc, az);
+      float_array_push(&texc, u); // X
+      float_array_push(&texc, v); // Y
 
       p[4].x = radius * sin(inc+inc_sz) * cos(az);
       p[4].y = radius * sin(inc+inc_sz) * sin(az);
       p[4].z = radius * cos(inc+inc_sz);
+      map_uv(&u, &v, inc+inc_sz, az);
+      float_array_push(&texc, u); // X
+      float_array_push(&texc, v); // Y
 
       p[5].x = radius * sin(inc+inc_sz) * cos(az+az_sz);
       p[5].y = radius * sin(inc+inc_sz) * sin(az+az_sz);
       p[5].z = radius * cos(inc+inc_sz);
+      map_uv(&u, &v, inc+inc_sz, az+az_sz);
+      float_array_push(&texc, u); // X
+      float_array_push(&texc, v); // Y
+
 
       for (int k = 0 ; k < 6 ; k ++) {
         float_array_push(&verts, p[k].x);
@@ -829,11 +872,6 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
         float_array_push(&normals, n.x);
         float_array_push(&normals, n.y);
         float_array_push(&normals, n.z);
-
-        float u = 0.5 + atan2(-n.x, -n.y) / (2.0 * M_PI);
-        float v = 0.5 - 2.0 * asin(-n.z) / (2.0 * M_PI);
-        float_array_push(&texc, u); // X
-        float_array_push(&texc, v); // Y
       }
     }
   }
