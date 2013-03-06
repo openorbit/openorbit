@@ -112,6 +112,30 @@ sg_object_print(const sg_object_t *obj)
               obj->camera_pos.x, obj->camera_pos.y, obj->camera_pos.z);
     //ooLogInfo("\tdp:  [%f %f %f]", obj->dp.x, obj->dp.y, obj->dp.z);
   }
+
+  if (obj->geometry) {
+    GLint access, mapped, size, usage;
+    GLint old_vbo;
+    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &old_vbo);
+
+    glBindBuffer(GL_ARRAY_BUFFER, obj->geometry->vbo);
+    glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_ACCESS, &access);
+    glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_MAPPED, &mapped);
+    glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+    glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &usage);
+
+    ooLogInfo("geometry %d:\n\taccess: %d\n\tmapped: %d\n\tsize: %d\n\tusage: %d",
+              obj->geometry->vbo, access, mapped, size, usage);
+
+    size = size < 1000*sizeof(float) ? size : 1000;
+    float data[size/sizeof(float)+1];
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+    for (int i = 0 ; i < sizeof(data)/sizeof(data[0])/3 ; i ++) {
+      printf("\t%f %f %f\n", data[i*3 + 0], data[i*3 + 1], data[i*3 + 2]);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, old_vbo);
+  }
 }
 
 void
@@ -297,12 +321,14 @@ sg_object_draw(sg_object_t *obj)
     const float4x4 *pm = sg_camera_project(sg_scene_get_cam(obj->scene));
     sg_shader_set_projection(obj->shader, &(*pm)[0]);
     SG_CHECK_ERROR;
-    //const float4 *vm = sg_camera_get_view(sg_scene_get_cam(obj->scene));
+
     sg_shader_set_model_view(obj->shader, obj->modelViewMatrix);
     SG_CHECK_ERROR;
 
+    // Normal matrix is the modelview matrix as we don't use scales
     sg_shader_set_normal_matrix(obj->shader, obj->modelViewMatrix);
     SG_CHECK_ERROR;
+
     // Set light params for object
     // TODO: Global ambient light as well...
     sg_scene_t *scene = obj->scene;
@@ -314,18 +340,20 @@ sg_object_draw(sg_object_t *obj)
     }
     SG_CHECK_ERROR;
 
+    // Ambient global light
     sg_shader_bind_amb(obj->shader, sg_scene_get_amb(obj->scene));
     SG_CHECK_ERROR;
+
     // Set material params
     sg_shader_bind_material(obj->shader, obj->material);
     SG_CHECK_ERROR;
+
     // Set texture params
     for (int i = 0 ; i < obj->texCount ; i ++) {
       SG_CHECK_ERROR;
       sg_shader_bind_texture(obj->shader, obj->textures[i], i);
       SG_CHECK_ERROR;
     }
-    //glUniform1iv(obj->shader->texArrayId, SG_OBJ_MAX_TEXTURES, obj->textures);
 
     SG_CHECK_ERROR;
 
@@ -337,16 +365,10 @@ sg_object_draw(sg_object_t *obj)
   SG_CHECK_ERROR;
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
-    SG_CHECK_ERROR;
     sg_object_draw(ARRAY_ELEM(obj->subObjects, i));
     SG_CHECK_ERROR;
   }
   SG_CHECK_ERROR;
-
-  //if (obj->rigidBody) {
-  //  ooLogInfo("draw object %s at campos %vf, p = %vd %vf",
-  //            obj->rigidBody->name, obj->camera_pos, obj->p.seg, obj->p.offs);
-  //}
 }
 
 void
@@ -408,9 +430,6 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
     }
   }
   if (vertexCount == 0) return NULL;
-
-  ooLogInfo("geometry: |[%f %f %f]| = %f", maxvert.x, maxvert.y, maxvert.z,
-            vf3_abs(maxvert));
 
 
   SG_CHECK_ERROR;
@@ -659,6 +678,8 @@ sg_new_object_with_geo(sg_shader_t *shader, const char *name,
 sg_object_t*
 sg_load_object(const char *file, sg_shader_t *shader)
 {
+  ooLogInfo("load %s", file);
+
   assert(file && "not null");
   assert(shader && "not null");
 
