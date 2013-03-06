@@ -157,6 +157,13 @@ sg_camera_track_object(sg_camera_t *cam, sg_object_t *obj)
   cam->tgt = obj;
 }
 
+sg_object_t*
+sg_camera_get_tracked_object(sg_camera_t *cam)
+{
+  return cam->tgt;
+}
+
+
 void
 sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj)
 {

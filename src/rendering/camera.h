@@ -37,6 +37,7 @@ extern "C" {
   void sg_camera_track_object(sg_camera_t *cam, sg_object_t *obj);
   void sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj);
   void sg_camera_set_perspective(sg_camera_t *cam, float perspective);
+  sg_object_t* sg_camera_get_tracked_object(sg_camera_t *cam);
 
   void sg_camera_update_modelview(sg_camera_t *cam);
   void sg_camera_set_follow_offset(sg_camera_t *cam, float3 offs);
