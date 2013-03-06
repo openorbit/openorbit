@@ -272,7 +272,7 @@ END_TEST
 
 START_TEST(test_m_subdet3)
 {
-  float3x3 m = {{ 1.0, -2.0,  0.0, 3.0},
+  float4x4 m = {{ 1.0, -2.0,  0.0, 3.0},
                 { 0.0,  4.0, -1.0, 2.0},
                 {-1.0,  0.0, -3.0, 1.0},
                 { 0.0,  2.0,  5.0, 0.0}};
@@ -324,6 +324,99 @@ START_TEST(test_m_inv)
 }
 END_TEST
 
+START_TEST(test_q_slerp)
+{
+  quaternion_t q0 = q_rot(1.0, 0.0, 0.0, 0.0);
+  quaternion_t q1 = q_rot(1.0, 0.0, 0.0, M_PI_2);
+
+  quaternion_t q = q_slerp(q0, q1, 0.0);
+  fail_unless(ALMOST_EQUAL(q.x, q0.x, 0.000001f), "q0.x (%f != %f)", q.x, q0.x);
+  fail_unless(ALMOST_EQUAL(q.y, q0.y, 0.000001f), "q0.y (%f != %f)", q.x, q0.x);
+  fail_unless(ALMOST_EQUAL(q.z, q0.z, 0.000001f), "q0.z (%f != %f)", q.x, q0.x);
+  fail_unless(ALMOST_EQUAL(q.w, q0.w, 0.000001f), "q0.w (%f != %f)", q.x, q0.x);
+
+  q = q_slerp(q0, q1, 1.0);
+  fail_unless(ALMOST_EQUAL(q.x, q1.x, 0.000001f), "q1.x (%f != %f)", q.x, q1.x);
+  fail_unless(ALMOST_EQUAL(q.y, q1.y, 0.000001f), "q1.y (%f != %f)", q.y, q1.y);
+  fail_unless(ALMOST_EQUAL(q.z, q1.z, 0.000001f), "q1.z (%f != %f)", q.z, q1.z);
+  fail_unless(ALMOST_EQUAL(q.w, q1.w, 0.000001f), "q1.w (%f != %f)", q.w, q1.w);
+
+  q = q_slerp(q0, q1, 0.5);
+  quaternion_t q_expect = q_rot(1.0, 0.0, 0.0, M_PI_4);
+  fail_unless(ALMOST_EQUAL(q.x, q_expect.x, 0.000001f), "q_exp.x (%f != %f)", q.x, q_expect.x);
+  fail_unless(ALMOST_EQUAL(q.y, q_expect.y, 0.000001f), "q_exp.y (%f != %f)", q.y, q_expect.y);
+  fail_unless(ALMOST_EQUAL(q.z, q_expect.z, 0.000001f), "q_exp.z (%f != %f)", q.z, q_expect.z);
+  fail_unless(ALMOST_EQUAL(q.w, q_expect.w, 0.000001f), "q_exp.w (%f != %f)", q.w, q_expect.w);
+}
+END_TEST
+
+START_TEST(test_mf4_q_convert)
+{
+  /* First test for unit matrix to unit quaternion */
+  float4x4 m;
+  mf4_ident(m);
+  quaternion_t q = mf4_q_convert(m);
+  quaternion_t q_exp = Q_IDENT;
+
+  fail_unless(q.x == q_exp.x);
+  fail_unless(q.y == q_exp.y);
+  fail_unless(q.z == q_exp.z);
+  fail_unless(q.w == q_exp.w);
+
+
+  // Second test, 90 degree around x
+  m[0] = vf4_set(1,0, 0,0);
+  m[1] = vf4_set(0,0,-1,0);
+  m[2] = vf4_set(0,1, 0,0);
+  m[3] = vf4_set(0,0, 0,1);
+
+  q_exp.x = 0.7071067811865475;
+  q_exp.y = 0.0;
+  q_exp.z = 0.0;
+  q_exp.w = 0.7071067811865476;
+
+  q = mf4_q_convert(m);
+
+  fail_unless(ALMOST_EQUAL(q.x, q_exp.x, 0.0000001));
+  fail_unless(ALMOST_EQUAL(q.y, q_exp.y, 0.0000001));
+  fail_unless(ALMOST_EQUAL(q.z, q_exp.z, 0.0000001));
+  fail_unless(ALMOST_EQUAL(q.w, q_exp.w, 0.0000001));
+}
+END_TEST
+
+START_TEST(test_mf3_q_convert)
+{
+  /* First test for unit matrix to unit quaternion */
+  float3x3 m;
+  mf3_ident(m);
+  quaternion_t q = mf3_q_convert(m);
+  quaternion_t q_exp = Q_IDENT;
+
+  fail_unless(q.x == q_exp.x);
+  fail_unless(q.y == q_exp.y);
+  fail_unless(q.z == q_exp.z);
+  fail_unless(q.w == q_exp.w);
+
+
+  // Second test, 90 degree around x
+  m[0] = vf3_set(1,0, 0);
+  m[1] = vf3_set(0,0,-1);
+  m[2] = vf3_set(0,1, 0);
+
+  q_exp.x = 0.7071067811865475;
+  q_exp.y = 0.0;
+  q_exp.z = 0.0;
+  q_exp.w = 0.7071067811865476;
+
+  q = mf3_q_convert(m);
+
+  fail_unless(ALMOST_EQUAL(q.x, q_exp.x, 0.0000001));
+  fail_unless(ALMOST_EQUAL(q.y, q_exp.y, 0.0000001));
+  fail_unless(ALMOST_EQUAL(q.z, q_exp.z, 0.0000001));
+  fail_unless(ALMOST_EQUAL(q.w, q_exp.w, 0.0000001));
+}
+END_TEST
+
 Suite
 *test_suite (void)
 {
@@ -355,6 +448,9 @@ Suite
 
   /* Quaternion functions */
   tcase_add_test(tc_core, test_q_mul);
+  tcase_add_test(tc_core, test_q_slerp);
+  tcase_add_test(tc_core, test_mf4_q_convert);
+  tcase_add_test(tc_core, test_mf3_q_convert);
 
 
   suite_add_tcase(s, tc_core);
