@@ -92,9 +92,6 @@ sg_object_t* sg_new_object(sg_shader_t *shader, const char *name);
 // Synchronise with physics model
 void sg_object_sync(sg_object_t *obj, float t);
 
-void sg_object_animate(sg_object_t *obj, float dt); // Linear interpolation between frames
-void sg_object_update(sg_object_t *obj); // Pull from physics system
-
 void sg_object_recompute_modelviewmatrix(sg_object_t *obj);
 void sg_object_draw(sg_object_t *obj);
 void sg_geometry_draw(sg_geometry_t *geo);

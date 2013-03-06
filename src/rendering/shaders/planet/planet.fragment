@@ -32,7 +32,6 @@ uniform bool oo_Texture2_valid; // Night
 uniform sampler2D oo_Texture0; // Normal texture
 uniform sampler2D oo_Texture1; // Specular map
 uniform sampler2D oo_Texture2; // Night texture
-//uniform sampler2D Tex2; // Bump map
 
 in vec2 TexCoord;
 
@@ -57,8 +56,13 @@ main()
   vec4 diffuseNight = diffuseNightTexel * oo_Light[0].diffuse;
 
   // Ambient light
-  AmbientGlob = oo_LightGlobalAmbient * diffuseNightTexel;
-  Ambient = diffuseNightTexel * oo_Light[0].ambient;
+  if (oo_Texture2_valid) {
+    AmbientGlob = oo_LightGlobalAmbient * diffuseNightTexel;
+    Ambient = diffuseNightTexel * oo_Light[0].ambient;
+  } else {
+    AmbientGlob = oo_LightGlobalAmbient * diffuseTexel;
+    Ambient = diffuseTexel * oo_Light[0].ambient;
+  }
 
   vec4 color = AmbientGlob;
 
@@ -68,16 +72,16 @@ main()
                       Dist * Dist * oo_Light[0].quadraticAttenuation);
 
     color += att * (diffuse * NdotL + Ambient);
+
     float RdotE = max(dot(reflect(-Ld, Normal), normalize(Eye)), 0.0);
 
-    //vec4 specColor = diffuseTexel;
+    //vec4 specColor = diffuseTexel + oo_Material.specular;
     vec4 specColor = oo_Material.specular;
     vec4 specIntensity = vec4(0.0,0.0,0.0,0.0);
 
     // Note: Grayscale spec map texture
     if (oo_Texture1_valid && (texture(oo_Texture1, TexCoord).r > 0.1) || !oo_Texture1_valid) {
-      specIntensity = oo_Light[0].specular *
-                      pow(RdotE, oo_Material.shininess);
+      specIntensity = oo_Light[0].specular * pow(RdotE, oo_Material.shininess);
     }
 
     color += att * specColor * specIntensity;
@@ -97,6 +101,4 @@ main()
   }
 
   oo_FragColor = color;
-  //oo_FragColor = vec4(1,1,1,1);
-
 }

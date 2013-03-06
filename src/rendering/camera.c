@@ -112,8 +112,9 @@ sg_camera_update_modelview(sg_camera_t *cam)
 {
   ASSERT_CAM(cam);
   float4x4 qm;
-  q_mf4_convert_inv(qm, cam->q);
+
   mf4_ident_z_up(cam->view_matrix);
+  q_mf4_convert_inv(qm, cam->q);
   mf4_mul2(cam->view_matrix, qm);
 }
 
@@ -135,7 +136,7 @@ sg_new_camera(sg_scene_t *scene)
   cam->q1 = Q_IDENT;
   cam->q = Q_IDENT;
 
-  mf4_perspective(cam->proj_matrix, M_PI_2, 1.0, 0.1, 1000000000000.0);
+  sg_camera_set_perspective(cam, 1.0);
 
   sg_camera_update_modelview(cam);
 
@@ -188,8 +189,9 @@ sg_camera_set_perspective(sg_camera_t *cam, float perspective)
 {
   ASSERT_CAM(cam);
 
-  mf4_perspective(cam->proj_matrix, DEG_TO_RAD(90.0), perspective,
+  mf4_perspective(cam->proj_matrix, M_PI_4, perspective,
                   0.1, 1000000000000.0);
+
   ASSERT_CAM(cam);
 }
 

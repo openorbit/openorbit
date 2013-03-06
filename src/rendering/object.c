@@ -118,6 +118,7 @@ void
 sg_object_add_child(sg_object_t *obj, sg_object_t *child)
 {
   obj_array_push(&obj->subObjects, child);
+  child->parent = obj;
   child->scene = obj->scene;
 }
 int
@@ -249,10 +250,12 @@ sg_geometry_draw(sg_geometry_t *geo)
   assert(geo != NULL);
   SG_CHECK_ERROR;
 
+  glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glFrontFace(GL_CCW);
   glCullFace(GL_BACK);
+
   glBindVertexArray(geo->vba);
 
   SG_CHECK_ERROR;
@@ -294,6 +297,9 @@ sg_object_draw(sg_object_t *obj)
     //const float4 *vm = sg_camera_get_view(sg_scene_get_cam(obj->scene));
     sg_shader_set_model_view(obj->shader, obj->modelViewMatrix);
     SG_CHECK_ERROR;
+
+    sg_shader_set_normal_matrix(obj->shader, obj->modelViewMatrix);
+    SG_CHECK_ERROR;
     // Set light params for object
     // TODO: Global ambient light as well...
     sg_scene_t *scene = obj->scene;
@@ -333,86 +339,48 @@ sg_object_draw(sg_object_t *obj)
     SG_CHECK_ERROR;
   }
   SG_CHECK_ERROR;
-}
 
-
-void
-sg_object_camera_moved(sg_object_t *obj, float3 cam_dp)
-{
-  obj->camera_pos -= cam_dp;
-}
-
-void
-sg_object_animate(sg_object_t *obj, float dt)
-{
-  obj->q = q_normalise(q_vf3_rot(obj->q, obj->dr, dt));
-  q_mf4_convert(obj->R, obj->q);
-
-  lwc_translate3fv(&obj->p, obj->dp * dt);
-  obj->camera_pos += obj->dp * dt;
-
-  if (obj->parent) {
-    mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
-  } else {
-    mf4_cpy(obj->modelViewMatrix, *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
-  }
-
-  float4x4 translate;
-  mf4_make_translate(translate, obj->camera_pos);
-  mf4_mul2(obj->modelViewMatrix, translate);
-  mf4_mul2(obj->modelViewMatrix, obj->R);
-
-  ARRAY_FOR_EACH(i, obj->subObjects) {
-    sg_object_animate(ARRAY_ELEM(obj->subObjects, i), dt);
-  }
-}
-
-// Updatdes an object from the physics system
-void
-sg_object_update(sg_object_t *obj)
-{
-  if (obj->rigidBody) {
-    obj->dp = plGetVel(obj->rigidBody);
-    obj->dr = plGetAngularVel(obj->rigidBody);
-    obj->q0 = plGetQuat(obj->rigidBody);
-    obj->q1 = q_vf3_rot(obj->q0, obj->dr, 1.0);
-    obj->q = q_slerp(obj->q0, obj->q1, 0.0);
-
-    obj->parent_offset = obj->rigidBody->p_offset;
-    // Update position, this is based on where the camera is
-
-    obj->p = obj->rigidBody->p;
-    lwc_translate3fv(&obj->p, obj->parent_offset);
-  } else {
-    if (obj->parent) obj->p = obj->parent->p;
-    lwc_translate3fv(&obj->p, obj->parent_offset);
-  }
-
-  ARRAY_FOR_EACH(i, obj->subObjects) {
-    sg_object_update(ARRAY_ELEM(obj->subObjects, i));
-  }
+  //if (obj->rigidBody) {
+  //  ooLogInfo("draw object %s at campos %vf, p = %vd %vf",
+  //            obj->rigidBody->name, obj->camera_pos, obj->p.seg, obj->p.offs);
+  //}
 }
 
 void
 sg_object_recompute_modelviewmatrix(sg_object_t *obj)
 {
-  sg_camera_t *cam = sg_scene_get_cam(obj->scene);
-  lwcoord_t pos = sg_camera_pos(cam);
-  obj->camera_pos = lwc_dist(&obj->p, &pos);
+  if (obj->rigidBody) {
+    sg_camera_t *cam = sg_scene_get_cam(obj->scene);
+    lwcoord_t pos = sg_camera_pos(cam);
+    obj->camera_pos = lwc_dist(&obj->p, &pos);
 
-  q_mf4_convert(obj->R, obj->q);
+    q_mf4_convert(obj->R, obj->q);
+    if (obj->parent) {
+      assert(0 && "should not happen");
+      mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+    } else {
+      mf4_cpy(obj->modelViewMatrix,
+              *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+    }
 
-  if (obj->parent) {
-    mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+    float4x4 translate;
+    mf4_make_translate(translate, obj->camera_pos);
+    mf4_mul2(obj->modelViewMatrix, translate);
+    mf4_mul2(obj->modelViewMatrix, obj->R);
   } else {
-    mf4_cpy(obj->modelViewMatrix,
-            *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
-  }
+    if (obj->parent) {
+      mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+    } else {
+      assert(0 && "should not happen");
+      mf4_cpy(obj->modelViewMatrix,
+              *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+    }
 
-  float4x4 translate;
-  mf4_make_translate(translate, obj->camera_pos);
-  mf4_mul2(obj->modelViewMatrix, translate);
-  mf4_mul2(obj->modelViewMatrix, obj->R);
+    float4x4 translate;
+    mf4_make_translate(translate, obj->parent_offset);
+    mf4_mul2(obj->modelViewMatrix, translate);
+    mf4_mul2(obj->modelViewMatrix, obj->R);
+  }
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_recompute_modelviewmatrix(ARRAY_ELEM(obj->subObjects, i));
@@ -583,26 +551,31 @@ sg_object_sync(sg_object_t *obj, float t)
 
     lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
     obj->p = obj->p0;
+  } else {
+    // TODO: Support translation and rotation of sub objects
+    //obj->q0 = obj->q1;
+    //obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
+    //obj->q = q_slerp(obj->q0, obj->q1, t);
   }
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_sync(ARRAY_ELEM(obj->subObjects, i), t);
   }
-
 }
 
 void
 sg_object_interpolate(sg_object_t *obj, float t)
 {
   // Interpolate rotation quaternion.
-  obj->q = q_slerp(obj->q0, obj->q1, t);
+  if (obj->rigidBody) {
+    obj->q = q_slerp(obj->q0, obj->q1, t);
 
-  // Approximate distance between physics frames
-  float3 dist = lwc_dist(&obj->p1, &obj->p0);
-  dist = vf3_s_mul(dist, t);
-  obj->p = obj->p0;
-  lwc_translate3fv(&obj->p, dist);
-
+    // Approximate distance between physics frames
+    float3 dist = lwc_dist(&obj->p1, &obj->p0);
+    dist = vf3_s_mul(dist, t);
+    obj->p = obj->p0;
+    lwc_translate3fv(&obj->p, dist);
+  }
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_interpolate(ARRAY_ELEM(obj->subObjects, i), t);
   }

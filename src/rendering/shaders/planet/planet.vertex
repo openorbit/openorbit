@@ -44,7 +44,7 @@ main()
 {
   N = normalize(oo_NormalMatrix * oo_Normal);
 
-  vec3 Lv = vec3(oo_Light[0].pos - (oo_ModelViewMatrix * oo_Vertex).xyz);
+  vec3 Lv = (oo_ModelViewMatrix * vec4(oo_Light[0].pos - oo_Vertex.xyz, 0.0)).xyz;
   Dist = length(Lv);
   Ld = normalize(Lv);
   Eye = -vec3(oo_ModelViewMatrix * oo_Vertex);

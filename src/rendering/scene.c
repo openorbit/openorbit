@@ -219,6 +219,9 @@ sg_new_scene(const char *name)
   obj_array_init(&scene->lights);
   obj_array_init(&scene->shaders);
 
+  // Default ambient light
+  scene->amb = vf4_set(0.2, 0.2, 0.2, 1.0);
+
   return scene;
 }
 

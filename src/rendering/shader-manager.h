@@ -46,6 +46,7 @@ void sg_shader_bind(sg_shader_t *program);
 
 void sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj);
 void sg_shader_set_model_view(sg_shader_t *shader, const float4x4 proj);
+void sg_shader_set_normal_matrix(sg_shader_t *shader, const float4x4 norm);
 
 void sg_shader_invalidate_textures(sg_shader_t *shader);
 void sg_shader_bind_texture(sg_shader_t *shader, sg_texture_t *tex,

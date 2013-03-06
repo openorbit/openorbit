@@ -528,6 +528,7 @@ sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
 {
   assert(shader != NULL);
   SG_CHECK_ERROR;
+
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.modelViewId, 1, GL_TRUE,
                      (GLfloat*)modelview);
@@ -538,6 +539,26 @@ sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
   //           i, modelview[i].x, modelview[i].y, modelview[i].z, modelview[i].w);
   //}
 }
+
+void
+sg_shader_set_normal_matrix(sg_shader_t *shader, const float4x4 norm)
+{
+  assert(shader != NULL);
+  SG_CHECK_ERROR;
+  sg_shader_bind(shader);
+  if (shader->uniforms.normalMatrixId >= 0) {
+    float nmat[9];
+    for (int i = 0 ; i < 3 ; i ++) {
+      for (int j = 0 ; j < 3 ; j ++) {
+        nmat[i*3+j] = norm[i][j];
+      }
+    }
+    glUniformMatrix3fv(shader->uniforms.normalMatrixId, 1, GL_TRUE,
+                       nmat);
+  }
+  SG_CHECK_ERROR;
+}
+
 
 void
 sg_shader_bind_param_3fv(sg_shader_t *shader, sg_param_id_t param, float3 p)
@@ -581,18 +602,26 @@ sg_shader_invalidate_textures(sg_shader_t *shader)
   SG_CHECK_ERROR;
   sg_shader_bind(shader);
   if (shader->uniforms.tex_validity[0] >= 0) {
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glUniform1i(shader->uniforms.tex_validity[0], 0);
     SG_CHECK_ERROR;
   }
   if (shader->uniforms.tex_validity[1] >= 0) {
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glUniform1i(shader->uniforms.tex_validity[1], 0);
     SG_CHECK_ERROR;
   }
   if (shader->uniforms.tex_validity[2] >= 0) {
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glUniform1i(shader->uniforms.tex_validity[2], 0);
     SG_CHECK_ERROR;
   }
   if (shader->uniforms.tex_validity[3] >= 0) {
+    glActiveTexture(GL_TEXTURE0 + 3);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glUniform1i(shader->uniforms.tex_validity[3], 0);
     SG_CHECK_ERROR;
   }

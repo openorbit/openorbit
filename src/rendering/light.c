@@ -34,7 +34,7 @@
 struct sg_light_t {
   sg_scene_t *scene;
   sg_object_t *obj;
-  float4 pos; // Global pos, relative to object position
+  float3 pos; // Global pos, relative to object position
 
   int lightId;
 
@@ -69,7 +69,6 @@ sg_light_set_pos3f(sg_light_t *light, float x, float y, float z)
   light->pos[0] = vf3_x(x);
   light->pos[1] = vf3_y(y);
   light->pos[2] = vf3_z(z);
-  light->pos[3] = 1.0;
 }
 
 void
@@ -78,7 +77,6 @@ sg_light_set_posv(sg_light_t *light, float3 v)
   light->pos[0] = vf3_x(v);
   light->pos[1] = vf3_y(v);
   light->pos[2] = vf3_z(v);
-  light->pos[3] = 1.0;
 }
 
 float3
@@ -208,6 +206,10 @@ sg_new_light3f(sg_scene_t *sc, float x, float y, float z)
   light->diffuse[1] = 1.0;
   light->diffuse[2] = 1.0;
   light->diffuse[3] = 1.0;
+
+  light->constantAttenuation = 1.0;
+  light->linearAttenuation = 0.0;
+  light->quadraticAttenuation = 0.0;
 
   sg_scene_add_light(sc, light);
 
