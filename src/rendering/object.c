@@ -251,6 +251,8 @@ sg_geometry_draw(sg_geometry_t *geo)
   SG_CHECK_ERROR;
 
   glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS); // We will try to draw objects sorted by camera
+                        // distance, less is correct in this case.
   glEnable(GL_CULL_FACE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glFrontFace(GL_CCW);
@@ -261,7 +263,6 @@ sg_geometry_draw(sg_geometry_t *geo)
   SG_CHECK_ERROR;
 
   if (geo->has_indices) {
-    //ooLogInfo("draw %d vertices", (int)geo->index_count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geo->ibo);
     glDrawElements(geo->gl_primitive_type, geo->index_count, geo->index_type, 0);
     SG_CHECK_ERROR;
@@ -269,10 +270,12 @@ sg_geometry_draw(sg_geometry_t *geo)
     if (geo->vertex_count) glDrawArrays(geo->gl_primitive_type, 0, geo->vertex_count);
     SG_CHECK_ERROR;
   }
-  //???  glDisableVertexAttribArray(geo->vba);
 
+  // Need to leave drawing function in a clean state
   glBindVertexArray(0);
-  //glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
   SG_CHECK_ERROR;
 }
 
@@ -433,6 +436,10 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   glGenBuffers(1, &geo->vbo);
   SG_CHECK_ERROR;
 
+  ooLogInfo("geometry: %d |[%f %f %f]| = %f", geo->vbo, maxvert.x, maxvert.y, maxvert.z,
+            vf3_abs(maxvert));
+
+
   glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
   glBufferData(GL_ARRAY_BUFFER,
                buffSize,
@@ -503,6 +510,9 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
     SG_CHECK_ERROR;
   }
   glBindVertexArray(0); // Done
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
   SG_CHECK_ERROR;
 
   return geo;

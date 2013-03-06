@@ -31,6 +31,7 @@ struct sg_scene_t {
   char *name;
   sg_camera_t *cam;
   sg_background_t *bg;
+  obj_array_t objects_sorted_by_name;
   obj_array_t objects;
   obj_array_t lights; // Scene global lights
   float4 amb; // Ambient light for the scene
@@ -63,9 +64,11 @@ void
 sg_scene_add_object(sg_scene_t *sc, sg_object_t *obj)
 {
   obj_array_push(&sc->objects, obj);
+  obj_array_push(&sc->objects_sorted_by_name, obj);
   sg_object_set_scene(obj, sc);
 
-  qsort_b(sc->objects.elems, sc->objects.length, sizeof(sg_object_t*),
+  qsort_b(sc->objects_sorted_by_name.elems, sc->objects_sorted_by_name.length,
+          sizeof(sg_object_t*),
           ^int(const void *a, const void *b) {
             const sg_object_t **ap = (const sg_object_t **)a;
             const sg_object_t **bp = (const sg_object_t **)b;
@@ -77,7 +80,10 @@ sg_object_t*
 sg_scene_get_object(sg_scene_t *sc, const char *name)
 {
   sg_object_t **obj =
-    bsearch_b(name, sc->objects.elems, sc->objects.length, sizeof(sg_object_t*),
+    bsearch_b(name, sc->objects_sorted_by_name.elems,
+              sc->objects_sorted_by_name.length,
+              sizeof(sg_object_t*),
+
               ^int(const void *a, const void *b) {
                 const sg_object_t **bp = (const sg_object_t **)b;
                 return strcmp(a, sg_object_get_name(*bp));
@@ -149,7 +155,6 @@ sg_scene_interpolate(sg_scene_t *scene)
   uint64_t ts = getmonotimestamp();
   uint64_t ns = subtractmonotime(ts, scene->sync_stamp);
   uint64_t T = subtractmonotime(scene->next_sync_estimate, scene->sync_stamp);
-  //double dt = ns / srt;
 
   double normalised_time = (double)ns/(double)T;
   if (normalised_time > 1.0) normalised_time = 1.0;
@@ -164,25 +169,31 @@ sg_scene_interpolate(sg_scene_t *scene)
   sg_camera_interpolate(scene->cam, normalised_time);
 }
 
-#if 0
 void
-sg_scene_update(sg_scene_t *scene)
+sg_scene_distance_sort(sg_scene_t *sc)
 {
-  ooLogTrace("scene update\n");
-  ARRAY_FOR_EACH(i, scene->objects) {
-    sg_object_update(ARRAY_ELEM(scene->objects, i));
-  }
+  lwcoord_t cam_pos = sg_camera_pos(sc->cam);
+  // This is not really optimal to do every frame, but works for now.
+  qsort_b(sc->objects.elems, sc->objects.length,
+          sizeof(sg_object_t*),
+          ^int(const void *a, const void *b) {
+            const sg_object_t **ap = (const sg_object_t **)a;
+            const sg_object_t **bp = (const sg_object_t **)b;
 
-  // If a camera is tracking an object, it needs to know the objects location
-  // the location is known after the object update
-  sg_camera_update_constraints(scene->cam);
-  sg_camera_update_modelview(scene->cam);
+            lwcoord_t pa = sg_object_get_p(*ap);
+            lwcoord_t pb = sg_object_get_p(*bp);
 
-  ARRAY_FOR_EACH(i, scene->objects) {
-    sg_object_recompute_modelviewmatrix(ARRAY_ELEM(scene->objects, i));
-  }
+            float3 va = lwc_dist(&pa, &cam_pos);
+            float3 vb = lwc_dist(&pb, &cam_pos);
+
+            int res = 0;
+            if (vf3_abs_square(va) < vf3_abs_square(vb)) res = 1;
+            else if (vf3_abs_square(va) > vf3_abs_square(vb)) res = -1;
+
+            return res;
+          });
 }
-#endif
+
 
 void
 sg_scene_draw(sg_scene_t *scene, float dt)
@@ -198,6 +209,8 @@ sg_scene_draw(sg_scene_t *scene, float dt)
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
   SG_CHECK_ERROR;
+
+  sg_scene_distance_sort(scene);
 
   ARRAY_FOR_EACH(i, scene->objects) {
     sg_object_recompute_modelviewmatrix(ARRAY_ELEM(scene->objects, i));
@@ -216,6 +229,7 @@ sg_new_scene(const char *name)
   memset(scene, 0, sizeof(sg_scene_t));
   scene->name = strdup(name);
   obj_array_init(&scene->objects);
+  obj_array_init(&scene->objects_sorted_by_name);
   obj_array_init(&scene->lights);
   obj_array_init(&scene->shaders);
 
@@ -233,13 +247,4 @@ sg_scene_has_name(sg_scene_t *sc, const char *name)
   }
   return false;
 }
-
-//typedef struct {
-//  sg_scenegraph_t *sg;
-//  sg_camera_t *cam;
-//  sg_background_t *bg;
-//  obj_array_t objects;
-//  obj_array_t lights;
-//  obj_array_t shaders;
-//} sg_scene_t;
 

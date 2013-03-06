@@ -167,6 +167,7 @@ sgCreateBackgroundFromFile(const char *file)
   SG_CHECK_ERROR;
 
   glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   //glBindBuffer(GL_ARRAY_BUFFER, 0);
   free(stars->data); // GL has copied arrays over
