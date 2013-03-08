@@ -43,6 +43,10 @@ void sg_light_set_scene(sg_light_t *light, sg_scene_t *sc);
 void sg_light_set_pos3f(sg_light_t *light, float x, float y, float z);
 void sg_light_set_posv(sg_light_t *light, float3 v);
 void sg_light_set_poslw(sg_light_t *light, lwcoord_t *lwc);
+
+/*!
+ * Return light position in eye coordinates.
+ */
 float3 sg_light_get_pos(const sg_light_t *light);
 
 void sg_light_set_ambient4f(sg_light_t *light,

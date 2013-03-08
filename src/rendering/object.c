@@ -154,6 +154,12 @@ sg_objects_compare_dist(sg_object_t const **o0, sg_object_t const **o1)
   else return 1;
 }
 
+const float4x4*
+sg_object_get_modelview(const sg_object_t *obj)
+{
+  return &obj->modelViewMatrix;
+}
+
 float3
 sg_object_get_camrea_pos(sg_object_t *obj)
 {
