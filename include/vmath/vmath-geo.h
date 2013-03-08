@@ -58,5 +58,6 @@ double  el_segment_area(double semiMajor, double ecc, double fi0, double fi1);
 float   el_eccf(float semiMajor, float semiMinor);
 double  el_ecc(double semiMajor, double semiMinor);
 
+double el_cs_area(double a, double ecc, double fi1, double fi0);
 
 #endif

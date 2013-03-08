@@ -359,6 +359,13 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
                              plAuToMetres(semiMajor),
                              plAuToMetres(ooGeoComputeSemiMinor(semiMajor, ecc)),
                              inc, longAscNode, longPerihel, meanLong, radius, flattening);
+
+  sg_object_t *ellipse = sg_new_ellipse(planetName.u.str, sg_get_shader("flat"),
+                                        plAuToMetres(semiMajor), ecc, inc, longAscNode,
+                                        longPerihel, 100);
+
+  sg_scene_add_object(sc, ellipse);
+
   sys->orbitalBody->atm = NULL; // Init as vaccuum
   if (atm) sys->orbitalBody->atm = plAtmosphere(1000.0, 100000.0, atm);
 

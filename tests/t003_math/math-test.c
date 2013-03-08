@@ -25,7 +25,7 @@
 
 #import <vmath/vmath.h>
 
-#define ALMOST_EQUAL(x, y, tol) (((y - (tol)) < (x)) && ((x) < ((y) + (tol))))
+#define ALMOST_EQUAL(x, y, tol) (((y - (tol)) <= (x)) && ((x) <= ((y) + (tol))))
 
 START_TEST(test_m_v_mul)
 {
@@ -417,6 +417,38 @@ START_TEST(test_mf3_q_convert)
 }
 END_TEST
 
+START_TEST(test_el_cs_area)
+{
+  // Last value is the expected, rest are parameters in order
+  double testdata[][5] = {
+    // Circles (a = 1, e = 0)
+    {1.0, 0.0, M_PI_4, 0.0,           M_PI_4/2.0},
+    {1.0, 0.0, M_PI_2, 0.0,           M_PI_4},
+    {1.0, 0.0, M_PI_4, -M_PI_4,       M_PI_4},
+    {1.0, 0.0, M_PI-M_PI_4, 0.0,      M_PI_2-M_PI_4/2.0},
+    {1.0, 0.0, M_PI, 0.0,             M_PI_2},
+    {1.0, 0.0, M_PI+M_PI_2, 0.0,      M_PI_2+M_PI_4},
+    {1.0, 0.0, M_PI_2+M_PI_4, 0.0,    M_PI_4+M_PI_4/2.0},
+    {1.0, 0.0, M_PI_2, -M_PI,         M_PI_4+M_PI_2},
+    {1.0, 0.0, M_PI_2, -M_PI_2,       M_PI_2},
+
+    // Ellipses, a = 1, b=0.5
+    {1.0, sqrt(1-0.5*0.5), M_PI, 0.0,  1.570796327/2.0},
+    {1.0, sqrt(1-0.5*0.5), M_PI_2, -M_PI_2,  1.570796327/2.0},
+    {1.0, sqrt(1-0.5*0.5), M_PI_2+M_PI_4, -M_PI_4,  1.570796327/2.0},
+  };
+
+  for (int i = 0 ; i < sizeof(testdata)/sizeof(testdata[0]) ; i ++) {
+    double res = el_cs_area(testdata[i][0], testdata[i][1], testdata[i][2],
+                            testdata[i][3]);
+    fail_unless(ALMOST_EQUAL(res, testdata[i][4], 0.00000001),
+                "%d el_cs_area(%f, %f, %f, %f) = %f != %f",
+                i, testdata[i][0], testdata[i][1], testdata[i][2],
+                testdata[i][3], res, testdata[i][4]);
+  }
+}
+END_TEST
+
 Suite
 *test_suite (void)
 {
@@ -452,6 +484,8 @@ Suite
   tcase_add_test(tc_core, test_mf4_q_convert);
   tcase_add_test(tc_core, test_mf3_q_convert);
 
+  /* Ellipse functions */
+  tcase_add_test(tc_core, test_el_cs_area);
 
   suite_add_tcase(s, tc_core);
 

@@ -399,16 +399,18 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
   } else {
+    float4x4 translate;
+
     if (obj->parent) {
       mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+      mf4_make_translate(translate, obj->parent_offset);
     } else {
-      assert(0 && "should not happen");
       mf4_cpy(obj->modelViewMatrix,
               *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+      lwcoord_t cpos = sg_camera_pos(sg_scene_get_cam(obj->scene));
+      mf4_make_translate(translate, lwc_dist(&obj->p, &cpos));
     }
 
-    float4x4 translate;
-    mf4_make_translate(translate, obj->parent_offset);
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
   }
@@ -913,74 +915,35 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
 
 sg_object_t*
 sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
-               float semiMinor, float asc,
-               float inc, float argOfPeriapsis,
-               float dec, float ra, int segments)
+               float ecc, float inc, float asc,
+               float argOfPeriapsis, int segments)
 {
-#define ITERSTOP 100000
-#define STEPSIZE 20.0
-
-  int segs = 30;
-
   float_array_t verts;
   float_array_init(&verts);
 
-  float ecc = sqrt(1.0-(semiMinor/semiMajor)*(semiMinor/semiMajor));;
-  double area = M_PI * semiMajor * semiMinor;
+  float semiMinor = semiMajor * sqrt(1.0 - ecc*ecc);
 
-  double sweep = area / (double)segs;
-
-  float_array_push(&verts, semiMajor * cos(0.0) - ecc * semiMajor);
-  float_array_push(&verts, semiMinor * sin(0.0));
-  float_array_push(&verts, 0.0f);
-
-  double segArea = 0.0, tol = 0.0;
-  double prevAngle = 0.0f;
-  double newAngle = prevAngle + 1.0*DEG_TO_RAD(360.0/(double)segs);
-  double delta;
-
-  for (size_t i = 1 ; i < segs ; i ++) {
-    int count = 0;
-    segArea = el_segment_area(semiMajor, ecc, prevAngle, newAngle);
-    delta = (newAngle-prevAngle);
-    do {
-      if (segArea > sweep) {
-        delta -= delta/STEPSIZE;
-      } else {
-        delta += delta/STEPSIZE;
-      }
-      newAngle = prevAngle + delta;
-      segArea = el_segment_area(semiMajor, ecc, prevAngle, newAngle);
-      tol = fabs(1.0 - segArea/sweep);
-      count ++;
-    } while (tol > 0.00001 && count < ITERSTOP);
-
-    if (count >= ITERSTOP) {
-      ooLogWarn("ellipse segment did not converge in %d iterations", ITERSTOP);
-    }
-    //segArea = segmentArea(prevAngle, newAngle, semimajor, ecc);
+  // Naive way
+  double seg_angle = 2.0*M_PI/segments;
+  for (size_t i = 0 ; i < segments ; i ++) {
+    double angle = i * seg_angle;
+    double b_cos = semiMinor * cos(angle);
+    double a_sin = semiMajor * sin(angle);
+    double r = semiMajor * semiMinor / sqrt(b_cos*b_cos+a_sin*a_sin);
 
     // Insert vec in array, note that center is in foci
-    float_array_push(&verts, semiMajor * cos(newAngle) - ecc * semiMajor);
-    float_array_push(&verts, semiMinor * sin(newAngle));
+    float_array_push(&verts, r * cos(angle));
+    float_array_push(&verts, r * sin(angle) - ecc * semiMajor);
     float_array_push(&verts, 0.0f);
-
-    double nextNewAngle = newAngle + (newAngle-prevAngle);
-    prevAngle = newAngle;
-    newAngle = nextNewAngle;
   }
 
-  sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE, verts.length/3,
+  sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE_LOOP,
+                                            verts.length/3,
                                             verts.elems, NULL, NULL);
 
 
   float_array_dispose(&verts);
-
-
   return obj;
-#undef ITERSTOP
-#undef STEPSIZE
-
 }
 
 sg_object_t*

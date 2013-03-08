@@ -75,10 +75,8 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                 uint8_t *colours);
 
 sg_object_t* sg_new_ellipse(const char *name, sg_shader_t *shader,
-                            float semiMajor,
-                            float semiMinor, float asc,
-                            float inc, float argOfPeriapsis,
-                            float dec, float ra, int segments);
+                            float semiMajor, float ecc, float inc, float asc,
+                            float argOfPeriapsis, int segments);
 
 sg_object_t* sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
                            sg_texture_t *tex, sg_texture_t *nightTex,

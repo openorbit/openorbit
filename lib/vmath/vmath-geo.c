@@ -35,8 +35,10 @@
  */
 
 
+#include <assert.h>
 #include <math.h>
-
+#include <stdio.h>
+#include <stdlib.h>
 
 float
 el_circumference_fastf(float semiMajor, float semiMinor)
@@ -145,9 +147,48 @@ el_ecc(double semiMajor, double semiMinor)
 }
 
 
+// Compute the area of a segment with the origin in the center and
+// the angles fi0, and fi1.
+// The angles fi0 and fi1 are polar angles on the ellpise
+double
+el_cs_area(double a, double ecc, double fi1, double fi0)
+{
+  if (fi1 == fi0) return 0.0;
+  assert(fi1 > fi0);
 
+  double b = a * sqrt(1.0 - ecc * ecc); // Semi-minor
+  // An ellipse is a circle that has been compressed by factor b / a
+  // We need two additional angles on the circle with the radius a.
+  // Now, it is a bit messy with the different quadrants and the signs of
+  // things.
 
+  double theta0, theta1;
+  double fi0_ = fabs(fi0);
+  double fi1_ = fabs(fi1);
 
+  static const struct {double cadjust; double reladjust;} quad_transform[] = {
+    {0.0,  0.0},
+    {M_PI, 2.0},
+    {M_PI, 0.0},
+    {2.0*M_PI, 2.0},
+  };
 
+  int q0 = fmod(fabs(fi0), 2.0*M_PI)/M_PI_2;
+  int q1 = fmod(fabs(fi1), 2.0*M_PI)/M_PI_2;
 
+  fi0_ -= quad_transform[q0].cadjust - quad_transform[q0].reladjust * fi0_;
+  fi1_ -= quad_transform[q1].cadjust - quad_transform[q1].reladjust * fi1_;
 
+  theta0 = atan(b * tan(fi0_)/a);
+  theta1 = atan(b * tan(fi1_)/a);
+
+  theta0 += quad_transform[q0].cadjust - quad_transform[q0].reladjust * theta0;
+  theta1 += quad_transform[q1].cadjust - quad_transform[q1].reladjust * theta1;
+
+  theta0 = copysign(theta0, fi0);
+  theta1 = copysign(theta1, fi1);
+
+  // Now we can compute the circle sector area for the given angles
+  double ca = (theta1-theta0) * 0.5 * a * a;
+  return fabs(ca * b / a);
+}

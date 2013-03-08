@@ -689,6 +689,7 @@ sgGetLocationForParamAndIndex(GLuint program, sg_param_id_t param,
 void
 sg_shader_bind_material(sg_shader_t *shader, sg_material_t *mat)
 {
+  if (mat == NULL) return;
   float4 amb = sg_material_get_amb(mat);
   float4 diff = sg_material_get_diff(mat);
   float4 spec = sg_material_get_spec(mat);
