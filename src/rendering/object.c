@@ -923,6 +923,9 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
 
   float semiMinor = semiMajor * sqrt(1.0 - ecc*ecc);
 
+  float3x3 R;
+  mf3_zxz_rotmatrix(R, asc, inc, argOfPeriapsis);
+
   // Naive way
   double seg_angle = 2.0*M_PI/segments;
   for (size_t i = 0 ; i < segments ; i ++) {
@@ -931,16 +934,21 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
     double a_sin = semiMajor * sin(angle);
     double r = semiMajor * semiMinor / sqrt(b_cos*b_cos+a_sin*a_sin);
 
+    float3 p;
+    p.y = r * cos(angle) - ecc * semiMajor;
+    p.x = r * sin(angle);
+    p.z = 0.0f;
+
+    p = mf3_v_mul(R, p);
     // Insert vec in array, note that center is in foci
-    float_array_push(&verts, r * cos(angle));
-    float_array_push(&verts, r * sin(angle) - ecc * semiMajor);
-    float_array_push(&verts, 0.0f);
+    float_array_push(&verts, p.x);
+    float_array_push(&verts, p.y);
+    float_array_push(&verts, p.z);
   }
 
   sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE_LOOP,
                                             verts.length/3,
                                             verts.elems, NULL, NULL);
-
 
   float_array_dispose(&verts);
   return obj;

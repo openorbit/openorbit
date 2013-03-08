@@ -970,3 +970,41 @@ vf3_axis_angle(float3 a, float3 b)
   return res;
 }
 
+
+void
+mf3_zxz_rotmatrix(float3x3 R, float asc_node, float incl, float arg_peri)
+{
+  float cos_an = cosf(asc_node);
+  float sin_an = sinf(asc_node);
+  float cos_inc = cosf(incl);
+  float sin_inc = sinf(incl);
+  float cos_ap = cosf(arg_peri);
+  float sin_ap = sinf(arg_peri);
+
+#if 1
+  R[0].x = cos_an * cos_ap -  sin_an * cos_inc * sin_ap;
+  R[0].y = -cos_an * sin_ap - sin_an * cos_inc * cos_ap;
+  R[0].z = sin_an * sin_inc;
+
+  R[1].x = sin_an * cos_ap  + cos_an * cos_inc * sin_ap;
+  R[1].y = cos_an * cos_inc * cos_ap - sin_an * sin_ap;
+  R[1].z = -cos_an * sin_inc;
+
+  R[2].x = sin_inc * sin_ap;
+  R[2].y = sin_inc * cos_ap;
+  R[2].z = cos_inc;
+#else
+  R[0].x = cos_an * cos_inc * cos_ap - sin_an * sin_ap;
+  R[0].y = -cos_ap * sin_an - cos_an * cos_inc * sin_ap;
+  R[0].z = cos_an * sin_inc;
+
+  R[1].x = cos_an * sin_ap + cos_inc * cos_ap * sin_an;
+  R[1].y = cos_an * cos_ap - cos_inc * sin_an * sin_ap;
+  R[1].z = sin_an * sin_inc;
+
+  R[2].x = -cos_ap * sin_inc;
+  R[2].y = sin_inc * sin_ap;
+  R[2].z = cos_inc;
+#endif
+}
+

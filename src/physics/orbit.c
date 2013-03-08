@@ -158,7 +158,7 @@ quaternion_t
 plOrbitalQuaternion(PL_keplerian_elements *kepler)
 {
   quaternion_t qasc = q_rot(0.0, 0.0, 1.0, kepler->longAsc);
-  quaternion_t qinc = q_rot(0.0, 1.0, 0.0, kepler->inc);
+  quaternion_t qinc = q_rot(1.0, 0.0, 0.0, kepler->inc);
   quaternion_t qaps = q_rot(0.0, 0.0, 1.0, kepler->argPeri);
 
   quaternion_t q = q_mul(qasc, qinc);
@@ -524,9 +524,11 @@ plCreateOrbitalObject(PLworld *world, sg_scene_t *scene, const char *name,
   lwc_set(&p, 0.0, 0.0, 0.0);
 
   // TODO: Cleanup this quaternion
+  // Z-X-Z for euler angles
   quaternion_t q = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(ascendingNode));
-  q = q_mul(q, q_rot(0.0, 1.0, 0.0, DEG_TO_RAD(inc)));
+  q = q_mul(q, q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(inc)));
   q = q_mul(q, q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(argOfPeriapsis)));
+  // TODO: Correct axis?
   q = q_mul(q, q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(obliquity)));
 
   sys->orbitalBody = plNewObjInSys(sys/*world->rootSys*/, name, m, gm, &p,

@@ -361,8 +361,9 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
                              inc, longAscNode, longPerihel, meanLong, radius, flattening);
 
   sg_object_t *ellipse = sg_new_ellipse(planetName.u.str, sg_get_shader("flat"),
-                                        plAuToMetres(semiMajor), ecc, inc, longAscNode,
-                                        longPerihel, 100);
+                                        plAuToMetres(semiMajor), ecc,
+                                        DEG_TO_RAD(inc), DEG_TO_RAD(longAscNode),
+                                        DEG_TO_RAD(longPerihel), 500);
 
   sg_scene_add_object(sc, ellipse);
 
