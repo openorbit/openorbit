@@ -139,15 +139,15 @@ simNewSpacecraft(const char *className, const char *scName)
 void
 ooGetAxises(OOaxises *axises)
 {
-  SIM_VAL(axises->pitch) = ioGetAxis(IO_AXIS_Y);
-  SIM_VAL(axises->roll) = ioGetAxis(IO_AXIS_X);
-  SIM_VAL(axises->yaw) = ioGetAxis(IO_AXIS_RZ);
+  SIM_VAL(axises->pitch) = io_get_axis(IO_AXIS_Y);
+  SIM_VAL(axises->roll) = io_get_axis(IO_AXIS_X);
+  SIM_VAL(axises->yaw) = io_get_axis(IO_AXIS_RZ);
 
-  SIM_VAL(axises->vertical) = ioGetAxis(IO_AXIS_Z);
-  SIM_VAL(axises->lateral) = ioGetAxis(IO_AXIS_RX);
-  SIM_VAL(axises->fwd) = ioGetAxis(IO_AXIS_RY);
+  SIM_VAL(axises->vertical) = io_get_axis(IO_AXIS_Z);
+  SIM_VAL(axises->lateral) = io_get_axis(IO_AXIS_RX);
+  SIM_VAL(axises->fwd) = io_get_axis(IO_AXIS_RY);
 
-  SIM_VAL(axises->orbital) = ioGetSlider(IO_SLIDER_THROT_0);
+  SIM_VAL(axises->orbital) = io_get_slider(IO_SLIDER_THROT_0);
 }
 
 

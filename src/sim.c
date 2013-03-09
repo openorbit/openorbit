@@ -119,7 +119,7 @@ sim_init(void)
   gSIM_state.stepSize = 1.0 / freq; // Period in s
   
   // Setup IO-tables, must be done after joystick system has been initialised
-  ioInit();
+  io_init();
 
   gSIM_state.world = ooOrbitLoad(sim_get_scene(), "data/solsystem.hrml");
 
@@ -165,19 +165,19 @@ simAxisPush(void)
 {
   sim_record_t *io = simPubsubGetRecord("/io/axis");
   if (io) {
-    float yaw_val = ioGetAxis(IO_AXIS_RZ);
+    float yaw_val = io_get_axis(IO_AXIS_RZ);
     sim_value_t *yaw = simGetValueByName(io, "yaw");
     simPubsubSetVal(yaw, SIM_TYPE_FLOAT, &yaw_val);
 
-    float roll_val = ioGetAxis(IO_AXIS_RY);
+    float roll_val = io_get_axis(IO_AXIS_RY);
     sim_value_t *roll = simGetValueByName(io, "roll");
     simPubsubSetVal(roll, SIM_TYPE_FLOAT, &roll_val);
 
-    float pitch_val = ioGetAxis(IO_AXIS_RX);
+    float pitch_val = io_get_axis(IO_AXIS_RX);
     sim_value_t *pitch = simGetValueByName(io, "pitch");
     simPubsubSetVal(pitch, SIM_TYPE_FLOAT, &pitch_val);
 
-    float throttle_val = ioGetSlider(IO_SLIDER_THROT_0);
+    float throttle_val = io_get_slider(IO_SLIDER_THROT_0);
     sim_value_t *throttle = simGetValueByName(io, "throttle");
     simPubsubSetVal(throttle, SIM_TYPE_FLOAT, &throttle_val);
 

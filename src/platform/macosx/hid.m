@@ -357,9 +357,9 @@ hidConnected(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef dev)
   }
   CFRelease(arr);
 
-  int deviceID = ioRegisterDevice(vendorID, vendorStr,
-                                  productID, productStr,
-                                  buttonCount, hatCount);
+  int deviceID = io_register_device(vendorID, vendorStr,
+                                    productID, productStr,
+                                    buttonCount, hatCount);
   CFDictionarySetValue(_deviceToIDDict, dev, (void*)deviceID);
 
   if (IOHIDDeviceConformsTo(dev, kHIDPage_Simulation,
@@ -381,7 +381,7 @@ hidDisconnected(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef dev)
   assert(sender == _hidManager);
   int devId = (int) CFDictionaryGetValue(_deviceToIDDict, dev);
   CFDictionaryRemoveValue(_deviceToIDDict, dev);
-  ioRemoveDevice(devId);
+  io_remove_device(devId);
 }
 
 void
@@ -412,31 +412,31 @@ hidValueChanged(void *ctxt, IOReturn result, void *sender, IOHIDValueRef val)
 
       switch (usage) {
         case kHIDUsage_GD_X: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_X, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_X, dval);
           break;
         }
         case kHIDUsage_GD_Y: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_Y, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_Y, dval);
           break;
         }
         case kHIDUsage_GD_Z: {
-         ioPhysicalAxisChanged(dev_id, IO_AXIS_Z, dval);
+         io_physical_axis_changed(dev_id, IO_AXIS_Z, dval);
           break;
         }
         case kHIDUsage_GD_Rx: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_RX, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_RX, dval);
           break;
         }
         case kHIDUsage_GD_Ry: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_RY, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_RY, dval);
           break;
         }
         case kHIDUsage_GD_Rz: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_RZ, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_RZ, dval);
           break;
         }
         case kHIDUsage_GD_Slider: {
-          ioPhysicalSliderChanged(dev_id, IO_SLIDER_THROT_0, dval);
+          io_physical_slider_changed(dev_id, IO_SLIDER_THROT_0, dval);
           break;
         }
         case kHIDUsage_GD_Hatswitch: {
@@ -450,9 +450,9 @@ hidValueChanged(void *ctxt, IOReturn result, void *sender, IOHIDValueRef val)
 
           // TODO: Think of this
           if (ival < hat_min || hat_max < ival) {
-            ioDeviceHatSet(dev_id, 0, -1, -1);
+            io_device_hat_set(dev_id, 0, -1, -1);
           } else {
-            ioDeviceHatSet(dev_id, 0, ival, hat_pval);
+            io_device_hat_set(dev_id, 0, ival, hat_pval);
           }
           break;
         }
@@ -480,9 +480,9 @@ hidValueChanged(void *ctxt, IOReturn result, void *sender, IOHIDValueRef val)
       uint32_t button_id = IOHIDElementGetUsage(elem);
       ooLogInfo("pushed button %u, state = %u", button_id, state);
       if (state) {
-        ioDeviceButtonDown(dev_id, button_id);
+        io_device_button_down(dev_id, button_id);
       } else {
-        ioDeviceButtonUp(dev_id, button_id);
+        io_device_button_up(dev_id, button_id);
       }
       //ioButtonStateChanged(dev, button_id, state);
       break;

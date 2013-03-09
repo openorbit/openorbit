@@ -49,8 +49,8 @@ simScCtrlDetatchStage(int state, void *data)
 void
 simScCtrlInit(void)
 {
-  ioRegActionHandler("main-engine-toggle", simScCtrlMainEngineToggle,
-                     IO_BUTTON_PUSH, NULL);
-  ioRegActionHandler("detatch-stage", simScCtrlDetatchStage,
-                     IO_BUTTON_PUSH, NULL);
+  io_reg_action_handler("main-engine-toggle", simScCtrlMainEngineToggle,
+                        IO_BUTTON_PUSH, NULL);
+  io_reg_action_handler("detatch-stage", simScCtrlDetatchStage,
+                        IO_BUTTON_PUSH, NULL);
 }

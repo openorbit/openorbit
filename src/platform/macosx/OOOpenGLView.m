@@ -226,7 +226,7 @@ static io_keycode_t keymap [256] = {
       if (theEvent.modifierFlags & NSControlKeyMask) mask |= OO_IO_MOD_LCTRL;
       if (theEvent.modifierFlags & NSAlternateKeyMask) mask |= OO_IO_MOD_LALT;
       if (theEvent.modifierFlags & NSShiftKeyMask) mask |= OO_IO_MOD_LSHIFT;
-      ioDispatchKeyDown(code, mask);
+      io_dispatch_key_down(code, mask);
     }
   } else {
     NSLog(@"unknown key pressed, keycode = %d", (int)key_code);
@@ -245,7 +245,7 @@ static io_keycode_t keymap [256] = {
       if (theEvent.modifierFlags & NSControlKeyMask) mask |= OO_IO_MOD_LCTRL;
       if (theEvent.modifierFlags & NSAlternateKeyMask) mask |= OO_IO_MOD_LALT;
       if (theEvent.modifierFlags & NSShiftKeyMask) mask |= OO_IO_MOD_LSHIFT;
-      ioDispatchKeyUp(code, mask);
+      io_dispatch_key_up(code, mask);
     }
   } else {
     NSLog(@"unknown key pressed, keycode = %d", (int)key_code);

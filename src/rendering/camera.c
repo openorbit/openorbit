@@ -350,5 +350,5 @@ sg_camera_rotate_hat(int buttonVal, void *data)
 
 // TODO: Should move to sim part, where we will keep all the io stuff
 MODULE_INIT(sgcamera, "iomanager", NULL) {
-  ioRegActionHandler("cam-rotate", sg_camera_rotate_hat, IO_BUTTON_HAT, NULL);
+  io_reg_action_handler("cam-rotate", sg_camera_rotate_hat, IO_BUTTON_HAT, NULL);
 }

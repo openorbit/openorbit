@@ -330,16 +330,16 @@ simMfdInitAll(sg_viewport_t *vp)
 MODULE_INIT(mfdio, "mfd", "iomanager", NULL) {
   ooLogTrace("initialising 'mfdio' module");
 
-  ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd0);
-  ioRegActionHandler("mfd0-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd0);
-  ioRegActionHandler("mfd0-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd0);
-  ioRegActionHandler("mfd1-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd1);
-  ioRegActionHandler("mfd1-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd1);
-  ioRegActionHandler("mfd1-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd1);
-  ioRegActionHandler("mfd2-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd2);
-  ioRegActionHandler("mfd2-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd2);
-  ioRegActionHandler("mfd2-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd2);
-  ioRegActionHandler("mfd3-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd3);
-  ioRegActionHandler("mfd3-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd3);
-  ioRegActionHandler("mfd3-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd3);
+  io_reg_action_handler("mfd0-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd0);
+  io_reg_action_handler("mfd0-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd0);
+  io_reg_action_handler("mfd0-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd0);
+  io_reg_action_handler("mfd1-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd1);
+  io_reg_action_handler("mfd1-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd1);
+  io_reg_action_handler("mfd1-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd1);
+  io_reg_action_handler("mfd2-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd2);
+  io_reg_action_handler("mfd2-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd2);
+  io_reg_action_handler("mfd2-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd2);
+  io_reg_action_handler("mfd3-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd3);
+  io_reg_action_handler("mfd3-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd3);
+  io_reg_action_handler("mfd3-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd3);
 }
