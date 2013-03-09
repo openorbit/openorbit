@@ -89,9 +89,9 @@ sim_init_graphics(void)
 void
 sim_init_plugins(void)
 {
-  ooPluginInit();
-  ooPluginLoadAll();
-  ooPluginPrintAll();
+  plugin_init();
+  plugin_load_all();
+  plugin_print_all();
 }
 
 
