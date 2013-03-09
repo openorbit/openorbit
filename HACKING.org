@@ -1,8 +1,8 @@
-HACKING OPEN ORBIT
-==================
+#+TITLE: Hacking Open Orbit
 
-ABSTRACT
---------
+* HACKING OPEN ORBIT
+
+** ABSTRACT
 This document describes the architecture and the coding conventions used in
 Open Orbit. Submitted patches must confirm to the coding conventions in order
 to be accepted. Note that these conventions are not yet finished, and under
@@ -12,23 +12,19 @@ hopefully be re-factored.
 
 THIS DOCUMENT IS OUT OF DATE, BEWARE!!!
 
-CONTRIBUTIONS
--------------
+** CONTRIBUTIONS
 For now, contributions to Open Orbit must be in public domain or signed over to
 the main author. If you wish to sign a copyright release form, please contact
 Mattias Holm (lorrden @ openorbit . org), but best is if you release your code
 as public domain.
 
-ARCHITECTURE
-------------
-
+** ARCHITECTURE
 The source is in the src directory, public includes are in the include
 directory.
 
 Libraries part of openorbit place public includes in include/libname.
 
-CODE STYLE
-----------
+** CODE STYLE
 Open Orbit is written in C and tries to confirm to the C99 standard. However,
 extensions supported by the clang compiler are used, including vector operations.
 
@@ -37,113 +33,123 @@ macros should be in ALL_CAPS. Global variables shall have a prefix in caps
 identifying the module where the variable is defined and then named as a normal
 variable, e.g. FOO_bar. All defined types ends with _t.
 
-Lines
-*****
+*** Lines
 The line length may not be more than 80 characters for code and documentation.
 
-Functions
-*********
+*** Tabs
+Tabs are not to be embedded in files. Indentation is done with spaces, two spaces
+per indent level.
+
+*** Functions
 Functions are declared in the headers on one line if possible. When they appear
 in the C-files, the return type is written on a separate line and the open
 brace as well. The pointer splat is considered part of the return type. Note
 that normal pointers have the splat adjacent to the variable name due to
 semantical issues with C.
 
-::
+#+BEGIN_SRC C
 
     int*
     foobar(int foo, int bar)
     {
-        int *pointer;
-        ...
+      int *pointer;
+      ...
     }
-
+#+END_SRC
 
 
 Calling a function will be done without white space between the name and the
 parantheses. Any gnu-style coding will be punished by cutting of the fingers.
 
-RIGHT: ``foobar(1, 1);``
-WRONG: ``foobar (1, 1);``
+RIGHT: =foobar(1, 1);=
+WRONG: =foobar (1, 1);=
 
-Control Structures
-******************
+*** Control Structures
 Control structures such as while, if and for shall have a space between the
 keyword and the first parentheses. The first curly brace shall be on the same
-line.
+line. This meas that it is easy to distinguish function calls from control
+structures visually.
 
-::
+#+BEGIN_SRC C
 
     while ( FOO ) {
-    
+
     }
+#+END_SRC
 
-
-Object Manager
-**************
+*** Object Manager
 In order to facilitate future automation of interface generation, you should
 finish any interface name, and only interface names with iface::
 
+#+BEGIN_SRC C
     typedef struct {
         ...
     } foo_bar_iface;
+#+END_SRC
 
-Macros
-******
+*** Macros
 All preprocessor macro names are in ALL_CAPS. When writing a macro consisting of
-several lines, add a do {} while (0) block around the lines. Enclose all
-parameters in parentheses as they may be statements.
+several lines, add a do {} while (0) block around the lines (to ensure the macro
+handles trailing semicolons as a function call does). Enclose all parameters in
+parentheses as they may be statements. Align the back slashes with eachother.
 
-Example::
+Example:
 
-    #define MY_MACRO(a, b, c)   \
-        do {                    \
-		    foo x = (a) * (b);	\
-        } while (0)
+#+BEGIN_SRC C
+    #define MY_MACRO(a, b, c)	\
+      do {   	                \
+        foo x = (a) * (b);      \
+      } while (0)
+#+END_SRC
 
-
-Constants
-*********
+*** Constants
 C constants are preprocessor macros and should be in all caps.
 
-E.g::
+E.g:
+
+#+BEGIN_SRC C
     #define PI 3.14
+#+END_SRC
 
-Enums
-*****
-::
+*** Enums
+Enums ar written in all caps like macros. The enums are prefixed with the type
+name (without the _t) in caps.
 
+#+BEGIN_SRC C
     typedef enum {
-        FOO_xyz,
-        FOO_bar
+        FOO_XYZ,
+        FOO_BAR
     } foo_t;
+#+END_SRC
 
-Global Variables
-****************
-Exported global variables must be defined with a 'g' and a package prefix. For
-example, if there is a package or library named foo, that exports a global named
-bar; the name of the symbol would be ``gFOO_bar``.
+*** Global Variables
+DO NOT EXPORT GLOBAL VARIABLES!
 
-OpenGL
-******
-The rendering engine is based on OpenGL. While the normal C coding rules apply
-to the C-land of OpenGL code, there are some additional rules for the shaders.
+Exported global variables must be defined with a 'g' and a package
+prefix. For example, if there is a package or library named foo, that
+exports a global named bar; the name of the symbol would be
+=gFOO_bar=.
 
-We use OpenGL 3.2 (when supported by all major platforms, we will move to 3.3 or
-above). The following conventions are used:
+*** OpenGL
+The rendering engine is based on OpenGL. While the normal C coding
+rules apply to the C-land of OpenGL code, there are some additional
+rules for the shaders.
 
-	Only one fragment output variable is used. This variable MUST BE NAMED
-		"oo_FragColor".
+We use OpenGL 3.2 (when supported by all major platforms, we will move
+to 3.3 or above). The following conventions are used:
+
+Only one fragment output variable is used. This variable MUST BE NAMED
+=oo_FragColor'.
 
 Variables in GLSL referenced from C should be prefixed with oo_.
 
 Common Attributes (in to vertex shaders):
-	vec4 oo_Vertex
-	vec2 oo_TexCoord0 (usually only one, some special shaders may used 2)
-	vec4 oo_Color
+- vec4 oo_Vertex
+- vec2 oo_TexCoord0 (usually only one, some special shaders may used 2)
+- vec4 oo_Color
 
 Common Uniforms:
-	mat4 oo_ModelViewMatrix
-	mat4 oo_ProjectionMatrix
-	mat3 oo_NormalMatrix
-	sampler2d oo_Texture[]
+- mat4 oo_ModelViewMatrix
+- mat4 oo_ProjectionMatrix
+- mat3 oo_NormalMatrix
+- sampler2d oo_Texture0
