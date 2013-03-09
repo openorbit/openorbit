@@ -210,8 +210,9 @@ ooSimStep(float dt)
 
   plWorldStep(gSIM_state.world, dt);
 
-  ooLogInfo("sim step");
-  sg_scene_update(sim_get_scene());
+  ooLogTrace("sim step");
+
+  sg_scene_sync(sim_get_scene());
 }
 
 void
