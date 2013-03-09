@@ -64,7 +64,7 @@ ooPluginInit(void)
 void
 ooPluginLoadAll(void)
 {
-  glob_t glob = ooResGetFilePaths("plugins/*.so");
+  glob_t glob = rsrc_get_file_paths("plugins/*.so");
 
   ooLogInfo("%u plugins found with extension " SO_EXT, glob.gl_pathc);
   for (int i = 0 ; i < glob.gl_pathc ; i ++) {

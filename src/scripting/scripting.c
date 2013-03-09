@@ -48,7 +48,7 @@ ooScriptingInit(void)
 
 
   // insert app-specific python path
-  char *ooPyPath = ooResGetPath("python/");
+  char *ooPyPath = rsrc_get_path("python/");
   if (! ooPyPath) ooLogFatal("cannot generate python path");
 
   const char *pyPath = Py_GetPath();
@@ -85,7 +85,7 @@ ooScriptingRunPostInit(void)
 bool
 ooScriptingRunFile(const char *fname)
 {
-  FILE *fp = ooResGetFile(fname);
+  FILE *fp = rsrc_get_file(fname);
 
   if (! fp) {
     ooLogWarn("could not open %s", fname);

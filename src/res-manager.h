@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -37,16 +37,16 @@
 #include <stdio.h>
 #include <glob.h>
 
-const char* ooResGetConfPath(void);
-const char* ooResGetJsonConfPath(void);
+const char* rsrc_get_conf_path(void);
+const char* rsrc_get_json_conf_path(void);
 
-char* ooResGetPath(const char *fileName);
-FILE* ooResGetFile(const char *fileName);
-int ooResGetFd(const char *fileName);
-glob_t ooResGetFilePaths(const char *pattern);
+char* rsrc_get_path(const char *fileName);
+FILE* rsrc_get_file(const char *fileName);
+int rsrc_get_fd(const char *fileName);
+glob_t rsrc_get_file_paths(const char *pattern);
 
-char* ooPluginGetPath(const char *fileName);
-FILE* ooPluginGetFile(const char *fileName);
-int ooPluginGetFd(const char *fileName);
+char* rsrc_get_plugin_path(const char *fileName);
+FILE* rsrc_get_plugin_file(const char *fileName);
+int rsrc_get_plugin_fd(const char *fileName);
 
 #endif /* _RES_MANAGER_H_ */

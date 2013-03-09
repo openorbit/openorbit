@@ -693,7 +693,7 @@ sg_load_object(const char *file, sg_shader_t *shader)
 
   ooLogInfo("load object '%s'", file);
 
-  char *fullpath = ooResGetPath(file);
+  char *fullpath = rsrc_get_path(file);
   sg_object_t *model = NULL;
 
   char *dot = strrchr(file, '.');

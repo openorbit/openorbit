@@ -47,7 +47,7 @@
     //#endif /* _UNIX_ */
 
 const char*
-ooResGetConfPath(void)
+rsrc_get_conf_path(void)
 {
   char *homeDir = getenv("HOME");
   ooLogFatalIfNull(homeDir, "$HOME not set");
@@ -62,7 +62,7 @@ ooResGetConfPath(void)
 }
 
 const char*
-ooResGetJsonConfPath(void)
+rsrc_get_json_conf_path(void)
 {
   char *homeDir = getenv("HOME");
   ooLogFatalIfNull(homeDir, "$HOME not set");
@@ -79,7 +79,7 @@ ooResGetJsonConfPath(void)
 
 
 const char*
-ooResGetBasePath(void)
+rsrc_get_base_path(void)
 {
     static UInt8 base[PATH_MAX+1] = {0};
 
@@ -103,20 +103,20 @@ ooResGetBasePath(void)
 }
 
 char*
-ooResGetPath(const char *fileName)
+rsrc_get_path(const char *fileName)
 {
     assert(fileName != NULL && "File name cannot be null");
 
     char *path;
-    asprintf(&path, "%s/%s", ooResGetBasePath(), fileName);
+    asprintf(&path, "%s/%s", rsrc_get_base_path(), fileName);
 
     return path; // Note, asprintf sets this to NULL if it fails
 }
 
 glob_t
-ooResGetFilePaths(const char *pattern)
+rsrc_get_file_paths(const char *pattern)
 {
-  const char *base = ooResGetBasePath();
+  const char *base = rsrc_get_base_path();
 
   char *fullPattern;
   asprintf(&fullPattern, "%s/%s", base, pattern);
@@ -130,9 +130,9 @@ ooResGetFilePaths(const char *pattern)
 
 
 FILE*
-ooResGetFile(const char *fileName)
+rsrc_get_file(const char *fileName)
 {
-    char *path = ooResGetPath(fileName);
+    char *path = rsrc_get_path(fileName);
 
     if (path != NULL) {
         FILE *file = fopen(path, "r");
@@ -146,9 +146,9 @@ ooResGetFile(const char *fileName)
 }
 
 int
-ooResGetFd(const char *fileName)
+rsrc_get_fd(const char *fileName)
 {
-    char *path = ooResGetPath(fileName);
+    char *path = rsrc_get_path(fileName);
 
     if (path != NULL) {
         int fd = open(path, O_RDONLY);
@@ -165,16 +165,16 @@ ooResGetFd(const char *fileName)
 
 
 char*
-ooPluginGetPath(const char *fileName)
+rsrc_get_plugin_path(const char *fileName)
 {
   (void)paths; // TODO
   return NULL;
 }
 
 FILE*
-ooPluginGetFile(const char *fileName)
+rsrc_get_plugin_file(const char *fileName)
 {
-    char *path = ooPluginGetPath(fileName);
+    char *path = rsrc_get_plugin_path(fileName);
 
     if (path != NULL) {
         FILE *file = fopen(path, "r");
@@ -186,9 +186,9 @@ ooPluginGetFile(const char *fileName)
 }
 
 int
-ooPluginGetFd(const char *fileName)
+rsrc_get_plugin_fd(const char *fileName)
 {
-    char *path = ooPluginGetPath(fileName);
+    char *path = rsrc_get_plugin_path(fileName);
 
     if (path != NULL) {
         int fd = open(path, O_RDONLY);

@@ -476,7 +476,7 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
 PLworld*
 ooOrbitLoad(sg_scene_t *sc, const char *fileName)
 {
-  char *file = ooResGetPath(fileName);
+  char *file = rsrc_get_path(fileName);
   HRMLdocument *solarSys = hrmlParse(file);
   free(file);
   //HRMLschema *schema = hrmlLoadSchema(ooResGetFile("solarsystem.hrmlschema"));

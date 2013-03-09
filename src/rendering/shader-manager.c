@@ -173,7 +173,7 @@ sgShaderPreprocess(mapped_file_t mf)
             char incfile[incfile_end - incfile_start + 2];
             memset(incfile, 0, incfile_end-incfile_start + 2);
             strncpy(incfile, &(((char*)mf.data)[incfile_start]), incfile_end - incfile_start + 1);
-            FILE *file = ooResGetFile(incfile);
+            FILE *file = rsrc_get_file(incfile);
             if (file) {
               size_t bytes = 0;
               ooLogTrace("found include file");
@@ -204,7 +204,7 @@ void
 sg_load_all_shaders(void)
 {
   SG_CHECK_ERROR;
-  const char *path = ooResGetPath("shaders");
+  const char *path = rsrc_get_path("shaders");
 
   DIR *dir = opendir(path);
   if (dir) {
@@ -262,7 +262,7 @@ sg_load_shader(const char *key,
     char pattern[strlen(vspath)+1+9];
     strcpy(pattern, vspath);
     strcat(pattern, "/*.vertex");
-    glob_t shaders = ooResGetFilePaths(pattern);
+    glob_t shaders = rsrc_get_file_paths(pattern);
 
     if (shaders.gl_matchc > 0) didLoadVertexShader = true;
 
@@ -310,7 +310,7 @@ sg_load_shader(const char *key,
     char pattern[strlen(vspath)+1+11];
     strcpy(pattern, vspath);
     strcat(pattern, "/*.fragment");
-    glob_t shaders = ooResGetFilePaths(pattern);
+    glob_t shaders = rsrc_get_file_paths(pattern);
 
     if (shaders.gl_matchc > 0) didLoadFragShader = true;
 

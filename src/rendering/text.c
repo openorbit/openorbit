@@ -52,7 +52,7 @@ SGfont*
 sgLoadFont(const char *fontName, int sz)
 {
   FT_Face face;
-  char *fontFile = ooResGetPath(fontName);
+  char *fontFile = rsrc_get_path(fontName);
 
   int error = FT_New_Face(library, fontFile, 0, &face);
   if (error == FT_Err_Unknown_File_Format) {

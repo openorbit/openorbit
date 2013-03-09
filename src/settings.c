@@ -215,7 +215,7 @@ MODULE_INIT(settings, NULL)
   //ooConfLoad(ooResGetConfPath());
 
   json_error_t err;
-  conf_doc = json_load_file(ooResGetJsonConfPath(), 0, &err);
+  conf_doc = json_load_file(rsrc_get_json_conf_path(), 0, &err);
   if (conf_doc == NULL) {
     // Either there was a parse error or the file was not found, if it was not
     // found, we copy the default config to the config directory.
@@ -223,13 +223,13 @@ MODULE_INIT(settings, NULL)
     // copy it to the destination
 
     // OK, we know that access is not the best tool...
-    if (access(ooResGetJsonConfPath(), W_OK) == -1) {
+    if (access(rsrc_get_json_conf_path(), W_OK) == -1) {
       // Copy over default config
-      char *path = ooResGetPath("default-conf.json");
+      char *path = rsrc_get_path("default-conf.json");
       mapped_file_t fIn = map_file(path);
 
       if (fIn.data) {
-        FILE *fOut = fopen(ooResGetJsonConfPath(), "wb");
+        FILE *fOut = fopen(rsrc_get_json_conf_path(), "wb");
         fwrite(fIn.data, 1, fIn.fileLenght, fOut);
         fclose(fOut);
         unmap_file(&fIn);
@@ -237,7 +237,7 @@ MODULE_INIT(settings, NULL)
       free(path);
 
       // Now try again...
-      conf_doc = json_load_file(ooResGetJsonConfPath(), 0, &err);
+      conf_doc = json_load_file(rsrc_get_json_conf_path(), 0, &err);
       if (conf_doc == NULL) {
         // Now lets panic...
         ooLogError("load %s:%d:%d: '%s'", err.source,

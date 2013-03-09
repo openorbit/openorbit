@@ -132,7 +132,7 @@ sgCreateBackgroundFromFile(const char *file)
   stars->a_len = STAR_COUNT;
   stars->n_stars = 0;
 
-  FILE *f = ooResGetFile(file);
+  FILE *f = rsrc_get_file(file);
   assert(f != NULL);
   double vmag, ra, dec, btmag, vtmag, bv, vi;
   while (fscanf(f, "%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
