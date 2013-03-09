@@ -97,7 +97,7 @@ MercuryAxisUpdate(sim_spacecraft_t *sc)
 static void
 MercuryDetatchComplete(void *data)
 {
-  ooLogInfo("detatch complete");
+  log_info("detatch complete");
 
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sc->detatchPossible = false; // Do not reenable, must be false after last stage detatched
@@ -113,11 +113,11 @@ MercuryDetatchComplete(void *data)
 static void
 MercuryDetatch(sim_spacecraft_t *sc)
 {
-  ooLogInfo("detatch commanded");
+  log_info("detatch commanded");
   sc->detatchPossible = false;
 
   if (sc->detatchSequence == MERC_REDSTONE) {
-    ooLogInfo("detatching redstone");
+    log_info("detatching redstone");
     sim_stage_t *redstone = sc->stages.elems[MERC_REDSTONE];
     sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
@@ -310,7 +310,7 @@ MercuryInit2(sim_class_t *cls, void *sc, void *arg)
 
 MODULE_INIT(mercury, "spacecraft", NULL)
 {
-  ooLogTrace("initialising 'mercury' module");
+  log_trace("initialising 'mercury' module");
 
   sim_class_t *cls = sim_register_class("Spacecraft", "Mercury",
                                         MercuryInit2, sizeof(sim_spacecraft_t));

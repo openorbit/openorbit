@@ -79,7 +79,7 @@ OOpubsubref fps_count_ref;
 Uint32
 fps_event(Uint32 interval, void *param)
 {
-  ooLogInfo("fps = %d", frames);
+  log_info("fps = %d", frames);
   fps_count = frames;
   frames = 0;
   simNotifyChange(fps_count_ref); // FIXME: NOT ASYNC SAFE
@@ -128,7 +128,7 @@ sdl_main_loop(void)
               ooResizeScreen(0, 0, event.window.data1, event.window.data2, false);
               break;
             default:
-              ooLogTrace("unknown window event %d", (int)event.window.event);
+              log_trace("unknown window event %d", (int)event.window.event);
           }
           break;
         }
@@ -210,7 +210,7 @@ sdl_main_loop(void)
           done = 1;
           break;
         default:
-          ooLogWarn("did not handle event number %d in main loop", event.type);
+          log_warn("did not handle event number %d in main loop", event.type);
       }
     }
 
@@ -254,7 +254,7 @@ main(int argc, const char *argv[argc])
   module_initialize();
   // Init SDL video subsystem
   if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {
-    ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
+    log_fatal("Couldn't initialize SDL: %s", SDL_GetError());
   }
 
   assert(SDL_WasInit(SDL_INIT_JOYSTICK) == SDL_INIT_JOYSTICK);

@@ -224,14 +224,14 @@ load_atm(HRMLobject *obj)
   }
 
   if (!(T_b && L_b && p_b && P_b && h_b)) {
-    ooLogError("missing one or more atmospheric parameter array "
+    log_error("missing one or more atmospheric parameter array "
                "(T_b, L_b, p_b, P_b or h_b)");
     return NULL;
   }
 
   if (!(T_b_len == L_b_len) && (L_b_len == p_b_len) && (p_b_len == P_b_len)
       && (P_b_len == h_b_len)) {
-    ooLogError("atmospheric parameter arrays must be of equal length"
+    log_error("atmospheric parameter arrays must be of equal length"
                "(%d %d %d %d %d)",
                (int)T_b_len, (int)L_b_len, (int)p_b_len, (int)P_b_len,
                (int)h_b_len);
@@ -239,11 +239,11 @@ load_atm(HRMLobject *obj)
   }
 
   if (!isfinite(g0)) {
-    ooLogError("atmospheric parameter g0 not set / finite");
+    log_error("atmospheric parameter g0 not set / finite");
     return NULL;
   }
   if (!isfinite(M)) {
-    ooLogError("atmospheric parameter molar-mass not set / finite");
+    log_error("atmospheric parameter molar-mass not set / finite");
     return NULL;
   }
 
@@ -502,6 +502,6 @@ ooOrbitLoad(sg_scene_t *sc, const char *fileName)
   hrmlFreeDocument(solarSys);
 
   pl_sys_init(world->rootSys);
-  ooLogInfo("loaded solar system");
+  log_info("loaded solar system");
   return world;
 }

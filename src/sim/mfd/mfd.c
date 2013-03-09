@@ -44,7 +44,7 @@ static SIMmfd mfd0, mfd1, mfd2, mfd3;
 static SIMhud hud;
 
 MODULE_INIT(mfd, NULL) {
-  ooLogTrace("initialising 'mfd' module");
+  log_trace("initialising 'mfd' module");
   obj_array_init(&mfd_pages);
 }
 
@@ -84,7 +84,7 @@ static SIMmfdpage sampleMfdPage = {"sample-mfd", samplemfddraw};
 
 
 MODULE_INIT(samplemfd, "mfd", NULL) {
-  ooLogTrace("initialising 'samplemfd' module");
+  log_trace("initialising 'samplemfd' module");
   simMfdPageRegister(&sampleMfdPage);
 }
 
@@ -328,7 +328,7 @@ simMfdInitAll(sg_viewport_t *vp)
 }
 
 MODULE_INIT(mfdio, "mfd", "iomanager", NULL) {
-  ooLogTrace("initialising 'mfdio' module");
+  log_trace("initialising 'mfdio' module");
 
   io_reg_action_handler("mfd0-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd0);
   io_reg_action_handler("mfd0-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd0);

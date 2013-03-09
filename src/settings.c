@@ -49,7 +49,7 @@ config_load(const char *name)
 {
   HRMLdocument *doc = hrmlParse(name);
   if (!doc) {
-    ooLogError("could not load config file '%s'", name);
+    log_error("could not load config file '%s'", name);
   }
 
   gConfSingleton.doc = doc;
@@ -136,39 +136,39 @@ validate(void)
         json_t *j = json_object_get(sys, "log-level");
         if (!json_is_string(j)) {
           valid = false;
-          ooLogError("openorbit/sys/log-level should be a string");
+          log_error("openorbit/sys/log-level should be a string");
         }
       } else valid = false;
       if (json_is_object(video)) {
         json_t *j = json_object_get(video, "fullscreen");
         if (!json_is_boolean(j)) {
           valid = false;
-          ooLogError("openorbit/video/fullscreen should be a bool");
+          log_error("openorbit/video/fullscreen should be a bool");
         }
         j = json_object_get(video, "width");
         if (!json_is_integer(j)) {
           valid = false;
-          ooLogError("openorbit/video/width should be an integer");
+          log_error("openorbit/video/width should be an integer");
         }
         j = json_object_get(video, "height");
         if (!json_is_integer(j)) {
           valid = false;
-          ooLogError("openorbit/video/height should be an integer");
+          log_error("openorbit/video/height should be an integer");
         }
         j = json_object_get(video, "depth");
         if (!json_is_integer(j)) {
           valid = false;
-          ooLogError("openorbit/video/depth should be an integer");
+          log_error("openorbit/video/depth should be an integer");
         }
       } else {
         valid = false;
-        ooLogError("openorbit/video is not an object");
+        log_error("openorbit/video is not an object");
       }
 
       if (json_is_object(audio)) {
       } else {
         valid = false;
-        ooLogError("openorbit/audio is not an object");
+        log_error("openorbit/audio is not an object");
       }
 
       if (json_is_object(sim)) {
@@ -178,31 +178,31 @@ validate(void)
         if (j && !json_is_number(j)) valid = false;
       } else {
         valid = false;
-        ooLogError("openorbit/sim is not an object");
+        log_error("openorbit/sim is not an object");
       }
 
       if (json_is_object(controls)) {
         json_t *j = json_object_get(controls, "keys");
         if (!json_is_array(j)) {
           valid = false;
-          ooLogError("openorbit/controls/keys is not an array");
+          log_error("openorbit/controls/keys is not an array");
         }
         j = json_object_get(controls, "mouse");
         if (!json_is_object(j)) {
           valid = false;
-          ooLogError("openorbit/controls/mouse is not an object");
+          log_error("openorbit/controls/mouse is not an object");
         }
       } else {
         valid = false;
-        ooLogError("openorbit/controls is not an object");
+        log_error("openorbit/controls is not an object");
       }
     } else {
       valid = false;
-      ooLogError("openorbit/ is not an object");
+      log_error("openorbit/ is not an object");
     }
   } else {
     valid = false;
-    ooLogError("/ is not an object");
+    log_error("/ is not an object");
   }
 
   return valid;
@@ -210,7 +210,7 @@ validate(void)
 
 MODULE_INIT(settings, NULL)
 {
-  ooLogTrace("initialising 'settings' module");
+  log_trace("initialising 'settings' module");
 
   //ooConfLoad(ooResGetConfPath());
 
@@ -240,20 +240,20 @@ MODULE_INIT(settings, NULL)
       conf_doc = json_load_file(rsrc_get_json_conf_path(), 0, &err);
       if (conf_doc == NULL) {
         // Now lets panic...
-        ooLogError("load %s:%d:%d: '%s'", err.source,
+        log_error("load %s:%d:%d: '%s'", err.source,
                    err.line, err.column, err.text);
         return;
       }
     } else {
       // Parse errro on the input file, we do not want to replace it
-      ooLogFatal("load %s:%d:%d: '%s'", err.source,
+      log_fatal("load %s:%d:%d: '%s'", err.source,
                  err.line, err.column, err.text);
       return;
     }
   }
 
   if (!validate()) {
-    ooLogError("config not compliant with specs");
+    log_error("config not compliant with specs");
   }
 }
 

@@ -232,7 +232,7 @@ simEngineAddOxidiserTank(SIMengine *engine, SIMtank *tank)
     SIMliquidrocketengine *lrocket = (SIMliquidrocketengine*)engine;
     obj_array_push(&lrocket->oxidiserTanks, tank);
   } else {
-    ooLogFatal("cannot add oxidiser tank to that engine");
+    log_fatal("cannot add oxidiser tank to that engine");
   }
 }
 
@@ -243,7 +243,7 @@ simEngineSetGrainType(SIMengine *engine, SIMgrainkind grain)
     SIMsolidrocketengine *srocket = (SIMsolidrocketengine*)engine;
     srocket->grain = grain;
   } else {
-    ooLogFatal("cannot set grain type if the engine is not a solid rocket");
+    log_fatal("cannot set grain type if the engine is not a solid rocket");
   }
 
 }

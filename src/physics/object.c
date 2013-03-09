@@ -507,20 +507,20 @@ void
 pl_object_check(PLobject *obj, const char *file, int line)
 {
   if (!isfinite(obj->p.offs.x) || !isfinite(obj->p.offs.y) || !isfinite(obj->p.offs.z)) {
-    ooLogAbort("%s:%d obj position not finite", file, line);
+    log_abort("%s:%d obj position not finite", file, line);
   }
   if (!isfinite(obj->f_ack.x) || !isfinite(obj->f_ack.y) || !isfinite(obj->f_ack.z)) {
-    ooLogAbort("%s:%d obj force ack not finite", file, line);
+    log_abort("%s:%d obj force ack not finite", file, line);
   }
   if (!isfinite(obj->t_ack.x) || !isfinite(obj->t_ack.y) || !isfinite(obj->t_ack.z)) {
-    ooLogAbort("%s:%d obj torque ack not finite", file, line);
+    log_abort("%s:%d obj torque ack not finite", file, line);
   }
   if (!isfinite(obj->g_ack.x) || !isfinite(obj->g_ack.y) || !isfinite(obj->g_ack.z)) {
-    ooLogAbort("%s:%d obj gravity ack not finite", file, line);
+    log_abort("%s:%d obj gravity ack not finite", file, line);
   }
 
   if (!isfinite(obj->v.x) || !isfinite(obj->v.y) || !isfinite(obj->v.z)) {
-    ooLogAbort("%s:%d obj velocity not finite", file, line);
+    log_abort("%s:%d obj velocity not finite", file, line);
   }
 }
 

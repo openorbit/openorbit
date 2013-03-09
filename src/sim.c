@@ -103,13 +103,13 @@ sim_init(void)
   // Set log level, need to do that here
   const char *levStr = NULL;
   config_get_str_def("openorbit/sys/log-level", &levStr, "info");
-  ooLogSetLevel(ooLogGetLevFromStr(levStr));
+  log_set_level(log_get_lev_from_str(levStr));
 
   // Load and run initialisation script
   scripting_init();
 
   if (!scripting_run_file("script/init.py")) {
-    ooLogFatal("script/init.py missing");
+    log_fatal("script/init.py missing");
   }
 
   sim_init_graphics();
@@ -142,7 +142,7 @@ sim_init(void)
   sim_init_plugins();
 
   if (!scripting_run_file("script/postinit.py")) {
-    ooLogFatal("script/postinit.py missing");
+    log_fatal("script/postinit.py missing");
   }
 
 }
@@ -181,7 +181,7 @@ simAxisPush(void)
     sim_value_t *throttle = simGetValueByName(io, "throttle");
     simPubsubSetVal(throttle, SIM_TYPE_FLOAT, &throttle_val);
 
-    ooLogTrace("axises: %f %f %f / %f",
+    log_trace("axises: %f %f %f / %f",
                pitch_val, roll_val, yaw_val, throttle_val);
   }
 }
@@ -201,7 +201,7 @@ ooSimStep(float dt)
 
   gettimeofday(&end, NULL);
 
-  ooLogTrace("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
+  log_trace("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
                                      (start.tv_sec*1000000 + start.tv_usec)));
 
   // Step spacecraft systems
@@ -210,7 +210,7 @@ ooSimStep(float dt)
 
   pl_world_step(gSIM_state.world, dt);
 
-  ooLogTrace("sim step");
+  log_trace("sim step");
 
   sg_scene_sync(sim_get_scene());
 }

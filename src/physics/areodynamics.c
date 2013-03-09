@@ -203,7 +203,7 @@ static hashtable_t *ht;
 
 MODULE_INIT(areodynamics, NULL)
 {
-  ooLogTrace("initialising 'areodynamics' module");
+  log_trace("initialising 'areodynamics' module");
   ht = hashtable_new_with_str_keys(128);
 
   for (pl_element_t i = PL_ELEM_First ; i < PL_ELEM_Last ; ++ i) {
@@ -349,7 +349,7 @@ pl_object_compute_airpressure(PLobject *obj)
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
   double pressure = pl_atmosphere_pressure(atm, h);//plComputeSimpleAirpressure(atm, h);
   //plPressureAtAltitude(atm->P0, atm->T0, g0, atm->M, h, 0.0);
-  //ooLogInfo("airpressure for %s = %f Pa", obj->name, pressure);
+  //log_info("airpressure for %s = %f Pa", obj->name, pressure);
 
   return pressure;
 }
@@ -374,10 +374,10 @@ pl_object_compute_airdensity(PLobject *obj)
   //double pressure = plComputeSimpleAirpressure(atm, h);
 
   double density = pl_atmosphere_density(atm, h);
-  //ooLogInfo("altitude for %s = %f m above surface of %s", obj->name, h,
+  //log_info("altitude for %s = %f m above surface of %s", obj->name, h,
   //          obj->sys->orbitalBody->name);
-  //ooLogInfo("atmosphere: P = %f Pa, h0 = %f m", atm->P0, atm->h0);
-  //ooLogInfo("airdensity for %s = %f kg/m**3", obj->name, density);
+  //log_info("atmosphere: P = %f Pa, h0 = %f m", atm->P0, atm->h0);
+  //log_info("airdensity for %s = %f kg/m**3", obj->name, density);
   //plPressureAtAltitude(atm->p0, atm->T0, g0, atm->M, h, 0.0);
   //return pressure * atm->M / (PL_UGC * atm->T0);
   return density;

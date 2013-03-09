@@ -145,12 +145,12 @@ pl_ecc_anomaly(long double ecc, long double n, long double t)
     i ++;
 
     if (i > 10) {
-      ooLogWarn("ecc anomaly did not converge in %d iters, err = %.16f", i, fabs(E_i1-E_i));
+      log_warn("ecc anomaly did not converge in %d iters, err = %.16f", i, fabs(E_i1-E_i));
       break;
     }
   }
 
-  ooLogTrace("ecc anomaly solved in %d iters", i);
+  log_trace("ecc anomaly solved in %d iters", i);
   return E_i1;
 #undef ERR_LIMIT
 }

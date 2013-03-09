@@ -39,7 +39,7 @@ static pool_t *gTimerParamPool;
 
 MODULE_INIT(simevent, NULL)
 {
-  ooLogTrace("initialising 'simevent' module");
+  log_trace("initialising 'simevent' module");
   gQueue = simNewEventQueue();
   gTimerParamPool = pool_create(sizeof(struct handler_param));
 }
@@ -73,7 +73,7 @@ simAllocEvent(void)
   if (gQueue->freeEvents == NULL) {
     gQueue->freeEvents = smalloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
     if (gQueue->freeEvents == NULL) {
-      ooLogFatal("out of memory %s:%d", __FILE__, __LINE__);
+      log_fatal("out of memory %s:%d", __FILE__, __LINE__);
     }
     for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
       gQueue->freeEvents[i].next = &gQueue->freeEvents[i+1];
@@ -118,7 +118,7 @@ simEnqueueAbsoluteEvent(double jd, OOeventhandler handler, void *data)
   double currentJD = simTimeGetTime();
   if (jd < currentJD) {
     // cannot enqueue events in the future
-    ooLogError("past events cannot be inserted in queue, current JD = %f, event JD = %f",
+    log_error("past events cannot be inserted in queue, current JD = %f, event JD = %f",
                currentJD, jd);
   }
 

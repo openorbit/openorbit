@@ -103,7 +103,7 @@ simNewSpacecraft(const char *className, const char *scName)
   sim_class_t *cls = sim_class_get(className);
 
   if (!cls) {
-    ooLogError("no such spacecraft class '%s'", className);
+    log_error("no such spacecraft class '%s'", className);
     return NULL;
   }
 
@@ -384,7 +384,7 @@ ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt) {
   ARRAY_FOR_EACH(i, stage->engines) {
     SIMengine *eng = ARRAY_ELEM(stage->engines, i);
     if (eng->state & SIM_ENGINE_BURNING_BIT) {
-      ooLogInfo("engine %s burning", eng->name);
+      log_info("engine %s burning", eng->name);
       eng->step(eng, dt);
     }
   }
@@ -486,7 +486,7 @@ ooScSetSystemAndPos(sim_spacecraft_t *sc, const char *sysName,
     float3 v = pl_compute_current_velocity(astrobody);
     pl_object_set_vel3fv(sc->obj, v);
   } else {
-    ooLogWarn("astrobody '%s' not found", sysName);
+    log_warn("astrobody '%s' not found", sysName);
   }
 }
 
@@ -689,7 +689,7 @@ InitStage(sim_class_t *cls, void *obj, void *arg)
 
 MODULE_INIT(spacecraft, "object", NULL)
 {
-  ooLogTrace("initialising 'spacecraft' module");
+  log_trace("initialising 'spacecraft' module");
 
   sim_class_t *sc_class = sim_register_class("Object", "Spacecraft",
                                              InitSpacecraft,

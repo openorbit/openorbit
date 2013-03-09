@@ -50,7 +50,7 @@ const char*
 rsrc_get_conf_path(void)
 {
   char *homeDir = getenv("HOME");
-  ooLogFatalIfNull(homeDir, "$HOME not set");
+  log_fatal_if_null(homeDir, "$HOME not set");
 
   static char *confPath = NULL;
 
@@ -65,7 +65,7 @@ const char*
 rsrc_get_json_conf_path(void)
 {
   char *homeDir = getenv("HOME");
-  ooLogFatalIfNull(homeDir, "$HOME not set");
+  log_fatal_if_null(homeDir, "$HOME not set");
 
   static char *confPath = NULL;
 
@@ -91,12 +91,12 @@ rsrc_get_base_path(void)
         if (!CFURLGetFileSystemRepresentation(resUrl, true, base, PATH_MAX)) {
             // Something went wrong
             CFRelease(resUrl);
-            ooLogFatal("%s:%d:base path not found", __FILE__, __LINE__); // no ret
+            log_fatal("%s:%d:base path not found", __FILE__, __LINE__); // no ret
         }
 
         CFRelease(resUrl);
 
-        ooLogTrace("res base = %s", base);
+        log_trace("res base = %s", base);
     }
 
     return (const char*)base;
@@ -120,7 +120,7 @@ rsrc_get_file_paths(const char *pattern)
 
   char *fullPattern;
   asprintf(&fullPattern, "%s/%s", base, pattern);
-  ooLogTrace("search for %s", fullPattern);
+  log_trace("search for %s", fullPattern);
   glob_t globs;
   glob(fullPattern, 0, NULL, &globs);
 
@@ -136,7 +136,7 @@ rsrc_get_file(const char *fileName)
 
     if (path != NULL) {
         FILE *file = fopen(path, "r");
-        if (!file) ooLogWarn("file %s not readable", path);
+        if (!file) log_warn("file %s not readable", path);
         free(path);
 
         return file;
@@ -153,7 +153,7 @@ rsrc_get_fd(const char *fileName)
     if (path != NULL) {
         int fd = open(path, O_RDONLY);
 
-        if (fd == -1) ooLogWarn("file %s not readable", path);
+        if (fd == -1) log_warn("file %s not readable", path);
 
         free(path);
 

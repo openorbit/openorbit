@@ -141,7 +141,7 @@ sgCreateBackgroundFromFile(const char *file)
   }
 
 
-  ooLogInfo("loaded %d stars from %s", stars->n_stars, file);
+  log_info("loaded %d stars from %s", stars->n_stars, file);
   glGenVertexArrays(1, &stars->vba);
   glBindVertexArray(stars->vba);
 

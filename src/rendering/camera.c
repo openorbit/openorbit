@@ -307,7 +307,7 @@ sg_scene_t* sim_get_scene(void);
 void
 sg_camera_rotate_hat(int buttonVal, void *data)
 {
-  //ooLogInfo("hat pushed %d", buttonVal);
+  //log_info("hat pushed %d", buttonVal);
   sg_scene_t *sc = sim_get_scene();
   sg_camera_t *cam = sg_scene_get_cam(sc);
 

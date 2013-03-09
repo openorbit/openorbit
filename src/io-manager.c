@@ -364,7 +364,7 @@ io_builtin_throttle(int state, void *data)
 
 MODULE_INIT(iomanager, NULL)
 {
-  ooLogTrace("initialising 'iomanager' module");
+  log_trace("initialising 'iomanager' module");
   gIoReverseKeySymMap = hashtable_new_with_str_keys(1024);
   gIoButtonHandlers = hashtable_new_with_str_keys(2048);
   gIoAxisNameMap = hashtable_new_with_str_keys(16);
@@ -586,7 +586,7 @@ io_init_keys(void)
       const char *action = config_get_str_by_name(keynode, "action");
       int keyCount = config_get_arr_len(keyarr);
       if (keyCount != 2) {
-        ooLogError("to many keys for axis emulation");
+        log_error("to many keys for axis emulation");
         goto next;
       }
       const char *key0 = config_get_arr_str(keyarr, 0);
@@ -600,7 +600,7 @@ io_init_keys(void)
       const char *action = config_get_str_by_name(keynode, "action");
       int keyCount = config_get_arr_len(keyarr);
       if (keyCount != 2) {
-        ooLogError("to many keys for slider emulation");
+        log_error("to many keys for slider emulation");
         goto next;
       }
       const char *key0 = config_get_arr_str(keyarr, 0);
@@ -703,7 +703,7 @@ io_reg_action_handler(const char *name, IObuttonhandlerfunc handlerFunc, io_butt
   IObuttonhandler *handler =
     (IObuttonhandler*)hashtable_lookup(gIoButtonHandlers, name);
   if (handler != NULL) {
-    ooLogWarn("%s already registered as button handler", name);
+    log_warn("%s already registered as button handler", name);
     return;
   }
 
@@ -722,7 +722,7 @@ io_reg_py_key_handler(const char *name, PyObject *handlerFunc)
   IObuttonhandler *handler
        = (IObuttonhandler*)hashtable_lookup(gIoButtonHandlers, name);
   if (handler != NULL) {
-    ooLogWarn("%s already registered as button handler", name);
+    log_warn("%s already registered as button handler", name);
     return;
   }
 
@@ -790,14 +790,14 @@ io_bind_key_handler(const char *keyName, const char *keyAction, int up, uint16_t
   IObuttonhandler *keyHandler = hashtable_lookup(gIoButtonHandlers, keyAction);
 
   if (keyHandler == NULL) {
-    ooLogWarn("%s not found in button handler dictionary", keyAction);
+    log_warn("%s not found in button handler dictionary", keyAction);
     return;
   }
 
 
   if (keyHandler) {
     if (key_id == 0) {
-      ooLogWarn("got key id 0 for %s", keyName);
+      log_warn("got key id 0 for %s", keyName);
     }
     if (up) {
       gIoKeyData[key_id].up[kmod] = *keyHandler;
@@ -927,7 +927,7 @@ io_register_device(int vendorID, const char *vendorName,
     dev->slider_map[i] = i;
   }
 
-  ooLogInfo("registering device: vendor = %s, product = %s, buttons = %d, "
+  log_info("registering device: vendor = %s, product = %s, buttons = %d, "
             "hats = %d",
             vendorName, productName, buttonCount, hatCount);
 
@@ -999,7 +999,7 @@ io_device_button_down(int deviceID, int button)
 {
   io_device_info_t *dev = obj_array_get(&devices, deviceID);
   if (dev->buttonHandler[button-1].isScript) {
-    ooLogInfo("is script...");
+    log_info("is script...");
   } else {
     dev->buttonHandler[button-1].cHandler(true, dev->buttonHandler[button-1].data);
   }
@@ -1062,7 +1062,7 @@ io_bind_device_button(int deviceID, int button, const char *key)
   io_device_info_t *dev = obj_array_get(&devices, deviceID);
 
   if (button < 0 || dev->buttons <= button) {
-    ooLogWarn("device '%s' cannot handle button id %d",
+    log_warn("device '%s' cannot handle button id %d",
               dev->productName, button);
     return;
   }
@@ -1078,14 +1078,14 @@ io_bind_device_button(int deviceID, int button, const char *key)
       return;
     }
 
-    ooLogWarn("could not find button handler '%s'", key);
+    log_warn("could not find button handler '%s'", key);
     return;
   }
 
   if (handler->kind == IO_BUTTON_PUSH) {
     dev->buttonHandler[button] = *handler;
   } else {
-    ooLogWarn("cannot bind multi value handler to simple push button");
+    log_warn("cannot bind multi value handler to simple push button");
   }
 }
 
@@ -1122,7 +1122,7 @@ io_bind_device_hat(int deviceID, int hat, const char *key)
   io_device_info_t *dev = obj_array_get(&devices, deviceID);
 
   if (hat < 0 || dev->hats <= hat) {
-    ooLogWarn("device '%s' cannot handle hat id %d",
+    log_warn("device '%s' cannot handle hat id %d",
               dev->productName, hat);
     return;
   }
@@ -1137,14 +1137,14 @@ io_bind_device_hat(int deviceID, int hat, const char *key)
       dev->hatHandler[hat].kind = IO_BUTTON_HAT;
       return;
     }
-    ooLogWarn("could not find button handler '%s'", key);
+    log_warn("could not find button handler '%s'", key);
     return;
   }
 
   if (handler->kind == IO_BUTTON_MULTI || handler->kind == IO_BUTTON_HAT) {
-    ooLogInfo("binding hat %d to %s (kind = %d)", hat, key, handler->kind);
+    log_info("binding hat %d to %s (kind = %d)", hat, key, handler->kind);
     dev->hatHandler[hat] = *handler;
   } else {
-    ooLogWarn("cannot bind push button handler to hat switch");
+    log_warn("cannot bind push button handler to hat switch");
   }
 }

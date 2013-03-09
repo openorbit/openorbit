@@ -23,7 +23,7 @@
 static void
 PowerOverloadLog(SIMpowerbus *pb)
 {
-  ooLogWarn("power overload");
+  log_warn("power overload");
 }
 
 void

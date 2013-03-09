@@ -103,7 +103,7 @@ AxisUpdate(sim_spacecraft_t *sc)
 static void
 DetatchComplete(void *data)
 {
-  ooLogInfo("detatch complete");
+  log_info("detatch complete");
 
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sc->detatchPossible = false; // Do not reenable, must be false after last stage detatched
@@ -119,11 +119,11 @@ DetatchComplete(void *data)
 static void
 DetatchStage(sim_spacecraft_t *sc)
 {
-  ooLogInfo("detatch commanded");
+  log_info("detatch commanded");
   sc->detatchPossible = false;
 
   if (sc->detatchSequence == MERC_REDSTONE) {
-    ooLogInfo("detatching redstone");
+    log_info("detatching redstone");
     sim_stage_t *redstone = sc->stages.elems[MERC_REDSTONE];
     sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
@@ -255,7 +255,7 @@ GemeniInit2(sim_class_t *cls, void *sc, void *arg)
 
 MODULE_INIT(gemeni, "spacecraft", NULL)
 {
-  ooLogTrace("initialising 'gemeni' module");
+  log_trace("initialising 'gemeni' module");
   sim_class_t *cls = sim_register_class("Spacecraft", "Gemeni",
                                         GemeniInit2, sizeof(sim_spacecraft_t));
   (void)cls;

@@ -37,7 +37,7 @@ static sim_record_t *_root;
 
 MODULE_INIT(pubsub, NULL)
 {
-  ooLogTrace("initialising 'pubsub' module");
+  log_trace("initialising 'pubsub' module");
   _root = simPubsubMakeRecord(NULL, NULL);
 }
 
@@ -80,10 +80,10 @@ simGetValueByIndex(sim_record_t *rec, int idx)
 
   sim_base_t *base = obj_array_get(&rec->entries, idx);
   if (base->type == SIM_TYPE_RECORD) {
-    ooLogError("queried for value, but found record");
+    log_error("queried for value, but found record");
     return NULL;
   } else if (base->type == SIM_TYPE_LINK){
-    ooLogError("queried for value, but found link");
+    log_error("queried for value, but found link");
     return NULL;
   }
 
@@ -97,7 +97,7 @@ simGetValueByName(sim_record_t *rec, const char *name)
 
   intptr_t idx = ((intptr_t) hashtable_lookup(rec->key_index_map, name)) - 1;
   if (idx < 0) {
-    ooLogError("unknown name '%s' in record", name);
+    log_error("unknown name '%s' in record", name);
     return NULL;
   }
 
@@ -115,7 +115,7 @@ simGetRecordByIndex(sim_record_t *rec, int idx)
     return ((sim_link_t*)base)->target;
   }
 
-  ooLogError("queried for record, but found value");
+  log_error("queried for record, but found value");
   return NULL;
 }
 
@@ -125,7 +125,7 @@ simGetRecordByName(sim_record_t *rec, const char *name)
   if (!rec) return NULL;
   intptr_t idx = ((intptr_t) hashtable_lookup(rec->key_index_map, name)) - 1;
   if (idx < 0) {
-    ooLogError("unknown name '%s' in record", name);
+    log_error("unknown name '%s' in record", name);
     return NULL;
   }
 
@@ -177,7 +177,7 @@ simPubsubGetRecord(const char *path)
     comp_start = strtcpy(key, comp_start+1, '/', sizeof(key));
     rec = simGetRecordByName(rec, key);
     if (!rec) {
-      ooLogTrace("could not find '%s'", path);
+      log_trace("could not find '%s'", path);
       return NULL;
     }
   }
@@ -222,13 +222,13 @@ simPubsubGetValue(const char *path)
     if (*comp_start) {
       rec = simGetRecordByName(rec, key);
       if (!rec) {
-        ooLogTrace("could not find '%s'", path);
+        log_trace("could not find '%s'", path);
         return NULL;
       }
     } else {
       val = simGetValueByName(rec, key);
       if (!val) {
-        ooLogTrace("could not find '%s'", path);
+        log_trace("could not find '%s'", path);
         return NULL;
       }
     }
@@ -243,11 +243,11 @@ sim_link_t*
 simPubsubMakeLink(sim_record_t *parent, const char *name)
 {
   if (!parent) {
-    ooLogError("cannot make the root object a link");
+    log_error("cannot make the root object a link");
     return NULL;
   }
   if (!name) {
-    ooLogError("cannot make link with no name");
+    log_error("cannot make link with no name");
     return NULL;
   }
 
@@ -273,7 +273,7 @@ simPubsubMakeLink(sim_record_t *parent, const char *name)
       link->target = NULL; // Just clear the target and return
       return link;
     }
-    ooLogError("tried to make a link over a record/value '%s'", name);
+    log_error("tried to make a link over a record/value '%s'", name);
     return NULL;
   }
 }
@@ -283,12 +283,12 @@ sim_record_t*
 simPubsubMakeRecord(sim_record_t *parent, const char *name)
 {
   if (parent && !name) {
-    ooLogError("cannot make record with a non null parent and no name");
+    log_error("cannot make record with a non null parent and no name");
     return NULL;
   }
 
   if (!parent && name) {
-    ooLogError("cannot make root record with a name");
+    log_error("cannot make root record with a name");
     return NULL;
   }
 
@@ -331,7 +331,7 @@ simPubsubMakeValue(sim_record_t *parent, sim_type_id_t typ, const char *name,
                      (void*)ARRAY_LEN(parent->entries));
     return val_desc;
   } else {
-    ooLogError("publishing variable that is already published");
+    log_error("publishing variable that is already published");
     return NULL;
   }
 }
@@ -471,7 +471,7 @@ void
 simPubsubSetVal(sim_value_t *ref, sim_type_id_t type_id, void *val)
 {
   if (ref->super.type != type_id) {
-    ooLogError("SetValue called, but type_id is not matching the descriptor");
+    log_error("SetValue called, but type_id is not matching the descriptor");
     return;
   }
 
@@ -508,7 +508,7 @@ CASE(U##A, u##a)
       //CASE(FLOAT_VEC3x3,float3x3);
       //CASE(FLOAT_VEC4x4,float4x4);
     default:
-      ooLogError("asignment of non supported value type");
+      log_error("asignment of non supported value type");
   }
 
 #undef UCASE_FIX
@@ -521,7 +521,7 @@ void
 simPubsubGetVal(sim_value_t *ref, sim_type_id_t type_id, void *val)
 {
   if (ref->super.type != type_id) {
-    ooLogError("SetValue called, but type_id is not matching the descriptor");
+    log_error("SetValue called, but type_id is not matching the descriptor");
     return;
   }
 
@@ -558,7 +558,7 @@ simPubsubGetVal(sim_value_t *ref, sim_type_id_t type_id, void *val)
     //CASE(FLOAT_VEC3x3,float3x3);
     //CASE(FLOAT_VEC4x4,float4x4);
     default:
-      ooLogError("asignment of non supported value type");
+      log_error("asignment of non supported value type");
   }
 
 #undef UCASE_FIX

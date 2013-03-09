@@ -146,7 +146,7 @@ sg_load_texture(const char *key)
   //                            GL_UNSIGNED_BYTE,
   //                            tex->data)))
   //{
-  //  ooLogFatal("failed mipmap generation %s", gluErrorString(err));
+  //  log_fatal("failed mipmap generation %s", gluErrorString(err));
   //}
 
 

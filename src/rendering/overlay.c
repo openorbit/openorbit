@@ -94,23 +94,23 @@ sg_overlay_init(sg_overlay_t *overlay, sg_draw_overlay_t drawfunc, void *obj,
   case GL_FRAMEBUFFER_COMPLETE:
     break; // A-OK
   case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-    ooLogInfo("incomplete attachment for framebuffer (rw = %d rh = %d)",
+    log_info("incomplete attachment for framebuffer (rw = %d rh = %d)",
               rw, rh);
     break;
   case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-    ooLogInfo("missing attachment for framebuffer (rw = %d rh = %d)",
+    log_info("missing attachment for framebuffer (rw = %d rh = %d)",
               rw, rh);
     break;
   case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-    ooLogInfo("incomplete draw buffer for framebuffer (rw = %d rh = %d)",
+    log_info("incomplete draw buffer for framebuffer (rw = %d rh = %d)",
               rw, rh);
     break;
   case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-    ooLogInfo("incomplete read buffer for framebuffer (rw = %d rh = %d)",
+    log_info("incomplete read buffer for framebuffer (rw = %d rh = %d)",
               rw, rh);
     break;
   default:
-    ooLogInfo("other framebuffer error: %d", (int)status);
+    log_info("other framebuffer error: %d", (int)status);
   }
   SG_CHECK_ERROR;
 

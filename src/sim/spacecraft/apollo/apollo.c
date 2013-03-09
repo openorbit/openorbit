@@ -115,7 +115,7 @@ AxisUpdate(sim_spacecraft_t *sc)
 static void
 DetatchComplete(void *data)
 {
-  ooLogInfo("detatch complete");
+  log_info("detatch complete");
 
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sc->detatchPossible = false; // Do not reenable, must be false after last stage detatched
@@ -131,12 +131,12 @@ DetatchComplete(void *data)
 static void
 DetatchStage(sim_spacecraft_t *sc)
 {
-  ooLogInfo("detatch commanded");
+  log_info("detatch commanded");
   sc->detatchPossible = false;
 
   switch (sc->detatchSequence) {
   case SATURN_1C: {
-    ooLogInfo("detatching saturn 1c stage");
+    log_info("detatching saturn 1c stage");
     sim_stage_t *sat_1c = sc->stages.elems[SATURN_1C];
     sim_stage_t *sat_ii = sc->stages.elems[SATURN_II];
 
@@ -153,13 +153,13 @@ DetatchStage(sim_spacecraft_t *sc)
     break;
   }
   case SATURN_II:
-    ooLogInfo("detatching saturn ii stage");
+    log_info("detatching saturn ii stage");
     break;
   case SATURN_IVB:
-    ooLogInfo("detatching saturn ivb stage");
+    log_info("detatching saturn ivb stage");
     break;
   case APOLLO_SERVICE:
-    ooLogInfo("detatching apollo service module");
+    log_info("detatching apollo service module");
     break;
   case APOLLO_COMMAND:
     break;
@@ -268,7 +268,7 @@ ApolloInit2(sim_class_t *cls, void *sc, void *arg)
 
 MODULE_INIT(apollo, "spacecraft", NULL)
 {
-  ooLogTrace("initialising 'apollo' module");
+  log_trace("initialising 'apollo' module");
   sim_class_t *cls = sim_register_class("Spacecraft", "Apollo",
                                         ApolloInit2, sizeof(sim_spacecraft_t));
   (void)cls; // TODO

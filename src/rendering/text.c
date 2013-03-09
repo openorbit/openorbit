@@ -39,7 +39,7 @@ static FT_Library library;
 
 MODULE_INIT(text, NULL)
 {
-  ooLogTrace("initialising 'text' module");
+  log_trace("initialising 'text' module");
 
   int error = FT_Init_FreeType( &library );
   if ( error ) {

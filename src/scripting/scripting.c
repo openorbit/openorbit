@@ -49,7 +49,7 @@ scripting_init(void)
 
   // insert app-specific python path
   char *ooPyPath = rsrc_get_path("python/");
-  if (! ooPyPath) ooLogFatal("cannot generate python path");
+  if (! ooPyPath) log_fatal("cannot generate python path");
 
   const char *pyPath = Py_GetPath();
 
@@ -88,13 +88,13 @@ scripting_run_file(const char *fname)
   FILE *fp = rsrc_get_file(fname);
 
   if (! fp) {
-    ooLogWarn("could not open %s", fname);
+    log_warn("could not open %s", fname);
     fprintf(stderr, "could not open %s\n", fname);
     return false;
   }
   if (PyRun_SimpleFile(fp, fname)) {
     fclose(fp);
-    ooLogFatal("execution of %s failed", fname);
+    log_fatal("execution of %s failed", fname);
     //return false;
   }
 

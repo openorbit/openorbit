@@ -178,7 +178,7 @@ pl_collide_coarse(pl_collisioncontext_t *coll,
   if (vf3_abs(dist) > (obj_a->radius + obj_b->radius)) {
     return false;
   }
-  ooLogWarn("collision test succeeded %s : %s", obj_a->name, obj_b->name);
+  log_warn("collision test succeeded %s : %s", obj_a->name, obj_b->name);
 
   return true;
 }
@@ -273,7 +273,7 @@ pl_collide_step(pl_collisioncontext_t *coll)
     b->v = bv;
 
     // Compute post colission momentums
-    ooLogInfo("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
+    log_info("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
     lwc_dump(&a->p);lwc_dump(&b->p);
   }
 }

@@ -70,7 +70,7 @@ text_bitmap_create_label(const char *fontName, float fontsize, const char *text)
   CGRect rect = CTLineGetImageBounds(line, context);
   CFRelease(context);
 
-  //ooLogInfo("rect is: %f %f, %f %f", rect.origin.x, rect.origin.y,
+  //log_info("rect is: %f %f, %f %f", rect.origin.x, rect.origin.y,
   //          rect.size.width, rect.size.height);
 
   size_t w = ceil(rect.size.width);
