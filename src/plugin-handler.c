@@ -34,6 +34,8 @@
 #include "res-manager.h"
 #include "plugin-handler.h"
 #include <openorbit/log.h>
+#include "palloc.h"
+
 
 #ifndef SO_EXT
 #define SO_EXT ".so"
@@ -118,7 +120,7 @@ ooPluginLoad(char *filename)
 
     // relative path? if so, append the SO_EXT to the file name and load in WD
     if (filename[0] != '/') {
-        char *file = malloc(strlen(filename) + strlen(SO_EXT) + 1);
+        char *file = smalloc(strlen(filename) + strlen(SO_EXT) + 1);
         strcpy(file, filename);
         strcat(file, SO_EXT);
 

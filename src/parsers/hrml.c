@@ -43,10 +43,13 @@ typedef enum {
   force_kN,
   force_count
 } force_unit;
+
+#if 0
 static double forceFactors[force_count][force_count] = {
   [force_N] = {[force_N] = 1.0, [force_kN] = 1.0/1000.0},
   [force_kN] = {[force_N] = 1000.0, [force_kN] = 1.0}
 };
+#endif
 
 typedef enum {
   length_mm = 0,
@@ -59,6 +62,7 @@ typedef enum {
   length_pc,
   length_count
 } length_unit;
+#if 0
 static double lengthFactors[length_count][length_count] = {
   [length_mm] = {[length_mm] = 1.0, [length_cm] = 1.0/10.0, [length_dm] = 1.0/100.0,
                  [length_m] = 1.0/1000.0, [length_km] = 1.0/1000000.0, [length_au] = 1.0,
@@ -91,7 +95,7 @@ static double lengthFactors[length_count][length_count] = {
                  [length_ly] = 1.0,
                  [length_pc] = 1.0},
 };
-
+#endif
 double
 hrmlGetRealWithUnit(HRMLobject *obj, const char *unit)
 {
@@ -434,7 +438,7 @@ HRMLvalue makeIntegerArray(const int64_t *array, size_t len)
   HRMLvalue val;
   val.typ = HRMLIntArray;
   val.alen = len;
-  val.u.intArray = calloc(len, sizeof(int64_t));
+  val.u.intArray = calloc(len, sizeof(uint64_t));
   memcpy(val.u.intArray, array, len * sizeof(int64_t));
   return val;
 }
@@ -1242,6 +1246,7 @@ HRMLdocument *hrmlParse(const char *path)
   return doc;
 }
 
+#if 0
 // Used to build up parsing tables for the si-unit parser
 static const char * gPrefixTable[HRML_siprefix_size] = {
     [HRML_yocto] = "y",
@@ -1266,7 +1271,7 @@ static const char * gPrefixTable[HRML_siprefix_size] = {
     [HRML_zetta] = "Z",
     [HRML_yotta] = "Y"
 };
-
+#endif
 // Used to build up parsing tables for the si-unit parser
 static const char * gUnitTable[HRML_siunit_size] = {
   [HRML_metre] = "m",

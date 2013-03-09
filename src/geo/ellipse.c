@@ -21,24 +21,25 @@
 #include <math.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
-#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 #else
-#include <GL/gl.h>
+#include <GL3/gl3.h>
 #endif
 
 
 #include "ellipse.h"
+#include "palloc.h"
 #include <openorbit/log.h>
 
 void
 ooGeoEllipseDraw(OOellipse *e)
 {
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, sizeof(float3), e->vec.elems);
-  glColor3f(1.0, 0.0, 0.0);
-  glDrawArrays(GL_LINE_LOOP, 0,  e->vec.length);
-  glDisableClientState(GL_VERTEX_ARRAY);
+  // TODO: Elipses in GL3
+  //glEnableClientState(GL_VERTEX_ARRAY);
+  //glVertexPointer(3, GL_FLOAT, sizeof(float3), e->vec.elems);
+  //glColor3f(1.0, 0.0, 0.0);
+  //glDrawArrays(GL_LINE_LOOP, 0,  e->vec.length);
+  //glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
@@ -107,7 +108,7 @@ ooVecArraySet(OOvecarray *vec, size_t i, float3 obj)
 #define STEPSIZE 20.0
 OOellipse* ooGeoEllipseAreaSeg(size_t segs, float semiMajor, float semiMinor)
 {
-  OOellipse *e = malloc(sizeof(OOellipse));
+  OOellipse *e = smalloc(sizeof(OOellipse));
   ooVecArrayInit(&e->vec);
   //uint64_t totalIterations = 0;
   e->semiMajor = semiMajor;

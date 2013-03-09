@@ -1,5 +1,5 @@
 /*
- Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -21,38 +21,40 @@
 #define RENDERING_SHADER_MANAGER_H
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
-#include <GL/gl.h>
+#include <GL3/gl3.h>
 #endif
 
-void sgLoadAllShaders(void);
+#include <stdbool.h>
 
-GLuint sgLoadProgram(const char *key, const char *vspath, const char *fspath,
-                     const char *gspath);
-GLuint sgGetProgram(const char *key);
-void sgEnableProgram(GLuint programId);
-void sgDisableProgram(void);
-GLuint sgShaderFromKey(const char *key);
+#include "rendering/object.h"
+#include "rendering/location.h"
+#include "rendering/texture.h"
+#include "rendering/light.h"
 
-typedef enum {
-  SG_VERTEX0 = 0,
-  SG_TEX_COORD0,
-  SG_COLOR0,
-  SG_TEX0,
-  SG_TEX1,
-  SG_TEX2,
-  SG_TEX3,
-  SG_LIGHT0,
-  SG_LIGHT1,
-  SG_LIGHT2,
-  SG_LIGHT3,
-  SG_MODELVIEW,
-  SG_PROJECTION,
-  SG_PARAM_COUNT,
-} sg_param_id_t;
+void sg_load_all_shaders(void);
 
-GLint sgGetLocationForParam(GLuint program, sg_param_id_t param);
-void sgSetShaderTex(GLuint program, sg_param_id_t param, GLuint tex);
+sg_shader_t* sg_load_shader(const char *key, const char *vspath, const char *fspath,
+                            const char *gspath);
+sg_shader_t* sg_get_shader(const char *key);
+sg_shader_t* sg_get_shader_without_warnings(const char *key);
 
+GLint sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required);
+
+void sg_shader_bind(sg_shader_t *program);
+
+void sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj);
+void sg_shader_set_model_view(sg_shader_t *shader, const float4x4 proj);
+void sg_shader_set_normal_matrix(sg_shader_t *shader, const float4x4 norm);
+
+void sg_shader_invalidate_textures(sg_shader_t *shader);
+void sg_shader_bind_texture(sg_shader_t *shader, sg_texture_t *tex,
+                            unsigned tex_unit);
+
+void sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
+                          sg_light_t *light);
+void sg_shader_bind_amb(sg_shader_t *shader, float4 light);
+
+void sg_shader_bind_material(sg_shader_t *shader, sg_material_t *mat);
 #endif /* !RENDERING_SHADER_MANAGER_H */

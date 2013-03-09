@@ -301,7 +301,7 @@ openorbit {
             }
             rendering {
               model: "sphere";
-              texture: "textures/4kGanymede.png";
+              texture: "textures/default/ganymede.jpg";
               shader: "planet";
               //albedo: 0.44;
             }
@@ -363,7 +363,8 @@ openorbit {
         }
         rendering {
           model: "sphere";
-          texture: "textures/saturn.jpg";
+          texture: "textures/default/saturn.jpg";
+          shader: "planet";
           // albedo: 0.342 bond, 0.47 geom
         }
         // Titan: adiabatic-lapse-rate: 1.301e-3 K/m;

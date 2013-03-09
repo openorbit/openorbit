@@ -177,7 +177,7 @@ simPubsubGetRecord(const char *path)
     comp_start = strtcpy(key, comp_start+1, '/', sizeof(key));
     rec = simGetRecordByName(rec, key);
     if (!rec) {
-      ooLogError("could not find '%s'", path);
+      ooLogTrace("could not find '%s'", path);
       return NULL;
     }
   }
@@ -222,13 +222,13 @@ simPubsubGetValue(const char *path)
     if (*comp_start) {
       rec = simGetRecordByName(rec, key);
       if (!rec) {
-        ooLogError("could not find '%s'", path);
+        ooLogTrace("could not find '%s'", path);
         return NULL;
       }
     } else {
       val = simGetValueByName(rec, key);
       if (!val) {
-        ooLogError("could not find '%s'", path);
+        ooLogTrace("could not find '%s'", path);
         return NULL;
       }
     }
@@ -570,12 +570,13 @@ simPubsubGetVal(sim_value_t *ref, sim_type_id_t type_id, void *val)
 
 #include <jansson.h>
 // JSON validation codes
-static const char *mat4x4_str = "[FFFF, FFFF, FFFF, FFFF!]";
-static const char *mat3x3_str = "[FFF, FFF, FFF!]";
-static const char *float4_str = "[FFFF!]";
-static const char *float3_str = "[FFF!]";
-static const char *float_str = "F";
-static const char *int_str = "I";
+// TODO
+//static const char *mat4x4_str = "[FFFF, FFFF, FFFF, FFFF!]";
+//static const char *mat3x3_str = "[FFF, FFF, FFF!]";
+//static const char *float4_str = "[FFFF!]";
+//static const char *float3_str = "[FFF!]";
+//static const char *float_str = "F";
+//static const char *int_str = "I";
 
 void
 simPackPubSubDB(void)

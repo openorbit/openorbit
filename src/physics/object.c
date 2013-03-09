@@ -20,7 +20,7 @@
 
 #include "physics.h"
 #include "object.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include <openorbit/log.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -50,12 +50,12 @@ plInitObject(PLobject *obj)
             1.0f, 1.0f, 1.0f,
             0.0f, 0.0f, 0.0f);
 
-  ooLwcSet(&obj->p, 0.0, 0.0, 0.0);
+  lwc_set(&obj->p, 0.0, 0.0, 0.0);
 
   obj->sys = NULL;
   obj->name = NULL;
   obj->parent = NULL;
-  obj->drawable = NULL;
+  //obj->drawable = NULL;
   obj->f_ack = vf3_set(0.0, 0.0, 0.0);
   obj->t_ack = vf3_set(0.0, 0.0, 0.0);
   obj->g_ack = vf3_set(0.0, 0.0, 0.0);
@@ -96,7 +96,8 @@ plObject(PLworld *world, const char *name)
 }
 
 PLobject*
-plSubObject3f(PLworld *world, PLobject *parent, const char * name, float x, float y, float z)
+plSubObject3f(PLworld *world, PLobject *parent, const char * name,
+              float x, float y, float z)
 {
   assert(parent != NULL);
 
@@ -159,19 +160,11 @@ plUpdateMass(PLobject *obj)
 
 
 void
-plSetDrawableForObject(PLobject *obj, SGdrawable *drawable)
-{
-  assert(obj != NULL);
-
-  obj->drawable = drawable;
-}
-
-void
 plSetObjectPos3d(PLobject *obj, double x, double y, double z)
 {
   PL_CHECK_OBJ(obj);
 
-  ooLwcSet(&obj->p, x, y, z);
+  lwc_set(&obj->p, x, y, z);
 
   PL_CHECK_OBJ(obj);
 }
@@ -186,7 +179,7 @@ plSetObjectPosExt3f(PLobject *obj,
 
   obj->p.seg = vi3_set(i, j, k);
   obj->p.offs = vf3_set(x, y, z);
-  ooLwcNormalise(&obj->p);
+  lwc_normalise(&obj->p);
 
   PL_CHECK_OBJ(obj);
 }
@@ -198,7 +191,7 @@ plSetObjectPosRel3d(PLobject * restrict obj, const PLobject * restrict otherObj,
   PL_CHECK_OBJ(obj);
 
   obj->p = otherObj->p;
-  ooLwcTranslate3f(&obj->p, x, y, z);
+  lwc_translate3f(&obj->p, x, y, z);
 
   PL_CHECK_OBJ(obj);
 }
@@ -211,9 +204,9 @@ plSetObjectPosRel3fv(PLobject * restrict obj,
   PL_CHECK_OBJ(obj);
 
   obj->p = otherObj->p;
-  ooLwcTranslate3fv(&obj->p, rp);
-  ooLwcDump(&otherObj->p);
-  ooLwcDump(&obj->p);
+  lwc_translate3fv(&obj->p, rp);
+  lwc_dump(&otherObj->p);
+  lwc_dump(&obj->p);
 
   PL_CHECK_OBJ(obj);
 }
@@ -249,7 +242,7 @@ plForceRelative3f(PLobject *obj, float fx, float fy, float fz)
   while (obj->parent) obj = obj->parent;
   PL_CHECK_OBJ(obj);
 
-  float3 f = { fx, fy, fz, 0.0f };
+  float3 f = vf3_set(fx, fy, fz);
   float3 f_rot = mf3_v_mul(obj->R, f);
   obj->f_ack += f_rot;
 }
@@ -271,8 +264,8 @@ plForceRelativePos3f(PLobject *obj,
 {
   PL_CHECK_OBJ(obj);
 
-  float3 f = { fx, fy, fz, 0.0f };
-  float3 p = { px, py, pz, 0.0f };
+  float3 f = vf3_set(fx, fy, fz);
+  float3 p = vf3_set(px, py, pz);
 
   while (obj->parent) { p += obj->p_offset; obj = obj->parent; }
 
@@ -346,7 +339,7 @@ plDumpObject(PLobject *obj)
   fprintf(stderr, "\tv: %f %f %f\n", obj->v.x, obj->v.y, obj->v.z);
   fprintf(stderr, "\tf_acc: %f %f %f\n", obj->f_ack.x, obj->f_ack.y, obj->f_ack.z);
   fprintf(stderr, "\tt_acc: %f %f %f\n", obj->t_ack.x, obj->t_ack.y, obj->t_ack.z);
-  fprintf(stderr, "\tp: "); ooLwcDump(&obj->p);
+  fprintf(stderr, "\tp: "); lwc_dump(&obj->p);
   fprintf(stderr, "\tp_offset: [%f %f %f]\n",
           obj->p_offset.x, obj->p_offset.y, obj->p_offset.z);
 
@@ -363,10 +356,10 @@ plStepObjectf(PLobject *obj, float dt)
 
   obj->v += fm * dt; // Update velocity from force
   float3 dv = vf3_s_mul(obj->v, dt);
-  ooLwcTranslate3fv(&obj->p, dv); // Update position from velocity
+  lwc_translate3fv(&obj->p, dv); // Update position from velocity
 
   obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
-  obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt)); // Update quaternion with rotational velocity
+  obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt));    // Update quaternion with rotational velocity
 
   plComputeDerived(obj); // Compute derived data (world inverted inertia tensor etc)
 
@@ -386,7 +379,7 @@ plStepChildObjectf(PLobject *obj, float dt)
   obj->p = obj->parent->p;
 
   float3 p_offset_rot = mf3_v_mul(obj->parent->R, obj->p_offset);
-  ooLwcTranslate3fv(&obj->p, p_offset_rot); // Update position from parent
+  lwc_translate3fv(&obj->p, p_offset_rot); // Update position from parent
   obj->angVel = obj->parent->angVel;
   obj->q = obj->parent->q;
 
@@ -405,7 +398,7 @@ plNormaliseObject(PLobject *obj)
   obj->q = q_normalise(obj->q);
   q_mf3_convert(obj->R, obj->q);
 
-  ooLwcNormalise(&obj->p);
+  lwc_normalise(&obj->p);
 }
 
 void
@@ -473,6 +466,19 @@ plSetAngularVel3fv(PLobject *obj, float3 r)
   obj->angVel = r;
 }
 
+
+float3
+plGetVel(PLobject *obj)
+{
+  return obj->v;
+}
+
+float3
+plGetAngularVel(PLobject *obj)
+{
+  return obj->angVel;
+}
+
 quaternion_t
 plGetQuat(PLobject *obj)
 {
@@ -516,4 +522,10 @@ plCheckObject(PLobject *obj, const char *file, int line)
   if (!isfinite(obj->v.x) || !isfinite(obj->v.y) || !isfinite(obj->v.z)) {
     ooLogAbort("%s:%d obj velocity not finite", file, line);
   }
+}
+
+lwcoord_t
+plGetLwc(PLobject *obj)
+{
+  return obj->p;
 }

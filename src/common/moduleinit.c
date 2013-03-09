@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <assert.h>
+#include "palloc.h"
 
 static obj_array_t roots;
 static avl_tree_t *modules;
@@ -40,7 +41,7 @@ typedef struct module_t {
 module_t*
 module_alloc(const char *name, module_init_t module_init)
 {
-  module_t *mod = malloc(sizeof(module_t));
+  module_t *mod = smalloc(sizeof(module_t));
   bzero(mod, sizeof(module_t));
   mod->name = strdup(name);
   str_array_init(&mod->deps);

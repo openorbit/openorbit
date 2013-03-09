@@ -10,6 +10,15 @@ development. This means that some code might not be consequent with these guide
 lines, if you find such an item, please notify the authors and the code will
 hopefully be re-factored.
 
+THIS DOCUMENT IS OUT OF DATE, BEWARE!!!
+
+CONTRIBUTIONS
+-------------
+For now, contributions to Open Orbit must be in public domain or signed over to
+the main author. If you wish to sign a copyright release form, please contact
+Mattias Holm (lorrden @ openorbit . org), but best is if you release your code
+as public domain.
+
 ARCHITECTURE
 ------------
 
@@ -20,9 +29,8 @@ Libraries part of openorbit place public includes in include/libname.
 
 CODE STYLE
 ----------
-Open Orbit is written in C and tries to confirm to the C99 standard.
-GNU-extensions are only allowed when they are not strictly needed for the code
-to work (e.g. attributes).
+Open Orbit is written in C and tries to confirm to the C99 standard. However,
+extensions supported by the clang compiler are used, including vector operations.
 
 The naming of symbols is not done with CamelCase, but with underscores. All
 macros should be in ALL_CAPS. Global variables shall have a prefix in caps
@@ -115,3 +123,27 @@ Global Variables
 Exported global variables must be defined with a 'g' and a package prefix. For
 example, if there is a package or library named foo, that exports a global named
 bar; the name of the symbol would be ``gFOO_bar``.
+
+OpenGL
+******
+The rendering engine is based on OpenGL. While the normal C coding rules apply
+to the C-land of OpenGL code, there are some additional rules for the shaders.
+
+We use OpenGL 3.2 (when supported by all major platforms, we will move to 3.3 or
+above). The following conventions are used:
+
+	Only one fragment output variable is used. This variable MUST BE NAMED
+		"oo_FragColor".
+
+Variables in GLSL referenced from C should be prefixed with oo_.
+
+Common Attributes (in to vertex shaders):
+	vec4 oo_Vertex
+	vec2 oo_TexCoord0 (usually only one, some special shaders may used 2)
+	vec4 oo_Color
+
+Common Uniforms:
+	mat4 oo_ModelViewMatrix
+	mat4 oo_ProjectionMatrix
+	mat3 oo_NormalMatrix
+	sampler2d oo_Texture[]

@@ -30,8 +30,32 @@
 #include <stdlib.h>
 #include <stddef.h>
 
-#include "scenegraph-private.h"
 #include "scenegraph.h"
+#include "palloc.h"
+
+struct sg_star_t {
+  unsigned char r, g, b, a;
+  float x, y, z;
+};
+
+struct sg_background_t {
+  sg_scene_t *scene;
+  sg_shader_t *shader;
+
+  GLuint vbo;
+  GLuint vba;
+
+  size_t a_len;
+  size_t n_stars;
+  sg_star_t *data;
+};
+
+void
+sg_background_set_scene(sg_background_t *bg, sg_scene_t *sc)
+{
+  bg->scene = sc;
+}
+
 float3
 ooEquToCart(float ra, float dec)
 {
@@ -58,160 +82,119 @@ ooVmagToAlpha(double vmag)
     return normalised_lin_diff;
 }
 
-void
-ooSkyAddStar(OOstars *stars, double ra, double dec, double mag, double bv)
-{
-    float3 cart;
-    cart = ooEquToCart(ra, dec);
-
-    // star list full, then extend block?
-    if (stars->a_len <= stars->n_stars) {
-      OOstar *newData = realloc(stars->data, stars->a_len * 2 * sizeof(OOstar));
-      stars->data = newData;
-      stars->a_len *= 2;
-      return;
-    }
-
-    double temp = bv_to_temp(bv);
-    if (temp < 1000.0) temp = 1000.0;
-    if (temp > 40000.0) temp = 40000.0;
-    const uint8_t *tempRGB = get_temp_colour((int)temp);
-
-    stars->data[stars->n_stars].x = 100.0*vf3_x(cart);
-    stars->data[stars->n_stars].y = 100.0*vf3_y(cart);
-    stars->data[stars->n_stars].z = 100.0*vf3_z(cart);
-    stars->data[stars->n_stars].r = *tempRGB;
-    stars->data[stars->n_stars].g = *(tempRGB+1);
-    stars->data[stars->n_stars].b = *(tempRGB+2);
-    stars->data[stars->n_stars].a = ooVmagToAlpha(mag) * 255;
-    if (stars->data[stars->n_stars].a < 40) stars->data[stars->n_stars].a = 40;
-
-    stars->n_stars ++;
-}
 
 double deg2rad(double deg) {
     return deg * M_PI / 180.0;
 }
 
-OOstars* ooSkyLoadStars(const char *file)
+void
+sgAddStar(sg_background_t *stars, double ra, double dec, double mag, double bv)
+{
+  float3 cart;
+  cart = ooEquToCart(ra, dec);
+
+  // star list full, then extend block?
+  if (stars->a_len <= stars->n_stars) {
+    sg_star_t *newData = realloc(stars->data, stars->a_len * 2 * sizeof(sg_star_t));
+    stars->data = newData;
+    stars->a_len *= 2;
+    return;
+  }
+
+  double temp = bv_to_temp(bv);
+  if (temp < 1000.0) temp = 1000.0;
+  if (temp > 40000.0) temp = 40000.0;
+  const uint8_t *tempRGB = get_temp_colour((int)temp);
+
+  stars->data[stars->n_stars].x = 100.0*vf3_x(cart);
+  stars->data[stars->n_stars].y = 100.0*vf3_y(cart);
+  stars->data[stars->n_stars].z = 100.0*vf3_z(cart);
+  stars->data[stars->n_stars].r = *tempRGB;
+  stars->data[stars->n_stars].g = *(tempRGB+1);
+  stars->data[stars->n_stars].b = *(tempRGB+2);
+  stars->data[stars->n_stars].a = ooVmagToAlpha(mag) * 255;
+  if (stars->data[stars->n_stars].a < 40) stars->data[stars->n_stars].a = 40;
+
+  stars->n_stars ++;
+}
+
+
+#define STAR_COUNT 4096
+sg_background_t*
+sgCreateBackgroundFromFile(const char *file)
 {
   SG_CHECK_ERROR;
 
-  OOstars *stars = ooSkyInitStars(4096);
+  sg_background_t *stars = smalloc(sizeof(sg_background_t));
+  memset(stars, 0, sizeof(sg_background_t));
+
+  stars->data = calloc(STAR_COUNT, sizeof(sg_star_t));
+  stars->a_len = STAR_COUNT;
+  stars->n_stars = 0;
+
   FILE *f = ooResGetFile(file);
   assert(f != NULL);
   double vmag, ra, dec, btmag, vtmag, bv, vi;
   while (fscanf(f, "%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
                 &vmag, &ra, &dec, &btmag, &vtmag, &bv, &vi) == 7) {
-    ooSkyAddStar(stars, deg2rad(ra), deg2rad(dec), vmag, bv);
+    sgAddStar(stars, deg2rad(ra), deg2rad(dec), vmag, bv);
   }
+
 
   ooLogInfo("loaded %d stars from %s", stars->n_stars, file);
+  glGenVertexArrays(1, &stars->vba);
+  glBindVertexArray(stars->vba);
+
   glGenBuffers(1, &stars->vbo);
   glBindBuffer(GL_ARRAY_BUFFER, stars->vbo);
-  glBufferData(GL_ARRAY_BUFFER, stars->n_stars*sizeof(OOstar), stars->data,
+  glBufferData(GL_ARRAY_BUFFER, stars->n_stars*sizeof(sg_star_t), stars->data,
                GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  free(stars->data); // GL has copied arrays over
-  stars->data = NULL;
-
   SG_CHECK_ERROR;
 
-  return stars;
-}
+  sg_shader_t *shader = sg_get_shader("sky");
+  stars->shader = shader;
+  glVertexAttribPointer(sg_shader_get_location(shader, SG_VERTEX, true),
+                        3, GL_FLOAT, GL_FALSE,
+                        sizeof(sg_star_t), (void*)offsetof(sg_star_t, x));
+  glEnableVertexAttribArray(sg_shader_get_location(shader, SG_VERTEX, true));
+  SG_CHECK_ERROR;
 
+  glVertexAttribPointer(sg_shader_get_location(shader, SG_COLOR, true),
+                        4, GL_UNSIGNED_BYTE,
+                        GL_TRUE, // Yes normalize
+                        sizeof(sg_star_t), offsetof(sg_star_t, r));
+  glEnableVertexAttribArray(sg_shader_get_location(shader, SG_COLOR, true));
+  SG_CHECK_ERROR;
 
-OOstars*
-ooSkyRandomStars(void)
-{
-  assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
-  float3 cart;
-  float ra, dec;
-
-  OOstars *stars = malloc(sizeof(OOstars) +  STAR_CNT*sizeof(OOstar));
-
-  for (int i = 0; i < STAR_CNT ; i ++) {
-    ra = deg2rad(random() % 360-180);
-    dec = deg2rad(random() % 180-90);
-    cart = ooEquToCart(ra, dec);
-    stars->data[i].x = 100.0*vf3_x(cart);
-    stars->data[i].y = 100.0*vf3_y(cart);
-    stars->data[i].z = 100.0*vf3_z(cart);
-    stars->data[i].r = 255;
-    stars->data[i].g = 255;
-    stars->data[i].b = 255;
-    stars->data[i].a = 255;
-  }
-
-  stars->n_stars = STAR_CNT;
-  stars->a_len = STAR_CNT;
-  glGenBuffers(1, &stars->vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, stars->vbo);
-  glBufferData(GL_ARRAY_BUFFER, stars->n_stars*sizeof(OOstar), stars->data,
-               GL_STATIC_DRAW);
-
+  glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
   free(stars->data); // GL has copied arrays over
   stars->data = NULL;
   SG_CHECK_ERROR;
 
   return stars;
+
 }
-
-
-OOstars*
-ooSkyInitStars(int star_count)
-{
-  assert(sizeof(OOstar) == 4*sizeof(char)+3*sizeof(float));
-
-  OOstars *stars = malloc(sizeof(OOstars));
-  stars->data = malloc(star_count*sizeof(OOstar));
-  stars->a_len = star_count;
-  stars->n_stars = 0;
-  return stars;
-}
-
 void
-ooSkyDrawStars(OOstars *stars)
+sg_background_draw(sg_background_t *bg)
 {
   SG_CHECK_ERROR;
-
-  ooLogTrace("draw %d stars", stars->n_stars);
-  glMatrixMode(GL_MODELVIEW);
-  glPushAttrib(GL_ENABLE_BIT);
-  glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-
-  glDisable(GL_TEXTURE_2D);
-  glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
-  glEnable(GL_BLEND);
+  // Background drawing needs to shortcut the normal camera, as the bg
+  // is at infinite distance (e.g. regarding translation)
+  // Here we rotate the camera as needed
+  sg_camera_t *cam = sg_scene_get_cam(bg->scene);
+
+  SG_CHECK_ERROR;
+  sg_shader_bind(bg->shader);
+  sg_shader_set_projection(bg->shader, *sg_camera_project(cam));
+  sg_shader_set_model_view(bg->shader, *sg_camera_modelview(cam));
+
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  glBindBuffer(GL_ARRAY_BUFFER, stars->vbo);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-
-  glPointSize(2.0f);
-  glVertexPointer(3, GL_FLOAT, sizeof(OOstar), (GLvoid*)offsetof(OOstar, x));
-  glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(OOstar), (GLvoid*)offsetof(OOstar, r));
-
-  glDrawArrays(GL_POINTS, 0, stars->n_stars);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glPopAttrib();
-  glPopClientAttrib();
+  glBindVertexArray(bg->vba);
+  glDrawArrays(GL_POINTS, 0, bg->n_stars);
+  glBindVertexArray(0);
   SG_CHECK_ERROR;
 }
-
-
-SGdrawable*
-ooSkyNewDrawable(const char *file)
-{
-  //  OOdrawable *sky = malloc(sizeof(OOdrawable));
-  OOstars *sky = ooSkyLoadStars(file);
-  SGdrawable *drawable = sgNewDrawable((SGdrawable*)sky, "sky", (SGdrawfunc)ooSkyDrawStars);
-
-  return drawable;
-}
-

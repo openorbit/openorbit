@@ -1,27 +1,27 @@
 /*
- Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
- 
+ Copyright 2006,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
+
  This file is part of Open Orbit. Open Orbit is free software: you can
  redistribute it and/or modify it under the terms of the GNU General Public
  License as published by the Free Software Foundation, either version 3 of the
  License, or (at your option) any later version.
- 
+
  You should have received a copy of the GNU General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
- 
+
  Some files of Open Orbit have relaxed licensing conditions. This file is
  licenced under the 2-clause BSD licence.
- 
+
  Redistribution and use of this file in source and binary forms, with or
  without modification, are permitted provided that the following conditions are
  met:
- 
+
  - Redistributions of source code must retain the above copyright notice,
    this list of conditions and the following disclaimer.
  - Redistributions in binary form must reproduce the above copyright notice,
    this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -53,6 +53,7 @@ extern "C" {
 #include <stdbool.h>
 #include <math.h>
 #include <vmath/vmath-types.h>
+#include <string.h>
   //#include <vmath/vmath-matvec.inl>
 
 void vf3_outprod(float3x3 m, float3 a, float3 b);
@@ -167,7 +168,7 @@ vf3_set(float x, float y, float z)
   float3 v = {x, y, z};
   return v;
 #else
-  float3_u uc = {.a = {x,y,z,0.0}};
+  float3_u uc = {.a = {x,y,z}};
   return uc.v;
 #endif
 }
@@ -188,6 +189,18 @@ vf4_set(float x, float y, float z, float w)
 {
 #if __has_feature(attribute_ext_vector_type)
   float4 v = {x, y, z, w};
+  return v;
+#else
+  float4_u uc = {.a = {x,y,z,w}};
+  return uc.v;
+#endif
+}
+
+static inline float4
+vf4_setv(float3 vec, float w)
+{
+#if __has_feature(attribute_ext_vector_type)
+  float4 v = {vec.x, vec.y, vec.z, w};
   return v;
 #else
   float4_u uc = {.a = {x,y,z,w}};
@@ -267,14 +280,14 @@ static inline float
 vf3_abs(float3 v)
 {
   float3 res = v * v;
-  return sqrt(vf3_get(res, 0) + vf3_get(res, 1) + vf3_get(res, 2));
+  return sqrtf(res.x + res.y + res.z);
 }
 
 static inline float
 vf4_abs(float4 v)
 {
   float4 res = v * v;
-  return sqrt(vf4_get(res, 0) + vf4_get(res, 1) + vf4_get(res, 2) + vf4_get(res, 3));
+  return sqrtf(res.x + res.y + res.z + res.w);
 }
 
 
@@ -339,9 +352,10 @@ static inline float
 vf4_dot(float4 a, float4 b)
 {
   float4 c = a * b;
-  float4_u uc = {.v = c};
+  //float4_u uc = {.v = c};
 
-  return uc.a[0] + uc.a[1] + uc.a[2] + uc.a[3];
+  return c.x + c.y + c.z + c.w;
+  //return uc.a[0] + uc.a[1] + uc.a[2] + uc.a[3];
 }
 
 
@@ -365,22 +379,11 @@ vd4_dot(double3 a, double3 b)
 
 
 
-
-
-float4 m_v_mul(const matrix_t *a, float4 v);
-float3 m_v3_mulf(const matrix_t *a, float3 v);
 float3 mf3_v_mul(const float3x3 a, float3 v);
 
-void m_transpose(matrix_t *mt, const matrix_t *m) __attribute__ ((__nonnull__));
+void mf4_add(float4x4 a, const float4x4 b, const float4x4 c);
 
-
-void m_mul(matrix_t *res, const matrix_t *a, const matrix_t *b)
-    __attribute__ ((__nonnull__));
-
-void m_add(matrix_t *res, matrix_t *a, matrix_t *b)
-    __attribute__ ((__nonnull__));
-
-void m_sub(matrix_t *res, matrix_t *a, matrix_t *b)
+void m_sub(float4x4 res, float4x4 a, float4x4 b)
     __attribute__ ((__nonnull__));
 
 float4 v_s_add(float4 a, float b);
@@ -491,6 +494,12 @@ vf3_mul(float3 a, float3 b)
   return a * b;
 }
 
+static inline float4
+vf4_mul(float4 a, float4 b)
+{
+  return a * b;
+}
+
 
 static inline float3
 vf3_s_mul(float3 a, float b)
@@ -556,36 +565,38 @@ float4 v_normalise(float4 v) __attribute__ ((__pure__));
     __attribute__ ((__pure__));
 
 /*! Compute determinant of 4x4 matrix M */
-float m_det(const matrix_t *M);
+float mf4_det(const float4x4 M);
 /*! Compute subdet with respect to position k, l */
-float m_subdet3(const matrix_t *M, int k, int l);
+float mf4_subdet3(const float4x4 m, int k, int l);
 
 /*! Compute inverse of 4x4 matrix M */
-matrix_t m_inv(const matrix_t *M);
+void mf4_inv(float4x4 M_inv, const float4x4 M);
+
+float mf3_det(const float3x3 m);
 
 
 /* creates rotation matrices, these are untested and might not work */
-void m_axis_rot_x(matrix_t *m, float a) __attribute__ ((__nonnull__));
-void m_axis_rot_y(matrix_t *m, float a) __attribute__ ((__nonnull__));
-void m_axis_rot_z(matrix_t *m, float a) __attribute__ ((__nonnull__));
+void m_axis_rot_x(float4x4 m, float a) __attribute__ ((__nonnull__));
+void m_axis_rot_y(float4x4 m, float a) __attribute__ ((__nonnull__));
+void m_axis_rot_z(float4x4 m, float a) __attribute__ ((__nonnull__));
 
-void m_vec_rot_x(matrix_t *m, float a) __attribute__ ((__nonnull__));
-void m_vec_rot_y(matrix_t *m, float a) __attribute__ ((__nonnull__));
-void m_vec_rot_z(matrix_t *m, float a) __attribute__ ((__nonnull__));
+void m_vec_rot_x(float4x4 m, float a) __attribute__ ((__nonnull__));
+void m_vec_rot_y(float4x4 m, float a) __attribute__ ((__nonnull__));
+void m_vec_rot_z(float4x4 m, float a) __attribute__ ((__nonnull__));
 
-void m_rot(matrix_t *m, float x, float y, float z, float alpha);
+void m_rot(float4x4 m, float x, float y, float z, float alpha);
 
 
 /* creates unit matrix */
 
-void m_unit(matrix_t *m) __attribute__ ((__nonnull__));
+void m_unit(float4x4 m) __attribute__ ((__nonnull__));
 
 /* creates zero matrix */
 
-void m_zero(matrix_t *m) __attribute__ ((__nonnull__));
+void m_zero(float4x4 m) __attribute__ ((__nonnull__));
 
 /* copying functions for duplicating matrices and vectors */
-void m_cpy(matrix_t * restrict dst, const matrix_t * restrict src)
+void m_cpy(float4x4 dst, const float4x4 src)
   __attribute__ ((__nonnull__));
 
 
@@ -617,11 +628,11 @@ vf3_gt(float3 a, float3 b)
 
 /*! Compares two matrices for elementvise equality, with a given absolute
  *  tolerance */
-bool m_eq(const matrix_t *a, const matrix_t *b, float tol)
+bool m_eq(const float4x4 a, const float4x4 b, float tol)
     __attribute__ ((__pure__, __nonnull__));
 
 
-void m_translate(matrix_t *m, float x, float y, float z, float w);
+void m_translate(float4x4 m, float x, float y, float z, float w);
 
 static inline float3
 vf3_normalise(float3 v)
@@ -638,13 +649,13 @@ vd3_normalise(double3 v)
 }
 
 static inline void
-m_s_mul(matrix_t *res, const matrix_t *a, float s)
+m_s_mul(float4x4 res, const float4x4 a, float s)
 {
   float4 vs = vf4_set(s, s, s, s);
-  res->v[0] = vf3_mul(a->v[0], vs);
-  res->v[1] = vf3_mul(a->v[1], vs);
-  res->v[2] = vf3_mul(a->v[2], vs);
-  res->v[3] = vf3_mul(a->v[3], vs);
+  res[0] = vf4_mul(a[0], vs);
+  res[1] = vf4_mul(a[1], vs);
+  res[2] = vf4_mul(a[2], vs);
+  res[3] = vf4_mul(a[3], vs);
 }
 
 void mf3_ident(float3x3 m);
@@ -663,6 +674,85 @@ void mf3_sub(float3x3 a, const float3x3 b, const float3x3 c);
 void mf3_s_mul(float3x3 res, const float3x3 m, float s);
 
 void mf3_basis(float3x3 res, const float3x3 m, const float3x3 b);
+
+void mf4_set_colvec(const float4x4 m, int col, float4 v);
+float4 mf4_colvec(const float4x4 m, int col);
+
+void mf4_transpose1(float4x4 a);
+void mf4_transpose2(float4x4 a, const float4x4 b);
+
+float4 mf4_v_mul(const float4x4 a, float4 v);
+
+void mf4_ident(float4x4 m);
+void mf4_ident_z_up(float4x4 m);
+
+void mf4_cpy(float4x4 a, const float4x4 b);
+void mf4_mul2(float4x4 a, const float4x4 b);
+void mf4_add(float4x4 a, const float4x4 b, const float4x4 c);
+
+static inline void
+mf4_zero(float4x4 a)
+{
+  memset(a, 0, sizeof(float4x4));
+}
+
+static inline void
+mf4_make_translate(float4x4 a, float3 v)
+{
+  mf4_ident(a);
+  float4 v2 = {v.x, v.y, v.z, 1.0f};
+  mf4_set_colvec(a, 3, v2);
+}
+
+void mf4_make_rotate(float4x4 m, float rads, float3 v);
+
+
+static inline void
+mf4_translate(float4x4 a, float3 v)
+{
+  float4x4 tmp;
+  mf4_make_translate(tmp, v);
+  mf4_mul2(a, tmp);
+}
+
+// Common opengl replacements
+/*! Create ortho projection matrix */
+void mf4_ortho(float4x4 m,
+               float left, float right,
+               float bottom, float top,
+               float nearVal, float farVal);
+
+/*! Create 2d ortho projection matrix */
+void mf4_ortho2D(float4x4 m,
+                 float left, float right,
+                 float bottom, float top);
+
+/*! Create fustum matrix for perspective correction */
+void mf4_fustum(float4x4 m,
+                float left, float right,
+                float bottom, float top,
+                float nearVal, float farVal);
+
+/*! Create perspective correction matrix the easy way */
+void mf4_perspective(float4x4 m,
+                     float fovy, float aspect, float zNear, float zFar);
+
+/*! Create matrix that point the camera at a specific position. */
+void mf4_lookat(float4x4 m,
+                float eyeX, float eyeY, float eyeZ,
+                float centerX, float centerY, float centerZ,
+                float upX, float upY, float upZ);
+
+/*!
+ * Compute normalised axis and angle for a rotation from a to b.
+ * \param a Vector to rotate from
+ * \param b Vector to rotate to
+ * \result Four element vector, where x,y,z correspond to the axis, and w the
+ *         angle.
+ */
+float4 vf3_axis_angle(float3 a, float3 b);
+
+void mf3_zxz_rotmatrix(float3x3 R, float asc_node, float incl, float arg_peri);
 
 
 #ifdef __cplusplus

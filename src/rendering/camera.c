@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2009,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -20,11 +20,12 @@
 #include <stdlib.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
-#include <GL/gl.h>
+#include <GL3/gl3.h>
 #endif
 
+#include "rendering/types.h"
 #include <vmath/vmath.h>
 #include "common/moduleinit.h"
 #include <openorbit/log.h>
@@ -32,489 +33,322 @@
 #include "camera.h"
 #include "settings.h"
 #include "scenegraph.h"
-#include "scenegraph-private.h"
+#include "palloc.h"
 
-/* Camera actions, registered as action handlers */
+/*
+ Note, due to the large world and floating point precision, when rotating the
+ camera, we are rotating the world around the camera, not the camera itself.
+ Second, which may be confusing, for the matrix math here, the y axis is up,
+ thus, this is not really what is used for planets and the physics system where
+ the z axis is up. We should perhaps fix this. One way would be to add an
+ identity matrix which shuffles the y and z axises.
+ */
+struct sg_camera_t {
+  sg_scene_t *scene;
+  float4x4 proj_matrix;
+  float4x4 view_matrix;
 
+  lwcoord_t p0;        // Initial camera position
+  lwcoord_t p1;        // End position of camera
+  lwcoord_t p;         // Interpolated position of camera
+  float3    dp;        // Velocity of camera
 
-void sgCamFwd(int state, void *data);
-void sgCamBack(int state, void *data);
-void sgCamLeft(int state, void *data);
-void sgCamRight(int state, void *data);
-void sgCamUp(int state, void *data);
-void sgCamDown(int state, void *data);
-void sgCamRollLeft(int state, void *data);
-void sgCamRollRight(int state, void *data);
-void sgCamYawLeft(int state, void *data);
-void sgCamYawRight(int state, void *data);
-void sgCamPitchDown(int state, void *data);
-void sgCamPitchUp(int state, void *data);
+  quaternion_t q;   // Quaternion used for view matrix (slerped from q0, q1)
+  quaternion_t q0;  // Quaternion from.
+  quaternion_t q1;  // Quaternion to (q0 * dq).
+  quaternion_t dq;  // Quaternion rot per time unit
 
-void sgCamRotateHat(int state, void *data);
+  // If there is a target object, rotation is relative to that objects location
+  // the source object constrains the lwc variable.
+  sg_object_t *tgt; // Target object, must have rigid obj backing
+  sg_object_t *src; // Source object, must have rigid obj backing
 
-struct str_action_triplet {
-  const char *confKey;
-  const char *ioKey;
-  IObuttonhandlerfunc action;
+  float3 src_offset;  // Source object, must have rigid obj backing
 };
 
-MODULE_INIT(camera, "iomanager", NULL) {
-  ooLogTrace("initialising 'camera' module");
-  const char *key;
-  static const struct str_action_triplet keyBindings[] = {
-    {"openorbit/controls/hat/cam-rotate", "cam-rotate", sgCamRotateHat},
-    {"openorbit/controls/keyboard/cam-fwd", "cam-fwd", sgCamFwd},
-    {"openorbit/controls/keyboard/cam-back", "cam-back", sgCamBack},
-    {"openorbit/controls/keyboard/cam-left", "cam-left", sgCamLeft},
-    {"openorbit/controls/keyboard/cam-right", "cam-right", sgCamRight},
-    {"openorbit/controls/keyboard/cam-up", "cam-up", sgCamUp},
-    {"openorbit/controls/keyboard/cam-down", "cam-down", sgCamDown},
-    {"openorbit/controls/keyboard/cam-roll-left", "cam-roll-left", sgCamRollLeft},
-    {"openorbit/controls/keyboard/cam-roll-right", "cam-roll-right", sgCamRollRight},
-    {"openorbit/controls/keyboard/cam-yaw-left", "cam-yaw-left", sgCamYawLeft},
-    {"openorbit/controls/keyboard/cam-yaw-right", "cam-yaw-right", sgCamYawRight},
-    {"openorbit/controls/keyboard/cam-pitch-down", "cam-pitch-down", sgCamPitchDown},
-    {"openorbit/controls/keyboard/cam-pitch-up", "cam-pitch-up", sgCamPitchUp}
-  };
 
-  ioRegActionHandler(keyBindings[0].ioKey, keyBindings[0].action,
-                     IO_BUTTON_HAT, NULL);
+#define ASSERT_CAM(c)\
+  assert(!isnan(cam->q0.x));\
+  assert(!isnan(cam->q1.x));\
+  assert(!isnan(cam->q.x));\
+  assert(!isnan(cam->dq.x));\
+  assert(!isnan(cam->q0.y));\
+  assert(!isnan(cam->q1.y));\
+  assert(!isnan(cam->q.y));\
+  assert(!isnan(cam->dq.y));\
+  assert(!isnan(cam->q0.z));\
+  assert(!isnan(cam->q1.z));\
+  assert(!isnan(cam->q.z));\
+  assert(!isnan(cam->dq.z));\
+  assert(!isnan(cam->q0.w));\
+  assert(!isnan(cam->q1.w));\
+  assert(!isnan(cam->q.w));\
+  assert(!isnan(cam->dq.w));
 
-  // Register camera actions
-  for (int i = 1 ; i < sizeof(keyBindings)/sizeof(struct str_action_triplet); ++ i) {
-    ioRegActionHandler(keyBindings[i].ioKey, keyBindings[i].action,
-                       IO_BUTTON_PUSH, NULL);
+
+lwcoord_t
+sg_camera_pos(sg_camera_t *cam)
+{
+  ASSERT_CAM(cam);
+  return cam->p;
+}
+
+quaternion_t
+sg_camera_quat(sg_camera_t *cam)
+{
+  ASSERT_CAM(cam);
+  return cam->q;
+}
+
+const float4x4*
+sg_camera_project(sg_camera_t *cam)
+{
+  ASSERT_CAM(cam);
+  return &cam->proj_matrix;
+}
+
+void
+sg_camera_update_modelview(sg_camera_t *cam)
+{
+  ASSERT_CAM(cam);
+  float4x4 qm;
+
+  mf4_ident_z_up(cam->view_matrix);
+  q_mf4_convert_inv(qm, cam->q);
+  mf4_mul2(cam->view_matrix, qm);
+}
+
+const float4x4*
+sg_camera_modelview(sg_camera_t *cam)
+{
+  ASSERT_CAM(cam);
+  return &cam->view_matrix;
+}
+
+sg_camera_t*
+sg_new_camera(sg_scene_t *scene)
+{
+  sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
+
+  // Initial rotation correspond to a vector pointing down the negative x axis.
+  cam->dq = Q_IDENT;
+  cam->q0 = Q_IDENT;
+  cam->q1 = Q_IDENT;
+  cam->q = Q_IDENT;
+
+  sg_camera_set_perspective(cam, 1.0);
+
+  sg_camera_update_modelview(cam);
+
+  cam->scene = scene;
+  if (scene) {
+    sg_scene_set_cam(scene, cam);
   }
+  ASSERT_CAM(cam);
+
+  return cam;
 }
 
 void
-sgCamInit(void)
+sg_camera_track_object(sg_camera_t *cam, sg_object_t *obj)
 {
+  ASSERT_CAM(cam);
+
+  cam->tgt = obj;
 }
 
-SGcam*
-sgNewFreeCam(SGscenegraph *sg, SGscene *sc,
-               float x, float y, float z, float rx, float ry, float rz)
+sg_object_t*
+sg_camera_get_tracked_object(sg_camera_t *cam)
 {
-  assert(sg != NULL);
-  SGfreecam *cam = malloc(sizeof(SGfreecam));
-  cam->super.kind = SGCam_Free;
-  cam->super.scene = sc;
-
-  cam->q = q_rot(rx,ry,rz, 0.0f);
-  cam->dp = vf3_set(0.0,0.0,0.0);
-  cam->dq = q_rot(rx,ry,rz, 0.0f);
-
-  ooLwcSet(&cam->lwc, x, y, z);
-
-  obj_array_push(&sg->cams, cam);
-  return (SGcam*)cam;
+  return cam->tgt;
 }
 
-SGcam*
-sgNewFixedCam(SGscenegraph *sg, SGscene *sc, PLobject *body,
-                float dx, float dy, float dz, float rx, float ry, float rz)
-{
-    SGfixedcam *cam = malloc(sizeof(SGfixedcam));
-    cam->super.kind = SGCam_Fixed;
-
-    cam->super.scene = sc;
-    cam->body = body;
-    cam->r = vf3_set(dx,dy,dz);
-    cam->q = q_rot(rx,ry,rz, 0.0f);
-
-    obj_array_push(&sg->cams, cam);
-    return (SGcam*)cam;
-}
-
-SGcam*
-sgNewOrbitCam(SGscenegraph *sg, SGscene *sc, PLobject *body,
-                float ra, float dec, float r)
-{
-  SGorbitcam *ocam = malloc(sizeof(SGorbitcam));
-  ocam->super.kind = SGCam_Orbit;
-  ocam->super.scene = sc;
-  ocam->body = body;
-  ocam->ra = ra;
-  ocam->dec = dec;
-
-  ocam->dr = 0.0;
-  ocam->dra = 0.0;
-  ocam->ddec = 0.0;
-
-  ocam->zoom = r;
-  ocam->r = r;
-  obj_array_push(&sg->cams, ocam);
-  return (SGcam*)ocam;
-}
 
 void
-sgSetCamTarget(SGcam *cam, PLobject *body)
+sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj)
 {
-  assert(cam != NULL);
-  assert(body != NULL);
+  ASSERT_CAM(cam);
 
-  if (cam->kind == SGCam_Fixed) {
-    SGfixedcam *fixCam = (SGfixedcam*)cam;
-    fixCam->body = body;
-  } else if (cam->kind == SGCam_Orbit) {
-    SGorbitcam *orbCam = (SGorbitcam*)cam;
-    orbCam->body = body;
+  cam->src = obj;
+
+  if (cam->tgt == NULL) {
+    cam->q0 = sg_object_get_q0(obj);
+    cam->q1 = q_normalise(q_mul(cam->q0, cam->dq));
   }
+
+  ASSERT_CAM(cam);
 }
 
-
-// Only rotate, used for things like sky painting that requires camera rotation but not
-// translation
 void
-sgCamRotate(SGcam *cam)
+sg_camera_set_follow_offset(sg_camera_t *cam, float3 offs)
 {
-  assert(cam != NULL && "cam not set");
-  glMatrixMode(GL_MODELVIEW);
-  switch (cam->kind) {
-  case SGCam_Orbit:
-    {
-      SGorbitcam* ocam = (SGorbitcam*)cam;
-      gluLookAt(0.0, 0.0, 0.0,
-                -ocam->r*cos(ocam->dec),
-                -ocam->r*sin(ocam->dec),
-                -ocam->r*sin(ocam->ra),
-                0.0, 0.0, 1.0);
-    }
-    break;
-  case SGCam_Fixed:
-    {
-      SGfixedcam* fix = (SGfixedcam*)cam;
-      quaternion_t q = fix->body->q;
-      q = q_mul(q, fix->q);
-      matrix_t m;
-      q_m_convert(&m, q);
-      matrix_t mt;
-      m_transpose(&mt, &m);
-      glMultMatrixf((GLfloat*)&mt);
-    }
-    break;
-  case SGCam_Free:
-    {
-      SGfreecam* freec = (SGfreecam*)cam;
-      quaternion_t q = freec->q;
-      matrix_t m;
-      q_m_convert(&m, q);
-      //      matrix_t mt;
-      //m_transpose(&mt, &m);
+  ASSERT_CAM(cam);
 
-      glMultMatrixf((GLfloat*)&m);
-    }
-    break;
-  default:
-    assert(0 && "invalid cam type");
+  if (cam->src) {
+    cam->src_offset = offs;
   }
+  ASSERT_CAM(cam);
+}
+
+
+void
+sg_camera_set_perspective(sg_camera_t *cam, float perspective)
+{
+  ASSERT_CAM(cam);
+
+  mf4_perspective(cam->proj_matrix, M_PI_4, perspective,
+                  0.1, 1000000000000.0);
+
+  ASSERT_CAM(cam);
 }
 
 void
-sgCamStep(SGcam *cam, float dt)
+sg_camera_interpolate(sg_camera_t *cam, float t)
 {
-  assert(cam != NULL && "cam not set");
-  switch (cam->kind) {
-  case SGCam_Orbit:
-    {
-      SGorbitcam *ocam = (SGorbitcam*)cam;
-      //sgCamAxisUpdate(cam);
+  assert(t >= 0.0);
+  assert(t <= 1.0);
 
-      ocam->ra += ocam->dra;
-      ocam->ra = fmod(ocam->ra, 2.0*M_PI);
-      ocam->dec += ocam->ddec;
-      ocam->dec = fmod(ocam->dec, 2.0*M_PI);
+  if (cam->tgt) {
+    cam->q = q_slerp(cam->q0, cam->q1, t);
+    float3x3 R;
+    q_mf3_convert(R, cam->q);
+    cam->src_offset = mf3_v_mul(R, vf3_set(vf3_abs(cam->src_offset), 0.0, 0.0));
 
-      ocam->zoom += ocam->dr; if (ocam->zoom < 1.0) ocam->zoom = 1.0;
-      ocam->r = ocam->zoom;
-    }
-    break;
-  case SGCam_Fixed:
-    assert(0 && "not supported yet");
-    break;
-  case SGCam_Free:
-    {
-      SGfreecam *freecam = (SGfreecam*)cam;
-      sgCamAxisUpdate(cam);
+    cam->p0 = sg_object_get_p0(cam->src);
+    lwc_translate3fv(&cam->p0, cam->src_offset);
 
-      ooLwcTranslate3fv(&freecam->lwc, freecam->dp);
-      freecam->q = q_mul(freecam->q, freecam->dq);
-    }
-    break;
-  default:
-    assert(0 && "invalid cam type");
+    cam->p1 = sg_object_get_p1(cam->src);
+    lwc_translate3fv(&cam->p1, cam->src_offset);
+    lwc_translate3fv(&cam->p1, cam->dp);
+
+    cam->p = cam->p0;
+    float3 d = lwc_dist(&cam->p1, &cam->p0);
+    lwc_translate3fv(&cam->p, vf3_s_mul(d, t));
+    ASSERT_CAM(cam);
+  } else if (cam->src) {
+    quaternion_t q = q_slerp(cam->q0, cam->q1, t);
+    cam->q = sg_object_get_quat(cam->src);
+    cam->q = q_mul(cam->q, q);
+
+    cam->p = cam->p0;
+    float3 d = lwc_dist(&cam->p1, &cam->p0);
+    lwc_translate3fv(&cam->p, vf3_s_mul(d, t));
+  } else {
+    cam->q = q_slerp(cam->q0, cam->q1, t);
+
+    cam->p = cam->p0;
+    float3 d = lwc_dist(&cam->p1, &cam->p0);
+    lwc_translate3fv(&cam->p, vf3_s_mul(d, t));
   }
+
+  ASSERT_CAM(cam);
 }
 
+// Synchronises camera with target and follow objects, t=0.0
 void
-sgCamMove(SGcam *cam)
+sg_camera_sync(sg_camera_t *cam)
 {
-  assert(cam != NULL && "cam not set");
-//    glPushMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  switch (cam->kind) {
-  case SGCam_Orbit:
-    {
-      SGorbitcam *ocam = (SGorbitcam*)cam;
-      float p[3] = {ocam->r*cos(ocam->dec),
-                    ocam->r*sin(ocam->dec),
-                    ocam->r*sin(ocam->ra)};
-      float3 cogOffset = mf3_v_mul(ocam->body->R, ocam->body->m.cog);
-      glTranslatef(-(p[0] + cogOffset.x),
-                   -(p[1] + cogOffset.y),
-                   -(p[2] + cogOffset.z));
-    }
-    break;
-  case SGCam_Fixed:
-    {
-      SGfixedcam* fix = (SGfixedcam*)cam;
+  ASSERT_CAM(cam);
 
-      float3 p = fix->body->p.offs;
-      p = vf3_add(p, fix->r);
-      quaternion_t q = fix->body->q;
-      q = q_mul(q, fix->q);
-      matrix_t m;
-      q_m_convert(&m, q);
-      //      matrix_t mt;
-      //      m_transpose(&mt, &m);
+  if (cam->src) {
+    // Following an object
+    cam->p0 = sg_object_get_p0(cam->src);
+    lwc_translate3fv(&cam->p0, cam->src_offset);
 
-      glMultMatrixf((GLfloat*)&m);
-      glTranslatef(-vf3_x(p), -vf3_y(p), -vf3_z(p));
-    }
-    break;
-  case SGCam_Free:
-    {
-//      SGfreecam *freecam = (SGfreecam*)cam;
+    cam->p1 = sg_object_get_p1(cam->src);
+    lwc_translate3fv(&cam->p1, cam->src_offset);
+    lwc_translate3fv(&cam->p1, cam->dp);
 
-//      glTranslatef(-vf3_x(freecam->lwc.offs),
-//                   -vf3_y(freecam->lwc.offs),
-//                   -vf3_z(freecam->lwc.offs));
-    }
-    break;
-  default:
-      assert(0 && "illegal case statement");
-  }
-}
+    if (cam->tgt) {
+      // Orbiting an object
+      cam->q0 = cam->q1;
+      cam->q1 = q_normalise(q_mul(cam->q0, cam->dq));
+      cam->q = q_slerp(cam->q0, cam->q1, 0.0);
 
+      float3x3 R;
+      q_mf3_convert(R, cam->q);
+      cam->src_offset = mf3_v_mul(R, vf3_set(vf3_abs(cam->src_offset), 0.0, 0.0));
 
-#include "sim.h"
-extern SIMstate gSIM_state;
+      cam->p0 = sg_object_get_p0(cam->src);
+      lwc_translate3fv(&cam->p0, cam->src_offset);
 
-// Axis checker
-void
-sgCamAxisUpdate(SGcam *cam)
-{
-  if (cam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)cam;
-    // Nice thing is that these return 0.0 if they are not assigned
-    float yaw = ioGetAxis(IO_AXIS_RZ);//ooIoGetAxis(NULL, "yaw");
-    float pitch = ioGetAxis(IO_AXIS_Y);//ooIoGetAxis(NULL, "pitch");
-    float roll = ioGetAxis(IO_AXIS_X);//ooIoGetAxis(NULL, "roll");
-    float horizontal = ioGetAxis(IO_AXIS_RX);//ooIoGetAxis(NULL, "horizontal");
-    float vertical = ioGetAxis(IO_AXIS_Z);//ooIoGetAxis(NULL, "vertical");
-    float thrust = ioGetAxis(IO_AXIS_RY);//ooIoGetAxis(NULL, "thrust");
+      cam->p1 = sg_object_get_p1(cam->src);
+      lwc_translate3fv(&cam->p1, cam->src_offset);
+      lwc_translate3fv(&cam->p1, cam->dp);
 
-    float3 v = vf3_set(1.0 * horizontal,
-                       1.0 * vertical,
-                       1.0 * thrust);
-    fcam->dp = v_q_rot(v, fcam->q);
-
-    fcam->dq = q_rot(0.0f,0.0f,1.0f, -0.02f * roll);
-    fcam->dq = q_mul(fcam->dq, q_rot(1.0f,0.0f,0.0f, 0.02f * pitch));
-    fcam->dq = q_mul(fcam->dq, q_rot(0.0f,1.0f,0.0f, -0.02f * yaw));
-  } else if (cam->kind == SGCam_Orbit) {
-    //float yaw = ooIoGetAxis(NULL, "camyaw");
-    //float pitch = ooIoGetAxis(NULL, "campitch");
-    float yaw = ioGetAxis(IO_AXIS_RZ);
-    float pitch = ioGetAxis(IO_AXIS_Y);
-
-    float zoom = ioGetAxis(IO_AXIS_Z);
-
-//    float zoom = ooIoGetAxis(NULL, "camzoom");
-    SGorbitcam *ocam = (SGorbitcam*)cam;
-    ocam->dra = pitch * 0.02;
-    ocam->ddec = yaw * 0.02;
-    ocam->dr = zoom * 2.0; // TODO: exponential
-  }
-}
-
-
-void
-sgCamRotateHat(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Orbit) {
-    SGorbitcam *cam = (SGorbitcam*)gSIM_state.sg->currentCam;
-    if (state == -1) {
-      // Depressed
-      cam->dra = 0.0;
-      cam->ddec = 0.0;
-      cam->dr = 0.0;
+      cam->p = cam->p0;
+      float3 d = lwc_dist(&cam->p1, &cam->p0);
+      lwc_translate3fv(&cam->p, vf3_s_mul(d, 0.0));
+      ASSERT_CAM(cam);
     } else {
-      float pitch = sin(DEG_TO_RAD((360 - (state - 90))%360));
-      float yaw = cos(DEG_TO_RAD((360 - (state - 90))%360));
-      cam->dra = pitch * 0.02;
-      cam->ddec = yaw * 0.02;
-      cam->dr = 0.0;
-    }
-  }
-}
+      cam->q0 = cam->q1;
+      cam->q1 = q_normalise(q_mul(cam->q0, cam->dq));
+      quaternion_t q = q_slerp(cam->q0, cam->q1, 0.0);
 
+      cam->q = sg_object_get_q0(cam->src);
+      cam->q = q_mul(cam->q, q);
+      ASSERT_CAM(cam);
+    }
+  } else {
+    cam->q0 = cam->q1;
+    cam->q1 = q_normalise(q_mul(cam->q0, cam->dq));
+    cam->q = q_slerp(cam->q0, cam->q1, 0.0);
+    ASSERT_CAM(cam);
+  }
+  ASSERT_CAM(cam);
+
+}
 
 /* Camera actions, registered as action handlers */
-void
-sgCamFwd(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      float3 v = vf3_set(0.0, 0.0, -10000.0);
-      fcam->dp = v_q_rot(v, fcam->q);
-    } else {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    }
-  }
-}
+
+// TODO: Cleanup, move camera rotate io handler to sim module
+sg_scene_t* sim_get_scene(void);
 
 void
-sgCamBack(int state, void *data)
+sg_camera_rotate_hat(int buttonVal, void *data)
 {
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      float3 v = vf3_set(0.0, 0.0, 10000.0);
-      fcam->dp = v_q_rot(v, fcam->q);
+  //ooLogInfo("hat pushed %d", buttonVal);
+  sg_scene_t *sc = sim_get_scene();
+  sg_camera_t *cam = sg_scene_get_cam(sc);
+
+  ASSERT_CAM(cam);
+
+  // Note that the camera control will rotate the camera based on WCT.
+  // This differ from the normal rotation of objects which is based on SRT.
+  // The interpolation doesn't really care, it just expresses time as a
+  // normalized value where 0 is the time of the last physics system sync
+  // and 1.0 is the expected time of the next sync.
+  // We thus need to take the frequency (not the SRT period) here.
+  float wct_freq;
+  ooConfGetFloatDef("openorbit/sim/freq", &wct_freq, 20.0); // Hz
+
+  if ((cam->src == cam->tgt) && cam->src) {
+    // We are targeting our follow object this means orbiting it
+    if (buttonVal == -1) {
+      cam->dq = Q_IDENT;
     } else {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
+      cam->dq = q_rot(0.0,
+                      cosf(DEG_TO_RAD(buttonVal)),
+                      sinf(DEG_TO_RAD(buttonVal)),
+                      M_PI_2 / wct_freq);
     }
-  }
-}
-void
-sgCamLeft(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      float3 v = vf3_set(-10000.0, 0.0, 0.0);
-      fcam->dp = v_q_rot(v, fcam->q);
+    cam->q1 = q_mul(cam->q0, cam->dq);
+  } else {
+    if (buttonVal == -1) {
+      cam->dq = Q_IDENT;
     } else {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
+      cam->dq = q_rot(0.0,
+                      cosf(DEG_TO_RAD(buttonVal)),
+                      sinf(DEG_TO_RAD(buttonVal)),
+                      M_PI_2 / wct_freq);
     }
+    cam->q1 = q_mul(cam->q0, cam->dq);
   }
-}
-void
-sgCamRight(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      float3 v = vf3_set(10000.0, 0.0, 0.0);
-      fcam->dp = v_q_rot(v, fcam->q);
-    } else {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    }
-  }
-}
-void
-sgCamUp(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      float3 v = vf3_set(0.0, 10000.0, 0.0);
-      fcam->dp = v_q_rot(v, fcam->q);
-    } else {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    }
-  }
-}
-void
-sgCamDown(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      float3 v = vf3_set(0.0, -10000.0, 0.0);
-      fcam->dp = v_q_rot(v, fcam->q);
-    } else {
-      fcam->dp = vf3_set(0.0, 0.0, 0.0);
-    }
-  }
-}
-void
-sgCamRollLeft(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.01f);
-    } else {
-      fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.00f);
-    }
-  }
-}
-void
-sgCamRollRight(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      fcam->dq = q_rot(0.0f,0.0f,1.0f, -0.01f);
-    } else {
-      fcam->dq = q_rot(0.0f,0.0f,1.0f, 0.00f);
-    }
-  }
+
+  ASSERT_CAM(cam);
 }
 
-void
-sgCamYawLeft(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.01f);
-    } else {
-      fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.00f);
-    }
-  }
-}
-
-void
-sgCamYawRight(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      fcam->dq = q_rot(0.0f,1.0f,0.0f, -0.01f);
-    } else {
-      fcam->dq = q_rot(0.0f,1.0f,0.0f, 0.00f);
-    }
-  }
-}
-
-void
-sgCamPitchDown(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      fcam->dq = q_rot(1.0f,0.0f,0.0f, -0.01f);
-    } else {
-      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.00f);
-    }
-  }
-}
-
-
-void
-sgCamPitchUp(int state, void *data)
-{
-  if (gSIM_state.sg->currentCam->kind == SGCam_Free) {
-    SGfreecam *fcam = (SGfreecam*)gSIM_state.sg->currentCam;
-    if (state) {
-      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.01f);
-    } else {
-      fcam->dq = q_rot(1.0f,0.0f,0.0f, 0.00f);
-    }
-  }
+// TODO: Should move to sim part, where we will keep all the io stuff
+MODULE_INIT(sgcamera, "iomanager", NULL) {
+  ioRegActionHandler("cam-rotate", sg_camera_rotate_hat, IO_BUTTON_HAT, NULL);
 }

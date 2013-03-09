@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2010 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2010,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -33,29 +33,95 @@
 #include "res-manager.h"
 #include "physics/orbit.h"
 #include "rendering/sky.h"
-#include "rendering/planet.h"
+#include "rendering/window.h"
+#include "rendering/scenegraph.h"
 #include "settings.h"
 #include "io-manager.h"
-
+#include "scripting/scripting.h"
+#include "plugin-handler.h"
 
 #include <openorbit/log.h>
 
 SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL};
 
-void
-ooSimInit(void)
+sg_scene_t*
+sim_get_scene(void)
 {
+  sg_scene_t *sc = sg_window_get_scene(gSIM_state.win, 0);
+  return sc;
+}
+
+sg_viewport_t*
+sim_get_main_viewport(void)
+{
+  return sg_window_get_viewport(gSIM_state.win, 0);
+}
+
+sg_camera_t*
+sim_get_current_camera(void)
+{
+  sg_viewport_t* vp = sim_get_main_viewport();
+  return sg_viewport_get_cam(vp);
+}
+
+void
+sim_init_graphics(void)
+{
+  sg_load_all_shaders();
+  gSIM_state.win = sg_new_window();
+
+  int width, height;
+  float fovy;
+  ooConfGetIntDef("openorbit/video/width", &width, 640);
+  ooConfGetIntDef("openorbit/video/height", &height, 480);
+  ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
+  sg_viewport_t *vp = sg_new_viewport(gSIM_state.win, 0, 0, width, height);
+  sg_scene_t *scene = sg_new_scene("main");
+  sg_viewport_set_scene(vp, scene);
+
+  sg_background_t *sky = sgCreateBackgroundFromFile("data/stars.csv");
+  sg_scene_set_bg(scene, sky);
+
+  sg_camera_t *cam = sg_new_camera(scene);
+  (void)cam; // TODO
+}
+
+void
+sim_init_plugins(void)
+{
+  ooPluginInit();
+  ooPluginLoadAll();
+  ooPluginPrintAll();
+}
+
+
+void
+sim_init(void)
+{
+  simScCtrlInit();
+
+  // Set log level, need to do that here
+  const char *levStr = NULL;
+  ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
+  ooLogSetLevel(ooLogGetLevFromStr(levStr));
+
+  // Load and run initialisation script
+  ooScriptingInit();
+
+  if (!ooScriptingRunFile("script/init.py")) {
+    ooLogFatal("script/init.py missing");
+  }
+
+  sim_init_graphics();
+
   float freq;
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   gSIM_state.stepSize = 1.0 / freq; // Period in s
-  //gSIM_state.evQueue = simNewEventQueue();
+  
+  // Setup IO-tables, must be done after joystick system has been initialised
+  ioInit();
 
-
-  SGdrawable *sky = ooSkyNewDrawable("data/stars.csv");
-  gSIM_state.sg = sgNewSceneGraph();
-  sgSetSky(gSIM_state.sg, sky);
-
-  gSIM_state.world = ooOrbitLoad(gSIM_state.sg, "data/solsystem.hrml");
+  gSIM_state.world = ooOrbitLoad(sim_get_scene(), "data/solsystem.hrml");
 
 
 
@@ -65,21 +131,20 @@ ooSimInit(void)
                       0.0 /*latitude*/,
                       250.0e3 /*altitude*/);
   simSetSpacecraft(sc);
+  sg_camera_t *cam = sg_scene_get_cam(sc->scene);
+  sim_stage_t *stage = ARRAY_ELEM(sc->stages, 0);
+  sg_camera_track_object(cam, stage->sgobj);
+  sg_camera_follow_object(cam, stage->sgobj);
+  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -100.0));
 
-  SGscene *scene = sgGetScene(gSIM_state.sg, "main");
+  simMfdInitAll(sim_get_main_viewport());
 
-  SGcam *cam = sgNewOrbitCam(gSIM_state.sg, scene, ooScGetPLObjForSc(sc),
-                             0.0, 0.0, 20.0);
-  sgSetCam(gSIM_state.sg, cam);
+  sim_init_plugins();
 
-  simMfdInitAll(gSIM_state.sg);
-}
+  if (!ooScriptingRunFile("script/postinit.py")) {
+    ooLogFatal("script/postinit.py missing");
+  }
 
-
-void
-ooSimSetSg(SGscenegraph *sg)
-{
-  gSIM_state.sg = sg;
 }
 
 
@@ -130,7 +195,7 @@ ooSimStep(float dt)
   gettimeofday(&start, NULL);
 
   simAxisPush();
-  sgCamStep(sgGetCam(gSIM_state.sg), dt);
+  //sgCamStep(sgGetCam(gSIM_state.sg), dt);
 
   plWorldClear(gSIM_state.world);
 
@@ -144,6 +209,10 @@ ooSimStep(float dt)
   simDispatchPendingEvents();
 
   plWorldStep(gSIM_state.world, dt);
+
+  ooLogTrace("sim step");
+
+  sg_scene_sync(sim_get_scene());
 }
 
 void
@@ -165,12 +234,6 @@ sim_spacecraft_t*
 simGetSpacecraft(void)
 {
   return gSIM_state.currentSc;
-}
-
-SGscenegraph*
-simGetSg(void)
-{
-  return gSIM_state.sg;
 }
 
 PLworld*

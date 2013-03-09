@@ -69,11 +69,14 @@ struct sim_stage_t {
   float3 pos;
   float expendedMass;
   sim_stage_state_t state;
+
   PLobject *obj; // Mass and inertia tensor of stage, unit is kg
                  //  obj_array_t actuators;
   obj_array_t engines;
   obj_array_t actuatorGroups;
   obj_array_t payload;
+
+  sg_object_t *sgobj;
 };
 
 typedef void (*OOscstepfunc)(sim_spacecraft_t*, double dt);
@@ -136,7 +139,8 @@ struct sim_spacecraft_t {
 
   float expendedMass;
 
-  SGscene *scene;
+  sg_scene_t *scene;
+  sg_object_t *sgobj;
 };
 
 typedef struct {
@@ -153,17 +157,17 @@ void simScInit(sim_spacecraft_t *sc, const char *name);
 void simInitStage(sim_stage_t *stage);
 void simAddStage(sim_spacecraft_t *sc, sim_stage_t *stage);
 
-sim_spacecraft_t* ooScNew(PLworld *world, SGscene *scene, const char *name);
+sim_spacecraft_t* ooScNew(PLworld *world, sg_scene_t *scene, const char *name);
 void simScDetatchStage(sim_spacecraft_t *sc);
 
 void simScToggleMainEngine(sim_spacecraft_t *sc);
 
-void ooScSetStageMesh(sim_stage_t *stage, SGdrawable *mesh);
+void ooScSetStageMesh(sim_stage_t *stage, sg_object_t *mesh);
 void simDetatchStage(sim_spacecraft_t *sc, sim_stage_t *stage);
 void simScStep(sim_spacecraft_t *sc, float dt);
 void ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt);
 void ooScForce(sim_spacecraft_t *sc, float rx, float ry, float rz);
-void ooScSetScene(sim_spacecraft_t *spacecraft, SGscene *scene);
+void ooScSetScene(sim_spacecraft_t *spacecraft, sg_scene_t *scene);
 
 PLobject* ooScGetPLObjForSc(sim_spacecraft_t *sc);
 
@@ -196,7 +200,7 @@ void ooScSetSysAndCoords(sim_spacecraft_t *sc, const char *sysName, double longi
 
 sim_stage_t* simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh);
 
-sim_spacecraft_t* ooScLoad(PLworld *world, SGscene *scene, const char *fileName);
+sim_spacecraft_t* ooScLoad(PLworld *world, sg_scene_t *scene, const char *fileName);
 
 void scStageSetOffset3f(sim_stage_t *stage, float x, float y, float z);
 void scStageSetOffset3fv(sim_stage_t *stage, float3 p);

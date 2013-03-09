@@ -25,7 +25,7 @@
 
 #include "simtypes.h"
 #include "physics/reftypes.h"
-#include "rendering/reftypes.h"
+#include "rendering/types.h"
 #include "rendering/particles.h"
 #include "rendering/scenegraph.h"
 #include "sim/propellant-tank.h"
@@ -83,7 +83,7 @@ struct SIMengine {
   float3 pos;
   float3 dir;
   obj_array_t fuelTanks;
-  SGparticles *psys;
+  //SGparticles *psys;
   void (*step)(struct SIMengine*, float);
 };
 

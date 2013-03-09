@@ -17,31 +17,12 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SG_REFTYPES_H
-#define SG_REFTYPES_H
+#ifndef CMOD_H
+#define CMOD_H
 
-typedef struct SGdrawable SGdrawable;
-typedef struct SGscene SGscene;
-typedef struct SGoverlay SGoverlay;
-typedef struct SGscenegraph SGscenegraph;
-typedef struct SGmaterial SGmaterial;
+#include "rendering/object.h"
 
-typedef struct SGlight SGlight;
-typedef struct SGspotlight SGspotlight;
-typedef struct SGpointlight SGpointlight;
-
-typedef struct SGsphere SGsphere;
-typedef struct SGcylinder SGcylinder;
-
-typedef struct SGparticles SGparticles;
-
-typedef void (*SGdrawfunc)(SGdrawable*);
+sg_object_t* cmod_load(const char *path);
 
 
-typedef enum SGcamtype SGcamtype;
-typedef struct SGfreecam SGfreecam;
-typedef struct SGfixedcam SGfixedcam;
-typedef struct SGorbitcam SGorbitcam;
-typedef struct SGcam SGcam;
-
-#endif /* !SG_REFTYPES_H */
+#endif /* !CMOD_H */

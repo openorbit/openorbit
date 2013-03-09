@@ -68,7 +68,8 @@ ooGetThrottleForActuatorGroup(unsigned groupId)
 OOactuatorgroup*
 ooScNewActuatorGroup(const char *name)
 {
-  OOactuatorgroup *eg = malloc(sizeof(OOactuatorgroup));
+  OOactuatorgroup *eg = smalloc(sizeof(OOactuatorgroup));
+  memset(eg, 0, sizeof(OOactuatorgroup));
   obj_array_init(&eg->actuators);
   eg->groupName = strdup(name);
   return eg;
@@ -89,7 +90,7 @@ void
 liquid_rocket_step(SIMengine *engine, float dt)
 {
   SIMliquidrocketengine *lrocket = (SIMliquidrocketengine*)engine;
-
+  (void)lrocket; // TODO
   //  plForceRelativePos3fv(lrocket->super.stage->sc->obj,
   //                      lrocket->fMax * lrocket->super.throttle,
   //                      lrocket->super.pos);
@@ -123,7 +124,7 @@ void
 jet_step(SIMengine *engine, float dt)
 {
   SIMjetengine *jet = (SIMjetengine*)engine;
-
+  (void)jet; // TODO
 }
 
 void
@@ -139,6 +140,7 @@ void
 turboprop_step(SIMengine *engine, float dt)
 {
   SIMturbopropengine *tprop = (SIMturbopropengine*)engine;
+  (void)tprop; // TODO
 }
 
 
@@ -202,15 +204,15 @@ simNewEngine(char *name, sim_stage_t *stage, SIMenginekind kind,
   engine->dir = vf3_normalise(dir);
 
   // Create particle system for engine
-  PLparticles *psys = plNewParticleSystem(name, 1000);
-  engine->psys = (SGparticles*) sgNewParticleSystem(name,
-                                                    "textures/particle-alpha.png",
-                                                    psys);
+  //PLparticles *psys = plNewParticleSystem(name, 1000);
+  //engine->psys = (SGparticles*) sgNewParticleSystem(name,
+  //                                                "textures/particle-alpha.png",
+  //                                                psys);
   // TODO: Make particle shader
-  sgDrawableLoadShader(&engine->psys->super, "fixed");
+  //sgDrawableLoadShader(&engine->psys->super, "fixed");
 
-  sgDrawableAddChild(stage->obj->drawable, (SGdrawable*)engine->psys,
-                     pos, q_rot(1.0f, 0.0f, 0.0f, 0.0f));
+  //sgDrawableAddChild(stage->obj->drawable, (SGdrawable*)engine->psys,
+  //                   pos, q_rot(1.0f, 0.0f, 0.0f, 0.0f));
   obj_array_push(&stage->engines, engine);
   obj_array_push(&stage->sc->engines, engine);
 

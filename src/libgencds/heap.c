@@ -45,8 +45,9 @@ heap_t
 
 #if THREAD_SAFE_HEAP
     if (pthread_mutex_init(&h->lock, NULL)) {
-        free(h->elements);
-        free(h);
+      free(h->elements);
+      free(h);
+      return NULL;
     }
 #endif
 

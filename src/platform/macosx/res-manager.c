@@ -167,6 +167,7 @@ ooResGetFd(const char *fileName)
 char*
 ooPluginGetPath(const char *fileName)
 {
+  (void)paths; // TODO
   return NULL;
 }
 

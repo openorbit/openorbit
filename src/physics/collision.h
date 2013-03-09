@@ -24,13 +24,13 @@
 #include <gencds/array.h>
 #include "physics/physics.h"
 #include "physics/reftypes.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include "common/palloc.h"
 
 
 struct PLrecgrid {
   struct PLrecgrid *parent;
-  OOlwcoord centre;
+  lwcoord_t centre;
   double size;
   obj_array_t objs;
   struct PLrecgrid *children[8];

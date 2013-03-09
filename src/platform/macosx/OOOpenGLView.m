@@ -1,5 +1,5 @@
 /*
- Copyright 2011 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2011,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -18,10 +18,11 @@
  */
 
 #import "OOOpenGLView.h"
-#import <OpenGL/OpenGL.h>
-#import <OpenGL/gl.h>
 
-#import "rendering/render.h"
+//#import <OpenGL/OpenGL.h>
+#import <OpenGL/gl3.h>
+
+#import "rendering/window.h"
 #import "rendering/scenegraph.h"
 #import "sim.h"
 #import "io-manager.h"
@@ -167,9 +168,15 @@ static io_keycode_t keymap [256] = {
     return self;
 }
 
-
 - (void) awakeFromNib
 {
+  NSOpenGLPixelFormatAttribute attributes [] = {
+    NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+    NSOpenGLPFADoubleBuffer, 0};
+
+  NSOpenGLPixelFormat *pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
+  self.openGLContext = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
+
 }
 
 - (void)simTicker:(NSTimer*)theTimer
@@ -188,12 +195,16 @@ static io_keycode_t keymap [256] = {
 {
   init_sim(0, NULL);
 
-  extern SIMstate gSIM_state;
+  //extern SIMstate gSIM_state;
   float freq;
   ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s
   float sim_period;
   ooConfGetFloatDef("openorbit/sim/period", &sim_period, wc_period);
+
+
+  // Step now to ensure physic system is in sync before drawing
+  ooSimStep(sim_period);
 
   timer = [NSTimer scheduledTimerWithTimeInterval:sim_period target:self selector:@selector(simTicker:) userInfo:nil repeats:YES];
 }
@@ -245,19 +256,31 @@ static io_keycode_t keymap [256] = {
 - (void) reshape
 {
   NSRect r = self.bounds;
-  ooResizeScreen(r.origin.x, r.origin.y, r.size.width, r.size.height, false);
+  extern SIMstate gSIM_state;
+  //sg_window_resize(gSIM_state.win, r.origin.x, r.origin.y, r.size.width, r.size.height);
+  sg_viewport_t *vp = sg_window_get_viewport(gSIM_state.win, 0);
+  sg_viewport_reshape(vp, r.origin.x, r.origin.y, r.size.width, r.size.height);
+
   [self setNeedsDisplay:YES];
 }
 
 - (void) drawRect:(NSRect)dirtyRect
 {
+  NSTimeInterval current = [NSDate timeIntervalSinceReferenceDate];
   extern SIMstate gSIM_state;
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  sgPaint(gSIM_state.sg);
+  sg_window_draw(gSIM_state.win, current - last);
+  //sgPaint(gSIM_state.sg);
 
   [self.openGLContext flushBuffer];
+  last = current;
+
+  // Draw as often as possible
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self setNeedsDisplay:YES];
+  });
 }
 
 @end

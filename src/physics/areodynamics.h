@@ -22,6 +22,7 @@
 
 #include "physics/reftypes.h"
 #include <vmath/vmath.h>
+#include <gencds/array.h>
 
 typedef enum PLelement {
   PL_Elem_First = 0, PL_Elem_n = 0,

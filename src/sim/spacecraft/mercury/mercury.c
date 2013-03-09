@@ -315,5 +315,5 @@ MODULE_INIT(mercury, "spacecraft", NULL)
   sim_class_t *cls = sim_register_class("Spacecraft", "Mercury",
                                         MercuryInit2, sizeof(sim_spacecraft_t));
 
-
+  (void)cls;
 }

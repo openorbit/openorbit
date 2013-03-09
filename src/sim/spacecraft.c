@@ -31,6 +31,8 @@
 #include "actuator.h"
 #include "io-manager.h"
 #include "sim/pubsub.h"
+#include "rendering/object.h"
+#include "palloc.h"
 
 extern SIMstate gSIM_state;
 
@@ -41,12 +43,50 @@ typedef struct {
 
 //static hashtable_t *gSpacecraftClasses;
 
+sim_spacecraft_t*
+sim_new_spacecraft(const char *class_name, const char *sc_name)
+{
+  sim_class_t *cls = sim_class_get(class_name);
+  sim_spacecraft_t *sc = cls->alloc(cls);
+
+  InitScArgs args = {sc_name};
+  cls->init(cls, sc, &args);
+  return sc;
+}
+
+sim_stage_t*
+sim_new_stage(sim_spacecraft_t *sc, const char *name, const char *mesh)
+{
+  sim_stage_t *stage = smalloc(sizeof(sim_stage_t));
+
+  stage->state = OO_Stage_Idle;
+  stage->sc = sc;
+  stage->expendedMass = 0.0;
+  stage->rec = simPubsubMakeRecord(sc->rec, name);
+
+  obj_array_init(&stage->engines);
+  obj_array_init(&stage->actuatorGroups);
+  obj_array_init(&stage->payload);
+
+  stage->obj = plSubObject3f(sc->world, sc->obj, name, 0.0, 0.0, 0.0);
+
+  obj_array_push(&sc->stages, stage);
+
+  // Load stage model
+  sg_object_t *model = sg_load_object(mesh, sg_get_shader("spacecraft"));
+  stage->sgobj = model;
+  sg_scene_t *scene = sc->scene; // TODO: FIX
+  sg_scene_add_object(scene, model);
+
+  return stage;
+}
+
 #if 0
 void
 simNewSpacecraftClass(const char *name, sim_spacecraft_t *(*alloc)(void),
                       void (*init)(sim_spacecraft_t *sc))
 {
-  SCclass *cls = malloc(sizeof(SCclass));
+  SCclass *cls = smalloc(sizeof(SCclass));
 
   cls->name = strdup(name);
   cls->alloc = alloc;
@@ -73,7 +113,8 @@ simNewSpacecraft(const char *className, const char *scName)
   cls->init(cls, sc, &args);
 
   plUpdateMass(sc->obj);
-  ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
+  // TODO: Update sg properties.
+  //       ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
 
   //  char *axises;
   // asprintf(&axises, "/sc/%s/axis", scName);
@@ -176,7 +217,6 @@ simScInit(sim_spacecraft_t *sc, const char *name)
   sc->rec = simPubsubCreateRecord(sckey);
   free(sckey);
 
-  SGscenegraph *sg = simGetSg();
   PLworld *world = simGetWorld();
 
   obj_array_init(&sc->stages);
@@ -190,7 +230,7 @@ simScInit(sim_spacecraft_t *sc, const char *name)
   sc->detatchStage = simDefaultDetatch;
   sc->detatchSequence = 0;
   sc->obj = plObject(world, name);
-  sc->scene = sgGetScene(sg, "main"); // Just use any of the existing ones
+  sc->scene = NULL;//sgGetScene(sg, "main"); // Just use any of the existing ones
   sc->expendedMass = 0.0;
   sc->mainEngineOn = false;
   sc->toggleMainEngine = simDefaultEngineToggle;
@@ -202,9 +242,9 @@ simScInit(sim_spacecraft_t *sc, const char *name)
 // TODO: Pass on PLsystem instead of PLworld to ensure that object has valid
 //       systems at all times.
 sim_spacecraft_t*
-ooScNew(PLworld *world, SGscene *scene, const char *name)
+ooScNew(PLworld *world, sg_scene_t *scene, const char *name)
 {
-  sim_spacecraft_t *sc = malloc(sizeof(sim_spacecraft_t));
+  sim_spacecraft_t *sc = smalloc(sizeof(sim_spacecraft_t));
 
   simScInit(sc, name);
 
@@ -294,11 +334,11 @@ ooScForce(sim_spacecraft_t *sc, float rx, float ry, float rz)
 
 
 void
-ooScSetStageMesh(sim_stage_t *stage, SGdrawable *mesh)
+ooScSetStageMesh(sim_stage_t *stage, sg_object_t *mesh)
 {
   assert(stage != NULL);
   assert(mesh != NULL);
-  stage->obj->drawable = mesh;
+  stage->sgobj = mesh;
 }
 
 void
@@ -322,11 +362,12 @@ ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt) {
   assert(axises != NULL);
 
   // Handle for all actuators call actuator handlers
-  const static char * axisKeys[] = {
-    "main-throttle",
-    "vertical-throttle", "horizontal-throttle", "distance-throttle",
-    "pitch", "roll", "yaw"
-  };
+  // FIXME
+  //const static char * axisKeys[] = {
+  //  "main-throttle",
+  //  "vertical-throttle", "horizontal-throttle", "distance-throttle",
+  //  "pitch", "roll", "yaw"
+  //};
   stage->expendedMass = 0.0f;
 
   for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
@@ -355,7 +396,7 @@ ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt) {
 sim_stage_t*
 simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
 {
-  sim_stage_t *stage = malloc(sizeof(sim_stage_t));
+  sim_stage_t *stage = smalloc(sizeof(sim_stage_t));
   stage->state = OO_Stage_Idle;
   stage->sc = sc;
   stage->expendedMass = 0.0;
@@ -374,10 +415,12 @@ simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
   obj_array_push(&sc->stages, stage);
 
   // Load stage model
-  SGdrawable *model = sgLoadModel(mesh);
-  sgDrawableLoadShader(model, "spacecraft");
+  sg_object_t *model = sg_load_object(mesh, sg_get_shader("spacecraft"));
+
   ooScSetStageMesh(stage, model);
-  sgSceneAddObj(sgGetScene(simGetSg(), "main"), model);
+  sg_scene_t *scene = sc->scene; // TODO: FIX
+  sg_scene_add_object(scene, model);
+  sg_object_set_rigid_body(model, stage->obj);
 
   return stage;
 }
@@ -397,14 +440,15 @@ scStageSetOffset3fv(sim_stage_t *stage, float3 p)
 }
 
 void
-ooScSetScene(sim_spacecraft_t *spacecraft, SGscene *scene)
+ooScSetScene(sim_spacecraft_t *spacecraft, sg_scene_t *scene)
 {
   for (int i = 0 ; i < spacecraft->stages.length ; ++i) {
     sim_stage_t *stage = spacecraft->stages.elems[i];
-
-    if (stage->state != OO_Stage_Detatched) {
-      sgSceneAddObj(scene, stage->obj->drawable);
-    }
+    (void)stage;
+    // TODO: Fixme
+    //if (stage->state != OO_Stage_Detatched) {
+    //  sg_scene_add_object(scene, stage->);
+    //}
   }
 }
 
@@ -536,7 +580,7 @@ simGetAltitude(sim_spacecraft_t *sc)
 float3
 simGetRelPos(sim_spacecraft_t *sc)
 {
-  return ooLwcDist(&sc->obj->p, &sc->obj->sys->orbitalBody->obj.p);
+  return lwc_dist(&sc->obj->p, &sc->obj->sys->orbitalBody->obj.p);
 }
 
 float3
@@ -608,7 +652,6 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
 
   sc->super.name = strdup(args->name);
 
-  SGscenegraph *sg = simGetSg();
   PLworld *world = simGetWorld();
 
   obj_array_init(&sc->stages);
@@ -622,7 +665,7 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
   sc->detatchStage = simDefaultDetatch;
   sc->detatchSequence = 0;
   sc->obj = plObject(world, args->name);
-  sc->scene = sgGetScene(sg, "main"); // Just use any of the existing ones
+  sc->scene = sim_get_scene(); // Just use any of the existing ones
   sc->expendedMass = 0.0;
   sc->mainEngineOn = false;
   sc->toggleMainEngine = simDefaultEngineToggle;
@@ -640,6 +683,7 @@ InitStage(sim_class_t *cls, void *obj, void *arg)
 {
   SIM_SUPER_INIT(cls, obj, arg);
   sim_stage_t *stage = obj;
+  (void)stage; // TODO
 }
 
 

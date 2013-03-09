@@ -1,27 +1,27 @@
 /*
  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
- 
+
  This file is part of Open Orbit. Open Orbit is free software: you can
  redistribute it and/or modify it under the terms of the GNU General Public
  License as published by the Free Software Foundation, either version 3 of the
  License, or (at your option) any later version.
- 
+
  You should have received a copy of the GNU General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
- 
+
  Some files of Open Orbit have relaxed licensing conditions. This file is
  licenced under the 2-clause BSD licence.
- 
+
  Redistribution and use of this file in source and binary forms, with or
  without modification, are permitted provided that the following conditions are
  met:
- 
+
  - Redistributions of source code must retain the above copyright notice,
  this list of conditions and the following disclaimer.
  - Redistributions in binary form must reproduce the above copyright notice,
  this list of conditions and the following disclaimer in the documentation
  and/or other materials provided with the distribution.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -81,16 +81,16 @@
 #define SEG_Z64(c) (((int64_t*)&(c)->seg)[2])
 #endif
 void
-ooLwcSet(OOlwcoord *coord, float x, float y, float z)
+lwc_set(lwcoord_t *coord, float x, float y, float z)
 {
   coord->offs = vf3_set(x, y, z);
   coord->seg = vi3_set(0, 0, 0);
 
-  ooLwcNormalise(coord);
+  lwc_normalise(coord);
 }
 
 void
-ooLwcNormalise(OOlwcoord *coord)
+lwc_normalise(lwcoord_t *coord)
 {
   if (fabsf(OFFS_X(coord)) >= OO_LW_SEGMENT_LEN) {
     SEG_X(coord) += (int32_t) (OFFS_X(coord) / OO_LW_SEGMENT_LEN);
@@ -107,7 +107,23 @@ ooLwcNormalise(OOlwcoord *coord)
 }
 
 void
-ooLwcDump(const OOlwcoord *lwc)
+lwc_mul(lwcoord_t *lwc, float b)
+{
+  float3 p = lwc_global(lwc);
+  p = p * b;
+  lwc_set(lwc, p.x, p.y, p.z);
+}
+
+void
+lwc_div(lwcoord_t *lwc, float b)
+{
+  float3 p = lwc_global(lwc);
+  p = p / b;
+  lwc_set(lwc, p.x, p.y, p.z);
+}
+
+void
+lwc_dump(const lwcoord_t *lwc)
 {
   fprintf(stderr, "lwc: [%d %d %d]/[%f %f %f]\n",
           lwc->seg.x, lwc->seg.y, lwc->seg.z,
@@ -116,21 +132,21 @@ ooLwcDump(const OOlwcoord *lwc)
 
 
 void
-ooLwcTranslate3fv(OOlwcoord *coord, float3 offs)
+lwc_translate3fv(lwcoord_t *coord, float3 offs)
 {
   coord->offs = vf3_add(coord->offs, offs);
-  ooLwcNormalise(coord);
+  lwc_normalise(coord);
 }
 
 void
-ooLwcTranslate3f(OOlwcoord *coord, float dx, float dy, float dz)
+lwc_translate3f(lwcoord_t *coord, float dx, float dy, float dz)
 {
   coord->offs = vf3_add(coord->offs, vf3_set(dx, dy, dz));
-  ooLwcNormalise(coord);
+  lwc_normalise(coord);
 }
 
 float3
-ooLwcGlobal(const OOlwcoord *coord)
+lwc_global(const lwcoord_t *coord)
 {
   float3 p = coord->offs;
   float3 seg = v3i_to_v3f(coord->seg);
@@ -139,7 +155,7 @@ ooLwcGlobal(const OOlwcoord *coord)
 }
 
 float3
-ooLwcRelVec(const OOlwcoord *coord, int3 seg)
+lwc_relvec(const lwcoord_t *coord, int3 seg)
 {
   float3 r = coord->offs;
   int3 segdiff = coord->seg - seg;
@@ -151,7 +167,7 @@ ooLwcRelVec(const OOlwcoord *coord, int3 seg)
 }
 
 float3
-ooLwcDist(const OOlwcoord *a, const OOlwcoord * b)
+lwc_dist(const lwcoord_t *a, const lwcoord_t * b)
 {
   float3 diff = vf3_sub(a->offs, b->offs);
   int3 segdiff = a->seg - b->seg;
@@ -164,9 +180,9 @@ ooLwcDist(const OOlwcoord *a, const OOlwcoord * b)
 
 
 int
-ooLwcOctant(const OOlwcoord *a, const OOlwcoord * b)
+lwc_octant(const lwcoord_t *a, const lwcoord_t * b)
 {
-  float3 rel = ooLwcDist(b, a);
+  float3 rel = lwc_dist(b, a);
 
   int octant = 0;
   if (rel.x >= 0.0) {
@@ -185,17 +201,17 @@ ooLwcOctant(const OOlwcoord *a, const OOlwcoord * b)
 }
 
 void
-ooLwcSet64(OOlwcoord64 *coord, double x, double y, double z)
+lwc_set64(lwcoord64_t *coord, double x, double y, double z)
 {
   coord->offs = vd3_set(x, y, z);
   coord->seg = vl3_set(0, 0, 0);
 
-  ooLwcNormalise64(coord);
+  lwc_normalise64(coord);
 }
 
 
 void
-ooLwcNormalise64(OOlwcoord64 *coord)
+lwc_normalise64(lwcoord64_t *coord)
 {
   if (fabs(OFFS_X64(coord)) >= OO_LW_SEGMENT_LEN64) {
     OFFS_X64(coord) += (int32_t) (OFFS_X64(coord) / OO_LW_SEGMENT_LEN64);
@@ -212,14 +228,14 @@ ooLwcNormalise64(OOlwcoord64 *coord)
 }
 
 void
-ooLwcTranslate64(OOlwcoord64 *coord, double3 offs)
+lwc_translate64(lwcoord64_t *coord, double3 offs)
 {
   coord->offs = vd3_add(coord->offs, offs);
-  ooLwcNormalise64(coord);
+  lwc_normalise64(coord);
 }
 
 double3
-ooLwcGlobal64(const OOlwcoord64 *coord)
+lwc_global64(const lwcoord64_t *coord)
 {
   double3 p = coord->offs;
   double3 seg = v3l_to_v3d(coord->seg);
@@ -227,7 +243,7 @@ ooLwcGlobal64(const OOlwcoord64 *coord)
 }
 
 double3
-ooLwcRelVec64(const OOlwcoord64 *coord, long3 seg)
+lwc_relvec64(const lwcoord64_t *coord, long3 seg)
 {
   double3 r = coord->offs;
   long3 segdiff = coord->seg - seg;
@@ -241,7 +257,7 @@ ooLwcRelVec64(const OOlwcoord64 *coord, long3 seg)
 }
 
 double3
-ooLwcDist64(const OOlwcoord64 *a, const OOlwcoord64 * b)
+lwc_dist64(const lwcoord64_t *a, const lwcoord64_t * b)
 {
   double3 diff = vd3_sub(a->offs, b->offs);
   long3 segdiff = a->seg - b->seg;

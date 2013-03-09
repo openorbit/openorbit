@@ -214,9 +214,11 @@ om_new_class(om_ctxt_t *ctxt, const char *class_name,
     class_obj->interface_dict = hashtable_new_with_str_keys(32);
     
     if (!(class_obj->property_dict) || !(class_obj->interface_dict)) {
-        hashtable_delete(class_obj->property_dict);
-        hashtable_delete(class_obj->interface_dict);
-        return NULL;
+      hashtable_delete(class_obj->property_dict);
+      hashtable_delete(class_obj->interface_dict);
+      free(class_obj->class_name);
+      free(class_obj);
+      return NULL;
     }
     
     hashtable_insert(ctxt->class_dict, class_name, class_obj);
