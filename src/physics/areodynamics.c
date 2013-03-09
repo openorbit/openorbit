@@ -32,171 +32,171 @@
 // account that some elements appear in molecules (i.e. H2)
 // TODO: Set all elements that are -0.0 to NAN, but this cannot be done until
 //       there is a new official release of clang for OS X
-static double elementMolarWeights[PL_Elem_Last] = {
-  [PL_Elem_n] = -0.0, // Neutron, but this is mosly here to be able to index by
+static double elementMolarWeights[PL_ELEM_Last] = {
+  [PL_ELEM_n] = -0.0, // Neutron, but this is mosly here to be able to index by
                       // proton count
-  [PL_Elem_H] = 0.00100794, [PL_Elem_He] = 0.004002602,
+  [PL_ELEM_H] = 0.00100794, [PL_ELEM_He] = 0.004002602,
 
   // Period 2
-  [PL_Elem_Li] = 0.006941,     [PL_Elem_Be] = 0.009012,
-  [PL_Elem_B]  = 0.010811,     [PL_Elem_C]  = 0.0120107,
-  [PL_Elem_N]  = 0.0140067,    [PL_Elem_O]  = 0.0159994,
-  [PL_Elem_F]  = 0.0189984032, [PL_Elem_Ne] = 0.0201797,
+  [PL_ELEM_Li] = 0.006941,     [PL_ELEM_Be] = 0.009012,
+  [PL_ELEM_B]  = 0.010811,     [PL_ELEM_C]  = 0.0120107,
+  [PL_ELEM_N]  = 0.0140067,    [PL_ELEM_O]  = 0.0159994,
+  [PL_ELEM_F]  = 0.0189984032, [PL_ELEM_Ne] = 0.0201797,
 
   // Period 3
-  [PL_Elem_Na] = 0.02298977,  [PL_Elem_Mg] = 0.0243050,
-  [PL_Elem_Al] = 0.026981538, [PL_Elem_Si] = 0.0280855,
-  [PL_Elem_P]  = 0.030973761, [PL_Elem_S]  = 0.032066,
-  [PL_Elem_Cl] = 0.0354527,   [PL_Elem_Ar] = 0.039948,
+  [PL_ELEM_Na] = 0.02298977,  [PL_ELEM_Mg] = 0.0243050,
+  [PL_ELEM_Al] = 0.026981538, [PL_ELEM_Si] = 0.0280855,
+  [PL_ELEM_P]  = 0.030973761, [PL_ELEM_S]  = 0.032066,
+  [PL_ELEM_Cl] = 0.0354527,   [PL_ELEM_Ar] = 0.039948,
 
   // Period 4
-  [PL_Elem_K]  = 0.0390983,   [PL_Elem_Ca] = 0.040078,
-  [PL_Elem_Sc] = 0.044955910, [PL_Elem_Ti] = 0.047867,
-  [PL_Elem_V]  = 0.0509415,   [PL_Elem_Cr] = 0.0519961,
-  [PL_Elem_Mn] = 0.054938049, [PL_Elem_Fe] = 0.055845,
-  [PL_Elem_Co] = 0.058933200, [PL_Elem_Ni] = 0.0586934,
-  [PL_Elem_Cu] = 0.063546,    [PL_Elem_Zn] = 0.06539,
-  [PL_Elem_Ga] = 0.069723,    [PL_Elem_Ge] = 0.07261,
-  [PL_Elem_As] = 0.07492160,  [PL_Elem_Se] = 0.07896,
-  [PL_Elem_Br] = 0.079904,    [PL_Elem_Kr] = 0.08380,
+  [PL_ELEM_K]  = 0.0390983,   [PL_ELEM_Ca] = 0.040078,
+  [PL_ELEM_Sc] = 0.044955910, [PL_ELEM_Ti] = 0.047867,
+  [PL_ELEM_V]  = 0.0509415,   [PL_ELEM_Cr] = 0.0519961,
+  [PL_ELEM_Mn] = 0.054938049, [PL_ELEM_Fe] = 0.055845,
+  [PL_ELEM_Co] = 0.058933200, [PL_ELEM_Ni] = 0.0586934,
+  [PL_ELEM_Cu] = 0.063546,    [PL_ELEM_Zn] = 0.06539,
+  [PL_ELEM_Ga] = 0.069723,    [PL_ELEM_Ge] = 0.07261,
+  [PL_ELEM_As] = 0.07492160,  [PL_ELEM_Se] = 0.07896,
+  [PL_ELEM_Br] = 0.079904,    [PL_ELEM_Kr] = 0.08380,
 
   // Period 5
-  [PL_Elem_Rb] = 0.0854678,  [PL_Elem_Sr] = 0.08762,
-  [PL_Elem_Y]  = 0.088905,   [PL_Elem_Zr] = 0.091224,
-  [PL_Elem_Nb] = 0.09290638, [PL_Elem_Mo] = 0.09594,
-  [PL_Elem_Tc] = -0.0,       [PL_Elem_Ru] = 0.10107,
-  [PL_Elem_Rh] = 0.10290550, [PL_Elem_Pd] = 0.10642,
-  [PL_Elem_Ag] = 0.1078682,  [PL_Elem_Cd] = 0.112411,
-  [PL_Elem_In] = 0.114818,   [PL_Elem_Sn] = 0.118710,
-  [PL_Elem_Sb] = 0.121760,   [PL_Elem_Te] = 0.12760,
-  [PL_Elem_I]  = 0.12690447, [PL_Elem_Xe] = 0.13129,
+  [PL_ELEM_Rb] = 0.0854678,  [PL_ELEM_Sr] = 0.08762,
+  [PL_ELEM_Y]  = 0.088905,   [PL_ELEM_Zr] = 0.091224,
+  [PL_ELEM_Nb] = 0.09290638, [PL_ELEM_Mo] = 0.09594,
+  [PL_ELEM_Tc] = -0.0,       [PL_ELEM_Ru] = 0.10107,
+  [PL_ELEM_Rh] = 0.10290550, [PL_ELEM_Pd] = 0.10642,
+  [PL_ELEM_Ag] = 0.1078682,  [PL_ELEM_Cd] = 0.112411,
+  [PL_ELEM_In] = 0.114818,   [PL_ELEM_Sn] = 0.118710,
+  [PL_ELEM_Sb] = 0.121760,   [PL_ELEM_Te] = 0.12760,
+  [PL_ELEM_I]  = 0.12690447, [PL_ELEM_Xe] = 0.13129,
 
   // Period 6
-  [PL_Elem_Cs] = 0.13290545, [PL_Elem_Ba] = 0.137327,
+  [PL_ELEM_Cs] = 0.13290545, [PL_ELEM_Ba] = 0.137327,
 
   // Lanthanoids
-  [PL_Elem_La] = 0.1389055,  [PL_Elem_Ce] = 0.140116,
-  [PL_Elem_Pr] = 0.14090765, [PL_Elem_Nd] = 0.14424,
-  [PL_Elem_Pm] = -0.0,       [PL_Elem_Sm] = 0.15036,
-  [PL_Elem_Eu] = 0.151964,   [PL_Elem_Gd] = 0.15725,
-  [PL_Elem_Tb] = 0.15892534, [PL_Elem_Dy] = 0.16250,
-  [PL_Elem_Ho] = 0.16493032, [PL_Elem_Er] = 0.1676,
-  [PL_Elem_Tm] = 0.16893421, [PL_Elem_Yb] = 0.17304,
-  [PL_Elem_Lu] = 0.174967,
+  [PL_ELEM_La] = 0.1389055,  [PL_ELEM_Ce] = 0.140116,
+  [PL_ELEM_Pr] = 0.14090765, [PL_ELEM_Nd] = 0.14424,
+  [PL_ELEM_Pm] = -0.0,       [PL_ELEM_Sm] = 0.15036,
+  [PL_ELEM_Eu] = 0.151964,   [PL_ELEM_Gd] = 0.15725,
+  [PL_ELEM_Tb] = 0.15892534, [PL_ELEM_Dy] = 0.16250,
+  [PL_ELEM_Ho] = 0.16493032, [PL_ELEM_Er] = 0.1676,
+  [PL_ELEM_Tm] = 0.16893421, [PL_ELEM_Yb] = 0.17304,
+  [PL_ELEM_Lu] = 0.174967,
 
-  [PL_Elem_Hf] = 0.17849,  [PL_Elem_Ta] = 0.1809479,
-  [PL_Elem_W]  = 0.18384,  [PL_Elem_Re] = 0.186207,
-  [PL_Elem_Os] = 0.19023,  [PL_Elem_Ir] = 0.192217,
-  [PL_Elem_Pt] = 0.195078, [PL_Elem_Au] = 0.19696655,
-  [PL_Elem_Hg] = 0.20059,  [PL_Elem_Tl] = 0.2043833,
-  [PL_Elem_Pb] = 0.2072,   [PL_Elem_Bi] = 0.20898038,
-  [PL_Elem_Po] = -0.0,     [PL_Elem_At] = -0.0,
-  [PL_Elem_Rn] = -0.0,
+  [PL_ELEM_Hf] = 0.17849,  [PL_ELEM_Ta] = 0.1809479,
+  [PL_ELEM_W]  = 0.18384,  [PL_ELEM_Re] = 0.186207,
+  [PL_ELEM_Os] = 0.19023,  [PL_ELEM_Ir] = 0.192217,
+  [PL_ELEM_Pt] = 0.195078, [PL_ELEM_Au] = 0.19696655,
+  [PL_ELEM_Hg] = 0.20059,  [PL_ELEM_Tl] = 0.2043833,
+  [PL_ELEM_Pb] = 0.2072,   [PL_ELEM_Bi] = 0.20898038,
+  [PL_ELEM_Po] = -0.0,     [PL_ELEM_At] = -0.0,
+  [PL_ELEM_Rn] = -0.0,
 
   // Period 7
-  [PL_Elem_Fr] = -0.0, [PL_Elem_Ra] = -0.0,
+  [PL_ELEM_Fr] = -0.0, [PL_ELEM_Ra] = -0.0,
 
   // Actinoids
-  [PL_Elem_Ac] = -0.0,       [PL_Elem_Th] = 0.2320381,
-  [PL_Elem_Pa] = 0.23103588, [PL_Elem_U]  = 0.2380289,
-  [PL_Elem_Np] = -0.0,       [PL_Elem_Pu] = -0.0,
-  [PL_Elem_Am] = -0.0,       [PL_Elem_Cm] = -0.0,
-  [PL_Elem_Bk] = -0.0,       [PL_Elem_Cf] = -0.0,
-  [PL_Elem_Es] = -0.0,       [PL_Elem_Fm] = -0.0,
-  [PL_Elem_Md] = -0.0,       [PL_Elem_No] = -0.0,
-  [PL_Elem_Lr] = -0.0,
+  [PL_ELEM_Ac] = -0.0,       [PL_ELEM_Th] = 0.2320381,
+  [PL_ELEM_Pa] = 0.23103588, [PL_ELEM_U]  = 0.2380289,
+  [PL_ELEM_Np] = -0.0,       [PL_ELEM_Pu] = -0.0,
+  [PL_ELEM_Am] = -0.0,       [PL_ELEM_Cm] = -0.0,
+  [PL_ELEM_Bk] = -0.0,       [PL_ELEM_Cf] = -0.0,
+  [PL_ELEM_Es] = -0.0,       [PL_ELEM_Fm] = -0.0,
+  [PL_ELEM_Md] = -0.0,       [PL_ELEM_No] = -0.0,
+  [PL_ELEM_Lr] = -0.0,
 
-  [PL_Elem_Rf]  = -0.0, [PL_Elem_Db]  = -0.0,
-  [PL_Elem_Sg]  = -0.0, [PL_Elem_Bh]  = -0.0,
-  [PL_Elem_Hs]  = -0.0, [PL_Elem_Mt]  = -0.0,
-  [PL_Elem_Ds]  = -0.0, [PL_Elem_Rg]  = -0.0,
-  [PL_Elem_Cn]  = -0.0, [PL_Elem_Uut] = -0.0,
-  [PL_Elem_Uuq] = -0.0, [PL_Elem_Uup] = -0.0,
-  [PL_Elem_Uuh] = -0.0, [PL_Elem_Uus] = -0.0,
-  [PL_Elem_Uuo] = -0.0,
+  [PL_ELEM_Rf]  = -0.0, [PL_ELEM_Db]  = -0.0,
+  [PL_ELEM_Sg]  = -0.0, [PL_ELEM_Bh]  = -0.0,
+  [PL_ELEM_Hs]  = -0.0, [PL_ELEM_Mt]  = -0.0,
+  [PL_ELEM_Ds]  = -0.0, [PL_ELEM_Rg]  = -0.0,
+  [PL_ELEM_Cn]  = -0.0, [PL_ELEM_Uut] = -0.0,
+  [PL_ELEM_Uuq] = -0.0, [PL_ELEM_Uup] = -0.0,
+  [PL_ELEM_Uuh] = -0.0, [PL_ELEM_Uus] = -0.0,
+  [PL_ELEM_Uuo] = -0.0,
 };
 
-static char *elemNames[PL_Elem_Last] = {
-  [PL_Elem_n] = "neutron",
-  [PL_Elem_H] = "hydrogen", [PL_Elem_He] = "helium",
+static char *elemNames[PL_ELEM_Last] = {
+  [PL_ELEM_n] = "neutron",
+  [PL_ELEM_H] = "hydrogen", [PL_ELEM_He] = "helium",
 
   // Period 2
-  [PL_Elem_Li] = "lithium",     [PL_Elem_Be] = "beryllium",
-  [PL_Elem_B]  = "boron",     [PL_Elem_C]  = "carbon",
-  [PL_Elem_N]  = "nitrogen",    [PL_Elem_O]  = "oxygen",
-  [PL_Elem_F]  = "flourine", [PL_Elem_Ne] = "neon",
+  [PL_ELEM_Li] = "lithium",     [PL_ELEM_Be] = "beryllium",
+  [PL_ELEM_B]  = "boron",     [PL_ELEM_C]  = "carbon",
+  [PL_ELEM_N]  = "nitrogen",    [PL_ELEM_O]  = "oxygen",
+  [PL_ELEM_F]  = "flourine", [PL_ELEM_Ne] = "neon",
 
   // Period 3
-  [PL_Elem_Na] = "sodium",  [PL_Elem_Mg] = "magnesium",
-  [PL_Elem_Al] = "aluminium", [PL_Elem_Si] = "silicon",
-  [PL_Elem_P]  = "phosphorus", [PL_Elem_S]  = "sulfur",
-  [PL_Elem_Cl] = "chlorine",   [PL_Elem_Ar] = "argon",
+  [PL_ELEM_Na] = "sodium",  [PL_ELEM_Mg] = "magnesium",
+  [PL_ELEM_Al] = "aluminium", [PL_ELEM_Si] = "silicon",
+  [PL_ELEM_P]  = "phosphorus", [PL_ELEM_S]  = "sulfur",
+  [PL_ELEM_Cl] = "chlorine",   [PL_ELEM_Ar] = "argon",
 
   // Period 4
-  [PL_Elem_K]  = "potassium",   [PL_Elem_Ca] = "calcium",
-  [PL_Elem_Sc] = "scandium", [PL_Elem_Ti] = "titanium",
-  [PL_Elem_V]  = "vanadium",   [PL_Elem_Cr] = "chromium",
-  [PL_Elem_Mn] = "manganese", [PL_Elem_Fe] = "iron",
-  [PL_Elem_Co] = "cobalt", [PL_Elem_Ni] = "nickel",
-  [PL_Elem_Cu] = "copper",    [PL_Elem_Zn] = "zinc",
-  [PL_Elem_Ga] = "gallium",    [PL_Elem_Ge] = "germanium",
-  [PL_Elem_As] = "arsenic",  [PL_Elem_Se] = "selenium",
-  [PL_Elem_Br] = "bromine",    [PL_Elem_Kr] = "krypton",
+  [PL_ELEM_K]  = "potassium",   [PL_ELEM_Ca] = "calcium",
+  [PL_ELEM_Sc] = "scandium", [PL_ELEM_Ti] = "titanium",
+  [PL_ELEM_V]  = "vanadium",   [PL_ELEM_Cr] = "chromium",
+  [PL_ELEM_Mn] = "manganese", [PL_ELEM_Fe] = "iron",
+  [PL_ELEM_Co] = "cobalt", [PL_ELEM_Ni] = "nickel",
+  [PL_ELEM_Cu] = "copper",    [PL_ELEM_Zn] = "zinc",
+  [PL_ELEM_Ga] = "gallium",    [PL_ELEM_Ge] = "germanium",
+  [PL_ELEM_As] = "arsenic",  [PL_ELEM_Se] = "selenium",
+  [PL_ELEM_Br] = "bromine",    [PL_ELEM_Kr] = "krypton",
 
   // Period 5
-  [PL_Elem_Rb] = "rubidium",  [PL_Elem_Sr] = "strontium",
-  [PL_Elem_Y]  = "yttrium",   [PL_Elem_Zr] = "zirconium",
-  [PL_Elem_Nb] = "niobium", [PL_Elem_Mo] = "molybdenum",
-  [PL_Elem_Tc] = "technetium",       [PL_Elem_Ru] = "ruthenium",
-  [PL_Elem_Rh] = "rhodium", [PL_Elem_Pd] = "palladium",
-  [PL_Elem_Ag] = "silver",  [PL_Elem_Cd] = "cadmium",
-  [PL_Elem_In] = "indium",   [PL_Elem_Sn] = "tin",
-  [PL_Elem_Sb] = "antimony",   [PL_Elem_Te] = "tellurium",
-  [PL_Elem_I]  = "iodine", [PL_Elem_Xe] = "xenon",
+  [PL_ELEM_Rb] = "rubidium",  [PL_ELEM_Sr] = "strontium",
+  [PL_ELEM_Y]  = "yttrium",   [PL_ELEM_Zr] = "zirconium",
+  [PL_ELEM_Nb] = "niobium", [PL_ELEM_Mo] = "molybdenum",
+  [PL_ELEM_Tc] = "technetium",       [PL_ELEM_Ru] = "ruthenium",
+  [PL_ELEM_Rh] = "rhodium", [PL_ELEM_Pd] = "palladium",
+  [PL_ELEM_Ag] = "silver",  [PL_ELEM_Cd] = "cadmium",
+  [PL_ELEM_In] = "indium",   [PL_ELEM_Sn] = "tin",
+  [PL_ELEM_Sb] = "antimony",   [PL_ELEM_Te] = "tellurium",
+  [PL_ELEM_I]  = "iodine", [PL_ELEM_Xe] = "xenon",
 
   // Period 6
-  [PL_Elem_Cs] = "cesium", [PL_Elem_Ba] = "barium",
+  [PL_ELEM_Cs] = "cesium", [PL_ELEM_Ba] = "barium",
 
   // Lanthanoids
-  [PL_Elem_La] = "lanthanum",  [PL_Elem_Ce] = "cerium",
-  [PL_Elem_Pr] = "praseodymium", [PL_Elem_Nd] = "neodymium",
-  [PL_Elem_Pm] = "promethium",       [PL_Elem_Sm] = "samarium",
-  [PL_Elem_Eu] = "europium",   [PL_Elem_Gd] = "gadolinium",
-  [PL_Elem_Tb] = "terbium", [PL_Elem_Dy] = "dysprosium",
-  [PL_Elem_Ho] = "holmium", [PL_Elem_Er] = "erbium",
-  [PL_Elem_Tm] = "thulium", [PL_Elem_Yb] = "ytterbium",
-  [PL_Elem_Lu] = "lutecium",
+  [PL_ELEM_La] = "lanthanum",  [PL_ELEM_Ce] = "cerium",
+  [PL_ELEM_Pr] = "praseodymium", [PL_ELEM_Nd] = "neodymium",
+  [PL_ELEM_Pm] = "promethium",       [PL_ELEM_Sm] = "samarium",
+  [PL_ELEM_Eu] = "europium",   [PL_ELEM_Gd] = "gadolinium",
+  [PL_ELEM_Tb] = "terbium", [PL_ELEM_Dy] = "dysprosium",
+  [PL_ELEM_Ho] = "holmium", [PL_ELEM_Er] = "erbium",
+  [PL_ELEM_Tm] = "thulium", [PL_ELEM_Yb] = "ytterbium",
+  [PL_ELEM_Lu] = "lutecium",
 
-  [PL_Elem_Hf] = "hafnium",  [PL_Elem_Ta] = "tantalum",
-  [PL_Elem_W]  = "tungsten",  [PL_Elem_Re] = "rhenium",
-  [PL_Elem_Os] = "osmium",  [PL_Elem_Ir] = "iridium",
-  [PL_Elem_Pt] = "platinum", [PL_Elem_Au] = "gold",
-  [PL_Elem_Hg] = "mercury",  [PL_Elem_Tl] = "thallium",
-  [PL_Elem_Pb] = "lead",   [PL_Elem_Bi] = "bismuth",
-  [PL_Elem_Po] = "polonium",     [PL_Elem_At] = "astatine",
-  [PL_Elem_Rn] = "radon",
+  [PL_ELEM_Hf] = "hafnium",  [PL_ELEM_Ta] = "tantalum",
+  [PL_ELEM_W]  = "tungsten",  [PL_ELEM_Re] = "rhenium",
+  [PL_ELEM_Os] = "osmium",  [PL_ELEM_Ir] = "iridium",
+  [PL_ELEM_Pt] = "platinum", [PL_ELEM_Au] = "gold",
+  [PL_ELEM_Hg] = "mercury",  [PL_ELEM_Tl] = "thallium",
+  [PL_ELEM_Pb] = "lead",   [PL_ELEM_Bi] = "bismuth",
+  [PL_ELEM_Po] = "polonium",     [PL_ELEM_At] = "astatine",
+  [PL_ELEM_Rn] = "radon",
 
   // Period 7
-  [PL_Elem_Fr] = "francium", [PL_Elem_Ra] = "radium",
+  [PL_ELEM_Fr] = "francium", [PL_ELEM_Ra] = "radium",
 
   // Actinoids
-  [PL_Elem_Ac] = "actinium",       [PL_Elem_Th] = "thorium",
-  [PL_Elem_Pa] = "protactinium", [PL_Elem_U]  = "uranium",
-  [PL_Elem_Np] = "neptunium",       [PL_Elem_Pu] = "plutonium",
-  [PL_Elem_Am] = "americium",       [PL_Elem_Cm] = "curium",
-  [PL_Elem_Bk] = "berkelium",       [PL_Elem_Cf] = "californium",
-  [PL_Elem_Es] = "einsteinium",       [PL_Elem_Fm] = "fermium",
-  [PL_Elem_Md] = "mendelevium",       [PL_Elem_No] = "nobelium",
-  [PL_Elem_Lr] = "lawrencium",
+  [PL_ELEM_Ac] = "actinium",       [PL_ELEM_Th] = "thorium",
+  [PL_ELEM_Pa] = "protactinium", [PL_ELEM_U]  = "uranium",
+  [PL_ELEM_Np] = "neptunium",       [PL_ELEM_Pu] = "plutonium",
+  [PL_ELEM_Am] = "americium",       [PL_ELEM_Cm] = "curium",
+  [PL_ELEM_Bk] = "berkelium",       [PL_ELEM_Cf] = "californium",
+  [PL_ELEM_Es] = "einsteinium",       [PL_ELEM_Fm] = "fermium",
+  [PL_ELEM_Md] = "mendelevium",       [PL_ELEM_No] = "nobelium",
+  [PL_ELEM_Lr] = "lawrencium",
 
-  [PL_Elem_Rf]  = "rutherfordium", [PL_Elem_Db]  = "dubnium",
-  [PL_Elem_Sg]  = "seaborgium", [PL_Elem_Bh]  = "bohrium",
-  [PL_Elem_Hs]  = "hassium", [PL_Elem_Mt]  = "meitnerium",
-  [PL_Elem_Ds]  = "darmstadtium", [PL_Elem_Rg]  = "aoentgenium",
-  [PL_Elem_Cn]  = "copernicium", [PL_Elem_Uut] = "ununtrium",
-  [PL_Elem_Uuq] = "ununquadium", [PL_Elem_Uup] = "ununpentium",
-  [PL_Elem_Uuh] = "ununhexium", [PL_Elem_Uus] = "ununseptium",
-  [PL_Elem_Uuo] = "ununoctium",
+  [PL_ELEM_Rf]  = "rutherfordium", [PL_ELEM_Db]  = "dubnium",
+  [PL_ELEM_Sg]  = "seaborgium", [PL_ELEM_Bh]  = "bohrium",
+  [PL_ELEM_Hs]  = "hassium", [PL_ELEM_Mt]  = "meitnerium",
+  [PL_ELEM_Ds]  = "darmstadtium", [PL_ELEM_Rg]  = "aoentgenium",
+  [PL_ELEM_Cn]  = "copernicium", [PL_ELEM_Uut] = "ununtrium",
+  [PL_ELEM_Uuq] = "ununquadium", [PL_ELEM_Uup] = "ununpentium",
+  [PL_ELEM_Uuh] = "ununhexium", [PL_ELEM_Uus] = "ununseptium",
+  [PL_ELEM_Uuo] = "ununoctium",
 };
 
 static hashtable_t *ht;
@@ -206,13 +206,13 @@ MODULE_INIT(areodynamics, NULL)
   ooLogTrace("initialising 'areodynamics' module");
   ht = hashtable_new_with_str_keys(128);
 
-  for (PLelement i = PL_Elem_First ; i < PL_Elem_Last ; ++ i) {
+  for (pl_element_t i = PL_ELEM_First ; i < PL_ELEM_Last ; ++ i) {
     hashtable_insert(ht, elemNames[i], (void*)i);
   }
 }
 
-PLelement
-plElementIdFromName(const char *name)
+pl_element_t
+pl_element_id_from_name(const char *name)
 {
   char nameCopy[strlen(name)+1];
 
@@ -220,40 +220,40 @@ plElementIdFromName(const char *name)
     nameCopy[i] = tolower(name[i]); // Will pass null marker unchanged
   }
 
-  PLelement i = (PLelement) hashtable_lookup(ht, nameCopy);
+  pl_element_t i = (pl_element_t) hashtable_lookup(ht, nameCopy);
   return i;
 }
 
 const char*
-plElementNameFromId(PLelement elem)
+pl_element_name_from_id(pl_element_t elem)
 {
-  assert(elem >= PL_Elem_First);
-  assert(elem < PL_Elem_Last);
+  assert(elem >= PL_ELEM_First);
+  assert(elem < PL_ELEM_Last);
 
   return elemNames[elem];
 }
 
 double
-plMoleculeWeight(unsigned nAtoms, PLelement elem)
+pl_molecule_weight(unsigned nAtoms, pl_element_t elem)
 {
   return (double)nAtoms * elementMolarWeights[elem];
 }
 
 
 double
-plCompIndividualGasConst(double M)
+pl_compute_individual_gas_const(double M)
 {
   return PL_UGC / M;
 }
 
 double
-plComputeDensity(double molWeight, double P, double T)
+pl_compute_density(double molWeight, double P, double T)
 {
   return (molWeight*P) / (PL_UGC * T);
 }
 
 double
-plEstimateTemp(double luminocity, double albedo, double R)
+pl_estimate_temp(double luminocity, double albedo, double R)
 {
   // Quad root
   double t = pow((luminocity*(1.0 - albedo))/(4.0 * M_PI * PL_ST*R*R),
@@ -266,16 +266,16 @@ plEstimateTemp(double luminocity, double albedo, double R)
 // rotation tangent subtracted
 
 float3
-plComputeAirvelocity(PLobject *obj)
+pl_compute_airvelocity(PLobject *obj)
 {
   // TODO: Adjust for planet rotation and wind
   return -(obj->v - obj->sys->orbitalBody->obj.v);
 }
 
 double
-plComputeAirspeed(PLobject *obj)
+pl_object_compute_airspeed(PLobject *obj)
 {
-  return vf3_abs(plComputeAirvelocity(obj));
+  return vf3_abs(pl_compute_airvelocity(obj));
 }
 // Compute drag force from
 // \param v Velocity of object of fluid
@@ -284,7 +284,7 @@ plComputeAirspeed(PLobject *obj)
 // \param A Area of object (i.e. the orthographic projection area)
 // \result A vector with the drag force (oposite direction of velocity)
 float3
-plComputeDrag(float3 v, double p, double Cd, double A)
+pl_compute_drag(float3 v, double p, double Cd, double A)
 {
   double v_mag = vf3_abs(vf3_neg(v));
   double fd = 0.5 * p * v_mag * v_mag * Cd * A;
@@ -298,7 +298,7 @@ plComputeDrag(float3 v, double p, double Cd, double A)
 // Lift: 0.5 * density * velocity ** 2 * A * CL
 //  where A is the planform area, i.e. area of the wings
 float3
-plComputeLift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil)
+pl_atmosphere_compute_lift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil)
 {
   //float3 vel = plComputeAirvelocity(obj);
   //float speed = plComputeAirspeed(obj);
@@ -315,7 +315,7 @@ plComputeLift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil)
 
 
 void
-plInitAtmosphere(PLatmosphere *atm, float groundPressure, float h0)
+pl_atmosphere_init(PLatmosphere *atm, float groundPressure, float h0)
 {
   atm->P0 = groundPressure;
   atm->T0 = NAN;
@@ -330,24 +330,24 @@ plInitAtmosphere(PLatmosphere *atm, float groundPressure, float h0)
  *  friction drag), and the drag from any airfoils.
  */
 float3
-plComputeDragForObject(PLobject *obj)
+pl_object_compute_drag(PLobject *obj)
 {
-  double p = plComputeAirdensity(obj);
-  float3 vel = plComputeAirvelocity(obj); // TODO: Adjust for planet rotation
+  double p = pl_object_compute_airdensity(obj);
+  float3 vel = pl_compute_airvelocity(obj); // TODO: Adjust for planet rotation
 
-  float3 drag = plComputeDrag(vel, p, obj->dragCoef, obj->area);
+  float3 drag = pl_compute_drag(vel, p, obj->dragCoef, obj->area);
   return drag;//vf3_set(0.0, 0.0, 0.0);
 }
 
 double
-plComputeAirpressure(PLobject *obj)
+pl_object_compute_airpressure(PLobject *obj)
 {
-  PLsystem *sys = obj->sys;
+  pl_system_t *sys = obj->sys;
   PLatmosphere *atm = obj->sys->orbitalBody->atm;
   float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
   //float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
-  double pressure = plAtmospherePressure(atm, h);//plComputeSimpleAirpressure(atm, h);
+  double pressure = pl_atmosphere_pressure(atm, h);//plComputeSimpleAirpressure(atm, h);
   //plPressureAtAltitude(atm->P0, atm->T0, g0, atm->M, h, 0.0);
   //ooLogInfo("airpressure for %s = %f Pa", obj->name, pressure);
 
@@ -355,25 +355,25 @@ plComputeAirpressure(PLobject *obj)
 }
 
 double
-plComputeAltitude(PLobject *obj)
+pl_object_compute_altitude(PLobject *obj)
 {
-  PLsystem *sys = obj->sys;
+  pl_system_t *sys = obj->sys;
   float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad;
   return h;
 }
 
 double
-plComputeAirdensity(PLobject *obj)
+pl_object_compute_airdensity(PLobject *obj)
 {
-  PLsystem *sys = obj->sys;
+  pl_system_t *sys = obj->sys;
   PLatmosphere *atm = obj->sys->orbitalBody->atm;
   float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
   //float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
   //double pressure = plComputeSimpleAirpressure(atm, h);
 
-  double density = plAtmosphereDensity(atm, h);
+  double density = pl_atmosphere_density(atm, h);
   //ooLogInfo("altitude for %s = %f m above surface of %s", obj->name, h,
   //          obj->sys->orbitalBody->name);
   //ooLogInfo("atmosphere: P = %f Pa, h0 = %f m", atm->P0, atm->h0);
@@ -405,7 +405,7 @@ plComputeAirdensity(PLobject *obj)
  \param Lb Lapse rate in kelvin per metre
  */
 double
-plPressureAtAltitudeWithLapse(double Pb, double Tb, double g0, double M,
+pl_pressure_at_altitude_with_lapse(double Pb, double Tb, double g0, double M,
                               double h, double hb, double Lb)
 {
   return Pb * pow(Tb/(Tb+Lb*(h-hb)), g0*M / (PL_UGC*Lb));
@@ -413,14 +413,14 @@ plPressureAtAltitudeWithLapse(double Pb, double Tb, double g0, double M,
 
 
 double
-plPressureAtAltitude(double Pb, double Tb, double g0, double M, double h,
+pl_pressure_at_altitude(double Pb, double Tb, double g0, double M, double h,
                      double hb)
 {
   return Pb * exp((-g0 * M * (h-hb)) / (PL_UGC * Tb));
 }
 
 float
-plComputeSimpleAirpressure(const PLatmosphere *atm, float h)
+pl_atmosphere_simple_compute_airpressure(const PLatmosphere *atm, float h)
 {
   double e = exp(-h/atm->h0);
   double p = atm->P0 * e;
@@ -428,7 +428,7 @@ plComputeSimpleAirpressure(const PLatmosphere *atm, float h)
 }
 
 float
-comp_pressure_lapse(PLatmosphereLayer *atm, float h)
+comp_pressure_lapse(pl_atm_layer_t *atm, float h)
 {
   return atm->P_b * pow(atm->T_b/(atm->T_b+atm->L_b*(h-atm->h_b)),
                         atm->g0 * atm->M / (PL_UGC*atm->L_b));
@@ -436,14 +436,14 @@ comp_pressure_lapse(PLatmosphereLayer *atm, float h)
 
 
 float
-comp_pressure_no_lapse(PLatmosphereLayer *atm, float h)
+comp_pressure_no_lapse(pl_atm_layer_t *atm, float h)
 {
   return atm->P_b * exp((-atm->g0 * atm->M * (h - atm->h_b)) / (PL_UGC * atm->T_b));
 }
 
 
 float
-comp_density_lapse(PLatmosphereLayer *atm, float h)
+comp_density_lapse(pl_atm_layer_t *atm, float h)
 {
   return atm->p_b * pow((atm->T_b+atm->L_b*(h-atm->h_b))/atm->T_b,
                         (-atm->g0 * atm->M / (PL_UGC*atm->L_b)) - 1.0);
@@ -451,7 +451,7 @@ comp_density_lapse(PLatmosphereLayer *atm, float h)
 
 
 float
-comp_density_no_lapse(PLatmosphereLayer *atm, float h)
+comp_density_no_lapse(pl_atm_layer_t *atm, float h)
 {
   return atm->p_b * exp((-atm->g0 * atm->M * (h - atm->h_b)) / (PL_UGC * atm->T_b));
 }
@@ -459,7 +459,7 @@ comp_density_no_lapse(PLatmosphereLayer *atm, float h)
 
 
 float
-plComputeAirpressure2(PLatmosphereTemplate *atm, float h)
+pl_atm_template_compute_airpressure(pl_atm_template_t *atm, float h)
 {
   int i = 0;
   for (i = 0 ; i < atm->layer_count - 1 ; i++) {
@@ -469,7 +469,7 @@ plComputeAirpressure2(PLatmosphereTemplate *atm, float h)
 }
 
 float
-plComputeAirdensity2(PLatmosphereTemplate *atm, float h)
+pl_atm_template_compute_airdensity(pl_atm_template_t *atm, float h)
 {
   int i = 0;
   for (i = 0 ; i < atm->layer_count - 1 ; i++) {
@@ -478,12 +478,12 @@ plComputeAirdensity2(PLatmosphereTemplate *atm, float h)
   return atm->layer[i].compDensity(&atm->layer[i], h);
 }
 
-PLatmosphereTemplate*
-plAtmospheref(size_t layers, float g0, float M, float *p_b, float *P_b,
+pl_atm_template_t*
+pl_new_atmospheref(size_t layers, float g0, float M, float *p_b, float *P_b,
              float *T_b, float *h_b, float *L_b)
 {
-  PLatmosphereTemplate *atm = smalloc(sizeof(PLatmosphereTemplate) +
-                                     sizeof(PLatmosphereLayer) * layers);
+  pl_atm_template_t *atm = smalloc(sizeof(pl_atm_template_t) +
+                                     sizeof(pl_atm_layer_t) * layers);
   atm->layer_count = layers;
   for (int i = 0 ; i < layers ; i++) {
     atm->layer[i].g0 = g0;
@@ -506,13 +506,13 @@ plAtmospheref(size_t layers, float g0, float M, float *p_b, float *P_b,
 }
 
 
-PLatmosphereTemplate*
-plAtmosphered(size_t layers, double g0, double M, const double *p_b,
+pl_atm_template_t*
+pl_new_atmosphere_template(size_t layers, double g0, double M, const double *p_b,
               const double *P_b, const double *T_b, const double *h_b,
               const double *L_b)
 {
-  PLatmosphereTemplate *atm = smalloc(sizeof(PLatmosphereTemplate) +
-                                     sizeof(PLatmosphereLayer) * layers);
+  pl_atm_template_t *atm = smalloc(sizeof(pl_atm_template_t) +
+                                     sizeof(pl_atm_layer_t) * layers);
   atm->layer_count = layers;
   for (int i = 0 ; i < layers ; i++) {
     atm->layer[i].g0 = g0;
@@ -535,7 +535,7 @@ plAtmosphered(size_t layers, double g0, double M, const double *p_b,
 }
 
 PLatmosphere*
-plAtmosphere(float sample_dist, float h, PLatmosphereTemplate *t)
+pl_new_atmosphere(float sample_dist, float h, pl_atm_template_t *t)
 {
   PLatmosphere *atm = smalloc(sizeof(PLatmosphere));
   float_array_init(&atm->P);
@@ -544,8 +544,8 @@ plAtmosphere(float sample_dist, float h, PLatmosphereTemplate *t)
   size_t samples = (size_t) h / sample_dist;
   atm->sample_distance = sample_dist;
   for (size_t i = 0 ; i < samples ; i ++) {
-    float P = plComputeAirpressure2(t, i*sample_dist);
-    float p = plComputeAirdensity2(t, i*sample_dist);
+    float P = pl_atm_template_compute_airpressure(t, i*sample_dist);
+    float p = pl_atm_template_compute_airdensity(t, i*sample_dist);
     float_array_push(&atm->P, P);
     float_array_push(&atm->p, p);
   }
@@ -553,7 +553,7 @@ plAtmosphere(float sample_dist, float h, PLatmosphereTemplate *t)
 }
 
 float
-plAtmospherePressure(const PLatmosphere *atm, float h)
+pl_atmosphere_pressure(const PLatmosphere *atm, float h)
 {
   if (atm == NULL) return 0.0;
   if (h < 0.0) {
@@ -577,7 +577,7 @@ plAtmospherePressure(const PLatmosphere *atm, float h)
 }
 
 float
-plAtmosphereDensity(const PLatmosphere *atm, float h)
+pl_atmosphere_density(const PLatmosphere *atm, float h)
 {
   if (atm == NULL) return 0.0;
   if (h < 0.0) {

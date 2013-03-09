@@ -29,10 +29,10 @@
 #include <vmath/lwcoord.h>
 
 struct PLobject {
-  PLsystem *sys;
+  pl_system_t *sys;
   struct PLobject *parent;
   char *name;
-  PLmass m;
+  pl_mass_t m;
   //SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
                         //!< object.
 
@@ -64,91 +64,91 @@ struct PLobject {
 };
 
 // Create standard object
-PLobject* plObject(PLworld *sys, const char *name);
+PLobject* pl_new_object(pl_world_t *sys, const char *name);
 
 // Create subobject
-PLobject* plSubObject3f(PLworld *world, PLobject *parent, const char *name,
+PLobject* pl_new_sub_object3f(pl_world_t *world, PLobject *parent, const char *name,
                         float x, float y, float z);
 
 // Init standard object (useful if allocated with malloc or explicitly in
 // structure).
-void plInitObject(PLobject *obj);
+void pl_object_init(PLobject *obj);
 
 /*! Update and compute all derived properties */
-void plComputeDerived(PLobject *obj);
+void pl_object_compute_derived(PLobject *obj);
 
 /*! Print object to console */
-void plDumpObject(PLobject *obj);
+void pl_object_dump(PLobject *obj);
 
 /*! Detatch object from parent */
-void plDetatchObject(PLobject *obj);
+void pl_object_detatch(PLobject *obj);
 
 /*! Compute aggregate object mass from children */
-void plUpdateMass(PLobject *obj);
+void pl_object_update_mass(PLobject *obj);
 
 /*! Assigns an SGdrawable pointer to the object. */
 //void plSetDrawableForObject(PLobject *obj, SGdrawable *drawable);
 
 /*! Apply force vector xyz on object */
-void plForce3f(PLobject *obj, float x, float y, float z);
+void pl_object_force3f(PLobject *obj, float x, float y, float z);
 /*! Apply force vector f on object */
-void plForce3fv(PLobject *obj, float3 f);
+void pl_object_force3fv(PLobject *obj, float3 f);
 
-void plForceRelative3f(PLobject *obj, float x, float y, float z);
-void plForceRelative3fv(PLobject *obj, float3 f);
-void plForceRelativePos3f(PLobject *obj,
+void pl_object_force_relative3f(PLobject *obj, float x, float y, float z);
+void pl_force_relative3fv(PLobject *obj, float3 f);
+void pl_object_force_relative_pos3f(PLobject *obj,
                           float fx, float fy, float fz,
                           float px, float py, float pz);
-void plForceRelativePos3fv(PLobject *obj, float3 f, float3 p);
+void pl_object_force_relative_pos3fv(PLobject *obj, float3 f, float3 p);
 
 /*! Apply gravity vector */
-void plGravity3f(PLobject *obj, float x, float y, float z);
+void pl_object_set_gravity3f(PLobject *obj, float x, float y, float z);
 /*! Apply gravity vector */
-void plGravity3fv(PLobject *obj, float3 f);
+void pl_object_set_gravity3fv(PLobject *obj, float3 f);
 
-void plTorque3f(PLobject *obj, float tx, float ty, float tz);
-void plTorque3fv(PLobject *obj, float3 t);
-void plTorqueRelative3f(PLobject *obj, float tx, float ty, float tz,
+void pl_object_torque3f(PLobject *obj, float tx, float ty, float tz);
+void pl_object_torque3fv(PLobject *obj, float3 t);
+void pl_object_torque_relative3f(PLobject *obj, float tx, float ty, float tz,
                         float px, float py, float pz);
-void plTorqueRelative3fv(PLobject *obj, float3 t, float3 p);
+void pl_object_torque_relative3fv(PLobject *obj, float3 t, float3 p);
 
 
-void plSetObjectPos3d(PLobject *obj, double x, double y, double z);
-void plSetObjectPosRel3d(PLobject * restrict obj,
+void pl_object_set_pos3d(PLobject *obj, double x, double y, double z);
+void pl_object_set_pos_rel3d(PLobject * restrict obj,
                          const PLobject * restrict otherObj,
                          double x, double y, double z);
-void plSetObjectPosExt3f(PLobject *obj,
+void pl_object_set_pos_ext3f(PLobject *obj,
                          int32_t i, int32_t j, int32_t k,
                          float x, float y, float z);
-void plSetObjectPosRel3fv(PLobject * restrict obj,
+void pl_object_set_pos_rel3fv(PLobject * restrict obj,
                           const PLobject * restrict otherObj,
                           float3 rp);
 
-void plStepObjectf(PLobject *obj, float dt);
-void plStepChildObjectf(PLobject *obj, float dt);
-void plNormaliseObject(PLobject *obj);
+void pl_object_step(PLobject *obj, float dt);
+void pl_object_step_child(PLobject *obj, float dt);
+void pl_object_normalise(PLobject *obj);
 /*! Clear object accumulators */
-void plClearObject(PLobject *obj);
+void pl_object_clear(PLobject *obj);
 
-float3 plGetVel(PLobject *obj);
-void plSetVel3f(PLobject *obj, float dx, float dy, float dz);
-void plSetVel3fv(PLobject *obj, float3 dp);
+float3 pl_object_get_vel(PLobject *obj);
+void pl_object_set_vel3f(PLobject *obj, float dx, float dy, float dz);
+void pl_object_set_vel3fv(PLobject *obj, float3 dp);
 
-float3 plGetAngularVel(PLobject *obj);
-void plSetAngularVel3f(PLobject *obj, float rx, float ry, float rz);
-void plSetAngularVel3fv(PLobject *obj, float3 r);
+float3 pl_object_get_angular_vel(PLobject *obj);
+void pl_object_set_angular_vel3f(PLobject *obj, float rx, float ry, float rz);
+void pl_object_set_angular_vel3fv(PLobject *obj, float3 r);
 
-quaternion_t plGetQuat(PLobject *obj);
+quaternion_t pl_object_get_quat(PLobject *obj);
 
-lwcoord_t plGetLwc(PLobject *obj);
+lwcoord_t pl_object_get_lwc(PLobject *obj);
 
-void plSetSystem(PLsystem *sys, PLobject *obj);
+void pl_system_add_object(pl_system_t *sys, PLobject *obj);
 
 /*! Check consistency of object. DO NOT CALL DIRECTLY. */
-void plCheckObject(PLobject *obj, const char *file, int line);
+void pl_object_check(PLobject *obj, const char *file, int line);
 
-void plSetDragCoef(PLobject *obj, float coef);
-void plSetArea(PLobject *obj, float area);
+void pl_object_set_drag_coef(PLobject *obj, float coef);
+void pl_object_set_area(PLobject *obj, float area);
 
 
 /*! Check consistency of object. When checking, the macro will assert that
@@ -158,6 +158,6 @@ void plSetArea(PLobject *obj, float area);
     In the case that a value is not finite, the program will abort and print an
     error message.
  */
-#define PL_CHECK_OBJ(obj) plCheckObject(obj, __FILE__, __LINE__)
+#define PL_CHECK_OBJ(obj) pl_object_check(obj, __FILE__, __LINE__)
 
 #endif /* !PHYSICS_OBJECT_H */

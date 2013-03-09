@@ -57,7 +57,7 @@ START_TEST(test_translate_obj)
               "k was not set properly (%d)", (int)v3i_get(obj->p.seg, 2));
   
   
-  PLfloat3 dp = vf3_set(PL_SEGMENT_LEN * 1.0,
+  float3 dp = vf3_set(PL_SEGMENT_LEN * 1.0,
                          PL_SEGMENT_LEN * 1.0,
                          - PL_SEGMENT_LEN * 1.0);
   plTranslateObject3fv(obj, dp);
@@ -85,7 +85,7 @@ START_TEST(test_obj_dist)
                                0.0);
 
 
-  PLfloat3 dist0 = plObjectDistance(obj, obj2);
+  float3 dist0 = plObjectDistance(obj, obj2);
 
   fail_unless(IN_RANGE(vf3_get(dist0, 0), 0.0, 0.00),
               "calculation of x failed (%f)", vf3_get(dist0, 0));
@@ -95,12 +95,12 @@ START_TEST(test_obj_dist)
               "calculation of z failed (%f)", vf3_get(dist0, 2));
 
 
-  PLfloat3 dp = vf3_set(0.0,
+  float3 dp = vf3_set(0.0,
                         150.0,
                         0.0);
   plTranslateObject3fv(obj2, dp);
 
-  PLfloat3 dist = plObjectDistance(obj, obj2);
+  float3 dist = plObjectDistance(obj, obj2);
 
   fail_unless(IN_RANGE(vf3_get(dist, 0), 0.0, 0.00),
               "calculation of x failed (%f)", vf3_get(dist, 0));

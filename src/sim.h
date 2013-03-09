@@ -36,23 +36,23 @@ extern "C" {
 typedef struct {
   float stepSize;     //!< Step size for simulation in seconds
   sim_spacecraft_t *currentSc; //!< Current active spacecraft
-  PLsystem *orbSys;   //!< Root orbit system, this will be the sun initially
-  PLworld *world;
+  pl_system_t *orbSys;   //!< Root orbit system, this will be the sun initially
+  pl_world_t *world;
   sg_window_t *win;
 } SIMstate;
 
 void sim_init(void);
 
   sg_scene_t* sim_get_scene(void);
-void ooSimSetOrbSys(PLsystem *osys);
-void ooSimSetOrbWorld(PLworld *world);
+void ooSimSetOrbSys(pl_system_t *osys);
+void ooSimSetOrbWorld(pl_world_t *world);
 
 void ooSimStep(float dt);
 
 void simSetSpacecraft(sim_spacecraft_t *sc);
 sim_spacecraft_t* simGetSpacecraft(void);
 OOeventqueue* simGetEventQueue(void);
-PLworld* simGetWorld(void);
+pl_world_t* simGetWorld(void);
 
 #ifdef __cplusplus
 }

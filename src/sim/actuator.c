@@ -80,7 +80,7 @@ thruster_step(SIMengine *engine, float dt)
 {
   SIMthrust *thruster = (SIMthrust*)engine;
 
-  plForceRelativePos3fv(thruster->super.stage->sc->obj,
+  pl_object_force_relative_pos3fv(thruster->super.stage->sc->obj,
                         thruster->fMax * thruster->super.throttle,
                         thruster->super.pos);
 }
@@ -131,9 +131,9 @@ void
 prop_step(SIMengine *engine, float dt)
 {
   SIMpropengine *prop = (SIMpropengine*)engine;
-  plForceRelativePos3fv(prop->super.stage->obj, prop->super.dir,
+  pl_object_force_relative_pos3fv(prop->super.stage->obj, prop->super.dir,
                         prop->super.pos);
-  plTorqueRelative3fv(prop->super.stage->obj,
+  pl_object_torque_relative3fv(prop->super.stage->obj,
                      vf3_set(0.0, 0.0, 0.0), prop->super.pos);
 }
 void
@@ -204,7 +204,7 @@ simNewEngine(char *name, sim_stage_t *stage, SIMenginekind kind,
   engine->dir = vf3_normalise(dir);
 
   // Create particle system for engine
-  //PLparticles *psys = plNewParticleSystem(name, 1000);
+  //pl_particles_t *psys = plNewParticleSystem(name, 1000);
   //engine->psys = (SGparticles*) sgNewParticleSystem(name,
   //                                                "textures/particle-alpha.png",
   //                                                psys);

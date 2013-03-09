@@ -234,15 +234,15 @@ ApolloInit(sim_spacecraft_t *sc)
                                     "spacecrafts/saturn/apollo_cmd.ac");
 
 
-  plMassSet(&sat_1c->obj->m, 1.0f, // Default to 1.0 kg
+  pl_mass_set(&sat_1c->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
             27.14764852, 0.39605, 27.14764852,
             0.0, 0.0, 0.0);
-  plMassMod(&sat_1c->obj->m, 24000.0 + 2200.0);
-  plMassTranslate(&sat_1c->obj->m, 0.0, 8.9916, 0.0);
-  plMassSetMin(&sat_1c->obj->m, 4400.0);
-  plSetDragCoef(sat_1c->obj, 0.5);
-  plSetArea(sat_1c->obj, 2.0*M_PI);
+  pl_mass_mod(&sat_1c->obj->m, 24000.0 + 2200.0);
+  pl_mass_translate(&sat_1c->obj->m, 0.0, 8.9916, 0.0);
+  pl_mass_set_min(&sat_1c->obj->m, 4400.0);
+  pl_object_set_drag_coef(sat_1c->obj, 0.5);
+  pl_object_set_area(sat_1c->obj, 2.0*M_PI);
 
   scStageSetOffset3f(sat_1c, 0.0, 0.0, 0.0);
 

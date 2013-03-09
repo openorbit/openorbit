@@ -24,72 +24,72 @@
 #include <vmath/vmath.h>
 #include <gencds/array.h>
 
-typedef enum PLelement {
-  PL_Elem_First = 0, PL_Elem_n = 0,
+typedef enum pl_element_t {
+  PL_ELEM_First = 0, PL_ELEM_n = 0,
   // Period 1
-  PL_Elem_H = 1, PL_Elem_He,
+  PL_ELEM_H = 1, PL_ELEM_He,
 
   // Period 2
-  PL_Elem_Li, PL_Elem_Be, PL_Elem_B, PL_Elem_C,
-  PL_Elem_N, PL_Elem_O, PL_Elem_F, PL_Elem_Ne,
+  PL_ELEM_Li, PL_ELEM_Be, PL_ELEM_B, PL_ELEM_C,
+  PL_ELEM_N, PL_ELEM_O, PL_ELEM_F, PL_ELEM_Ne,
 
   // Period 3
-  PL_Elem_Na, PL_Elem_Mg, PL_Elem_Al, PL_Elem_Si,
-  PL_Elem_P, PL_Elem_S, PL_Elem_Cl, PL_Elem_Ar,
+  PL_ELEM_Na, PL_ELEM_Mg, PL_ELEM_Al, PL_ELEM_Si,
+  PL_ELEM_P, PL_ELEM_S, PL_ELEM_Cl, PL_ELEM_Ar,
 
   // Period 4
-  PL_Elem_K, PL_Elem_Ca, PL_Elem_Sc, PL_Elem_Ti,
-  PL_Elem_V, PL_Elem_Cr, PL_Elem_Mn, PL_Elem_Fe,
-  PL_Elem_Co, PL_Elem_Ni, PL_Elem_Cu, PL_Elem_Zn,
-  PL_Elem_Ga, PL_Elem_Ge, PL_Elem_As, PL_Elem_Se,
-  PL_Elem_Br, PL_Elem_Kr,
+  PL_ELEM_K, PL_ELEM_Ca, PL_ELEM_Sc, PL_ELEM_Ti,
+  PL_ELEM_V, PL_ELEM_Cr, PL_ELEM_Mn, PL_ELEM_Fe,
+  PL_ELEM_Co, PL_ELEM_Ni, PL_ELEM_Cu, PL_ELEM_Zn,
+  PL_ELEM_Ga, PL_ELEM_Ge, PL_ELEM_As, PL_ELEM_Se,
+  PL_ELEM_Br, PL_ELEM_Kr,
 
   // Period 5
-  PL_Elem_Rb, PL_Elem_Sr, PL_Elem_Y, PL_Elem_Zr,
-  PL_Elem_Nb, PL_Elem_Mo, PL_Elem_Tc, PL_Elem_Ru,
-  PL_Elem_Rh, PL_Elem_Pd, PL_Elem_Ag, PL_Elem_Cd,
-  PL_Elem_In, PL_Elem_Sn, PL_Elem_Sb, PL_Elem_Te,
-  PL_Elem_I, PL_Elem_Xe,
+  PL_ELEM_Rb, PL_ELEM_Sr, PL_ELEM_Y, PL_ELEM_Zr,
+  PL_ELEM_Nb, PL_ELEM_Mo, PL_ELEM_Tc, PL_ELEM_Ru,
+  PL_ELEM_Rh, PL_ELEM_Pd, PL_ELEM_Ag, PL_ELEM_Cd,
+  PL_ELEM_In, PL_ELEM_Sn, PL_ELEM_Sb, PL_ELEM_Te,
+  PL_ELEM_I, PL_ELEM_Xe,
 
   // Period 6
-  PL_Elem_Cs, PL_Elem_Ba,
+  PL_ELEM_Cs, PL_ELEM_Ba,
 
   // Lanthanoids
-  PL_Elem_La, PL_Elem_Ce, PL_Elem_Pr, PL_Elem_Nd,
-  PL_Elem_Pm, PL_Elem_Sm, PL_Elem_Eu, PL_Elem_Gd,
-  PL_Elem_Tb, PL_Elem_Dy, PL_Elem_Ho, PL_Elem_Er,
-  PL_Elem_Tm, PL_Elem_Yb, PL_Elem_Lu,
+  PL_ELEM_La, PL_ELEM_Ce, PL_ELEM_Pr, PL_ELEM_Nd,
+  PL_ELEM_Pm, PL_ELEM_Sm, PL_ELEM_Eu, PL_ELEM_Gd,
+  PL_ELEM_Tb, PL_ELEM_Dy, PL_ELEM_Ho, PL_ELEM_Er,
+  PL_ELEM_Tm, PL_ELEM_Yb, PL_ELEM_Lu,
 
-  PL_Elem_Hf, PL_Elem_Ta, PL_Elem_W, PL_Elem_Re,
-  PL_Elem_Os, PL_Elem_Ir, PL_Elem_Pt, PL_Elem_Au,
-  PL_Elem_Hg, PL_Elem_Tl, PL_Elem_Pb, PL_Elem_Bi,
-  PL_Elem_Po, PL_Elem_At, PL_Elem_Rn,
+  PL_ELEM_Hf, PL_ELEM_Ta, PL_ELEM_W, PL_ELEM_Re,
+  PL_ELEM_Os, PL_ELEM_Ir, PL_ELEM_Pt, PL_ELEM_Au,
+  PL_ELEM_Hg, PL_ELEM_Tl, PL_ELEM_Pb, PL_ELEM_Bi,
+  PL_ELEM_Po, PL_ELEM_At, PL_ELEM_Rn,
 
   // Period 7
-  PL_Elem_Fr, PL_Elem_Ra,
+  PL_ELEM_Fr, PL_ELEM_Ra,
 
   // Actinoids
-  PL_Elem_Ac, PL_Elem_Th, PL_Elem_Pa, PL_Elem_U,
-  PL_Elem_Np, PL_Elem_Pu, PL_Elem_Am, PL_Elem_Cm,
-  PL_Elem_Bk, PL_Elem_Cf, PL_Elem_Es, PL_Elem_Fm,
-  PL_Elem_Md, PL_Elem_No, PL_Elem_Lr,
+  PL_ELEM_Ac, PL_ELEM_Th, PL_ELEM_Pa, PL_ELEM_U,
+  PL_ELEM_Np, PL_ELEM_Pu, PL_ELEM_Am, PL_ELEM_Cm,
+  PL_ELEM_Bk, PL_ELEM_Cf, PL_ELEM_Es, PL_ELEM_Fm,
+  PL_ELEM_Md, PL_ELEM_No, PL_ELEM_Lr,
 
-  PL_Elem_Rf, PL_Elem_Db, PL_Elem_Sg, PL_Elem_Bh,
-  PL_Elem_Hs, PL_Elem_Mt, PL_Elem_Ds, PL_Elem_Rg,
-  PL_Elem_Cn, PL_Elem_Uut, PL_Elem_Uuq, PL_Elem_Uup,
-  PL_Elem_Uuh, PL_Elem_Uus, PL_Elem_Uuo,
+  PL_ELEM_Rf, PL_ELEM_Db, PL_ELEM_Sg, PL_ELEM_Bh,
+  PL_ELEM_Hs, PL_ELEM_Mt, PL_ELEM_Ds, PL_ELEM_Rg,
+  PL_ELEM_Cn, PL_ELEM_Uut, PL_ELEM_Uuq, PL_ELEM_Uup,
+  PL_ELEM_Uuh, PL_ELEM_Uus, PL_ELEM_Uuo,
 
-  PL_Elem_Last,
-} PLelement;
+  PL_ELEM_Last,
+} pl_element_t;
 
-typedef struct PLmolecule {
+typedef struct pl_molecule_t {
   unsigned elems;
 
   struct {
     unsigned count;
-    PLelement elem;
+    pl_element_t elem;
   } atoms[];
-} PLmolecule;
+} pl_molecule_t;
 
 // Atmospheres are divided into troposphere, stratosphere, mesosphere,
 // thermosphere and exosphere. The boundaries between these are the
@@ -101,12 +101,12 @@ typedef struct PLmolecule {
 // an atmosphere object which contain a number of sample points of fixed
 // distance. The values are then interpolated between the sample points.
 
-typedef struct PLatmosphereLayer PLatmosphereLayer;
-typedef struct PLatmosphereTemplate PLatmosphereTemplate;
+typedef struct pl_atm_layer_t pl_atm_layer_t;
+typedef struct pl_atm_template_t pl_atm_template_t;
 
-typedef float (*PLatmcomputef)(PLatmosphereLayer *,float);
+typedef float (*pl_atm_comp_fn_t)(pl_atm_layer_t *,float);
 
-struct PLatmosphereLayer {
+struct pl_atm_layer_t {
   float g0;
   float P_b;
   float T_b;
@@ -114,13 +114,13 @@ struct PLatmosphereLayer {
   float p_b;
   float h_b;
   float L_b;
-  PLatmcomputef compPressure;
-  PLatmcomputef compDensity;
+  pl_atm_comp_fn_t compPressure;
+  pl_atm_comp_fn_t compDensity;
 };
 
-struct PLatmosphereTemplate {
+struct pl_atm_template_t {
   size_t layer_count;
-  PLatmosphereLayer layer[];
+  pl_atm_layer_t layer[];
 };
 
 
@@ -136,14 +136,14 @@ typedef struct PLatmosphere {
   float_array_t p; // Density points
 } PLatmosphere;
 
-double plComputeAltitude(PLobject *obj);
-float3 plComputeAirvelocity(PLobject *obj);
-double plComputeAirspeed(PLobject *obj);
-double plComputeAirpressure(PLobject *obj);
-double plComputeAirdensity(PLobject *obj);
-float3 plComputeDragForObject(PLobject *obj);
-double plComputeAirdensityWithCurrentPressure(PLobject *obj);
-void plInitAtmosphere(PLatmosphere *atm, float groundPressure, float h0);
+double pl_object_compute_altitude(PLobject *obj);
+float3 pl_compute_airvelocity(PLobject *obj);
+double pl_object_compute_airspeed(PLobject *obj);
+double pl_object_compute_airpressure(PLobject *obj);
+double pl_object_compute_airdensity(PLobject *obj);
+float3 pl_object_compute_drag(PLobject *obj);
+double pl_object_compute_airdensity_with_current_pressure(PLobject *obj);
+void pl_atmosphere_init(PLatmosphere *atm, float groundPressure, float h0);
 
 /*!
  Computes the air preasure at a given altitude, note that for simplicitys sake,
@@ -158,26 +158,28 @@ void plInitAtmosphere(PLatmosphere *atm, float groundPressure, float h0);
  \param Lb Lapse rate in kelvin per metre
  */
 double
-plPressureAtAltitudeWithLapse(double Pb, double Tb, double g0, double M,
+pl_pressure_at_altitude_with_lapse(double Pb, double Tb, double g0, double M,
                               double h, double hb, double Lb);
 
 double
-plPressureAtAltitude(double Pb, double Tb, double g0, double M, double h,
+pl_pressure_at_altitude(double Pb, double Tb, double g0, double M, double h,
                      double hb);
 
 // Simplified atmospheric model
-float plComputeSimpleAirpressure(const PLatmosphere *atm, float h);
+float pl_atmosphere_simple_compute_airpressure(const PLatmosphere *atm, float h);
 
-float plComputeAirpressure2(PLatmosphereTemplate *atm, float h);
-float plComputeAirdensity2(PLatmosphereTemplate *atm, float h);
+float pl_atm_template_compute_airpressure(pl_atm_template_t *atm, float h);
+float pl_atm_template_compute_airdensity(pl_atm_template_t *atm, float h);
 
-PLatmosphereTemplate*
-plAtmosphered(size_t layers, double g0, double M, const double *p_b,
-              const double *P_b, const double *T_b, const double *h_b,
-              const double *L_b);
-PLatmosphere* plAtmosphere(float sample_dist, float h, PLatmosphereTemplate *t);
-float plAtmosphereDensity(const PLatmosphere *atm, float h);
-float plAtmospherePressure(const PLatmosphere *atm, float h);
+pl_atm_template_t*
+pl_new_atmosphere_template(size_t layers, double g0, double M,
+                           const double *p_b, const double *P_b,
+                           const double *T_b, const double *h_b,
+                           const double *L_b);
+PLatmosphere* pl_new_atmosphere(float sample_dist, float h,
+                                pl_atm_template_t *t);
+float pl_atmosphere_density(const PLatmosphere *atm, float h);
+float pl_atmosphere_pressure(const PLatmosphere *atm, float h);
 
 
 typedef struct PLairfoil {
@@ -185,7 +187,7 @@ typedef struct PLairfoil {
   float Ct0;
 } PLairfoil;
 
-float3 plComputeLift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil);
+float3 pl_atmosphere_compute_lift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil);
 
 
 #endif /* ! PL_ATMOSPHERE_H */

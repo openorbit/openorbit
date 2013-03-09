@@ -25,14 +25,14 @@
   scattered around in the world.
 
   The physics library has five major object types that need to be known of.
-  1. PLworld that encapsulate all the state of the simulation, including a root
+  1. pl_world_t that encapsulate all the state of the simulation, including a root
      system.
-  2. PLsystem that identify a system of astronomical bodies with one body
+  2. pl_system_t that identify a system of astronomical bodies with one body
      associated with the system.
-  3. PLastrobody that represents a large astronomical body, like the sun, a
+  3. pl_astrobody_t that represents a large astronomical body, like the sun, a
      planet or a moon.
   4. PLobject that represent a small object.
-  5. PLmass that represent mass and inertia parameters.
+  5. pl_mass_t that represent mass and inertia parameters.
 
   A feature with the physics library is that it is integrated with the
   scenegraph, that means that the objects keep track of their respective model
@@ -53,13 +53,6 @@
 #ifndef __has_feature
 #define __has_feature(x) 0  // Compatibility with non-clang compilers.
 #endif
-
-typedef float4 PLfloat3;
-typedef double3 PLdouble3;
-typedef long3 PLlong3;
-typedef int3 PLint3;
-typedef short3 PLshort3;
-typedef float3x3 PLfloat3x3;
 
 // Speed of light
 #define PL_C 299792458.0
@@ -98,53 +91,54 @@ typedef float3x3 PLfloat3x3;
 
 // Unit conversion macros
 
-void plInit(void);
+void pl_init(void);
+
 static inline double
-plMetresToAu(double m)
+pl_metres_to_au(double m)
 {
   return m / 149598000000.0;
 }
 
-static inline PLdouble3
-plMetresToAu_v(PLdouble3 m)
+static inline double3
+pl_metres_to_au_v(double3 m)
 {
   return vd3_s_div(m, 149598000000.0);
 }
 
 
 static inline double
-plAuToMetres(double au)
+pl_au_to_metres(double au)
 {
   return au * 149598000000.0;
 }
 
-static inline PLdouble3
-plAuToMetres_v(PLdouble3 au)
+static inline double3
+pl_au_to_metres_v(double3 au)
 {
   return vd3_s_mul(au, 149598000000.0);
 }
 
 
 static inline double
-plMetresToPc(double m)
+pl_metres_to_pc(double m)
 {
   return m / 3.08e16;
 }
 
 static inline double
-plPcToMetres(double pc)
+pl_pc_to_metres(double pc)
 {
   return pc * 3.08e16;
 }
 
-static inline PLdouble3
-plMetresToPc_v(PLdouble3 m)
+static inline double3
+pl_metres_to_pc_v(double3 m)
 {
   return vd3_s_div(m, 3.08e16);
 }
 
-static inline PLdouble3
-plPcToMetres_v(PLdouble3 pc)
+static inline double3
+pl_pc_to_metres_v(double3 pc)
 {
   return vd3_s_mul(pc, 3.08e16);
 }
@@ -152,26 +146,26 @@ plPcToMetres_v(PLdouble3 pc)
 
 
 static inline double
-plPaToBar(double p)
+pl_pa_to_bar(double p)
 {
   return p / 100000.0;
 }
 
 static inline double
-plBarToPa(double p)
+pl_bar_to_pa(double p)
 {
   return p * 100000.0;
 }
 
 
 static inline double
-plCToK(double t)
+pl_c_to_k(double t)
 {
   return t + 273.16;
 }
 
 static inline double
-plKToC(double t)
+pl_k_to_c(double t)
 {
   return t - 273.16;
 }

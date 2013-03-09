@@ -243,15 +243,15 @@ MercuryInit(sim_spacecraft_t *sc)
   sim_stage_t *redstone = simNewStage(sc, "Mercury-Redstone",
                                   "spacecrafts/mercury/redstone.ac");
 
-  plMassSet(&redstone->obj->m, 1.0f, // Default to 1.0 kg
+  pl_mass_set(&redstone->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
             27.14764852, 0.39605, 27.14764852,
             0.0, 0.0, 0.0);
-  plMassMod(&redstone->obj->m, 24000.0 + 2200.0);
-  plMassTranslate(&redstone->obj->m, 0.0, 8.9916, 0.0);
-  plMassSetMin(&redstone->obj->m, 4400.0);
-  plSetDragCoef(redstone->obj, 0.5);
-  plSetArea(redstone->obj, 2.0*M_PI);
+  pl_mass_mod(&redstone->obj->m, 24000.0 + 2200.0);
+  pl_mass_translate(&redstone->obj->m, 0.0, 8.9916, 0.0);
+  pl_mass_set_min(&redstone->obj->m, 4400.0);
+  pl_object_set_drag_coef(redstone->obj, 0.5);
+  pl_object_set_area(redstone->obj, 2.0*M_PI);
 
   scStageSetOffset3f(redstone, 0.0, 0.0, 0.0);
 
@@ -264,15 +264,15 @@ MercuryInit(sim_spacecraft_t *sc)
   sim_stage_t *capsule = simNewStage(sc, "Command-Module",
                                  "spacecrafts/mercury/mercury.ac");
 
-  plMassSet(&capsule->obj->m, 1.0f, // Default to 1.0 kg
+  pl_mass_set(&capsule->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
             1.2188583333, 0.39605, 1.2188583333,
             0.0, 0.0, 0.0);
-  plMassMod(&capsule->obj->m, 1354.0);
-  plMassTranslate(&capsule->obj->m, 0.0, 0.55, 0.0);
-  plMassSetMin(&capsule->obj->m, 1354.0);
-  plSetDragCoef(capsule->obj, 0.5);
-  plSetArea(capsule->obj, 2.0*M_PI);
+  pl_mass_mod(&capsule->obj->m, 1354.0);
+  pl_mass_translate(&capsule->obj->m, 0.0, 0.55, 0.0);
+  pl_mass_set_min(&capsule->obj->m, 1354.0);
+  pl_object_set_drag_coef(capsule->obj, 0.5);
+  pl_object_set_area(capsule->obj, 2.0*M_PI);
 
   scStageSetOffset3f(capsule, 0.0, 17.9832, 0.0);
 

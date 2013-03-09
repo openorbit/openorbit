@@ -576,14 +576,14 @@ sg_object_sync(sg_object_t *obj, float t)
 {
   if (obj->rigidBody) {
     // Synchronise rotational velocity and quaternions
-    obj->dr = plGetAngularVel(obj->rigidBody);
-    obj->q0 = plGetQuat(obj->rigidBody);
+    obj->dr = pl_object_get_angular_vel(obj->rigidBody);
+    obj->q0 = pl_object_get_quat(obj->rigidBody);
     obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
     obj->q = q_slerp(obj->q0, obj->q1, 0.0);
 
     // Synchronise world coordinates
-    obj->dp = plGetVel(obj->rigidBody);
-    obj->p0 = plGetLwc(obj->rigidBody);
+    obj->dp = pl_object_get_vel(obj->rigidBody);
+    obj->p0 = pl_object_get_lwc(obj->rigidBody);
     obj->p1 = obj->p0;
 
     lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));

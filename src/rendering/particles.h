@@ -38,11 +38,11 @@
 struct SGparticles {
   SGdrawable super;
   GLuint texture;
-  PLparticles *ps;
+  pl_particles_t *ps;
 };
 
 SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
-                                PLparticles *ps);
+                                pl_particles_t *ps);
 #endif
 
 #endif /* !SG_PARTICLES_H */

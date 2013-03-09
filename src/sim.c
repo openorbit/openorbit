@@ -149,13 +149,13 @@ sim_init(void)
 
 
 void
-ooSimSetOrbSys(PLsystem *osys)
+ooSimSetOrbSys(pl_system_t *osys)
 {
   gSIM_state.orbSys = osys;
 }
 
 void
-ooSimSetOrbWorld(PLworld *world)
+ooSimSetOrbWorld(pl_world_t *world)
 {
   gSIM_state.world = world;
 }
@@ -197,7 +197,7 @@ ooSimStep(float dt)
   simAxisPush();
   //sgCamStep(sgGetCam(gSIM_state.sg), dt);
 
-  plWorldClear(gSIM_state.world);
+  pl_world_clear(gSIM_state.world);
 
   gettimeofday(&end, NULL);
 
@@ -208,7 +208,7 @@ ooSimStep(float dt)
   simScStep(gSIM_state.currentSc, dt);
   simDispatchPendingEvents();
 
-  plWorldStep(gSIM_state.world, dt);
+  pl_world_step(gSIM_state.world, dt);
 
   ooLogTrace("sim step");
 
@@ -236,7 +236,7 @@ simGetSpacecraft(void)
   return gSIM_state.currentSc;
 }
 
-PLworld*
+pl_world_t*
 simGetWorld(void)
 {
   return gSIM_state.world;

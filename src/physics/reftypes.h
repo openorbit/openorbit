@@ -21,13 +21,13 @@
 #ifndef PL_REFTYPES_H
 #define PL_REFTYPES_H
 
-typedef struct PLworld PLworld;
-typedef struct PLsystem PLsystem;
-typedef struct PLastrobody PLastrobody;
+typedef struct pl_world_t pl_world_t;
+typedef struct pl_system_t pl_system_t;
+typedef struct pl_astrobody_t pl_astrobody_t;
 typedef struct PLobject PLobject;
-typedef struct PLparticle PLparticle;
-typedef struct PLparticles PLparticles;
-typedef struct PLrecgrid PLrecgrid;
-typedef struct PLcollisioncontext PLcollisioncontext;
+typedef struct pl_particle_t pl_particle_t;
+typedef struct pl_particles_t pl_particles_t;
+typedef struct pl_recgrid_t pl_recgrid_t;
+typedef struct pl_collisioncontext_t pl_collisioncontext_t;
 
 #endif /* !PL_REFTYPES_H */

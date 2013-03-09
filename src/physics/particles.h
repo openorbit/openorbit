@@ -27,7 +27,7 @@
 #include <vmath/vmath.h>
 #include "physics/object.h"
 
-struct PLparticle {
+struct pl_particle_t {
   bool active;
   float	age; // Age of particles
   float	lifeTime; // lifetime
@@ -38,7 +38,7 @@ struct PLparticle {
   float3 s; // Size
 };
 
-struct PLparticles {
+struct pl_particles_t {
   PLobject *obj; // Object the particle generator is attached to
   //GLuint texture;
   float directionLimit;
@@ -56,20 +56,20 @@ struct PLparticles {
   bool enabled; // Should we simulate the particle system at all?
   bool autoDisable; // Do not emit new particles, and disable when no particles are alive
 
-  PLparticle *particles;
+  pl_particle_t *particles;
   int_array_t freeParticles;
 };
 
 
-PLparticles* plNewParticleSystem(const char *name, size_t particleCount);
-void plDeleteParticleSystem(PLparticles *ps);
-void plStepParticleSystem(PLparticles *ps, float dt);
-void plAttachParticleSystem3f(PLparticles *ps, PLobject *obj, float x, float y, float z);
-void plSetEmitterDirection3f(PLparticles *ps, float x, float y, float z);
+pl_particles_t* pl_new_particle_system(const char *name, size_t particleCount);
+void pl_particles_delete(pl_particles_t *ps);
+void pl_particles_step(pl_particles_t *ps, float dt);
+void pl_particles_attach3f(pl_particles_t *ps, PLobject *obj, float x, float y, float z);
+void pl_particles_set_emitter_direction3f(pl_particles_t *ps, float x, float y, float z);
 
-void plEnableParticleSystem(PLparticles *ps);
-void plDisableParticleSystem(PLparticles *ps);
+void pl_particles_enable(pl_particles_t *ps);
+void pl_particles_disable(pl_particles_t *ps);
 
-void plParticleSystemSetEmissionRate(PLparticles *ps, float er);
+void pl_particles_set_emission_rate(pl_particles_t *ps, float er);
 
 #endif /* !PL_PARTICLES_H */

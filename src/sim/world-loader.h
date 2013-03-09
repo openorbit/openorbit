@@ -30,7 +30,7 @@
  This function does not belong in the physics system, but will be here for
  now beeing.
  */
-PLworld* ooOrbitLoad(sg_scene_t *sc, const char *fileName);
+pl_world_t* ooOrbitLoad(sg_scene_t *sc, const char *fileName);
 
 
 

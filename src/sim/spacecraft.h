@@ -115,7 +115,7 @@ struct sim_spacecraft_t {
 
   sim_record_t *rec;
 
-  PLworld *world;
+  pl_world_t *world;
   PLobject *obj;
 
   const char *name;
@@ -157,7 +157,7 @@ void simScInit(sim_spacecraft_t *sc, const char *name);
 void simInitStage(sim_stage_t *stage);
 void simAddStage(sim_spacecraft_t *sc, sim_stage_t *stage);
 
-sim_spacecraft_t* ooScNew(PLworld *world, sg_scene_t *scene, const char *name);
+sim_spacecraft_t* ooScNew(pl_world_t *world, sg_scene_t *scene, const char *name);
 void simScDetatchStage(sim_spacecraft_t *sc);
 
 void simScToggleMainEngine(sim_spacecraft_t *sc);
@@ -200,7 +200,7 @@ void ooScSetSysAndCoords(sim_spacecraft_t *sc, const char *sysName, double longi
 
 sim_stage_t* simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh);
 
-sim_spacecraft_t* ooScLoad(PLworld *world, sg_scene_t *scene, const char *fileName);
+sim_spacecraft_t* ooScLoad(pl_world_t *world, sg_scene_t *scene, const char *fileName);
 
 void scStageSetOffset3f(sim_stage_t *stage, float x, float y, float z);
 void scStageSetOffset3fv(sim_stage_t *stage, float3 p);
@@ -223,7 +223,7 @@ float simGetAltitude(sim_spacecraft_t *sc);
 // gravitational source
 float3 simGetRelPos(sim_spacecraft_t *sc);
 float3 simGetRelVel(sim_spacecraft_t *sc);
-PLsystem* simGetSys(sim_spacecraft_t *sc);
+pl_system_t* simGetSys(sim_spacecraft_t *sc);
 
 void simStageArmEngines(sim_stage_t *stage);
 void simStageDisarmEngines(sim_stage_t *stage);
