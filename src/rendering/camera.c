@@ -320,7 +320,7 @@ sg_camera_rotate_hat(int buttonVal, void *data)
   // and 1.0 is the expected time of the next sync.
   // We thus need to take the frequency (not the SRT period) here.
   float wct_freq;
-  ooConfGetFloatDef("openorbit/sim/freq", &wct_freq, 20.0); // Hz
+  config_get_float_def("openorbit/sim/freq", &wct_freq, 20.0); // Hz
 
   if ((cam->src == cam->tgt) && cam->src) {
     // We are targeting our follow object this means orbiting it

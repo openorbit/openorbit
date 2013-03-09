@@ -90,8 +90,8 @@ sdl_init_gl(void)
 {
   // Setup attributes we want for the OpenGL context
   int stencilSize, colourSize;
-  ooConfGetIntDef("openorbit/video/stencil-bits", &stencilSize, 1);
-  ooConfGetIntDef("openorbit/video/colour-bits", &colourSize, 32);
+  config_get_int_def("openorbit/video/stencil-bits", &stencilSize, 1);
+  config_get_int_def("openorbit/video/colour-bits", &colourSize, 32);
 
   // Don't set color bit sizes (SDL_GL_RED_SIZE, etc)
   //    Mac OS X will always use 8-8-8-8 ARGB for 32-bit screens and

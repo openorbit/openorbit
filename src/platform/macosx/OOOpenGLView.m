@@ -197,10 +197,10 @@ static io_keycode_t keymap [256] = {
 
   //extern SIMstate gSIM_state;
   float freq;
-  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
+  config_get_float_def("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s
   float sim_period;
-  ooConfGetFloatDef("openorbit/sim/period", &sim_period, wc_period);
+  config_get_float_def("openorbit/sim/period", &sim_period, wc_period);
 
 
   // Step now to ensure physic system is in sync before drawing

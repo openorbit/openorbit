@@ -35,17 +35,17 @@
 #include "common/mapped-file.h"
 #include "palloc.h"
 
-struct OOconf
+struct config_t
 {
   HRMLdocument *doc;
 };
 
-static OOconf gConfSingleton = {.doc = NULL};
+static config_t gConfSingleton = {.doc = NULL};
 
 json_t *conf_doc;
 
 void
-ooConfLoad(const char *name)
+config_load(const char *name)
 {
   HRMLdocument *doc = hrmlParse(name);
   if (!doc) {
@@ -260,7 +260,7 @@ MODULE_INIT(settings, NULL)
 
 
 void
-ooConfRegisterBoolDef(const char *key, bool val)
+config_register_bool_def(const char *key, bool val)
 {
   json_t *json = lookup(key);
 
@@ -273,7 +273,7 @@ ooConfRegisterBoolDef(const char *key, bool val)
 }
 
 void
-ooConfRegisterFloatDef(const char *key, float val)
+config_register_float_def(const char *key, float val)
 {
   json_t *json = lookup(key);
 
@@ -287,7 +287,7 @@ ooConfRegisterFloatDef(const char *key, float val)
 }
 
 void
-ooConfRegisterIntegerDef(const char *key, long val)
+config_register_integer_def(const char *key, long val)
 {
   json_t *json = lookup(key);
 
@@ -300,7 +300,7 @@ ooConfRegisterIntegerDef(const char *key, long val)
 }
 
 void
-ooConfRegisterStringDef(const char *key, const char *val)
+config_register_string_def(const char *key, const char *val)
 {
   json_t *json = lookup(key);
 
@@ -316,7 +316,7 @@ ooConfRegisterStringDef(const char *key, const char *val)
 
 
 void
-ooConfDelete()
+config_delete()
 {
   hrmlFreeDocument(gConfSingleton.doc);
   json_decref(conf_doc);
@@ -324,7 +324,7 @@ ooConfDelete()
 
 
 int
-ooConfGetBoolDef(const char *key, bool *val, bool defVal)
+config_get_bool_def(const char *key, bool *val, bool defVal)
 {
   json_t *obj = lookup(key);
   if (json_is_true(obj)) {
@@ -339,7 +339,7 @@ ooConfGetBoolDef(const char *key, bool *val, bool defVal)
 }
 
 int
-ooConfGetBoolAsIntDef(const char *key, int *val, int defVal)
+config_get_bool_as_int_def(const char *key, int *val, int defVal)
 {
   json_t *obj = lookup(key);
   if (json_is_true(obj)) {
@@ -353,7 +353,7 @@ ooConfGetBoolAsIntDef(const char *key, int *val, int defVal)
 }
 
 int
-ooConfGetIntDef(const char *key, int *val, int defVal)
+config_get_int_def(const char *key, int *val, int defVal)
 {
   json_t *obj = lookup(key);
   if (json_is_integer(obj)) {
@@ -365,7 +365,7 @@ ooConfGetIntDef(const char *key, int *val, int defVal)
 }
 
 int
-ooConfGetFloatDef(const char *key, float *val, float defVal)
+config_get_float_def(const char *key, float *val, float defVal)
 {
   json_t *obj = lookup(key);
   if (json_is_real(obj)) {
@@ -377,7 +377,7 @@ ooConfGetFloatDef(const char *key, float *val, float defVal)
 }
 
 int
-ooConfGetStrDef(const char *key, const char **val, const char *defVal)
+config_get_str_def(const char *key, const char **val, const char *defVal)
 {
   json_t *obj = lookup(key);
   if (json_is_string(obj)) {
@@ -388,26 +388,26 @@ ooConfGetStrDef(const char *key, const char **val, const char *defVal)
   return 0;
 }
 
-struct OOconfnode {
+struct config_node_t {
   json_t *obj;
   void *iter;
 };
 
-OOconfnode*
-ooConfGetNode(const char *key)
+config_node_t*
+config_get_node(const char *key)
 {
-  OOconfnode *conf = smalloc(sizeof(struct OOconfnode));
+  config_node_t *conf = smalloc(sizeof(struct config_node_t));
   conf->obj = lookup(key);
   conf->iter = json_object_iter(conf->obj);
   return conf;
 }
 
-OOconfarr*
-ooConfGetNamedArr(const char *key)
+config_arr_t*
+config_get_named_arr(const char *key)
 {
   json_t *obj = lookup(key);
   if (json_is_array(obj)) {
-    return (OOconfarr*)obj;
+    return (config_arr_t*)obj;
   }
 
   return NULL;
@@ -415,7 +415,7 @@ ooConfGetNamedArr(const char *key)
 
 
 bool
-ooConfNodeNext(OOconfnode *node)
+config_node_next(config_node_t *node)
 {
   node->iter = json_object_iter_next(node->obj, node->iter);
   if (node->iter) return true;
@@ -423,34 +423,34 @@ ooConfNodeNext(OOconfnode *node)
 }
 
 const char*
-ooConfName(OOconfnode *node)
+config_name(config_node_t *node)
 {
   return json_object_iter_key(node->iter);
 }
 
 bool
-ooConfIsFloat(OOconfnode *node)
+config_is_float(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
   return json_is_real(obj);
 }
 
 bool
-ooConfIsInt(OOconfnode *node)
+config_is_int(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
   return json_is_integer(obj);
 }
 
 bool
-ooConfIsObj(OOconfnode *node)
+config_is_obj(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
   return json_is_object(obj);
 }
 
 bool
-ooConfIsBool(OOconfnode *node)
+config_is_bool(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
 
@@ -463,7 +463,7 @@ ooConfIsBool(OOconfnode *node)
 }
 
 float
-ooConfGetFloat(OOconfnode *node)
+config_get_float(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
 
@@ -476,7 +476,7 @@ ooConfGetFloat(OOconfnode *node)
 }
 
 long
-ooConfGetInt(OOconfnode *node)
+config_get_int(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
 
@@ -489,13 +489,13 @@ ooConfGetInt(OOconfnode *node)
 }
 
 // TODO: fix type
-OOconfnode*
-ooConfGetObj(OOconfnode *node)
+config_node_t*
+config_get_obj(config_node_t *node)
 {
   json_t *val = json_object_iter_value(node->iter);
 
   if (json_is_object(val)) {
-    OOconfnode *child = smalloc(sizeof(struct OOconfnode));
+    config_node_t *child = smalloc(sizeof(struct config_node_t));
     child->obj = val;
     child->iter = json_object_iter(child->obj);
     return child;
@@ -506,7 +506,7 @@ ooConfGetObj(OOconfnode *node)
 }
 
 bool
-ooConfGetBool(OOconfnode *node)
+config_get_bool(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
 
@@ -519,7 +519,7 @@ ooConfGetBool(OOconfnode *node)
 }
 
 const char*
-ooConfGetStr(OOconfnode *node)
+config_get_str(config_node_t *node)
 {
   json_t *val = json_object_iter_value(node->iter);
 
@@ -532,14 +532,14 @@ ooConfGetStr(OOconfnode *node)
 
 
 void
-ooConfNodeDispose(OOconfnode *node)
+config_node_dispose(config_node_t *node)
 {
   free(node);
 }
 
 
 bool
-ooConfGetBoolByName(OOconfnode *node, const char *name)
+config_get_bool_by_name(config_node_t *node, const char *name)
 {
   json_t *val = json_object_get(node->obj, name);
 
@@ -551,13 +551,13 @@ ooConfGetBoolByName(OOconfnode *node, const char *name)
   return false;
 }
 
-OOconfnode*
-ooConfGetObjByName(OOconfnode *node, const char *name)
+config_node_t*
+config_get_obj_by_name(config_node_t *node, const char *name)
 {
   json_t *val = json_object_get(node->obj, name);
 
   if (json_is_object(val)) {
-    OOconfnode *child = smalloc(sizeof(struct OOconfnode));
+    config_node_t *child = smalloc(sizeof(struct config_node_t));
     child->obj = val;
     child->iter = json_object_iter(child->obj);
     return child;
@@ -568,12 +568,12 @@ ooConfGetObjByName(OOconfnode *node, const char *name)
 }
 
 long
-ooConfGetIntByName(OOconfnode *node, const char *name)
+config_get_int_by_name(config_node_t *node, const char *name)
 {
   json_t *val = json_object_get(node->obj, name);
   return json_integer_value(val);
 }
-float ooConfGetFloatByName(OOconfnode *node, const char *name)
+float config_get_float_by_name(config_node_t *node, const char *name)
 {
   json_t *val = json_object_get(node->obj, name);
 
@@ -586,7 +586,7 @@ float ooConfGetFloatByName(OOconfnode *node, const char *name)
 }
 
 const char*
-ooConfGetStrByName(OOconfnode *node, const char *name)
+config_get_str_by_name(config_node_t *node, const char *name)
 {
   json_t *val = json_object_get(node->obj, name);
 
@@ -597,24 +597,24 @@ ooConfGetStrByName(OOconfnode *node, const char *name)
   return NULL;
 }
 
-OOconfarr*
-ooConfGetArr(OOconfnode *node)
+config_arr_t*
+config_get_arr(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
   if (json_is_array(obj)) {
-    return (OOconfarr*)obj;
+    return (config_arr_t*)obj;
   }
 
   assert(0 && "not an array");
   return NULL;
 }
 
-OOconfarr*
-ooConfGetArrByName(OOconfnode *node, const char *name)
+config_arr_t*
+config_get_arr_by_name(config_node_t *node, const char *name)
 {
   json_t *obj = json_object_get(node->obj, name);
   if (json_is_array(obj)) {
-    return (OOconfarr*)obj;
+    return (config_arr_t*)obj;
   }
 
   assert(0 && "not an array");
@@ -623,14 +623,14 @@ ooConfGetArrByName(OOconfnode *node, const char *name)
 
 
 bool
-ooConfIsArr(OOconfnode *node)
+config_is_arr(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
   return json_is_array(obj);
 }
 
 bool
-ooConfIsStr(OOconfnode *node)
+config_is_str(config_node_t *node)
 {
   json_t *obj = json_object_iter_value(node->iter);
   return json_is_string(obj);
@@ -638,20 +638,20 @@ ooConfIsStr(OOconfnode *node)
 
 
 int
-ooConfGetArrLen(OOconfarr *arr)
+config_get_arr_len(config_arr_t *arr)
 {
   json_t *jarr = (json_t*)arr;
   return json_array_size(jarr);
 }
 
-OOconfnode*
-ooConfGetArrObj(OOconfarr *arr, int i)
+config_node_t*
+config_get_arr_obj(config_arr_t *arr, int i)
 {
   json_t *jarr = (json_t*)arr;
   json_t *obj = json_array_get(jarr, i);
 
   if (json_is_object(obj)) {
-    OOconfnode *child = smalloc(sizeof(struct OOconfnode));
+    config_node_t *child = smalloc(sizeof(struct config_node_t));
     child->obj = obj;
     child->iter = json_object_iter(child->obj);
     return child;
@@ -662,7 +662,7 @@ ooConfGetArrObj(OOconfarr *arr, int i)
 }
 
 long
-ooConfGetArrInt(OOconfarr *arr, int i)
+config_get_arr_int(config_arr_t *arr, int i)
 {
   json_t *jarr = (json_t*)arr;
   json_t *obj = json_array_get(jarr, i);
@@ -675,7 +675,7 @@ ooConfGetArrInt(OOconfarr *arr, int i)
 }
 
 float
-ooConfGetArrFloat(OOconfarr *arr, int i)
+config_get_arr_float(config_arr_t *arr, int i)
 {
   json_t *jarr = (json_t*)arr;
   json_t *obj = json_array_get(jarr, i);
@@ -687,7 +687,7 @@ ooConfGetArrFloat(OOconfarr *arr, int i)
   return -1;
 }
 bool
-ooConfGetArrBool(OOconfarr *arr, int i)
+config_get_arr_bool(config_arr_t *arr, int i)
 {
   json_t *jarr = (json_t*)arr;
   json_t *obj = json_array_get(jarr, i);
@@ -700,7 +700,7 @@ ooConfGetArrBool(OOconfarr *arr, int i)
 }
 
 const char*
-ooConfGetArrStr(OOconfarr *arr, int i)
+config_get_arr_str(config_arr_t *arr, int i)
 {
   json_t *jarr = (json_t*)arr;
   json_t *obj = json_array_get(jarr, i);

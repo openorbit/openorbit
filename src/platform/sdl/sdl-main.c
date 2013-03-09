@@ -104,10 +104,10 @@ sdl_main_loop(void)
   publish_variables();
 
   extern SIMstate gSIM_state;
-  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
+  config_get_float_def("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s
   Uint32 interv = (Uint32) (wc_period * 1000.0); // SDL wants time in ms
-  ooConfGetFloatDef("openorbit/sim/period", &sim_period, wc_period);
+  config_get_float_def("openorbit/sim/period", &sim_period, wc_period);
 
   SDL_Event event;
   const char *evName;
@@ -173,7 +173,7 @@ sdl_main_loop(void)
         case SDL_VIDEORESIZE:
         {
           bool fullscreen;
-          ooConfGetBoolDef("openorbit/video/fullscreen", &fullscreen, false);
+          config_get_bool_def("openorbit/video/fullscreen", &fullscreen, false);
           ooResizeScreen(0, 0, event.resize.w, event.resize.h, fullscreen);
         }
           break;
@@ -266,9 +266,9 @@ main(int argc, const char *argv[argc])
   bool fullscreen;
   int width, height;
 
-  ooConfGetBoolDef("openorbit/video/fullscreen", &fullscreen, false);
-  ooConfGetIntDef("openorbit/video/width", &width, 640);
-  ooConfGetIntDef("openorbit/video/height", &height, 480);
+  config_get_bool_def("openorbit/video/fullscreen", &fullscreen, false);
+  config_get_int_def("openorbit/video/width", &width, 640);
+  config_get_int_def("openorbit/video/height", &height, 480);
 
   mainWindow = sdl_window_init(width, height, fullscreen);
   sdl_init_gl();

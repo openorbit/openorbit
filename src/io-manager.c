@@ -560,58 +560,58 @@ ioSetHatEmu(const char *action, int keycount, io_keycode_t keys[keycount])
 void
 io_init_keys(void)
 {
-  OOconfarr *keys = ooConfGetNamedArr("openorbit/controls/keys");
-  int len = ooConfGetArrLen(keys);
+  config_arr_t *keys = config_get_named_arr("openorbit/controls/keys");
+  int len = config_get_arr_len(keys);
   for (int i = 0 ; i < len ; i++) {
-    OOconfnode *keynode = ooConfGetArrObj(keys, i);
-    const char *kind = ooConfGetStrByName(keynode, "kind");
+    config_node_t *keynode = config_get_arr_obj(keys, i);
+    const char *kind = config_get_str_by_name(keynode, "kind");
     if (!strcmp(kind, "normal")) {
-      const char *key = ooConfGetStrByName(keynode, "key");
-      const char *action = ooConfGetStrByName(keynode, "action");
+      const char *key = config_get_str_by_name(keynode, "key");
+      const char *action = config_get_str_by_name(keynode, "action");
       io_keycode_t kc = io_get_key_code(key);
       io_set_key_handler(kc, action, NULL);
     } else if (!strcmp(kind, "hat")) {
-      OOconfarr *keyarr = ooConfGetArrByName(keynode, "keys");
-      const char *action = ooConfGetStrByName(keynode, "action");
-      int keyCount = ooConfGetArrLen(keyarr);
+      config_arr_t *keyarr = config_get_arr_by_name(keynode, "keys");
+      const char *action = config_get_str_by_name(keynode, "action");
+      int keyCount = config_get_arr_len(keyarr);
       io_keycode_t keys[keyCount];
       for (int i = 0 ; i < keyCount ; i++) {
-        const char *key = ooConfGetArrStr(keyarr, i);
+        const char *key = config_get_arr_str(keyarr, i);
         io_keycode_t kc = io_get_key_code(key);
         keys[i] = kc;
       }
       ioSetHatEmu(action, keyCount, keys);
     } else if (!strcmp(kind, "axis")) {
-      OOconfarr *keyarr = ooConfGetArrByName(keynode, "keys");
-      const char *action = ooConfGetStrByName(keynode, "action");
-      int keyCount = ooConfGetArrLen(keyarr);
+      config_arr_t *keyarr = config_get_arr_by_name(keynode, "keys");
+      const char *action = config_get_str_by_name(keynode, "action");
+      int keyCount = config_get_arr_len(keyarr);
       if (keyCount != 2) {
         ooLogError("to many keys for axis emulation");
         goto next;
       }
-      const char *key0 = ooConfGetArrStr(keyarr, 0);
-      const char *key1 = ooConfGetArrStr(keyarr, 0);
+      const char *key0 = config_get_arr_str(keyarr, 0);
+      const char *key1 = config_get_arr_str(keyarr, 0);
       io_keycode_t kc0 = io_get_key_code(key0);
       io_keycode_t kc1 = io_get_key_code(key1);
       io_axis_t axis = io_get_axis_by_name(action);
       io_set_axis_emu(axis, kc0, kc1);
     } else if (!strcmp(kind, "slider")) {
-      OOconfarr *keyarr = ooConfGetArrByName(keynode, "keys");
-      const char *action = ooConfGetStrByName(keynode, "action");
-      int keyCount = ooConfGetArrLen(keyarr);
+      config_arr_t *keyarr = config_get_arr_by_name(keynode, "keys");
+      const char *action = config_get_str_by_name(keynode, "action");
+      int keyCount = config_get_arr_len(keyarr);
       if (keyCount != 2) {
         ooLogError("to many keys for slider emulation");
         goto next;
       }
-      const char *key0 = ooConfGetArrStr(keyarr, 0);
-      const char *key1 = ooConfGetArrStr(keyarr, 0);
+      const char *key0 = config_get_arr_str(keyarr, 0);
+      const char *key1 = config_get_arr_str(keyarr, 0);
       io_keycode_t kc0 = io_get_key_code(key0);
       io_keycode_t kc1 = io_get_key_code(key1);
       io_slider_t slider = ioGetSliderByName(action);
       ioSetSliderEmu(slider, kc0, kc1);
     }
   next:
-    ooConfNodeDispose(keynode);
+    config_node_dispose(keynode);
   }
 }
 
@@ -810,49 +810,49 @@ io_bind_key_handler(const char *keyName, const char *keyAction, int up, uint16_t
 void
 io_init_joysticks(void)
 {
-  OOconfarr *joyArr = ooConfGetNamedArr("openorbit/controls/joystick");
-  int len = ooConfGetArrLen(joyArr);
+  config_arr_t *joyArr = config_get_named_arr("openorbit/controls/joystick");
+  int len = config_get_arr_len(joyArr);
   for (int i = 0 ; i < len ; i++) {
-    OOconfnode *node = ooConfGetArrObj(joyArr, i);
-    const char *joyName = ooConfGetStrByName(node, "name");
-    int joyId = ooConfGetIntByName(node, "id");
+    config_node_t *node = config_get_arr_obj(joyArr, i);
+    const char *joyName = config_get_str_by_name(node, "name");
+    int joyId = config_get_int_by_name(node, "id");
 
     if (!strcmp(joyName, "default")) {
       // Default joystick assignment, special case
     } else {
       int device = io_get_named_device(joyId, NULL, joyName);
-      OOconfarr *axises = ooConfGetArrByName(node, "axises");
-      int axisLen = ooConfGetArrLen(axises);
+      config_arr_t *axises = config_get_arr_by_name(node, "axises");
+      int axisLen = config_get_arr_len(axises);
       for (int i = 0 ; i < axisLen ; i ++) {
-        const char *axisBinding = ooConfGetArrStr(axises, i);
+        const char *axisBinding = config_get_arr_str(axises, i);
         io_axis_t vaxis = io_get_axis_by_name(axisBinding);
         io_bind_device_axis(device, i, vaxis);
       }
 
-      OOconfarr *sliders = ooConfGetArrByName(node, "sliders");
-      int sliderLen = ooConfGetArrLen(sliders);
+      config_arr_t *sliders = config_get_arr_by_name(node, "sliders");
+      int sliderLen = config_get_arr_len(sliders);
       for (int i = 0 ; i < sliderLen ; i ++) {
-        const char *sliderBinding = ooConfGetArrStr(sliders, i);
+        const char *sliderBinding = config_get_arr_str(sliders, i);
         io_slider_t vslider = ioGetSliderByName(sliderBinding);
         io_bind_device_slider(device, i, vslider);
       }
 
-      OOconfarr *buttons = ooConfGetArrByName(node, "buttons");
-      int buttonLen = ooConfGetArrLen(buttons);
+      config_arr_t *buttons = config_get_arr_by_name(node, "buttons");
+      int buttonLen = config_get_arr_len(buttons);
       for (int i = 0 ; i < buttonLen ; i ++) {
-        const char *buttonBinding = ooConfGetArrStr(buttons, i);
+        const char *buttonBinding = config_get_arr_str(buttons, i);
         io_bind_device_button(device, i, buttonBinding);
       }
 
-      OOconfarr *hats = ooConfGetArrByName(node, "hats");
-      int hatLen = ooConfGetArrLen(hats);
+      config_arr_t *hats = config_get_arr_by_name(node, "hats");
+      int hatLen = config_get_arr_len(hats);
       for (int i = 0 ; i < hatLen ; i ++) {
-        const char *hatBinding = ooConfGetArrStr(hats, i);
+        const char *hatBinding = config_get_arr_str(hats, i);
         io_bind_device_hat(device, i, hatBinding);
       }
 
     }
-    ooConfNodeDispose(node);
+    config_node_dispose(node);
   }
 }
 

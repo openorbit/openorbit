@@ -72,9 +72,9 @@ sim_init_graphics(void)
 
   int width, height;
   float fovy;
-  ooConfGetIntDef("openorbit/video/width", &width, 640);
-  ooConfGetIntDef("openorbit/video/height", &height, 480);
-  ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
+  config_get_int_def("openorbit/video/width", &width, 640);
+  config_get_int_def("openorbit/video/height", &height, 480);
+  config_get_float_def("openorbit/video/gl/fovy", &fovy, 45.0f);
   sg_viewport_t *vp = sg_new_viewport(gSIM_state.win, 0, 0, width, height);
   sg_scene_t *scene = sg_new_scene("main");
   sg_viewport_set_scene(vp, scene);
@@ -102,7 +102,7 @@ sim_init(void)
 
   // Set log level, need to do that here
   const char *levStr = NULL;
-  ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
+  config_get_str_def("openorbit/sys/log-level", &levStr, "info");
   ooLogSetLevel(ooLogGetLevFromStr(levStr));
 
   // Load and run initialisation script
@@ -115,7 +115,7 @@ sim_init(void)
   sim_init_graphics();
 
   float freq;
-  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
+  config_get_float_def("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   gSIM_state.stepSize = 1.0 / freq; // Period in s
   
   // Setup IO-tables, must be done after joystick system has been initialised
