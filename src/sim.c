@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2010,2012 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2010,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -106,9 +106,9 @@ sim_init(void)
   ooLogSetLevel(ooLogGetLevFromStr(levStr));
 
   // Load and run initialisation script
-  ooScriptingInit();
+  scripting_init();
 
-  if (!ooScriptingRunFile("script/init.py")) {
+  if (!scripting_run_file("script/init.py")) {
     ooLogFatal("script/init.py missing");
   }
 
@@ -141,7 +141,7 @@ sim_init(void)
 
   sim_init_plugins();
 
-  if (!ooScriptingRunFile("script/postinit.py")) {
+  if (!scripting_run_file("script/postinit.py")) {
     ooLogFatal("script/postinit.py missing");
   }
 
