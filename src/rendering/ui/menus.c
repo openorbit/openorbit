@@ -20,11 +20,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "menus.h"
+#include "palloc.h"
 
 ui_menu_t*
 ui_new_menu(const char *title)
 {
-  ui_menu_t *menu = malloc(sizeof(ui_menu_t));
+  ui_menu_t *menu = smalloc(sizeof(ui_menu_t));
   obj_array_init(&menu->items);
   menu->title = strdup(title);
 
@@ -35,7 +36,7 @@ ui_menu_item_t*
 ui_new_menu_item(ui_menu_t *menu, const char *title,
                  ui_menu_action_f action, void *data)
 {
-  ui_menu_item_t *mi = malloc(sizeof(ui_menu_item_t));
+  ui_menu_item_t *mi = smalloc(sizeof(ui_menu_item_t));
   mi->title = strdup(title);
   mi->action = action;
   mi->data = data;

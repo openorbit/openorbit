@@ -88,7 +88,7 @@ load_mesh(FILE *fp)
     }
   }
 }
-model_t*
+sg_object_t*
 cmod_load(const char *path)
 {
   FILE *fp = fopen(path, "r");

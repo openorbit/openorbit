@@ -17,39 +17,10 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef COLLADA_H
+#define COLLADA_H
+#include "rendering/object.h"
 
-#include "collada.h"
+sg_object_t* collada_load(const char *path);
 
-#include <libxml/parser.h>
-#include <libxml/xpath.h>
-#include <libxml/tree.h>
-#include <libxml/xmlreader.h>
-
-model_t*
-collada_load(const char *path)
-{
-  LIBXML_TEST_VERSION
-  
-  model_t *model = NULL;
-  xmlTextReaderPtr reader = xmlReaderForFile(path, NULL, 0);
-  if (reader == NULL) {
-    fprintf(stderr, "no such file: '%s'\n", path);
-    return NULL;
-  }
-  
-  
-  int ret = xmlTextReaderRead(reader);
-  while (ret == 1) {
-    // Handle node
-    
-    ret = xmlTextReaderRead(reader);
-  }
-
-  if (ret != 0) {
-    fprintf(stderr, "error parsing xml file: '%s'\n", path);
-  }
-  
-  xmlFreeTextReader(reader);
-  xmlCleanupParser();
-  return model;
-}
+#endif /* !COLLADA_H */

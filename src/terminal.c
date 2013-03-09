@@ -23,10 +23,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <openorbit/log.h>
+#include <gencds/avl-tree.h>
+
 #include "terminal.h"
-#include "log.h"
 #include "res-manager.h"
-#include "avl-tree.h"
+#include "palloc.h"
+
 
 // Length of terminal buffer
 #define TERM_BUFF_LEN 1000
@@ -152,7 +155,7 @@ terminal_add_command(const char *cmd,
     return;
   }
 
-  terminal_command_t *c = malloc(sizeof(terminal_command_t));
+  terminal_command_t *c = smalloc(sizeof(terminal_command_t));
   c->name = strdup(cmd);
   c->synopsis = strdup(short_help);
   c->help = strdup(help);

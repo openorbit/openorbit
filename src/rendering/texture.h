@@ -25,19 +25,12 @@ extern "C" {
 #endif
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
-#include <GL/gl.h>
+#include <GL3/gl3.h>
 #endif
 
-typedef struct {
-  GLint width, height;
-  GLuint texId;
-  GLenum texType;
-  GLint bytesPerTex;
-  const char *path;
-  void *data;
-} OOtexture;
+#include "rendering/types.h"
 
 /*! \brief Loads a named resource texture file
  *
@@ -45,28 +38,21 @@ typedef struct {
  * the key has already been bound, the memoized texture is returned and no file
  * is loaded.
  *
- * \param key Key for hashtable lookups (usually, set as same as name)
- * \param name File name (relative to application resource directory)
+ * \param key Name of resource file
  * \result Returns the texture number. Will return 0 on a failed load.
  */
-GLuint ooTexLoad(const char *key, const char *name);
-/*! \brief binds the texture specified by key as the current texture
+sg_texture_t* sg_load_texture(const char *key);
 
-    Do not use the bind function to much, it is acceptable to use it in non
-    performant rendering code (e.g. user interfaces). In normal cases, use
-    tex_num and cache the texid.
- */
-int    ooTexBind(const char *key);
 
-/*! \brief Get the OpenGL texture name associated with the key */
-GLuint ooTexNum(const char *key);
+  /*! \brief Get the OpenGL texture name associated with the key */
+GLuint sg_texture_get_id(sg_texture_t *tex);
 /*! \brief Remove a texture from the global texture dictionary.
 
     Also deletes the texture name
  */
-int    ooTexUnload(const char *key);
+void sg_texture_unload(sg_texture_t *tex);
 
-OOtexture *ooTexGet(const char *key);
+sg_texture_t *sg_find_texture(const char *key);
 
 #ifdef __cplusplus
 }

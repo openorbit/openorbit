@@ -23,5 +23,6 @@
 @interface OOOpenGLView : NSOpenGLView
 {
   NSTimer *timer;
+  NSTimeInterval last;
 }
 @end

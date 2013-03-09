@@ -388,15 +388,15 @@ void
 hidValueChanged(void *ctxt, IOReturn result, void *sender, IOHIDValueRef val)
 {
   IOHIDElementRef elem = IOHIDValueGetElement(val);
-  IOHIDElementCookie cookie = IOHIDElementGetCookie(elem);
+  //IOHIDElementCookie cookie = IOHIDElementGetCookie(elem);
   IOHIDElementType etype = IOHIDElementGetType(elem);
-  IOHIDElementCollectionType ctype = IOHIDElementGetCollectionType(elem);
+  //IOHIDElementCollectionType ctype = IOHIDElementGetCollectionType(elem);
 
   IOHIDDeviceRef dev = IOHIDElementGetDevice(elem);
   int dev_id = (int) CFDictionaryGetValue(_deviceToIDDict, dev);
 
   //CFStringRef name = hidProduct(dev);
-  double_t dval = IOHIDValueGetScaledValue(val, kIOHIDValueScaleTypeCalibrated);
+  //double_t dval = IOHIDValueGetScaledValue(val, kIOHIDValueScaleTypeCalibrated);
 
   //CFIndex maxVal = IOHIDElementGetPhysicalMax(elem);
   //CFIndex minVal = IOHIDElementGetPhysicalMin(elem);

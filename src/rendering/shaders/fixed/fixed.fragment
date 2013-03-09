@@ -1,9 +1,13 @@
-#version 120
+#version 150
 
-uniform sampler2D tex;
+uniform sampler2D oo_Texture[1];
+in vec2 FragTexCoord;
+in vec4 FragColor;
+
+out vec4 oo_FragColor;
 
 void
 main()
 {
-  gl_FragColor = gl_Color * texture2D(tex, gl_TexCoord[0].xy);
+  oo_FragColor = FragColor * texture(oo_Texture[0], FragTexCoord);
 }

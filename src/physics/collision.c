@@ -23,8 +23,9 @@
 #include <openorbit/log.h>
 
 #include "collision.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
 #include "physics/object.h"
+#include "palloc.h"
 
 #define THRESHOLD 10
 #define TOLERANCE 0.1
@@ -38,7 +39,7 @@ plNewRecgrid(PLcollisioncontext *ctxt, double size)
 
   assert(((uintptr_t)recgrid & 3) == 0);
   recgrid->size = size;
-  memset(&recgrid->centre, 0, sizeof(OOlwcoord));
+  memset(&recgrid->centre, 0, sizeof(lwcoord_t));
   memset(recgrid->children, 0, sizeof(PLrecgrid *[8]));
   obj_array_init(&recgrid->objs);
 
@@ -55,7 +56,7 @@ plDeleteRecgrid(PLrecgrid *grid)
 PLcollisioncontext*
 plNewCollisionContext(void)
 {
-  PLcollisioncontext *ctxt = malloc(sizeof(PLcollisioncontext));
+  PLcollisioncontext *ctxt = smalloc(sizeof(PLcollisioncontext));
   ctxt->pool = pool_create(sizeof(PLrecgrid));
   obj_array_init(&ctxt->colls);
   ctxt->otree = plNewRecgrid(ctxt, plAuToMetres(100.0)); // Roughly the heliospause
@@ -65,16 +66,16 @@ plNewCollisionContext(void)
 void plInsertObject(PLcollisioncontext *ctxt, PLrecgrid *grid, PLobject *obj);
 
 static int
-getoctant(const OOlwcoord *coord, const PLobject *obj)
+getoctant(const lwcoord_t *coord, const PLobject *obj)
 {
-  float3 dist = ooLwcDist(&obj->p, coord);
+  float3 dist = lwc_dist(&obj->p, coord);
   int oct = signbit(dist.x) * 4 + signbit(dist.y) * 2 + signbit(dist.z);
   return oct;
 }
 static bool
 fits(const PLrecgrid *grid, const PLobject *obj)
 {
-  float3 dist = ooLwcDist(&obj->p, &grid->centre);
+  float3 dist = lwc_dist(&obj->p, &grid->centre);
 
   if (fabsf(dist.x) + obj->radius > grid->size
       || fabsf(dist.y) + obj->radius > grid->size
@@ -92,21 +93,21 @@ split(PLcollisioncontext *ctxt, PLrecgrid *grid)
       grid->children[i] = plNewRecgrid(ctxt, grid->size/2.0);
       grid->children[i]->centre = grid->centre;
     }
-    ooLwcTranslate3f(&grid->children[0]->centre,
+    lwc_translate3f(&grid->children[0]->centre,
                       grid->size/4.0,  grid->size/4.0,  grid->size/4.0);
-    ooLwcTranslate3f(&grid->children[1]->centre,
+    lwc_translate3f(&grid->children[1]->centre,
                       grid->size/4.0,  grid->size/4.0, -grid->size/4.0);
-    ooLwcTranslate3f(&grid->children[2]->centre,
+    lwc_translate3f(&grid->children[2]->centre,
                       grid->size/4.0, -grid->size/4.0,  grid->size/4.0);
-    ooLwcTranslate3f(&grid->children[3]->centre,
+    lwc_translate3f(&grid->children[3]->centre,
                       grid->size/4.0, -grid->size/4.0, -grid->size/4.0);
-    ooLwcTranslate3f(&grid->children[4]->centre,
+    lwc_translate3f(&grid->children[4]->centre,
                      -grid->size/4.0,  grid->size/4.0,  grid->size/4.0);
-    ooLwcTranslate3f(&grid->children[5]->centre,
+    lwc_translate3f(&grid->children[5]->centre,
                      -grid->size/4.0,  grid->size/4.0, -grid->size/4.0);
-    ooLwcTranslate3f(&grid->children[6]->centre,
+    lwc_translate3f(&grid->children[6]->centre,
                      -grid->size/4.0, -grid->size/4.0,  grid->size/4.0);
-    ooLwcTranslate3f(&grid->children[7]->centre,
+    lwc_translate3f(&grid->children[7]->centre,
                      -grid->size/4.0, -grid->size/4.0, -grid->size/4.0);
   }
 
@@ -146,11 +147,12 @@ plCheckCollissions(PLrecgrid *grid)
 
   for (int i = 0 ; i < grid->objs.length ; ++i) {
     PLobject *obj_a = grid->objs.elems[i];
+    (void) obj_a; // TODO
 
     // Check against local objects
     for (int j = i ; j < grid->objs.length ; ++j) {
       PLobject *obj_b = grid->objs.elems[j];
-
+      (void) obj_b; // TODO
     }
 
     // Check against parent objects
@@ -159,7 +161,7 @@ plCheckCollissions(PLrecgrid *grid)
       // Check against local objects
       for (int j = 0 ; j < higher_grid->objs.length ; ++j) {
         PLobject *obj_b = higher_grid->objs.elems[j];
-
+        (void) obj_b; // TODO
       }
 
       higher_grid = higher_grid->parent;
@@ -171,7 +173,7 @@ bool
 plCollideCoarse(PLcollisioncontext *coll,
                 PLobject * restrict obj_a, PLobject * restrict obj_b)
 {
-  float3 dist = ooLwcDist(&obj_a->p, &obj_b->p);
+  float3 dist = lwc_dist(&obj_a->p, &obj_b->p);
 
   if (vf3_abs(dist) > (obj_a->radius + obj_b->radius)) {
     return false;
@@ -272,7 +274,7 @@ plCollideStep(PLcollisioncontext *coll)
 
     // Compute post colission momentums
     ooLogInfo("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
-    ooLwcDump(&a->p);ooLwcDump(&b->p);
+    lwc_dump(&a->p);lwc_dump(&b->p);
   }
 }
 

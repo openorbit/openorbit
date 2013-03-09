@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "orbit.h"
+#include "palloc.h"
+
 static float3
 random_direction(float ra, float dec, float maxOffsetAngle)
 {
@@ -43,7 +45,7 @@ random_direction(float ra, float dec, float maxOffsetAngle)
 PLparticles*
 plNewParticleSystem(const char *name, size_t particleCount)
 {
-  PLparticles *ps = malloc(sizeof(PLparticles));
+  PLparticles *ps = smalloc(sizeof(PLparticles));
   ps->enabled = false;
   ps->autoDisable = false;
   ps->particleCount = particleCount;

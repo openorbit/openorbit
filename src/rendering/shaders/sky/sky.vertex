@@ -1,0 +1,16 @@
+#version 150
+
+uniform mat4 oo_ModelViewMatrix;
+uniform mat4 oo_ProjectionMatrix;
+
+in vec4 oo_Vertex;
+in vec4 oo_Color;
+
+out vec4 VertColor;
+
+void
+main()
+{
+  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex;
+  VertColor = oo_Color;
+}

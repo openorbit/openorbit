@@ -27,6 +27,11 @@
         "kind": "hat",
         "keys": ["up", "right", "down", "left"],
         "action": "cam-rotate" 
+      },
+      {
+         "kind": "normal",
+         "key": "d",
+         "action": "detatch-stage"
       }
     ],
     "mouse": {

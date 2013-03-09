@@ -33,9 +33,8 @@
 #include "parsers/hrml.h"
 #include "res-manager.h"
 #include "rendering/scenegraph.h"
-#include "rendering/scenegraph-private.h"
-
-#include "common/lwcoord.h"
+#include "palloc.h"
+#include <vmath/lwcoord.h>
 
 /*
  NOTE: Coordinate system are specified in the normal convention used for mission
@@ -159,7 +158,7 @@ quaternion_t
 plOrbitalQuaternion(PL_keplerian_elements *kepler)
 {
   quaternion_t qasc = q_rot(0.0, 0.0, 1.0, kepler->longAsc);
-  quaternion_t qinc = q_rot(0.0, 1.0, 0.0, kepler->inc);
+  quaternion_t qinc = q_rot(1.0, 0.0, 0.0, kepler->inc);
   quaternion_t qaps = q_rot(0.0, 0.0, 1.0, kepler->argPeri);
 
   quaternion_t q = q_mul(qasc, qinc);
@@ -210,7 +209,7 @@ PL_keplerian_elements*
 plNewKeplerElements(double ecc, double a, double inc, double longAsc,
                     double argOfPeriapsis, double meanAnomalyOfEpoch)
 {
-  PL_keplerian_elements *elems = malloc(sizeof(PL_keplerian_elements));
+  PL_keplerian_elements *elems = smalloc(sizeof(PL_keplerian_elements));
   elems->ecc = ecc;
   elems->a = a; // Semi-major
   elems->b = ooGeoComputeSemiMinor(a, ecc); // Auxillary semi-minor
@@ -289,7 +288,7 @@ plGetObject(PLworld *world, const char *name)
 float3
 plGetPos(const PLastrobody *obj)
 {
-  return ooLwcGlobal(&obj->obj.p);
+  return lwc_global(&obj->obj.p);
 }
 
 float3
@@ -318,7 +317,7 @@ plGetPosForName3f(const PLworld *world, const char *name,
 void
 plNormaliseObject__(PLastrobody *obj)
 {
-  ooLwcNormalise(&obj->obj.p);
+  lwc_normalise(&obj->obj.p);
 }
 
 void
@@ -335,7 +334,7 @@ plSysUpdateCurrentPos(PLsystem *sys, double dt)
     double t = simTimeGetJD();
 
     if (sys->orbitalBody->tUpdate > 0) {
-      ooLwcTranslate3fv(&sys->orbitalBody->obj.p,
+      lwc_translate3fv(&sys->orbitalBody->obj.p,
                         vf3_s_mul(sys->orbitalBody->obj.v, dt));
       sys->orbitalBody->tUpdate --;
     } else {
@@ -351,7 +350,7 @@ plSysUpdateCurrentPos(PLsystem *sys, double dt)
                              (double)sys->orbitalBody->orbitFixationPeriod * dt);
 
       sys->orbitalBody->obj.p = sys->parent->orbitalBody->obj.p;
-      ooLwcTranslate3fv(&sys->orbitalBody->obj.p, newPos);
+      lwc_translate3fv(&sys->orbitalBody->obj.p, newPos);
 
       sys->orbitalBody->obj.v = sys->parent->orbitalBody->obj.v + vel;
       // Reset tUpdate;
@@ -359,7 +358,7 @@ plSysUpdateCurrentPos(PLsystem *sys, double dt)
     }
     sys->orbitalBody->obj.q = plSideralRotationAtTime(sys->orbitalBody, t);
   } else {
-    ooLwcSet(&sys->orbitalBody->obj.p, 0.0, 0.0, 0.0);
+    lwc_set(&sys->orbitalBody->obj.p, 0.0, 0.0, 0.0);
   }
 }
 
@@ -374,7 +373,7 @@ plSysSetCurrentPos(PLsystem *sys)
                                      sys->parent->orbitalBody->GM,
                                      t*PL_SEC_PER_DAY);
     sys->orbitalBody->obj.p = sys->parent->orbitalBody->obj.p;
-    ooLwcTranslate3fv(&sys->orbitalBody->obj.p, newPos);
+    lwc_translate3fv(&sys->orbitalBody->obj.p, newPos);
 
     sys->orbitalBody->obj.q = plSideralRotationAtTime(sys->orbitalBody, t);
     sys->orbitalBody->tUpdate = 0;
@@ -402,12 +401,6 @@ plDeleteWorld(PLworld *world)
   free(world);
 }
 
-void
-plSetDrawable(PLastrobody *obj, SGdrawable *drawable)
-{
-  obj->drawable = drawable;
-}
-
 /*!
   Creates a new object
   All objects, even the small ones have a GM value
@@ -423,11 +416,11 @@ plSetDrawable(PLastrobody *obj, SGdrawable *drawable)
  */
 PLastrobody*
 plNewObj(PLworld*world, const char *name, double m, double gm,
-         OOlwcoord * coord,
+         lwcoord_t * coord,
          quaternion_t q, double siderealPeriod, double obliquity,
          double radius, double flattening)
 {
-  PLastrobody *obj = malloc(sizeof(PLastrobody));
+  PLastrobody *obj = smalloc(sizeof(PLastrobody));
 
   plInitObject(&obj->obj);
   obj->obj.p.offs = coord->offs;
@@ -437,13 +430,12 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
   obj->obj.name = obj->name = strdup(name);
   obj->sys = NULL;
   obj->world = world;
-  obj->lightSource = NULL;
+
   // TODO: Ensure quaternion is set for orbit
   //       asc * inc * obl ?
 
   plCollideInsertObject(world->collCtxt, &obj->obj);
 
-  obj->drawable = NULL;
   obj->obj.m.m = m;
 
   if (isnormal(gm)) {
@@ -467,7 +459,7 @@ plNewObj(PLworld*world, const char *name, double m, double gm,
 
 PLastrobody*
 plNewObjInSys(PLsystem *sys, const char *name, double m, double gm,
-              OOlwcoord *coord, quaternion_t q, double siderealPeriod, double obliquity,
+              lwcoord_t *coord, quaternion_t q, double siderealPeriod, double obliquity,
               double radius, double flattening)
 {
   PLastrobody *obj = plNewObj(sys->world, name, m, gm, coord,
@@ -481,11 +473,11 @@ plNewObjInSys(PLsystem *sys, const char *name, double m, double gm,
 
 
 PLworld*
-plNewWorld(const char *name, SGscene *sc,
+plNewWorld(const char *name, sg_scene_t *sc,
            double m, double gm, double radius, double siderealPeriod,
            double obliquity, double eqRadius, double flattening)
 {
-  PLworld *world = malloc(sizeof(PLworld));
+  PLworld *world = smalloc(sizeof(PLworld));
 
   world->name = strdup(name);
   world->collCtxt = plNewCollisionContext();
@@ -500,7 +492,7 @@ plNewWorld(const char *name, SGscene *sc,
 }
 
 PLsystem*
-plCreateOrbitalObject(PLworld *world, SGscene *scene, const char *name,
+plCreateOrbitalObject(PLworld *world, sg_scene_t *scene, const char *name,
                       double m, double gm,
                       double orbitPeriod,
                       double obliquity, double siderealPeriod,
@@ -511,7 +503,7 @@ plCreateOrbitalObject(PLworld *world, SGscene *scene, const char *name,
 {
   assert(world);
 
-  PLsystem *sys = malloc(sizeof(PLsystem));
+  PLsystem *sys = smalloc(sizeof(PLsystem));
   obj_array_init(&sys->orbits);
   obj_array_init(&sys->astroObjs);
   obj_array_init(&sys->rigidObjs);
@@ -528,13 +520,15 @@ plCreateOrbitalObject(PLworld *world, SGscene *scene, const char *name,
   strcpy(orbitName, name); // safe as size is checked in allocation
   strcat(orbitName, " Orbit");
 
-  OOlwcoord p;
-  ooLwcSet(&p, 0.0, 0.0, 0.0);
+  lwcoord_t p;
+  lwc_set(&p, 0.0, 0.0, 0.0);
 
   // TODO: Cleanup this quaternion
+  // Z-X-Z for euler angles
   quaternion_t q = q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(ascendingNode));
-  q = q_mul(q, q_rot(0.0, 1.0, 0.0, DEG_TO_RAD(inc)));
+  q = q_mul(q, q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(inc)));
   q = q_mul(q, q_rot(0.0, 0.0, 1.0, DEG_TO_RAD(argOfPeriapsis)));
+  // TODO: Correct axis?
   q = q_mul(q, q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(obliquity)));
 
   sys->orbitalBody = plNewObjInSys(sys/*world->rootSys*/, name, m, gm, &p,
@@ -544,22 +538,23 @@ plCreateOrbitalObject(PLworld *world, SGscene *scene, const char *name,
                                                  semiMaj, inc, ascendingNode,
                                                  argOfPeriapsis, meanAnomaly);
 
-  sys->orbitDrawable = sgNewEllipsis(orbitName, semiMaj, semiMin,
-                                     ascendingNode, inc, argOfPeriapsis,
-                                     0.0, 0.0, 1.0,
-                                     1024);
-  sgSceneAddObj(sys->scene, sys->orbitDrawable);
+  // TODO: Ensure elipsises are created outside of pl
+  //sys->orbitDrawable = sgNewEllipsis(orbitName, semiMaj, semiMin,
+  //                                   ascendingNode, inc, argOfPeriapsis,
+  //                                   0.0, 0.0, 1.0,
+  //                                   1024);
+  //sgSceneAddObj(sys->scene, sys->orbitDrawable);
 
   return sys;
 }
 
 PLsystem*
-plNewRootSystem(PLworld *world, SGscene *sc, const char *name, double m, double gm, double obliquity, double siderealPeriod,
+plNewRootSystem(PLworld *world, sg_scene_t *sc, const char *name, double m, double gm, double obliquity, double siderealPeriod,
                 double eqRadius, double flattening)
 {
   assert(world);
 
-  PLsystem *sys = malloc(sizeof(PLsystem));
+  PLsystem *sys = smalloc(sizeof(PLsystem));
   obj_array_init(&sys->orbits);
   obj_array_init(&sys->astroObjs);
   obj_array_init(&sys->rigidObjs);
@@ -568,14 +563,13 @@ plNewRootSystem(PLworld *world, SGscene *sc, const char *name, double m, double 
   sys->world = world;
   sys->parent = NULL;
   sys->scene = sc;
-  OOlwcoord p;
-  ooLwcSet(&p, 0.0, 0.0, 0.0);
+  lwcoord_t p;
+  lwc_set(&p, 0.0, 0.0, 0.0);
   quaternion_t q = q_rot(1.0, 0.0, 0.0, DEG_TO_RAD(obliquity));
 
   sys->orbitalBody = plNewObj(world, name, m, gm, &p, q, siderealPeriod, obliquity,
                               eqRadius, flattening);
   sys->orbitalBody->kepler = NULL;
-  sys->orbitDrawable = NULL;
 //  ooSgSceneAddObj(sys->world->scene,
 //                  sys->orbitDrawable);
 
@@ -587,7 +581,7 @@ plNewRootSystem(PLworld *world, SGscene *sc, const char *name, double m, double 
 
 
 PLsystem*
-plNewOrbit(PLworld *world, SGscene *sc, const char *name,
+plNewOrbit(PLworld *world, sg_scene_t *sc, const char *name,
            double m, double gm,
            double orbitPeriod, double obliquity, double siderealPeriod,
            double semiMaj, double semiMin,
@@ -603,7 +597,7 @@ plNewOrbit(PLworld *world, SGscene *sc, const char *name,
 }
 
 PLsystem*
-plNewSubOrbit(PLsystem *parent, SGscene *sc, const char *name,
+plNewSubOrbit(PLsystem *parent, sg_scene_t *sc, const char *name,
               double m, double gm,
               double orbitPeriod, double obliquity, double siderealPeriod,
               double semiMaj, double semiMin,
@@ -647,7 +641,7 @@ plWorldClear(PLworld *world)
 float3
 plComputeGravity(PLastrobody *a, PLobject *b)
 {
-  float3 dist = ooLwcDist(&b->p, &a->obj.p);
+  float3 dist = lwc_dist(&b->p, &a->obj.p);
   double r12 = vf3_abs_square(dist);
   float3 ndist = vf3_normalise(dist);
   float3 f12 = vf3_s_mul(ndist,
@@ -713,22 +707,22 @@ plSysInit(PLsystem *sys)
   }
 }
 
-
 void
 plSysUpdateSg(PLsystem *sys)
 {
-  if (sys->orbitalBody->lightSource)
-    sgSetLightPosLW(sys->orbitalBody->lightSource, &sys->orbitalBody->obj.p);
+  //if (sys->orbitalBody->lightSource)
+  //  sgSetLightPosLW(sys->orbitalBody->lightSource, &sys->orbitalBody->obj.p);
 
-  quaternion_t q = plGetQuat(&sys->orbitalBody->obj);
-  sgSetObjectQuatv(sys->orbitalBody->drawable, q);
+  //quaternion_t q = plGetQuat(&sys->orbitalBody->obj);
+  // TODO: Ensure this is pulled from SG
+  //sgSetObjectQuatv(sys->orbitalBody->drawable, q);
 
-  sgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
+  //sgSetObjectPosLW(sys->orbitalBody->drawable, &sys->orbitalBody->obj.p);
 
   // Update orbital path base
-  if (sys->parent) {
-    sgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->obj.p);
-  }
+  //if (sys->parent) {
+  //  sgSetObjectPosLW(sys->orbitDrawable, &sys->parent->orbitalBody->obj.p);
+  //}
 
   for (size_t i = 0; i < sys->orbits.length ; i ++) {
     plSysUpdateSg(sys->orbits.elems[i]);
@@ -743,13 +737,13 @@ plWorldStep(PLworld *world, double dt)
 
   plSysUpdateSg(world->rootSys);
 
-  for (size_t i = 0; i < world->objs.length ; i ++) {
-    PLobject *obj = world->objs.elems[i];
-    if (obj->drawable) {
-      sgSetObjectPosLW(obj->drawable, &obj->p);
-      sgSetObjectQuatv(obj->drawable, obj->q);
-    }
-  }
+  //for (size_t i = 0; i < world->objs.length ; i ++) {
+  //  PLobject *obj = world->objs.elems[i];
+    //if (obj->drawable) {
+    //  sgSetObjectPosLW(obj->drawable, &obj->p);
+    //  sgSetObjectQuatv(obj->drawable, obj->q);
+    //}
+    //}
 
   for (size_t i = 0; i < world->partSys.length ; ++ i) {
     PLparticles *psys = world->partSys.elems[i];

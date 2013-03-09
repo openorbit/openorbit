@@ -1,11 +1,13 @@
-#version 120
+#version 150
 
-uniform sampler2D Tex0;
-varying vec2 TexCoord;
+uniform sampler2D oo_Texture[1];
+
+in vec2 TexCoord;
+out vec4 oo_FragColor;
 
 void
 main()
 {
-  vec4 texel0 = texture2D(Tex0, TexCoord);
-  gl_FragColor = texel0;
+  vec4 texel0 = texture(oo_Texture[0], TexCoord);
+  oo_FragColor = texel0;
 }

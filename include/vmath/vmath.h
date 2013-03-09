@@ -1,5 +1,5 @@
 /*
-  Copyright 2008 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2008,2012 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -37,5 +37,6 @@
 #include <vmath/vmath-quaternions.h>
 #include <vmath/vmath-convert.h>
 #include <vmath/vmath-integer.h>
+#include <vmath/vmath-geo.h>
 
 #endif /* ! VMATH_H__ */

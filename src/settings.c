@@ -33,6 +33,7 @@
 #include <openorbit/log.h>
 #include "common/moduleinit.h"
 #include "common/mapped-file.h"
+#include "palloc.h"
 
 struct OOconf
 {
@@ -395,7 +396,7 @@ struct OOconfnode {
 OOconfnode*
 ooConfGetNode(const char *key)
 {
-  OOconfnode *conf = malloc(sizeof(struct OOconfnode));
+  OOconfnode *conf = smalloc(sizeof(struct OOconfnode));
   conf->obj = lookup(key);
   conf->iter = json_object_iter(conf->obj);
   return conf;
@@ -494,7 +495,7 @@ ooConfGetObj(OOconfnode *node)
   json_t *val = json_object_iter_value(node->iter);
 
   if (json_is_object(val)) {
-    OOconfnode *child = malloc(sizeof(struct OOconfnode));
+    OOconfnode *child = smalloc(sizeof(struct OOconfnode));
     child->obj = val;
     child->iter = json_object_iter(child->obj);
     return child;
@@ -556,7 +557,7 @@ ooConfGetObjByName(OOconfnode *node, const char *name)
   json_t *val = json_object_get(node->obj, name);
 
   if (json_is_object(val)) {
-    OOconfnode *child = malloc(sizeof(struct OOconfnode));
+    OOconfnode *child = smalloc(sizeof(struct OOconfnode));
     child->obj = val;
     child->iter = json_object_iter(child->obj);
     return child;
@@ -650,7 +651,7 @@ ooConfGetArrObj(OOconfarr *arr, int i)
   json_t *obj = json_array_get(jarr, i);
 
   if (json_is_object(obj)) {
-    OOconfnode *child = malloc(sizeof(struct OOconfnode));
+    OOconfnode *child = smalloc(sizeof(struct OOconfnode));
     child->obj = obj;
     child->iter = json_object_iter(child->obj);
     return child;

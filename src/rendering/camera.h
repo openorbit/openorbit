@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2009,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -25,65 +25,26 @@ extern "C" {
 
 #include <stdbool.h>
 #include <vmath/vmath.h>
-#include "physics/reftypes.h"
-#include "rendering/reftypes.h"
-#include "common/lwcoord.h"
+#include <vmath/lwcoord.h>
+#include "rendering/types.h"
 
-  enum SGcamtype {
-    SGCam_Free,
-    SGCam_Fixed,
-    SGCam_Orbit
-  };
+  sg_camera_t* sg_new_camera(sg_scene_t *scene);
+  lwcoord_t sg_camera_pos(sg_camera_t *cam);
+  quaternion_t sg_camera_quat(sg_camera_t *cam);
+  const float4x4* sg_camera_project(sg_camera_t *cam);
+  const float4x4* sg_camera_modelview(sg_camera_t *cam);
 
-  struct SGcam {
-    SGcamtype kind;
-    SGscene *scene;
-  };
+  void sg_camera_track_object(sg_camera_t *cam, sg_object_t *obj);
+  void sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj);
+  void sg_camera_set_perspective(sg_camera_t *cam, float perspective);
+  sg_object_t* sg_camera_get_tracked_object(sg_camera_t *cam);
 
-  struct SGfreecam {
-    SGcam super;
-    OOlwcoord lwc;
-    float3 dp;
-    quaternion_t q;
-    quaternion_t dq;
-  };
+  void sg_camera_update_modelview(sg_camera_t *cam);
+  void sg_camera_set_follow_offset(sg_camera_t *cam, float3 offs);
 
-  struct SGfixedcam {
-    SGcam super;
-    PLobject *body;
-    float3 r; // With this offset
-    quaternion_t q; // and this rotation (rotate before translation)
-  };
-
-  struct SGorbitcam {
-    SGcam super;
-    PLobject *body;
-
-    float ra, dec;
-    float dra, ddec, dr;
-    float r, zoom;
-  };
-
-
-  void sgCamInit(void);
-
-  SGcam* sgNewFreeCam(SGscenegraph *sg, SGscene *sc,
-                        float x, float y, float z,
-                        float rx, float ry, float rz);
-
-  SGcam* sgNewFixedCam(SGscenegraph *sg, SGscene *sc, PLobject *body,
-                         float dx, float dy, float dz,
-                         float rx, float ry, float rz);
-
-  SGcam* sgNewOrbitCam(SGscenegraph *sg, SGscene *sc, PLobject *body,
-                         float ra, float dec, float r);
-
-  void sgSetCamTarget(SGcam *cam, PLobject *body);
-
-  void sgCamMove(SGcam *cam);
-  void sgCamRotate(SGcam *cam);
-  void sgCamStep(SGcam *cam, float dt);
-  void sgCamAxisUpdate(SGcam *cam);
+  // Interpolate camera position and rotation based on WCT
+  void sg_camera_interpolate(sg_camera_t *cam, float t);
+  void sg_camera_sync(sg_camera_t *cam);
 
 #ifdef __cplusplus
 }

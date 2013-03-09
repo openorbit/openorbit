@@ -1,9 +1,21 @@
-#version 120
+#version 150
+
+#include "shaders/shared/shader-types.glsl"
+
+uniform mat4 oo_ModelViewMatrix;
+uniform mat4 oo_ProjectionMatrix;
+
+in vec4 oo_Vertex;
+in vec2 oo_TexCoord[1];
+in vec4 oo_Color;
+
+out vec2 FragTexCoord;
+out vec4 FragColor;
 
 void
 main()
 {
-  gl_TexCoord[0] = gl_MultiTexCoord0;
-  gl_FrontColor = gl_Color;
-  gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
+  FragTexCoord = oo_TexCoord[0];
+  FragColor = oo_Color;
+  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex;
 }

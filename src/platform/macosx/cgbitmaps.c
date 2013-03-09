@@ -17,7 +17,7 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 #include <ApplicationServices/ApplicationServices.h>
 #include <stdlib.h>
 #include "res-manager.h"
@@ -100,16 +100,17 @@ text_bitmap_create_label(const char *fontName, float fontsize, const char *text)
   glBindTexture(GL_TEXTURE_2D, bitmap->tex);
   SG_CHECK_ERROR;
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
   SG_CHECK_ERROR;
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_INTENSITY,
+  // NEED SHADER SUPPORT FOR GL_R8 (i.e. splatter out red comp into g and b)
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
                CGBitmapContextGetWidth(bitmap->ctxt),
                CGBitmapContextGetHeight(bitmap->ctxt),
-               0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap->data);
+               0, GL_RED, GL_UNSIGNED_BYTE, bitmap->data);
 
   //dump_bytes(w*h, bitmap->data);
 
@@ -149,8 +150,8 @@ text_bitmap_create(const char *font, float fontsize, unsigned w, unsigned h)
 
   glGenTextures(1, &bitmap->tex);
   glBindTexture(GL_TEXTURE_2D, bitmap->tex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
@@ -195,10 +196,11 @@ text_bitmap_drawtext(text_bitmap_t *bitmap, const char *text)
   CGContextFlush(bitmap->ctxt);
   glBindTexture(GL_TEXTURE_2D, bitmap->tex);
   SG_CHECK_ERROR;
-  glTexImage2D(GL_TEXTURE_2D, 0, 1,
+  // TODO: Need shader support
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
                CGBitmapContextGetWidth(bitmap->ctxt),
                CGBitmapContextGetHeight(bitmap->ctxt),
-               0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap->data);
+               0, GL_RED, GL_UNSIGNED_BYTE, bitmap->data);
   SG_CHECK_ERROR;
   //dump_bytes(CGBitmapContextGetWidth(bitmap->ctxt)*CGBitmapContextGetHeight(bitmap->ctxt), bitmap->data);
 

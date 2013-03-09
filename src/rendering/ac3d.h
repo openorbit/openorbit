@@ -17,10 +17,13 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COLLADA_H
-#define COLLADA_H
-#include "model.h"
 
-model_t* collada_load(const char *path);
+#ifndef AC3D_H
+#define AC3D_H
 
-#endif /* !COLLADA_H */
+#include "rendering/object.h"
+#include "rendering/shader-manager.h"
+
+sg_object_t* ac3d_load(const char *path, sg_shader_t *shader);
+
+#endif /* ! AC3D_H */

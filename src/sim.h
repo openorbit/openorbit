@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include "rendering/types.h"
 #include "physics/physics.h"
 #include "physics/orbit.h"
 #include "rendering/scenegraph.h"
@@ -37,13 +38,12 @@ typedef struct {
   sim_spacecraft_t *currentSc; //!< Current active spacecraft
   PLsystem *orbSys;   //!< Root orbit system, this will be the sun initially
   PLworld *world;
-  SGscenegraph *sg;   //!< Scenegraph of the world
+  sg_window_t *win;
 } SIMstate;
 
-void ooSimInit(void);
+void sim_init(void);
 
-void ooSimSetSg(SGscenegraph *sg);
-
+  sg_scene_t* sim_get_scene(void);
 void ooSimSetOrbSys(PLsystem *osys);
 void ooSimSetOrbWorld(PLworld *world);
 
@@ -52,7 +52,6 @@ void ooSimStep(float dt);
 void simSetSpacecraft(sim_spacecraft_t *sc);
 sim_spacecraft_t* simGetSpacecraft(void);
 OOeventqueue* simGetEventQueue(void);
-SGscenegraph* simGetSg(void);
 PLworld* simGetWorld(void);
 
 #ifdef __cplusplus

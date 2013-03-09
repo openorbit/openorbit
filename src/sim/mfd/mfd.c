@@ -21,9 +21,9 @@
 #include <string.h>
 
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
-#include <GL/gl.h>
+#include <GL3/gl3.h>
 #endif
 
 #include "mfd.h"
@@ -32,7 +32,7 @@
 #include "common/moduleinit.h"
 #include "common/palloc.h"
 #include "io-manager.h"
-#include "rendering/render.h"
+#include "rendering/overlay.h"
 #include "sim.h"
 
 void simMfdInit(SIMmfd *mfd, unsigned orig_x, unsigned orig_y,
@@ -49,9 +49,10 @@ MODULE_INIT(mfd, NULL) {
 }
 
 static void
-mfd_draw(SGoverlay *overlay)
+mfd_draw(sg_overlay_t *overlay, void *obj)
 {
-  SIMmfd *mfd = (SIMmfd*)overlay;
+  SG_CHECK_ERROR;
+  SIMmfd *mfd = (SIMmfd*)obj;
 
   if (mfd_pages.length > 0) {
     SIMmfdpage *page = ARRAY_ELEM(mfd_pages, mfd->page_no);
@@ -60,6 +61,7 @@ mfd_draw(SGoverlay *overlay)
     glClearColor(0.0, 1.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
   }
+  SG_CHECK_ERROR;
 }
 
 
@@ -69,11 +71,13 @@ mfd_draw(SGoverlay *overlay)
 static void
 samplemfddraw(SIMmfdpage *mfd)
 {
-  glDisable(GL_BLEND);
-  glDisable(GL_TEXTURE_2D);
+  SG_CHECK_ERROR;
 
+  glDisable(GL_BLEND);
   glClearColor(0.0625, 0.05078125, 0.2265625, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  SG_CHECK_ERROR;
 }
 
 static SIMmfdpage sampleMfdPage = {"sample-mfd", samplemfddraw};
@@ -113,7 +117,8 @@ mfdToggle(int state, void *data)
 {
   if (state) {
     SIMmfd *mfd = data;
-    mfd->super.enabled = !mfd->super.enabled;
+    (void)mfd; // TODO
+    //mfd->super.enabled = !mfd->super.enabled;
   }
 }
 
@@ -157,101 +162,105 @@ simSelectMfd(SIMmfd *mfd, unsigned mfdId)
 }
 
 void
-test_hud_draw(SGoverlay *overlay)
+test_hud_draw(sg_overlay_t *overlay, void *obj)
 {
-  SIMhud *hud = (SIMhud*)overlay;
+  SG_CHECK_ERROR;
 
+  SIMhud *hud = (SIMhud*)obj;
+
+  // TODO
   sim_spacecraft_t *sc = simGetSpacecraft();
-  float3 gv = simGetGravityVector(sc);
+  //float3 gv = simGetGravityVector(sc);
+
   //quaternion_t q = simGetQuaternion(sc);
   const float3x3 *R = simGetRotMat(sc);
   float3x3 R_inv;
   mf3_transpose2(R_inv, *R); // Invert rotation matrix, we need this to
                              // transform the vectors into view relative values
-  float3 v = simGetVelocityVector(sc);
-  float3 as = simGetAirspeedVector(sc);
-  float3 p = simGetRelPos(sc);
-  float3 rv = simGetRelVel(sc);
+  //float3 v = simGetVelocityVector(sc);
+  //float3 as = simGetAirspeedVector(sc);
+  //float3 p = simGetRelPos(sc);
+  //float3 rv = simGetRelVel(sc);
 
-  float3 v_view = mf3_v_mul(R_inv, v);
-  float3 g_view = mf3_v_mul(R_inv, gv);
-  float3 rv_view = mf3_v_mul(R_inv, rv);
-  float3 as_view = mf3_v_mul(R_inv, as);
-  float3 p_view = mf3_v_mul(R_inv, p);
+  //float3 v_view = mf3_v_mul(R_inv, v);
+  //float3 g_view = mf3_v_mul(R_inv, gv);
+  //float3 rv_view = mf3_v_mul(R_inv, rv);
+  //float3 as_view = mf3_v_mul(R_inv, as);
+  //float3 p_view = mf3_v_mul(R_inv, p);
 
-  float h = simGetAltitude(sc);
+  //float h = simGetAltitude(sc);
   // The hud should display the following data: airspeed, altitude, horizon,
   // heading, turn / bank
   // Angle of attack, accelleration, boresight, flight path vector
   // Hud should adopt to whether it is used in space or not.
   // Hud need to be able to select reference object in space as data is always
   // relative.
-  glPushAttrib(GL_ENABLE_BIT);
+  //glPushAttrib(GL_ENABLE_BIT);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
   glClear(GL_COLOR_BUFFER_BIT);
 
   glDisable(GL_BLEND);
-  glDisable(GL_TEXTURE_2D);
   glDisable(GL_LINE_SMOOTH);
 
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  gluOrtho2D(-1.0*sgRenderInfo.aspect, 1.0*sgRenderInfo.aspect,
-             -1.0, 1.0); // TODO: Fix to viewport aspect
+  //glMatrixMode(GL_PROJECTION);
+  //glPushMatrix();
+  //glLoadIdentity();
+  //gluOrtho2D(-1.0*sgRenderInfo.aspect, 1.0*sgRenderInfo.aspect,
+  //           -1.0, 1.0); // TODO: Fix to viewport aspect
 
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
+  //glMatrixMode(GL_MODELVIEW);
+  //glPushMatrix();
+  //glLoadIdentity();
 
   glLineWidth(1.0);
 
-  glBegin(GL_LINES);
-  glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-  glVertex2f(-0.5f, 0.0f);
-  glVertex2f(0.5f, 0.0f);
+  //glBegin(GL_LINES);
+  //glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+  //glVertex2f(-0.5f, 0.0f);
+  //glVertex2f(0.5f, 0.0f);
 
-  glVertex2f(0.0f, -0.5f);
-  glVertex2f(0.0f, 0.5f);
+  //glVertex2f(0.0f, -0.5f);
+  // glVertex2f(0.0f, 0.5f);
 
-  glEnd();
+  //glEnd();
+  SG_CHECK_ERROR;
 
-  glEnable(GL_TEXTURE_2D);
-  //glEnable(GL_POINT_SPRITE);
-  //glPointSize(10.0);
   glActiveTexture(GL_TEXTURE0);
+  SG_CHECK_ERROR;
+
   glBindTexture(GL_TEXTURE_2D, sgTextTexture(hud->text));
+
   SG_CHECK_ERROR;
   //GLuint tex_num = glGetUniformLocation(, )
   //glUniform1i(, 0);
   //sgBindTextBuffer(hud->text);
-  glDisable(GL_LIGHTING);
-  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+  //glDisable(GL_LIGHTING);
+  //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 
-  glColor4f(0.0, 1.0, 0.0, 0.0);
-  glBegin(GL_QUADS);
+  //glColor4f(0.0, 1.0, 0.0, 0.0);
+  //glBegin(GL_QUADS);
 
-  glTexCoord2f(0.0, 0.0);
-  glVertex2f(-0.025f, 0.025f);
+  //glTexCoord2f(0.0, 0.0);
+  //glVertex2f(-0.025f, 0.025f);
 
-  glTexCoord2f(1.0, 0.0);
-  glVertex2f(0.025f, 0.025f);
+  //glTexCoord2f(1.0, 0.0);
+  //glVertex2f(0.025f, 0.025f);
 
-  glTexCoord2f(1.0, 1.0);
-  glVertex2f(0.025f, -0.025f);
+  //glTexCoord2f(1.0, 1.0);
+  //glVertex2f(0.025f, -0.025f);
 
-  glTexCoord2f(0.0, 1.0);
-  glVertex2f(-0.025f, -0.025f);
+  //glTexCoord2f(0.0, 1.0);
+  //glVertex2f(-0.025f, -0.025f);
 
-  glEnd();
+  //glEnd();
 
-  glDisable(GL_TEXTURE_2D);
-
-  glPopMatrix();
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  glPopAttrib();
+  //glPopMatrix();
+  // glMatrixMode(GL_PROJECTION);
+  //glPopMatrix();
+  // glMatrixMode(GL_MODELVIEW);
+  //glPopAttrib();
+  SG_CHECK_ERROR;
 }
 
 
@@ -265,23 +274,30 @@ simHudDraw(SIMhud *hud)
 
 
 void
-simMfdInitAll(SGscenegraph *sg)
+simMfdInitAll(sg_viewport_t *vp)
 {
   mfd0.page_no = 0;
   mfd1.page_no = 0;
   mfd2.page_no = 0;
   mfd3.page_no = 0;
 
-  sgInitOverlay(&mfd0.super, mfd_draw,   0.0,   0.0, 128.0, 128.0, 128, 128);
-  sgInitOverlay(&mfd1.super, mfd_draw, sgRenderInfo.w - 128.0,   0.0,
-                128.0, 128.0, 128, 128);
-  sgInitOverlay(&mfd2.super, mfd_draw, sgRenderInfo.w - 128.0,
-                sgRenderInfo.h - 128.0, 128.0, 128.0, 128, 128);
-  sgInitOverlay(&mfd3.super, mfd_draw,   0.0, sgRenderInfo.h - 128.0,
+  sg_overlay_t *overlay0    = sg_new_overlay(),
+               *overlay1    = sg_new_overlay(),
+               *overlay2    = sg_new_overlay(),
+               *overlay3    = sg_new_overlay(),
+               *overlay_hud = sg_new_overlay();
+
+  sg_overlay_init(overlay0, mfd_draw, &mfd0, 0.0,   0.0, 128.0, 128.0, 128, 128);
+  sg_overlay_init(overlay1, mfd_draw, &mfd1, sg_viewport_get_width(vp) - 128.0,   0.0,
+                  128.0, 128.0, 128, 128);
+  sg_overlay_init(overlay2, mfd_draw, &mfd2, sg_viewport_get_width(vp)- 128.0,
+                 sg_viewport_get_height(vp) - 128.0, 128.0, 128.0, 128, 128);
+  sg_overlay_init(overlay3, mfd_draw, &mfd3, 0.0, sg_viewport_get_height(vp) - 128.0,
                 128.0, 128.0, 128, 128);
 
-  sgInitOverlay(&hud.super, test_hud_draw,   0.0, 0.0,
-                sgRenderInfo.w, sgRenderInfo.h, sgRenderInfo.w, sgRenderInfo.h);
+  sg_overlay_init(overlay_hud, test_hud_draw, &hud,  0.0, 0.0,
+                  sg_viewport_get_width(vp), sg_viewport_get_height(vp),
+                  sg_viewport_get_width(vp), sg_viewport_get_height(vp));
 
   hud.text = sgNewTextLabel("Helvetica", 14.0, "20");
   SG_CHECK_ERROR;
@@ -303,11 +319,12 @@ simMfdInitAll(SGscenegraph *sg)
   SG_CHECK_ERROR;
   glBufferData(GL_ARRAY_BUFFER, hud.lines*4*sizeof(GLfloat), hud.lineVerts,
                GL_STATIC_DRAW);
-  sgAddOverlay(sg, &mfd0.super);
-  sgAddOverlay(sg, &mfd1.super);
-  sgAddOverlay(sg, &mfd2.super);
-  sgAddOverlay(sg, &mfd3.super);
-  sgAddOverlay(sg, &hud.super);
+
+  sg_viewport_add_overlay(vp, overlay0);
+  sg_viewport_add_overlay(vp, overlay1);
+  sg_viewport_add_overlay(vp, overlay2);
+  sg_viewport_add_overlay(vp, overlay3);
+  sg_viewport_add_overlay(vp, overlay_hud);
 }
 
 MODULE_INIT(mfdio, "mfd", "iomanager", NULL) {

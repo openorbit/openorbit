@@ -1,23 +1,54 @@
-#version 120
+#version 150
 
-uniform mat4 ModelViewMatrix;
-uniform mat4 ProjectionMatrix;
 
-varying vec2 TexCoord;
+struct material_t {
+  vec4 emission;
+  vec4 ambient;
+  vec4 diffuse;
+  vec4 specular;
+  float shininess;
+};
 
-varying vec3 N, Ld, Eye;
-varying float Dist;
+struct light_t {
+  vec3 pos;
+  vec4 ambient;
+  vec4 specular;
+  vec4 diffuse;
+  vec3 dir; // Only used for spotlights
+  
+  float constantAttenuation;
+  float linearAttenuation;
+  float quadraticAttenuation;
+};
+
+
+uniform light_t oo_Light[1];
+uniform vec4 oo_LightGlobalAmbient;
+uniform material_t oo_Material;
+
+uniform mat4 oo_ModelViewMatrix;
+uniform mat4 oo_ProjectionMatrix;
+uniform mat3 oo_NormalMatrix;
+
+in vec4 oo_Vertex;
+in vec3 oo_Normal;
+
+in vec2 oo_TexCoord0;
+
+out vec2 TexCoord;
+out vec3 N, Ld, Eye;
+out float Dist;
 
 void
 main()
 {
-  N = normalize(gl_NormalMatrix * gl_Normal);
+  N = normalize(oo_NormalMatrix * oo_Normal);
 
-  vec3 Lv = vec3(gl_LightSource[0].position - ModelViewMatrix * gl_Vertex);
+  vec3 Lv = oo_Light[0].pos - (oo_ModelViewMatrix * vec4(oo_Vertex.xyz, 0.0)).xyz;
   Dist = length(Lv);
   Ld = normalize(Lv);
-  Eye = -vec3(ModelViewMatrix * gl_Vertex);
+  Eye = -vec3(oo_ModelViewMatrix * oo_Vertex);
 
-  gl_Position = ProjectionMatrix * ModelViewMatrix * gl_Vertex;
-  TexCoord = gl_MultiTexCoord0.st;
+  gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex;
+  TexCoord = oo_TexCoord0;
 }

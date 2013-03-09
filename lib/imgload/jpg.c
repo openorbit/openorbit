@@ -53,7 +53,6 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;
   FILE * infile;  /* source file */
-  JSAMPARRAY buffer;  /* Output row buffer */
 
   if ((infile = fopen(filename, "rb")) == NULL) {
     ooLogError("can't open %s\n", filename);
@@ -79,6 +78,13 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
 
   img->data = malloc(cinfo.output_width * cinfo.output_height *
                      cinfo.output_components);
+  if (img->data == NULL) {
+    (void) jpeg_finish_decompress(&cinfo);
+    jpeg_destroy_decompress(&cinfo);
+    fclose(infile);
+    return -1;
+  }
+
   uint8_t *line;
   // Read lines in reverse to compensate for opengl coordinate system
   for (int i = cinfo.output_height - 1 ; i >= 0 ; --i) {

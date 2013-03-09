@@ -21,10 +21,12 @@
 #include "flightrecorder.h"
 #include "sim/spacecraft.h"
 #include <gencds/array.h>
+#include "palloc.h"
+
 OOflightrecorder*
 ooNewFlightRecorder(sim_spacecraft_t *sc, int maxSamples, int sampleInterval)
 {
-  OOflightrecorder *fr = malloc(sizeof(OOflightrecorder));
+  OOflightrecorder *fr = smalloc(sizeof(OOflightrecorder));
   double_array_init(&fr->data);
   fr->sampleInterval = sampleInterval;
   fr->sampleTimeStamp = 0;

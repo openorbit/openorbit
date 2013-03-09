@@ -20,9 +20,9 @@
 #include <assert.h>
 
 #ifdef __APPLE__
-#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 #else
-#include <GL/gl.h>
+#include <GL3/gl3.h>
 #endif
 
 #include <openorbit/log.h>
@@ -30,6 +30,7 @@
 #include "texture.h"
 #include "res-manager.h"
 #include "common/moduleinit.h"
+#include "palloc.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -67,10 +68,13 @@ sgLoadFont(const char *fontName, int sz)
   }
 
   error = FT_Set_Char_Size(face, 0, sz*64, 72, 72);
+  if (error) {
+    // TODO
+  }
   // FT_Set_Pixel_Size...
   free(fontFile);
 
-  SGfont *font = malloc(sizeof(SGfont));
+  SGfont *font = smalloc(sizeof(SGfont));
   font->face = face;
   font->size = sz;
 
@@ -121,7 +125,7 @@ sgNewStaticTextBuffer(const char *fontName, unsigned fontSize,
 SGtextbuffer*
 sgNewTextBuffer(const char *fontName, unsigned fontSize, unsigned width, unsigned rows)
 {
-//  SGtextbuffer *buff = malloc(sizeof(SGtextbuffer));
+//  SGtextbuffer *buff = smalloc(sizeof(SGtextbuffer));
 
 //  buff->font = sgLoadFont(fontName, fontSize);
 //  buff->h = rows * fontSize;

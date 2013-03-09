@@ -20,25 +20,43 @@
 #include "material.h"
 #include "scenegraph.h"
 #ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
 #else
-#include <GL/gl.h>
+#include <GL3/gl3.h>
 #endif
+#include "palloc.h"
+
+struct sg_material_t {
+  float4 emission;
+  float4 ambient;
+  float4 diffuse;
+  float4 specular;
+  float shininess;
+};
+
+sg_material_t*
+sg_new_material(void)
+{
+  sg_material_t *mat = smalloc(sizeof(sg_material_t));
+
+  sg_material_init(mat);
+  return mat;
+}
 
 void
-sgBindMaterial(SGmaterial *mat)
+sg_material_bind(sg_material_t *mat, sg_shader_t *shader)
 {
   SG_CHECK_ERROR;
-  glMaterialfv(GL_FRONT, GL_AMBIENT, mat->ambient);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat->diffuse);
-  glMaterialfv(GL_FRONT, GL_SPECULAR, mat->specular);
-  glMaterialfv(GL_FRONT, GL_EMISSION, mat->emission);
-  glMaterialf(GL_FRONT, GL_SHININESS, mat->shininess);
+  //glMaterialfv(GL_FRONT, GL_AMBIENT, (GLfloat*)&mat->ambient);
+  //glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat*)&mat->diffuse);
+  //glMaterialfv(GL_FRONT, GL_SPECULAR, (GLfloat*)&mat->specular);
+  //glMaterialfv(GL_FRONT, GL_EMISSION, (GLfloat*)&mat->emission);
+  //glMaterialf(GL_FRONT, GL_SHININESS, mat->shininess);
   SG_CHECK_ERROR;
 }
 
 void
-sgInitMaterial(SGmaterial *mat)
+sg_material_init(sg_material_t *mat)
 {
   mat->ambient[0] = 0.2;
   mat->ambient[1] = 0.2;
@@ -64,7 +82,7 @@ sgInitMaterial(SGmaterial *mat)
 }
 
 void
-sgSetMaterialAmb4f(SGmaterial *mat, float r, float g, float b, float a)
+sg_material_set_amb4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->ambient[0] = r;
   mat->ambient[1] = g;
@@ -73,7 +91,7 @@ sgSetMaterialAmb4f(SGmaterial *mat, float r, float g, float b, float a)
 }
 
 void
-sgSetMaterialDiff4f(SGmaterial *mat, float r, float g, float b, float a)
+sg_material_set_diff4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->diffuse[0] = r;
   mat->diffuse[1] = g;
@@ -82,7 +100,7 @@ sgSetMaterialDiff4f(SGmaterial *mat, float r, float g, float b, float a)
 }
 
 void
-sgSetMaterialSpec4f(SGmaterial *mat, float r, float g, float b, float a)
+sg_material_set_spec4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->specular[0] = r;
   mat->specular[1] = g;
@@ -91,7 +109,7 @@ sgSetMaterialSpec4f(SGmaterial *mat, float r, float g, float b, float a)
 }
 
 void
-sgSetMaterialEmiss4f(SGmaterial *mat, float r, float g, float b, float a)
+sg_material_set_emiss4f(sg_material_t *mat, float r, float g, float b, float a)
 {
   mat->emission[0] = r;
   mat->emission[1] = g;
@@ -100,7 +118,38 @@ sgSetMaterialEmiss4f(SGmaterial *mat, float r, float g, float b, float a)
 }
 
 void
-sgSetMaterialShininess(SGmaterial *mat, float s)
+sg_material_set_shininess(sg_material_t *mat, float s)
 {
   mat->shininess = s;
+}
+
+
+float4
+sg_material_get_amb(sg_material_t *mat)
+{
+  return mat->ambient;
+}
+
+float4
+sg_material_get_diff(sg_material_t *mat)
+{
+  return mat->diffuse;
+}
+
+float4
+sg_material_get_spec(sg_material_t *mat)
+{
+  return mat->specular;
+}
+
+float4
+sg_material_get_emiss(sg_material_t *mat)
+{
+  return mat->emission;
+}
+
+float
+sg_material_get_shininess(sg_material_t *mat)
+{
+  return mat->shininess;
 }
