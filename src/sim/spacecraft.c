@@ -34,7 +34,7 @@
 #include "rendering/object.h"
 #include "palloc.h"
 
-extern SIMstate gSIM_state;
+extern sim_state_t gSIM_state;
 
 typedef struct {
   const char *name;
@@ -42,7 +42,7 @@ typedef struct {
 
 
 //static hashtable_t *gSpacecraftClasses;
-
+#if 0
 sim_spacecraft_t*
 sim_new_spacecraft(const char *class_name, const char *sc_name)
 {
@@ -53,16 +53,18 @@ sim_new_spacecraft(const char *class_name, const char *sc_name)
   cls->init(cls, sc, &args);
   return sc;
 }
+#endif
 
+#if 0
 sim_stage_t*
 sim_new_stage(sim_spacecraft_t *sc, const char *name, const char *mesh)
 {
   sim_stage_t *stage = smalloc(sizeof(sim_stage_t));
 
-  stage->state = OO_Stage_Idle;
+  stage->state = SIM_STAGE_IDLE;
   stage->sc = sc;
   stage->expendedMass = 0.0;
-  stage->rec = simPubsubMakeRecord(sc->rec, name);
+  stage->rec = sim_pubsub_make_record(sc->rec, name);
 
   obj_array_init(&stage->engines);
   obj_array_init(&stage->actuatorGroups);
@@ -80,13 +82,14 @@ sim_new_stage(sim_spacecraft_t *sc, const char *name, const char *mesh)
 
   return stage;
 }
+#endif
 
 #if 0
 void
-simNewSpacecraftClass(const char *name, sim_spacecraft_t *(*alloc)(void),
-                      void (*init)(sim_spacecraft_t *sc))
+sim_new_spacecraft_class(const char *name, sim_spacecraft_t *(*alloc)(void),
+                         void (*init)(sim_spacecraft_t *sc))
 {
-  SCclass *cls = smalloc(sizeof(SCclass));
+  sim_sc_class_t *cls = smalloc(sizeof(sim_sc_class_t));
 
   cls->name = strdup(name);
   cls->alloc = alloc;
@@ -98,7 +101,7 @@ simNewSpacecraftClass(const char *name, sim_spacecraft_t *(*alloc)(void),
 #endif
 
 sim_spacecraft_t*
-simNewSpacecraft(const char *className, const char *scName)
+sim_new_spacecraft(const char *className, const char *scName)
 {
   sim_class_t *cls = sim_class_get(className);
 
@@ -108,28 +111,28 @@ simNewSpacecraft(const char *className, const char *scName)
   }
 
   sim_spacecraft_t *sc = cls->alloc(cls);
-  //simScInit(sc, scName);
+  //sim_spacecraft_init(sc, scName);
   InitScArgs args = {scName};
   cls->init(cls, sc, &args);
 
   pl_object_update_mass(sc->obj);
   // TODO: Update sg properties.
-  //       ooScSetScene(sc, sgGetScene(simGetSg(), "main"));
+  //       sim_spacecraft_set_scene(sc, sgGetScene(simGetSg(), "main"));
 
   //  char *axises;
   // asprintf(&axises, "/sc/%s/axis", scName);
 
-  sim_record_t *rec = simPubsubMakeRecord(sc->rec, "axis");
+  sim_record_t *rec = sim_pubsub_make_record(sc->rec, "axis");
 
   if (rec) {
-    simPublishValue(rec, SIM_TYPE_FLOAT, "yaw", &sc->axises.yaw);
-    simPublishValue(rec, SIM_TYPE_FLOAT, "roll", &sc->axises.roll);
-    simPublishValue(rec, SIM_TYPE_FLOAT, "pitch", &sc->axises.pitch);
-    simPublishValue(rec, SIM_TYPE_FLOAT, "lateral", &sc->axises.lateral);
-    simPublishValue(rec, SIM_TYPE_FLOAT, "vertical", &sc->axises.vertical);
-    simPublishValue(rec, SIM_TYPE_FLOAT, "forward", &sc->axises.fwd);
-    simPublishValue(rec, SIM_TYPE_FLOAT, "orbital", &sc->axises.orbital);
-    simPublishValue(rec, SIM_TYPE_FLOAT, "throttle", &sc->axises.throttle);
+    sim_pubsub_publish_val(rec, SIM_TYPE_FLOAT, "yaw", &sc->axises.yaw);
+    sim_pubsub_publish_val(rec, SIM_TYPE_FLOAT, "roll", &sc->axises.roll);
+    sim_pubsub_publish_val(rec, SIM_TYPE_FLOAT, "pitch", &sc->axises.pitch);
+    sim_pubsub_publish_val(rec, SIM_TYPE_FLOAT, "lateral", &sc->axises.lateral);
+    sim_pubsub_publish_val(rec, SIM_TYPE_FLOAT, "vertical", &sc->axises.vertical);
+    sim_pubsub_publish_val(rec, SIM_TYPE_FLOAT, "forward", &sc->axises.fwd);
+    sim_pubsub_publish_val(rec, SIM_TYPE_FLOAT, "orbital", &sc->axises.orbital);
+    sim_pubsub_publish_val(rec, SIM_TYPE_FLOAT, "throttle", &sc->axises.throttle);
   }
 
   return sc;
@@ -137,7 +140,7 @@ simNewSpacecraft(const char *className, const char *scName)
 
 
 void
-ooGetAxises(OOaxises *axises)
+sim_get_axises(sim_axises_t *axises)
 {
   SIM_VAL(axises->pitch) = io_get_axis(IO_AXIS_Y);
   SIM_VAL(axises->roll) = io_get_axis(IO_AXIS_X);
@@ -159,7 +162,7 @@ ooGetAxises(OOaxises *axises)
   produce a little bit better results.
  */
 double
-ooSimpleWingLift(OOsimplewing *wing, const OOsimenv *env)
+ooSimpleWingLift(sim_simplewing_t *wing, const sim_environment_t *env)
 {
   double p = env->airDensity;  // air density
   double v = 0.0; // Velocity
@@ -177,30 +180,30 @@ ooSimpleWingLift(OOsimplewing *wing, const OOsimenv *env)
 }
 
 void
-simDefaultDetatch(sim_spacecraft_t *sc)
+sim_spacecraft_default_detatch(sim_spacecraft_t *sc)
 {
 
 }
 
 void
-simDefaultPrestep(sim_spacecraft_t *sc, double dt)
+sim_spacecraft_default_prestep(sim_spacecraft_t *sc, double dt)
 {
 
 }
 
 void
-simDefaultPoststep(sim_spacecraft_t *sc, double dt)
+sim_spacecraft_default_poststep(sim_spacecraft_t *sc, double dt)
 {
 
 }
 
 void
-simDefaultEngineToggle(sim_spacecraft_t *sc)
+sim_spacecraft_default_engine_toggle(sim_spacecraft_t *sc)
 {
 }
 
 void
-simDefaultAxisUpdate(sim_spacecraft_t *sc)
+sim_spacecraft_default_axis_update(sim_spacecraft_t *sc)
 {
 }
 
@@ -208,49 +211,50 @@ simDefaultAxisUpdate(sim_spacecraft_t *sc)
 
 
 void
-simScInit(sim_spacecraft_t *sc, const char *name)
+sim_spacecraft_init(sim_spacecraft_t *sc, const char *name)
 {
   sc->name = strdup(name);
 
   char *sckey;
   asprintf(&sckey, "/sc/%s", name);
-  sc->rec = simPubsubCreateRecord(sckey);
+  sc->rec = sim_pubsub_create_record(sckey);
   free(sckey);
 
-  pl_world_t *world = simGetWorld();
+  pl_world_t *world = sim_get_world();
 
   obj_array_init(&sc->stages);
   obj_array_init(&sc->engines);
 
   sc->world = world;
-  sc->prestep = simDefaultPrestep;
-  sc->poststep = simDefaultPoststep;
+  sc->prestep = sim_spacecraft_default_prestep;
+  sc->poststep = sim_spacecraft_default_poststep;
   sc->detatchPossible = true;
   sc->detatchComplete = true;
-  sc->detatchStage = simDefaultDetatch;
+  sc->detatchStage = sim_spacecraft_default_detatch;
   sc->detatchSequence = 0;
   sc->obj = pl_new_object(world, name);
   sc->scene = NULL;//sgGetScene(sg, "main"); // Just use any of the existing ones
   sc->expendedMass = 0.0;
   sc->mainEngineOn = false;
-  sc->toggleMainEngine = simDefaultEngineToggle;
-  sc->axisUpdate = simDefaultAxisUpdate;
+  sc->toggleMainEngine = sim_spacecraft_default_engine_toggle;
+  sc->axisUpdate = sim_spacecraft_default_axis_update;
   pl_mass_set(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   pl_system_add_object(world->rootSys, sc->obj);
 }
 
+#if 0
 // TODO: Pass on pl_system_t instead of pl_world_t to ensure that object has valid
 //       systems at all times.
 sim_spacecraft_t*
-ooScNew(pl_world_t *world, sg_scene_t *scene, const char *name)
+sim_new_spacecraft(pl_world_t *world, sg_scene_t *scene, const char *name)
 {
   sim_spacecraft_t *sc = smalloc(sizeof(sim_spacecraft_t));
 
-  simScInit(sc, name);
+  sim_spacecraft_init(sc, name);
 
   return sc;
 }
-
+#endif
 
 //void
 //dMassSetConeTotal(dMass *m, dReal total_mass,
@@ -275,50 +279,41 @@ ooScNew(pl_world_t *world, sg_scene_t *scene, const char *name)
 
 
 void
-simDetatchStage(sim_spacecraft_t *sc, sim_stage_t *stage)
+sim_spaccraft_detatch_stage(sim_spacecraft_t *sc, sim_stage_t *stage)
 {
-  stage->state = OO_Stage_Detatched;
+  stage->state = SIM_STAGE_DETATCHED;
   pl_object_detatch(stage->obj);
 }
 
 void
-simScDetatchStage(sim_spacecraft_t *sc)
-{
-  if (sc->detatchPossible) {
-    sc->detatchStage(sc);
-    sc->detatchSequence ++;
-  }
-}
-
-void
-simScToggleMainEngine(sim_spacecraft_t *sc)
+sim_spacecraft_toggle_main_engine(sim_spacecraft_t *sc)
 {
   sc->toggleMainEngine(sc);
 }
 
 PLobject*
-ooScGetPLObjForSc(sim_spacecraft_t *sc)
+sim_spacecraft_get_pl_obj(sim_spacecraft_t *sc)
 {
   return (PLobject*)sc->obj;
 }
 
 
 void
-simScStep(sim_spacecraft_t *sc, float dt)
+sim_spacecraft_step(sim_spacecraft_t *sc, float dt)
 {
   assert(sc != NULL);
 
 
   sc->expendedMass = 0.0;
 
-  OOaxises axises;
-  ooGetAxises(&axises);
+  sim_axises_t axises;
+  sim_get_axises(&axises);
 
   sc->prestep(sc, dt);
   sc->axisUpdate(sc);
   for (size_t i = 0 ; i < sc->stages.length ; ++ i) {
     sim_stage_t *stage = sc->stages.elems[i];
-    ooScStageStep(stage, &axises, dt);
+    sim_stage_step(stage, &axises, dt);
   }
 
   pl_mass_mod(&sc->obj->m, sc->obj->m.m - sc->expendedMass);
@@ -327,14 +322,14 @@ simScStep(sim_spacecraft_t *sc, float dt)
 }
 
 void // for scripts and events
-ooScForce(sim_spacecraft_t *sc, float rx, float ry, float rz)
+sim_spacecraft_force(sim_spacecraft_t *sc, float rx, float ry, float rz)
 {
   pl_object_force_relative3f(sc->obj, rx, ry, rz);
 }
 
 
 void
-ooScSetStageMesh(sim_stage_t *stage, sg_object_t *mesh)
+sim_stage_set_mesh(sim_stage_t *stage, sg_object_t *mesh)
 {
   assert(stage != NULL);
   assert(mesh != NULL);
@@ -342,22 +337,22 @@ ooScSetStageMesh(sim_stage_t *stage, sg_object_t *mesh)
 }
 
 void
-ooScSyncStage(sim_stage_t *stage)
+sim_stage_sync(sim_stage_t *stage)
 {
   //  stage->mesh->p;
   //  stage->mesh->q;
 }
 
 void
-ooScSyncSpacecraft(sim_spacecraft_t *sc)
+sim_spacecraft_sync(sim_spacecraft_t *sc)
 {
   for (size_t i = 0 ; i < sc->stages.length; ++ i) {
-    ooScSyncStage(sc->stages.elems[i]);
+    sim_stage_sync(sc->stages.elems[i]);
   }
 }
 
 void
-ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt) {
+sim_stage_step(sim_stage_t *stage, sim_axises_t *axises, float dt) {
   assert(stage != NULL);
   assert(axises != NULL);
 
@@ -370,8 +365,8 @@ ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt) {
   //};
   stage->expendedMass = 0.0f;
 
-  for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
-    OOactuatorgroup *actGroup = (OOactuatorgroup*)stage->actuatorGroups.elems[i];
+  for (int i = 0 ; i < SIM_ACT_GROUP_COUNT ; ++i) {
+    sim_actuatorgroup_t *actGroup = (sim_actuatorgroup_t*)stage->actuatorGroups.elems[i];
     //double axisVal = ooIoGetAxis(NULL, axisKeys[i]);
     for (int j = 0 ; j < actGroup->actuators.length ; ++j) {
       //OOactuator *act = actGroup->actuators.elems[j];
@@ -382,7 +377,7 @@ ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt) {
   }
 
   ARRAY_FOR_EACH(i, stage->engines) {
-    SIMengine *eng = ARRAY_ELEM(stage->engines, i);
+    sim_engine_t *eng = ARRAY_ELEM(stage->engines, i);
     if (eng->state & SIM_ENGINE_BURNING_BIT) {
       log_info("engine %s burning", eng->name);
       eng->step(eng, dt);
@@ -394,19 +389,19 @@ ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt) {
 }
 
 sim_stage_t*
-simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
+sim_new_stage(sim_spacecraft_t *sc, const char *name, const char *mesh)
 {
   sim_stage_t *stage = smalloc(sizeof(sim_stage_t));
-  stage->state = OO_Stage_Idle;
+  stage->state = SIM_STAGE_IDLE;
   stage->sc = sc;
   stage->expendedMass = 0.0;
-  stage->rec = simPubsubMakeRecord(sc->rec, name);
+  stage->rec = sim_pubsub_make_record(sc->rec, name);
 
   obj_array_init(&stage->engines);
   obj_array_init(&stage->actuatorGroups);
   obj_array_init(&stage->payload);
-  for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
-    OOactuatorgroup *actGroup = ooScNewActuatorGroup(ooGetActuatorGroupName(i));
+  for (int i = 0 ; i < SIM_ACT_GROUP_COUNT ; ++i) {
+    sim_actuatorgroup_t *actGroup = sim_new_actuator_group(sim_get_actuator_group_name(i));
     obj_array_push(&stage->actuatorGroups, actGroup);
   }
 
@@ -417,7 +412,7 @@ simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
   // Load stage model
   sg_object_t *model = sg_load_object(mesh, sg_get_shader("spacecraft"));
 
-  ooScSetStageMesh(stage, model);
+  sim_stage_set_mesh(stage, model);
   sg_scene_t *scene = sc->scene; // TODO: FIX
   sg_scene_add_object(scene, model);
   sg_object_set_rigid_body(model, stage->obj);
@@ -426,34 +421,34 @@ simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh)
 }
 
 void
-scStageSetOffset3f(sim_stage_t *stage, float x, float y, float z)
+sim_stage_set_offset3f(sim_stage_t *stage, float x, float y, float z)
 {
   stage->pos = vf3_set(x, y, z);
   stage->obj->p_offset = vf3_set(x, y, z);
 }
 
 void
-scStageSetOffset3fv(sim_stage_t *stage, float3 p)
+sim_stage_set_offset3fv(sim_stage_t *stage, float3 p)
 {
   stage->pos = p;
   stage->obj->p_offset = p;
 }
 
 void
-ooScSetScene(sim_spacecraft_t *spacecraft, sg_scene_t *scene)
+sim_spacecraft_set_scene(sim_spacecraft_t *spacecraft, sg_scene_t *scene)
 {
   for (int i = 0 ; i < spacecraft->stages.length ; ++i) {
     sim_stage_t *stage = spacecraft->stages.elems[i];
     (void)stage;
     // TODO: Fixme
-    //if (stage->state != OO_Stage_Detatched) {
+    //if (stage->state != SIM_STAGE_DETATCHED) {
     //  sg_scene_add_object(scene, stage->);
     //}
   }
 }
 
 void
-ooScSetSystem(sim_spacecraft_t *spacecraft, pl_system_t *sys)
+sim_spacecraft_set_system(sim_spacecraft_t *spacecraft, pl_system_t *sys)
 {
   pl_system_t *oldSys = spacecraft->obj->sys;
 
@@ -470,19 +465,19 @@ ooScSetSystem(sim_spacecraft_t *spacecraft, pl_system_t *sys)
   spacecraft->obj->sys = sys;
 }
 void
-ooScSetPos(sim_spacecraft_t *sc, double x, double y, double z)
+sim_spacecraft_set_pos(sim_spacecraft_t *sc, double x, double y, double z)
 {
   pl_object_set_pos3d(sc->obj, x, y, z);
 }
 
 void
-ooScSetSystemAndPos(sim_spacecraft_t *sc, const char *sysName,
+sim_spacecraft_set_sys_and_pos(sim_spacecraft_t *sc, const char *sysName,
                     double x, double y, double z)
 {
   pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
   if (astrobody != NULL) {
     pl_object_set_pos_rel3d(sc->obj, &astrobody->obj, x, y, z);
-    ooScSetSystem(sc, astrobody->sys);
+    sim_spacecraft_set_system(sc, astrobody->sys);
     float3 v = pl_compute_current_velocity(astrobody);
     pl_object_set_vel3fv(sc->obj, v);
   } else {
@@ -491,7 +486,7 @@ ooScSetSystemAndPos(sim_spacecraft_t *sc, const char *sysName,
 }
 
 void
-ooScSetSysAndCoords(sim_spacecraft_t *sc, const char *sysName,
+sim_spacecraft_set_sys_and_coords(sim_spacecraft_t *sc, const char *sysName,
                     double longitude, double latitude, double altitude)
 {
   // Find planetoid object
@@ -504,7 +499,7 @@ ooScSetSysAndCoords(sim_spacecraft_t *sc, const char *sysName,
                                latitude, longitude, altitude);
     pl_object_set_pos_rel3fv(sc->obj, &astrobody->obj, p);
 
-    ooScSetSystem(sc, astrobody->sys);
+    sim_spacecraft_set_system(sc, astrobody->sys);
     float3 v = pl_compute_current_velocity(astrobody);
 
     // Compute standard orbital velocity
@@ -515,12 +510,12 @@ ooScSetSysAndCoords(sim_spacecraft_t *sc, const char *sysName,
 }
 
 void
-simInitStage(sim_stage_t *stage)
+sim_stage_init(sim_stage_t *stage)
 {
 }
 
 void
-simAddStage(sim_spacecraft_t *sc, sim_stage_t *stage)
+sim_spacecraft_add_stage(sim_spacecraft_t *sc, sim_stage_t *stage)
 {
   obj_array_push(&sc->stages, stage);
 }
@@ -528,114 +523,114 @@ simAddStage(sim_spacecraft_t *sc, sim_stage_t *stage)
 // TODO: This is buggy, gravity is only set on the parent object unless the
 //       stage has been detatched.
 float3
-simGetStageGravityVector(sim_stage_t *stage)
+sim_stage_get_gravity(sim_stage_t *stage)
 {
   return stage->obj->g_ack;
 }
 
 float3
-simGetGravityVector(sim_spacecraft_t *sc)
+sim_spacecraft_get_gravity(sim_spacecraft_t *sc)
 {
   // TODO: Return the real gravity instead of force ackumulator
   return sc->obj->g_ack;
 }
 
 float3
-simGetVelocityVector(sim_spacecraft_t *sc)
+sim_spacecraft_get_velocity(sim_spacecraft_t *sc)
 {
   return sc->obj->v;
 }
 
 float3
-simGetAirspeedVector(sim_spacecraft_t *sc)
+sim_spacecraft_get_airspeed(sim_spacecraft_t *sc)
 {
   return pl_compute_airvelocity(sc->obj);
 }
 
 float3
-simGetForceVector(sim_spacecraft_t *sc)
+sim_spacecraft_get_force(sim_spacecraft_t *sc)
 {
   return sc->obj->f_ack;
 }
 
 quaternion_t
-simGetQuaternion(sim_spacecraft_t *sc)
+sim_spacecraft_get_quaternion(sim_spacecraft_t *sc)
 {
   return sc->obj->q;
 }
 
 const float3x3*
-simGetRotMat(sim_spacecraft_t *sc)
+sim_spacecraft_get_rotmat(sim_spacecraft_t *sc)
 {
   return (const float3x3*)&sc->obj->R;
 }
 
 float
-simGetAltitude(sim_spacecraft_t *sc)
+sim_spacecraft_get_altitude(sim_spacecraft_t *sc)
 {
   return pl_object_compute_altitude(sc->obj);
 }
 
 
 float3
-simGetRelPos(sim_spacecraft_t *sc)
+sim_spacecraft_get_rel_pos(sim_spacecraft_t *sc)
 {
   return lwc_dist(&sc->obj->p, &sc->obj->sys->orbitalBody->obj.p);
 }
 
 float3
-simGetRelVel(sim_spacecraft_t *sc)
+sim_spacecraft_get_rel_vel(sim_spacecraft_t *sc)
 {
   return sc->obj->v - sc->obj->sys->orbitalBody->obj.v;
 }
 
 pl_system_t*
-simGetSys(sim_spacecraft_t *sc)
+sim_spacecraft_get_sys(sim_spacecraft_t *sc)
 {
   return sc->obj->sys;
 }
 
 
 void
-simStageArmEngines(sim_stage_t *stage)
+sim_stage_arm_engines(sim_stage_t *stage)
 {
   ARRAY_FOR_EACH(i, stage->engines) {
-    SIMengine *eng = ARRAY_ELEM(stage->engines, i);
-    if (eng->state == SIM_Disarmed) {
-      simEngineArm(eng);
+    sim_engine_t *eng = ARRAY_ELEM(stage->engines, i);
+    if (eng->state == SIM_DISARMED) {
+      sim_engine_arm(eng);
     }
   }
 }
 
 void
-simStageDisarmEngines(sim_stage_t *stage)
+sim_stage_disarm_engines(sim_stage_t *stage)
 {
   ARRAY_FOR_EACH(i, stage->engines) {
-    SIMengine *eng = ARRAY_ELEM(stage->engines, i);
-    if (eng->state == SIM_Armed) {
-      simEngineDisarm(eng);
+    sim_engine_t *eng = ARRAY_ELEM(stage->engines, i);
+    if (eng->state == SIM_ARMED) {
+      sim_engine_disarm(eng);
     }
   }
 }
 
 void
-simStageDisableEngines(sim_stage_t *stage)
+sim_stage_disable_engines(sim_stage_t *stage)
 {
   ARRAY_FOR_EACH(i, stage->engines) {
-    SIMengine *eng = ARRAY_ELEM(stage->engines, i);
-    if (eng->state == SIM_Burning) {
-      simEngineDisable(eng);
+    sim_engine_t *eng = ARRAY_ELEM(stage->engines, i);
+    if (eng->state == SIM_BURNING) {
+      sim_engine_disable(eng);
     }
   }
 }
 
 void
-simStageLockEngines(sim_stage_t *stage)
+sim_stage_lock_engines(sim_stage_t *stage)
 {
   ARRAY_FOR_EACH(i, stage->engines) {
-    SIMengine *eng = ARRAY_ELEM(stage->engines, i);
-    if (eng->state == SIM_Burning || eng->state == SIM_Armed) {
-      simEngineLock(eng);
+    sim_engine_t *eng = ARRAY_ELEM(stage->engines, i);
+    if (eng->state == SIM_BURNING || eng->state == SIM_ARMED) {
+      sim_engine_lock(eng);
     }
   }
 }
@@ -652,24 +647,24 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
 
   sc->super.name = strdup(args->name);
 
-  pl_world_t *world = simGetWorld();
+  pl_world_t *world = sim_get_world();
 
   obj_array_init(&sc->stages);
   obj_array_init(&sc->engines);
 
   sc->world = world;
-  sc->prestep = simDefaultPrestep;
-  sc->poststep = simDefaultPoststep;
+  sc->prestep = sim_spacecraft_default_prestep;
+  sc->poststep = sim_spacecraft_default_poststep;
   sc->detatchPossible = true;
   sc->detatchComplete = true;
-  sc->detatchStage = simDefaultDetatch;
+  sc->detatchStage = sim_spacecraft_default_detatch;
   sc->detatchSequence = 0;
   sc->obj = pl_new_object(world, args->name);
   sc->scene = sim_get_scene(); // Just use any of the existing ones
   sc->expendedMass = 0.0;
   sc->mainEngineOn = false;
-  sc->toggleMainEngine = simDefaultEngineToggle;
-  sc->axisUpdate = simDefaultAxisUpdate;
+  sc->toggleMainEngine = sim_spacecraft_default_engine_toggle;
+  sc->axisUpdate = sim_spacecraft_default_axis_update;
   pl_mass_set(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   pl_system_add_object(world->rootSys, sc->obj);
 }

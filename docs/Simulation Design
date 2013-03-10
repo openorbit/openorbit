@@ -21,12 +21,12 @@ When you design your spacecraft you usually add an actuator to one of these
 groups. Additional groups can be created for special purpose systems.
 
 Actuators can be of various types:
-  OOrocket:     liquid fuel rockets
-  OOsrb:        solid fuel rockets
-  OOjetengine:  jet engines
-  OOmagtorquer: magneto torquers
-  OOwing:       wings
-  OOflap:       flaps
+  sim_rocket_t:     liquid fuel rockets
+  sim_srb_t:        solid fuel rockets
+  sim_jetengine_t:  jet engines
+  sim_magtorquer_t: magneto torquers
+  sim_wing_t:       wings
+  sim_flap_t:       flaps
 
 These are all inheriting the base actuator class. The rocket and srb class are
 typically used for creating both thrusters and orbital engines, there is nothing

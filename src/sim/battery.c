@@ -21,20 +21,20 @@
 #include <openorbit/log.h>
 #include <gencds/array.h>
 static void
-PowerOverloadLog(SIMpowerbus *pb)
+PowerOverloadLog(sim_powerbus_t *pb)
 {
   log_warn("power overload");
 }
 
 void
-simResetPowerbus(SIMpowerbus *pb)
+sim_powerbus_reset(sim_powerbus_t *pb)
 {
   pb->currentLoad = 0.0;
   pb->currentPower = 0.0;
 }
 
 float
-simRequestPower(SIMpowerbus *pb, float power)
+sim_powerbus_request_power(sim_powerbus_t *pb, float power)
 {
   if (pb->currentLoad + power > pb->currentPower) {
     // Overload
@@ -47,13 +47,13 @@ simRequestPower(SIMpowerbus *pb, float power)
 }
 
 void
-simProducePower(SIMpowerbus *pb, float power)
+sim_powerbus_provide_power(sim_powerbus_t *pb, float power)
 {
   pb->currentPower += power;
 }
 
 void
-simPowerStep(SIMpowerbus *pb, float dt)
+sim_powerbus_step(sim_powerbus_t *pb, float dt)
 {
   ARRAY_FOR_EACH(i, pb->batteries) {
 

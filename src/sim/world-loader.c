@@ -474,7 +474,7 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
   return world;
 }
 pl_world_t*
-ooOrbitLoad(sg_scene_t *sc, const char *fileName)
+sim_load_world(sg_scene_t *sc, const char *fileName)
 {
   char *file = rsrc_get_path(fileName);
   HRMLdocument *solarSys = hrmlParse(file);

@@ -38,12 +38,12 @@ static sim_record_t *_root;
 MODULE_INIT(pubsub, NULL)
 {
   log_trace("initialising 'pubsub' module");
-  _root = simPubsubMakeRecord(NULL, NULL);
+  _root = sim_pubsub_make_record(NULL, NULL);
 }
 
 
 void
-simDumpPubsubDB(void)
+sim_pubsub_dump_db(void)
 {
 #if 0
   list_entry_t *le = hashtable_first(objects);
@@ -74,7 +74,7 @@ simDumpPubsubDB(void)
 }
 
 sim_value_t*
-simGetValueByIndex(sim_record_t *rec, int idx)
+sim_pubsub_get_value_by_index(sim_record_t *rec, int idx)
 {
   if (!rec) return NULL;
 
@@ -91,7 +91,7 @@ simGetValueByIndex(sim_record_t *rec, int idx)
 }
 
 sim_value_t*
-simGetValueByName(sim_record_t *rec, const char *name)
+sim_pubsub_get_value_by_name(sim_record_t *rec, const char *name)
 {
   if (!rec) return NULL;
 
@@ -101,11 +101,11 @@ simGetValueByName(sim_record_t *rec, const char *name)
     return NULL;
   }
 
-  return simGetValueByIndex(rec, idx);
+  return sim_pubsub_get_value_by_index(rec, idx);
 }
 
 sim_record_t*
-simGetRecordByIndex(sim_record_t *rec, int idx)
+sim_pubsub_get_record_by_index(sim_record_t *rec, int idx)
 {
   if (!rec) return NULL;
   sim_base_t *base = obj_array_get(&rec->entries, idx);
@@ -120,7 +120,7 @@ simGetRecordByIndex(sim_record_t *rec, int idx)
 }
 
 sim_record_t*
-simGetRecordByName(sim_record_t *rec, const char *name)
+sim_pubsub_get_record_by_name(sim_record_t *rec, const char *name)
 {
   if (!rec) return NULL;
   intptr_t idx = ((intptr_t) hashtable_lookup(rec->key_index_map, name)) - 1;
@@ -129,11 +129,11 @@ simGetRecordByName(sim_record_t *rec, const char *name)
     return NULL;
   }
 
-  return simGetRecordByIndex(rec, idx);
+  return sim_pubsub_get_record_by_index(rec, idx);
 }
 
 sim_record_t*
-simGetRecordByNameSilent(sim_record_t *rec, const char *name)
+sim_pubsub_get_record_by_nameSilent(sim_record_t *rec, const char *name)
 {
   if (!rec) return NULL;
   intptr_t idx = ((intptr_t) hashtable_lookup(rec->key_index_map, name)) - 1;
@@ -141,13 +141,13 @@ simGetRecordByNameSilent(sim_record_t *rec, const char *name)
     return NULL;
   }
 
-  return simGetRecordByIndex(rec, idx);
+  return sim_pubsub_get_record_by_index(rec, idx);
 }
 
 
 
 sim_record_t*
-simPubsubGetRecordWithComps(const char *fst_comp, ...)
+sim_pubsub_get_record_with_comps(const char *fst_comp, ...)
 {
   sim_record_t *rec = _root;
   va_list ap;
@@ -155,7 +155,7 @@ simPubsubGetRecordWithComps(const char *fst_comp, ...)
 
   const char *comp_name = fst_comp;
   while (comp_name) {
-    rec = simGetRecordByName(rec, comp_name);
+    rec = sim_pubsub_get_record_by_name(rec, comp_name);
     comp_name = va_arg(ap, const char *);
   }
   va_end(ap);
@@ -165,7 +165,7 @@ simPubsubGetRecordWithComps(const char *fst_comp, ...)
 
 
 sim_record_t*
-simPubsubGetRecord(const char *path)
+sim_pubsub_get_record(const char *path)
 {
   assert(path[0] == '/');
   const char *comp_start = path;
@@ -175,7 +175,7 @@ simPubsubGetRecord(const char *path)
 
   while (*comp_start) {
     comp_start = strtcpy(key, comp_start+1, '/', sizeof(key));
-    rec = simGetRecordByName(rec, key);
+    rec = sim_pubsub_get_record_by_name(rec, key);
     if (!rec) {
       log_trace("could not find '%s'", path);
       return NULL;
@@ -186,7 +186,7 @@ simPubsubGetRecord(const char *path)
 }
 
 sim_record_t*
-simPubsubCreateRecord(const char *path)
+sim_pubsub_create_record(const char *path)
 {
   assert(path[0] == '/');
   const char *comp_start = path;
@@ -196,9 +196,9 @@ simPubsubCreateRecord(const char *path)
 
   while (*comp_start) {
     comp_start = strtcpy(key, comp_start+1, '/', sizeof(key));
-    rec = simGetRecordByNameSilent(parent, key);
+    rec = sim_pubsub_get_record_by_nameSilent(parent, key);
     if (!rec) {
-      rec = simPubsubMakeRecord(parent, key);
+      rec = sim_pubsub_make_record(parent, key);
     }
     parent = rec;
   }
@@ -207,7 +207,7 @@ simPubsubCreateRecord(const char *path)
 }
 
 sim_value_t*
-simPubsubGetValue(const char *path)
+sim_pubsub_get_value(const char *path)
 {
   assert(path[0] == '/');
   const char *comp_start = path;
@@ -220,13 +220,13 @@ simPubsubGetValue(const char *path)
     comp_start = strtcpy(key, comp_start+1, '/', sizeof(key));
 
     if (*comp_start) {
-      rec = simGetRecordByName(rec, key);
+      rec = sim_pubsub_get_record_by_name(rec, key);
       if (!rec) {
         log_trace("could not find '%s'", path);
         return NULL;
       }
     } else {
-      val = simGetValueByName(rec, key);
+      val = sim_pubsub_get_value_by_name(rec, key);
       if (!val) {
         log_trace("could not find '%s'", path);
         return NULL;
@@ -240,7 +240,7 @@ simPubsubGetValue(const char *path)
 
 
 sim_link_t*
-simPubsubMakeLink(sim_record_t *parent, const char *name)
+sim_pubsub_make_link(sim_record_t *parent, const char *name)
 {
   if (!parent) {
     log_error("cannot make the root object a link");
@@ -280,7 +280,7 @@ simPubsubMakeLink(sim_record_t *parent, const char *name)
 
 
 sim_record_t*
-simPubsubMakeRecord(sim_record_t *parent, const char *name)
+sim_pubsub_make_record(sim_record_t *parent, const char *name)
 {
   if (parent && !name) {
     log_error("cannot make record with a non null parent and no name");
@@ -311,7 +311,7 @@ simPubsubMakeRecord(sim_record_t *parent, const char *name)
 }
 
 sim_value_t*
-simPubsubMakeValue(sim_record_t *parent, sim_type_id_t typ, const char *name,
+sim_pubsub_make_value(sim_record_t *parent, sim_type_id_t typ, const char *name,
                    void *val)
 {
   intptr_t idx = ((intptr_t)hashtable_lookup(parent->key_index_map, name)) - 1;
@@ -414,61 +414,61 @@ simGetValuePtr(sim_type_id_t type, void *sim_val)
 
 
 void
-simPublishValue(sim_record_t *parent, sim_type_id_t type, const char *key,
+sim_pubsub_publish_val(sim_record_t *parent, sim_type_id_t type, const char *key,
                 void *sim_val)
 {
   // Note that ref must be first field in the struct
   sim_char_t *val = sim_val;
-  val->ref = simPubsubMakeValue(parent, type, key,
+  val->ref = sim_pubsub_make_value(parent, type, key,
                                 simGetValuePtr(type, sim_val));
 }
 
 void
-simNotifyChangedVal(void *sim_val)
+sim_pubsub_notify_changed_val(void *sim_val)
 {
   sim_value_t *val = simGetValueDesc(sim_val);
   ARRAY_FOR_EACH(i, val->updateFuncs) {
-    SIMvalueobserver observer = ARRAY_ELEM(val->updateFuncs, i);
+    sim_valueobserver_fn_t observer = ARRAY_ELEM(val->updateFuncs, i);
     observer(val);
   }
 }
 
 void
-simObserveValue(sim_value_t *val, SIMvalueobserver f)
+sim_pubsub_observe_val(sim_value_t *val, sim_valueobserver_fn_t f)
 {
   obj_array_push(&val->updateFuncs, f);
 }
 
 void
-simObserveNamedValue(const char *key, SIMvalueobserver f)
+sim_pubsub_observe_named_val(const char *key, sim_valueobserver_fn_t f)
 {
-  sim_value_t *val = simPubsubGetValue(key);
+  sim_value_t *val = sim_pubsub_get_value(key);
   if (val) {
-    simObserveValue(val, f);
+    sim_pubsub_observe_val(val, f);
   }
 }
 
 void
-simObserveNamedValueOfRecord(sim_record_t *parent, const char *key,
-                             SIMvalueobserver f)
+sim_pubsub_observe_named_val_of_rec(sim_record_t *parent, const char *key,
+                             sim_valueobserver_fn_t f)
 {
-  sim_value_t *val = simGetValueByName(parent, key);
+  sim_value_t *val = sim_pubsub_get_value_by_name(parent, key);
   if (val) {
-    simObserveValue(val, f);
+    sim_pubsub_observe_val(val, f);
   }
 }
 
 void
-simLinkRecord(sim_record_t *parent, const char *key, sim_record_t *rec)
+sim_pubsub_link_record(sim_record_t *parent, const char *key, sim_record_t *rec)
 {
-  sim_link_t *link = simPubsubMakeLink(parent, key);
+  sim_link_t *link = sim_pubsub_make_link(parent, key);
   if (link) {
     link->target = rec;
   }
 }
 
 void
-simPubsubSetVal(sim_value_t *ref, sim_type_id_t type_id, void *val)
+sim_pubsub_set_val(sim_value_t *ref, sim_type_id_t type_id, void *val)
 {
   if (ref->super.type != type_id) {
     log_error("SetValue called, but type_id is not matching the descriptor");
@@ -518,7 +518,7 @@ CASE(U##A, u##a)
 
 
 void
-simPubsubGetVal(sim_value_t *ref, sim_type_id_t type_id, void *val)
+sim_pubsub_get_val(sim_value_t *ref, sim_type_id_t type_id, void *val)
 {
   if (ref->super.type != type_id) {
     log_error("SetValue called, but type_id is not matching the descriptor");

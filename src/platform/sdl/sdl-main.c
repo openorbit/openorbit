@@ -103,7 +103,7 @@ sdl_main_loop(void)
 {
   publish_variables();
 
-  extern SIMstate gSIM_state;
+  extern sim_state_t gSIM_state;
   config_get_float_def("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s
   Uint32 interv = (Uint32) (wc_period * 1000.0); // SDL wants time in ms
@@ -182,12 +182,12 @@ sdl_main_loop(void)
         case SDL_USEREVENT:
           switch (event.user.code) {
             case SIM_STEP_EVENT: // this event will make a time step
-              ooSimStep(sim_period);
+              sim_step(sim_period);
               break;
             case SIM_DEBUG_EVENT: // display console?
               break;
             case SIM_WCT_TIMER: {
-              OOeventhandler timer_func = event.user.data1;
+              sim_event_handler_fn_t timer_func = event.user.data1;
               void *timer_data = event.user.data2;
               timer_func(timer_data);
               break;

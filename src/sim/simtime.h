@@ -1,5 +1,5 @@
 /*
-  Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -23,14 +23,14 @@
 #include <stdint.h>
 #include <time.h>
 
-void simTimeTick(double dt);
-void simTimeTick_ms(int64_t dms);
+void sim_time_tick(double dt);
+void sim_time_tick_ms(int64_t dms);
 
-double simTimeGetJD(void);
-time_t simTimeGetTime(void);
-int64_t simTimeJDToTimeStamp(double jd);
-time_t simTimeGetTime(void);
-int64_t simTimeGetTimeStamp(void);
+double sim_time_get_jd(void);
+time_t sim_time_get_time(void);
+int64_t sim_time_jd_to_time_stamp(double jd);
+time_t sim_time_get_time(void);
+int64_t sim_time_get_time_stamp(void);
 
 
 #endif /* end of include guard: SIMTIME_H_STPF70AM */

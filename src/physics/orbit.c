@@ -331,7 +331,7 @@ void
 pl_sys_update_current_pos(pl_system_t *sys, double dt)
 {
   if (sys->parent) {
-    double t = simTimeGetJD();
+    double t = sim_time_get_jd();
 
     if (sys->orbitalBody->tUpdate > 0) {
       lwc_translate3fv(&sys->orbitalBody->obj.p,
@@ -368,7 +368,7 @@ void
 pl_sys_set_current_pos(pl_system_t *sys)
 {
   if (sys->parent) {
-    double t = simTimeGetJD();
+    double t = sim_time_get_jd();
     float3 newPos = plOrbitPosAtTime(sys->orbitalBody->kepler,
                                      sys->parent->orbitalBody->GM,
                                      t*PL_SEC_PER_DAY);
@@ -731,7 +731,7 @@ float3
 pl_compute_current_velocity(pl_astrobody_t *ab)
 {
   assert(ab->sys->parent != NULL);
-  double t = simTimeGetJD();
+  double t = sim_time_get_jd();
 
   float3 currentPos = plOrbitPosAtTime(ab->kepler,
                                        ab->sys->parent->orbitalBody->GM,

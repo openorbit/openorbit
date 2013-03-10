@@ -39,20 +39,20 @@ typedef struct {
   pl_system_t *orbSys;   //!< Root orbit system, this will be the sun initially
   pl_world_t *world;
   sg_window_t *win;
-} SIMstate;
+} sim_state_t;
 
 void sim_init(void);
 
   sg_scene_t* sim_get_scene(void);
-void ooSimSetOrbSys(pl_system_t *osys);
-void ooSimSetOrbWorld(pl_world_t *world);
+void sim_set_orb_sys(pl_system_t *osys);
+void sim_set_orb_world(pl_world_t *world);
 
-void ooSimStep(float dt);
+void sim_step(float dt);
 
-void simSetSpacecraft(sim_spacecraft_t *sc);
-sim_spacecraft_t* simGetSpacecraft(void);
-OOeventqueue* simGetEventQueue(void);
-pl_world_t* simGetWorld(void);
+void sim_set_spacecraft(sim_spacecraft_t *sc);
+sim_spacecraft_t* sim_get_spacecraft(void);
+sim_event_queue_t* sim_get_event_queue(void);
+pl_world_t* sim_get_world(void);
 
 #ifdef __cplusplus
 }

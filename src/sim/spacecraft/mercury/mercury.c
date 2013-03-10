@@ -55,37 +55,37 @@ MercuryAxisUpdate(sim_spacecraft_t *sc)
   switch (sc->detatchSequence) {
   case MERC_REDSTONE: {
     sim_stage_t *redstone = sc->stages.elems[MERC_REDSTONE];
-    SIMengine *eng = ARRAY_ELEM(redstone->engines, THR_ROCKETDYNE);
-    simEngineSetThrottle(eng, SIM_VAL(sc->axises.orbital));
+    sim_engine_t *eng = ARRAY_ELEM(redstone->engines, THR_ROCKETDYNE);
+    sim_engine_set_throttle(eng, SIM_VAL(sc->axises.orbital));
     break;
   }
   case MERC_CAPSULE: {
     if (!sc->detatchComplete) break;
     sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
-    simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_ROLL_0),
+    sim_engine_set_throttle(ARRAY_ELEM(capsule->engines, THR_ROLL_0),
                          SIM_VAL(sc->axises.roll));
-    simEngineFire(ARRAY_ELEM(capsule->engines, THR_ROLL_0));
+    sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_ROLL_0));
 
-    simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_ROLL_1),
+    sim_engine_set_throttle(ARRAY_ELEM(capsule->engines, THR_ROLL_1),
                          -SIM_VAL(sc->axises.roll));
-    simEngineFire(ARRAY_ELEM(capsule->engines, THR_ROLL_1));
+    sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_ROLL_1));
 
-    simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_PITCH_0),
+    sim_engine_set_throttle(ARRAY_ELEM(capsule->engines, THR_PITCH_0),
                          SIM_VAL(sc->axises.pitch));
-    simEngineFire(ARRAY_ELEM(capsule->engines, THR_PITCH_0));
+    sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_PITCH_0));
 
-    simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_PITCH_1),
+    sim_engine_set_throttle(ARRAY_ELEM(capsule->engines, THR_PITCH_1),
                          -SIM_VAL(sc->axises.pitch));
-    simEngineFire(ARRAY_ELEM(capsule->engines, THR_PITCH_1));
+    sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_PITCH_1));
 
-    simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_YAW_0),
+    sim_engine_set_throttle(ARRAY_ELEM(capsule->engines, THR_YAW_0),
                          SIM_VAL(sc->axises.yaw));
-    simEngineFire(ARRAY_ELEM(capsule->engines, THR_YAW_0));
+    sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_YAW_0));
 
-    simEngineSetThrottle(ARRAY_ELEM(capsule->engines, THR_YAW_1),
+    sim_engine_set_throttle(ARRAY_ELEM(capsule->engines, THR_YAW_1),
                          -SIM_VAL(sc->axises.yaw));
-    simEngineFire(ARRAY_ELEM(capsule->engines, THR_YAW_1));
+    sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_YAW_1));
 
     break;
   }
@@ -105,9 +105,9 @@ MercuryDetatchComplete(void *data)
 
   sim_stage_t *stage = sc->stages.elems[MERC_CAPSULE];
 
-  simEngineDisable(ARRAY_ELEM(stage->engines, THR_POSI));
-  simStageArmEngines(stage);
-  simEngineDisarm(ARRAY_ELEM(stage->engines, THR_POSI));
+  sim_engine_disable(ARRAY_ELEM(stage->engines, THR_POSI));
+  sim_stage_arm_engines(stage);
+  sim_engine_disarm(ARRAY_ELEM(stage->engines, THR_POSI));
 }
 
 static void
@@ -121,16 +121,16 @@ MercuryDetatch(sim_spacecraft_t *sc)
     sim_stage_t *redstone = sc->stages.elems[MERC_REDSTONE];
     sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
-    simStageDisableEngines(redstone);
-    simStageLockEngines(redstone);
+    sim_stage_disable_engines(redstone);
+    sim_stage_lock_engines(redstone);
 
-    simDetatchStage(sc, redstone);
+    sim_spaccraft_detatch_stage(sc, redstone);
 
-    simEngineArm(ARRAY_ELEM(capsule->engines, THR_POSI));
-    simEngineFire(ARRAY_ELEM(capsule->engines, THR_POSI));
+    sim_engine_arm(ARRAY_ELEM(capsule->engines, THR_POSI));
+    sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_POSI));
 
     sc->detatchComplete = false;
-    simEnqueueDelta_s(1.0, MercuryDetatchComplete, sc);
+    sim_event_enqueue_relative_s(1.0, MercuryDetatchComplete, sc);
   }
 }
 
@@ -140,8 +140,8 @@ RetroDisable_2(void *data)
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
-  simEngineDisable(ARRAY_ELEM(capsule->engines, THR_RETRO_2));
-  simEngineDisarm(ARRAY_ELEM(capsule->engines, THR_RETRO_2));
+  sim_engine_disable(ARRAY_ELEM(capsule->engines, THR_RETRO_2));
+  sim_engine_disarm(ARRAY_ELEM(capsule->engines, THR_RETRO_2));
 }
 
 static void
@@ -150,8 +150,8 @@ RetroFire_2(void *data)
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
-  simEngineFire(ARRAY_ELEM(capsule->engines, THR_RETRO_2));
-  simEnqueueDelta_s(10.0, RetroDisable_2, sc);
+  sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_RETRO_2));
+  sim_event_enqueue_relative_s(10.0, RetroDisable_2, sc);
 }
 
 static void
@@ -160,8 +160,8 @@ RetroDisable_1(void *data)
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
-  simEngineDisable(ARRAY_ELEM(capsule->engines, THR_RETRO_1));
-  simEngineDisarm(ARRAY_ELEM(capsule->engines, THR_RETRO_1));
+  sim_engine_disable(ARRAY_ELEM(capsule->engines, THR_RETRO_1));
+  sim_engine_disarm(ARRAY_ELEM(capsule->engines, THR_RETRO_1));
 }
 
 static void
@@ -170,10 +170,10 @@ RetroFire_1(void *data)
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
-  simEngineFire(ARRAY_ELEM(capsule->engines, THR_RETRO_1));
+  sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_RETRO_1));
 
-  simEnqueueDelta_s(10.0, RetroDisable_1, sc);
-  simEnqueueDelta_s(5.0, RetroFire_2, sc);
+  sim_event_enqueue_relative_s(10.0, RetroDisable_1, sc);
+  sim_event_enqueue_relative_s(5.0, RetroFire_2, sc);
 }
 
 static void
@@ -182,8 +182,8 @@ RetroDisable_0(void *data)
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
-  simEngineDisable(ARRAY_ELEM(capsule->engines, THR_RETRO_0));
-  simEngineDisarm(ARRAY_ELEM(capsule->engines, THR_RETRO_0));
+  sim_engine_disable(ARRAY_ELEM(capsule->engines, THR_RETRO_0));
+  sim_engine_disarm(ARRAY_ELEM(capsule->engines, THR_RETRO_0));
 }
 
 
@@ -193,10 +193,10 @@ RetroFire_0(void *data)
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
 
-  simEngineFire(ARRAY_ELEM(capsule->engines, THR_RETRO_0));
+  sim_engine_fire(ARRAY_ELEM(capsule->engines, THR_RETRO_0));
 
-  simEnqueueDelta_s(10.0, RetroDisable_0, sc);
-  simEnqueueDelta_s(5.0, RetroFire_1, sc);
+  sim_event_enqueue_relative_s(10.0, RetroDisable_0, sc);
+  sim_event_enqueue_relative_s(5.0, RetroFire_1, sc);
 }
 
 static void
@@ -205,15 +205,15 @@ MainEngineToggle(sim_spacecraft_t *sc)
   switch (sc->detatchSequence) {
   case MERC_REDSTONE: {
     sim_stage_t *redstone = sc->stages.elems[MERC_REDSTONE];
-    SIMengine *eng = ARRAY_ELEM(redstone->engines, THR_ROCKETDYNE);
-    if (eng->state == SIM_Armed) simEngineFire(eng);
-    else if (eng->state == SIM_Burning) simEngineDisable(eng);
+    sim_engine_t *eng = ARRAY_ELEM(redstone->engines, THR_ROCKETDYNE);
+    if (eng->state == SIM_ARMED) sim_engine_fire(eng);
+    else if (eng->state == SIM_BURNING) sim_engine_disable(eng);
     break;
   }
   case MERC_CAPSULE: {
     sim_stage_t *capsule = sc->stages.elems[MERC_CAPSULE];
-    SIMengine *eng = ARRAY_ELEM(capsule->engines, THR_RETRO_0);
-    if (eng->state == SIM_Armed) RetroFire_0(sc);
+    sim_engine_t *eng = ARRAY_ELEM(capsule->engines, THR_RETRO_0);
+    if (eng->state == SIM_ARMED) RetroFire_0(sc);
     break;
   }
   default:
@@ -240,7 +240,7 @@ MercuryInit(sim_spacecraft_t *sc)
   // 1/2 mrr = 0.5 * 1.0 * 0.89 * 0.89 = 0.39605
   // 1/12 m(3rr + hh) = 27.14764852
 
-  sim_stage_t *redstone = simNewStage(sc, "Mercury-Redstone",
+  sim_stage_t *redstone = sim_new_stage(sc, "Mercury-Redstone",
                                   "spacecrafts/mercury/redstone.ac");
 
   pl_mass_set(&redstone->obj->m, 1.0f, // Default to 1.0 kg
@@ -253,15 +253,15 @@ MercuryInit(sim_spacecraft_t *sc)
   pl_object_set_drag_coef(redstone->obj, 0.5);
   pl_object_set_area(redstone->obj, 2.0*M_PI);
 
-  scStageSetOffset3f(redstone, 0.0, 0.0, 0.0);
+  sim_stage_set_offset3f(redstone, 0.0, 0.0, 0.0);
 
   //"LOX/ethyl alcohol"
-  simNewEngine("Rocketdyne A7", redstone, SIM_Thruster, SIM_Armed, 1.0f,
+  sim_new_engine("Rocketdyne A7", redstone, SIM_THRUSTER, SIM_ARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
   //orbital
 
 
-  sim_stage_t *capsule = simNewStage(sc, "Command-Module",
+  sim_stage_t *capsule = sim_new_stage(sc, "Command-Module",
                                  "spacecrafts/mercury/mercury.ac");
 
   pl_mass_set(&capsule->obj->m, 1.0f, // Default to 1.0 kg
@@ -274,29 +274,29 @@ MercuryInit(sim_spacecraft_t *sc)
   pl_object_set_drag_coef(capsule->obj, 0.5);
   pl_object_set_area(capsule->obj, 2.0*M_PI);
 
-  scStageSetOffset3f(capsule, 0.0, 17.9832, 0.0);
+  sim_stage_set_offset3f(capsule, 0.0, 17.9832, 0.0);
 
-  simNewEngine("Posigrade", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Posigrade", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,1.8e3,0.0});
 
   // Ripple fire 10 s burntime each
-  simNewEngine("Retro 0", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Retro 0", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
-  simNewEngine("Retro 1", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Retro 1", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
-  simNewEngine("Retro 2", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Retro 2", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,4.5e3,0.0});
-  simNewEngine("Roll 0", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Roll 0", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){0.82, 0.55, 0.00}, (float3){0.0, 0.0,108.0});
-  simNewEngine("Roll 1", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Roll 1", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){-0.82, 0.55, 0.00}, (float3){0.0, 0.0,108.0});
-  simNewEngine("Pitch 0", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Pitch 0", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){0.00, 2.20, 0.41}, (float3){0.0, 0.0,-108.0});
-  simNewEngine("Pitch 1", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Pitch 1", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){0.00, 2.20,-0.41}, (float3){0.0, 0.0,108.0});
-  simNewEngine("Yaw 0", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Yaw 0", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){0.41, 2.20, 0.00}, (float3){-108.0, 0.0,0.0});
-  simNewEngine("Yaw 1", capsule, SIM_Thruster, SIM_Disarmed, 1.0f,
+  sim_new_engine("Yaw 1", capsule, SIM_THRUSTER, SIM_DISARMED, 1.0f,
                (float3){-0.41, 2.20, 0.00}, (float3){108.0, 0.0,0.0});
 }
 

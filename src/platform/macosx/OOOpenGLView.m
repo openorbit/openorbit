@@ -182,7 +182,7 @@ static io_keycode_t keymap [256] = {
 - (void)simTicker:(NSTimer*)theTimer
 {
   //NSLog(@"sim step");
-  ooSimStep(theTimer.timeInterval);
+  sim_step(theTimer.timeInterval);
   [self setNeedsDisplay:YES];
 }
 
@@ -195,7 +195,7 @@ static io_keycode_t keymap [256] = {
 {
   init_sim(0, NULL);
 
-  //extern SIMstate gSIM_state;
+  //extern sim_state_t gSIM_state;
   float freq;
   config_get_float_def("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s
@@ -204,7 +204,7 @@ static io_keycode_t keymap [256] = {
 
 
   // Step now to ensure physic system is in sync before drawing
-  ooSimStep(sim_period);
+  sim_step(sim_period);
 
   timer = [NSTimer scheduledTimerWithTimeInterval:sim_period target:self selector:@selector(simTicker:) userInfo:nil repeats:YES];
 }
@@ -256,7 +256,7 @@ static io_keycode_t keymap [256] = {
 - (void) reshape
 {
   NSRect r = self.bounds;
-  extern SIMstate gSIM_state;
+  extern sim_state_t gSIM_state;
   //sg_window_resize(gSIM_state.win, r.origin.x, r.origin.y, r.size.width, r.size.height);
   sg_viewport_t *vp = sg_window_get_viewport(gSIM_state.win, 0);
   sg_viewport_reshape(vp, r.origin.x, r.origin.y, r.size.width, r.size.height);
@@ -267,7 +267,7 @@ static io_keycode_t keymap [256] = {
 - (void) drawRect:(NSRect)dirtyRect
 {
   NSTimeInterval current = [NSDate timeIntervalSinceReferenceDate];
-  extern SIMstate gSIM_state;
+  extern sim_state_t gSIM_state;
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 

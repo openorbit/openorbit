@@ -1,5 +1,5 @@
 /*
- Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2009,2013 Mattias Holm <lorrden(at)openorbit.org>
  
  This file is part of Open Orbit.
  
@@ -21,14 +21,14 @@
 #ifndef SIMENVIRONMENT_H__
 #define SIMENVIRONMENT_H__
 
-typedef struct OOsimenv OOsimenv;
+typedef struct sim_environment_t sim_environment_t;
 
-struct OOsimenv {
+struct sim_environment_t {
   float airPressure; // Pa
   float airDensity;
   float aoa; // angle of attack
 };
 
-void ooSimComputeEnvForSc(OOsimenv *env, void *sc);
+void sim_compute_env(sim_environment_t *env, void *sc);
 
 #endif // SIMENVIRONMENT_H__

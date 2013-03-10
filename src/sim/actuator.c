@@ -29,20 +29,20 @@
 #include <openorbit/log.h>
 #include "io-manager.h"
 
-static const char *actuatorNames[OO_Act_Group_Count] = {
-  [OO_Act_Orbital] = "orbital",
-  [OO_Act_Vertical] = "vertical",
-  [OO_Act_Horisontal] = "horisontal",
-  [OO_Act_Forward] = "forward",
-  [OO_Act_Pitch] = "pitch",
-  [OO_Act_Roll] = "roll",
-  [OO_Act_Yaw] = "yaw"
+static const char *actuatorNames[SIM_ACT_GROUP_COUNT] = {
+  [SIM_ACT_ORBITAL] = "orbital",
+  [SIM_ACT_VERTICAL] = "vertical",
+  [SIM_ACT_HORISONTAL] = "horisontal",
+  [SIM_ACT_FORWARD] = "forward",
+  [SIM_ACT_PITCH] = "pitch",
+  [SIM_ACT_ROLL] = "roll",
+  [SIM_ACT_YAW] = "yaw"
 };
 
 int
-ooGetActuatorGroupId(const char *groupName)
+sim_get_actuator_group_id(const char *groupName)
 {
-  for (int i = 0 ; i < OO_Act_Group_Count ; ++i) {
+  for (int i = 0 ; i < SIM_ACT_GROUP_COUNT ; ++i) {
     if (!strcmp(actuatorNames[i], groupName)) {
       return i;
     }
@@ -51,34 +51,34 @@ ooGetActuatorGroupId(const char *groupName)
 }
 
 const char*
-ooGetActuatorGroupName(unsigned groupId)
+sim_get_actuator_group_name(unsigned groupId)
 {
-  assert(groupId < OO_Act_Group_Count);
+  assert(groupId < SIM_ACT_GROUP_COUNT);
   return actuatorNames[groupId];
 }
 
 float
-ooGetThrottleForActuatorGroup(unsigned groupId)
+sim_get_throttle_for_actuator_group(unsigned groupId)
 {
   float throttle = io_get_slider(IO_SLIDER_THROT_0);//ooIoGetAxis(NULL, ooGetActuatorGroupName(groupId));
   return throttle;
 }
 
 
-OOactuatorgroup*
-ooScNewActuatorGroup(const char *name)
+sim_actuatorgroup_t*
+sim_new_actuator_group(const char *name)
 {
-  OOactuatorgroup *eg = smalloc(sizeof(OOactuatorgroup));
-  memset(eg, 0, sizeof(OOactuatorgroup));
+  sim_actuatorgroup_t *eg = smalloc(sizeof(sim_actuatorgroup_t));
+  memset(eg, 0, sizeof(sim_actuatorgroup_t));
   obj_array_init(&eg->actuators);
   eg->groupName = strdup(name);
   return eg;
 }
 
 void
-thruster_step(SIMengine *engine, float dt)
+thruster_step(sim_engine_t *engine, float dt)
 {
-  SIMthrust *thruster = (SIMthrust*)engine;
+  sim_thruster_t *thruster = (sim_thruster_t*)engine;
 
   pl_object_force_relative_pos3fv(thruster->super.stage->sc->obj,
                         thruster->fMax * thruster->super.throttle,
@@ -87,9 +87,9 @@ thruster_step(SIMengine *engine, float dt)
 
 
 void
-liquid_rocket_step(SIMengine *engine, float dt)
+liquid_rocket_step(sim_engine_t *engine, float dt)
 {
-  SIMliquidrocketengine *lrocket = (SIMliquidrocketengine*)engine;
+  sim_liquidrocketengine_t *lrocket = (sim_liquidrocketengine_t*)engine;
   (void)lrocket; // TODO
   //  plForceRelativePos3fv(lrocket->super.stage->sc->obj,
   //                      lrocket->fMax * lrocket->super.throttle,
@@ -97,15 +97,15 @@ liquid_rocket_step(SIMengine *engine, float dt)
 }
 
 void
-solid_rocket_step(SIMengine *engine, float dt)
+solid_rocket_step(sim_engine_t *engine, float dt)
 {
-  SIMsolidrocketengine *srocket = (SIMsolidrocketengine*)engine;
+  sim_solid_rocketengine_t *srocket = (sim_solid_rocketengine_t*)engine;
   switch (srocket->grain) {
-  case SIM_Circular:
-  case SIM_End_Burner:
-  case SIM_C_Slot:
-  case SIM_Moon_Burner:
-  case SIM_Finocyl:
+  case SIM_CIRCULAR:
+  case SIM_END_BURNER:
+  case SIM_C_SLOT:
+  case SIM_MOON_BURNER:
+  case SIM_FINOCYL:
   default:
     assert(0 && "invalid solid rocket type");
   }
@@ -121,72 +121,72 @@ solid_rocket_step(SIMengine *engine, float dt)
 }
 
 void
-jet_step(SIMengine *engine, float dt)
+jet_step(sim_engine_t *engine, float dt)
 {
-  SIMjetengine *jet = (SIMjetengine*)engine;
+  sim_jetengine_t *jet = (sim_jetengine_t*)engine;
   (void)jet; // TODO
 }
 
 void
-prop_step(SIMengine *engine, float dt)
+prop_step(sim_engine_t *engine, float dt)
 {
-  SIMpropengine *prop = (SIMpropengine*)engine;
+  sim_propengine_t *prop = (sim_propengine_t*)engine;
   pl_object_force_relative_pos3fv(prop->super.stage->obj, prop->super.dir,
                         prop->super.pos);
   pl_object_torque_relative3fv(prop->super.stage->obj,
                      vf3_set(0.0, 0.0, 0.0), prop->super.pos);
 }
 void
-turboprop_step(SIMengine *engine, float dt)
+turboprop_step(sim_engine_t *engine, float dt)
 {
-  SIMturbopropengine *tprop = (SIMturbopropengine*)engine;
+  sim_turbopropengine_t *tprop = (sim_turbopropengine_t*)engine;
   (void)tprop; // TODO
 }
 
 
-SIMengine*
-simNewEngine(char *name, sim_stage_t *stage, SIMenginekind kind,
-             SIMenginestate state, float throttle, float3 pos, float3 dir)
+sim_engine_t*
+sim_new_engine(char *name, sim_stage_t *stage, sim_enginekind_t kind,
+             sim_enginestate_t state, float throttle, float3 pos, float3 dir)
 {
-  SIMengine *engine = NULL;
+  sim_engine_t *engine = NULL;
 
-  SIMthrust *thrust = NULL;
-  SIMpropengine *prop = NULL;
-  SIMturbopropengine *tprop = NULL;
-  SIMjetengine *jet = NULL;;
-  SIMliquidrocketengine *lrocket = NULL;
-  SIMsolidrocketengine *srocket = NULL;
+  sim_thruster_t *thrust = NULL;
+  sim_propengine_t *prop = NULL;
+  sim_turbopropengine_t *tprop = NULL;
+  sim_jetengine_t *jet = NULL;;
+  sim_liquidrocketengine_t *lrocket = NULL;
+  sim_solid_rocketengine_t *srocket = NULL;
 
   switch (kind) {
-  case SIM_Thruster:
-    thrust = smalloc(sizeof(SIMthrust));
+  case SIM_THRUSTER:
+    thrust = smalloc(sizeof(sim_thruster_t));
     thrust->fMax = dir;
     engine = &thrust->super;
     engine->step = thruster_step;
     break;
-  case SIM_Prop:
-    prop = smalloc(sizeof(SIMpropengine));
+  case SIM_PROP:
+    prop = smalloc(sizeof(sim_propengine_t));
     engine = &prop->super;
     engine->step = prop_step;
     break;
-  case SIM_TurboProp:
-    tprop = smalloc(sizeof(SIMturbopropengine));
+  case SIM_TURBO_PROP:
+    tprop = smalloc(sizeof(sim_turbopropengine_t));
     engine = &tprop->super;
     engine->step = turboprop_step;
     break;
-  case SIM_Jet:
-    jet = smalloc(sizeof(SIMjetengine));
+  case SIM_JET:
+    jet = smalloc(sizeof(sim_jetengine_t));
     engine = &jet->super;
     engine->step = jet_step;
     break;
-  case SIM_LiquidRocket:
-    lrocket = smalloc(sizeof(SIMliquidrocketengine));
+  case SIM_LIQUID_ROCKET:
+    lrocket = smalloc(sizeof(sim_liquidrocketengine_t));
     obj_array_init(&lrocket->oxidiserTanks);
     engine = &lrocket->super;
     engine->step = liquid_rocket_step;
     break;
-  case SIM_SolidRocket:
-    srocket = smalloc(sizeof(SIMsolidrocketengine));
+  case SIM_SOLID_ROCKET:
+    srocket = smalloc(sizeof(sim_solid_rocketengine_t));
     engine = &srocket->super;
     engine->step = solid_rocket_step;
     break;
@@ -220,16 +220,16 @@ simNewEngine(char *name, sim_stage_t *stage, SIMenginekind kind,
 }
 
 void
-simEngineAddTank(SIMengine *engine, SIMtank *tank)
+sim_engine_add_tank(sim_engine_t *engine, sim_tank_t *tank)
 {
   obj_array_push(&engine->fuelTanks, tank);
 }
 
 void
-simEngineAddOxidiserTank(SIMengine *engine, SIMtank *tank)
+sim_engine_add_oxidiser_tank(sim_engine_t *engine, sim_tank_t *tank)
 {
-  if (engine->kind == SIM_LiquidRocket) {
-    SIMliquidrocketengine *lrocket = (SIMliquidrocketengine*)engine;
+  if (engine->kind == SIM_LIQUID_ROCKET) {
+    sim_liquidrocketengine_t *lrocket = (sim_liquidrocketengine_t*)engine;
     obj_array_push(&lrocket->oxidiserTanks, tank);
   } else {
     log_fatal("cannot add oxidiser tank to that engine");
@@ -237,10 +237,10 @@ simEngineAddOxidiserTank(SIMengine *engine, SIMtank *tank)
 }
 
 void
-simEngineSetGrainType(SIMengine *engine, SIMgrainkind grain)
+sim_engine_set_grain_type(sim_engine_t *engine, sim_grainkind_t grain)
 {
-  if (engine->kind == SIM_SolidRocket) {
-    SIMsolidrocketengine *srocket = (SIMsolidrocketengine*)engine;
+  if (engine->kind == SIM_SOLID_ROCKET) {
+    sim_solid_rocketengine_t *srocket = (sim_solid_rocketengine_t*)engine;
     srocket->grain = grain;
   } else {
     log_fatal("cannot set grain type if the engine is not a solid rocket");
@@ -249,73 +249,73 @@ simEngineSetGrainType(SIMengine *engine, SIMgrainkind grain)
 }
 
 void
-simEngineStep(SIMengine *engine, double dt)
+sim_engine_step(sim_engine_t *engine, double dt)
 {
   engine->step(engine, dt);
 }
 
 void
-simEngineSetThrottle(SIMengine *engine, float throttle)
+sim_engine_set_throttle(sim_engine_t *engine, float throttle)
 {
   engine->throttle = fminf(1.0f, fmaxf(0.0f, throttle));
 }
 
 float
-simEngineGetThrottle(SIMengine *engine)
+sim_engine_get_throttle(sim_engine_t *engine)
 {
   return engine->throttle;
 }
 
 void
-simEngineFire(SIMengine *eng)
+sim_engine_fire(sim_engine_t *eng)
 {
-  assert((eng->state == SIM_Armed || eng->state == SIM_Burning)
+  assert((eng->state == SIM_ARMED || eng->state == SIM_BURNING)
          && "invalid state");
 
-  if (eng->throttle > 0.0) {eng->state = SIM_Burning;}
-  else eng->state = SIM_Armed;
+  if (eng->throttle > 0.0) {eng->state = SIM_BURNING;}
+  else eng->state = SIM_ARMED;
 }
 
 void
-simEngineArm(SIMengine *eng)
+sim_engine_arm(sim_engine_t *eng)
 {
-  assert((eng->state == SIM_Disarmed) && "invalid state");
-  eng->state = SIM_Armed;
+  assert((eng->state == SIM_DISARMED) && "invalid state");
+  eng->state = SIM_ARMED;
 }
 
 void
-simEngineDisarm(SIMengine *eng)
+sim_engine_disarm(sim_engine_t *eng)
 {
-  assert((eng->state == SIM_Armed) && "invalid state");
-  eng->state = SIM_Disarmed;
+  assert((eng->state == SIM_ARMED) && "invalid state");
+  eng->state = SIM_DISARMED;
 }
 
 void
-simEngineDisable(SIMengine *eng)
+sim_engine_disable(sim_engine_t *eng)
 {
-  assert((eng->state == SIM_Burning) && "invalid state");
-  eng->state = SIM_Armed;
+  assert((eng->state == SIM_BURNING) && "invalid state");
+  eng->state = SIM_ARMED;
 }
 
 void
-simEngineLock(SIMengine *eng)
+sim_engine_lock(sim_engine_t *eng)
 {
-  if (eng->state == SIM_Armed) eng->state = SIM_Locked_Closed;
-  else if (eng->state == SIM_Burning) eng->state = SIM_Locked_Burning;
+  if (eng->state == SIM_ARMED) eng->state = SIM_LOCKED_CLOSED;
+  else if (eng->state == SIM_BURNING) eng->state = SIM_LOCKED_BURNING;
   else assert(0 && "invalid state");
 }
 
 void
-simEngineUnlock(SIMengine *eng)
+sim_engine_unlock(sim_engine_t *eng)
 {
-  if (eng->state == SIM_Locked_Burning) eng->state = SIM_Burning;
-  else if (eng->state == SIM_Locked_Closed) eng->state = SIM_Armed;
+  if (eng->state == SIM_LOCKED_BURNING) eng->state = SIM_BURNING;
+  else if (eng->state == SIM_LOCKED_CLOSED) eng->state = SIM_ARMED;
   else assert(0 && "invalid state");
 }
 
 void
-simEngineFail(SIMengine *eng)
+sim_engine_fail(sim_engine_t *eng)
 {
-  if (eng->state == SIM_Burning) eng->state = SIM_Fault_Burning;
-  else eng->state = SIM_Fault_Closed;
+  if (eng->state == SIM_BURNING) eng->state = SIM_FAULT_BURNING;
+  else eng->state = SIM_FAULT_CLOSED;
 }

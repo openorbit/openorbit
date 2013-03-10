@@ -1,5 +1,5 @@
 /*
- Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2009,2013 Mattias Holm <lorrden(at)openorbit.org>
  
  This file is part of Open Orbit.
  
@@ -25,7 +25,7 @@
  planet or moon the object is closest to.
  */
 void
-ooSimComputeEnvForSc(OOsimenv *env, void *sc)
+sim_compute_env(sim_environment_t *env, void *sc)
 {
   
 }

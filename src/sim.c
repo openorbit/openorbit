@@ -42,7 +42,7 @@
 
 #include <openorbit/log.h>
 
-SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL};
+sim_state_t gSIM_state = {0.0, NULL, NULL, NULL, NULL};
 
 sg_scene_t*
 sim_get_scene(void)
@@ -98,7 +98,7 @@ sim_init_plugins(void)
 void
 sim_init(void)
 {
-  simScCtrlInit();
+  sim_spacecraft_control_init();
 
   // Set log level, need to do that here
   const char *levStr = NULL;
@@ -121,16 +121,16 @@ sim_init(void)
   // Setup IO-tables, must be done after joystick system has been initialised
   io_init();
 
-  gSIM_state.world = ooOrbitLoad(sim_get_scene(), "data/solsystem.hrml");
+  gSIM_state.world = sim_load_world(sim_get_scene(), "data/solsystem.hrml");
 
 
 
-  sim_spacecraft_t *sc = simNewSpacecraft("Mercury", "Mercury I");
-  ooScSetSysAndCoords(sc, "Sol/Earth",
+  sim_spacecraft_t *sc = sim_new_spacecraft("Mercury", "Mercury I");
+  sim_spacecraft_set_sys_and_coords(sc, "Sol/Earth",
                       0.0 /*longitude*/,
                       0.0 /*latitude*/,
                       250.0e3 /*altitude*/);
-  simSetSpacecraft(sc);
+  sim_set_spacecraft(sc);
   sg_camera_t *cam = sg_scene_get_cam(sc->scene);
   sim_stage_t *stage = ARRAY_ELEM(sc->stages, 0);
   sg_camera_track_object(cam, stage->sgobj);
@@ -149,13 +149,13 @@ sim_init(void)
 
 
 void
-ooSimSetOrbSys(pl_system_t *osys)
+sim_set_orb_sys(pl_system_t *osys)
 {
   gSIM_state.orbSys = osys;
 }
 
 void
-ooSimSetOrbWorld(pl_world_t *world)
+sim_set_orb_world(pl_world_t *world)
 {
   gSIM_state.world = world;
 }
@@ -163,23 +163,23 @@ ooSimSetOrbWorld(pl_world_t *world)
 void
 simAxisPush(void)
 {
-  sim_record_t *io = simPubsubGetRecord("/io/axis");
+  sim_record_t *io = sim_pubsub_get_record("/io/axis");
   if (io) {
     float yaw_val = io_get_axis(IO_AXIS_RZ);
-    sim_value_t *yaw = simGetValueByName(io, "yaw");
-    simPubsubSetVal(yaw, SIM_TYPE_FLOAT, &yaw_val);
+    sim_value_t *yaw = sim_pubsub_get_value_by_name(io, "yaw");
+    sim_pubsub_set_val(yaw, SIM_TYPE_FLOAT, &yaw_val);
 
     float roll_val = io_get_axis(IO_AXIS_RY);
-    sim_value_t *roll = simGetValueByName(io, "roll");
-    simPubsubSetVal(roll, SIM_TYPE_FLOAT, &roll_val);
+    sim_value_t *roll = sim_pubsub_get_value_by_name(io, "roll");
+    sim_pubsub_set_val(roll, SIM_TYPE_FLOAT, &roll_val);
 
     float pitch_val = io_get_axis(IO_AXIS_RX);
-    sim_value_t *pitch = simGetValueByName(io, "pitch");
-    simPubsubSetVal(pitch, SIM_TYPE_FLOAT, &pitch_val);
+    sim_value_t *pitch = sim_pubsub_get_value_by_name(io, "pitch");
+    sim_pubsub_set_val(pitch, SIM_TYPE_FLOAT, &pitch_val);
 
     float throttle_val = io_get_slider(IO_SLIDER_THROT_0);
-    sim_value_t *throttle = simGetValueByName(io, "throttle");
-    simPubsubSetVal(throttle, SIM_TYPE_FLOAT, &throttle_val);
+    sim_value_t *throttle = sim_pubsub_get_value_by_name(io, "throttle");
+    sim_pubsub_set_val(throttle, SIM_TYPE_FLOAT, &throttle_val);
 
     log_trace("axises: %f %f %f / %f",
                pitch_val, roll_val, yaw_val, throttle_val);
@@ -187,9 +187,9 @@ simAxisPush(void)
 }
 
 void
-ooSimStep(float dt)
+sim_step(float dt)
 {
-  simTimeTick(dt);
+  sim_time_tick(dt);
   struct timeval start;
   struct timeval end;
   gettimeofday(&start, NULL);
@@ -205,8 +205,8 @@ ooSimStep(float dt)
                                      (start.tv_sec*1000000 + start.tv_usec)));
 
   // Step spacecraft systems
-  simScStep(gSIM_state.currentSc, dt);
-  simDispatchPendingEvents();
+  sim_spacecraft_step(gSIM_state.currentSc, dt);
+  sim_event_dispatch_pending();
 
   pl_world_step(gSIM_state.world, dt);
 
@@ -216,28 +216,28 @@ ooSimStep(float dt)
 }
 
 void
-simSetSpacecraft(sim_spacecraft_t *sc)
+sim_set_spacecraft(sim_spacecraft_t *sc)
 {
   gSIM_state.currentSc = sc;
   // Update standard pubsub links
-  sim_record_t *axis_rec = simPubsubGetRecordWithComps("sc", sc->name,
+  sim_record_t *axis_rec = sim_pubsub_get_record_with_comps("sc", sc->name,
                                                        "axis",
                                                        NULL);
 
-  sim_record_t *io_rec = simPubsubCreateRecord("/io");
-  simLinkRecord(io_rec, "axis", axis_rec);
+  sim_record_t *io_rec = sim_pubsub_create_record("/io");
+  sim_pubsub_link_record(io_rec, "axis", axis_rec);
 
   // Notify spacecraft that it is current (so it can update custom pubsub links)
 }
 
 sim_spacecraft_t*
-simGetSpacecraft(void)
+sim_get_spacecraft(void)
 {
   return gSIM_state.currentSc;
 }
 
 pl_world_t*
-simGetWorld(void)
+sim_get_world(void)
 {
   return gSIM_state.world;
 }

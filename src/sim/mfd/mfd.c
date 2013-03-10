@@ -169,11 +169,11 @@ test_hud_draw(sg_overlay_t *overlay, void *obj)
   SIMhud *hud = (SIMhud*)obj;
 
   // TODO
-  sim_spacecraft_t *sc = simGetSpacecraft();
+  sim_spacecraft_t *sc = sim_get_spacecraft();
   //float3 gv = simGetGravityVector(sc);
 
   //quaternion_t q = simGetQuaternion(sc);
-  const float3x3 *R = simGetRotMat(sc);
+  const float3x3 *R = sim_spacecraft_get_rotmat(sc);
   float3x3 R_inv;
   mf3_transpose2(R_inv, *R); // Invert rotation matrix, we need this to
                              // transform the vectors into view relative values

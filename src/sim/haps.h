@@ -28,7 +28,7 @@
 #define SIM_HAPS_H
 
 
-typedef void (*SIMhaphandler)(void *, void *);
+typedef void (*sim_haphandler_t)(void *, void *);
 
 enum SIMhapID {
   HAP_NONE = 0,
@@ -40,12 +40,12 @@ enum SIMhapID {
 /*!
   Register a hap handler
  */
-void simRegisterHapHandler(enum SIMhapID hap, SIMhaphandler handler);
+void sim_hap_register_handler(enum SIMhapID hap, sim_haphandler_t handler);
 
 /*!
   Notify that a hap occured. This will invoke all the hap handlers registered
   to that hap.
  */
-void simHapOccured(enum SIMhapID hap, void *arg0, void *arg1);
+void sim_hap_occured(enum SIMhapID hap, void *arg0, void *arg1);
 
 #endif /* ! SIM_HAPS_H */

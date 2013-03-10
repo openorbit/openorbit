@@ -44,7 +44,7 @@
  shuttle). The program also keep a pointer to a function called when detatching
  the stage.
 */
-typedef struct OOaxises {
+typedef struct {
   sim_float_t yaw;
   sim_float_t pitch;
   sim_float_t roll;
@@ -53,13 +53,13 @@ typedef struct OOaxises {
   sim_float_t fwd;
   sim_float_t orbital;
   sim_float_t throttle;
-} OOaxises;
+} sim_axises_t;
 
 
 typedef enum sim_stage_state_t {
-  OO_Stage_Idle,
-  OO_Stage_Detatched,
-  OO_Stage_Enabled
+  SIM_STAGE_IDLE,
+  SIM_STAGE_DETATCHED,
+  SIM_STAGE_ENABLED
 } sim_stage_state_t;
 
 struct sim_stage_t {
@@ -79,19 +79,19 @@ struct sim_stage_t {
   sg_object_t *sgobj;
 };
 
-typedef void (*OOscstepfunc)(sim_spacecraft_t*, double dt);
-typedef void (*OOscactionfunc)(sim_spacecraft_t*); // Detatch stages
+typedef void (*sim_sc_step_fn_t)(sim_spacecraft_t*, double dt);
+typedef void (*sim_sc_action_fn_t)(sim_spacecraft_t*); // Detatch stages
 
 // Wing for lifting design
-typedef void (*OOwingstep)(OOwing *, const OOsimenv *env);
-struct OOwing {
+typedef void (*sim_wing_tstep)(sim_wing_t *, const sim_environment_t *env);
+struct sim_wing_t {
   sim_stage_t *stage;
-  OOwingstep step;
+  sim_wing_tstep step;
 };
 
-typedef struct OOsimplewing OOsimplewing;
-struct OOsimplewing {
-  OOwing super;
+typedef struct sim_simplewing_t sim_simplewing_t;
+struct sim_simplewing_t {
+  sim_wing_t super;
   double area;
   double liftCoeffs[72]; // one per 5 degree aoa
 };
@@ -119,7 +119,7 @@ struct sim_spacecraft_t {
   PLobject *obj;
 
   const char *name;
-  OOaxises axises;
+  sim_axises_t axises;
 
   obj_array_t stages;
   obj_array_t engines;
@@ -128,14 +128,14 @@ struct sim_spacecraft_t {
   bool detatchComplete;
   int detatchSequence;
 
-  OOscstepfunc prestep;
-  OOscstepfunc poststep;
-  OOscactionfunc detatchStage;
+  sim_sc_step_fn_t prestep;
+  sim_sc_step_fn_t poststep;
+  sim_sc_action_fn_t detatchStage;
 
   bool mainEngineOn;
-  OOscactionfunc toggleMainEngine;
+  sim_sc_action_fn_t toggleMainEngine;
 
-  OOscactionfunc axisUpdate;
+  sim_sc_action_fn_t axisUpdate;
 
   float expendedMass;
 
@@ -148,33 +148,31 @@ typedef struct {
   sim_spacecraft_t *(*alloc)(void);
   void (*init)(sim_spacecraft_t *sc);
   void (*dealloc)(sim_spacecraft_t *sc);
-} SCclass;
+} sim_sc_class_t;
 
 
-sim_spacecraft_t* simNewSpacecraft(const char *className, const char *scName);
+sim_spacecraft_t* sim_new_spacecraft(const char *className, const char *scName);
 
-void simScInit(sim_spacecraft_t *sc, const char *name);
-void simInitStage(sim_stage_t *stage);
-void simAddStage(sim_spacecraft_t *sc, sim_stage_t *stage);
+void sim_spacecraft_init(sim_spacecraft_t *sc, const char *name);
+void sim_stage_init(sim_stage_t *stage);
+void sim_spacecraft_add_stage(sim_spacecraft_t *sc, sim_stage_t *stage);
 
-sim_spacecraft_t* ooScNew(pl_world_t *world, sg_scene_t *scene, const char *name);
-void simScDetatchStage(sim_spacecraft_t *sc);
+void sim_spacecraft_toggle_main_engine(sim_spacecraft_t *sc);
 
-void simScToggleMainEngine(sim_spacecraft_t *sc);
+void sim_stage_set_mesh(sim_stage_t *stage, sg_object_t *mesh);
 
-void ooScSetStageMesh(sim_stage_t *stage, sg_object_t *mesh);
-void simDetatchStage(sim_spacecraft_t *sc, sim_stage_t *stage);
-void simScStep(sim_spacecraft_t *sc, float dt);
-void ooScStageStep(sim_stage_t *stage, OOaxises *axises, float dt);
-void ooScForce(sim_spacecraft_t *sc, float rx, float ry, float rz);
-void ooScSetScene(sim_spacecraft_t *spacecraft, sg_scene_t *scene);
+void sim_spaccraft_detatch_stage(sim_spacecraft_t *sc, sim_stage_t *stage);
+void sim_spacecraft_step(sim_spacecraft_t *sc, float dt);
+void sim_stage_step(sim_stage_t *stage, sim_axises_t *axises, float dt);
+void sim_spacecraft_force(sim_spacecraft_t *sc, float rx, float ry, float rz);
+void sim_spacecraft_set_scene(sim_spacecraft_t *spacecraft, sg_scene_t *scene);
 
-PLobject* ooScGetPLObjForSc(sim_spacecraft_t *sc);
+PLobject* sim_spacecraft_get_pl_obj(sim_spacecraft_t *sc);
 
 /*!
   Set position of spacecraft in global coordinates
  */
-void ooScSetPos(sim_spacecraft_t *sc, double x, double y, double z);
+void sim_spacecraft_set_pos(sim_spacecraft_t *sc, double x, double y, double z);
 
 /*!
  Set position of spacecraft relative to the named system's center
@@ -184,7 +182,7 @@ void ooScSetPos(sim_spacecraft_t *sc, double x, double y, double z);
  \param y Position in y dimension with respect to system centre
  \param z Position in z dimension with respect to system centre
  */
-void ooScSetSystemAndPos(sim_spacecraft_t *sc, const char *sysName,
+void sim_spacecraft_set_sys_and_pos(sim_spacecraft_t *sc, const char *sysName,
                          double x, double y, double z);
 
 /*!
@@ -195,39 +193,38 @@ void ooScSetSystemAndPos(sim_spacecraft_t *sc, const char *sysName,
  \param lattidue Latitude
  \param altitude Altitude ASL
  */
-void ooScSetSysAndCoords(sim_spacecraft_t *sc, const char *sysName, double longitude, double latitude, double altitude);
+void sim_spacecraft_set_sys_and_coords(sim_spacecraft_t *sc, const char *sysName, double longitude, double latitude, double altitude);
 
 
-sim_stage_t* simNewStage(sim_spacecraft_t *sc, const char *name, const char *mesh);
-
-sim_spacecraft_t* ooScLoad(pl_world_t *world, sg_scene_t *scene, const char *fileName);
-
-void scStageSetOffset3f(sim_stage_t *stage, float x, float y, float z);
-void scStageSetOffset3fv(sim_stage_t *stage, float3 p);
+sim_stage_t* sim_new_stage(sim_spacecraft_t *sc, const char *name, const char *mesh);
 
 
-void ooGetAxises(OOaxises *axises);
+void sim_stage_set_offset3f(sim_stage_t *stage, float x, float y, float z);
+void sim_stage_set_offset3fv(sim_stage_t *stage, float3 p);
 
-float3 simGetStageGravityVector(sim_stage_t *stage);
+
+void sim_get_axises(sim_axises_t *axises);
+
+float3 sim_stage_get_gravity(sim_stage_t *stage);
 //float3 simGetAirspeedVector(sim_stage_t *stage);
 
-float3 simGetGravityVector(sim_spacecraft_t *sc);
-float3 simGetVelocityVector(sim_spacecraft_t *sc);
-float3 simGetAirspeedVector(sim_spacecraft_t *sc);
-float3 simGetForceVector(sim_spacecraft_t *sc);
-quaternion_t simGetQuaternion(sim_spacecraft_t *sc);
-const float3x3* simGetRotMat(sim_spacecraft_t *sc);
-float simGetAltitude(sim_spacecraft_t *sc);
+float3 sim_spacecraft_get_gravity(sim_spacecraft_t *sc);
+float3 sim_spacecraft_get_velocity(sim_spacecraft_t *sc);
+float3 sim_spacecraft_get_airspeed(sim_spacecraft_t *sc);
+float3 sim_spacecraft_get_force(sim_spacecraft_t *sc);
+quaternion_t sim_spacecraft_get_quaternion(sim_spacecraft_t *sc);
+const float3x3* sim_spacecraft_get_rotmat(sim_spacecraft_t *sc);
+float sim_spacecraft_get_altitude(sim_spacecraft_t *sc);
 
 // Returns the position vector that is relative to the dominating
 // gravitational source
-float3 simGetRelPos(sim_spacecraft_t *sc);
-float3 simGetRelVel(sim_spacecraft_t *sc);
-pl_system_t* simGetSys(sim_spacecraft_t *sc);
+float3 sim_spacecraft_get_rel_pos(sim_spacecraft_t *sc);
+float3 sim_spacecraft_get_rel_vel(sim_spacecraft_t *sc);
+pl_system_t* sim_spacecraft_get_sys(sim_spacecraft_t *sc);
 
-void simStageArmEngines(sim_stage_t *stage);
-void simStageDisarmEngines(sim_stage_t *stage);
-void simStageDisableEngines(sim_stage_t *stage);
-void simStageLockEngines(sim_stage_t *stage);
+void sim_stage_arm_engines(sim_stage_t *stage);
+void sim_stage_disarm_engines(sim_stage_t *stage);
+void sim_stage_disable_engines(sim_stage_t *stage);
+void sim_stage_lock_engines(sim_stage_t *stage);
 
 #endif /* end of include guard: SPACECRAFT_H_7SCB1CH8 */

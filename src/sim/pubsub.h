@@ -336,42 +336,42 @@ SIM_TYPEDEF(obj_array, obj_array_t);
 // C strings
 SIM_TYPEDEF(str, char*);
 
-typedef void (*SIMvalueobserver)(sim_value_t *val);
+typedef void (*sim_valueobserver_fn_t)(sim_value_t *val);
 
-sim_record_t* simPubsubGetRecordWithComps(const char *fst_comp, ...)
+sim_record_t* sim_pubsub_get_record_with_comps(const char *fst_comp, ...)
               __attribute__ ((sentinel));
 
-sim_record_t* simPubsubGetRecord(const char *path);
-sim_value_t* simPubsubGetValue(const char *path);
-sim_record_t* simGetRecordByName(sim_record_t *rec, const char *name);
-sim_record_t* simGetRecordByIndex(sim_record_t *rec, int idx);
-sim_value_t* simGetValueByIndex(sim_record_t *rec, int idx);
-sim_value_t* simGetValueByName(sim_record_t *rec, const char *name);
+sim_record_t* sim_pubsub_get_record(const char *path);
+sim_value_t* sim_pubsub_get_value(const char *path);
+sim_record_t* sim_pubsub_get_record_by_name(sim_record_t *rec, const char *name);
+sim_record_t* sim_pubsub_get_record_by_index(sim_record_t *rec, int idx);
+sim_value_t* sim_pubsub_get_value_by_index(sim_record_t *rec, int idx);
+sim_value_t* sim_pubsub_get_value_by_name(sim_record_t *rec, const char *name);
 
-sim_record_t* simPubsubMakeRecord(sim_record_t *parent, const char *name);
-sim_value_t* simPubsubMakeValue(sim_record_t *parent, sim_type_id_t typ,
+sim_record_t* sim_pubsub_make_record(sim_record_t *parent, const char *name);
+sim_value_t* sim_pubsub_make_value(sim_record_t *parent, sim_type_id_t typ,
                                 const char *name, void *val);
-sim_link_t* simPubsubMakeLink(sim_record_t *parent, const char *name);
+sim_link_t* sim_pubsub_make_link(sim_record_t *parent, const char *name);
 
-sim_record_t* simPubsubCreateRecord(const char *path);
+sim_record_t* sim_pubsub_create_record(const char *path);
 
-void simLinkRecord(sim_record_t *parent, const char *key, sim_record_t *rec);
+void sim_pubsub_link_record(sim_record_t *parent, const char *key, sim_record_t *rec);
 
-void simPublishValue(sim_record_t *parent, sim_type_id_t type, const char *key,
+void sim_pubsub_publish_val(sim_record_t *parent, sim_type_id_t type, const char *key,
                      void *sim_val);
-void simObserveValue(sim_value_t *val, SIMvalueobserver f);
-void simObserveNamedValue(const char *key, SIMvalueobserver f);
-void simObserveNamedValueOfRecord(sim_record_t *parent, const char *key,
-                                  SIMvalueobserver f);
-void simNotifyChangedVal(void *sim_val);
+void sim_pubsub_observe_val(sim_value_t *val, sim_valueobserver_fn_t f);
+void sim_pubsub_observe_named_val(const char *key, sim_valueobserver_fn_t f);
+void sim_pubsub_observe_named_val_of_rec(sim_record_t *parent, const char *key,
+                                  sim_valueobserver_fn_t f);
+void sim_pubsub_notify_changed_val(void *sim_val);
 
 
-void simPubsubGetVal(sim_value_t *val_desc, sim_type_id_t type_id, void *val);
+void sim_pubsub_get_val(sim_value_t *val_desc, sim_type_id_t type_id, void *val);
 
-void simPubsubSetVal(sim_value_t *val_desc, sim_type_id_t type_id, void *val);
+void sim_pubsub_set_val(sim_value_t *val_desc, sim_type_id_t type_id, void *val);
 /*
   Prints the contents of the pubsub database
  */
-void simDumpPubsubDB(void);
+void sim_pubsub_dump_db(void);
 
 #endif /* !SIM_PUBSUB_H */
