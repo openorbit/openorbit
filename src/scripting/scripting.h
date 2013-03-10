@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2013 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -53,14 +53,14 @@ extern "C" {
  * Brings any internal scripting modules online. E.g. it registers C-functions
  * whith the scripting subsystem.
  * */
-void ooScriptingInit(void);
-bool ooScriptingRunPostInit(void);
+void scripting_init(void);
+bool scripting_run_post_init(void);
 /*!
  * \brief Cleans up and shuts down the scripting system.
  * 
  * Call this at exit.
  * */
-void ooScriptingFinalise(void);
+void scripting_finalise(void);
 
 /*!
  * \brief Loads and executes the init script.
@@ -68,9 +68,9 @@ void ooScriptingFinalise(void);
  * The init script is executed before the graphics system is enabled and is
  * responsible for setting up items such as video modes, controls and so forth.
  * */
-void ooScriptingRunInit(void);
+void scripting_run_init(void);
 
-bool ooScriptingRunFile(const char *fname);
+bool scripting_run_file(const char *fname);
 
 #ifdef __cplusplus
 }

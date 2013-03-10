@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2010,2012 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2010,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -42,7 +42,7 @@
 
 #include <openorbit/log.h>
 
-SIMstate gSIM_state = {0.0, NULL, NULL, NULL, NULL};
+sim_state_t gSIM_state = {0.0, NULL, NULL, NULL, NULL};
 
 sg_scene_t*
 sim_get_scene(void)
@@ -72,9 +72,9 @@ sim_init_graphics(void)
 
   int width, height;
   float fovy;
-  ooConfGetIntDef("openorbit/video/width", &width, 640);
-  ooConfGetIntDef("openorbit/video/height", &height, 480);
-  ooConfGetFloatDef("openorbit/video/gl/fovy", &fovy, 45.0f);
+  config_get_int_def("openorbit/video/width", &width, 640);
+  config_get_int_def("openorbit/video/height", &height, 480);
+  config_get_float_def("openorbit/video/gl/fovy", &fovy, 45.0f);
   sg_viewport_t *vp = sg_new_viewport(gSIM_state.win, 0, 0, width, height);
   sg_scene_t *scene = sg_new_scene("main");
   sg_viewport_set_scene(vp, scene);
@@ -89,48 +89,48 @@ sim_init_graphics(void)
 void
 sim_init_plugins(void)
 {
-  ooPluginInit();
-  ooPluginLoadAll();
-  ooPluginPrintAll();
+  plugin_init();
+  plugin_load_all();
+  plugin_print_all();
 }
 
 
 void
 sim_init(void)
 {
-  simScCtrlInit();
+  sim_spacecraft_control_init();
 
   // Set log level, need to do that here
   const char *levStr = NULL;
-  ooConfGetStrDef("openorbit/sys/log-level", &levStr, "info");
-  ooLogSetLevel(ooLogGetLevFromStr(levStr));
+  config_get_str_def("openorbit/sys/log-level", &levStr, "info");
+  log_set_level(log_get_lev_from_str(levStr));
 
   // Load and run initialisation script
-  ooScriptingInit();
+  scripting_init();
 
-  if (!ooScriptingRunFile("script/init.py")) {
-    ooLogFatal("script/init.py missing");
+  if (!scripting_run_file("script/init.py")) {
+    log_fatal("script/init.py missing");
   }
 
   sim_init_graphics();
 
   float freq;
-  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
+  config_get_float_def("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   gSIM_state.stepSize = 1.0 / freq; // Period in s
   
   // Setup IO-tables, must be done after joystick system has been initialised
-  ioInit();
+  io_init();
 
-  gSIM_state.world = ooOrbitLoad(sim_get_scene(), "data/solsystem.hrml");
+  gSIM_state.world = sim_load_world(sim_get_scene(), "data/solsystem.hrml");
 
 
 
-  sim_spacecraft_t *sc = simNewSpacecraft("Mercury", "Mercury I");
-  ooScSetSysAndCoords(sc, "Sol/Earth",
+  sim_spacecraft_t *sc = sim_new_spacecraft("Mercury", "Mercury I");
+  sim_spacecraft_set_sys_and_coords(sc, "Sol/Earth",
                       0.0 /*longitude*/,
                       0.0 /*latitude*/,
                       250.0e3 /*altitude*/);
-  simSetSpacecraft(sc);
+  sim_set_spacecraft(sc);
   sg_camera_t *cam = sg_scene_get_cam(sc->scene);
   sim_stage_t *stage = ARRAY_ELEM(sc->stages, 0);
   sg_camera_track_object(cam, stage->sgobj);
@@ -141,21 +141,21 @@ sim_init(void)
 
   sim_init_plugins();
 
-  if (!ooScriptingRunFile("script/postinit.py")) {
-    ooLogFatal("script/postinit.py missing");
+  if (!scripting_run_file("script/postinit.py")) {
+    log_fatal("script/postinit.py missing");
   }
 
 }
 
 
 void
-ooSimSetOrbSys(PLsystem *osys)
+sim_set_orb_sys(pl_system_t *osys)
 {
   gSIM_state.orbSys = osys;
 }
 
 void
-ooSimSetOrbWorld(PLworld *world)
+sim_set_orb_world(pl_world_t *world)
 {
   gSIM_state.world = world;
 }
@@ -163,33 +163,33 @@ ooSimSetOrbWorld(PLworld *world)
 void
 simAxisPush(void)
 {
-  sim_record_t *io = simPubsubGetRecord("/io/axis");
+  sim_record_t *io = sim_pubsub_get_record("/io/axis");
   if (io) {
-    float yaw_val = ioGetAxis(IO_AXIS_RZ);
-    sim_value_t *yaw = simGetValueByName(io, "yaw");
-    simPubsubSetVal(yaw, SIM_TYPE_FLOAT, &yaw_val);
+    float yaw_val = io_get_axis(IO_AXIS_RZ);
+    sim_value_t *yaw = sim_pubsub_get_value_by_name(io, "yaw");
+    sim_pubsub_set_val(yaw, SIM_TYPE_FLOAT, &yaw_val);
 
-    float roll_val = ioGetAxis(IO_AXIS_RY);
-    sim_value_t *roll = simGetValueByName(io, "roll");
-    simPubsubSetVal(roll, SIM_TYPE_FLOAT, &roll_val);
+    float roll_val = io_get_axis(IO_AXIS_RY);
+    sim_value_t *roll = sim_pubsub_get_value_by_name(io, "roll");
+    sim_pubsub_set_val(roll, SIM_TYPE_FLOAT, &roll_val);
 
-    float pitch_val = ioGetAxis(IO_AXIS_RX);
-    sim_value_t *pitch = simGetValueByName(io, "pitch");
-    simPubsubSetVal(pitch, SIM_TYPE_FLOAT, &pitch_val);
+    float pitch_val = io_get_axis(IO_AXIS_RX);
+    sim_value_t *pitch = sim_pubsub_get_value_by_name(io, "pitch");
+    sim_pubsub_set_val(pitch, SIM_TYPE_FLOAT, &pitch_val);
 
-    float throttle_val = ioGetSlider(IO_SLIDER_THROT_0);
-    sim_value_t *throttle = simGetValueByName(io, "throttle");
-    simPubsubSetVal(throttle, SIM_TYPE_FLOAT, &throttle_val);
+    float throttle_val = io_get_slider(IO_SLIDER_THROT_0);
+    sim_value_t *throttle = sim_pubsub_get_value_by_name(io, "throttle");
+    sim_pubsub_set_val(throttle, SIM_TYPE_FLOAT, &throttle_val);
 
-    ooLogTrace("axises: %f %f %f / %f",
+    log_trace("axises: %f %f %f / %f",
                pitch_val, roll_val, yaw_val, throttle_val);
   }
 }
 
 void
-ooSimStep(float dt)
+sim_step(float dt)
 {
-  simTimeTick(dt);
+  sim_time_tick(dt);
   struct timeval start;
   struct timeval end;
   gettimeofday(&start, NULL);
@@ -197,47 +197,47 @@ ooSimStep(float dt)
   simAxisPush();
   //sgCamStep(sgGetCam(gSIM_state.sg), dt);
 
-  plWorldClear(gSIM_state.world);
+  pl_world_clear(gSIM_state.world);
 
   gettimeofday(&end, NULL);
 
-  ooLogTrace("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
+  log_trace("simstep time: %lu us", ((end.tv_sec*1000000 + end.tv_usec) -
                                      (start.tv_sec*1000000 + start.tv_usec)));
 
   // Step spacecraft systems
-  simScStep(gSIM_state.currentSc, dt);
-  simDispatchPendingEvents();
+  sim_spacecraft_step(gSIM_state.currentSc, dt);
+  sim_event_dispatch_pending();
 
-  plWorldStep(gSIM_state.world, dt);
+  pl_world_step(gSIM_state.world, dt);
 
-  ooLogTrace("sim step");
+  log_trace("sim step");
 
   sg_scene_sync(sim_get_scene());
 }
 
 void
-simSetSpacecraft(sim_spacecraft_t *sc)
+sim_set_spacecraft(sim_spacecraft_t *sc)
 {
   gSIM_state.currentSc = sc;
   // Update standard pubsub links
-  sim_record_t *axis_rec = simPubsubGetRecordWithComps("sc", sc->name,
+  sim_record_t *axis_rec = sim_pubsub_get_record_with_comps("sc", sc->name,
                                                        "axis",
                                                        NULL);
 
-  sim_record_t *io_rec = simPubsubCreateRecord("/io");
-  simLinkRecord(io_rec, "axis", axis_rec);
+  sim_record_t *io_rec = sim_pubsub_create_record("/io");
+  sim_pubsub_link_record(io_rec, "axis", axis_rec);
 
   // Notify spacecraft that it is current (so it can update custom pubsub links)
 }
 
 sim_spacecraft_t*
-simGetSpacecraft(void)
+sim_get_spacecraft(void)
 {
   return gSIM_state.currentSc;
 }
 
-PLworld*
-simGetWorld(void)
+pl_world_t*
+sim_get_world(void)
 {
   return gSIM_state.world;
 }

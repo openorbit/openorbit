@@ -25,13 +25,10 @@
 typedef struct sim_spacecraft_t sim_spacecraft_t;
 typedef struct sim_stage_t sim_stage_t;
 
-typedef struct OOactuatorgroup OOactuatorgroup;
+typedef struct sim_actuatorgroup_t sim_actuatorgroup_t;
 
-typedef struct OOrocket OOrocket;
-typedef struct OOsrb OOsrb;
-typedef struct OOjetengine OOjetengine;
-typedef struct OOmagtorquer OOmagtorquer;
-typedef struct OOwing OOwing;
-typedef struct OOflap OOflap;
+typedef struct sim_magtorquer_t sim_magtorquer_t;
+typedef struct sim_wing_t sim_wing_t;
+typedef struct sim_flap_t sim_flap_t;
 
 #endif /* ! OO_SIM_SIMTYPES_H__ */

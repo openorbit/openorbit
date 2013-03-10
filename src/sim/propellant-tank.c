@@ -21,16 +21,16 @@
 #include "spacecraft.h"
 #include "palloc.h"
 
-SIMtank*
-simNewTank(sim_stage_t *stage, const char *tankName, float p, float v, float t)
+sim_tank_t*
+sim_new_tank(sim_stage_t *stage, const char *tankName, float p, float v, float t)
 {
-  SIMtank *tank = smalloc(sizeof(SIMtank));
+  sim_tank_t *tank = smalloc(sizeof(sim_tank_t));
 
-  tank->rec = simPubsubMakeRecord(stage->rec, tankName);
+  tank->rec = sim_pubsub_make_record(stage->rec, tankName);
 
-  simPublishValue(tank->rec, SIM_TYPE_FLOAT, "pressure", &tank->pressure);
-  simPublishValue(tank->rec, SIM_TYPE_FLOAT, "volume", &tank->volume);
-  simPublishValue(tank->rec, SIM_TYPE_FLOAT, "temperature", &tank->temperature);
+  sim_pubsub_publish_val(tank->rec, SIM_TYPE_FLOAT, "pressure", &tank->pressure);
+  sim_pubsub_publish_val(tank->rec, SIM_TYPE_FLOAT, "volume", &tank->volume);
+  sim_pubsub_publish_val(tank->rec, SIM_TYPE_FLOAT, "temperature", &tank->temperature);
 
   SIM_VAL(tank->pressure) = p;
   SIM_VAL(tank->volume) = v;
@@ -40,19 +40,19 @@ simNewTank(sim_stage_t *stage, const char *tankName, float p, float v, float t)
 }
 
 void
-simDeleteTank(SIMtank *tank)
+sim_tank_delete(sim_tank_t *tank)
 {
   free(tank);
 }
 
 
 void
-simOpenValve(SIMtank *tank)
+sim_tank_open_valve(sim_tank_t *tank)
 {
 }
 
 void
-simEnablePump(SIMtank *tank)
+sim_tank_enable_pump(sim_tank_t *tank)
 {
 
 }

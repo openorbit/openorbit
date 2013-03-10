@@ -55,7 +55,7 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
   FILE * infile;  /* source file */
 
   if ((infile = fopen(filename, "rb")) == NULL) {
-    ooLogError("can't open %s\n", filename);
+    log_error("can't open %s\n", filename);
     return -1;
   }
   cinfo.err = jpeg_std_error(&jerr);
@@ -68,10 +68,10 @@ jpeg_load(jpg_image_t * restrict img, const char * restrict filename)
   img->h = cinfo.output_height;
   if (cinfo.output_components == 3) {
     img->kind = JPG_RGB;
-    ooLogTrace("loading colour jpg %s\n", filename);
+    log_trace("loading colour jpg %s\n", filename);
   } else if (cinfo.output_components == 1) {
     img->kind = JPG_GRAY;
-    ooLogTrace("loading grayscale jpg %s\n", filename);
+    log_trace("loading grayscale jpg %s\n", filename);
   } else {
     assert(0 && "no support for non RGB or GRAYSCALE jpgs");
   }

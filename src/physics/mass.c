@@ -23,7 +23,7 @@
 void
 testMassFuncs(void)
 {
-  PLmass m;
+  pl_mass_t m;
   plMassSet(&m, 5.0,
             0.0, 0.0, 0.0,
             10.0, 20.0, 30.0,
@@ -97,12 +97,12 @@ testMassFuncs(void)
 }
 #endif
 void
-plMassSet(PLmass *mo, float m,
+pl_mass_set(pl_mass_t *mo, float m,
           float cox, float coy, float coz,
           float ixx, float iyy, float izz,
           float ixy, float ixz, float iyz)
 {
-  memset(mo, 0, sizeof(PLmass));
+  memset(mo, 0, sizeof(pl_mass_t));
 
   mo->m = m;
   mo->I[0][0] = ixx;
@@ -123,63 +123,63 @@ plMassSet(PLmass *mo, float m,
 }
 
 void
-plMassHollowCylinder(PLmass *mo, float m, float r)
+pl_mass_hollow_cylinder(pl_mass_t *mo, float m, float r)
 {
   float i = m * r * r;
-  plMassSet(mo, m,
+  pl_mass_set(mo, m,
             0.0f, 0.0f, 0.0f,
             i, i, i,
             0.0f, 0.0f, 0.0f);
 }
 
 void
-plMassSolidCylinder(PLmass *mo, float m, float r, float h)
+pl_mass_solid_cylinder(pl_mass_t *mo, float m, float r, float h)
 {
   float ixy = 1.0f / 12.0f * m * (3.0f * r * r + h * h);
   float iz = m * r * r / 2.0f;
-  plMassSet(mo, m,
+  pl_mass_set(mo, m,
             0.0f, 0.0f, 0.0f,
             ixy, ixy, iz,
             0.0f, 0.0f, 0.0f);
 }
 
 void
-plMassWalledCylinder(PLmass *mo, float m, float out_r, float in_r, float h)
+pl_mass_walled_cylinder(pl_mass_t *mo, float m, float out_r, float in_r, float h)
 {
   float ixy = 1.0f / 12.0f * m * (3.0f * (out_r * out_r + in_r * in_r) + h * h);
   float iz = 0.5 * m * (in_r*in_r + out_r * out_r);
-  plMassSet(mo, m,
+  pl_mass_set(mo, m,
             0.0f, 0.0f, 0.0f,
             ixy, ixy, iz,
             0.0f, 0.0f, 0.0f);
 }
 
 void
-plMassSolidSphere(PLmass *mo, float m, float r)
+pl_mass_solid_sphere(pl_mass_t *mo, float m, float r)
 {
   float ixyz = 2.0f * m * r * r / 5.0f;
-  plMassSet(mo, m,
+  pl_mass_set(mo, m,
             0.0f, 0.0f, 0.0f,
             ixyz, ixyz, ixyz,
             0.0f, 0.0f, 0.0f);
 }
 
 void
-plMassHollowSphere(PLmass *mo, float m, float r)
+pl_mass_hollow_sphere(pl_mass_t *mo, float m, float r)
 {
   float ixyz = 2.0f * m * r * r / 3.0f;
-  plMassSet(mo, m,
+  pl_mass_set(mo, m,
             0.0f, 0.0f, 0.0f,
             ixyz, ixyz, ixyz,
             0.0f, 0.0f, 0.0f);
 }
 
 void
-plMassSolidCone(PLmass *mo, float m, float r, float h)
+pl_mass_solid_cone(pl_mass_t *mo, float m, float r, float h)
 {
   float iz = 3.0f / 10.0f * m * r * r;
   float ixy = 3.0f / 5.0f * m * (r * r / 4.0f + h * h);
-  plMassSet(mo, m,
+  pl_mass_set(mo, m,
             0.0f, 0.0f, 0.0f,
             ixy, ixy, iz,
             0.0f, 0.0f, 0.0f);
@@ -188,7 +188,7 @@ plMassSolidCone(PLmass *mo, float m, float r, float h)
 
 
 void
-plMassTranslate(PLmass *m, float dx, float dy, float dz)
+pl_mass_translate(pl_mass_t *m, float dx, float dy, float dz)
 {
   float3x3 re;
   mf3_ident(re);
@@ -211,7 +211,7 @@ plMassTranslate(PLmass *m, float dx, float dy, float dz)
 }
 
 void
-plMassRotateM(PLmass *m, const float3x3 rm)
+pl_mass_rotate_m(pl_mass_t *m, const float3x3 rm)
 {
   // We want to rotate the inertia tensor with
   // Ir = M * I0 * M^-1
@@ -231,17 +231,17 @@ plMassRotateM(PLmass *m, const float3x3 rm)
 }
 
 void
-plMassRotateQ(PLmass *m, quaternion_t q)
+pl_mass_rotate_q(pl_mass_t *m, quaternion_t q)
 {
   float3x3 mat;
   q_mf3_convert(mat, q);
 
-  plMassRotateM(m, mat);
+  pl_mass_rotate_m(m, mat);
 }
 
 
 void
-plMassAdd(PLmass * restrict md, const PLmass * restrict ms)
+pl_mass_add(pl_mass_t * restrict md, const pl_mass_t * restrict ms)
 {
   float recip = 1.0f / (md->m + ms->m);
 
@@ -259,7 +259,7 @@ plMassAdd(PLmass * restrict md, const PLmass * restrict ms)
 }
 
 void
-plMassMod(PLmass *m, float newMass)
+pl_mass_mod(pl_mass_t *m, float newMass)
 {
   float s = newMass / m->m;
   m->m = newMass;
@@ -271,7 +271,7 @@ plMassMod(PLmass *m, float newMass)
 }
 
 float
-plMassRed(PLmass *m, float deltaMass)
+pl_mass_red(pl_mass_t *m, float deltaMass)
 {
   float oldMass = m->m;
   float newMass = oldMass - deltaMass;
@@ -279,12 +279,12 @@ plMassRed(PLmass *m, float deltaMass)
     newMass = m->minMass;
   }
 
-  plMassMod(m, newMass);
+  pl_mass_mod(m, newMass);
   return oldMass - newMass;
 }
 
 void
-plMassSetMin(PLmass *m, float minMass)
+pl_mass_set_min(pl_mass_t *m, float minMass)
 {
   m->minMass = minMass;
 }

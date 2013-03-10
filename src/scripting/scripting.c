@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2013 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -38,7 +38,7 @@ extern void init_event(void);
 #define OO_PATH_SEP ":"
 
 void
-ooScriptingInit(void)
+scripting_init(void)
 {
 
   Py_InitializeEx(0); // note that ex(0) prevents python from stealing sighandlers
@@ -48,8 +48,8 @@ ooScriptingInit(void)
 
 
   // insert app-specific python path
-  char *ooPyPath = ooResGetPath("python/");
-  if (! ooPyPath) ooLogFatal("cannot generate python path");
+  char *ooPyPath = rsrc_get_path("python/");
+  if (! ooPyPath) log_fatal("cannot generate python path");
 
   const char *pyPath = Py_GetPath();
 
@@ -65,36 +65,36 @@ ooScriptingInit(void)
 }
 
 void
-ooScriptingFinalise(void)
+scripting_finalise(void)
 {
   Py_Finalize();
 }
 
 void
-ooScriptingRunInit(void)
+scripting_run_init(void)
 {
-  ooScriptingRunFile(SCR_INIT_SCRIPT_NAME);
+  scripting_run_file(SCR_INIT_SCRIPT_NAME);
 }
 
 bool
-ooScriptingRunPostInit(void)
+scripting_run_post_init(void)
 {
-  return ooScriptingRunFile(SCR_POST_INIT_SCRIPT_NAME);
+  return scripting_run_file(SCR_POST_INIT_SCRIPT_NAME);
 }
 
 bool
-ooScriptingRunFile(const char *fname)
+scripting_run_file(const char *fname)
 {
-  FILE *fp = ooResGetFile(fname);
+  FILE *fp = rsrc_get_file(fname);
 
   if (! fp) {
-    ooLogWarn("could not open %s", fname);
+    log_warn("could not open %s", fname);
     fprintf(stderr, "could not open %s\n", fname);
     return false;
   }
   if (PyRun_SimpleFile(fp, fname)) {
     fclose(fp);
-    ooLogFatal("execution of %s failed", fname);
+    log_fatal("execution of %s failed", fname);
     //return false;
   }
 

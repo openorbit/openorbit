@@ -64,7 +64,7 @@ sim_class_init(void)
 
 MODULE_INIT(object, NULL)
 {
-  ooLogTrace("initialising 'object' module");
+  log_trace("initialising 'object' module");
   sim_class_init();
 }
 
@@ -72,7 +72,7 @@ sim_class_t*
 sim_class_get(const char *cls_name)
 {
   sim_class_t *cls = avl_find(classes, cls_name);
-  ooLogFatalIfNull(cls, "unknown class '%s'", cls_name);
+  log_fatal_if_null(cls, "unknown class '%s'", cls_name);
   return cls;
 }
 
@@ -196,7 +196,7 @@ sim_set_field(sim_object_t *obj, const char *field_name,
 {
   sim_field_t *field = sim_class_get_field(obj->cls, field_name);
   if (!field) {
-    ooLogError("field '%s' is not a member of class '%s'",
+    log_error("field '%s' is not a member of class '%s'",
                field_name, obj->cls->name);
     return;
   }
@@ -284,7 +284,7 @@ sim_set_field_by_index(sim_object_t *obj, const char *field_name,
   assert(obj != NULL);
   sim_field_t *field = sim_class_get_field(obj->cls, field_name);
   if (!field) {
-    ooLogError("field '%s' is not a member of class '%s'",
+    log_error("field '%s' is not a member of class '%s'",
                field_name, obj->cls->name);
     return;
   }

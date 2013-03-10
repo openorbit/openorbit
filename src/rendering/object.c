@@ -103,14 +103,14 @@ void
 sg_object_print(const sg_object_t *obj)
 {
   if (obj->rigidBody) {
-    ooLogInfo("** object %s", obj->rigidBody->name);
+    log_info("** object %s", obj->rigidBody->name);
 
-    //    ooLogInfo("\tlwc: [%d %d %d] + [%f %f %f]",
+    //    log_info("\tlwc: [%d %d %d] + [%f %f %f]",
     //        obj->p.seg.x, obj->p.seg.y, obj->p.seg.z,
     //        obj->p.offs.x, obj->p.offs.y, obj->p.offs.z);
-    ooLogInfo("\tcam pos: [%f %f %f]",
+    log_info("\tcam pos: [%f %f %f]",
               obj->camera_pos.x, obj->camera_pos.y, obj->camera_pos.z);
-    //ooLogInfo("\tdp:  [%f %f %f]", obj->dp.x, obj->dp.y, obj->dp.z);
+    //log_info("\tdp:  [%f %f %f]", obj->dp.x, obj->dp.y, obj->dp.z);
   }
 
   if (obj->geometry) {
@@ -124,7 +124,7 @@ sg_object_print(const sg_object_t *obj)
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &usage);
 
-    ooLogInfo("geometry %d:\n\taccess: %d\n\tmapped: %d\n\tsize: %d\n\tusage: %d",
+    log_info("geometry %d:\n\taccess: %d\n\tmapped: %d\n\tsize: %d\n\tusage: %d",
               obj->geometry->vbo, access, mapped, size, usage);
 
     size = size < 1000*sizeof(float) ? size : 1000;
@@ -463,7 +463,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   glGenBuffers(1, &geo->vbo);
   SG_CHECK_ERROR;
 
-  ooLogInfo("geometry: %d |[%f %f %f]| = %f", geo->vbo, maxvert.x, maxvert.y, maxvert.z,
+  log_info("geometry: %d |[%f %f %f]| = %f", geo->vbo, maxvert.x, maxvert.y, maxvert.z,
             vf3_abs(maxvert));
 
 
@@ -560,7 +560,7 @@ void
 sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody)
 {
   if (obj->parent) {
-    ooLogWarn("setting rigid body for sg object that is not root");
+    log_warn("setting rigid body for sg object that is not root");
     return;
   }
   obj->rigidBody = rigidBody;
@@ -576,14 +576,14 @@ sg_object_sync(sg_object_t *obj, float t)
 {
   if (obj->rigidBody) {
     // Synchronise rotational velocity and quaternions
-    obj->dr = plGetAngularVel(obj->rigidBody);
-    obj->q0 = plGetQuat(obj->rigidBody);
+    obj->dr = pl_object_get_angular_vel(obj->rigidBody);
+    obj->q0 = pl_object_get_quat(obj->rigidBody);
     obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
     obj->q = q_slerp(obj->q0, obj->q1, 0.0);
 
     // Synchronise world coordinates
-    obj->dp = plGetVel(obj->rigidBody);
-    obj->p0 = plGetLwc(obj->rigidBody);
+    obj->dp = pl_object_get_vel(obj->rigidBody);
+    obj->p0 = pl_object_get_lwc(obj->rigidBody);
     obj->p1 = obj->p0;
 
     lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
@@ -686,14 +686,14 @@ sg_new_object_with_geo(sg_shader_t *shader, const char *name,
 sg_object_t*
 sg_load_object(const char *file, sg_shader_t *shader)
 {
-  ooLogInfo("load %s", file);
+  log_info("load %s", file);
 
   assert(file && "not null");
   assert(shader && "not null");
 
-  ooLogInfo("load object '%s'", file);
+  log_info("load object '%s'", file);
 
-  char *fullpath = ooResGetPath(file);
+  char *fullpath = rsrc_get_path(file);
   sg_object_t *model = NULL;
 
   char *dot = strrchr(file, '.');
@@ -729,7 +729,7 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
               sg_texture_t *tex, sg_texture_t *nightTex, sg_texture_t *spec,
               sg_material_t *mat)
 {
-  ooLogInfo("sphere '%s' radius: %f", name, radius);
+  log_info("sphere '%s' radius: %f", name, radius);
 
   // NOTE: Z is up
   sg_object_t *sphere = sg_new_object(shader, name);

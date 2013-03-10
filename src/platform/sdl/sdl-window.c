@@ -76,7 +76,7 @@ sdl_window_init(int width, int height, bool fullscreen)
                             width, height, flags);
 
   if (!window) {
-    ooLogError("Couldn't set %dx%d OpenGL video mode: %s\n",
+    log_error("Couldn't set %dx%d OpenGL video mode: %s\n",
                width, height, SDL_GetError());
     SDL_Quit();
     exit(2);
@@ -90,8 +90,8 @@ sdl_init_gl(void)
 {
   // Setup attributes we want for the OpenGL context
   int stencilSize, colourSize;
-  ooConfGetIntDef("openorbit/video/stencil-bits", &stencilSize, 1);
-  ooConfGetIntDef("openorbit/video/colour-bits", &colourSize, 32);
+  config_get_int_def("openorbit/video/stencil-bits", &stencilSize, 1);
+  config_get_int_def("openorbit/video/colour-bits", &colourSize, 32);
 
   // Don't set color bit sizes (SDL_GL_RED_SIZE, etc)
   //    Mac OS X will always use 8-8-8-8 ARGB for 32-bit screens and
@@ -108,7 +108,7 @@ sdl_init_gl(void)
     }
   }
   if (depthSetFailed) {
-    ooLogFatal("could not set depth size SDL: \"%s\"", SDL_GetError());
+    log_fatal("could not set depth size SDL: \"%s\"", SDL_GetError());
   }
 
 #if 0
@@ -121,7 +121,7 @@ sdl_init_gl(void)
     }
   }
   if (stencilSetFailed) {
-    ooLogFatal("could not set stencil size SDL: \"%s\"", SDL_GetError());
+    log_fatal("could not set stencil size SDL: \"%s\"", SDL_GetError());
   }
 #endif
 
@@ -129,7 +129,7 @@ sdl_init_gl(void)
   //     The fact that windows are double-buffered on Mac OS X has no effect
   //     on OpenGL double buffering.
   if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
-    ooLogFatal("could not set gl double buffer SDL: \"%s\"", SDL_GetError());
+    log_fatal("could not set gl double buffer SDL: \"%s\"", SDL_GetError());
   }
 
   extern SDL_WindowID mainWindow;
@@ -151,9 +151,9 @@ sdl_init_gl(void)
   assert(sscanf((const char*)shadervers, "%u.%u",
                 &sgRenderInfo.glsl_major_vers,
                 &sgRenderInfo.glsl_minor_vers) == 2);
-  ooLogInfo("gl version = %u.%u", sgRenderInfo.gl_major_vers,
+  log_info("gl version = %u.%u", sgRenderInfo.gl_major_vers,
             sgRenderInfo.gl_minor_vers);
-  ooLogInfo("glsl version = %u.%u", sgRenderInfo.glsl_major_vers,
+  log_info("glsl version = %u.%u", sgRenderInfo.glsl_major_vers,
             sgRenderInfo.glsl_minor_vers);
 }
 
@@ -180,7 +180,7 @@ sdl_print_gl_attrs(void)
   for (i = 0; i < nAttr; i++) {
     int value;
     SDL_GL_GetAttribute(attr[i], &value);
-    ooLogInfo(desc[i], value);
+    log_info(desc[i], value);
   }
 }
 

@@ -51,7 +51,7 @@ sgDrawParticles(SGparticles *sp)
 }
 
 SGdrawable* sgNewParticleSystem(const char *name, const char *tex,
-                                PLparticles *ps)
+                                pl_particles_t *ps)
 {
   SGparticles *drawable = smalloc(sizeof(SGparticles));
   drawable->ps = ps;

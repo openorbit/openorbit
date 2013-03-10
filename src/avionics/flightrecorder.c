@@ -37,7 +37,7 @@ ooNewFlightRecorder(sim_spacecraft_t *sc, int maxSamples, int sampleInterval)
 void
 ooFlightRecorderStep(OOflightrecorder *fr, float dt)
 {
-  double currentSimTime = simTimeGetJD();
+  double currentSimTime = sim_time_get_jd();
 
   // Time
   double_array_push(&fr->data, currentSimTime);

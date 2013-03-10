@@ -108,7 +108,7 @@ img_load(image_t * restrict img, const char * restrict fileName)
           break;
         case JPG_GRAY:
           img->kind = IMG_GRAY8;
-          ooLogTrace("set img to gray8\n");
+          log_trace("set img to gray8\n");
           break;
         default:
           assert(0 && "invalid case");

@@ -79,7 +79,7 @@ OOpubsubref fps_count_ref;
 Uint32
 fps_event(Uint32 interval, void *param)
 {
-  ooLogInfo("fps = %d", frames);
+  log_info("fps = %d", frames);
   fps_count = frames;
   frames = 0;
   simNotifyChange(fps_count_ref); // FIXME: NOT ASYNC SAFE
@@ -103,11 +103,11 @@ sdl_main_loop(void)
 {
   publish_variables();
 
-  extern SIMstate gSIM_state;
-  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Read in Hz
+  extern sim_state_t gSIM_state;
+  config_get_float_def("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s
   Uint32 interv = (Uint32) (wc_period * 1000.0); // SDL wants time in ms
-  ooConfGetFloatDef("openorbit/sim/period", &sim_period, wc_period);
+  config_get_float_def("openorbit/sim/period", &sim_period, wc_period);
 
   SDL_Event event;
   const char *evName;
@@ -128,7 +128,7 @@ sdl_main_loop(void)
               ooResizeScreen(0, 0, event.window.data1, event.window.data2, false);
               break;
             default:
-              ooLogTrace("unknown window event %d", (int)event.window.event);
+              log_trace("unknown window event %d", (int)event.window.event);
           }
           break;
         }
@@ -173,7 +173,7 @@ sdl_main_loop(void)
         case SDL_VIDEORESIZE:
         {
           bool fullscreen;
-          ooConfGetBoolDef("openorbit/video/fullscreen", &fullscreen, false);
+          config_get_bool_def("openorbit/video/fullscreen", &fullscreen, false);
           ooResizeScreen(0, 0, event.resize.w, event.resize.h, fullscreen);
         }
           break;
@@ -182,12 +182,12 @@ sdl_main_loop(void)
         case SDL_USEREVENT:
           switch (event.user.code) {
             case SIM_STEP_EVENT: // this event will make a time step
-              ooSimStep(sim_period);
+              sim_step(sim_period);
               break;
             case SIM_DEBUG_EVENT: // display console?
               break;
             case SIM_WCT_TIMER: {
-              OOeventhandler timer_func = event.user.data1;
+              sim_event_handler_fn_t timer_func = event.user.data1;
               void *timer_data = event.user.data2;
               timer_func(timer_data);
               break;
@@ -210,7 +210,7 @@ sdl_main_loop(void)
           done = 1;
           break;
         default:
-          ooLogWarn("did not handle event number %d in main loop", event.type);
+          log_warn("did not handle event number %d in main loop", event.type);
       }
     }
 
@@ -254,7 +254,7 @@ main(int argc, const char *argv[argc])
   module_initialize();
   // Init SDL video subsystem
   if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK) < 0 ) {
-    ooLogFatal("Couldn't initialize SDL: %s", SDL_GetError());
+    log_fatal("Couldn't initialize SDL: %s", SDL_GetError());
   }
 
   assert(SDL_WasInit(SDL_INIT_JOYSTICK) == SDL_INIT_JOYSTICK);
@@ -266,9 +266,9 @@ main(int argc, const char *argv[argc])
   bool fullscreen;
   int width, height;
 
-  ooConfGetBoolDef("openorbit/video/fullscreen", &fullscreen, false);
-  ooConfGetIntDef("openorbit/video/width", &width, 640);
-  ooConfGetIntDef("openorbit/video/height", &height, 480);
+  config_get_bool_def("openorbit/video/fullscreen", &fullscreen, false);
+  config_get_int_def("openorbit/video/width", &width, 640);
+  config_get_int_def("openorbit/video/height", &height, 480);
 
   mainWindow = sdl_window_init(width, height, fullscreen);
   sdl_init_gl();

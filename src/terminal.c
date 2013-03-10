@@ -151,7 +151,7 @@ terminal_add_command(const char *cmd,
   }
 
   if (avl_find(commands, cmd)) {
-    ooLogError("terminal command '%s' already added", cmd);
+    log_error("terminal command '%s' already added", cmd);
     return;
   }
 
@@ -215,7 +215,7 @@ terminal_main(void *arg)
       }
     }
   }
-  ooLogInfo("EOF on console, terminating\n");
+  log_info("EOF on console, terminating\n");
   history_end(hist);
   el_end(el);
   tok_end(tok);

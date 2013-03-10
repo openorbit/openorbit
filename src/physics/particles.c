@@ -42,16 +42,16 @@ random_direction(float ra, float dec, float maxOffsetAngle)
 }
 
 
-PLparticles*
-plNewParticleSystem(const char *name, size_t particleCount)
+pl_particles_t*
+pl_new_particle_system(const char *name, size_t particleCount)
 {
-  PLparticles *ps = smalloc(sizeof(PLparticles));
+  pl_particles_t *ps = smalloc(sizeof(pl_particles_t));
   ps->enabled = false;
   ps->autoDisable = false;
   ps->particleCount = particleCount;
   ps->obj = NULL;
   // Note: calloc initialise all fields to 0
-  ps->particles = calloc(particleCount, sizeof(PLparticle));
+  ps->particles = calloc(particleCount, sizeof(pl_particle_t));
 
   int_array_init(&ps->freeParticles);
   for (int i = 0 ; i < particleCount ; ++ i) {
@@ -62,13 +62,13 @@ plNewParticleSystem(const char *name, size_t particleCount)
 }
 
 void
-plSetEmitterDirection3f(PLparticles *ps, float x, float y, float z)
+pl_particles_set_emitter_direction3f(pl_particles_t *ps, float x, float y, float z)
 {
   ps->v = vf3_set(x, y, z);
 }
 
 void
-plAttachParticleSystem3f(PLparticles *ps, PLobject *obj, float x, float y, float z)
+pl_particles_attach3f(pl_particles_t *ps, PLobject *obj, float x, float y, float z)
 {
   assert(ps != NULL);
   assert(obj != NULL);
@@ -85,7 +85,7 @@ plAttachParticleSystem3f(PLparticles *ps, PLobject *obj, float x, float y, float
 
 
 void
-plDeleteParticleSystem(PLparticles *ps)
+pl_particles_delete(pl_particles_t *ps)
 {
   assert(ps != NULL);
   free(ps->particles);
@@ -93,7 +93,7 @@ plDeleteParticleSystem(PLparticles *ps)
 }
 
 void
-plParticleSystemSetEmissionRate(PLparticles *ps, float er)
+pl_particles_set_emission_rate(pl_particles_t *ps, float er)
 {
   assert(ps != NULL);
   assert(er >= 0.0f);
@@ -101,21 +101,21 @@ plParticleSystemSetEmissionRate(PLparticles *ps, float er)
 }
 
 void
-plEnableParticleSystem(PLparticles *ps)
+pl_particles_enable(pl_particles_t *ps)
 {
   assert(ps != NULL);
   ps->enabled = true;
 }
 
 void
-plTurnOffParticleSystem(PLparticles *ps)
+pl_particles_turn_off(pl_particles_t *ps)
 {
   assert(ps != NULL);
   ps->autoDisable = true;
 }
 
 void
-plDisableParticleSystem(PLparticles *ps)
+pl_particles_disable(pl_particles_t *ps)
 {
   assert(ps != NULL);
   ps->enabled = false;
@@ -127,7 +127,7 @@ float rand_percent(int a)
 }
 
 void
-plStepParticleSystem(PLparticles *ps, float dt)
+pl_particles_step(pl_particles_t *ps, float dt)
 {
   assert(ps != NULL);
   if (ps->enabled == false) return;

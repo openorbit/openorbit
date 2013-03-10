@@ -69,27 +69,27 @@ sgCheckGLError(const char *file, int line)
     // All OK
     break;
   case GL_INVALID_ENUM:
-    ooLogError("GL invalid enum at %s:%d", file, line);
+    log_error("GL invalid enum at %s:%d", file, line);
     break;
   case GL_INVALID_VALUE:
-    ooLogError("GL invalid value at %s:%d", file, line);
+    log_error("GL invalid value at %s:%d", file, line);
     break;
   case GL_INVALID_OPERATION:
-    ooLogError("GL invalid operation at %s:%d", file, line);
+    log_error("GL invalid operation at %s:%d", file, line);
     break;
       //  case GL_STACK_OVERFLOW:
-      //ooLogError("GL stack overflow at %s:%d", file, line);
+      //log_error("GL stack overflow at %s:%d", file, line);
       //break;
       //case GL_STACK_UNDERFLOW:
-      // ooLogError("GL stack underflow at %s:%d", file, line);
+      // log_error("GL stack underflow at %s:%d", file, line);
       //break;
   case GL_OUT_OF_MEMORY:
-    ooLogError("GL out of memory at %s:%d", file, line);
+    log_error("GL out of memory at %s:%d", file, line);
     break;
       //case GL_TABLE_TOO_LARGE:
-      //ooLogError("GL invalid enum at %s:%d", file, line);
+      //log_error("GL invalid enum at %s:%d", file, line);
       //break;
   default:
-    ooLogError("unknown GL error at %s:%d", file, line);
+    log_error("unknown GL error at %s:%d", file, line);
   }
 }

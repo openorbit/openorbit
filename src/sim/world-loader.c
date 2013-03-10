@@ -76,7 +76,7 @@ loadMaterial(sg_material_t *mat, HRMLobject *obj)
 }
 
 void
-ooLoadMoon__(PLsystem *sys, HRMLobject *obj, sg_scene_t *sc)
+ooLoadMoon__(pl_system_t *sys, HRMLobject *obj, sg_scene_t *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -162,7 +162,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, sg_scene_t *sc)
     gm = mass*PL_G;
   }
   // Period will be in years assuming that semiMajor is in au
-  double period = plOrbitalPeriod(semiMajor, sys->orbitalBody->GM * gm) / PL_SEC_PER_DAY;
+  double period = pl_orbital_period(semiMajor, sys->orbitalBody->GM * gm) / PL_SEC_PER_DAY;
 
   //  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
   sg_object_t *drawable = sg_new_sphere(moonName.u.str, sg_get_shader(shader), radius,
@@ -173,7 +173,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, sg_scene_t *sc)
 
   sg_scene_add_object(sc, drawable); // TODO: scale to radius
 
-  PLsystem *moonSys = plNewSubOrbit(sys, sys->scene, moonName.u.str, mass, gm,
+  pl_system_t *moonSys = pl_new_sub_orbit(sys, sys->scene, moonName.u.str, mass, gm,
                                     period, axialTilt, siderealPeriod,
                                     semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc),
                                     inc, longAscNode, longPerihel, meanLong, radius, flattening);
@@ -189,7 +189,7 @@ ooLoadMoon__(PLsystem *sys, HRMLobject *obj, sg_scene_t *sc)
   //plSetDrawable(moonSys->orbitalBody, drawable);
 }
 
-PLatmosphereTemplate*
+pl_atm_template_t*
 load_atm(HRMLobject *obj)
 {
   double scale_height = NAN, pressure = NAN;
@@ -224,14 +224,14 @@ load_atm(HRMLobject *obj)
   }
 
   if (!(T_b && L_b && p_b && P_b && h_b)) {
-    ooLogError("missing one or more atmospheric parameter array "
+    log_error("missing one or more atmospheric parameter array "
                "(T_b, L_b, p_b, P_b or h_b)");
     return NULL;
   }
 
   if (!(T_b_len == L_b_len) && (L_b_len == p_b_len) && (p_b_len == P_b_len)
       && (P_b_len == h_b_len)) {
-    ooLogError("atmospheric parameter arrays must be of equal length"
+    log_error("atmospheric parameter arrays must be of equal length"
                "(%d %d %d %d %d)",
                (int)T_b_len, (int)L_b_len, (int)p_b_len, (int)P_b_len,
                (int)h_b_len);
@@ -239,28 +239,28 @@ load_atm(HRMLobject *obj)
   }
 
   if (!isfinite(g0)) {
-    ooLogError("atmospheric parameter g0 not set / finite");
+    log_error("atmospheric parameter g0 not set / finite");
     return NULL;
   }
   if (!isfinite(M)) {
-    ooLogError("atmospheric parameter molar-mass not set / finite");
+    log_error("atmospheric parameter molar-mass not set / finite");
     return NULL;
   }
 
-  PLatmosphereTemplate *atm = plAtmosphered(h_b_len, g0, M, p_b, P_b, T_b, h_b,
+  pl_atm_template_t *atm = pl_new_atmosphere_template(h_b_len, g0, M, p_b, P_b, T_b, h_b,
                                             L_b);
   return atm;
 }
 
 void
-ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
+ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
 
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
-  PLatmosphereTemplate *atm = NULL;
+  pl_atm_template_t *atm = NULL;
   double mass, radius, siderealPeriod, axialTilt = 0.0, gm = NAN;
   double semiMajor = NAN, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
   //double pressure = 0.0, scale_height = 1.0; //TODO
@@ -343,7 +343,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
   }
 
   // NOTE: At present, all planets must be specified with AUs as parameters
-  double period = plOrbitalPeriod(plAuToMetres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
+  double period = pl_orbital_period(pl_au_to_metres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
 
   sg_object_t *drawable = sg_new_sphere(planetName.u.str,
                                         sg_get_shader(shader), radius,
@@ -353,22 +353,22 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
                                         mat);
 
   sg_scene_add_object(sc, drawable); // TODO: scale to radius
-  PLsystem *sys = plNewOrbit(world, sc, planetName.u.str,
+  pl_system_t *sys = pl_new_orbit(world, sc, planetName.u.str,
                              mass, gm,
                              period, axialTilt, siderealPeriod,
-                             plAuToMetres(semiMajor),
-                             plAuToMetres(ooGeoComputeSemiMinor(semiMajor, ecc)),
+                             pl_au_to_metres(semiMajor),
+                             pl_au_to_metres(ooGeoComputeSemiMinor(semiMajor, ecc)),
                              inc, longAscNode, longPerihel, meanLong, radius, flattening);
 
   sg_object_t *ellipse = sg_new_ellipse(planetName.u.str, sg_get_shader("flat"),
-                                        plAuToMetres(semiMajor), ecc,
+                                        pl_au_to_metres(semiMajor), ecc,
                                         DEG_TO_RAD(inc), DEG_TO_RAD(longAscNode),
                                         DEG_TO_RAD(longPerihel), 500);
 
   sg_scene_add_object(sc, ellipse);
 
   sys->orbitalBody->atm = NULL; // Init as vaccuum
-  if (atm) sys->orbitalBody->atm = plAtmosphere(1000.0, 100000.0, atm);
+  if (atm) sys->orbitalBody->atm = pl_new_atmosphere(1000.0, 100000.0, atm);
 
   sg_object_set_rigid_body(drawable, &sys->orbitalBody->obj);
 
@@ -382,7 +382,7 @@ ooLoadPlanet__(PLworld *world, HRMLobject *obj, sg_scene_t *sc)
 }
 
 
-PLworld*
+pl_world_t*
 ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
 {
   assert(obj);
@@ -453,7 +453,7 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
   sg_light_t *starLightSource = sg_new_light3f(sc, 0.0f, 0.0f, 0.0f);
   sg_object_add_light(drawable, starLightSource);
 
-  PLworld *world = plNewWorld(starName.u.str, sc, mass, gm, radius,
+  pl_world_t *world = pl_new_world(starName.u.str, sc, mass, gm, radius,
                               siderealPeriod, axialTilt, radius, flattening);
 
   world->rootSys->orbitalBody->atm = NULL; // Init as vaccuum
@@ -473,10 +473,10 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
 
   return world;
 }
-PLworld*
-ooOrbitLoad(sg_scene_t *sc, const char *fileName)
+pl_world_t*
+sim_load_world(sg_scene_t *sc, const char *fileName)
 {
-  char *file = ooResGetPath(fileName);
+  char *file = rsrc_get_path(fileName);
   HRMLdocument *solarSys = hrmlParse(file);
   free(file);
   //HRMLschema *schema = hrmlLoadSchema(ooResGetFile("solarsystem.hrmlschema"));
@@ -486,7 +486,7 @@ ooOrbitLoad(sg_scene_t *sc, const char *fileName)
     return NULL;
   }
 
-  PLworld *world = NULL;
+  pl_world_t *world = NULL;
   // Go through the document and handle each entry in the document
 
   for (HRMLobject *node = hrmlGetRoot(solarSys); node != NULL; node = node->next) {
@@ -501,7 +501,7 @@ ooOrbitLoad(sg_scene_t *sc, const char *fileName)
 
   hrmlFreeDocument(solarSys);
 
-  plSysInit(world->rootSys);
-  ooLogInfo("loaded solar system");
+  pl_sys_init(world->rootSys);
+  log_info("loaded solar system");
   return world;
 }

@@ -39,7 +39,7 @@ static FT_Library library;
 
 MODULE_INIT(text, NULL)
 {
-  ooLogTrace("initialising 'text' module");
+  log_trace("initialising 'text' module");
 
   int error = FT_Init_FreeType( &library );
   if ( error ) {
@@ -52,7 +52,7 @@ SGfont*
 sgLoadFont(const char *fontName, int sz)
 {
   FT_Face face;
-  char *fontFile = ooResGetPath(fontName);
+  char *fontFile = rsrc_get_path(fontName);
 
   int error = FT_New_Face(library, fontFile, 0, &face);
   if (error == FT_Err_Unknown_File_Format) {

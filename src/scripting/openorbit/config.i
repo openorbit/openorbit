@@ -10,14 +10,14 @@
 */
 
 
-%rename(GetBool) ooConfGetBoolDef;
-int ooConfGetBoolDef(const char *key, bool *val, bool defVal);
+%rename(GetBool) config_get_bool_def;
+int config_get_bool_def(const char *key, bool *val, bool defVal);
 
-%rename(GetInt) ooConfGetIntDef;
-int ooConfGetIntDef(const char *key, int *val, int defVal);
+%rename(GetInt) config_get_int_def;
+int config_get_int_def(const char *key, int *val, int defVal);
 
-%rename(GetFloat) ooConfGetFloatDef;
-int ooConfGetFloatDef(const char *key, float *val, float defVal);
+%rename(GetFloat) config_get_float_def;
+int config_get_float_def(const char *key, float *val, float defVal);
 
-%rename(GetStr) ooConfGetStrDef;
-int ooConfGetStrDef(const char *key, const char **val, const char *defVal);
+%rename(GetStr) config_get_str_def;
+int config_get_str_def(const char *key, const char **val, const char *defVal);

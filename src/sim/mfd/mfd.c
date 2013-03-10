@@ -44,7 +44,7 @@ static SIMmfd mfd0, mfd1, mfd2, mfd3;
 static SIMhud hud;
 
 MODULE_INIT(mfd, NULL) {
-  ooLogTrace("initialising 'mfd' module");
+  log_trace("initialising 'mfd' module");
   obj_array_init(&mfd_pages);
 }
 
@@ -84,7 +84,7 @@ static SIMmfdpage sampleMfdPage = {"sample-mfd", samplemfddraw};
 
 
 MODULE_INIT(samplemfd, "mfd", NULL) {
-  ooLogTrace("initialising 'samplemfd' module");
+  log_trace("initialising 'samplemfd' module");
   simMfdPageRegister(&sampleMfdPage);
 }
 
@@ -169,11 +169,11 @@ test_hud_draw(sg_overlay_t *overlay, void *obj)
   SIMhud *hud = (SIMhud*)obj;
 
   // TODO
-  sim_spacecraft_t *sc = simGetSpacecraft();
+  sim_spacecraft_t *sc = sim_get_spacecraft();
   //float3 gv = simGetGravityVector(sc);
 
   //quaternion_t q = simGetQuaternion(sc);
-  const float3x3 *R = simGetRotMat(sc);
+  const float3x3 *R = sim_spacecraft_get_rotmat(sc);
   float3x3 R_inv;
   mf3_transpose2(R_inv, *R); // Invert rotation matrix, we need this to
                              // transform the vectors into view relative values
@@ -328,18 +328,18 @@ simMfdInitAll(sg_viewport_t *vp)
 }
 
 MODULE_INIT(mfdio, "mfd", "iomanager", NULL) {
-  ooLogTrace("initialising 'mfdio' module");
+  log_trace("initialising 'mfdio' module");
 
-  ioRegActionHandler("mfd0-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd0);
-  ioRegActionHandler("mfd0-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd0);
-  ioRegActionHandler("mfd0-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd0);
-  ioRegActionHandler("mfd1-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd1);
-  ioRegActionHandler("mfd1-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd1);
-  ioRegActionHandler("mfd1-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd1);
-  ioRegActionHandler("mfd2-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd2);
-  ioRegActionHandler("mfd2-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd2);
-  ioRegActionHandler("mfd2-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd2);
-  ioRegActionHandler("mfd3-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd3);
-  ioRegActionHandler("mfd3-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd3);
-  ioRegActionHandler("mfd3-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd3);
+  io_reg_action_handler("mfd0-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd0);
+  io_reg_action_handler("mfd0-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd0);
+  io_reg_action_handler("mfd0-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd0);
+  io_reg_action_handler("mfd1-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd1);
+  io_reg_action_handler("mfd1-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd1);
+  io_reg_action_handler("mfd1-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd1);
+  io_reg_action_handler("mfd2-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd2);
+  io_reg_action_handler("mfd2-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd2);
+  io_reg_action_handler("mfd2-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd2);
+  io_reg_action_handler("mfd3-cycle-next", mfdCycleNext, IO_BUTTON_PUSH, &mfd3);
+  io_reg_action_handler("mfd3-cycle-prev", mfdCyclePrev, IO_BUTTON_PUSH, &mfd3);
+  io_reg_action_handler("mfd3-toggle", mfdToggle, IO_BUTTON_PUSH, &mfd3);
 }

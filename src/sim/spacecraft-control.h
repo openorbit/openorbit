@@ -20,6 +20,6 @@
 #ifndef SIM_SPACECRAFT_CONTROL_H
 #define SIM_SPACECRAFT_CONTROL_H
 
-void simScCtrlInit(void);
+void sim_spacecraft_control_init(void);
 
 #endif /* !SIM_SPACECRAFT_CONTROL_H */

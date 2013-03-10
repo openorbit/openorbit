@@ -27,23 +27,23 @@
 #include <openorbit/log.h>
 
 static FILE *sLogFile;
-static OOloglev sLogLev = OOLog_Info;
+static log_level_t sLogLev = LOG_INFO;
 static char* sLogNames[] = {"trace", "info", "warning", "error", "fatal", "abort"};
 
-OOloglev ooLogGetLevFromStr(const char *str)
+log_level_t log_get_lev_from_str(const char *str)
 {
   for (int i = 0 ; i < sizeof(sLogNames)/sizeof(char*) ; ++ i) {
     if (!strcmp(sLogNames[i], str)) {
-      return (OOloglev)i;
+      return (log_level_t)i;
     }
   }
 
-  ooLogError("loglev from string \"%s\" not recognised", str);
-  return OOLog_Info;
+  log_error("loglev from string \"%s\" not recognised", str);
+  return LOG_INFO;
 }
 
 static void
-ooLogWriteV(OOloglev lev, const char *msg, va_list vaList)
+log_write_v(log_level_t lev, const char *msg, va_list vaList)
 {
   if (!sLogFile) sLogFile = stderr;
   if (lev >= sLogLev) {
@@ -54,91 +54,91 @@ ooLogWriteV(OOloglev lev, const char *msg, va_list vaList)
 }
 
 void
-ooLogSetLevel(OOloglev lev)
+log_set_level(log_level_t lev)
 {
   sLogLev = lev;
 }
 
 
 void
-ooLogTrace(const char *msg, ...)
+log_trace(const char *msg, ...)
 {
   va_list vaList;
   va_start(vaList, msg);
-  ooLogWriteV(OOLog_Trace, msg, vaList);
+  log_write_v(LOG_TRACE, msg, vaList);
   va_end(vaList);
 }
 
 
 void
-ooLogInfo(const char *msg, ...)
+log_info(const char *msg, ...)
 {
   va_list vaList;
   va_start(vaList, msg);
-  ooLogWriteV(OOLog_Info, msg, vaList);
+  log_write_v(LOG_INFO, msg, vaList);
   va_end(vaList);
 }
 
 
 void
-ooLogWarn(const char *msg, ...)
+log_warn(const char *msg, ...)
 {
   va_list vaList;
   va_start(vaList, msg);
-  ooLogWriteV(OOLog_Warn, msg, vaList);
+  log_write_v(LOG_WARN, msg, vaList);
   va_end(vaList);
 }
 
 
 void
-ooLogError(const char *msg, ...)
+log_error(const char *msg, ...)
 {
   va_list vaList;
   va_start(vaList, msg);
-  ooLogWriteV(OOLog_Error, msg, vaList);
+  log_write_v(LOG_ERROR, msg, vaList);
   va_end(vaList);
 }
 
 void
-ooLogFatalIfNull(const void *ptr, const char *msg, ...)
+log_fatal_if_null(const void *ptr, const char *msg, ...)
 {
   if (ptr == NULL) {
     va_list vaList;
     va_start(vaList, msg);
-    ooLogWriteV(OOLog_Fatal, msg, vaList);
+    log_write_v(LOG_FATAL, msg, vaList);
     va_end(vaList);
     exit(EX_SOFTWARE);
   }
 }
 
 void
-ooLogFatal(const char *msg, ...)
+log_fatal(const char *msg, ...)
 {
   va_list vaList;
   va_start(vaList, msg);
-  ooLogWriteV(OOLog_Fatal, msg, vaList);
+  log_write_v(LOG_FATAL, msg, vaList);
   va_end(vaList);
   exit(EX_SOFTWARE);
 }
 
 void
-ooLogAbort(const char *msg, ...)
+log_abort(const char *msg, ...)
 {
   va_list vaList;
   va_start(vaList, msg);
-  ooLogWriteV(OOLog_Fatal, msg, vaList);
+  log_write_v(LOG_FATAL, msg, vaList);
   va_end(vaList);
   abort();
 }
 
 
 void
-ooLogMsg(OOloglev lev, const char *msg, ...)
+log_msg(log_level_t lev, const char *msg, ...)
 {
   va_list vaList;
   va_start(vaList, msg);
-  ooLogWriteV(lev, msg, vaList);
+  log_write_v(lev, msg, vaList);
   va_end(vaList);
-  if (lev == OOLog_Fatal) exit(EX_SOFTWARE);
-  if (lev == OOLog_Abort) abort();
+  if (lev == LOG_FATAL) exit(EX_SOFTWARE);
+  if (lev == LOG_ABORT) abort();
 }
