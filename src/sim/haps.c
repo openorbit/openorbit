@@ -22,10 +22,10 @@
 
 #define MAX_HAP_HANDLERS 4
 
-static SIMhaphandler haps[HAP_COUNT][MAX_HAP_HANDLERS];
+static sim_haphandler_t haps[HAP_COUNT][MAX_HAP_HANDLERS];
 
 void
-simRegisterHapHandler(enum SIMhapID hap, SIMhaphandler handler)
+sim_hap_register_handler(enum SIMhapID hap, sim_haphandler_t handler)
 {
   for (int i = 0 ; i < MAX_HAP_HANDLERS ; i ++) {
     if (haps[hap][i] == NULL) {
@@ -36,7 +36,7 @@ simRegisterHapHandler(enum SIMhapID hap, SIMhaphandler handler)
 }
 
 void
-simHapOccured(enum SIMhapID hap, void *arg0, void *arg1)
+sim_hap_occured(enum SIMhapID hap, void *arg0, void *arg1)
 {
   for (int i = 0 ; i < MAX_HAP_HANDLERS ; i ++) {
     if (haps[hap][i]) haps[hap][i](arg0, arg1);

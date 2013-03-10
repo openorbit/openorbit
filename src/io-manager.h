@@ -32,32 +32,32 @@ extern "C" {
 #include <Python.h>
 #endif
 
-  typedef enum IOkeymod {
-    OO_None = 0,
+  typedef enum io_keymod_t {
+    IO_MOD_NONE = 0,
 
-    OO_L_Shift,
-    OO_L_Ctrl,
-    OO_L_Cmd,
-    OO_L_Alt,
+    IO_MOD_L_SHIFT,
+    IO_MOD_L_CTRL,
+    IO_MOD_L_CMD,
+    IO_MOD_L_ALT,
 
-    OO_R_Shift,
-    OO_R_Ctrl,
-    OO_R_Cmd,
-    OO_R_Alt,
+    IO_MOD_R_SHIFT,
+    IO_MOD_R_CTRL,
+    IO_MOD_R_CMD,
+    IO_MOD_R_ALT,
 
-    OO_Key_Mod_Count
-  } IOkeymod;
+    IO_MOD_KEY_COUNT
+  } io_keymod_t;
 
 
 #define OO_IO_MOD_NONE   (0)
-#define OO_IO_MOD_LSHIFT (1 << OO_L_Shift)
-#define OO_IO_MOD_RSHIFT (1 << OO_R_Shift)
-#define OO_IO_MOD_LCTRL  (1 << OO_L_Ctrl)
-#define OO_IO_MOD_RCTRL  (1 << OO_R_Ctrl)
-#define OO_IO_MOD_LALT   (1 << OO_L_Alt)
-#define OO_IO_MOD_RALT   (1 << OO_R_Alt)
-#define OO_IO_MOD_LMETA  (1 << OO_L_Cmd)
-#define OO_IO_MOD_RMETA  (1 << OO_R_Cmd)
+#define OO_IO_MOD_LSHIFT (1 << IO_MOD_L_SHIFT)
+#define OO_IO_MOD_RSHIFT (1 << IO_MOD_R_SHIFT)
+#define OO_IO_MOD_LCTRL  (1 << IO_MOD_L_CTRL)
+#define OO_IO_MOD_RCTRL  (1 << IO_MOD_R_CTRL)
+#define OO_IO_MOD_LALT   (1 << IO_MOD_L_ALT)
+#define OO_IO_MOD_RALT   (1 << IO_MOD_R_ALT)
+#define OO_IO_MOD_LMETA  (1 << IO_MOD_L_CMD)
+#define OO_IO_MOD_RMETA  (1 << IO_MOD_R_CMD)
 
 typedef enum io_keycode_t
 {
@@ -221,58 +221,57 @@ typedef enum {
   IO_BUTTON_HAT, // Like multi, except values are degrees from north, -1 is depressed
 } io_button_kind_t;
 
-void ioSetKeyHandler(io_keycode_t key, const char *action, void *data);
+void io_set_key_handler(io_keycode_t key, const char *action, void *data);
 
-void ioInit(void);
-void ioInitKeys(void);
-void ioInitJoysticks(void);
+void io_init(void);
+void io_init_keys(void);
+void io_init_joysticks(void);
 
-void ioDispatchKeyUp(io_keycode_t key, uint16_t mask);
-void ioDispatchKeyDown(io_keycode_t key, uint16_t mask);
-void ioBindKeyToAxis(const char *key, const char *button, float val);
-void ioDispatchButtonDown(int dev, int button);
-void ioDispatchButtonUp(int dev, int button);
+void io_dispatch_key_up(io_keycode_t key, uint16_t mask);
+void io_dispatch_key_down(io_keycode_t key, uint16_t mask);
+  //void ioDispatchButtonDown(int dev, int button);
+  //void ioDispatchButtonUp(int dev, int button);
 
-void ioSetAxisEmu(io_axis_t axis, io_keycode_t plus, io_keycode_t minus);
+void io_set_axis_emu(io_axis_t axis, io_keycode_t plus, io_keycode_t minus);
 
-void ioPhysicalAxisChanged(int dev_id, io_axis_t axis, float val);
-void ioAxisChanged(io_axis_t axis, float val);
-float ioGetAxis(io_axis_t axis);
+void io_physical_axis_changed(int dev_id, io_axis_t axis, float val);
+void io_axis_changed(io_axis_t axis, float val);
+float io_get_axis(io_axis_t axis);
 
-void ioPhysicalSliderChanged(int dev_id, io_slider_t slider, float val);
-void ioSliderChanged(io_slider_t slider, float val);
-float ioGetSlider(io_slider_t slider);
+void io_physical_slider_changed(int dev_id, io_slider_t slider, float val);
+void io_slider_changed(io_slider_t slider, float val);
+float io_get_slider(io_slider_t slider);
 
-int ioRegisterDevice(int vendorID, const char *vendorName,
+int io_register_device(int vendorID, const char *vendorName,
                      int productID, const char *productName,
                      int buttonCount, int hatCount);
-void ioRemoveDevice(int deviceID);
+void io_remove_device(int deviceID);
 
-void ioBindDeviceSlider(int deviceID, io_slider_t phys_slider,
+void io_bind_device_slider(int deviceID, io_slider_t phys_slider,
                         io_slider_t virt_slider);
 
-void ioBindDeviceAxis(int deviceID, io_axis_t phys_axis, io_axis_t virt_axis);
-void ioBindDeviceButton(int deviceID, int button, const char *key);
-void ioBindDeviceHat(int deviceID, int button, const char *key);
+void io_bind_device_axis(int deviceID, io_axis_t phys_axis, io_axis_t virt_axis);
+void io_bind_device_button(int deviceID, int button, const char *key);
+void io_bind_device_hat(int deviceID, int button, const char *key);
 
-void ioDeviceButtonDown(int deviceID, int button);
-void ioDeviceButtonUp(int deviceID, int button);
+void io_device_button_down(int deviceID, int button);
+void io_device_button_up(int deviceID, int button);
 
 // State will be 0..n
 // Dir will be direction in degrees from up, if the hat is cleared
 // dir will be -1
-void ioDeviceHatSet(int deviceID, int hat_id, int state, int dir);
+void io_device_hat_set(int deviceID, int hat_id, int state, int dir);
 
-int ioGetNamedDevice(int pos, const char *vendorName, const char *productName);
+int io_get_named_device(int pos, const char *vendorName, const char *productName);
 
 // For buttons, 0 means depressed, 1 is down, further values can be
 // issued by for example hat switches
 typedef void (*IObuttonhandlerfunc)(int buttonVal, void *data);
 
-void ioRegActionHandler(const char *name, IObuttonhandlerfunc handlerFunc, io_button_kind_t kind, void *data);
+void io_reg_action_handler(const char *name, IObuttonhandlerfunc handlerFunc, io_button_kind_t kind, void *data);
 
 /*! Register key handler Python function */
-void ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc);
+void io_reg_py_key_handler(const char *name, PyObject *handlerFunc);
 
 /*! Bind keyboard with keyName to the keyAction key
 
@@ -282,7 +281,7 @@ void ooIoRegPyKeyHandler(const char *name, PyObject *handlerFunc);
         fire on button up.
     \param mask ored mask from the OO_IO_MOD* constants
 */
-void ooIoBindKeyHandler(const char *keyName, const char *keyAction, int up,
+void io_bind_key_handler(const char *keyName, const char *keyAction, int up,
                         uint16_t mask);
 
 #ifdef __cplusplus

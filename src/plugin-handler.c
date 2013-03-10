@@ -47,14 +47,14 @@ static hashtable_t *gPLUGIN_dict = NULL;
 OOplugincontext_v1 ctxt = { NULL };
 
 void
-ooPluginInit(void)
+plugin_init(void)
 {
     if (! (gPLUGIN_interface_dict = hashtable_new_with_str_keys(512)) ) {
-      ooLogFatal("plugin: interface dictionary not created");
+      log_fatal("plugin: interface dictionary not created");
     }
     if (! (gPLUGIN_dict = hashtable_new_with_str_keys(512)) ) {
         hashtable_delete(gPLUGIN_interface_dict);
-        ooLogFatal("plugin: plugin dictionary not created");
+        log_fatal("plugin: plugin dictionary not created");
     }
 
     ctxt.objectManager = omCtxtNew();
@@ -62,13 +62,13 @@ ooPluginInit(void)
 
 /* read in all dynlibs in the plug-in directories */
 void
-ooPluginLoadAll(void)
+plugin_load_all(void)
 {
-  glob_t glob = ooResGetFilePaths("plugins/*.so");
+  glob_t glob = rsrc_get_file_paths("plugins/*.so");
 
-  ooLogInfo("%u plugins found with extension " SO_EXT, glob.gl_pathc);
+  log_info("%u plugins found with extension " SO_EXT, glob.gl_pathc);
   for (int i = 0 ; i < glob.gl_pathc ; i ++) {
-    ooPluginLoad(glob.gl_pathv[i]);
+    plugin_load(glob.gl_pathv[i]);
   }
 
   globfree(&glob);
@@ -81,7 +81,7 @@ ooPluginLoadSO(char *filename)
     void *plugin_handle = dlopen(filename, RTLD_NOW|RTLD_LOCAL);
 
     if (! plugin_handle) {
-      ooLogError("plugin load failed: %s", dlerror());
+      log_error("plugin load failed: %s", dlerror());
       return NULL;
     }
 
@@ -90,7 +90,7 @@ ooPluginLoadSO(char *filename)
     init_f init_func = dlsym(plugin_handle, PLUGIN_INIT_SYMBOL);
 
     if (! init_func) {
-        ooLogError("plugin %s does not supply " PLUGIN_INIT_SYMBOL "()",
+        log_error("plugin %s does not supply " PLUGIN_INIT_SYMBOL "()",
                    filename);
         dlclose(plugin_handle);
         return NULL;
@@ -101,11 +101,11 @@ ooPluginLoadSO(char *filename)
       plugin->dynlib_handle = plugin_handle; // this is a runtime param not set by the plugin itself
       /* insert plugin in our plugin registry */
       hashtable_insert(gPLUGIN_dict, plugin->key, plugin);
-      ooLogInfo("plugin %s loaded", plugin->key);
+      log_info("plugin %s loaded", plugin->key);
       return plugin->key;
     } else {
-      if (!vers) ooLogError("plugin %s does not specify oopluginversion", filename);
-      else ooLogError("plugin %s incompatible (plugin v = %d, supported = %d)",
+      if (!vers) log_error("plugin %s does not specify oopluginversion", filename);
+      else log_error("plugin %s incompatible (plugin v = %d, supported = %d)",
                       filename, *vers, OO_Plugin_Ver_1_00);
     }
 
@@ -114,7 +114,7 @@ ooPluginLoadSO(char *filename)
 
 // Check what kind of plugin is available in the search path and load it
 char*
-ooPluginLoad(char *filename)
+plugin_load(char *filename)
 {
     if (! filename) return NULL;
 
@@ -145,13 +145,13 @@ unload_plugin(char *key)
 
     OOpluginversion *vers = dlsym(plugin->dynlib_handle, "oopluginversion");
 
-    if (! vers) ooLogFatal("pluginversion not found when unloading");
+    if (! vers) log_fatal("pluginversion not found when unloading");
     switch (*vers) {
     case OO_Plugin_Ver_1_00:
       {
         void (*finalise_func)(void*) = dlsym(plugin->dynlib_handle,
                                              PLUGIN_FINALISE_SYMBOL);
-        if (finalise_func == NULL) ooLogFatal("no finalisation function in plugin");
+        if (finalise_func == NULL) log_fatal("no finalisation function in plugin");
         finalise_func(NULL);// TODO: Pass in proper context
       }
     default:
@@ -164,19 +164,19 @@ unload_plugin(char *key)
 
 
 void
-register_plugin_interface(char *interface_key, void *interface)
+plugin_register_interface(char *interface_key, void *interface)
 {
     hashtable_insert(gPLUGIN_interface_dict, interface_key, interface);
 }
 
 void
-remove_plugin_interface(char *interface_key)
+plugin_remove_interface(char *interface_key)
 {
     hashtable_remove(gPLUGIN_interface_dict, interface_key);
 }
 
 void
-ooPluginPrintAll()
+plugin_print_all()
 {
   // Prints info on all loaded plugins
   list_entry_t *entry = hashtable_first(gPLUGIN_dict);

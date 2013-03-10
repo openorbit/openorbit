@@ -57,7 +57,7 @@ ooVecArrayPushV(OOvecarray *vec, float3 obj)
     if (vec->length >= vec->asize) {
         float3 *newVec = realloc(vec->elems,
                                  vec->asize * sizeof(float3) * 2);
-        if (newVec == NULL) ooLogFatal("realloc of vector failed");
+        if (newVec == NULL) log_fatal("realloc of vector failed");
         vec->asize *= 2;
         vec->elems = newVec;
     }
@@ -71,7 +71,7 @@ ooVecArrayPushC(OOvecarray *vec, float x, float y, float z, float w)
   if (vec->length >= vec->asize) {
     float3 *newVec = realloc(vec->elems,
                              vec->asize * sizeof(float3) * 2);
-    if (newVec == NULL) ooLogFatal("realloc of vector failed");
+    if (newVec == NULL) log_fatal("realloc of vector failed");
     vec->asize *= 2;
     vec->elems = newVec;
   }
@@ -90,7 +90,7 @@ float3
 ooVecArrayGet(OOvecarray *vec, size_t i)
 {
   if (vec->length <= i)
-    ooLogFatal("vector out of bounds length = %d idx = %d", vec->length, i);
+    log_fatal("vector out of bounds length = %d idx = %d", vec->length, i);
   else
     return vec->elems[i];
 }
@@ -99,7 +99,7 @@ void
 ooVecArraySet(OOvecarray *vec, size_t i, float3 obj)
 {
   if (vec->length <= i)
-    ooLogFatal("vector out of bounds length = %d idx = %d", vec->length, i);
+    log_fatal("vector out of bounds length = %d idx = %d", vec->length, i);
   else
     vec->elems[i] = obj;
 }
@@ -143,7 +143,7 @@ OOellipse* ooGeoEllipseAreaSeg(size_t segs, float semiMajor, float semiMinor)
     } while (tol > 0.00001 && count < ITERSTOP);
 
     if (count >= ITERSTOP) {
-      ooLogWarn("ellipse segment did not converge in %d iterations", ITERSTOP);
+      log_warn("ellipse segment did not converge in %d iterations", ITERSTOP);
     }
     //segArea = segmentArea(prevAngle, newAngle, semimajor, ecc);
 

@@ -22,7 +22,7 @@
 
 #include <vmath/vmath.h>
 
-struct PLmass {
+struct pl_mass_t {
   float m; //!< Mass in kg
   float minMass; //!< Minimum mass
   float3x3 I; //!< Moment of inertia
@@ -30,21 +30,21 @@ struct PLmass {
   float3 cog; //!< Center of gravity
 };
 
-typedef struct PLmass PLmass;
+typedef struct pl_mass_t pl_mass_t;
 
-void plMassSet(PLmass *mo, float m,
+void pl_mass_set(pl_mass_t *mo, float m,
                float cox, float coy, float coz,
                float ixx, float iyy, float izz,
                float ixy, float ixz, float iyz);
-void plMassTranslate(PLmass *m, float dx, float dy, float dz);
+void pl_mass_translate(pl_mass_t *m, float dx, float dy, float dz);
 
 /*! Adds mass mb to ma
  */
-void plMassAdd(PLmass * restrict ma, const PLmass * restrict mb);
+void pl_mass_add(pl_mass_t * restrict ma, const pl_mass_t * restrict mb);
 /*! Modify mass object by setting a new mass, do not do this manually as the
     function will take care of updating the inertia tensor as well as the mass. 
  */
-void plMassMod(PLmass *m, float newMass);
+void pl_mass_mod(pl_mass_t *m, float newMass);
 
 /*! Reduce mass with delta mass
 
@@ -55,28 +55,28 @@ void plMassMod(PLmass *m, float newMass);
  \param deltaMass the mass in kg to subtract
  \result The amount of mass removed (may be less than the delta)
  */
-float plMassRed(PLmass *m, float deltaMass);
+float pl_mass_red(pl_mass_t *m, float deltaMass);
 
 /*!
   Set the minimum mass
  */
-void plMassSetMin(PLmass *m, float minMass);
+void pl_mass_set_min(pl_mass_t *m, float minMass);
 
 
 /*! Rotate mass m by rotation matrix rm
  */
-void plMassRotateM(PLmass *m, const float3x3 rm);
+void pl_mass_rotate_m(pl_mass_t *m, const float3x3 rm);
 
 /*! Rotate mass m by quaternion q
  */
-void plMassRotateQ(PLmass *m, quaternion_t q);
+void pl_mass_rotate_q(pl_mass_t *m, quaternion_t q);
 
 
-void plMassHollowCylinder(PLmass *mo, float m, float r);
-void plMassSolidCylinder(PLmass *mo, float m, float r, float h);
-void plMassWalledCylinder(PLmass *mo, float m, float out_r, float in_r, float h);
-void plMassSolidSphere(PLmass *mo, float m, float r);
-void plMassHollowSphere(PLmass *mo, float m, float r);
-void plMassSolidCone(PLmass *mo, float m, float r, float h);
+void pl_mass_hollow_cylinder(pl_mass_t *mo, float m, float r);
+void pl_mass_solid_cylinder(pl_mass_t *mo, float m, float r, float h);
+void pl_mass_walled_cylinder(pl_mass_t *mo, float m, float out_r, float in_r, float h);
+void pl_mass_solid_sphere(pl_mass_t *mo, float m, float r);
+void pl_mass_hollow_sphere(pl_mass_t *mo, float m, float r);
+void pl_mass_solid_cone(pl_mass_t *mo, float m, float r, float h);
 
 #endif /* ! PL_MASS_H_ */

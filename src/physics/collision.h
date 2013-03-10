@@ -28,31 +28,31 @@
 #include "common/palloc.h"
 
 
-struct PLrecgrid {
-  struct PLrecgrid *parent;
+struct pl_recgrid_t {
+  struct pl_recgrid_t *parent;
   lwcoord_t centre;
   double size;
   obj_array_t objs;
-  struct PLrecgrid *children[8];
+  struct pl_recgrid_t *children[8];
 };
 
-struct PLcollisioncontext {
+struct pl_collisioncontext_t {
   pool_t *pool;
-  PLrecgrid *otree;
+  pl_recgrid_t *otree;
   obj_array_t colls;
 };
 
-PLcollisioncontext *plNewCollisionContext(void);
+pl_collisioncontext_t *pl_new_collision_context(void);
 
-bool plCollideCoarse(PLcollisioncontext *coll,
+bool pl_collide_coarse(pl_collisioncontext_t *coll,
                      PLobject * restrict obj_a, PLobject * restrict obj_b);
 
-bool plCollideFine(PLcollisioncontext *coll,
+bool pl_collide_fine(pl_collisioncontext_t *coll,
                    PLobject * restrict obj_a, PLobject * restrict obj_b);
 
-void plCollideInsertObject(PLcollisioncontext *coll, PLobject *obj);
+void pl_collide_insert_object(pl_collisioncontext_t *coll, PLobject *obj);
 
-void plCollideStep(PLcollisioncontext *coll);
+void pl_collide_step(pl_collisioncontext_t *coll);
 
 
 #endif /* !PHYSICS__COLLISION_H */

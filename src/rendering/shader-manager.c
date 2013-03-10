@@ -125,7 +125,7 @@ static hashtable_t *shaderKeyMap = NULL;
 
 MODULE_INIT(shadermanager, NULL)
 {
-  ooLogTrace("initialising 'shadermanager' module");
+  log_trace("initialising 'shadermanager' module");
   shaderKeyMap = hashtable_new_with_str_keys(64);
 }
 
@@ -139,14 +139,14 @@ sgShaderPreprocess(mapped_file_t mf)
 
   for (int i = 0 ; i < mf.fileLenght ; i ++) {
     if (((char*)mf.data)[i] == '#') {
-      ooLogTrace("found preprocessor directive");
+      log_trace("found preprocessor directive");
       int j = i + 1;
       // Skip ws after '#'
       while (j < mf.fileLenght && (((char*)mf.data)[j] == ' ' || ((char*)mf.data)[j] == '\t')) {
         j ++;
       }
       if (strncmp(&(((char*)mf.data)[j]), "include", MIN(sizeof("include")-1, mf.fileLenght-j)) == 0) {
-        ooLogTrace("found include directive");
+        log_trace("found include directive");
 
         j += sizeof("include") - 1;
 
@@ -162,7 +162,7 @@ sgShaderPreprocess(mapped_file_t mf)
             j ++;
           }
           if (((char*)mf.data)[j] != '"') {
-            ooLogError("syntax error for include directive\n");
+            log_error("syntax error for include directive\n");
             // TODO: Return error code
           }
 
@@ -173,17 +173,17 @@ sgShaderPreprocess(mapped_file_t mf)
             char incfile[incfile_end - incfile_start + 2];
             memset(incfile, 0, incfile_end-incfile_start + 2);
             strncpy(incfile, &(((char*)mf.data)[incfile_start]), incfile_end - incfile_start + 1);
-            FILE *file = ooResGetFile(incfile);
+            FILE *file = rsrc_get_file(incfile);
             if (file) {
               size_t bytes = 0;
-              ooLogTrace("found include file");
+              log_trace("found include file");
               char byte;
               while (fread(&byte, sizeof(char), 1, file)) {
                 char_array_push(&shader, byte);
                 bytes ++;
               }
             } else {
-              ooLogError("include file '%s' not found\n", incfile);
+              log_error("include file '%s' not found\n", incfile);
             }
           }
         }
@@ -204,7 +204,7 @@ void
 sg_load_all_shaders(void)
 {
   SG_CHECK_ERROR;
-  const char *path = ooResGetPath("shaders");
+  const char *path = rsrc_get_path("shaders");
 
   DIR *dir = opendir(path);
   if (dir) {
@@ -238,7 +238,7 @@ sg_load_shader(const char *key,
   assert(fspath != NULL);
 
   SG_CHECK_ERROR;
-  ooLogInfo("compiling '%s'", key);
+  log_info("compiling '%s'", key);
 
   sg_shader_t *tmp = hashtable_lookup(shaderKeyMap, key);
   if (tmp) return tmp;
@@ -262,7 +262,7 @@ sg_load_shader(const char *key,
     char pattern[strlen(vspath)+1+9];
     strcpy(pattern, vspath);
     strcat(pattern, "/*.vertex");
-    glob_t shaders = ooResGetFilePaths(pattern);
+    glob_t shaders = rsrc_get_file_paths(pattern);
 
     if (shaders.gl_matchc > 0) didLoadVertexShader = true;
 
@@ -293,12 +293,12 @@ sg_load_shader(const char *key,
         free(tmp);
 
         // No globfree as this is a fatal error
-        ooLogFatal("vertex shader '%s' did not compile", shaders.gl_pathv[i]);
+        log_fatal("vertex shader '%s' did not compile", shaders.gl_pathv[i]);
       }
 
       char_array_dispose(&vshader);
       glAttachShader(shaderProgram, shaderId);
-      ooLogTrace("loaded vertex shader '%s'", shaders.gl_pathv[i]);
+      log_trace("loaded vertex shader '%s'", shaders.gl_pathv[i]);
     }
     globfree(&shaders);
   }
@@ -310,7 +310,7 @@ sg_load_shader(const char *key,
     char pattern[strlen(vspath)+1+11];
     strcpy(pattern, vspath);
     strcat(pattern, "/*.fragment");
-    glob_t shaders = ooResGetFilePaths(pattern);
+    glob_t shaders = rsrc_get_file_paths(pattern);
 
     if (shaders.gl_matchc > 0) didLoadFragShader = true;
 
@@ -342,12 +342,12 @@ sg_load_shader(const char *key,
         free(tmp);
 
         // No globfree as this is a fatal error
-        ooLogFatal("fragment shader '%s' did not compile", shaders.gl_pathv[i]);
+        log_fatal("fragment shader '%s' did not compile", shaders.gl_pathv[i]);
       }
 
       char_array_dispose(&fshader);
       glAttachShader(shaderProgram, shaderId);
-      ooLogTrace("loaded fragment shader '%s'", shaders.gl_pathv[i]);
+      log_trace("loaded fragment shader '%s'", shaders.gl_pathv[i]);
     }
     globfree(&shaders);
   }
@@ -385,12 +385,12 @@ sg_load_shader(const char *key,
 
     free(tmp);
 
-    ooLogFatal("shader linking did not succeed");
+    log_fatal("shader linking did not succeed");
   }
-  ooLogInfo("shader program '%s' succesfully linked", key);
+  log_info("shader program '%s' succesfully linked", key);
 
   if (!didLoadVertexShader && !didLoadFragShader && !didLoadGeoShader) {
-    ooLogInfo("no shaders found for '%s'", key);
+    log_info("no shaders found for '%s'", key);
     glDeleteProgram(shaderProgram);
     hashtable_remove(shaderKeyMap, key); // Memoize if loaded again
 
@@ -460,7 +460,7 @@ sg_get_shader(const char *key)
 {
   sg_shader_t *tmp = hashtable_lookup(shaderKeyMap, key);
   if (tmp) return tmp;
-  else ooLogWarn("no such shader '%s'", key);
+  else log_warn("no such shader '%s'", key);
   return 0;
 }
 
@@ -480,7 +480,7 @@ sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required)
   if (param < SG_ATTRIBUTE_END) {
     GLint attrib_loc = glGetAttribLocation(program->shaderId, param_names[param]);
     if (required && (attrib_loc == -1)) {
-      ooLogError("shader '%s' missing attribute: '%s'",
+      log_error("shader '%s' missing attribute: '%s'",
                  program->name, param_names[param]);
     }
     return attrib_loc;
@@ -488,7 +488,7 @@ sg_shader_get_location(sg_shader_t *program, sg_param_id_t param, bool required)
 
   GLint uniform_loc = glGetUniformLocation(program->shaderId, param_names[param]);
   if (required && (uniform_loc == -1)) {
-    ooLogError("shader '%s' missing uniform: '%s'",
+    log_error("shader '%s' missing uniform: '%s'",
                program->name, param_names[param]);
   }
   return uniform_loc;
@@ -499,7 +499,7 @@ sg_shader_bind(sg_shader_t *program)
 {
   SG_CHECK_ERROR;
   if (program) {
-    //ooLogInfo("bind shader '%s'", program->name);
+    //log_info("bind shader '%s'", program->name);
     glUseProgram(program->shaderId);
   } else {
     glUseProgram(0);
@@ -518,7 +518,7 @@ sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj)
   SG_CHECK_ERROR;
 
   //for (int i = 0; i < 4; i++) {
-  //  ooLogInfo("project[%d]: [%f %f %f %f]",
+  //  log_info("project[%d]: [%f %f %f %f]",
   //            i, proj[i].x, proj[i].y, proj[i].z, proj[i].w);
   //}
 }
@@ -535,7 +535,7 @@ sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
   SG_CHECK_ERROR;
 
   //for (int i = 0; i < 4; i++) {
-  //  ooLogInfo("model[%d]: [%f %f %f %f]",
+  //  log_info("model[%d]: [%f %f %f %f]",
   //           i, modelview[i].x, modelview[i].y, modelview[i].z, modelview[i].w);
   //}
 }
@@ -636,7 +636,7 @@ sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
 
   float3 pos = sg_light_get_pos(light);
 
-  //ooLogInfo("light pos %f %f %f", pos.x, pos.y, pos.z);
+  //log_info("light pos %f %f %f", pos.x, pos.y, pos.z);
 
   float4 amb = sg_light_get_ambient(light);
   float4 diffuse = sg_light_get_diffuse(light);

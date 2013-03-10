@@ -603,7 +603,7 @@ ac3d_load(const char *path, sg_shader_t *shader)
   }
 
   if (ferror(fp)) {
-    ooLogError("error reading file '%s'\n", path);
+    log_error("error reading file '%s'\n", path);
     fclose(fp);
     ac3d_delete(ac3d);
     return NULL;
@@ -616,7 +616,7 @@ ac3d_load(const char *path, sg_shader_t *shader)
 error:
   fclose(fp);
   ac3d_delete(ac3d);
-  ooLogError("ac3d load failed");
+  log_error("ac3d load failed");
 
   return NULL;
 }

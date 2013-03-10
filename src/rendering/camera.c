@@ -307,7 +307,7 @@ sg_scene_t* sim_get_scene(void);
 void
 sg_camera_rotate_hat(int buttonVal, void *data)
 {
-  //ooLogInfo("hat pushed %d", buttonVal);
+  //log_info("hat pushed %d", buttonVal);
   sg_scene_t *sc = sim_get_scene();
   sg_camera_t *cam = sg_scene_get_cam(sc);
 
@@ -320,7 +320,7 @@ sg_camera_rotate_hat(int buttonVal, void *data)
   // and 1.0 is the expected time of the next sync.
   // We thus need to take the frequency (not the SRT period) here.
   float wct_freq;
-  ooConfGetFloatDef("openorbit/sim/freq", &wct_freq, 20.0); // Hz
+  config_get_float_def("openorbit/sim/freq", &wct_freq, 20.0); // Hz
 
   if ((cam->src == cam->tgt) && cam->src) {
     // We are targeting our follow object this means orbiting it
@@ -350,5 +350,5 @@ sg_camera_rotate_hat(int buttonVal, void *data)
 
 // TODO: Should move to sim part, where we will keep all the io stuff
 MODULE_INIT(sgcamera, "iomanager", NULL) {
-  ioRegActionHandler("cam-rotate", sg_camera_rotate_hat, IO_BUTTON_HAT, NULL);
+  io_reg_action_handler("cam-rotate", sg_camera_rotate_hat, IO_BUTTON_HAT, NULL);
 }

@@ -26,20 +26,20 @@
 /*!
   Event handler function
  */
- typedef void (*OOeventhandler)(void *data);
+ typedef void (*sim_event_handler_fn_t)(void *data);
 
 /*!
   Internal event structure. The structure is not for direct access.
 
   \todo Move to C-file if possible
  */
-typedef struct _OOevent {
+typedef struct _sim_event_t {
   int64_t fireTime;
-  OOeventhandler handler;
+  sim_event_handler_fn_t handler;
 //  void (^handler_block)(void)
   void *data;
-  struct _OOevent *next;
-} OOevent;
+  struct _sim_event_t *next;
+} sim_event_t;
 
 
 /*!
@@ -67,17 +67,17 @@ typedef struct _OOevent {
 */
  typedef struct {
    heap_t *activeEventHeap;
-   OOevent *freeEvents;
- } OOeventqueue;
+   sim_event_t *freeEvents;
+ } sim_event_queue_t;
 
-OOeventqueue* simNewEventQueue(void);
+sim_event_queue_t* sim_new_event_queue(void);
 
-void simStackEvent(OOeventhandler handler, void *data);
-void simEnqueueAbsoluteEvent(double jd, OOeventhandler handler, void *data);
-void simEnqueueDelta_ms(unsigned offset, OOeventhandler handler, void *data);
-void simEnqueueDelta_s(double offset, OOeventhandler handler, void *data);
-void simEnqueueDelta_s_wct(double offset, OOeventhandler handler, void *data);
+void sim_event_stackpost(sim_event_handler_fn_t handler, void *data);
+void sim_event_enqueue_absolute(double jd, sim_event_handler_fn_t handler, void *data);
+void sim_event_enqueue_relative_ms(unsigned offset, sim_event_handler_fn_t handler, void *data);
+void sim_event_enqueue_relative_s(double offset, sim_event_handler_fn_t handler, void *data);
+void sim_event_enqueue_relative_s_wct(double offset, sim_event_handler_fn_t handler, void *data);
 
-void simDispatchPendingEvents(void);
+void sim_event_dispatch_pending(void);
 
 #endif /* end of include guard: SIMEVENT_H_KHYQLKNG */

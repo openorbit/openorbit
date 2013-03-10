@@ -22,15 +22,15 @@
 // Note that this is used by engine models to model their behaviour, the values dm and ve
 #include "physics.h"
 #include <vmath/vmath.h>
-PLdouble3
-plTsiolkovsky(PLdouble3 ve, double m0, double dm)
+double3
+pl_tsiolkovsky(double3 ve, double m0, double dm)
 {
   return vd3_s_mul(ve, log(m0 / (m0 - dm)));
 }
 
 // Thrust for exhaust velocity ve, delta m and delta t
-PLdouble3
-plThrust(PLdouble3 ve, double dm, double dt)
+double3
+pl_thrust(double3 ve, double dm, double dt)
 {
   return vd3_s_mul(ve, dm / dt);
 }

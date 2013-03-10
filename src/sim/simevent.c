@@ -30,31 +30,31 @@
 #define OO_EVENT_QUEUE_INIT_LEN 100
 
 struct handler_param {
-  OOeventhandler handler;
+  sim_event_handler_fn_t handler;
   void *data;
 };
 
-static OOeventqueue *gQueue;
+static sim_event_queue_t *gQueue;
 static pool_t *gTimerParamPool;
 
 MODULE_INIT(simevent, NULL)
 {
-  ooLogTrace("initialising 'simevent' module");
-  gQueue = simNewEventQueue();
+  log_trace("initialising 'simevent' module");
+  gQueue = sim_new_event_queue();
   gTimerParamPool = pool_create(sizeof(struct handler_param));
 }
 
 // BUG: If working with events with fire time < 1970 as event time then is negative
-int64_t EventRank(OOevent *ev)
+int64_t EventRank(sim_event_t *ev)
 {
   return ev->fireTime;
 }
 
-OOeventqueue*
-simNewEventQueue(void)
+sim_event_queue_t*
+sim_new_event_queue(void)
 {
-  OOeventqueue *queue = smalloc(sizeof(OOeventqueue));
-  queue->freeEvents = smalloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
+  sim_event_queue_t *queue = smalloc(sizeof(sim_event_queue_t));
+  queue->freeEvents = smalloc(sizeof(sim_event_t) * OO_EVENT_QUEUE_INIT_LEN);
   queue->activeEventHeap = heap_new(8, (compute_rank_f)EventRank);
 
   for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
@@ -67,13 +67,13 @@ simNewEventQueue(void)
   return queue;
 }
 
-OOevent*
-simAllocEvent(void)
+sim_event_t*
+sim_event_alloc(void)
 {
   if (gQueue->freeEvents == NULL) {
-    gQueue->freeEvents = smalloc(sizeof(OOevent) * OO_EVENT_QUEUE_INIT_LEN);
+    gQueue->freeEvents = smalloc(sizeof(sim_event_t) * OO_EVENT_QUEUE_INIT_LEN);
     if (gQueue->freeEvents == NULL) {
-      ooLogFatal("out of memory %s:%d", __FILE__, __LINE__);
+      log_fatal("out of memory %s:%d", __FILE__, __LINE__);
     }
     for (int i = 0 ; i < OO_EVENT_QUEUE_INIT_LEN; i ++) {
       gQueue->freeEvents[i].next = &gQueue->freeEvents[i+1];
@@ -83,74 +83,74 @@ simAllocEvent(void)
     }
   }
 
-  OOevent * ev = gQueue->freeEvents;
+  sim_event_t * ev = gQueue->freeEvents;
   gQueue->freeEvents = ev->next;
   ev->next = NULL;
   return ev;
 }
 
 void
-simReleaseEvent(OOevent *ev)
+sim_event_release(sim_event_t *ev)
 {
   ev->next = gQueue->freeEvents;
   gQueue->freeEvents = ev;
 }
 
 void
-simInsertEvent(OOevent *ev)
+sim_event_insert(sim_event_t *ev)
 {
   heap_insert(gQueue->activeEventHeap, ev);
 }
 
 void
-simStackEvent(OOeventhandler handler, void *data)
+sim_event_stackpost(sim_event_handler_fn_t handler, void *data)
 {
-  OOevent *ev = simAllocEvent();
-  ev->fireTime = simTimeGetTimeStamp();
+  sim_event_t *ev = sim_event_alloc();
+  ev->fireTime = sim_time_get_time_stamp();
   ev->handler = handler;
   ev->data = data;
-  simInsertEvent(ev);
+  sim_event_insert(ev);
 }
 
 void
-simEnqueueAbsoluteEvent(double jd, OOeventhandler handler, void *data)
+sim_event_enqueue_absolute(double jd, sim_event_handler_fn_t handler, void *data)
 {
-  double currentJD = simTimeGetTime();
+  double currentJD = sim_time_get_time();
   if (jd < currentJD) {
     // cannot enqueue events in the future
-    ooLogError("past events cannot be inserted in queue, current JD = %f, event JD = %f",
+    log_error("past events cannot be inserted in queue, current JD = %f, event JD = %f",
                currentJD, jd);
   }
 
-  OOevent *ev = simAllocEvent();
-  ev->fireTime = simTimeJDToTimeStamp(jd);
+  sim_event_t *ev = sim_event_alloc();
+  ev->fireTime = sim_time_jd_to_time_stamp(jd);
   ev->handler = handler;
   ev->data = data;
 
-  simInsertEvent(ev);
+  sim_event_insert(ev);
 }
 
 
 void
-simEnqueueDelta_ms(unsigned offset, OOeventhandler handler, void *data)
+sim_event_enqueue_relative_ms(unsigned offset, sim_event_handler_fn_t handler, void *data)
 {
-  OOevent *ev = simAllocEvent();
-  ev->fireTime = simTimeGetTimeStamp() + offset;
+  sim_event_t *ev = sim_event_alloc();
+  ev->fireTime = sim_time_get_time_stamp() + offset;
   ev->handler = handler;
   ev->data = data;
 
-  simInsertEvent(ev);
+  sim_event_insert(ev);
 }
 
 void
-simEnqueueDelta_s(double offset, OOeventhandler handler, void *data)
+sim_event_enqueue_relative_s(double offset, sim_event_handler_fn_t handler, void *data)
 {
-  OOevent *ev = simAllocEvent();
-  ev->fireTime = simTimeGetTimeStamp() + offset*1000.0;
+  sim_event_t *ev = sim_event_alloc();
+  ev->fireTime = sim_time_get_time_stamp() + offset*1000.0;
   ev->handler = handler;
   ev->data = data;
 
-  simInsertEvent(ev);
+  sim_event_insert(ev);
 }
 
 // This is a rather messy thing. We want to be able to enqueue events on a fixed
@@ -185,7 +185,7 @@ sim_timer_event(uint32_t interval, void *param)
 }
 
 void
-simEnqueueDelta_s_wct(double offset, OOeventhandler handler, void *data)
+sim_event_enqueue_relative_s_wct(double offset, sim_event_handler_fn_t handler, void *data)
 {
   struct handler_param *param = pool_alloc(gTimerParamPool);
   param->handler = handler;
@@ -195,13 +195,13 @@ simEnqueueDelta_s_wct(double offset, OOeventhandler handler, void *data)
 #endif
 
 void
-simDispatchPendingEvents()
+sim_event_dispatch_pending()
 {
-  OOevent *ev = heap_peek(gQueue->activeEventHeap);
-  while (ev && ev->fireTime < simTimeGetTimeStamp()) {
+  sim_event_t *ev = heap_peek(gQueue->activeEventHeap);
+  while (ev && ev->fireTime < sim_time_get_time_stamp()) {
     heap_remove(gQueue->activeEventHeap);
     ev->handler(ev->data);
-    simReleaseEvent(ev);
+    sim_event_release(ev);
     ev = heap_peek(gQueue->activeEventHeap);
   }
 }

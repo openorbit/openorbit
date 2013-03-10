@@ -29,36 +29,36 @@
 // parameters are obviously dependent on the design and various environmental
 // parameters. In the future, this interface should be updated to support more
 // complex simulations.
-struct SIMbattery {
+struct sim_battery_t {
   float energyContent;    // Joule
   float maxDischargeRate; // Watt
   float maxChargeRate;    // Watt
   float currentLoad;      // Watt
 };
 
-typedef struct SIMbattery SIMbattery;
+typedef struct sim_battery_t sim_battery_t;
 
 // Energy sources are the primary energy reserves, these may be for example
 // solar panels or similar.
-struct SIMenergysource {
+struct sim_energysource_t {
   float currentPower;     // Watt
 };
-typedef struct SIMenergysource SIMenergysource;
+typedef struct sim_energysource_t sim_energysource_t;
 
-typedef struct SIMpowerbus SIMpowerbus;
-typedef void (*SIMpoweroverload)(SIMpowerbus *pb);
+typedef struct sim_powerbus_t sim_powerbus_t;
+typedef void (*sim_poweroverload_fn_t)(sim_powerbus_t *pb);
 
-struct SIMpowerbus {
+struct sim_powerbus_t {
   float currentLoad;
   float currentPower;
   obj_array_t batteries;
   obj_array_t energySources;
-  SIMpoweroverload overloadAction;
+  sim_poweroverload_fn_t overloadAction;
 };
 
-void simResetPowerbus(SIMpowerbus *pb);
-float simRequestPower(SIMpowerbus *pb, float power);
-void simProducePower(SIMpowerbus *pb, float power);
+void sim_powerbus_reset(sim_powerbus_t *pb);
+float sim_powerbus_request_power(sim_powerbus_t *pb, float power);
+void sim_powerbus_provide_power(sim_powerbus_t *pb, float power);
 
 #endif /* !SIM_BATTERY_H */
 

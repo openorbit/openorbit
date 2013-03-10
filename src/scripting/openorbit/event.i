@@ -33,7 +33,7 @@
       free(ev);
     } else {
       // TODO: Enqueue based on absolute time
-      simEnqueueDelta_s(ev->period, pyeventhandler, ev);
+      sim_event_enqueue_relative_s(ev->period, pyeventhandler, ev);
     }
   }
 
@@ -48,7 +48,7 @@
     Py_INCREF(func);
     Py_INCREF(arg);
 
-    simStackEvent(pyeventhandler, ev);
+    sim_event_stackpost(pyeventhandler, ev);
   }
 
   void
@@ -62,7 +62,7 @@
     Py_INCREF(func);
     Py_INCREF(arg);
 
-    simEnqueueAbsoluteEvent(jd, pyeventhandler, ev);
+    sim_event_enqueue_absolute(jd, pyeventhandler, ev);
   }
 
 
@@ -77,7 +77,7 @@
     Py_INCREF(func);
     Py_INCREF(arg);
 
-    simEnqueueDelta_ms(offset, pyeventhandler, ev);
+    sim_event_enqueue_relative_ms(offset, pyeventhandler, ev);
   }
 
   void
@@ -91,7 +91,7 @@
     Py_INCREF(func);
     Py_INCREF(arg);
 
-    simEnqueueDelta_s(offset, pyeventhandler, ev);
+    sim_event_enqueue_relative_s(offset, pyeventhandler, ev);
   }
 
 %}

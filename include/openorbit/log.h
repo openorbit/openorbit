@@ -22,13 +22,13 @@
 #include <stdio.h>
 
 typedef enum {
-  OOLog_Trace = 0,
-  OOLog_Info,
-  OOLog_Warn,
-  OOLog_Error,
-  OOLog_Fatal,
-  OOLog_Abort,
-} OOloglev;
+  LOG_TRACE = 0,
+  LOG_INFO,
+  LOG_WARN,
+  LOG_ERROR,
+  LOG_FATAL,
+  LOG_ABORT,
+} log_level_t;
 
 typedef enum {
   OOErr_None = 0,
@@ -41,16 +41,15 @@ typedef enum {
   OOErr_NetAddr
 } OOerr;
 
-void ooLogInit(FILE *logPath);
-void ooLogSetLevel(OOloglev lev);
-OOloglev ooLogGetLevFromStr(const char *str);
-void ooLogTrace(const char *msg, ...);
-void ooLogInfo(const char *msg, ...);
-void ooLogWarn(const char *msg, ...);
-void ooLogError(const char *msg, ...);
-void ooLogFatalIfNull(const void *ptr, const char *msg, ...);
-void ooLogFatal(const char *msg, ...) __attribute__((__noreturn__));
-void ooLogAbort(const char *msg, ...) __attribute__((__noreturn__));
-void ooLogMsg(OOloglev lev, const char *msg, ...);
+void log_set_level(log_level_t lev);
+log_level_t log_get_lev_from_str(const char *str);
+void log_trace(const char *msg, ...);
+void log_info(const char *msg, ...);
+void log_warn(const char *msg, ...);
+void log_error(const char *msg, ...);
+void log_fatal_if_null(const void *ptr, const char *msg, ...);
+void log_fatal(const char *msg, ...) __attribute__((__noreturn__));
+void log_abort(const char *msg, ...) __attribute__((__noreturn__));
+void log_msg(log_level_t lev, const char *msg, ...);
 
 #endif /* _LOG_H_ */

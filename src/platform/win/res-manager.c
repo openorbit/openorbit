@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -30,15 +30,15 @@
 
 // TODO: More thurough error checking and handling
 char*
-ooResGetPath(const char *file_name)
+rsrc_get_path(const char *file_name)
 {
     return NULL;
 }
 
 FILE*
-ooResGetFile(const char *file_name)
+rsrc_get_file(const char *file_name)
 {
-    char *path = ooResGetPath(file_name);
+    char *path = rsrc_get_path(file_name);
     
     if (path != NULL) {
         FILE *file = fopen(path, "r");
@@ -50,9 +50,9 @@ ooResGetFile(const char *file_name)
 }
 
 int
-ooResGetFd(const char *file_name)
+rsrc_get_fd(const char *file_name)
 {
-    char *path = ooResGetPath(file_name);
+    char *path = rsrc_get_path(file_name);
     
     if (path != NULL) {
         int fd = open(path, O_RDONLY);
@@ -66,15 +66,15 @@ ooResGetFd(const char *file_name)
 
 
 char*
-ooPluginGetPath(const char *file_name)
+rsrc_get_plugin_path(const char *file_name)
 {
     
 }
 
 FILE*
-ooPluginGetFile(const char *file_name)
+rsrc_get_plugin_file(const char *file_name)
 {
-    char *path = ooPluginGetPath(file_name);
+    char *path = rsrc_get_plugin_path(file_name);
     
     if (path != NULL) {
         FILE *file = fopen(path, "r");
@@ -86,9 +86,9 @@ ooPluginGetFile(const char *file_name)
 }
 
 int
-ooPluginGetFd(const char *file_name)
+rsrc_get_plugin_fd(const char *file_name)
 {
-    char *path = ooPluginGetPath(file_name);
+    char *path = rsrc_get_plugin_path(file_name);
     
     if (path != NULL) {
         int fd = open(path, O_RDONLY);

@@ -30,40 +30,40 @@
 #define THRESHOLD 10
 #define TOLERANCE 0.1
 
-PLrecgrid*
-plNewRecgrid(PLcollisioncontext *ctxt, double size)
+pl_recgrid_t*
+pl_new_recgrid(pl_collisioncontext_t *ctxt, double size)
 {
-  PLrecgrid *recgrid = pool_alloc(ctxt->pool);
+  pl_recgrid_t *recgrid = pool_alloc(ctxt->pool);
 
   recgrid->parent = NULL;
 
   assert(((uintptr_t)recgrid & 3) == 0);
   recgrid->size = size;
   memset(&recgrid->centre, 0, sizeof(lwcoord_t));
-  memset(recgrid->children, 0, sizeof(PLrecgrid *[8]));
+  memset(recgrid->children, 0, sizeof(pl_recgrid_t *[8]));
   obj_array_init(&recgrid->objs);
 
   return recgrid;
 }
 
 void
-plDeleteRecgrid(PLrecgrid *grid)
+pl_recgrid_delete(pl_recgrid_t *grid)
 {
   obj_array_dispose(&grid->objs);
   pool_free(grid);
 }
 
-PLcollisioncontext*
-plNewCollisionContext(void)
+pl_collisioncontext_t*
+pl_new_collision_context(void)
 {
-  PLcollisioncontext *ctxt = smalloc(sizeof(PLcollisioncontext));
-  ctxt->pool = pool_create(sizeof(PLrecgrid));
+  pl_collisioncontext_t *ctxt = smalloc(sizeof(pl_collisioncontext_t));
+  ctxt->pool = pool_create(sizeof(pl_recgrid_t));
   obj_array_init(&ctxt->colls);
-  ctxt->otree = plNewRecgrid(ctxt, plAuToMetres(100.0)); // Roughly the heliospause
+  ctxt->otree = pl_new_recgrid(ctxt, pl_au_to_metres(100.0)); // Roughly the heliospause
   return ctxt;
 }
 
-void plInsertObject(PLcollisioncontext *ctxt, PLrecgrid *grid, PLobject *obj);
+void pl_collcontext_insert_object(pl_collisioncontext_t *ctxt, pl_recgrid_t *grid, PLobject *obj);
 
 static int
 getoctant(const lwcoord_t *coord, const PLobject *obj)
@@ -73,7 +73,7 @@ getoctant(const lwcoord_t *coord, const PLobject *obj)
   return oct;
 }
 static bool
-fits(const PLrecgrid *grid, const PLobject *obj)
+fits(const pl_recgrid_t *grid, const PLobject *obj)
 {
   float3 dist = lwc_dist(&obj->p, &grid->centre);
 
@@ -86,11 +86,11 @@ fits(const PLrecgrid *grid, const PLobject *obj)
 }
 
 static void
-split(PLcollisioncontext *ctxt, PLrecgrid *grid)
+split(pl_collisioncontext_t *ctxt, pl_recgrid_t *grid)
 {
   if (grid->children[0] == NULL) {
     for (int i = 0 ; i < 8 ; i++) {
-      grid->children[i] = plNewRecgrid(ctxt, grid->size/2.0);
+      grid->children[i] = pl_new_recgrid(ctxt, grid->size/2.0);
       grid->children[i]->centre = grid->centre;
     }
     lwc_translate3f(&grid->children[0]->centre,
@@ -115,7 +115,7 @@ split(PLcollisioncontext *ctxt, PLrecgrid *grid)
     PLobject *obj = grid->objs.elems[i];
     int octant = getoctant(&grid->centre, obj);
     if (fits(grid->children[octant], obj)) {
-      plInsertObject(ctxt, grid->children[octant], obj);
+      pl_collcontext_insert_object(ctxt, grid->children[octant], obj);
       obj_array_remove(&grid->objs, i);
       i --;
     }
@@ -123,11 +123,11 @@ split(PLcollisioncontext *ctxt, PLrecgrid *grid)
 }
 
 void
-plInsertObject(PLcollisioncontext *ctxt, PLrecgrid *grid, PLobject *obj)
+pl_collcontext_insert_object(pl_collisioncontext_t *ctxt, pl_recgrid_t *grid, PLobject *obj)
 {
   int octant = getoctant(&grid->centre, obj);
   if (grid->children[octant] && fits(grid->children[octant], obj)){
-    plInsertObject(ctxt, grid->children[octant], obj);
+    pl_collcontext_insert_object(ctxt, grid->children[octant], obj);
   } else {
     obj_array_push(&grid->objs, obj);
   }
@@ -138,11 +138,11 @@ plInsertObject(PLcollisioncontext *ctxt, PLrecgrid *grid, PLobject *obj)
 }
 
 void
-plCheckCollissions(PLrecgrid *grid)
+pl_check_collissions(pl_recgrid_t *grid)
 {
   if (grid == NULL) return;
   for (int i = 0 ; i < 8 ; ++i) {
-    plCheckCollissions(grid->children[i]);
+    pl_check_collissions(grid->children[i]);
   }
 
   for (int i = 0 ; i < grid->objs.length ; ++i) {
@@ -156,7 +156,7 @@ plCheckCollissions(PLrecgrid *grid)
     }
 
     // Check against parent objects
-    PLrecgrid *higher_grid = grid->parent;
+    pl_recgrid_t *higher_grid = grid->parent;
     while (higher_grid) {
       // Check against local objects
       for (int j = 0 ; j < higher_grid->objs.length ; ++j) {
@@ -170,42 +170,42 @@ plCheckCollissions(PLrecgrid *grid)
 }
 
 bool
-plCollideCoarse(PLcollisioncontext *coll,
-                PLobject * restrict obj_a, PLobject * restrict obj_b)
+pl_collide_coarse(pl_collisioncontext_t *coll,
+                  PLobject * restrict obj_a, PLobject * restrict obj_b)
 {
   float3 dist = lwc_dist(&obj_a->p, &obj_b->p);
 
   if (vf3_abs(dist) > (obj_a->radius + obj_b->radius)) {
     return false;
   }
-  ooLogWarn("collision test succeeded %s : %s", obj_a->name, obj_b->name);
+  log_warn("collision test succeeded %s : %s", obj_a->name, obj_b->name);
 
   return true;
 }
 
 bool
-plCollideFine(PLcollisioncontext *coll,
+pl_collide_fine(pl_collisioncontext_t *coll,
               PLobject * restrict obj_a, PLobject * restrict obj_b)
 {
   return true;
 }
 
 void
-plCollideInsertObject(PLcollisioncontext *ctxt, PLobject *obj)
+pl_collide_insert_object(pl_collisioncontext_t *ctxt, PLobject *obj)
 {
-  plInsertObject(ctxt, ctxt->otree, obj);
+  pl_collcontext_insert_object(ctxt, ctxt->otree, obj);
 }
 
 static void
-plCollidePromoteStep(PLcollisioncontext *ctxt, PLrecgrid *otree)
+pl_collide_promote_step(pl_collisioncontext_t *ctxt, pl_recgrid_t *otree)
 {
   for (int i = 0 ; i < 8 ; ++ i) {
-    if (otree->children[i]) plCollidePromoteStep(ctxt, otree->children[i]);
+    if (otree->children[i]) pl_collide_promote_step(ctxt, otree->children[i]);
   }
 
   for (int i = 0 ; i < otree->objs.length ; ++i) {
     if (!fits(otree, otree->objs.elems[i])) {
-      plInsertObject(ctxt, otree->parent, otree->objs.elems[i]);
+      pl_collcontext_insert_object(ctxt, otree->parent, otree->objs.elems[i]);
       obj_array_remove(&otree->objs, i);
       i --;
     }
@@ -213,17 +213,17 @@ plCollidePromoteStep(PLcollisioncontext *ctxt, PLrecgrid *otree)
 }
 
 static void
-plCollideTreeNode(PLcollisioncontext *coll, PLrecgrid *otree)
+pl_collide_tree_node(pl_collisioncontext_t *coll, pl_recgrid_t *otree)
 {
   if (otree == NULL) return;
   for (int i = 0 ; i < 8 ; ++ i) {
-    plCollideTreeNode(coll, otree->children[i]);
+    pl_collide_tree_node(coll, otree->children[i]);
   }
 
   for (int i = 0 ; i < otree->objs.length ; ++i) {
     for (int j = i+1 ; j < otree->objs.length ; ++j) {
-      if (plCollideCoarse(coll, otree->objs.elems[i], otree->objs.elems[j])) {
-        if (plCollideFine(coll, otree->objs.elems[i], otree->objs.elems[j])) {
+      if (pl_collide_coarse(coll, otree->objs.elems[i], otree->objs.elems[j])) {
+        if (pl_collide_fine(coll, otree->objs.elems[i], otree->objs.elems[j])) {
           // TODO: Pair objects
           obj_array_push(&coll->colls, otree->objs.elems[i]);
           obj_array_push(&coll->colls, otree->objs.elems[j]);
@@ -232,13 +232,13 @@ plCollideTreeNode(PLcollisioncontext *coll, PLrecgrid *otree)
     }
 
     // Check against parent objects
-    PLrecgrid *higher_grid = otree->parent;
+    pl_recgrid_t *higher_grid = otree->parent;
     while (higher_grid) {
       // Check against local objects
       for (int j = 0 ; j < higher_grid->objs.length ; ++j) {
         PLobject *obj_b = higher_grid->objs.elems[j];
-        if (plCollideCoarse(coll, otree->objs.elems[i], obj_b)) {
-          if (plCollideFine(coll, otree->objs.elems[i], obj_b)) {
+        if (pl_collide_coarse(coll, otree->objs.elems[i], obj_b)) {
+          if (pl_collide_fine(coll, otree->objs.elems[i], obj_b)) {
             // TODO: Pair objects
             obj_array_push(&coll->colls, otree->objs.elems[i]);
             obj_array_push(&coll->colls, obj_b);
@@ -252,11 +252,11 @@ plCollideTreeNode(PLcollisioncontext *coll, PLrecgrid *otree)
 }
 
 void
-plCollideStep(PLcollisioncontext *coll)
+pl_collide_step(pl_collisioncontext_t *coll)
 {
   coll->colls.length = 0; // Flush collission array
-  plCollidePromoteStep(coll, coll->otree);
-  plCollideTreeNode(coll, coll->otree);
+  pl_collide_promote_step(coll, coll->otree);
+  pl_collide_tree_node(coll, coll->otree);
 
   // Resolve computed collisions
   for (int i = 0 ; i < coll->colls.length ; i += 2) {
@@ -273,7 +273,7 @@ plCollideStep(PLcollisioncontext *coll)
     b->v = bv;
 
     // Compute post colission momentums
-    ooLogInfo("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
+    log_info("collission between '%s' and '%s' (%f, %f)", a->name, b->name, a->radius, b->radius);
     lwc_dump(&a->p);lwc_dump(&b->p);
   }
 }

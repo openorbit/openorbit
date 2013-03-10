@@ -70,7 +70,7 @@ sg_load_texture(const char *key)
     return tex;
   }
 
-  char *fname = ooResGetPath(key);
+  char *fname = rsrc_get_path(key);
   if (fname == NULL) return 0;
 
   image_t img;
@@ -146,7 +146,7 @@ sg_load_texture(const char *key)
   //                            GL_UNSIGNED_BYTE,
   //                            tex->data)))
   //{
-  //  ooLogFatal("failed mipmap generation %s", gluErrorString(err));
+  //  log_fatal("failed mipmap generation %s", gluErrorString(err));
   //}
 
 

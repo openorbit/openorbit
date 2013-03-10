@@ -170,7 +170,7 @@ omAddProp(OMclass *cls, const char *name, OMpropkind typ, size_t offset)
 {
   if (cls->propAlloc <= cls->propCount) {
     cls->props = realloc(cls->props, sizeof(OMproperty)*(cls->propAlloc * 2));
-    //ooLogFatalIfNull(cls, "Failed to realloc class object");
+    //log_fatal_if_null(cls, "Failed to realloc class object");
 
     cls->propAlloc *= 2;
   }
@@ -288,7 +288,7 @@ omTreeInsert(OMtree *tree, uintptr_t key, void *data)
         break;
       }
     } else {
-      //ooLogError("objectree: can't insert multiple copies");
+      //log_error("objectree: can't insert multiple copies");
       return;
     }
 

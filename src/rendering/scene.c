@@ -135,12 +135,12 @@ sg_scene_sync(sg_scene_t *scene)
   // TODO: Instead of rereading the freq and period every step, we want to
   //       listen for some type of event that the config variable was modified.
   float freq;
-  ooConfGetFloatDef("openorbit/sim/freq", &freq, 20.0); // Hz
+  config_get_float_def("openorbit/sim/freq", &freq, 20.0); // Hz
 
   scene->next_sync_estimate = scene->sync_stamp + nstomonotime((1.0/freq)*1.0e9);
 
   float t = 0.0; // Period
-  ooConfGetFloatDef("openorbit/sim/period", &t, 1.0/freq); // Seconds
+  config_get_float_def("openorbit/sim/period", &t, 1.0/freq); // Seconds
 
   ARRAY_FOR_EACH(i, scene->objects) {
     sg_object_sync(ARRAY_ELEM(scene->objects, i), t);
@@ -160,7 +160,7 @@ sg_scene_interpolate(sg_scene_t *scene)
   if (normalised_time > 1.0) normalised_time = 1.0;
   assert(normalised_time >= 0.0);
 
-  ooLogTrace("intepolate to: %f", normalised_time);
+  log_trace("intepolate to: %f", normalised_time);
 
   ARRAY_FOR_EACH(i, scene->objects) {
     sg_object_interpolate(ARRAY_ELEM(scene->objects, i), normalised_time);

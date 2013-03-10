@@ -47,10 +47,10 @@
     //#endif /* _UNIX_ */
 
 const char*
-ooResGetConfPath(void)
+rsrc_get_conf_path(void)
 {
   char *homeDir = getenv("HOME");
-  ooLogFatalIfNull(homeDir, "$HOME not set");
+  log_fatal_if_null(homeDir, "$HOME not set");
 
   static char *confPath = NULL;
 
@@ -62,10 +62,10 @@ ooResGetConfPath(void)
 }
 
 const char*
-ooResGetJsonConfPath(void)
+rsrc_get_json_conf_path(void)
 {
   char *homeDir = getenv("HOME");
-  ooLogFatalIfNull(homeDir, "$HOME not set");
+  log_fatal_if_null(homeDir, "$HOME not set");
 
   static char *confPath = NULL;
 
@@ -79,7 +79,7 @@ ooResGetJsonConfPath(void)
 
 
 const char*
-ooResGetBasePath(void)
+rsrc_get_base_path(void)
 {
     static UInt8 base[PATH_MAX+1] = {0};
 
@@ -91,36 +91,36 @@ ooResGetBasePath(void)
         if (!CFURLGetFileSystemRepresentation(resUrl, true, base, PATH_MAX)) {
             // Something went wrong
             CFRelease(resUrl);
-            ooLogFatal("%s:%d:base path not found", __FILE__, __LINE__); // no ret
+            log_fatal("%s:%d:base path not found", __FILE__, __LINE__); // no ret
         }
 
         CFRelease(resUrl);
 
-        ooLogTrace("res base = %s", base);
+        log_trace("res base = %s", base);
     }
 
     return (const char*)base;
 }
 
 char*
-ooResGetPath(const char *fileName)
+rsrc_get_path(const char *fileName)
 {
     assert(fileName != NULL && "File name cannot be null");
 
     char *path;
-    asprintf(&path, "%s/%s", ooResGetBasePath(), fileName);
+    asprintf(&path, "%s/%s", rsrc_get_base_path(), fileName);
 
     return path; // Note, asprintf sets this to NULL if it fails
 }
 
 glob_t
-ooResGetFilePaths(const char *pattern)
+rsrc_get_file_paths(const char *pattern)
 {
-  const char *base = ooResGetBasePath();
+  const char *base = rsrc_get_base_path();
 
   char *fullPattern;
   asprintf(&fullPattern, "%s/%s", base, pattern);
-  ooLogTrace("search for %s", fullPattern);
+  log_trace("search for %s", fullPattern);
   glob_t globs;
   glob(fullPattern, 0, NULL, &globs);
 
@@ -130,13 +130,13 @@ ooResGetFilePaths(const char *pattern)
 
 
 FILE*
-ooResGetFile(const char *fileName)
+rsrc_get_file(const char *fileName)
 {
-    char *path = ooResGetPath(fileName);
+    char *path = rsrc_get_path(fileName);
 
     if (path != NULL) {
         FILE *file = fopen(path, "r");
-        if (!file) ooLogWarn("file %s not readable", path);
+        if (!file) log_warn("file %s not readable", path);
         free(path);
 
         return file;
@@ -146,14 +146,14 @@ ooResGetFile(const char *fileName)
 }
 
 int
-ooResGetFd(const char *fileName)
+rsrc_get_fd(const char *fileName)
 {
-    char *path = ooResGetPath(fileName);
+    char *path = rsrc_get_path(fileName);
 
     if (path != NULL) {
         int fd = open(path, O_RDONLY);
 
-        if (fd == -1) ooLogWarn("file %s not readable", path);
+        if (fd == -1) log_warn("file %s not readable", path);
 
         free(path);
 
@@ -165,16 +165,16 @@ ooResGetFd(const char *fileName)
 
 
 char*
-ooPluginGetPath(const char *fileName)
+rsrc_get_plugin_path(const char *fileName)
 {
   (void)paths; // TODO
   return NULL;
 }
 
 FILE*
-ooPluginGetFile(const char *fileName)
+rsrc_get_plugin_file(const char *fileName)
 {
-    char *path = ooPluginGetPath(fileName);
+    char *path = rsrc_get_plugin_path(fileName);
 
     if (path != NULL) {
         FILE *file = fopen(path, "r");
@@ -186,9 +186,9 @@ ooPluginGetFile(const char *fileName)
 }
 
 int
-ooPluginGetFd(const char *fileName)
+rsrc_get_plugin_fd(const char *fileName)
 {
-    char *path = ooPluginGetPath(fileName);
+    char *path = rsrc_get_plugin_path(fileName);
 
     if (path != NULL) {
         int fd = open(path, O_RDONLY);

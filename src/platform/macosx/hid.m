@@ -53,7 +53,7 @@ hidCreateMatchDict(int page, int key)
                                     &kCFTypeDictionaryValueCallBacks);
 
   if (!query) {
-    ooLogError("could not create device matching dictionary");
+    log_error("could not create device matching dictionary");
   }
   CFNumberRef pageNum = CFNumberCreate(kCFAllocatorDefault,
                                        kCFNumberIntType,
@@ -149,7 +149,7 @@ hidVendorId(IOHIDDeviceRef dev)
     return result;
   }
 
-  ooLogError("vendor id is invalid");
+  log_error("vendor id is invalid");
   return -1;
 }
 
@@ -160,7 +160,7 @@ hidProductId(IOHIDDeviceRef dev)
   if (hidDevGetLongProp(dev, CFSTR( kIOHIDProductIDKey ), &result)) {
     return result;
   }
-  ooLogError("product id is invalid");
+  log_error("product id is invalid");
   return -1;
 }
 
@@ -172,7 +172,7 @@ hidProductName(IOHIDDeviceRef dev)
     return ref;
   }
 
-  ooLogError("product name is invalid");
+  log_error("product name is invalid");
   return NULL;
 }
 
@@ -184,7 +184,7 @@ hidVendorName(IOHIDDeviceRef dev)
     return ref;
   }
 
-  ooLogError("vendor name is invalid");
+  log_error("vendor name is invalid");
   return NULL;
 }
 
@@ -196,7 +196,7 @@ hidSerialNumber(IOHIDDeviceRef dev)
     return ref;
   }
 
-  ooLogError("vendor name is invalid");
+  log_error("vendor name is invalid");
   return NULL;
 }
 
@@ -240,7 +240,7 @@ hidInit(void)
 
   IOReturn res = IOHIDManagerOpen(_hidManager, kIOHIDOptionsTypeNone);
   if (res != kIOReturnSuccess) {
-    ooLogError("could not open hid-manager");
+    log_error("could not open hid-manager");
   }
 
   // Schedule hid manager to main run loop
@@ -297,7 +297,7 @@ hidCalibrateDevice(IOHIDDeviceRef dev)
             case kHIDUsage_GD_Hatswitch: {
               int hat_min = IOHIDElementGetLogicalMin(elem);
               int hat_max = IOHIDElementGetLogicalMax(elem);
-              ooLogInfo("hat switch min %d max %d", hat_min, hat_max);
+              log_info("hat switch min %d max %d", hat_min, hat_max);
               break;
             }
             default:
@@ -357,9 +357,9 @@ hidConnected(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef dev)
   }
   CFRelease(arr);
 
-  int deviceID = ioRegisterDevice(vendorID, vendorStr,
-                                  productID, productStr,
-                                  buttonCount, hatCount);
+  int deviceID = io_register_device(vendorID, vendorStr,
+                                    productID, productStr,
+                                    buttonCount, hatCount);
   CFDictionarySetValue(_deviceToIDDict, dev, (void*)deviceID);
 
   if (IOHIDDeviceConformsTo(dev, kHIDPage_Simulation,
@@ -381,7 +381,7 @@ hidDisconnected(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef dev)
   assert(sender == _hidManager);
   int devId = (int) CFDictionaryGetValue(_deviceToIDDict, dev);
   CFDictionaryRemoveValue(_deviceToIDDict, dev);
-  ioRemoveDevice(devId);
+  io_remove_device(devId);
 }
 
 void
@@ -402,7 +402,7 @@ hidValueChanged(void *ctxt, IOReturn result, void *sender, IOHIDValueRef val)
   //CFIndex minVal = IOHIDElementGetPhysicalMin(elem);
   //NSLog(@"Name: %@", name);
 
-//  ooLogInfo("%d: %d [%d, %d]", (int)ctype, (int)ival, (int)minVal, (int)maxVal);
+//  log_info("%d: %d [%d, %d]", (int)ctype, (int)ival, (int)minVal, (int)maxVal);
 
   switch (etype){
     case kIOHIDElementTypeInput_Misc: {
@@ -412,31 +412,31 @@ hidValueChanged(void *ctxt, IOReturn result, void *sender, IOHIDValueRef val)
 
       switch (usage) {
         case kHIDUsage_GD_X: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_X, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_X, dval);
           break;
         }
         case kHIDUsage_GD_Y: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_Y, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_Y, dval);
           break;
         }
         case kHIDUsage_GD_Z: {
-         ioPhysicalAxisChanged(dev_id, IO_AXIS_Z, dval);
+         io_physical_axis_changed(dev_id, IO_AXIS_Z, dval);
           break;
         }
         case kHIDUsage_GD_Rx: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_RX, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_RX, dval);
           break;
         }
         case kHIDUsage_GD_Ry: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_RY, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_RY, dval);
           break;
         }
         case kHIDUsage_GD_Rz: {
-          ioPhysicalAxisChanged(dev_id, IO_AXIS_RZ, dval);
+          io_physical_axis_changed(dev_id, IO_AXIS_RZ, dval);
           break;
         }
         case kHIDUsage_GD_Slider: {
-          ioPhysicalSliderChanged(dev_id, IO_SLIDER_THROT_0, dval);
+          io_physical_slider_changed(dev_id, IO_SLIDER_THROT_0, dval);
           break;
         }
         case kHIDUsage_GD_Hatswitch: {
@@ -450,9 +450,9 @@ hidValueChanged(void *ctxt, IOReturn result, void *sender, IOHIDValueRef val)
 
           // TODO: Think of this
           if (ival < hat_min || hat_max < ival) {
-            ioDeviceHatSet(dev_id, 0, -1, -1);
+            io_device_hat_set(dev_id, 0, -1, -1);
           } else {
-            ioDeviceHatSet(dev_id, 0, ival, hat_pval);
+            io_device_hat_set(dev_id, 0, ival, hat_pval);
           }
           break;
         }
@@ -460,38 +460,38 @@ hidValueChanged(void *ctxt, IOReturn result, void *sender, IOHIDValueRef val)
           break;// ignore
       }
     }
-//      ooLogInfo("input misc");
+//      log_info("input misc");
       break;
     case kIOHIDElementTypeOutput:
-//      ooLogInfo("output");
+//      log_info("output");
       break;
     case kIOHIDElementTypeFeature:
-//      ooLogInfo("feature");
+//      log_info("feature");
 
       break;
     case kIOHIDElementTypeCollection:
-//      ooLogInfo("collection");
+//      log_info("collection");
       break;
     case kIOHIDElementTypeInput_Axis:
-//      ooLogInfo("axis value");
+//      log_info("axis value");
       break;
     case kIOHIDElementTypeInput_Button: {
       CFIndex state = IOHIDValueGetIntegerValue(val);
       uint32_t button_id = IOHIDElementGetUsage(elem);
-      ooLogInfo("pushed button %u, state = %u", button_id, state);
+      log_info("pushed button %u, state = %u", button_id, state);
       if (state) {
-        ioDeviceButtonDown(dev_id, button_id);
+        io_device_button_down(dev_id, button_id);
       } else {
-        ioDeviceButtonUp(dev_id, button_id);
+        io_device_button_up(dev_id, button_id);
       }
       //ioButtonStateChanged(dev, button_id, state);
       break;
     }
     case kIOHIDElementTypeInput_ScanCodes:
-//      ooLogInfo("scan code");
+//      log_info("scan code");
       break;
     default:
-      ooLogInfo("other value");
+      log_info("other value");
   }
 }
 
@@ -506,7 +506,7 @@ hidConnectedDesktop(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef de
   long product = hidProductId(dev);
   CFStringRef prodName = hidProduct(dev);
 
-  ooLogInfo("usb device detected (v = %ld, p = %ld)", vendor, product);
+  log_info("usb device detected (v = %ld, p = %ld)", vendor, product);
   NSLog(@"%@", prodName);
 
   // Get all elements of the device
@@ -514,7 +514,7 @@ hidConnectedDesktop(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef de
   //kIOHIDElementNameKey
   int elemCount = CFArrayGetCount(elements);
 
-  ooLogInfo("elements in device = %d", elemCount);
+  log_info("elements in device = %d", elemCount);
   for (int i = 0 ; i < elemCount ; i ++) {
     IOHIDElementRef elem = (IOHIDElementRef) CFArrayGetValueAtIndex(elements, i);
     IOHIDElementType etype = IOHIDElementGetType(elem);
@@ -531,88 +531,88 @@ hidConnectedDesktop(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef de
         uint32_t usage = IOHIDElementGetUsage(elem);
         switch (usage) {
           case kHIDUsage_GD_X:
-            ooLogInfo("found x-axis");
+            log_info("found x-axis");
             break;
           case kHIDUsage_GD_Y:
-            ooLogInfo("found y-axis");
+            log_info("found y-axis");
             break;
           case kHIDUsage_GD_Z:
-            ooLogInfo("found z-axis");
+            log_info("found z-axis");
             break;
           case kHIDUsage_GD_Rx:
-            ooLogInfo("found rx-axis");
+            log_info("found rx-axis");
             break;
           case kHIDUsage_GD_Ry:
-            ooLogInfo("found ry-axis");
+            log_info("found ry-axis");
             break;
           case kHIDUsage_GD_Rz:
-            ooLogInfo("found rz-axis");
+            log_info("found rz-axis");
             break;
 
           // Vector stuff
           case kHIDUsage_GD_Vx: /* Dynamic Value */
-            ooLogInfo("found vec x");
+            log_info("found vec x");
             break;
           case kHIDUsage_GD_Vy: /* Dynamic Value */
-            ooLogInfo("found vec y");
+            log_info("found vec y");
             break;
           case kHIDUsage_GD_Vz:	/* Dynamic Value */
-            ooLogInfo("found vec z");
+            log_info("found vec z");
             break;
           case kHIDUsage_GD_Vbrx:	/* Dynamic Value */
-            ooLogInfo("found vec rx");
+            log_info("found vec rx");
             break;
           case kHIDUsage_GD_Vbry:	/* Dynamic Value */
-            ooLogInfo("found vec ry");
+            log_info("found vec ry");
             break;
           case kHIDUsage_GD_Vbrz:	/* Dynamic Value */
-            ooLogInfo("found vec rz");
+            log_info("found vec rz");
             break;
           case kHIDUsage_GD_Vno:	/* Dynamic Value */
-            ooLogInfo("found vec no");
+            log_info("found vec no");
             break;
           // Dpad
           case kHIDUsage_GD_DPadUp:	/* On/Off Control */
-            ooLogInfo("found dpad up");
+            log_info("found dpad up");
             break;
           case kHIDUsage_GD_DPadDown:	/* On/Off Control */
-            ooLogInfo("found dpad down");
+            log_info("found dpad down");
             break;
           case kHIDUsage_GD_DPadRight:	/* On/Off Control */
-            ooLogInfo("found dpad right");
+            log_info("found dpad right");
             break;
           case kHIDUsage_GD_DPadLeft:
-            ooLogInfo("found dpad left");
+            log_info("found dpad left");
             break;
 
           // Sliders and dials
           case kHIDUsage_GD_Slider:	/* Dynamic Value */
-            ooLogInfo("found slider");
+            log_info("found slider");
             break;
           case kHIDUsage_GD_Dial:	/* Dynamic Value */
-            ooLogInfo("found dial");
+            log_info("found dial");
             break;
           case kHIDUsage_GD_Wheel:	/* Dynamic Value */
-            ooLogInfo("found wheel");
+            log_info("found wheel");
             break;
           case kHIDUsage_GD_Hatswitch:	/* Dynamic Value */
-            ooLogInfo("found hat");
+            log_info("found hat");
             break;
           case kHIDUsage_GD_CountedBuffer:	/* Logical Collection */
-            ooLogInfo("found counted buffer");
+            log_info("found counted buffer");
             break;
           case kHIDUsage_GD_ByteCount:	/* Dynamic Value */
-            ooLogInfo("found byte count");
+            log_info("found byte count");
             break;
           case kHIDUsage_GD_MotionWakeup:	/* One-Shot Control */
-            ooLogInfo("found motion wakeup");
+            log_info("found motion wakeup");
             break;
           case kHIDUsage_GD_Start:	/* On/Off Control */
-            ooLogInfo("found start");
+            log_info("found start");
 
             break;
           case kHIDUsage_GD_Select:	/* On/Off Control */
-            ooLogInfo("found select");
+            log_info("found select");
             break;
           default: {
             const char *strName = CFStringGetCStringPtr(prodName,
@@ -622,40 +622,40 @@ hidConnectedDesktop(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef de
             break;
           }
         }
-        //ooLogInfo("input misc");
+        //log_info("input misc");
 
         break;
       }
       case kIOHIDElementTypeOutput:
-        ooLogInfo("output");
+        log_info("output");
         break;
       case kIOHIDElementTypeFeature:
-        ooLogInfo("feature");
+        log_info("feature");
         break;
       case kIOHIDElementTypeCollection: {
-        ooLogInfo("collection");
+        log_info("collection");
         IOHIDElementCollectionType ctyp = IOHIDElementGetCollectionType(elem);
         switch (ctyp) {
           case kIOHIDElementCollectionTypePhysical:
-            ooLogInfo("physical");
+            log_info("physical");
             break;
           case kIOHIDElementCollectionTypeApplication:
-            ooLogInfo("application");
+            log_info("application");
             break;
           case kIOHIDElementCollectionTypeLogical:
-            ooLogInfo("logical");
+            log_info("logical");
             break;
           case kIOHIDElementCollectionTypeReport:
-            ooLogInfo("report");
+            log_info("report");
             break;
           case kIOHIDElementCollectionTypeNamedArray:
-            ooLogInfo("named array");
+            log_info("named array");
             break;
           case kIOHIDElementCollectionTypeUsageSwitch:
-            ooLogInfo("usage switch");
+            log_info("usage switch");
             break;
           case kIOHIDElementCollectionTypeUsageModifier:
-            ooLogInfo("usage modifier");
+            log_info("usage modifier");
             break;
           default:
           break;
@@ -663,19 +663,19 @@ hidConnectedDesktop(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef de
         break;
       }
       case kIOHIDElementTypeInput_Axis:
-        ooLogInfo("axis value");
+        log_info("axis value");
         break;
       case kIOHIDElementTypeInput_Button: {
         // In this case, usage is button id
         uint32_t usage = IOHIDElementGetUsage(elem);
-        ooLogInfo("found button %d", usage);
+        log_info("found button %d", usage);
         break;
       }
       case kIOHIDElementTypeInput_ScanCodes:
-        ooLogInfo("scan code");
+        log_info("scan code");
         break;
       default:
-        ooLogInfo("other value");
+        log_info("other value");
     }
   }
 }

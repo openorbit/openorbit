@@ -70,17 +70,17 @@ init_al(void)
   ALCdevice *dev = alcOpenDevice(NULL);
   ALenum err = alcGetError(dev);
   if (err != ALC_NO_ERROR) {
-    ooLogError("could not get the default al device");
+    log_error("could not get the default al device");
   }
 
   ALCcontext *ctxt = alcCreateContext(dev, NULL);
   err = alcGetError(dev);
   if (err != ALC_NO_ERROR) {
-    ooLogError("could not create al context");
+    log_error("could not create al context");
   }
 
   if (alcMakeContextCurrent(ctxt) == ALC_FALSE) {
-    ooLogError("could not make the al context current");
+    log_error("could not make the al context current");
   }
 }
 

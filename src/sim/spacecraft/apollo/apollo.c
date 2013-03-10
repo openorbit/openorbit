@@ -68,14 +68,14 @@ AxisUpdate(sim_spacecraft_t *sc)
   //       This is important in order to allow for multiplexed axis commands,
   //       in turn enabling autopilots and network control.
 
-  OOaxises axises;
-  ooGetAxises(&axises);
+  sim_axises_t axises;
+  sim_get_axises(&axises);
 
   switch (sc->detatchSequence) {
     case SATURN_1C: {
       sim_stage_t *saturn_1c = sc->stages.elems[SATURN_1C];
       ARRAY_FOR_EACH(i, saturn_1c->engines) {
-        simEngineSetThrottle(ARRAY_ELEM(saturn_1c->engines, i),
+        sim_engine_set_throttle(ARRAY_ELEM(saturn_1c->engines, i),
                              SIM_VAL(axises.orbital));
       }
       break;
@@ -83,7 +83,7 @@ AxisUpdate(sim_spacecraft_t *sc)
     case SATURN_II: {
       sim_stage_t *saturn_ii = sc->stages.elems[SATURN_II];
       ARRAY_FOR_EACH(i, saturn_ii->engines) {
-        simEngineSetThrottle(ARRAY_ELEM(saturn_ii->engines, i),
+        sim_engine_set_throttle(ARRAY_ELEM(saturn_ii->engines, i),
                              SIM_VAL(axises.orbital));
       }
       break;
@@ -91,14 +91,14 @@ AxisUpdate(sim_spacecraft_t *sc)
     case SATURN_IVB: {
       sim_stage_t *saturn_ivb = sc->stages.elems[SATURN_IVB];
       ARRAY_FOR_EACH(i, saturn_ivb->engines) {
-        simEngineSetThrottle(ARRAY_ELEM(saturn_ivb->engines, i),
+        sim_engine_set_throttle(ARRAY_ELEM(saturn_ivb->engines, i),
                              SIM_VAL(axises.orbital));
       }
       break;
     }
     case APOLLO_SERVICE: {
       sim_stage_t *apollo_service = sc->stages.elems[APOLLO_SERVICE];
-      SIMengine *eng = ARRAY_ELEM(apollo_service->engines, ENG_SERV_PROP);
+      sim_engine_t *eng = ARRAY_ELEM(apollo_service->engines, ENG_SERV_PROP);
       (void)eng; // TODO
       break;
     }
@@ -115,7 +115,7 @@ AxisUpdate(sim_spacecraft_t *sc)
 static void
 DetatchComplete(void *data)
 {
-  ooLogInfo("detatch complete");
+  log_info("detatch complete");
 
   sim_spacecraft_t *sc = (sim_spacecraft_t*)data;
   sc->detatchPossible = false; // Do not reenable, must be false after last stage detatched
@@ -123,43 +123,43 @@ DetatchComplete(void *data)
 
   //sim_stage_t *stage = sc->stages.elems[MERC_CAPSULE];
   //
-  //simEngineDisable(ARRAY_ELEM(stage->engines, THR_POSI));
-  //simStageArmEngines(stage);
-  //simEngineDisarm(ARRAY_ELEM(stage->engines, THR_POSI));
+  //sim_engine_disable(ARRAY_ELEM(stage->engines, THR_POSI));
+  //sim_stage_arm_engines(stage);
+  //sim_engine_disarm(ARRAY_ELEM(stage->engines, THR_POSI));
 }
 
 static void
 DetatchStage(sim_spacecraft_t *sc)
 {
-  ooLogInfo("detatch commanded");
+  log_info("detatch commanded");
   sc->detatchPossible = false;
 
   switch (sc->detatchSequence) {
   case SATURN_1C: {
-    ooLogInfo("detatching saturn 1c stage");
+    log_info("detatching saturn 1c stage");
     sim_stage_t *sat_1c = sc->stages.elems[SATURN_1C];
     sim_stage_t *sat_ii = sc->stages.elems[SATURN_II];
 
-    simStageDisableEngines(sat_1c);
-    simStageLockEngines(sat_1c);
+    sim_stage_disable_engines(sat_1c);
+    sim_stage_lock_engines(sat_1c);
 
-    simDetatchStage(sc, sat_1c);
+    sim_spaccraft_detatch_stage(sc, sat_1c);
 
-    simEngineArm(ARRAY_ELEM(sat_ii->engines, THR_POSI));
-    simEngineFire(ARRAY_ELEM(sat_ii->engines, THR_POSI));
+    sim_engine_arm(ARRAY_ELEM(sat_ii->engines, THR_POSI));
+    sim_engine_fire(ARRAY_ELEM(sat_ii->engines, THR_POSI));
 
     sc->detatchComplete = false;
-    simEnqueueDelta_s(1.0, DetatchComplete, sc);
+    sim_event_enqueue_relative_s(1.0, DetatchComplete, sc);
     break;
   }
   case SATURN_II:
-    ooLogInfo("detatching saturn ii stage");
+    log_info("detatching saturn ii stage");
     break;
   case SATURN_IVB:
-    ooLogInfo("detatching saturn ivb stage");
+    log_info("detatching saturn ivb stage");
     break;
   case APOLLO_SERVICE:
-    ooLogInfo("detatching apollo service module");
+    log_info("detatching apollo service module");
     break;
   case APOLLO_COMMAND:
     break;
@@ -222,39 +222,39 @@ ApolloInit(sim_spacecraft_t *sc)
   // 1/2 mrr = 0.5 * 1.0 * 0.89 * 0.89 = 0.39605
   // 1/12 m(3rr + hh) = 27.14764852
 
-  sim_stage_t *sat_1c = simNewStage(sc, "Saturn 1C",
+  sim_stage_t *sat_1c = sim_new_stage(sc, "Saturn 1C",
                                 "spacecrafts/saturn/saturn_1c.ac");
-  /*sim_stage_t *sat_ii =*/ simNewStage(sc, "Saturn II",
+  /*sim_stage_t *sat_ii =*/ sim_new_stage(sc, "Saturn II",
                                 "spacecrafts/saturn/saturn_ii.ac");
-  /*sim_stage_t *sat_ivb =*/ simNewStage(sc, "Saturn IVB",
+  /*sim_stage_t *sat_ivb =*/ sim_new_stage(sc, "Saturn IVB",
                                  "spacecrafts/saturn/saturn_ivb.ac");
-  /*sim_stage_t *apollo_serv =*/ simNewStage(sc, "Service Module",
+  /*sim_stage_t *apollo_serv =*/ sim_new_stage(sc, "Service Module",
                                      "spacecrafts/saturn/apollo_serv.ac");
-  /*sim_stage_t *apollo_cmd =*/ simNewStage(sc, "Command Module",
+  /*sim_stage_t *apollo_cmd =*/ sim_new_stage(sc, "Command Module",
                                     "spacecrafts/saturn/apollo_cmd.ac");
 
 
-  plMassSet(&sat_1c->obj->m, 1.0f, // Default to 1.0 kg
+  pl_mass_set(&sat_1c->obj->m, 1.0f, // Default to 1.0 kg
             0.0f, 0.0f, 0.0f,
             27.14764852, 0.39605, 27.14764852,
             0.0, 0.0, 0.0);
-  plMassMod(&sat_1c->obj->m, 24000.0 + 2200.0);
-  plMassTranslate(&sat_1c->obj->m, 0.0, 8.9916, 0.0);
-  plMassSetMin(&sat_1c->obj->m, 4400.0);
-  plSetDragCoef(sat_1c->obj, 0.5);
-  plSetArea(sat_1c->obj, 2.0*M_PI);
+  pl_mass_mod(&sat_1c->obj->m, 24000.0 + 2200.0);
+  pl_mass_translate(&sat_1c->obj->m, 0.0, 8.9916, 0.0);
+  pl_mass_set_min(&sat_1c->obj->m, 4400.0);
+  pl_object_set_drag_coef(sat_1c->obj, 0.5);
+  pl_object_set_area(sat_1c->obj, 2.0*M_PI);
 
-  scStageSetOffset3f(sat_1c, 0.0, 0.0, 0.0);
+  sim_stage_set_offset3f(sat_1c, 0.0, 0.0, 0.0);
 
-  simNewEngine("Rocketdyne F-1:0", sat_1c, SIM_Thruster, SIM_Armed, 1.0f,
+  sim_new_engine("Rocketdyne F-1:0", sat_1c, SIM_THRUSTER, SIM_ARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
-  simNewEngine("Rocketdyne F-1:1", sat_1c, SIM_Thruster, SIM_Armed, 1.0f,
+  sim_new_engine("Rocketdyne F-1:1", sat_1c, SIM_THRUSTER, SIM_ARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
-  simNewEngine("Rocketdyne F-1:2", sat_1c, SIM_Thruster, SIM_Armed, 1.0f,
+  sim_new_engine("Rocketdyne F-1:2", sat_1c, SIM_THRUSTER, SIM_ARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
-  simNewEngine("Rocketdyne F-1:3", sat_1c, SIM_Thruster, SIM_Armed, 1.0f,
+  sim_new_engine("Rocketdyne F-1:3", sat_1c, SIM_THRUSTER, SIM_ARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
-  simNewEngine("Rocketdyne F-1:4", sat_1c, SIM_Thruster, SIM_Armed, 1.0f,
+  sim_new_engine("Rocketdyne F-1:4", sat_1c, SIM_THRUSTER, SIM_ARMED, 1.0f,
                (float3){0.0,0.0,0.0}, (float3){0.0,370.0e3,0.0});
 
 }
@@ -268,7 +268,7 @@ ApolloInit2(sim_class_t *cls, void *sc, void *arg)
 
 MODULE_INIT(apollo, "spacecraft", NULL)
 {
-  ooLogTrace("initialising 'apollo' module");
+  log_trace("initialising 'apollo' module");
   sim_class_t *cls = sim_register_class("Spacecraft", "Apollo",
                                         ApolloInit2, sizeof(sim_spacecraft_t));
   (void)cls; // TODO

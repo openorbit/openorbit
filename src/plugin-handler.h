@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2013 Mattias Holm <mattias.holm(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -28,7 +28,7 @@ extern "C" {
 
 #include <openorbit/plugin.h>
 
-void ooPluginInit(void);
+void plugin_init(void);
 
 /*!
     Loads a plugin
@@ -52,14 +52,14 @@ void ooPluginInit(void);
     \return A zero terminated c-string containing the identifier of the plugin.
 */
 
-void ooPluginLoadAll(void);
-char *ooPluginLoad(char *filename);
-void ooPluginUnload(char *key);
+void plugin_load_all(void);
+char *plugin_load(char *filename);
+void plugin_unload(char *key);
 
-void ooPluginRegisterInterface(char *interface_key, void *interface);
-void ooPluginRemoveInterface(char *interface_key);
+void plugin_register_interface(char *interface_key, void *interface);
+void plugin_remove_interface(char *interface_key);
 
-void ooPluginPrintAll(void);
+void plugin_print_all(void);
 
 
 #ifdef __cplusplus

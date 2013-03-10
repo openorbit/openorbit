@@ -36,7 +36,7 @@
 #include "physics/areodynamics.h"
 #include "physics/collision.h"
 
-typedef struct PL_keplerian_elements {
+typedef struct pl_keplerelems_t {
   double ecc;
   double a; // Semi-major
   double b; // Auxillary semi-minor
@@ -45,16 +45,16 @@ typedef struct PL_keplerian_elements {
   double argPeri;
   double meanAnomalyOfEpoch;
   quaternion_t qOrbit; // Orbital quaternion, this is derived information
-} PL_keplerian_elements ;
+} pl_keplerelems_t ;
 
-struct PLastrobody {
+struct pl_astrobody_t {
   char *name;
-  PLworld *world;
-  PLsystem *sys;
+  pl_world_t *world;
+  pl_system_t *sys;
   PLobject obj;
   double GM;
   PLatmosphere *atm;
-  PL_keplerian_elements *kepler;
+  pl_keplerelems_t *kepler;
   //sg_object_t *drawable; //!< Link to scenegraph drawable object representing this
   //                      //!< object.
   //sg_light_t *lightSource; //!< Light source if the object emits light
@@ -74,9 +74,9 @@ struct PLastrobody {
   int orbitFixationPeriod; // How many steps between updates
 };
 
-struct PLsystem {
-  PLworld *world;
-  PLsystem *parent;
+struct pl_system_t {
+  pl_world_t *world;
+  pl_system_t *parent;
   sg_scene_t *scene;
 
   const char *name;
@@ -93,58 +93,65 @@ struct PLsystem {
   obj_array_t astroObjs; // objects in this system
   obj_array_t rigidObjs; // objects in this system
 
-  PLastrobody *orbitalBody; // The body actually orbiting at this point, note that it is
+  pl_astrobody_t *orbitalBody; // The body actually orbiting at this point, note that it is
   double orbitalPeriod;
 };
 
 
-struct PLworld {
+struct pl_world_t {
   const char *name;
-  PLsystem *rootSys;
-  PLcollisioncontext *collCtxt;
+  pl_system_t *rootSys;
+  pl_collisioncontext_t *collCtxt;
   obj_array_t objs; // All objects in world, even ones not placed in subsystems
   obj_array_t partSys; // All particle systems in world
 };
 
-PLworld* plNewWorld(const char *name, sg_scene_t *sc,
-                    double m, double gm, double radius,
-                    double siderealPeriod, double obliquity,
-                    double eqRadius, double flattening);
+pl_world_t* pl_new_world(const char *name, sg_scene_t *sc,
+                         double m, double gm, double radius,
+                         double siderealPeriod, double obliquity,
+                         double eqRadius, double flattening);
 
-PLsystem* plNewRootSystem(PLworld *world, sg_scene_t *sc, const char *name,
-                          double m, double gm, double obliquity, double siderealPeriod,
+pl_system_t* pl_new_root_system(pl_world_t *world, sg_scene_t *sc,
+                                const char *name,
+                                double m, double gm, double obliquity,
+                                double siderealPeriod,
+                                double eqRadius, double flattening);
+
+
+pl_system_t* pl_new_orbit(pl_world_t *world, sg_scene_t *sc, const char *name,
+                          double m, double gm,
+                          double orbitPeriod, double obliquity,
+                          double siderealPeriod,
+                          double semiMaj, double semiMin,
+                          double inc, double ascendingNode,
+                          double argOfPeriapsis,
+                          double meanAnomaly,
                           double eqRadius, double flattening);
+pl_system_t* pl_new_sub_orbit(pl_system_t *orb, sg_scene_t *sc,
+                              const char *name, double m, double gm,
+                              double orbitPeriod, double obliquity,
+                              double siderealPeriod,
+                              double semiMaj, double semiMin,
+                              double inc, double ascendingNode,
+                              double argOfPeriapsis,
+                              double meanAnomaly,
+                              double eqRadius, double flattening);
 
+pl_system_t* pl_world_get_system(pl_world_t *world, const char *name);
+pl_astrobody_t* pl_world_get_object(pl_world_t *world, const char *name);
+float3 pl_astrobody_get_pos(const pl_astrobody_t *obj);
+float3 pl_world_get_pos_for_name(const pl_world_t *world, const char *name);
+void pl_world_get_pos_for_name3f(const pl_world_t *world, const char *name,
+                                 float *x, float *y, float *z);
+PLobject* pl_astrobody_get_obj(pl_astrobody_t *abody);
 
-PLsystem* plNewOrbit(PLworld *world, sg_scene_t *sc, const char *name, double m, double gm,
-                     double orbitPeriod, double obliquity, double siderealPeriod,
-                     double semiMaj, double semiMin,
-                     double inc, double ascendingNode, double argOfPeriapsis,
-                     double meanAnomaly,
-                     double eqRadius, double flattening);
-PLsystem* plNewSubOrbit(PLsystem *orb, sg_scene_t *sc, const char *name, double m, double gm,
-                        double orbitPeriod, double obliquity, double siderealPeriod,
-                        double semiMaj, double semiMin,
-                        double inc, double ascendingNode, double argOfPeriapsis,
-                        double meanAnomaly,
-                        double eqRadius, double flattening);
+float3 pl_compute_current_velocity(pl_astrobody_t *ab);
 
-PLsystem* plGetSystem(PLworld *world, const char *name);
-PLastrobody* plGetObject(PLworld *world, const char *name);
-float3 plGetPos(const PLastrobody *obj);
-float3 plGetPosForName(const PLworld *world, const char *name);
-void plGetPosForName3f(const PLworld *world, const char *name,
-                       float *x, float *y, float *z);
-PLobject* plObjForAstroBody(PLastrobody *abody);
+void pl_world_step(pl_world_t *world, double dt);
+void pl_world_clear(pl_world_t *world);
 
-float3 plComputeCurrentVelocity(PLastrobody *ab);
-
-void plWorldStep(PLworld *world, double dt);
-void plWorldClear(PLworld *world);
-
-double plOrbitalPeriod(double a, double GM);
-void plSetDrawable(PLastrobody *obj, sg_object_t *drawable);
-void plSysInit(PLsystem *sys);
+double pl_orbital_period(double a, double GM);
+void pl_sys_init(pl_system_t *sys);
 
 
 #endif /* ! _ORBIT_H_ */
