@@ -139,7 +139,7 @@ We use OpenGL 3.2 (when supported by all major platforms, we will move
 to 3.3 or above). The following conventions are used:
 
 Only one fragment output variable is used. This variable MUST BE NAMED
-=oo_FragColor'.
+=oo_FragColor=.
 
 Variables in GLSL referenced from C should be prefixed with oo_.
 
