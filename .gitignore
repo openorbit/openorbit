@@ -8,4 +8,5 @@ xcuserdata
 deps/*
 *.bak
 *.orig
-
+lib/vmath/*
+lib/celmek/*
