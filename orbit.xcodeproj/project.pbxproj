@@ -233,6 +233,8 @@
 		EC8CC1F015F1FE0E00FC71F4 /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1E515F1FE0C00FC71F4 /* collada.c */; };
 		EC8CC1F515F2003E00FC71F4 /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F415F2003D00FC71F4 /* overlay.c */; };
 		EC8CC1F615F2003E00FC71F4 /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F415F2003D00FC71F4 /* overlay.c */; };
+		EC8CF7C416EE75FF004A6F83 /* barneshut.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CF7C316EE75FF004A6F83 /* barneshut.c */; };
+		EC8CF7C516EE75FF004A6F83 /* barneshut.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CF7C316EE75FF004A6F83 /* barneshut.c */; };
 		EC8E74A114F7732F0052BBE6 /* pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8E749E14F773240052BBE6 /* pcm.c */; };
 		EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9351D314F7989900962391 /* libpython2.7.a */; };
 		EC9351EB14F9449700962391 /* menus.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351EA14F9449700962391 /* menus.c */; };
@@ -279,7 +281,8 @@
 		ECE3C1EE14363D85001C1F32 /* mouse.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE3C1ED14363D85001C1F32 /* mouse.c */; };
 		ECE3C1F014363DCB001C1F32 /* sdl-mouse.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE3C1EF14363DCB001C1F32 /* sdl-mouse.c */; };
 		ECE6A8441167CAB400003CBD /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
-		ECE73AED16F7037900A4662C /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE73AEC16F7037900A4662C /* libvmath.a */; };
+		ECE73AF216F9D7EE00A4662C /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE73AEC16F7037900A4662C /* libvmath.a */; };
+		ECE73AF416F9D7EE00A4662C /* libcelmek.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE73AF316F9D7EE00A4662C /* libcelmek.a */; };
 		ECF322B015E8DF520063AC74 /* location.c in Sources */ = {isa = PBXBuildFile; fileRef = ECF322AF15E8DF520063AC74 /* location.c */; };
 		ECF322B115E8DF520063AC74 /* location.c in Sources */ = {isa = PBXBuildFile; fileRef = ECF322AF15E8DF520063AC74 /* location.c */; };
 /* End PBXBuildFile section */
@@ -403,6 +406,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = ECBF1744108C565600D3E412;
 			remoteInfo = imgload;
+		};
+		ECE73AF016F8B68F00A4662C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC0C0215144174AD00A2AE5E;
+			remoteInfo = auload;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -658,6 +668,8 @@
 		EC8CC1E615F1FE0D00FC71F4 /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
 		EC8CC1F315F2003400FC71F4 /* overlay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = overlay.h; sourceTree = "<group>"; };
 		EC8CC1F415F2003D00FC71F4 /* overlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay.c; sourceTree = "<group>"; };
+		EC8CF77716EE3AAE004A6F83 /* libcelmek.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcelmek.a; path = lib/celmek/build/Release/libcelmek.a; sourceTree = "<group>"; };
+		EC8CF7C316EE75FF004A6F83 /* barneshut.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = barneshut.c; sourceTree = "<group>"; };
 		EC8E749E14F773240052BBE6 /* pcm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcm.c; sourceTree = "<group>"; };
 		EC8E749F14F773240052BBE6 /* pcm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcm.h; sourceTree = "<group>"; };
 		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
@@ -714,7 +726,9 @@
 		ECE3C1EF14363DCB001C1F32 /* sdl-mouse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-mouse.c"; sourceTree = "<group>"; };
 		ECE6A8421167CAB400003CBD /* pubsub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pubsub.h; sourceTree = "<group>"; };
 		ECE6A8431167CAB400003CBD /* pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pubsub.c; sourceTree = "<group>"; };
+		ECE73AA116F5BD0900A4662C /* barneshut.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = barneshut.h; sourceTree = "<group>"; };
 		ECE73AEC16F7037900A4662C /* libvmath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvmath.a; path = "../build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug/libvmath.a"; sourceTree = "<group>"; };
+		ECE73AF316F9D7EE00A4662C /* libcelmek.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcelmek.a; path = "../build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug/libcelmek.a"; sourceTree = "<group>"; };
 		ECF322AF15E8DF520063AC74 /* location.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = location.c; sourceTree = "<group>"; };
 		ECF6011F118D53B600332A94 /* spacecraft-control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spacecraft-control.h"; sourceTree = "<group>"; };
 		ECF60B4D140F75DD00EAD012 /* location.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = location.h; sourceTree = "<group>"; };
@@ -787,7 +801,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECE73AED16F7037900A4662C /* libvmath.a in Frameworks */,
+				ECE73AF416F9D7EE00A4662C /* libcelmek.a in Frameworks */,
+				ECE73AF216F9D7EE00A4662C /* libvmath.a in Frameworks */,
 				EC6CA8AC156BAD650052D56E /* libedit.dylib in Frameworks */,
 				EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */,
 				ECE17A881079DE71006B6A37 /* OpenGL.framework in Frameworks */,
@@ -1025,6 +1040,8 @@
 				EC1217881125410A007DC66F /* reftypes.h */,
 				EC0FBAEE11A70DEE00CEF95A /* collision.h */,
 				EC0FBAEF11A70DEE00CEF95A /* collision.c */,
+				EC8CF7C316EE75FF004A6F83 /* barneshut.c */,
+				ECE73AA116F5BD0900A4662C /* barneshut.h */,
 			);
 			path = physics;
 			sourceTree = "<group>";
@@ -1241,6 +1258,7 @@
 		EC4476740CCBFEDB001C88AD = {
 			isa = PBXGroup;
 			children = (
+				ECE73AF316F9D7EE00A4662C /* libcelmek.a */,
 				EC4C89F5137D4E5B007AC0DF /* tools */,
 				ECA5F8AF109D8FB3004278EC /* docs */,
 				EC34BDB1107B2C480011B76E /* lib */,
@@ -1283,6 +1301,7 @@
 			isa = PBXGroup;
 			children = (
 				ECE73AEC16F7037900A4662C /* libvmath.a */,
+				EC8CF77716EE3AAE004A6F83 /* libcelmek.a */,
 				EC6CA8AB156BAD650052D56E /* libedit.dylib */,
 				EC9351D314F7989900962391 /* libpython2.7.a */,
 				EC2386FD14F7851F00C59F16 /* libjansson.a */,
@@ -1718,6 +1737,7 @@
 				EC4485D50CCD4A19001C88AD /* PBXBuildRule */,
 			);
 			dependencies = (
+				ECE73AF116F8B68F00A4662C /* PBXTargetDependency */,
 				ECBF1753108C56C700D3E412 /* PBXTargetDependency */,
 			);
 			name = "Open Orbit";
@@ -2040,6 +2060,7 @@
 				EC8CC1EF15F1FE0E00FC71F4 /* collada.c in Sources */,
 				EC8CC1F515F2003E00FC71F4 /* overlay.c in Sources */,
 				ECD57DE316DFBE4200815416 /* monotonic-time.c in Sources */,
+				EC8CF7C416EE75FF004A6F83 /* barneshut.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2142,6 +2163,7 @@
 				EC8CC1F015F1FE0E00FC71F4 /* collada.c in Sources */,
 				EC8CC1F615F2003E00FC71F4 /* overlay.c in Sources */,
 				ECD57DE416DFBE4200815416 /* monotonic-time.c in Sources */,
+				EC8CF7C516EE75FF004A6F83 /* barneshut.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2218,6 +2240,11 @@
 			isa = PBXTargetDependency;
 			target = ECBF1744108C565600D3E412 /* imgload */;
 			targetProxy = ECBF1752108C56C700D3E412 /* PBXContainerItemProxy */;
+		};
+		ECE73AF116F8B68F00A4662C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC0C0215144174AD00A2AE5E /* auload */;
+			targetProxy = ECE73AF016F8B68F00A4662C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2625,6 +2652,7 @@
 					src/,
 					"$(ORBIT_INCPATH)",
 					include,
+					"${PROJECT_DIR}/lib/celmek/include",
 					"${PROJECT_DIR}/lib/vmath/include",
 				);
 				INFOPLIST_FILE = "Open Orbit-Info.plist";
@@ -2672,6 +2700,7 @@
 					src/,
 					"$(ORBIT_INCPATH)",
 					include,
+					"${PROJECT_DIR}/lib/celmek/include",
 					"${PROJECT_DIR}/lib/vmath/include",
 				);
 				INFOPLIST_FILE = "Open Orbit-Info.plist";
