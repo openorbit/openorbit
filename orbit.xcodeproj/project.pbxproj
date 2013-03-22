@@ -233,8 +233,8 @@
 		EC8CC1F015F1FE0E00FC71F4 /* collada.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1E515F1FE0C00FC71F4 /* collada.c */; };
 		EC8CC1F515F2003E00FC71F4 /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F415F2003D00FC71F4 /* overlay.c */; };
 		EC8CC1F615F2003E00FC71F4 /* overlay.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CC1F415F2003D00FC71F4 /* overlay.c */; };
-		EC8CF7C416EE75FF004A6F83 /* barneshut.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CF7C316EE75FF004A6F83 /* barneshut.c */; };
-		EC8CF7C516EE75FF004A6F83 /* barneshut.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CF7C316EE75FF004A6F83 /* barneshut.c */; };
+		EC8CF7C116EE3EEA004A6F83 /* celestial-object.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CF7C016EE3EEA004A6F83 /* celestial-object.c */; };
+		EC8CF7C216EE3EEA004A6F83 /* celestial-object.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8CF7C016EE3EEA004A6F83 /* celestial-object.c */; };
 		EC8E74A114F7732F0052BBE6 /* pcm.c in Sources */ = {isa = PBXBuildFile; fileRef = EC8E749E14F773240052BBE6 /* pcm.c */; };
 		EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9351D314F7989900962391 /* libpython2.7.a */; };
 		EC9351EB14F9449700962391 /* menus.c in Sources */ = {isa = PBXBuildFile; fileRef = EC9351EA14F9449700962391 /* menus.c */; };
@@ -283,6 +283,12 @@
 		ECE6A8441167CAB400003CBD /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
 		ECE73AF216F9D7EE00A4662C /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE73AEC16F7037900A4662C /* libvmath.a */; };
 		ECE73AF416F9D7EE00A4662C /* libcelmek.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE73AF316F9D7EE00A4662C /* libcelmek.a */; };
+		ECE73B0616FC477500A4662C /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE73B0516FC477400A4662C /* world.c */; };
+		ECE73B0716FC477500A4662C /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE73B0516FC477400A4662C /* world.c */; };
+		ECE73B0816FC477500A4662C /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE73B0516FC477400A4662C /* world.c */; };
+		ECE73B0C16FC4D0E00A4662C /* octtree.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE73B0B16FC4D0D00A4662C /* octtree.c */; };
+		ECE73B0D16FC4D0E00A4662C /* octtree.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE73B0B16FC4D0D00A4662C /* octtree.c */; };
+		ECE73B0E16FC4D0E00A4662C /* octtree.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE73B0B16FC4D0D00A4662C /* octtree.c */; };
 		ECF322B015E8DF520063AC74 /* location.c in Sources */ = {isa = PBXBuildFile; fileRef = ECF322AF15E8DF520063AC74 /* location.c */; };
 		ECF322B115E8DF520063AC74 /* location.c in Sources */ = {isa = PBXBuildFile; fileRef = ECF322AF15E8DF520063AC74 /* location.c */; };
 /* End PBXBuildFile section */
@@ -669,7 +675,7 @@
 		EC8CC1F315F2003400FC71F4 /* overlay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = overlay.h; sourceTree = "<group>"; };
 		EC8CC1F415F2003D00FC71F4 /* overlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay.c; sourceTree = "<group>"; };
 		EC8CF77716EE3AAE004A6F83 /* libcelmek.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcelmek.a; path = lib/celmek/build/Release/libcelmek.a; sourceTree = "<group>"; };
-		EC8CF7C316EE75FF004A6F83 /* barneshut.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = barneshut.c; sourceTree = "<group>"; };
+		EC8CF7C016EE3EEA004A6F83 /* celestial-object.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "celestial-object.c"; sourceTree = "<group>"; };
 		EC8E749E14F773240052BBE6 /* pcm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcm.c; sourceTree = "<group>"; };
 		EC8E749F14F773240052BBE6 /* pcm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcm.h; sourceTree = "<group>"; };
 		EC91C41E1101C28B00011177 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
@@ -726,9 +732,13 @@
 		ECE3C1EF14363DCB001C1F32 /* sdl-mouse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "sdl-mouse.c"; sourceTree = "<group>"; };
 		ECE6A8421167CAB400003CBD /* pubsub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pubsub.h; sourceTree = "<group>"; };
 		ECE6A8431167CAB400003CBD /* pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pubsub.c; sourceTree = "<group>"; };
-		ECE73AA116F5BD0900A4662C /* barneshut.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = barneshut.h; sourceTree = "<group>"; };
 		ECE73AEC16F7037900A4662C /* libvmath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvmath.a; path = "../build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug/libvmath.a"; sourceTree = "<group>"; };
 		ECE73AF316F9D7EE00A4662C /* libcelmek.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcelmek.a; path = "../build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug/libcelmek.a"; sourceTree = "<group>"; };
+		ECE73B0516FC477400A4662C /* world.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = world.c; sourceTree = "<group>"; };
+		ECE73B0916FC478400A4662C /* world.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
+		ECE73B0A16FC4D0100A4662C /* octtree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = octtree.h; sourceTree = "<group>"; };
+		ECE73B0B16FC4D0D00A4662C /* octtree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = octtree.c; sourceTree = "<group>"; };
+		ECE73B0F16FC7EC400A4662C /* celestial-object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "celestial-object.h"; sourceTree = "<group>"; };
 		ECF322AF15E8DF520063AC74 /* location.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = location.c; sourceTree = "<group>"; };
 		ECF6011F118D53B600332A94 /* spacecraft-control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spacecraft-control.h"; sourceTree = "<group>"; };
 		ECF60B4D140F75DD00EAD012 /* location.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = location.h; sourceTree = "<group>"; };
@@ -1040,8 +1050,12 @@
 				EC1217881125410A007DC66F /* reftypes.h */,
 				EC0FBAEE11A70DEE00CEF95A /* collision.h */,
 				EC0FBAEF11A70DEE00CEF95A /* collision.c */,
-				EC8CF7C316EE75FF004A6F83 /* barneshut.c */,
-				ECE73AA116F5BD0900A4662C /* barneshut.h */,
+				ECE73B0F16FC7EC400A4662C /* celestial-object.h */,
+				EC8CF7C016EE3EEA004A6F83 /* celestial-object.c */,
+				ECE73B0516FC477400A4662C /* world.c */,
+				ECE73B0916FC478400A4662C /* world.h */,
+				ECE73B0A16FC4D0100A4662C /* octtree.h */,
+				ECE73B0B16FC4D0D00A4662C /* octtree.c */,
 			);
 			path = physics;
 			sourceTree = "<group>";
@@ -1952,6 +1966,8 @@
 			files = (
 				EC44856D0CCD2547001C88AD /* testdriver-main.c in Sources */,
 				EC4485730CCD258E001C88AD /* test-case.c in Sources */,
+				ECE73B0816FC477500A4662C /* world.c in Sources */,
+				ECE73B0E16FC4D0E00A4662C /* octtree.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2060,7 +2076,9 @@
 				EC8CC1EF15F1FE0E00FC71F4 /* collada.c in Sources */,
 				EC8CC1F515F2003E00FC71F4 /* overlay.c in Sources */,
 				ECD57DE316DFBE4200815416 /* monotonic-time.c in Sources */,
-				EC8CF7C416EE75FF004A6F83 /* barneshut.c in Sources */,
+				EC8CF7C116EE3EEA004A6F83 /* celestial-object.c in Sources */,
+				ECE73B0616FC477500A4662C /* world.c in Sources */,
+				ECE73B0C16FC4D0E00A4662C /* octtree.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2163,7 +2181,9 @@
 				EC8CC1F015F1FE0E00FC71F4 /* collada.c in Sources */,
 				EC8CC1F615F2003E00FC71F4 /* overlay.c in Sources */,
 				ECD57DE416DFBE4200815416 /* monotonic-time.c in Sources */,
-				EC8CF7C516EE75FF004A6F83 /* barneshut.c in Sources */,
+				EC8CF7C216EE3EEA004A6F83 /* celestial-object.c in Sources */,
+				ECE73B0716FC477500A4662C /* world.c in Sources */,
+				ECE73B0D16FC4D0E00A4662C /* octtree.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

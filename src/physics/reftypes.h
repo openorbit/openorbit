@@ -29,5 +29,9 @@ typedef struct pl_particle_t pl_particle_t;
 typedef struct pl_particles_t pl_particles_t;
 typedef struct pl_recgrid_t pl_recgrid_t;
 typedef struct pl_collisioncontext_t pl_collisioncontext_t;
+typedef struct pl_celobject_t pl_celobject_t;
+typedef struct pl_octtree_t pl_octtree_t;
+typedef struct pl_atm_template_t pl_atm_template_t;
+typedef struct pl_atm_layer_t pl_atm_layer_t;
 
 #endif /* !PL_REFTYPES_H */

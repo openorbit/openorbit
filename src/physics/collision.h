@@ -42,7 +42,7 @@ struct pl_collisioncontext_t {
   obj_array_t colls;
 };
 
-pl_collisioncontext_t *pl_new_collision_context(void);
+pl_collisioncontext_t *pl_new_collision_context(double size);
 
 bool pl_collide_coarse(pl_collisioncontext_t *coll,
                      pl_object_t * restrict obj_a, pl_object_t * restrict obj_b);

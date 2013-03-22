@@ -23,18 +23,18 @@
 #include <vmath/vmath.h>
 #include <gencds/array.h>
 
+#include "physics/world.h"
 #include "physics/mass.h"
 #include "physics/reftypes.h"
 
 #include <vmath/lwcoord.h>
 
-  pl_system_t *sys;
-  struct PLobject *parent;
 struct pl_object_t {
+  pl_world_t *world;
+  pl_octtree_t *tree;
+  struct pl_object_t *parent;
   char *name;
   pl_mass_t m;
-  //SGdrawable *drawable; //!< Link to scenegraph drawable object representing this
-                        //!< object.
 
   lwcoord_t p; // Large world coordinates
   quaternion_t q; // Rotation quaternion

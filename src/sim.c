@@ -98,6 +98,8 @@ sim_init_plugins(void)
 void
 sim_init(void)
 {
+  pl_init();
+
   sim_spacecraft_control_init();
 
   // Set log level, need to do that here
@@ -122,20 +124,20 @@ sim_init(void)
   io_init();
 
   gSIM_state.world = sim_load_world(sim_get_scene(), "data/solsystem.hrml");
-
+  pl_time_set(sim_time_get_jd());
 
 
   sim_spacecraft_t *sc = sim_new_spacecraft("Mercury", "Mercury I");
-  sim_spacecraft_set_sys_and_coords(sc, "Sol/Earth",
+  sim_spacecraft_set_sys_and_coords(sc, "Earth",
                       0.0 /*longitude*/,
                       0.0 /*latitude*/,
                       250.0e3 /*altitude*/);
   sim_set_spacecraft(sc);
   sg_camera_t *cam = sg_scene_get_cam(sc->scene);
-  sim_stage_t *stage = ARRAY_ELEM(sc->stages, 0);
+  sim_stage_t *stage = ARRAY_ELEM(sc->stages, 1);
   sg_camera_track_object(cam, stage->sgobj);
   sg_camera_follow_object(cam, stage->sgobj);
-  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -100.0));
+  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -50.0));
 
   simMfdInitAll(sim_get_main_viewport());
 
@@ -195,7 +197,6 @@ sim_step(float dt)
   gettimeofday(&start, NULL);
 
   simAxisPush();
-  //sgCamStep(sgGetCam(gSIM_state.sg), dt);
 
   pl_world_clear(gSIM_state.world);
 
@@ -208,7 +209,8 @@ sim_step(float dt)
   sim_spacecraft_step(gSIM_state.currentSc, dt);
   sim_event_dispatch_pending();
 
-  pl_world_step(gSIM_state.world, dt);
+  double jde = sim_time_get_jd();
+  pl_world_step(gSIM_state.world, jde, dt);
 
   log_trace("sim step");
 

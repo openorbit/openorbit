@@ -239,7 +239,6 @@ sim_spacecraft_init(sim_spacecraft_t *sc, const char *name)
   sc->toggleMainEngine = sim_spacecraft_default_engine_toggle;
   sc->axisUpdate = sim_spacecraft_default_axis_update;
   pl_mass_set(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  pl_system_add_object(world->rootSys, sc->obj);
 }
 
 #if 0
@@ -447,6 +446,7 @@ sim_spacecraft_set_scene(sim_spacecraft_t *spacecraft, sg_scene_t *scene)
   }
 }
 
+#if 0
 void
 sim_spacecraft_set_system(sim_spacecraft_t *spacecraft, pl_system_t *sys)
 {
@@ -464,6 +464,8 @@ sim_spacecraft_set_system(sim_spacecraft_t *spacecraft, pl_system_t *sys)
   obj_array_push(&sys->rigidObjs, spacecraft->obj);
   spacecraft->obj->sys = sys;
 }
+#endif
+
 void
 sim_spacecraft_set_pos(sim_spacecraft_t *sc, double x, double y, double z)
 {
@@ -474,11 +476,12 @@ void
 sim_spacecraft_set_sys_and_pos(sim_spacecraft_t *sc, const char *sysName,
                     double x, double y, double z)
 {
-  pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
-  if (astrobody != NULL) {
-    pl_object_set_pos_rel3d(sc->obj, &astrobody->obj, x, y, z);
-    sim_spacecraft_set_system(sc, astrobody->sys);
-    float3 v = pl_compute_current_velocity(astrobody);
+  //pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
+  pl_celobject_t *body = pl_world_get_celobject(sc->world, sysName);
+  if (body != NULL) {
+    pl_object_set_pos_celobj_rel(sc->obj, body, vf3_set(x, y, z));
+    //sim_spacecraft_set_system(sc, astrobody->sys);
+    float3 v = vf3_set(body->cm_orbit->v.x, body->cm_orbit->v.y, body->cm_orbit->v.z);//pl_compute_current_velocity(astrobody);
     pl_object_set_vel3fv(sc->obj, v);
   } else {
     log_warn("astrobody '%s' not found", sysName);
@@ -490,21 +493,26 @@ sim_spacecraft_set_sys_and_coords(sim_spacecraft_t *sc, const char *sysName,
                     double longitude, double latitude, double altitude)
 {
   // Find planetoid object
-  pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
-  if (astrobody != NULL) {
+  pl_celobject_t *body = pl_world_get_celobject(sc->world, sysName);
+  //pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
+  if (body != NULL) {
     // Compute position relative to planet centre, this requires the equatorial
     // radius and the eccentricity of the spheroid, we shoudl also adjust for
     // sideral rotation.
-    float3 p = geodetic2cart_f(astrobody->eqRad, astrobody->angEcc,
+    // TODO: angular eccentricity not provided at present.
+    float3 p = geodetic2cart_f(body->cm_orbit->radius, 0.0,
                                latitude, longitude, altitude);
-    pl_object_set_pos_rel3fv(sc->obj, &astrobody->obj, p);
+    //pl_object_set_pos_rel3fv(sc->obj, &astrobody->obj, p);
+    pl_object_set_pos_celobj_rel(sc->obj, body, p);
 
-    sim_spacecraft_set_system(sc, astrobody->sys);
-    float3 v = pl_compute_current_velocity(astrobody);
+    //sim_spacecraft_set_system(sc, astrobody->sys);
+
+    float3 v = vf3_set(body->cm_orbit->v.x, body->cm_orbit->v.y,
+                       body->cm_orbit->v.z); //pl_compute_current_velocity(astrobody);
 
     // Compute standard orbital velocity
     float3 velvec = vf3_normalise(vf3_cross(p, vf3_set(0.0f, 0.0f, 1.0f)));
-    velvec = vf3_s_mul(velvec, sqrtf(sc->obj->sys->orbitalBody->GM/vf3_abs(p)));
+    velvec = vf3_s_mul(velvec, sqrtf(body->cm_orbit->GM/vf3_abs(p)));
     pl_object_set_vel3fv(sc->obj, vf3_add(v, velvec));
   }
 }
@@ -571,7 +579,7 @@ sim_spacecraft_get_altitude(sim_spacecraft_t *sc)
   return pl_object_compute_altitude(sc->obj);
 }
 
-
+#if 0
 float3
 sim_spacecraft_get_rel_pos(sim_spacecraft_t *sc)
 {
@@ -589,7 +597,7 @@ sim_spacecraft_get_sys(sim_spacecraft_t *sc)
 {
   return sc->obj->sys;
 }
-
+#endif
 
 void
 sim_stage_arm_engines(sim_stage_t *stage)
@@ -666,7 +674,8 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
   sc->toggleMainEngine = sim_spacecraft_default_engine_toggle;
   sc->axisUpdate = sim_spacecraft_default_axis_update;
   pl_mass_set(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  pl_system_add_object(world->rootSys, sc->obj);
+
+  //pl_system_add_object(world->rootSys, sc->obj);
 }
 
 typedef struct {

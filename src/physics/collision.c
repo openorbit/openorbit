@@ -54,12 +54,12 @@ pl_recgrid_delete(pl_recgrid_t *grid)
 }
 
 pl_collisioncontext_t*
-pl_new_collision_context(void)
+pl_new_collision_context(double size)
 {
   pl_collisioncontext_t *ctxt = smalloc(sizeof(pl_collisioncontext_t));
   ctxt->pool = pool_create(sizeof(pl_recgrid_t));
   obj_array_init(&ctxt->colls);
-  ctxt->otree = pl_new_recgrid(ctxt, pl_au_to_metres(100.0)); // Roughly the heliospause
+  ctxt->otree = pl_new_recgrid(ctxt, size); // Roughly the heliospause
   return ctxt;
 }
 
@@ -69,7 +69,7 @@ static int
 getoctant(const lwcoord_t *coord, const pl_object_t *obj)
 {
   float3 dist = lwc_dist(&obj->p, coord);
-  int oct = signbit(dist.x) * 4 + signbit(dist.y) * 2 + signbit(dist.z);
+  int oct = vf3_octant(vf3_set(0, 0, 0), dist);
   return oct;
 }
 static bool

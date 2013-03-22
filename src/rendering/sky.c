@@ -82,11 +82,6 @@ ooVmagToAlpha(double vmag)
     return normalised_lin_diff;
 }
 
-
-double deg2rad(double deg) {
-    return deg * M_PI / 180.0;
-}
-
 void
 sgAddStar(sg_background_t *stars, double ra, double dec, double mag, double bv)
 {
@@ -137,7 +132,7 @@ sgCreateBackgroundFromFile(const char *file)
   double vmag, ra, dec, btmag, vtmag, bv, vi;
   while (fscanf(f, "%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
                 &vmag, &ra, &dec, &btmag, &vtmag, &bv, &vi) == 7) {
-    sgAddStar(stars, deg2rad(ra), deg2rad(dec), vmag, bv);
+    sgAddStar(stars, ra*VMATH_RAD_PER_DEG, dec*VMATH_RAD_PER_DEG, vmag, bv);
   }
 
 

@@ -77,8 +77,10 @@
 
 #define PL_SEC_PER_DAY (3600.0 * 24.0)
 
+#define PL_M_PER_AU 149597870700.0
+
 #include "object.h"
-#include "orbit.h"
+#include "world.h"
 #include "mass.h"
 
 // We cannot cope with the precision issues without subdividing the universe

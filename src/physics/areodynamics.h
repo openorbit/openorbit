@@ -101,9 +101,6 @@ typedef struct pl_molecule_t {
 // an atmosphere object which contain a number of sample points of fixed
 // distance. The values are then interpolated between the sample points.
 
-typedef struct pl_atm_layer_t pl_atm_layer_t;
-typedef struct pl_atm_template_t pl_atm_template_t;
-
 typedef float (*pl_atm_comp_fn_t)(pl_atm_layer_t *,float);
 
 struct pl_atm_layer_t {

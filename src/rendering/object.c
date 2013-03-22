@@ -70,6 +70,7 @@ struct sg_object_t {
   lwcoord_t p;  // Global position
 
   pl_object_t *rigidBody;
+  pl_celobject_t *celestial_body;
 
   float3 camera_pos; // Relative to camera
   float3 parent_offset; // Offset from parent
@@ -565,6 +566,18 @@ sg_object_set_rigid_body(sg_object_t *obj, pl_object_t *rigidBody)
   }
   obj->rigidBody = rigidBody;
 }
+
+void
+sg_object_set_celestial_body(sg_object_t *obj, pl_celobject_t *cel_body)
+{
+  if (obj->parent) {
+    log_warn("setting celestial body for sg object that is not root");
+    return;
+  }
+  obj->celestial_body = cel_body;
+}
+
+
 pl_object_t*
 sg_object_get_rigid_body(const sg_object_t *obj)
 {
@@ -588,6 +601,19 @@ sg_object_sync(sg_object_t *obj, float t)
 
     lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
     obj->p = obj->p0;
+  } else if (obj->celestial_body) {
+    // Synchronise rotational velocity and quaternions
+    obj->q0 = pl_celobject_get_quat(obj->celestial_body);
+    obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
+    obj->q = q_slerp(obj->q0, obj->q1, 0.0);
+
+    // Synchronise world coordinates
+    obj->dp = pl_celobject_get_vel(obj->celestial_body);
+    obj->p0 = pl_celobject_get_lwc(obj->celestial_body);
+    obj->p1 = obj->p0;
+
+    lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
+    obj->p = obj->p0;
   } else {
     // TODO: Support translation and rotation of sub objects
     //obj->q0 = obj->q1;
@@ -604,7 +630,7 @@ void
 sg_object_interpolate(sg_object_t *obj, float t)
 {
   // Interpolate rotation quaternion.
-  if (obj->rigidBody) {
+  if (obj->rigidBody || obj->celestial_body) {
     obj->q = q_slerp(obj->q0, obj->q1, t);
 
     // Approximate distance between physics frames

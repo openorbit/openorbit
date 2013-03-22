@@ -76,9 +76,9 @@ pl_particles_attach3f(pl_particles_t *ps, pl_object_t *obj, float x, float y, fl
   obj_array_push(&obj->psystem, ps);
   ps->obj = obj;
   if (obj->parent) {
-    obj_array_push(&obj->parent->sys->world->partSys, ps);
+    obj_array_push(&obj->parent->world->particle_systems, ps);
   } else {
-    obj_array_push(&obj->sys->world->partSys, ps);
+    obj_array_push(&obj->world->particle_systems, ps);
   }
   ps->p = vf3_set(x, y, z);
 }

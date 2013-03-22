@@ -21,6 +21,9 @@
 #include "world-loader.h"
 #include "scenegraph.h"
 #include "physics/physics.h"
+#include "physics/reftypes.h"
+#include "physics/areodynamics.h"
+
 #include "parsers/hrml.h"
 #include "res-manager.h"
 #include <openorbit/log.h>
@@ -76,7 +79,7 @@ loadMaterial(sg_material_t *mat, HRMLobject *obj)
 }
 
 void
-ooLoadMoon__(pl_system_t *sys, HRMLobject *obj, sg_scene_t *sc)
+ooLoadMoon__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
 {
   assert(obj);
   assert(obj->val.typ == HRMLNode);
@@ -162,7 +165,7 @@ ooLoadMoon__(pl_system_t *sys, HRMLobject *obj, sg_scene_t *sc)
     gm = mass*PL_G;
   }
   // Period will be in years assuming that semiMajor is in au
-  double period = pl_orbital_period(semiMajor, sys->orbitalBody->GM * gm) / PL_SEC_PER_DAY;
+  //double period = pl_orbital_period(semiMajor, sys->orbitalBody->GM * gm) / PL_SEC_PER_DAY;
 
   //  double period = 0.1;//comp_orbital_period_for_planet(semiMajor);
   sg_object_t *drawable = sg_new_sphere(moonName.u.str, sg_get_shader(shader), radius,
@@ -172,19 +175,23 @@ ooLoadMoon__(pl_system_t *sys, HRMLobject *obj, sg_scene_t *sc)
 
 
   sg_scene_add_object(sc, drawable); // TODO: scale to radius
+  pl_celobject_t *celbody = pl_world_get_celobject(world, moonName.u.str);
 
-  pl_system_t *moonSys = pl_new_sub_orbit(sys, sys->scene, moonName.u.str, mass, gm,
-                                    period, axialTilt, siderealPeriod,
-                                    semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc),
-                                    inc, longAscNode, longPerihel, meanLong, radius, flattening);
+  sg_object_set_celestial_body(drawable, celbody);
 
-  moonSys->orbitalBody->atm = NULL; // Init as vaccuum
+
+  //pl_system_t *moonSys = pl_new_sub_orbit(sys, moonName.u.str, mass, gm,
+  //                                  period, axialTilt, siderealPeriod,
+  //                                  semiMajor, ooGeoComputeSemiMinor(semiMajor, ecc),
+  //                                  inc, longAscNode, longPerihel, meanLong, radius, flattening);
+
+  //moonSys->orbitalBody->atm = NULL; // Init as vaccuum
 
   if (shader) {
     sg_object_set_shader_by_name(drawable, shader);
   }
 
-  sg_object_set_rigid_body(drawable, &moonSys->orbitalBody->obj);
+  //sg_object_set_rigid_body(drawable, &moonSys->orbitalBody->obj);
 
   //plSetDrawable(moonSys->orbitalBody, drawable);
 }
@@ -343,8 +350,8 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
   }
 
   // NOTE: At present, all planets must be specified with AUs as parameters
-  double period = pl_orbital_period(pl_au_to_metres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
-
+  //double period = pl_orbital_period(pl_au_to_metres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
+  pl_celobject_t *celbody = pl_world_get_celobject(world, planetName.u.str);
   sg_object_t *drawable = sg_new_sphere(planetName.u.str,
                                         sg_get_shader(shader), radius,
                                         sg_load_texture(tex),
@@ -353,12 +360,12 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
                                         mat);
 
   sg_scene_add_object(sc, drawable); // TODO: scale to radius
-  pl_system_t *sys = pl_new_orbit(world, sc, planetName.u.str,
-                             mass, gm,
-                             period, axialTilt, siderealPeriod,
-                             pl_au_to_metres(semiMajor),
-                             pl_au_to_metres(ooGeoComputeSemiMinor(semiMajor, ecc)),
-                             inc, longAscNode, longPerihel, meanLong, radius, flattening);
+  //pl_system_t *sys = pl_new_orbit(world, planetName.u.str,
+  //                           mass, gm,
+  //                           period, axialTilt, siderealPeriod,
+  //                           pl_au_to_metres(semiMajor),
+  //                           pl_au_to_metres(ooGeoComputeSemiMinor(semiMajor, ecc)),
+  //                           inc, longAscNode, longPerihel, meanLong, radius, flattening);
 
   sg_object_t *ellipse = sg_new_ellipse(planetName.u.str, sg_get_shader("flat"),
                                         pl_au_to_metres(semiMajor), ecc,
@@ -367,15 +374,16 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
 
   sg_scene_add_object(sc, ellipse);
 
-  sys->orbitalBody->atm = NULL; // Init as vaccuum
-  if (atm) sys->orbitalBody->atm = pl_new_atmosphere(1000.0, 100000.0, atm);
+  //sys->orbitalBody->atm = NULL; // Init as vaccuum
+  //if (atm) sys->orbitalBody->atm = pl_new_atmosphere(1000.0, 100000.0, atm);
 
-  sg_object_set_rigid_body(drawable, &sys->orbitalBody->obj);
+  sg_object_set_celestial_body(drawable, celbody);
+  //sg_object_set_rigid_body(drawable, &sys->orbitalBody->obj);
 
   if (sats) {
     for (HRMLobject *sat = sats->children; sat != NULL; sat = sat->next) {
       if (!strcmp(sat->name, "moon")) {
-        ooLoadMoon__(sys, sat, sc);
+        ooLoadMoon__(world, sat, sc);
       }
     }
   }
@@ -453,11 +461,19 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
   sg_light_t *starLightSource = sg_new_light3f(sc, 0.0f, 0.0f, 0.0f);
   sg_object_add_light(drawable, starLightSource);
 
-  pl_world_t *world = pl_new_world(starName.u.str, sc, mass, gm, radius,
-                              siderealPeriod, axialTilt, radius, flattening);
+  // Create the new world for physics simulation. The size parameter is used
+  // in for example the barnes hut solver as the size of the solar system.
+  // 100000 AU is roughly the diameter of the solar system including all comets.
+  pl_world_t *world = pl_new_world(100000.0 * PL_M_PER_AU);
 
-  world->rootSys->orbitalBody->atm = NULL; // Init as vaccuum
-  sg_object_set_rigid_body(drawable, &world->rootSys->orbitalBody->obj);
+  //pl_world_t *world = pl_new_world(starName.u.str, mass, gm, radius,
+  //                                 siderealPeriod, axialTilt, radius,
+  //                                 flattening, 100000.0 * PL_M_PER_AU);
+
+  //world->rootSys->orbitalBody->atm = NULL; // Init as vaccuum
+  pl_celobject_t *celobj = pl_world_get_celobject(world, starName.u.str);
+  //sg_object_set_rigid_body(drawable, &world->rootSys->orbitalBody->obj);
+  sg_object_set_celestial_body(drawable, celobj);
 
   if (shader) {
     sg_object_set_shader_by_name(drawable, shader);
@@ -501,7 +517,7 @@ sim_load_world(sg_scene_t *sc, const char *fileName)
 
   hrmlFreeDocument(solarSys);
 
-  pl_sys_init(world->rootSys);
+  //pl_sys_init(world->rootSys);
   log_info("loaded solar system");
   return world;
 }

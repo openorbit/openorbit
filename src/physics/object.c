@@ -52,10 +52,10 @@ pl_object_init(pl_object_t *obj)
 
   lwc_set(&obj->p, 0.0, 0.0, 0.0);
 
-  obj->sys = NULL;
+  obj->world = NULL;
   obj->name = NULL;
   obj->parent = NULL;
-  //obj->drawable = NULL;
+
   obj->f_ack = vf3_set(0.0, 0.0, 0.0);
   obj->t_ack = vf3_set(0.0, 0.0, 0.0);
   obj->g_ack = vf3_set(0.0, 0.0, 0.0);
@@ -85,13 +85,14 @@ pl_new_object(pl_world_t *world, const char *name)
   pl_object_t *obj = calloc(1, sizeof(pl_object_t));
   pl_object_init(obj);
   obj->name = strdup(name);
+  obj->world = world;
 
-  obj_array_push(&world->objs, obj);
-
+  obj_array_push(&world->rigid_bodies, obj);
+  obj_array_push(&world->root_bodies, obj);
   pl_object_compute_derived(obj);
 
-  pl_collide_insert_object(world->collCtxt, obj);
-
+  pl_collide_insert_object(world->coll_ctxt, obj);
+  pl_octtree_insert_rbody(world->octtree, obj);
   return obj;
 }
 
@@ -104,11 +105,11 @@ pl_new_sub_object3f(pl_world_t *world, pl_object_t *parent, const char * name,
   pl_object_t *obj = calloc(1, sizeof(pl_object_t));
   pl_object_init(obj);
   obj->name = strdup(name);
-
-  obj->sys = parent->sys;
+  obj->world = parent->world;
   obj->parent = parent;
+
   obj->p_offset = vf3_set(x, y, z);
-  obj_array_push(&world->objs, obj);
+  obj_array_push(&world->rigid_bodies, obj);
   obj_array_push(&parent->children, obj);
   return obj;
 }
@@ -118,22 +119,23 @@ pl_object_detatch(pl_object_t *obj)
 {
   assert(obj != NULL);
   assert(obj->parent != NULL);
-  pl_world_t *world = obj->sys->world;
+  //pl_world_t *world = obj->sys->world;
   pl_object_t *parent = obj->parent;
 
   obj->parent = NULL;
-  obj->sys = parent->sys;
+  //obj->sys = parent->sys;
   for (int i = 0 ; i < parent->children.length ; ++i) {
     if (parent->children.elems[i] == obj) {
       obj_array_remove(&parent->children, i);
-      obj_array_push(&parent->sys->rigidObjs, obj);
+      obj_array_push(&parent->world->root_bodies, obj);
       break;
     }
   }
 
   pl_object_update_mass(parent);
   pl_object_compute_derived(obj);
-  pl_collide_insert_object(world->collCtxt, obj);
+  pl_collide_insert_object(obj->world->coll_ctxt, obj);
+  pl_octtree_insert_rbody(obj->world->octtree, obj);
 }
 
 void
@@ -210,6 +212,22 @@ pl_object_set_pos_rel3fv(pl_object_t * restrict obj,
 
   PL_CHECK_OBJ(obj);
 }
+
+void
+pl_object_set_pos_celobj_rel(pl_object_t * restrict obj,
+                             const pl_celobject_t * restrict otherObj,
+                             float3 rp)
+{
+  PL_CHECK_OBJ(obj);
+
+  double3 celobj_p = otherObj->cm_orbit->p;
+  lwc_set(&obj->p, celobj_p.x, celobj_p.y, celobj_p.z);
+  lwc_translate3fv(&obj->p, rp);
+  lwc_dump(&obj->p);
+
+  PL_CHECK_OBJ(obj);
+}
+
 void
 pl_object_force3f(pl_object_t *obj, float x, float y, float z)
 {
@@ -504,7 +522,7 @@ pl_system_add_object(pl_system_t *sys, pl_object_t *obj)
   obj->sys = sys;
   obj_array_push(&sys->rigidObjs, obj);
 }
-
+#endif
 
 void
 pl_object_check(pl_object_t *obj, const char *file, int line)
