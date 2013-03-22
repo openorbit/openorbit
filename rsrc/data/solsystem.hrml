@@ -1,5 +1,5 @@
 openorbit {
-  star (name: Sol) {
+  star (name: Sun) {
     physical {
       mass: 1.991e30 kg;
       gm: 1.327e20;
