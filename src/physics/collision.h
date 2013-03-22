@@ -45,12 +45,12 @@ struct pl_collisioncontext_t {
 pl_collisioncontext_t *pl_new_collision_context(void);
 
 bool pl_collide_coarse(pl_collisioncontext_t *coll,
-                     PLobject * restrict obj_a, PLobject * restrict obj_b);
+                     pl_object_t * restrict obj_a, pl_object_t * restrict obj_b);
 
 bool pl_collide_fine(pl_collisioncontext_t *coll,
-                   PLobject * restrict obj_a, PLobject * restrict obj_b);
+                   pl_object_t * restrict obj_a, pl_object_t * restrict obj_b);
 
-void pl_collide_insert_object(pl_collisioncontext_t *coll, PLobject *obj);
+void pl_collide_insert_object(pl_collisioncontext_t *coll, pl_object_t *obj);
 
 void pl_collide_step(pl_collisioncontext_t *coll);
 

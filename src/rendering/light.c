@@ -133,7 +133,7 @@ sg_light_set_poslw(sg_light_t *light, lwcoord_t *lwc)
     light->pos[3] = 1.0;
   } else if (sg_camera_get_type(cam) == SG_CAMERA_ORBITING) {
     sg_object_t *obj = sg_camera_orbiting_get_obj(cam);
-    PLobject *pobj = sg_object_get_rigid_body(obj);
+    pl_object_t *pobj = sg_object_get_rigid_body(obj);
     float3 relPos = lwc_relvec(lwc, pobj->p.seg);
 
     light->pos[0] = vf3_x(relPos);

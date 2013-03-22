@@ -321,12 +321,13 @@ pl_normalise_object__(pl_astrobody_t *obj)
 }
 
 void
-pl_object_clear_(PLobject *obj)
+pl_object_clear_(pl_object_t *obj)
 {
   obj->f_ack = vf3_set(0.0f, 0.0f, 0.0f);
   obj->t_ack = vf3_set(0.0f, 0.0f, 0.0f);
 }
 
+#if 0
 void
 pl_sys_update_current_pos(pl_system_t *sys, double dt)
 {
@@ -631,7 +632,7 @@ pl_world_clear(pl_world_t *world)
 }
 
 float3
-pl_compute_gravity(pl_astrobody_t *a, PLobject *b)
+pl_compute_gravity(pl_astrobody_t *a, pl_object_t *b)
 {
   float3 dist = lwc_dist(&b->p, &a->obj.p);
   double r12 = vf3_abs_square(dist);
@@ -662,7 +663,7 @@ pl_sys_step(pl_system_t *sys, double dt)
 {
   // Add gravitational forces
   for (size_t i = 0; i < sys->rigidObjs.length ; i ++) {
-    PLobject *obj = sys->rigidObjs.elems[i];
+    pl_object_t *obj = sys->rigidObjs.elems[i];
     PL_CHECK_OBJ(obj);
     float3 f12 = pl_compute_gravity(sys->orbitalBody, obj);
     pl_object_set_gravity3fv(obj, f12);
@@ -720,7 +721,7 @@ pl_world_step(pl_world_t *world, double dt)
   pl_collide_step(world->collCtxt);
 }
 
-PLobject*
+pl_object_t*
 pl_astrobody_get_obj(pl_astrobody_t *abody)
 {
   return &abody->obj;

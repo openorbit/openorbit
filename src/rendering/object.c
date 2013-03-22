@@ -69,7 +69,7 @@ struct sg_object_t {
   lwcoord_t p1; // Global position
   lwcoord_t p;  // Global position
 
-  PLobject *rigidBody;
+  pl_object_t *rigidBody;
 
   float3 camera_pos; // Relative to camera
   float3 parent_offset; // Offset from parent
@@ -557,7 +557,7 @@ sg_object_load_shader(sg_object_t *obj, const char *name)
 }
 
 void
-sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody)
+sg_object_set_rigid_body(sg_object_t *obj, pl_object_t *rigidBody)
 {
   if (obj->parent) {
     log_warn("setting rigid body for sg object that is not root");
@@ -565,7 +565,7 @@ sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody)
   }
   obj->rigidBody = rigidBody;
 }
-PLobject*
+pl_object_t*
 sg_object_get_rigid_body(const sg_object_t *obj)
 {
   return obj->rigidBody;

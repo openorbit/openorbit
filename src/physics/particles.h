@@ -39,7 +39,7 @@ struct pl_particle_t {
 };
 
 struct pl_particles_t {
-  PLobject *obj; // Object the particle generator is attached to
+  pl_object_t *obj; // Object the particle generator is attached to
   //GLuint texture;
   float directionLimit;
   float3 rgb; // Default colour
@@ -64,7 +64,7 @@ struct pl_particles_t {
 pl_particles_t* pl_new_particle_system(const char *name, size_t particleCount);
 void pl_particles_delete(pl_particles_t *ps);
 void pl_particles_step(pl_particles_t *ps, float dt);
-void pl_particles_attach3f(pl_particles_t *ps, PLobject *obj, float x, float y, float z);
+void pl_particles_attach3f(pl_particles_t *ps, pl_object_t *obj, float x, float y, float z);
 void pl_particles_set_emitter_direction3f(pl_particles_t *ps, float x, float y, float z);
 
 void pl_particles_enable(pl_particles_t *ps);

@@ -136,13 +136,13 @@ typedef struct PLatmosphere {
   float_array_t p; // Density points
 } PLatmosphere;
 
-double pl_object_compute_altitude(PLobject *obj);
-float3 pl_compute_airvelocity(PLobject *obj);
-double pl_object_compute_airspeed(PLobject *obj);
-double pl_object_compute_airpressure(PLobject *obj);
-double pl_object_compute_airdensity(PLobject *obj);
-float3 pl_object_compute_drag(PLobject *obj);
-double pl_object_compute_airdensity_with_current_pressure(PLobject *obj);
+double pl_object_compute_altitude(pl_object_t *obj);
+float3 pl_compute_airvelocity(pl_object_t *obj);
+double pl_object_compute_airspeed(pl_object_t *obj);
+double pl_object_compute_airpressure(pl_object_t *obj);
+double pl_object_compute_airdensity(pl_object_t *obj);
+float3 pl_object_compute_drag(pl_object_t *obj);
+double pl_object_compute_airdensity_with_current_pressure(pl_object_t *obj);
 void pl_atmosphere_init(PLatmosphere *atm, float groundPressure, float h0);
 
 /*!
@@ -187,7 +187,7 @@ typedef struct PLairfoil {
   float Ct0;
 } PLairfoil;
 
-float3 pl_atmosphere_compute_lift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil);
+float3 pl_atmosphere_compute_lift(PLatmosphere *atm, pl_object_t *obj, PLairfoil *foil);
 
 
 #endif /* ! PL_ATMOSPHERE_H */

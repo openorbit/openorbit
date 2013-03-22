@@ -51,7 +51,7 @@ struct pl_astrobody_t {
   char *name;
   pl_world_t *world;
   pl_system_t *sys;
-  PLobject obj;
+  pl_object_t obj;
   double GM;
   PLatmosphere *atm;
   pl_keplerelems_t *kepler;
@@ -143,7 +143,7 @@ float3 pl_astrobody_get_pos(const pl_astrobody_t *obj);
 float3 pl_world_get_pos_for_name(const pl_world_t *world, const char *name);
 void pl_world_get_pos_for_name3f(const pl_world_t *world, const char *name,
                                  float *x, float *y, float *z);
-PLobject* pl_astrobody_get_obj(pl_astrobody_t *abody);
+pl_object_t* pl_astrobody_get_obj(pl_astrobody_t *abody);
 
 float3 pl_compute_current_velocity(pl_astrobody_t *ab);
 

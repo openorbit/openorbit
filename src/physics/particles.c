@@ -68,7 +68,7 @@ pl_particles_set_emitter_direction3f(pl_particles_t *ps, float x, float y, float
 }
 
 void
-pl_particles_attach3f(pl_particles_t *ps, PLobject *obj, float x, float y, float z)
+pl_particles_attach3f(pl_particles_t *ps, pl_object_t *obj, float x, float y, float z)
 {
   assert(ps != NULL);
   assert(obj != NULL);

@@ -96,8 +96,8 @@ void sg_object_recompute_modelviewmatrix(sg_object_t *obj);
 void sg_object_draw(sg_object_t *obj);
 void sg_geometry_draw(sg_geometry_t *geo);
 
-void sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody);
-PLobject* sg_object_get_rigid_body(const sg_object_t *obj);
+void sg_object_set_rigid_body(sg_object_t *obj, pl_object_t *rigidBody);
+pl_object_t* sg_object_get_rigid_body(const sg_object_t *obj);
 
 // Interpolate object position and rotation between key frames.
 // Key frames is based on the physics system steps.

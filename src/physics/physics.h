@@ -31,7 +31,7 @@
      associated with the system.
   3. pl_astrobody_t that represents a large astronomical body, like the sun, a
      planet or a moon.
-  4. PLobject that represent a small object.
+  4. pl_object_t that represent a small object.
   5. pl_mass_t that represent mass and inertia parameters.
 
   A feature with the physics library is that it is integrated with the

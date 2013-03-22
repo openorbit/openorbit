@@ -291,10 +291,10 @@ sim_spacecraft_toggle_main_engine(sim_spacecraft_t *sc)
   sc->toggleMainEngine(sc);
 }
 
-PLobject*
+pl_object_t*
 sim_spacecraft_get_pl_obj(sim_spacecraft_t *sc)
 {
-  return (PLobject*)sc->obj;
+  return (pl_object_t*)sc->obj;
 }
 
 
@@ -454,7 +454,7 @@ sim_spacecraft_set_system(sim_spacecraft_t *spacecraft, pl_system_t *sys)
 
   if (oldSys != NULL) {
     for (int i = 0 ; i < oldSys->rigidObjs.length ; ++i) {
-      PLobject *oldSysObj = oldSys->rigidObjs.elems[i];
+      pl_object_t *oldSysObj = oldSys->rigidObjs.elems[i];
       if (oldSysObj == spacecraft->obj) {
         obj_array_remove(&oldSys->rigidObjs, i);
         break;

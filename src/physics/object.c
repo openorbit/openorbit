@@ -37,13 +37,13 @@
   colission detection.
 */
 void
-pl_object_compute_derived(PLobject *obj)
+pl_object_compute_derived(pl_object_t *obj)
 {
   q_mf3_convert(obj->R, obj->q); // Convert our quaternion to rotation matrix
   mf3_basis(obj->I_inv_world, obj->m.I_inv, obj->R);
 }
 void
-pl_object_init(PLobject *obj)
+pl_object_init(pl_object_t *obj)
 {
   pl_mass_set(&obj->m, 0.0f,
             0.0f, 0.0f, 0.0f,
@@ -77,12 +77,12 @@ pl_object_init(PLobject *obj)
   pl_object_compute_derived(obj);
 }
 
-PLobject*
+pl_object_t*
 pl_new_object(pl_world_t *world, const char *name)
 {
   assert(world != NULL);
 
-  PLobject *obj = calloc(1, sizeof(PLobject));
+  pl_object_t *obj = calloc(1, sizeof(pl_object_t));
   pl_object_init(obj);
   obj->name = strdup(name);
 
@@ -95,13 +95,13 @@ pl_new_object(pl_world_t *world, const char *name)
   return obj;
 }
 
-PLobject*
-pl_new_sub_object3f(pl_world_t *world, PLobject *parent, const char * name,
+pl_object_t*
+pl_new_sub_object3f(pl_world_t *world, pl_object_t *parent, const char * name,
               float x, float y, float z)
 {
   assert(parent != NULL);
 
-  PLobject *obj = calloc(1, sizeof(PLobject));
+  pl_object_t *obj = calloc(1, sizeof(pl_object_t));
   pl_object_init(obj);
   obj->name = strdup(name);
 
@@ -114,12 +114,12 @@ pl_new_sub_object3f(pl_world_t *world, PLobject *parent, const char * name,
 }
 
 void
-pl_object_detatch(PLobject *obj)
+pl_object_detatch(pl_object_t *obj)
 {
   assert(obj != NULL);
   assert(obj->parent != NULL);
   pl_world_t *world = obj->sys->world;
-  PLobject *parent = obj->parent;
+  pl_object_t *parent = obj->parent;
 
   obj->parent = NULL;
   obj->sys = parent->sys;
@@ -137,7 +137,7 @@ pl_object_detatch(PLobject *obj)
 }
 
 void
-pl_object_update_mass(PLobject *obj)
+pl_object_update_mass(pl_object_t *obj)
 {
   memset(&obj->m, 0, sizeof(pl_mass_t));
 
@@ -147,7 +147,7 @@ pl_object_update_mass(PLobject *obj)
             0.0, 0.0, 0.0);
 
   for (int i = 0 ; i < obj->children.length ; ++ i) {
-    PLobject *child = obj->children.elems[i];
+    pl_object_t *child = obj->children.elems[i];
     pl_mass_t tmp = child->m;
     pl_mass_translate(&tmp,
                     child->p_offset.x,
@@ -160,7 +160,7 @@ pl_object_update_mass(PLobject *obj)
 
 
 void
-pl_object_set_pos3d(PLobject *obj, double x, double y, double z)
+pl_object_set_pos3d(pl_object_t *obj, double x, double y, double z)
 {
   PL_CHECK_OBJ(obj);
 
@@ -171,7 +171,7 @@ pl_object_set_pos3d(PLobject *obj, double x, double y, double z)
 
 
 void
-pl_object_set_pos_ext3f(PLobject *obj,
+pl_object_set_pos_ext3f(pl_object_t *obj,
                     int32_t i, int32_t j, int32_t k,
                     float x, float y, float z)
 {
@@ -185,7 +185,7 @@ pl_object_set_pos_ext3f(PLobject *obj,
 }
 
 void
-pl_object_set_pos_rel3d(PLobject * restrict obj, const PLobject * restrict otherObj,
+pl_object_set_pos_rel3d(pl_object_t * restrict obj, const pl_object_t * restrict otherObj,
                     double x, double y, double z)
 {
   PL_CHECK_OBJ(obj);
@@ -197,8 +197,8 @@ pl_object_set_pos_rel3d(PLobject * restrict obj, const PLobject * restrict other
 }
 
 void
-pl_object_set_pos_rel3fv(PLobject * restrict obj,
-                     const PLobject * restrict otherObj,
+pl_object_set_pos_rel3fv(pl_object_t * restrict obj,
+                     const pl_object_t * restrict otherObj,
                      float3 rp)
 {
   PL_CHECK_OBJ(obj);
@@ -211,7 +211,7 @@ pl_object_set_pos_rel3fv(PLobject * restrict obj,
   PL_CHECK_OBJ(obj);
 }
 void
-pl_object_force3f(PLobject *obj, float x, float y, float z)
+pl_object_force3f(pl_object_t *obj, float x, float y, float z)
 {
   while (obj->parent) obj = obj->parent;
 
@@ -224,7 +224,7 @@ pl_object_force3f(PLobject *obj, float x, float y, float z)
   PL_CHECK_OBJ(obj);
 }
 void
-pl_object_force3fv(PLobject *obj, float3 f)
+pl_object_force3fv(pl_object_t *obj, float3 f)
 {
   while (obj->parent) obj = obj->parent;
 
@@ -237,7 +237,7 @@ pl_object_force3fv(PLobject *obj, float3 f)
 
 
 void
-pl_object_force_relative3f(PLobject *obj, float fx, float fy, float fz)
+pl_object_force_relative3f(pl_object_t *obj, float fx, float fy, float fz)
 {
   while (obj->parent) obj = obj->parent;
   PL_CHECK_OBJ(obj);
@@ -248,7 +248,7 @@ pl_object_force_relative3f(PLobject *obj, float fx, float fy, float fz)
 }
 
 void
-pl_force_relative3fv(PLobject *obj, float3 f)
+pl_force_relative3fv(pl_object_t *obj, float3 f)
 {
   while (obj->parent) obj = obj->parent;
   PL_CHECK_OBJ(obj);
@@ -258,7 +258,7 @@ pl_force_relative3fv(PLobject *obj, float3 f)
 }
 
 void
-pl_object_force_relative_pos3f(PLobject *obj,
+pl_object_force_relative_pos3f(pl_object_t *obj,
                      float fx, float fy, float fz,
                      float px, float py, float pz)
 {
@@ -276,26 +276,26 @@ pl_object_force_relative_pos3f(PLobject *obj,
 }
 
 void
-pl_object_torque3f(PLobject *obj, float tx, float ty, float tz)
+pl_object_torque3f(pl_object_t *obj, float tx, float ty, float tz)
 {
   obj->t_ack += vf3_set(tx, ty, tz);
 }
 
 void
-pl_object_torque3fv(PLobject *obj, float3 t)
+pl_object_torque3fv(pl_object_t *obj, float3 t)
 {
   obj->t_ack += t;
 }
 
 void
-pl_object_torque_relative3f(PLobject *obj, float tx, float ty, float tz,
+pl_object_torque_relative3f(pl_object_t *obj, float tx, float ty, float tz,
                    float px, float py, float pz)
 {
   obj->t_ack += mf3_v_mul(obj->R, vf3_set(tx, ty, tz));
 }
 
 void
-pl_object_torque_relative3fv(PLobject *obj, float3 t, float3 p)
+pl_object_torque_relative3fv(pl_object_t *obj, float3 t, float3 p)
 {
   obj->t_ack += mf3_v_mul(obj->R, t);
 }
@@ -303,7 +303,7 @@ pl_object_torque_relative3fv(PLobject *obj, float3 t, float3 p)
 
 
 void
-pl_object_force_relative_pos3fv(PLobject *obj, float3 f, float3 p)
+pl_object_force_relative_pos3fv(pl_object_t *obj, float3 f, float3 p)
 {
   while (obj->parent) { p += obj->p_offset; obj = obj->parent; }
   float3x3 Rt;
@@ -315,7 +315,7 @@ pl_object_force_relative_pos3fv(PLobject *obj, float3 f, float3 p)
 }
 
 void
-pl_object_set_gravity3f(PLobject *obj, float x, float y, float z)
+pl_object_set_gravity3f(pl_object_t *obj, float x, float y, float z)
 {
   while (obj->parent) obj = obj->parent;
   obj->g_ack += vf3_set(x, y, z);
@@ -323,7 +323,7 @@ pl_object_set_gravity3f(PLobject *obj, float x, float y, float z)
 
 
 void
-pl_object_set_gravity3fv(PLobject *obj, float3 f)
+pl_object_set_gravity3fv(pl_object_t *obj, float3 f)
 {
   while (obj->parent) obj = obj->parent;
   obj->g_ack += f;
@@ -331,7 +331,7 @@ pl_object_set_gravity3fv(PLobject *obj, float3 f)
 
 
 void
-pl_object_dump(PLobject *obj)
+pl_object_dump(pl_object_t *obj)
 {
   fprintf(stderr, "obj: %p\n", (void*)obj);
   fprintf(stderr, "\tmass: %f [%f, %f, %f]\n", obj->m.m, obj->m.I[0][0], obj->m.I[1][1], obj->m.I[2][2]);
@@ -346,11 +346,13 @@ pl_object_dump(PLobject *obj)
 }
 
 void
-pl_object_step(PLobject *obj, float dt)
+pl_object_step(pl_object_t *obj, float dt)
 {
+  // TOOD: Fix air pressure computations
+#if 0
   obj->airPressure = pl_object_compute_airpressure(obj);
   obj->airDensity = pl_object_compute_airdensity(obj);
-
+#endif
   PL_CHECK_OBJ(obj);
   float3 fm = (obj->f_ack / obj->m.m);
 
@@ -371,7 +373,7 @@ pl_object_step(PLobject *obj, float dt)
 }
 
 void
-pl_object_step_child(PLobject *obj, float dt)
+pl_object_step_child(pl_object_t *obj, float dt)
 {
   PL_CHECK_OBJ(obj);
 
@@ -388,7 +390,7 @@ pl_object_step_child(PLobject *obj, float dt)
 }
 
 void
-pl_object_normalise(PLobject *obj)
+pl_object_normalise(pl_object_t *obj)
 {
   PL_CHECK_OBJ(obj);
   // Since we are using non safe casts here, we must ensure this in case someone upgrades
@@ -402,7 +404,7 @@ pl_object_normalise(PLobject *obj)
 }
 
 void
-pl_object_clear(PLobject *obj)
+pl_object_clear(pl_object_t *obj)
 {
   obj->f_ack = vf3_set(0.0f, 0.0f, 0.0f);
   obj->t_ack = vf3_set(0.0f, 0.0f, 0.0f);
@@ -410,31 +412,31 @@ pl_object_clear(PLobject *obj)
 }
 
 void
-pl_object_set_angular_vel3f(PLobject *obj, float rx, float ry, float rz)
+pl_object_set_angular_vel3f(pl_object_t *obj, float rx, float ry, float rz)
 {
   obj->angVel = vf3_set(rx, ry, rz);
 }
 
 void
-pl_object_set_vel3f(PLobject *obj, float dx, float dy, float dz)
+pl_object_set_vel3f(pl_object_t *obj, float dx, float dy, float dz)
 {
   obj->v = vf3_set(dx, dy, dz);
 }
 void
-pl_object_set_vel3fv(PLobject *obj, float3 dp)
+pl_object_set_vel3fv(pl_object_t *obj, float3 dp)
 {
   obj->v = dp;
 }
 
 void
-pl_object_set_drag_coef(PLobject *obj, float coef)
+pl_object_set_drag_coef(pl_object_t *obj, float coef)
 {
   // TODO: What about parent objects?
   obj->dragCoef = coef;
 }
 
 void
-pl_object_set_area(PLobject *obj, float area)
+pl_object_set_area(pl_object_t *obj, float area)
 {
   // TODO: What about parent objects?
   obj->area = area;
@@ -445,7 +447,7 @@ pl_object_set_area(PLobject *obj, float area)
 // The quaternion should represent rotation around dec and ra of the main rot
 // vector and r should represent the rads per second that the rotation will be
 void
-plSetAngularVel4fq(PLobject *obj, quaternion_t q, float r)
+plSetAngularVel4fq(pl_object_t *obj, quaternion_t q, float r)
 {
   float3 v = vf3_set(1.0f, 0.0f, 0.0f);
   quaternion_t qrx = q_rot(1.0f, 0.0f, 0.0f, r);
@@ -461,32 +463,33 @@ plSetAngularVel4fq(PLobject *obj, quaternion_t q, float r)
 
 
 void
-pl_object_set_angular_vel3fv(PLobject *obj, float3 r)
+pl_object_set_angular_vel3fv(pl_object_t *obj, float3 r)
 {
   obj->angVel = r;
 }
 
 
 float3
-pl_object_get_vel(PLobject *obj)
+pl_object_get_vel(pl_object_t *obj)
 {
   return obj->v;
 }
 
 float3
-pl_object_get_angular_vel(PLobject *obj)
+pl_object_get_angular_vel(pl_object_t *obj)
 {
   return obj->angVel;
 }
 
 quaternion_t
-pl_object_get_quat(PLobject *obj)
+pl_object_get_quat(pl_object_t *obj)
 {
   return obj->q;
 }
 
+#if 0
 void
-pl_system_add_object(pl_system_t *sys, PLobject *obj)
+pl_system_add_object(pl_system_t *sys, pl_object_t *obj)
 {
   if (obj->sys != NULL) {
     // Not the most efficient way if there are several objects in the system,
@@ -504,7 +507,7 @@ pl_system_add_object(pl_system_t *sys, PLobject *obj)
 
 
 void
-pl_object_check(PLobject *obj, const char *file, int line)
+pl_object_check(pl_object_t *obj, const char *file, int line)
 {
   if (!isfinite(obj->p.offs.x) || !isfinite(obj->p.offs.y) || !isfinite(obj->p.offs.z)) {
     log_abort("%s:%d obj position not finite", file, line);
@@ -525,7 +528,7 @@ pl_object_check(PLobject *obj, const char *file, int line)
 }
 
 lwcoord_t
-pl_object_get_lwc(PLobject *obj)
+pl_object_get_lwc(pl_object_t *obj)
 {
   return obj->p;
 }
