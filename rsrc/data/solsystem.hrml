@@ -135,7 +135,7 @@ openorbit {
           }
         }
         satellites {
-          moon (name: Luna) {
+          moon (name: Moon) {
             physical {
               mass: 7.36e22 kg;
               radius: 1.74e6 m;
