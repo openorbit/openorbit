@@ -403,7 +403,7 @@ openorbit {
         rendering {
           model: "sphere";
           shader: "planet";
-          texture: "textures/uranus.jpg";
+          texture: "textures/default/uranus.jpg";
         }
       }
       planet (name: Neptune) {
