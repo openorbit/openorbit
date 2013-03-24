@@ -179,7 +179,7 @@ pl_object_set_pos_ext3f(pl_object_t *obj,
 {
   PL_CHECK_OBJ(obj);
 
-  obj->p.seg = vi3_set(i, j, k);
+  obj->p.seg = vl3_set(i, j, k);
   obj->p.offs = vf3_set(x, y, z);
   lwc_normalise(&obj->p);
 
