@@ -50,10 +50,6 @@ pl_new_celobject(pl_world_t *world, cm_orbit_t *cm_orbit)
 quaternion_t
 pl_celobject_get_quat(pl_celobject_t *celobj)
 {
-  //float3 vec = vf3_set(celobj->cm_orbit->r.x,
-  //                     celobj->cm_orbit->r.y,
-  //                     celobj->cm_orbit->r.z);
-  //return q_rotv(vec, celobj->cm_orbit->W);
   return celobj->cm_orbit->q;
 }
 
