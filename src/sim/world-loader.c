@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2013 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -367,13 +367,15 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
   //                           pl_au_to_metres(ooGeoComputeSemiMinor(semiMajor, ecc)),
   //                           inc, longAscNode, longPerihel, meanLong, radius, flattening);
 
-  sg_object_t *ellipse = sg_new_ellipse(planetName.u.str, sg_get_shader("flat"),
+  char elname[strlen(planetName.u.str)+5];
+  strcpy(elname, planetName.u.str);
+  strcat(elname, ".orb");
+  sg_object_t *ellipse = sg_new_ellipse(elname, sg_get_shader("flat"),
                                         pl_au_to_metres(semiMajor), ecc,
                                         DEG_TO_RAD(inc), DEG_TO_RAD(longAscNode),
                                         DEG_TO_RAD(longPerihel), 500);
 
   sg_scene_add_object(sc, ellipse);
-
   //sys->orbitalBody->atm = NULL; // Init as vaccuum
   //if (atm) sys->orbitalBody->atm = pl_new_atmosphere(1000.0, 100000.0, atm);
 
