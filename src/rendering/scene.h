@@ -53,4 +53,8 @@ bool sg_scene_has_name(sg_scene_t *sc, const char *name);
 void sg_scene_sync(sg_scene_t *scene);
 void sg_scene_interpolate(sg_scene_t *scene);
 
+const sg_object_t** sg_scene_get_objects(sg_scene_t *scene);
+size_t sg_scene_get_object_count(sg_scene_t *scene);
+
+
 #endif

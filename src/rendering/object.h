@@ -37,6 +37,9 @@ int sg_objects_compare_dist(sg_object_t const **o0, sg_object_t const **o1);
 
 void sg_object_add_child(sg_object_t *obj, sg_object_t *child);
 
+sg_scene_t* sg_object_get_scene(sg_object_t *obj);
+
+
 void sg_object_set_camera_pos(sg_object_t *obj, float3 pos);
 float3 sg_object_get_camera_pos(sg_object_t *obj);
 void sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc);

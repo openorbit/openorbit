@@ -20,14 +20,14 @@ along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
 #define orbit_menu_manager_h
 
 typedef void menu_t;
-typedef void (*menu_func_t)(void);
+typedef void (*menu_func_t)(void*);
 #define MENU_SEP ":"
 
 menu_t* menu_get(const char *menu_name);
 
 // Creates a new menu entry
 // If f is NULL, it is a submenu
-menu_t* menu_new(menu_t *parent, const char *name, menu_func_t f);
+menu_t* menu_new(menu_t *parent, const char *name, menu_func_t f, void *arg);
 
 
 #endif

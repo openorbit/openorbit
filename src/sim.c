@@ -39,10 +39,14 @@
 #include "io-manager.h"
 #include "scripting/scripting.h"
 #include "plugin-handler.h"
+#include "menu-manager.h"
 
 #include <openorbit/log.h>
 
 sim_state_t gSIM_state = {0.0, NULL, NULL, NULL, NULL};
+
+void sim_setup_menus(sim_state_t *state);
+
 
 sg_scene_t*
 sim_get_scene(void)
@@ -133,11 +137,12 @@ sim_init(void)
                       0.0 /*latitude*/,
                       250.0e3 /*altitude*/);
   sim_set_spacecraft(sc);
+
   sg_camera_t *cam = sg_scene_get_cam(sc->scene);
   sim_stage_t *stage = ARRAY_ELEM(sc->stages, 1);
   sg_camera_track_object(cam, stage->sgobj);
   sg_camera_follow_object(cam, stage->sgobj);
-  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -50.0));
+  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -150.0e9));
 
   simMfdInitAll(sim_get_main_viewport());
 
@@ -147,6 +152,7 @@ sim_init(void)
     log_fatal("script/postinit.py missing");
   }
 
+  sim_setup_menus(&gSIM_state);
 }
 
 
@@ -242,4 +248,33 @@ pl_world_t*
 sim_get_world(void)
 {
   return gSIM_state.world;
+}
+
+void
+menu_camera(void *arg)
+{
+  sg_object_t *obj = arg;
+  log_info("selected camera target: %s", sg_object_get_name(obj));
+
+  sg_scene_t *sc = sg_object_get_scene(obj);
+  sg_camera_t *cam = sg_scene_get_cam(sc);
+
+  sg_camera_track_object(cam, obj);
+  sg_camera_follow_object(cam, obj);
+  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -150.0e6));
+
+}
+
+void
+sim_setup_menus(sim_state_t *state)
+{
+  menu_t *cam_menu = menu_new(NULL, "Camera", NULL, NULL);
+
+  sg_scene_t *scene = sg_window_get_scene(state->win, 0);
+  size_t object_count = sg_scene_get_object_count(scene);
+  const sg_object_t **objects = sg_scene_get_objects(scene);
+  for (int i = 0 ; i < object_count ; i++) {
+    menu_new(cam_menu, sg_object_get_name(objects[i]), menu_camera,
+             (void*)objects[i]);
+  }
 }

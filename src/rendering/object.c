@@ -100,6 +100,12 @@ struct sg_object_t {
   obj_array_t subObjects;
 };
 
+sg_scene_t*
+sg_object_get_scene(sg_object_t *obj)
+{
+  return obj->scene;
+}
+
 void
 sg_object_print(const sg_object_t *obj)
 {

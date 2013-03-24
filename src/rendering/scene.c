@@ -248,3 +248,14 @@ sg_scene_has_name(sg_scene_t *sc, const char *name)
   return false;
 }
 
+const sg_object_t**
+sg_scene_get_objects(sg_scene_t *scene)
+{
+  return (const sg_object_t**)scene->objects_sorted_by_name.elems;
+}
+
+size_t
+sg_scene_get_object_count(sg_scene_t *scene)
+{
+  return scene->objects_sorted_by_name.length;
+}
