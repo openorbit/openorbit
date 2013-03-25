@@ -107,7 +107,7 @@ menu_new(menu_t *parent, const char *name, menu_func_t f, void *arg)
 
 
 void
-print_foo(void)
+print_foo(void *foo)
 {
   printf("Hello World!\n");
 }
