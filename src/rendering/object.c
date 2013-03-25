@@ -955,10 +955,8 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
 
   float semiMinor = semiMajor * sqrt(1.0 - ecc*ecc);
 
-  float3x3 R;
-  mf3_zxz_rotmatrix(R, asc, inc, argOfPeriapsis);
-
-  // Naive way
+  // Naive way, we probably actually want just a single circle and then reuse it
+  // for all ellipses using a scaling transformation.
   double seg_angle = 2.0*M_PI/segments;
   for (size_t i = 0 ; i < segments ; i ++) {
     double angle = i * seg_angle;
@@ -971,7 +969,6 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
     p.x = r * sin(angle);
     p.z = 0.0f;
 
-    p = mf3_v_mul(R, p);
     // Insert vec in array, note that center is in foci
     float_array_push(&verts, p.x);
     float_array_push(&verts, p.y);
@@ -982,6 +979,7 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
                                             verts.length/3,
                                             verts.elems, NULL, NULL);
 
+  mf4_zxz_rotmatrix(obj->R, asc, inc, argOfPeriapsis);
   float_array_dispose(&verts);
   return obj;
 }
