@@ -65,10 +65,13 @@ struct sg_object_t {
   struct sg_object_t *parent;
   sg_scene_t *scene;
 
+  float radius; // Radius is used by camera system (exponential zoom etc)
+
   lwcoord_t p0; // Global position
   lwcoord_t p1; // Global position
   lwcoord_t p;  // Global position
 
+  // Object may track either a rigid body or a celestial object
   pl_object_t *rigidBody;
   pl_celobject_t *celestial_body;
 
@@ -104,6 +107,12 @@ sg_scene_t*
 sg_object_get_scene(sg_object_t *obj)
 {
   return obj->scene;
+}
+
+float
+sg_object_get_radius(sg_object_t *obj)
+{
+  return obj->radius;
 }
 
 void
@@ -625,6 +634,8 @@ sg_object_sync(sg_object_t *obj, float t)
 
     lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
     obj->p = obj->p0;
+
+    obj->radius = obj->rigidBody->radius;
   } else if (obj->celestial_body) {
     // Synchronise rotational velocity and quaternions
     obj->q0 = pl_celobject_get_quat(obj->celestial_body);
@@ -638,6 +649,7 @@ sg_object_sync(sg_object_t *obj, float t)
 
     lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
     obj->p = obj->p0;
+    obj->radius = obj->celestial_body->cm_orbit->radius;
   } else {
     // TODO: Support translation and rotation of sub objects
     //obj->q0 = obj->q1;

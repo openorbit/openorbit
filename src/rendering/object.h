@@ -50,6 +50,7 @@ void sg_object_print(const sg_object_t *obj);
 
 const float4x4* sg_object_get_modelview(const sg_object_t *obj);
 
+float sg_object_get_radius(sg_object_t *obj);
 quaternion_t sg_object_get_quat(const sg_object_t *obj);
 quaternion_t sg_object_get_q0(const sg_object_t *obj);
 quaternion_t sg_object_get_q1(const sg_object_t *obj);
