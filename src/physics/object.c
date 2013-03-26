@@ -69,7 +69,7 @@ pl_object_init(pl_object_t *obj)
   obj->airPressure = 0.0;
   obj->dragCoef = 0.0;
   obj->area = 0.0;
-  obj->radius = 0.0;
+  obj->radius = 1.0;
 
   obj_array_init(&obj->children);
   obj_array_init(&obj->psystem);

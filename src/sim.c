@@ -254,14 +254,20 @@ void
 menu_camera(void *arg)
 {
   sg_object_t *obj = arg;
-  log_info("selected camera target: %s", sg_object_get_name(obj));
+
+  float radius = sg_object_get_radius(obj);
+  log_info("selected camera target: %s radius: %f",
+           sg_object_get_name(obj), radius);
 
   sg_scene_t *sc = sg_object_get_scene(obj);
   sg_camera_t *cam = sg_scene_get_cam(sc);
 
   sg_camera_track_object(cam, obj);
   sg_camera_follow_object(cam, obj);
-  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -150.0e6));
+
+
+  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0,
+                                           radius * 3.0));
 
 }
 
