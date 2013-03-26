@@ -405,6 +405,24 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
     mf4_make_translate(translate, obj->camera_pos);
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
+  } else if (obj->celestial_body) {
+    sg_camera_t *cam = sg_scene_get_cam(obj->scene);
+    lwcoord_t pos = sg_camera_pos(cam);
+    obj->camera_pos = lwc_dist(&obj->p, &pos);
+
+    q_mf4_convert(obj->R, obj->q);
+    if (obj->parent) {
+      assert(0 && "should not happen");
+      mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+    } else {
+      mf4_cpy(obj->modelViewMatrix,
+              *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+    }
+
+    float4x4 translate;
+    mf4_make_translate(translate, obj->camera_pos);
+    mf4_mul2(obj->modelViewMatrix, translate);
+    mf4_mul2(obj->modelViewMatrix, obj->R);
   } else {
     float4x4 translate;
 
@@ -610,7 +628,7 @@ sg_object_sync(sg_object_t *obj, float t)
   } else if (obj->celestial_body) {
     // Synchronise rotational velocity and quaternions
     obj->q0 = pl_celobject_get_quat(obj->celestial_body);
-    obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
+    obj->q1 = obj->q0;
     obj->q = q_slerp(obj->q0, obj->q1, 0.0);
 
     // Synchronise world coordinates
@@ -1080,7 +1098,6 @@ sg_object_add_light(sg_object_t *obj, sg_light_t *light)
 
   obj->lights[obj->lightCount ++] = light;
   sg_light_set_obj(light, obj);
-  sg_scene_add_light(obj->scene, light);
 }
 
 //typedef void (*sg_object_visitor_t)(sg_object_t obj);
