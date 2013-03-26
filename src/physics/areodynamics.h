@@ -121,7 +121,7 @@ struct pl_atm_template_t {
 };
 
 
-typedef struct PLatmosphere {
+typedef struct pl_atmosphere_t {
   float P0; // Standard pressure at "ground"-level
   float T0; // Standard temperature at "ground"-level
   float M; // Molar mass (kg / mol)
@@ -131,7 +131,7 @@ typedef struct PLatmosphere {
   float sample_distance;
   float_array_t P; // Pressure points
   float_array_t p; // Density points
-} PLatmosphere;
+} pl_atmosphere_t;
 
 double pl_object_compute_altitude(pl_object_t *obj);
 float3 pl_compute_airvelocity(pl_object_t *obj);
@@ -140,7 +140,7 @@ double pl_object_compute_airpressure(pl_object_t *obj);
 double pl_object_compute_airdensity(pl_object_t *obj);
 float3 pl_object_compute_drag(pl_object_t *obj);
 double pl_object_compute_airdensity_with_current_pressure(pl_object_t *obj);
-void pl_atmosphere_init(PLatmosphere *atm, float groundPressure, float h0);
+void pl_atmosphere_init(pl_atmosphere_t *atm, float groundPressure, float h0);
 
 /*!
  Computes the air preasure at a given altitude, note that for simplicitys sake,
@@ -163,7 +163,7 @@ pl_pressure_at_altitude(double Pb, double Tb, double g0, double M, double h,
                      double hb);
 
 // Simplified atmospheric model
-float pl_atmosphere_simple_compute_airpressure(const PLatmosphere *atm, float h);
+float pl_atmosphere_simple_compute_airpressure(const pl_atmosphere_t *atm, float h);
 
 float pl_atm_template_compute_airpressure(pl_atm_template_t *atm, float h);
 float pl_atm_template_compute_airdensity(pl_atm_template_t *atm, float h);
@@ -173,10 +173,10 @@ pl_new_atmosphere_template(size_t layers, double g0, double M,
                            const double *p_b, const double *P_b,
                            const double *T_b, const double *h_b,
                            const double *L_b);
-PLatmosphere* pl_new_atmosphere(float sample_dist, float h,
+pl_atmosphere_t* pl_new_atmosphere(float sample_dist, float h,
                                 pl_atm_template_t *t);
-float pl_atmosphere_density(const PLatmosphere *atm, float h);
-float pl_atmosphere_pressure(const PLatmosphere *atm, float h);
+float pl_atmosphere_density(const pl_atmosphere_t *atm, float h);
+float pl_atmosphere_pressure(const pl_atmosphere_t *atm, float h);
 
 
 typedef struct PLairfoil {
@@ -184,7 +184,7 @@ typedef struct PLairfoil {
   float Ct0;
 } PLairfoil;
 
-float3 pl_atmosphere_compute_lift(PLatmosphere *atm, pl_object_t *obj, PLairfoil *foil);
+float3 pl_atmosphere_compute_lift(pl_atmosphere_t *atm, pl_object_t *obj, PLairfoil *foil);
 
 
 #endif /* ! PL_ATMOSPHERE_H */

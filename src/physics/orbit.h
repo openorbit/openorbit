@@ -54,7 +54,7 @@ struct pl_astrobody_t {
   pl_system_t *sys;
   pl_object_t obj;
   double GM;
-  PLatmosphere *atm;
+  pl_atmosphere_t *atm;
   pl_keplerelems_t *kepler;
   //sg_object_t *drawable; //!< Link to scenegraph drawable object representing this
   //                      //!< object.
