@@ -90,8 +90,8 @@ sg_light_get_pos(const sg_light_t *light)
     lwcoord_t cam_pos = sg_camera_pos(cam);
     float3 dist = lwc_dist(&light_pos, &cam_pos);
 
-    const float4x4 *mv = sg_object_get_modelview(light->obj);
-    float4 pos = mf4_v_mul(*mv, vf4_setv(dist,0.0));
+    const float4x4 *mv = sg_camera_modelview(cam);
+    float4 pos = mf4_v_mul(*mv, vf4_setv(dist,1.0));
     return pos.xyz;
   }
   return light->pos.xyz;
