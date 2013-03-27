@@ -42,6 +42,11 @@
         "kind": "normal",
         "key": "z",
         "action": "cam-move-back"
+      },
+      {
+        "kind": "normal",
+        "key": "1",
+        "action": "icrf-grid-toggle"
       }
     ],
     "mouse": {

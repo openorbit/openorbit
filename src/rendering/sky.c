@@ -22,13 +22,19 @@
 #include "sky.h"
 #include "colour.h"
 #include "res-manager.h"
+#include "common/moduleinit.h"
+#include "sim.h"
+#include "io-manager.h"
+
 #include <openorbit/log.h>
 #include <tgmath.h>
-#include <stdio.h>
-#include <stdint.h>
+
 #include <assert.h>
-#include <stdlib.h>
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "scenegraph.h"
 #include "palloc.h"
@@ -49,6 +55,8 @@ struct sg_background_t {
   size_t a_len;
   size_t n_stars;
   sg_star_t *data;
+
+  bool icrf_enabled;
 
   GLuint icrf_vbo;
   GLuint icrf_vba;
@@ -281,12 +289,31 @@ sg_background_draw(sg_background_t *bg)
   SG_CHECK_ERROR;
 
   // Draw icrf grid
-  sg_shader_bind(bg->icrf_shader);
-  sg_shader_set_projection(bg->icrf_shader, *sg_camera_project(cam));
-  sg_shader_set_model_view(bg->icrf_shader, *sg_camera_modelview(cam));
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindVertexArray(bg->icrf_vba);
-  glDrawArrays(GL_LINES, 0, bg->icrf_num_lines*2);
-  glBindVertexArray(0);
-  SG_CHECK_ERROR;
+  if (bg->icrf_enabled) {
+    sg_shader_bind(bg->icrf_shader);
+    sg_shader_set_projection(bg->icrf_shader, *sg_camera_project(cam));
+    sg_shader_set_model_view(bg->icrf_shader, *sg_camera_modelview(cam));
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindVertexArray(bg->icrf_vba);
+    glDrawArrays(GL_LINES, 0, bg->icrf_num_lines*2);
+    glBindVertexArray(0);
+    SG_CHECK_ERROR;
+  }
 }
+
+void
+sg_icrf_toggle(int button_val, void *data)
+{
+  sg_scene_t *sc = sim_get_scene();
+  sg_background_t *bg = sg_scene_get_bg(sc);
+
+  if (button_val == 1) {
+    bg->icrf_enabled = !bg->icrf_enabled;
+  }
+}
+
+MODULE_INIT(sky, "iomanager", NULL) {
+  io_reg_action_handler("icrf-grid-toggle", sg_icrf_toggle, IO_BUTTON_PUSH, NULL);
+}
+
+

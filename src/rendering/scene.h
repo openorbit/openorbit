@@ -29,6 +29,7 @@ sg_scene_t* sg_new_scene(const char *name);
 void sg_scene_draw(sg_scene_t *scene, float dt);
 
 void sg_scene_set_bg(sg_scene_t *sc, sg_background_t *bg);
+sg_background_t* sg_scene_get_bg(sg_scene_t *sc);
 
 void sg_scene_set_cam(sg_scene_t *sc, sg_camera_t *cam);
 sg_camera_t* sg_scene_get_cam(sg_scene_t *sc);
