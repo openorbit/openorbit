@@ -374,6 +374,13 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
                                         pl_au_to_metres(semiMajor), ecc,
                                         DEG_TO_RAD(inc), DEG_TO_RAD(longAscNode),
                                         DEG_TO_RAD(longPerihel), 500);
+  pl_celobject_t *solar_celbody = pl_world_get_celobject(world, "sun");
+
+  sg_object_set_celestial_body(ellipse, solar_celbody);
+  sg_object_set_celestial_rot_body(ellipse, celbody);
+  //  cm_compute_mean_orbital_elements_j2000(cm_orbital_elements_t *elems,
+  //                                         cm_body_id_t planet, double T)
+
 
   sg_scene_add_object(sc, ellipse);
   //sys->orbitalBody->atm = NULL; // Init as vaccuum

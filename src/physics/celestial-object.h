@@ -21,7 +21,8 @@ struct pl_celobject_t {
 void pl_celinit(pl_world_t *world);
 pl_celobject_t* pl_new_celobject(pl_world_t *world, cm_orbit_t *cm_orbit);
 
-quaternion_t pl_celobject_get_quat(pl_celobject_t *celobj);
+quaternion_t pl_celobject_get_body_quat(pl_celobject_t *celobj);
+quaternion_t pl_celobject_get_orbit_quat(pl_celobject_t *celobj);
 float3 pl_celobject_get_vel(pl_celobject_t *celobj);
 lwcoord_t pl_celobject_get_lwc(pl_celobject_t *celobj);
 

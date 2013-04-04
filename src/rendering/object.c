@@ -62,6 +62,7 @@ struct sg_geometry_t {
 
 struct sg_object_t {
   const char *name;
+
   struct sg_object_t *parent;
   sg_scene_t *scene;
 
@@ -74,6 +75,8 @@ struct sg_object_t {
   // Object may track either a rigid body or a celestial object
   pl_object_t *rigidBody;
   pl_celobject_t *celestial_body;
+  pl_celobject_t *celestial_rot_body;
+
 
   float3 camera_pos; // Relative to camera
   float3 parent_offset; // Offset from parent
@@ -87,6 +90,7 @@ struct sg_object_t {
   quaternion_t dq; // Quaternion rot per time
 
   float4x4 R;
+  float4x4 scale; // Typically not used
   float4x4 modelViewMatrix;
 
   // Light sources associated with this object
@@ -313,7 +317,8 @@ sg_geometry_draw(sg_geometry_t *geo)
     glDrawElements(geo->gl_primitive_type, geo->index_count, geo->index_type, 0);
     SG_CHECK_ERROR;
   } else {
-    if (geo->vertex_count) glDrawArrays(geo->gl_primitive_type, 0, geo->vertex_count);
+    if (geo->vertex_count) glDrawArrays(geo->gl_primitive_type, 0,
+                                        geo->vertex_count);
     SG_CHECK_ERROR;
   }
 
@@ -412,6 +417,7 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
 
     float4x4 translate;
     mf4_make_translate(translate, obj->camera_pos);
+    mf4_mul2(obj->modelViewMatrix, obj->scale);
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
   } else if (obj->celestial_body) {
@@ -420,6 +426,7 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
     obj->camera_pos = lwc_dist(&obj->p, &pos);
 
     q_mf4_convert(obj->R, obj->q);
+
     if (obj->parent) {
       assert(0 && "should not happen");
       mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
@@ -430,6 +437,7 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
 
     float4x4 translate;
     mf4_make_translate(translate, obj->camera_pos);
+    mf4_mul2(obj->modelViewMatrix, obj->scale);
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
   } else {
@@ -445,6 +453,7 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
       mf4_make_translate(translate, lwc_dist(&obj->p, &cpos));
     }
 
+    mf4_mul2(obj->modelViewMatrix, obj->scale);
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
   }
@@ -610,6 +619,17 @@ sg_object_set_celestial_body(sg_object_t *obj, pl_celobject_t *cel_body)
   obj->celestial_body = cel_body;
 }
 
+void
+sg_object_set_celestial_rot_body(sg_object_t *obj, pl_celobject_t *cel_body)
+{
+  if (obj->parent) {
+    log_warn("setting celestial body for sg object that is not root");
+    return;
+  }
+  obj->celestial_rot_body = cel_body;
+}
+
+
 
 pl_object_t*
 sg_object_get_rigid_body(const sg_object_t *obj)
@@ -638,9 +658,22 @@ sg_object_sync(sg_object_t *obj, float t)
     obj->radius = obj->rigidBody->radius;
   } else if (obj->celestial_body) {
     // Synchronise rotational velocity and quaternions
-    obj->q0 = pl_celobject_get_quat(obj->celestial_body);
-    obj->q1 = obj->q0;
-    obj->q = q_slerp(obj->q0, obj->q1, 0.0);
+
+    if (obj->celestial_rot_body) {
+      obj->q0 = pl_celobject_get_orbit_quat(obj->celestial_rot_body);
+      obj->q1 = obj->q0;
+      obj->q = obj->q0;
+
+      //double xscale = cm_orbit_get_orbit_xscale(obj->celestial_rot_body->cm_orbit);
+      //double yscale = cm_orbit_get_orbit_yscale(obj->celestial_rot_body->cm_orbit);
+      //mf4_scale(obj->scale, xscale, yscale, 1.0);
+      //log_info("scale: %f %f %f %f", obj->scale[0][0], obj->scale[1][1],
+      //    obj->scale[2][2], obj->scale[3][3]);
+    } else {
+      obj->q0 = pl_celobject_get_body_quat(obj->celestial_body);
+      obj->q1 = obj->q0;
+      obj->q = q_slerp(obj->q0, obj->q1, 0.0);
+    }
 
     // Synchronise world coordinates
     obj->dp = pl_celobject_get_vel(obj->celestial_body);
@@ -696,6 +729,7 @@ sg_new_object(sg_shader_t *shader, const char *name)
   obj->dq = Q_IDENT;
 
   mf4_ident(obj->R);
+  mf4_ident(obj->scale);
   mf4_ident(obj->modelViewMatrix);
 
   obj->material = sg_new_material();
@@ -737,6 +771,7 @@ sg_new_object_with_geo(sg_shader_t *shader, const char *name,
   obj->dq = Q_IDENT;
 
   mf4_ident(obj->R);
+  mf4_ident(obj->scale);
   mf4_ident(obj->modelViewMatrix);
 
   obj->geometry = sg_new_geometry(obj, gl_primitive,
@@ -783,7 +818,8 @@ static void
 map_uv(float *u, float *v, float inc, float az)
 {
   *u = az/(2.0*M_PI) - 0.5; // Shift as we expect textures centered on meridian
-  *v = 1.0 - inc/M_PI;
+  *v = 1.0 - inc/M_PI; // Texture coordinates are positive upwards (but
+                       // inclination is positive downwards)
 }
 
 sg_object_t*
@@ -820,6 +856,9 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
   // Azimuth is the longitude from [0,2pi]
   // Inclination correspond to colatitude, i.e. latitude where 0 is the north
   // pole and pi the south pole. This is obviously 90 - normal latitude.
+
+  // Textures are assumed to be defined with the meridian in the center.
+
   double az_sz = (2.0 * M_PI) / (double)SLICES;
   double inc_sz = M_PI / (double)STACKS;
 
@@ -984,19 +1023,21 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
   float_array_init(&verts);
 
   float semiMinor = semiMajor * sqrt(1.0 - ecc*ecc);
+  double focus = semiMajor * ecc;
 
   // Naive way, we probably actually want just a single circle and then reuse it
   // for all ellipses using a scaling transformation.
   double seg_angle = 2.0*M_PI/segments;
   for (size_t i = 0 ; i < segments ; i ++) {
     double angle = i * seg_angle;
-    double b_cos = semiMinor * cos(angle);
-    double a_sin = semiMajor * sin(angle);
-    double r = semiMajor * semiMinor / sqrt(b_cos*b_cos+a_sin*a_sin);
 
     float3 p;
-    p.y = r * cos(angle) - ecc * semiMajor;
-    p.x = r * sin(angle);
+    p.x = semiMajor * cos(angle) - focus; // Note, x is the vernal equinox,
+                                          // which is also the point where an
+                                          // orbital ellipse will have its
+                                          // periapsis if the long asc and
+                                          // arg peri would be 0
+    p.y = semiMinor * sin(angle);
     p.z = 0.0f;
 
     // Insert vec in array, note that center is in foci
@@ -1008,8 +1049,6 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
   sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE_LOOP,
                                             verts.length/3,
                                             verts.elems, NULL, NULL);
-
-  mf4_zxz_rotmatrix(obj->R, asc, inc, argOfPeriapsis);
   float_array_dispose(&verts);
   return obj;
 }
@@ -1017,12 +1056,45 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
 sg_object_t*
 sg_new_axises(const char *name, sg_shader_t *shader, float length)
 {
-  float axis[] = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
-                  0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-                  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f};
+  static float axis[] = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+                         0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+                         0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f};
   sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE, 6, axis, NULL, NULL);
   return obj;
 }
+
+sg_object_t*
+sg_new_axises_with_prime(const char *name, sg_shader_t *shader, float length)
+{
+  float axis[] = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+                  0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+                  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+    // Prime meredian
+    0.0, 0.0,  1.0,   sin(M_PI_4),    0.0, cos(M_PI_4),
+    sin(M_PI_4), 0.0, cos(M_PI_4),    sin(M_PI_2), 0.0, cos(M_PI_2),
+    sin(M_PI_2), 0.0, cos(M_PI_2),    sin(M_PI_2+M_PI_4), 0.0, cos(M_PI_2+M_PI_4),
+    sin(M_PI_2+M_PI_4), 0.0, cos(M_PI_2+M_PI_4),      0.0, 0.0, -1.0,
+  };
+  uint8_t colours[] = {
+    255,0,0, 255,0,0,
+    0,255,0, 0,255,0,
+    0,0,255, 0,0,255,
+    255,255,0, 255,255,0,
+    255,255,0, 255,255,0,
+    255,255,0, 255,255,0,
+    255,255,0, 255,255,0,
+  };
+
+  for (int i = 0 ; i < sizeof(axis)/sizeof(axis[0]) ; i ++) {
+    axis[i] *= length;
+  }
+
+  sg_object_t *obj = sg_new_object(shader, name);
+  sg_new_geometry(obj, GL_LINES, sizeof(axis)/(sizeof(axis[0]*3)),
+                  axis, NULL, NULL, 0, 0, NULL, colours);
+  return obj;
+}
+
 
 sg_object_t*
 sg_new_cube(const char *name, sg_shader_t *shader, float side)

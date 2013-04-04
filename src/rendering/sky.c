@@ -315,5 +315,3 @@ sg_icrf_toggle(int button_val, void *data)
 MODULE_INIT(sky, "iomanager", NULL) {
   io_reg_action_handler("icrf-grid-toggle", sg_icrf_toggle, IO_BUTTON_PUSH, NULL);
 }
-
-

@@ -48,9 +48,15 @@ pl_new_celobject(pl_world_t *world, cm_orbit_t *cm_orbit)
 }
 
 quaternion_t
-pl_celobject_get_quat(pl_celobject_t *celobj)
+pl_celobject_get_body_quat(pl_celobject_t *celobj)
 {
-  return celobj->cm_orbit->q;
+  return cm_orbit_get_bodyq(celobj->cm_orbit);
+}
+
+quaternion_t
+pl_celobject_get_orbit_quat(pl_celobject_t *celobj)
+{
+  return cm_orbit_get_orbitq(celobj->cm_orbit);
 }
 
 float3

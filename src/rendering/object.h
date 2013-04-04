@@ -104,6 +104,7 @@ void sg_object_set_rigid_body(sg_object_t *obj, pl_object_t *rigidBody);
 pl_object_t* sg_object_get_rigid_body(const sg_object_t *obj);
 
 void sg_object_set_celestial_body(sg_object_t *obj, pl_celobject_t *cel_body);
+void sg_object_set_celestial_rot_body(sg_object_t *obj, pl_celobject_t *cel_body);
 
 // Interpolate object position and rotation between key frames.
 // Key frames is based on the physics system steps.
