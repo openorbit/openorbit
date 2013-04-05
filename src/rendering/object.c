@@ -506,8 +506,9 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   glGenBuffers(1, &geo->vbo);
   SG_CHECK_ERROR;
 
-  log_info("geometry: %d |[%f %f %f]| = %f", geo->vbo, maxvert.x, maxvert.y, maxvert.z,
-            vf3_abs(maxvert));
+  log_info("geometry: (%s) %d |[%f %f %f]| = %f", obj->name, geo->vbo,
+           maxvert.x, maxvert.y, maxvert.z,
+           vf3_abs(maxvert));
 
 
   glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
