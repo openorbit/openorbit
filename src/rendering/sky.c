@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2011,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -19,8 +19,8 @@
 
 
 
-#include "sky.h"
-#include "colour.h"
+#include "rendering/sky.h"
+#include "rendering/colour.h"
 #include "res-manager.h"
 #include "common/moduleinit.h"
 #include "sim.h"
@@ -36,8 +36,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "scenegraph.h"
-#include "palloc.h"
+#include "rendering/scenegraph.h"
+#include "common/palloc.h"
 
 struct sg_star_t {
   unsigned char r, g, b, a;
@@ -69,6 +69,10 @@ sg_new_icrf_grid(sg_background_t *bg)
 {
   float_array_t arr;
   float_array_init(&arr);
+
+  u8_array_t colours;
+  u8_array_init(&colours);
+
   // We want to show the grid with slices and stacks of M_PI_4
   // We are not generating triangles, but lines.
 #define STACKS 10
@@ -107,12 +111,21 @@ sg_new_icrf_grid(sg_background_t *bg)
           float_array_push(&arr, p[k].x);
           float_array_push(&arr, p[k].y);
           float_array_push(&arr, p[k].z);
+
+          u8_array_push(&colours, 128);
+          u8_array_push(&colours, 128);
+          u8_array_push(&colours, 255);
+          u8_array_push(&colours, 255);
         }
       } else {
         for (int k = 0 ; k < 2 ; k ++) {
           float_array_push(&arr, p[k].x);
           float_array_push(&arr, p[k].y);
           float_array_push(&arr, p[k].z);
+          u8_array_push(&colours, 128);
+          u8_array_push(&colours, 128);
+          u8_array_push(&colours, 255);
+          u8_array_push(&colours, 255);
         }
       }
     }
@@ -124,16 +137,26 @@ sg_new_icrf_grid(sg_background_t *bg)
 
   glGenBuffers(1, &bg->icrf_vbo);
   glBindBuffer(GL_ARRAY_BUFFER, bg->icrf_vbo);
-  glBufferData(GL_ARRAY_BUFFER, bg->icrf_num_lines*sizeof(float)*3*2, arr.elems,
+  glBufferData(GL_ARRAY_BUFFER,
+               arr.length*sizeof(float)+colours.length, NULL,
                GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, arr.length*sizeof(float), arr.elems);
+  glBufferSubData(GL_ARRAY_BUFFER, arr.length*sizeof(float),
+                  colours.length, colours.elems);
   SG_CHECK_ERROR;
 
   sg_shader_t *shader = sg_get_shader("flat");
   bg->icrf_shader = shader;
   glVertexAttribPointer(sg_shader_get_location(shader, SG_VERTEX, true),
                         3, GL_FLOAT, GL_FALSE,
-                        sizeof(float)*3, 0);
+                        0, 0);
   glEnableVertexAttribArray(sg_shader_get_location(shader, SG_VERTEX, true));
+
+  glVertexAttribPointer(SG_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0,
+                        (void*)(arr.length*sizeof(float)));
+  glEnableVertexAttribArray(sg_shader_get_location(shader, SG_COLOR, true));
+
+
   SG_CHECK_ERROR;
 
   glBindVertexArray(0);
@@ -141,6 +164,7 @@ sg_new_icrf_grid(sg_background_t *bg)
 
 
   float_array_dispose(&arr);
+  u8_array_dispose(&colours);
 }
 
 

@@ -12,5 +12,5 @@ void
 main()
 {
   gl_Position = oo_ProjectionMatrix * oo_ModelViewMatrix * oo_Vertex;
-  VertColor = vec4(1.0,0.0,0.0,1.0);//oo_Color;
+  VertColor = oo_Color;
 }

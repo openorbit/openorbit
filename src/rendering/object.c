@@ -34,12 +34,12 @@
 #include "physics/physics.h"
 #include "res-manager.h"
 #include <openorbit/log.h>
-#include "palloc.h"
+#include "common/palloc.h"
 
-#include "3ds.h"
-#include "ac3d.h"
-#include "cmod.h"
-#include "collada.h"
+#include "rendering/3ds.h"
+#include "rendering/ac3d.h"
+#include "rendering/cmod.h"
+#include "rendering/collada.h"
 
 struct sg_geometry_t {
   sg_object_t *obj;
@@ -1023,6 +1023,9 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
   float_array_t verts;
   float_array_init(&verts);
 
+  u8_array_t colours;
+  u8_array_init(&colours);
+
   float semiMinor = semiMajor * sqrt(1.0 - ecc*ecc);
   double focus = semiMajor * ecc;
 
@@ -1045,53 +1048,85 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
     float_array_push(&verts, p.x);
     float_array_push(&verts, p.y);
     float_array_push(&verts, p.z);
+
+    u8_array_push(&colours, 255);
+    u8_array_push(&colours, 0);
+    u8_array_push(&colours, 0);
+    u8_array_push(&colours, 255);
   }
 
-  sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE_LOOP,
-                                            verts.length/3,
-                                            verts.elems, NULL, NULL);
+  sg_object_t *obj = sg_new_object(shader, name);
+  sg_new_geometry(obj, GL_LINE_LOOP, verts.length/3, verts.elems, NULL, NULL,
+                  0, 0, NULL,
+                  colours.elems);
   float_array_dispose(&verts);
+  u8_array_dispose(&colours);
+
   return obj;
 }
 
 sg_object_t*
 sg_new_axises(const char *name, sg_shader_t *shader, float length)
 {
-  static float axis[] = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
-                         0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-                         0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f};
-  sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE, 6, axis, NULL, NULL);
+  float axis[] = {0.0f, 0.0f, 0.0f,  length, 0.0f, 0.0f,
+                  0.0f, 0.0f, 0.0f,  0.0f, length, 0.0f,
+                  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, length};
+
+  static uint8_t colours[] = {
+    255,0,0,255, 255,0,0,255,
+    0,255,0,255, 0,255,0,255,
+    0,0,255,255, 0,0,255,255,
+  };
+
+
+  sg_object_t *obj = sg_new_object(shader, name);
+  sg_new_geometry(obj, GL_LINES, sizeof(axis)/(sizeof(axis[0])*3),
+                  axis, NULL, NULL, 0, 0, NULL, colours);
   return obj;
 }
 
+// Creates a scenegraph object representing a set of axises and a prime half
+// circle.
 sg_object_t*
 sg_new_axises_with_prime(const char *name, sg_shader_t *shader, float length)
 {
-  float axis[] = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
-                  0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-                  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
-    // Prime meredian
-    0.0, 0.0,  1.0,   sin(M_PI_4),    0.0, cos(M_PI_4),
-    sin(M_PI_4), 0.0, cos(M_PI_4),    sin(M_PI_2), 0.0, cos(M_PI_2),
-    sin(M_PI_2), 0.0, cos(M_PI_2),    sin(M_PI_2+M_PI_4), 0.0, cos(M_PI_2+M_PI_4),
-    sin(M_PI_2+M_PI_4), 0.0, cos(M_PI_2+M_PI_4),      0.0, 0.0, -1.0,
-  };
-  uint8_t colours[] = {
-    255,0,0, 255,0,0,
-    0,255,0, 0,255,0,
-    0,0,255, 0,0,255,
-    255,255,0, 255,255,0,
-    255,255,0, 255,255,0,
-    255,255,0, 255,255,0,
-    255,255,0, 255,255,0,
+  float axis[6*3+32*3*2] = {
+
+    0.0f, 0.0f, 0.0f,  length, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,  0.0f, length, 0.0f,
+    0.0f, 0.0f, 0.0f,  0.0f, 0.0f, length,
+
+    // Rest is prime meridian
   };
 
-  for (int i = 0 ; i < sizeof(axis)/sizeof(axis[0]) ; i ++) {
-    axis[i] *= length;
+  uint8_t colours[6*4+32*4*2] = {
+    255,0,0,255,   255,0,0,255,
+    0,255,0,255,     0,255,0,255,
+    0,0,255,255,     0,0,255,255,
+
+    // Rest is prime meridian
+  };
+
+  // Fill in the meridian vertices (two per line) and colours
+  for (int i = 0 ; i < 32 ; i ++) {
+    axis[18+i*6+0] = length*sin(i*M_PI/32);
+    axis[18+i*6+2] = length*cos(i*M_PI/32);
+    axis[18+i*6+3] = length*sin((i+1)*M_PI/32);
+    axis[18+i*6+5] = length*cos((i+1)*M_PI/32);
+
+    colours[6*4+i*8+0] = 255;
+    colours[6*4+i*8+1] = 255;
+    colours[6*4+i*8+2] = 0;
+    colours[6*4+i*8+3] = 255;
+
+    colours[6*4+i*8+4] = 255;
+    colours[6*4+i*8+5] = 255;
+    colours[6*4+i*8+6] = 0;
+    colours[6*4+i*8+7] = 255;
   }
 
   sg_object_t *obj = sg_new_object(shader, name);
-  sg_new_geometry(obj, GL_LINES, sizeof(axis)/(sizeof(axis[0]*3)),
+  sg_new_geometry(obj, GL_LINES, sizeof(axis)/(sizeof(axis[0])*3),
                   axis, NULL, NULL, 0, 0, NULL, colours);
   return obj;
 }
