@@ -268,7 +268,7 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
   pl_atm_template_t *atm = NULL;
-  double mass, radius, siderealPeriod, axialTilt = 0.0, gm = NAN;
+  double mass, radius = NAN, siderealPeriod, axialTilt = 0.0, gm = NAN;
   double semiMajor = NAN, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
   //double pressure = 0.0, scale_height = 1.0; //TODO
   const char *tex = NULL;
@@ -374,6 +374,16 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
                                         pl_au_to_metres(semiMajor), ecc,
                                         DEG_TO_RAD(inc), DEG_TO_RAD(longAscNode),
                                         DEG_TO_RAD(longPerihel), 500);
+
+  char axname[strlen(planetName.u.str)+6];
+  strcpy(axname, planetName.u.str);
+  strcat(axname, ".axis");
+
+  sg_object_t *axises = sg_new_axises_with_prime(axname, sg_get_shader("flat"),
+                                                 radius*2);
+  sg_object_set_celestial_body(axises, celbody);
+  sg_scene_add_object(sc, axises);
+
   pl_celobject_t *solar_celbody = pl_world_get_celobject(world, "sun");
 
   sg_object_set_celestial_body(ellipse, solar_celbody);
