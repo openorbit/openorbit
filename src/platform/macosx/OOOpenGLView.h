@@ -24,5 +24,6 @@
 {
   NSTimer *timer;
   NSTimeInterval last;
+  float sim_period;
 }
 @end
