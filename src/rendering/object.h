@@ -91,7 +91,8 @@ sg_object_t* sg_new_cube(const char *name, sg_shader_t *shader, float side);
 sg_object_t* sg_new_axises(const char *name, sg_shader_t *shader, float length);
 sg_object_t* sg_new_axises_with_prime(const char *name, sg_shader_t *shader,
                                       float length);
-
+sg_object_t* sg_new_dynamic_vectorset(const char *name, sg_shader_t *shader,
+                                      pl_object_t *plobj);
 
 sg_object_t* sg_new_object_with_geo(sg_shader_t *shader, const char *name,
                                     int gl_primitive, size_t vertexCount,

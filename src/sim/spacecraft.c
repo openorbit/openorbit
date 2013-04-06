@@ -1,5 +1,5 @@
 /*
-  Copyright 2009,2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010,2011,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -28,11 +28,11 @@
 #include <gencds/hashtable.h>
 #include <gencds/array.h>
 #include "common/moduleinit.h"
-#include "actuator.h"
+#include "sim/actuator.h"
 #include "io-manager.h"
 #include "sim/pubsub.h"
 #include "rendering/object.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 extern sim_state_t gSIM_state;
 
@@ -474,7 +474,7 @@ sim_spacecraft_set_pos(sim_spacecraft_t *sc, double x, double y, double z)
 
 void
 sim_spacecraft_set_sys_and_pos(sim_spacecraft_t *sc, const char *sysName,
-                    double x, double y, double z)
+                               double x, double y, double z)
 {
   //pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
   pl_celobject_t *body = pl_world_get_celobject(sc->world, sysName);
@@ -490,7 +490,8 @@ sim_spacecraft_set_sys_and_pos(sim_spacecraft_t *sc, const char *sysName,
 
 void
 sim_spacecraft_set_sys_and_coords(sim_spacecraft_t *sc, const char *sysName,
-                    double longitude, double latitude, double altitude)
+                                  double longitude, double latitude,
+                                  double altitude)
 {
   // Find planetoid object
   pl_celobject_t *body = pl_world_get_celobject(sc->world, sysName);
@@ -675,6 +676,14 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
   sc->axisUpdate = sim_spacecraft_default_axis_update;
   pl_mass_set(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
+  // Adding vectors to scenegraph
+  char vecname[strlen(args->name) + 5];
+  strcpy(vecname, args->name);
+  strcat(vecname, ".vec");
+  sg_object_t *vectors =
+    sg_new_dynamic_vectorset(vecname, sg_get_shader("flat"), sc->obj);
+  sg_scene_add_object(sc->scene, vectors);
+
   //pl_system_add_object(world->rootSys, sc->obj);
 }
 
@@ -719,5 +728,3 @@ MODULE_INIT(spacecraft, "object", NULL)
   sim_class_add_field(stage_class, SIM_TYPE_OBJ_ARR,
                       "payload", offsetof(sim_stage_t, payload));
 }
-
-

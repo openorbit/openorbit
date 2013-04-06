@@ -43,6 +43,7 @@
 
 struct sg_geometry_t {
   sg_object_t *obj;
+  void (*update)(struct sg_geometry_t *);
   int gl_primitive_type;
   int vertex_count;
 
@@ -400,6 +401,8 @@ sg_geometry_draw(sg_geometry_t *geo)
 {
   assert(geo != NULL);
   SG_CHECK_ERROR;
+
+  if (geo->update) geo->update(geo);
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS); // We will try to draw objects sorted by camera
@@ -1038,8 +1041,8 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
 
   // Default to 10 x 10 degree slices and stacks, note that the texture
   // coordinates are messed up around the poles here.
-#define STACKS 18
-#define SLICES 36
+#define STACKS 50
+#define SLICES 50
 
   // Azimuth is the longitude from [0,2pi]
   // Inclination correspond to colatitude, i.e. latitude where 0 is the north
@@ -1382,6 +1385,103 @@ sg_new_cube(const char *name, sg_shader_t *shader, float side)
                                        cube_elements,
                                        cube_colors);
   sg_object_set_geometry(obj, geo);
+
+  return obj;
+}
+
+void
+sg_dynamic_vectorset_update(sg_geometry_t *geo)
+{
+  assert(geo->obj->kind == SG_OBJECT_NO_ROT);
+  pl_object_t *plobj = geo->obj->object.rigid_body;
+
+  glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
+  SG_CHECK_ERROR;
+
+  float vectors[8*3] = {
+    0.0,0.0,0.0,  plobj->v.x, plobj->v.y, plobj->v.z,
+    0.0,0.0,0.0,  plobj->f.x, plobj->f.y, plobj->f.z,
+    0.0,0.0,0.0,  plobj->g.x, plobj->g.y, plobj->g.z,
+    0.0,0.0,0.0,  plobj->t.x, plobj->t.y, plobj->t.z,
+  };
+
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vectors), vectors);
+  SG_CHECK_ERROR;
+
+#if 0
+  static uint8_t colours[8*3] = {
+    0,255,255,    0,255,255,
+    255,255,0,    255,255,0,
+    255,0,255,    255,0,255,
+    255,255,255,  255,255,255,
+  };
+  glBufferSubData(GL_ARRAY_BUFFER, sizeof(vectors), sizeof(colours), colours);
+  SG_CHECK_ERROR;
+
+#endif
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  SG_CHECK_ERROR;
+}
+
+
+
+sg_object_t*
+sg_new_dynamic_vectorset(const char *name, sg_shader_t *shader, pl_object_t *plobj)
+{
+  sg_object_t *obj = sg_new_object(shader, name);
+  sg_geometry_t *geo = smalloc(sizeof(sg_geometry_t));
+  obj->geometry = geo;
+  geo->obj = obj;
+  geo->obj->kind = SG_OBJECT_NO_ROT;
+  geo->obj->object.rigid_body = plobj;
+  geo->gl_primitive_type = GL_LINES;
+  geo->vertex_count = 8;
+  geo->update = sg_dynamic_vectorset_update;
+
+  glGenVertexArrays(1, &geo->vba);
+  glBindVertexArray(geo->vba);
+  glGenBuffers(1, &geo->vbo);
+
+  SG_CHECK_ERROR;
+
+  glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
+  glBufferData(GL_ARRAY_BUFFER,
+               8*sizeof(float)*3 + 8*4,
+               NULL, // Just allocate, will copy with subdata
+               GL_DYNAMIC_DRAW);
+
+  SG_CHECK_ERROR;
+
+  float vectors[8*3] = {
+    0.0,0.0,0.0,  plobj->v.x, plobj->v.y, plobj->v.z,
+    0.0,0.0,0.0,  plobj->f.x, plobj->f.y, plobj->f.z,
+    0.0,0.0,0.0,  plobj->g.x, plobj->g.y, plobj->g.z,
+    0.0,0.0,0.0,  plobj->t.x, plobj->t.y, plobj->t.z,
+  };
+
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vectors), vectors);
+
+  glVertexAttribPointer(SG_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(SG_VERTEX);
+
+  static uint8_t colours[8*3] = {
+    0,255,255,    0,255,255,
+    255,255,0,    255,255,0,
+    255,0,255,    255,0,255,
+    255,255,255,  255,255,255,
+  };
+  glBufferSubData(GL_ARRAY_BUFFER, sizeof(vectors), sizeof(colours), colours);
+  SG_CHECK_ERROR;
+  glVertexAttribPointer(SG_COLOR, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0,
+                        (void*)sizeof(vectors));
+  SG_CHECK_ERROR;
+  glEnableVertexAttribArray(SG_COLOR);
+  SG_CHECK_ERROR;
+
+  glBindVertexArray(0); // Done
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 
   return obj;
 }
