@@ -61,14 +61,19 @@ struct pl_object_t {
 
   obj_array_t psystem;// Optionally attatched particle systems
   obj_array_t children;
+
+  float3 g; // Previous g_ack
+  float3 t; // Previous t_ack
+  float3 f; // Previous f_ack
 };
 
 // Create standard object
 pl_object_t* pl_new_object(pl_world_t *sys, const char *name);
 
 // Create subobject
-pl_object_t* pl_new_sub_object3f(pl_world_t *world, pl_object_t *parent, const char *name,
-                        float x, float y, float z);
+pl_object_t* pl_new_sub_object3f(pl_world_t *world, pl_object_t *parent,
+                                 const char *name,
+                                 float x, float y, float z);
 
 // Init standard object (useful if allocated with malloc or explicitly in
 // structure).

@@ -372,7 +372,7 @@ pl_object_step(pl_object_t *obj, float dt)
   obj->airDensity = pl_object_compute_airdensity(obj);
 #endif
   PL_CHECK_OBJ(obj);
-  float3 fm = (obj->f_ack / obj->m.m);
+  float3 fm = ((obj->f_ack + obj->g_ack)/ obj->m.m);
 
   obj->v += fm * dt; // Update velocity from force
   float3 dv = vf3_s_mul(obj->v, dt);
@@ -424,6 +424,10 @@ pl_object_normalise(pl_object_t *obj)
 void
 pl_object_clear(pl_object_t *obj)
 {
+  obj->g = obj->g_ack;
+  obj->t = obj->t_ack;
+  obj->f = obj->f_ack;
+
   obj->f_ack = vf3_set(0.0f, 0.0f, 0.0f);
   obj->t_ack = vf3_set(0.0f, 0.0f, 0.0f);
   obj->g_ack = vf3_set(0.0f, 0.0f, 0.0f);
