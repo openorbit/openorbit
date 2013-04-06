@@ -60,28 +60,58 @@ struct sg_geometry_t {
   GLuint ibo;
 };
 
+// Determines how we sync the position and rotation
+typedef enum {
+  SG_STATIC,
+  SG_OBJECT,
+  SG_OBJECT_NO_ROT,
+  SG_CELOBJECT,
+  SG_CELOBJECT_ROT,
+} sg_object_kind_t;
+
 struct sg_object_t {
   const char *name;
+  sg_object_kind_t kind;
 
   struct sg_object_t *parent;
   sg_scene_t *scene;
 
   float radius; // Radius is used by camera system (exponential zoom etc)
 
-  lwcoord_t p0; // Global position
-  lwcoord_t p1; // Global position
-  lwcoord_t p;  // Global position
+  union {
+    struct {
+      pl_object_t *rigid_body;
+      lwcoord_t p0; // Global position
+      lwcoord_t p1; // Global position
+      lwcoord_t p;  // Global position
+      float3 dp;
+    } object;
+    struct {
+      pl_celobject_t *celestial_body;
+      double3 p0; // Global position
+      double3 p1; // Global position
+      double3 p;  // Global position
+      double3 dp;
+    } celobject;
+    struct {
+      pl_celobject_t *celestial_body;
+      pl_celobject_t *celestial_rot_body;
 
-  // Object may track either a rigid body or a celestial object
-  pl_object_t *rigidBody;
-  pl_celobject_t *celestial_body;
-  pl_celobject_t *celestial_rot_body;
-
+      double3 p0; // Global position
+      double3 p1; // Global position
+      double3 p;  // Global position
+      double3 dp;
+    } celobject_rot;
+    struct {
+      lwcoord_t p0; // Global position
+      lwcoord_t p1; // Global position
+      lwcoord_t p;  // Global position
+    } stat;
+  };
 
   float3 camera_pos; // Relative to camera
   float3 parent_offset; // Offset from parent
 
-  float3 dp; // Delta pos per time step
   float3 dr; // Angular velocity
 
   quaternion_t q;  // Slerped quaternion
@@ -122,8 +152,8 @@ sg_object_get_radius(sg_object_t *obj)
 void
 sg_object_print(const sg_object_t *obj)
 {
-  if (obj->rigidBody) {
-    log_info("** object %s", obj->rigidBody->name);
+  if (obj->kind == SG_OBJECT) {
+    log_info("** object %s", obj->object.rigid_body->name);
 
     //    log_info("\tlwc: [%d %d %d] + [%f %f %f]",
     //        obj->p.seg.x, obj->p.seg.y, obj->p.seg.z,
@@ -208,32 +238,103 @@ sg_object_get_parent_offset(sg_object_t *obj)
 float3
 sg_object_get_vel(sg_object_t *obj)
 {
-  return obj->dp;
+  switch (obj->kind) {
+  case SG_STATIC:
+    assert(0 && "fixme");
+    break;
+  case SG_CELOBJECT_ROT:
+    return vf3_set(obj->celobject_rot.dp.x, obj->celobject_rot.dp.y,
+                   obj->celobject_rot.dp.z);
+  case SG_CELOBJECT:
+    return vf3_set(obj->celobject.dp.x, obj->celobject.dp.y, obj->celobject.dp.z);
+  case SG_OBJECT_NO_ROT:
+    return obj->object.dp;
+  case SG_OBJECT:
+    return obj->object.dp;
+  default:
+      assert(0 && "invalid");
+  }
 }
 
 
 void
 sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc)
 {
-  *lwc = obj->p;
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
+    *lwc = obj->object.p;
+    return;
+  case SG_CELOBJECT:
+    lwc_setv(lwc, obj->celobject.p);
+    return;
+  case SG_CELOBJECT_ROT:
+    lwc_setv(lwc, obj->celobject_rot.p);
+    return;
+  case SG_STATIC:
+  default:
+    assert(0 && "invalid");
+  }
 }
 
 lwcoord_t
 sg_object_get_p0(const sg_object_t *obj)
 {
-  return obj->p0;
+  lwcoord_t lwc;
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
+    return obj->object.p0;
+  case SG_CELOBJECT:
+    lwc_setv(&lwc, obj->celobject.p0);
+    return lwc;
+  case SG_CELOBJECT_ROT:
+    lwc_setv(&lwc, obj->celobject_rot.p0);
+    return lwc;
+  case SG_STATIC:
+  default:
+    assert(0 && "invalid");
+  }
 }
 
 lwcoord_t
 sg_object_get_p1(const sg_object_t *obj)
 {
-  return obj->p1;
+  lwcoord_t lwc;
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
+    return obj->object.p1;
+  case SG_CELOBJECT:
+    lwc_setv(&lwc, obj->celobject.p1);
+    return lwc;
+  case SG_CELOBJECT_ROT:
+    lwc_setv(&lwc, obj->celobject_rot.p1);
+    return lwc;
+  case SG_STATIC:
+  default:
+    assert(0 && "invalid");
+  }
 }
 
 lwcoord_t
 sg_object_get_p(const sg_object_t *obj)
 {
-  return obj->p;
+  lwcoord_t lwc;
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
+    return obj->object.p;
+  case SG_CELOBJECT:
+    lwc_setv(&lwc, obj->celobject.p);
+    return lwc;
+  case SG_CELOBJECT_ROT:
+    lwc_setv(&lwc, obj->celobject_rot.p);
+    return lwc;
+  case SG_STATIC:
+  default:
+    assert(0 && "invalid");
+  }
 }
 
 
@@ -401,10 +502,11 @@ sg_object_draw(sg_object_t *obj)
 void
 sg_object_recompute_modelviewmatrix(sg_object_t *obj)
 {
-  if (obj->rigidBody) {
+  switch (obj->kind) {
+  case SG_OBJECT: {
     sg_camera_t *cam = sg_scene_get_cam(obj->scene);
     lwcoord_t pos = sg_camera_pos(cam);
-    obj->camera_pos = lwc_dist(&obj->p, &pos);
+    obj->camera_pos = lwc_dist(&obj->object.p, &pos);
 
     q_mf4_convert(obj->R, obj->q);
     if (obj->parent) {
@@ -420,27 +522,61 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
     mf4_mul2(obj->modelViewMatrix, obj->scale);
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
-  } else if (obj->celestial_body) {
+  }
+    break;
+  case SG_OBJECT_NO_ROT: {
+    assert(obj->parent == NULL);
     sg_camera_t *cam = sg_scene_get_cam(obj->scene);
     lwcoord_t pos = sg_camera_pos(cam);
-    obj->camera_pos = lwc_dist(&obj->p, &pos);
+    obj->camera_pos = lwc_dist(&obj->object.p, &pos);
 
-    q_mf4_convert(obj->R, obj->q);
-
-    if (obj->parent) {
-      assert(0 && "should not happen");
-      mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
-    } else {
-      mf4_cpy(obj->modelViewMatrix,
-              *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
-    }
-
+    mf4_cpy(obj->modelViewMatrix,
+            *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
     float4x4 translate;
     mf4_make_translate(translate, obj->camera_pos);
     mf4_mul2(obj->modelViewMatrix, obj->scale);
     mf4_mul2(obj->modelViewMatrix, translate);
-    mf4_mul2(obj->modelViewMatrix, obj->R);
-  } else {
+  }
+    break;
+  case SG_CELOBJECT:
+    {
+      sg_camera_t *cam = sg_scene_get_cam(obj->scene);
+      lwcoord_t pos = sg_camera_pos(cam);
+
+      double3 tmp = obj->celobject.p - lwc_globald(&pos);
+      obj->camera_pos = vf3_set(tmp.x, tmp.y, tmp.z);
+      q_mf4_convert(obj->R, obj->q);
+
+      mf4_cpy(obj->modelViewMatrix,
+              *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+
+      float4x4 translate;
+      mf4_make_translate(translate, obj->camera_pos);
+      mf4_mul2(obj->modelViewMatrix, obj->scale);
+      mf4_mul2(obj->modelViewMatrix, translate);
+      mf4_mul2(obj->modelViewMatrix, obj->R);
+    }
+    break;
+  case SG_CELOBJECT_ROT:
+    {
+      sg_camera_t *cam = sg_scene_get_cam(obj->scene);
+      lwcoord_t pos = sg_camera_pos(cam);
+
+      double3 tmp = obj->celobject_rot.p - lwc_globald(&pos);
+      obj->camera_pos = vf3_set(tmp.x, tmp.y, tmp.z);
+      q_mf4_convert(obj->R, obj->q);
+
+      mf4_cpy(obj->modelViewMatrix,
+                *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+
+      float4x4 translate;
+      mf4_make_translate(translate, obj->camera_pos);
+      mf4_mul2(obj->modelViewMatrix, obj->scale);
+      mf4_mul2(obj->modelViewMatrix, translate);
+      mf4_mul2(obj->modelViewMatrix, obj->R);
+    }
+    break;
+  case SG_STATIC: {
     float4x4 translate;
 
     if (obj->parent) {
@@ -450,12 +586,17 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
       mf4_cpy(obj->modelViewMatrix,
               *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
       lwcoord_t cpos = sg_camera_pos(sg_scene_get_cam(obj->scene));
-      mf4_make_translate(translate, lwc_dist(&obj->p, &cpos));
+
+      mf4_make_translate(translate, lwc_dist(&obj->stat.p, &cpos));
     }
 
     mf4_mul2(obj->modelViewMatrix, obj->scale);
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
+  }
+    break;
+  default:
+    assert(0 && "invalid");
   }
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
@@ -607,7 +748,8 @@ sg_object_set_rigid_body(sg_object_t *obj, pl_object_t *rigidBody)
     log_warn("setting rigid body for sg object that is not root");
     return;
   }
-  obj->rigidBody = rigidBody;
+  obj->kind = SG_OBJECT;
+  obj->object.rigid_body = rigidBody;
 }
 
 void
@@ -617,7 +759,13 @@ sg_object_set_celestial_body(sg_object_t *obj, pl_celobject_t *cel_body)
     log_warn("setting celestial body for sg object that is not root");
     return;
   }
-  obj->celestial_body = cel_body;
+
+  if ( obj->kind == SG_CELOBJECT_ROT) {
+    obj->celobject_rot.celestial_body = cel_body;
+  } else {
+    obj->kind = SG_CELOBJECT;
+    obj->celobject.celestial_body = cel_body;
+  }
 }
 
 void
@@ -627,7 +775,16 @@ sg_object_set_celestial_rot_body(sg_object_t *obj, pl_celobject_t *cel_body)
     log_warn("setting celestial body for sg object that is not root");
     return;
   }
-  obj->celestial_rot_body = cel_body;
+
+  if ( obj->kind == SG_CELOBJECT) {
+    pl_celobject_t *old_cobj = obj->celobject_rot.celestial_body;
+    obj->kind = SG_CELOBJECT_ROT;
+    obj->celobject_rot.celestial_body = old_cobj;
+    obj->celobject_rot.celestial_rot_body = cel_body;
+  } else {
+    obj->kind = SG_CELOBJECT_ROT;
+    obj->celobject.celestial_body = cel_body;
+  }
 }
 
 
@@ -635,60 +792,77 @@ sg_object_set_celestial_rot_body(sg_object_t *obj, pl_celobject_t *cel_body)
 pl_object_t*
 sg_object_get_rigid_body(const sg_object_t *obj)
 {
-  return obj->rigidBody;
+  if (obj->kind == SG_OBJECT || obj->kind == SG_OBJECT_NO_ROT) {
+    return obj->object.rigid_body;
+  }
+
+  return NULL;
 }
 
 void
 sg_object_sync(sg_object_t *obj, float t)
 {
-  if (obj->rigidBody) {
+  switch (obj->kind) {
+  case SG_OBJECT:
     // Synchronise rotational velocity and quaternions
-    obj->dr = pl_object_get_angular_vel(obj->rigidBody);
-    obj->q0 = pl_object_get_quat(obj->rigidBody);
+    obj->dr = pl_object_get_angular_vel(obj->object.rigid_body);
+    obj->q0 = pl_object_get_quat(obj->object.rigid_body);
     obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
     obj->q = q_slerp(obj->q0, obj->q1, 0.0);
 
     // Synchronise world coordinates
-    obj->dp = pl_object_get_vel(obj->rigidBody);
-    obj->p0 = pl_object_get_lwc(obj->rigidBody);
-    obj->p1 = obj->p0;
+    obj->object.dp = pl_object_get_vel(obj->object.rigid_body);
+    obj->object.p0 = pl_object_get_lwc(obj->object.rigid_body);
+    obj->object.p1 = obj->object.p0;
 
-    lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
-    obj->p = obj->p0;
+    lwc_translate3fv(&obj->object.p1, vf3_s_mul(obj->object.dp, t));
+    obj->object.p = obj->object.p0;
 
-    obj->radius = obj->rigidBody->radius;
-  } else if (obj->celestial_body) {
-    // Synchronise rotational velocity and quaternions
-
-    if (obj->celestial_rot_body) {
-      obj->q0 = pl_celobject_get_orbit_quat(obj->celestial_rot_body);
-      obj->q1 = obj->q0;
-      obj->q = obj->q0;
-
-      //double xscale = cm_orbit_get_orbit_xscale(obj->celestial_rot_body->cm_orbit);
-      //double yscale = cm_orbit_get_orbit_yscale(obj->celestial_rot_body->cm_orbit);
-      //mf4_scale(obj->scale, xscale, yscale, 1.0);
-      //log_info("scale: %f %f %f %f", obj->scale[0][0], obj->scale[1][1],
-      //    obj->scale[2][2], obj->scale[3][3]);
-    } else {
-      obj->q0 = pl_celobject_get_body_quat(obj->celestial_body);
-      obj->q1 = obj->q0;
-      obj->q = q_slerp(obj->q0, obj->q1, 0.0);
-    }
+    obj->radius = obj->object.rigid_body->radius;
+    break;
+  case SG_OBJECT_NO_ROT:
+    obj->q0 = Q_IDENT;
+    obj->q1 = Q_IDENT;
+    obj->q = Q_IDENT;
 
     // Synchronise world coordinates
-    obj->dp = pl_celobject_get_vel(obj->celestial_body);
-    obj->p0 = pl_celobject_get_lwc(obj->celestial_body);
-    obj->p1 = obj->p0;
+    obj->object.dp = pl_object_get_vel(obj->object.rigid_body);
+    obj->object.p0 = pl_object_get_lwc(obj->object.rigid_body);
+    obj->object.p1 = obj->object.p0;
 
-    lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
-    obj->p = obj->p0;
-    obj->radius = obj->celestial_body->cm_orbit->radius;
-  } else {
-    // TODO: Support translation and rotation of sub objects
-    //obj->q0 = obj->q1;
-    //obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
-    //obj->q = q_slerp(obj->q0, obj->q1, t);
+    lwc_translate3fv(&obj->object.p1, vf3_s_mul(obj->object.dp, t));
+    obj->object.p = obj->object.p0;
+
+    obj->radius = obj->object.rigid_body->radius;
+    break;
+  case SG_CELOBJECT:
+    obj->q0 = pl_celobject_get_body_quat(obj->celobject.celestial_body);
+    obj->q1 = obj->q0;
+    obj->q = q_slerp(obj->q0, obj->q1, 0.0);
+
+    obj->celobject.dp = obj->celobject.celestial_body->cm_orbit->v;
+    obj->celobject.p0 = obj->celobject.celestial_body->cm_orbit->p;
+    obj->celobject.p1 = obj->celobject.p0 + obj->celobject.dp * t;
+    obj->celobject.p = obj->celobject.p0;
+
+    obj->radius = obj->celobject.celestial_body->cm_orbit->radius;
+    break;
+  case SG_CELOBJECT_ROT:
+    obj->q0 = pl_celobject_get_orbit_quat(obj->celobject_rot.celestial_rot_body);
+    obj->q1 = obj->q0;
+    obj->q = obj->q0;
+
+    obj->celobject_rot.dp = obj->celobject_rot.celestial_body->cm_orbit->v;
+    obj->celobject_rot.p0 = obj->celobject_rot.celestial_body->cm_orbit->p;
+    obj->celobject_rot.p1 = obj->celobject_rot.p0 + obj->celobject_rot.dp * t;
+    obj->celobject_rot.p = obj->celobject_rot.p0;
+
+    obj->radius = obj->celobject_rot.celestial_body->cm_orbit->radius;
+    break;
+  case SG_STATIC:
+    break;
+    default:
+    assert(0 && "invalid");
   }
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
@@ -700,15 +874,28 @@ void
 sg_object_interpolate(sg_object_t *obj, float t)
 {
   // Interpolate rotation quaternion.
-  if (obj->rigidBody || obj->celestial_body) {
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
     obj->q = q_slerp(obj->q0, obj->q1, t);
-
     // Approximate distance between physics frames
-    float3 dist = lwc_dist(&obj->p1, &obj->p0);
+    float3 dist = lwc_dist(&obj->object.p1, &obj->object.p0);
     dist = vf3_s_mul(dist, t);
-    obj->p = obj->p0;
-    lwc_translate3fv(&obj->p, dist);
+    obj->object.p = obj->object.p0;
+    lwc_translate3fv(&obj->object.p, dist);
+    break;
+  case SG_CELOBJECT:
+    obj->celobject.p = obj->celobject.p0
+                     + (obj->celobject.p1 - obj->celobject.p0) * t;
+    break;
+  case SG_CELOBJECT_ROT:
+    obj->celobject_rot.p = obj->celobject_rot.p0
+                         + (obj->celobject_rot.p1 - obj->celobject_rot.p0) * t;
+    break;
+  default:
+    break;
   }
+
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_interpolate(ARRAY_ELEM(obj->subObjects, i), t);
   }
