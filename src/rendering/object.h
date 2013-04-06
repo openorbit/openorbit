@@ -37,6 +37,9 @@ int sg_objects_compare_dist(sg_object_t const **o0, sg_object_t const **o1);
 
 void sg_object_add_child(sg_object_t *obj, sg_object_t *child);
 
+sg_scene_t* sg_object_get_scene(sg_object_t *obj);
+
+
 void sg_object_set_camera_pos(sg_object_t *obj, float3 pos);
 float3 sg_object_get_camera_pos(sg_object_t *obj);
 void sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc);
@@ -47,6 +50,7 @@ void sg_object_print(const sg_object_t *obj);
 
 const float4x4* sg_object_get_modelview(const sg_object_t *obj);
 
+float sg_object_get_radius(sg_object_t *obj);
 quaternion_t sg_object_get_quat(const sg_object_t *obj);
 quaternion_t sg_object_get_q0(const sg_object_t *obj);
 quaternion_t sg_object_get_q1(const sg_object_t *obj);
@@ -84,6 +88,12 @@ sg_object_t* sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
                            sg_material_t *mat);
 sg_object_t* sg_new_cube(const char *name, sg_shader_t *shader, float side);
 
+sg_object_t* sg_new_axises(const char *name, sg_shader_t *shader, float length);
+sg_object_t* sg_new_axises_with_prime(const char *name, sg_shader_t *shader,
+                                      float length);
+sg_object_t* sg_new_dynamic_vectorset(const char *name, sg_shader_t *shader,
+                                      pl_object_t *plobj);
+
 sg_object_t* sg_new_object_with_geo(sg_shader_t *shader, const char *name,
                                     int gl_primitive, size_t vertexCount,
                                     float *vertices, float *normals, float *texCoords);
@@ -96,8 +106,11 @@ void sg_object_recompute_modelviewmatrix(sg_object_t *obj);
 void sg_object_draw(sg_object_t *obj);
 void sg_geometry_draw(sg_geometry_t *geo);
 
-void sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody);
-PLobject* sg_object_get_rigid_body(const sg_object_t *obj);
+void sg_object_set_rigid_body(sg_object_t *obj, pl_object_t *rigidBody);
+pl_object_t* sg_object_get_rigid_body(const sg_object_t *obj);
+
+void sg_object_set_celestial_body(sg_object_t *obj, pl_celobject_t *cel_body);
+void sg_object_set_celestial_rot_body(sg_object_t *obj, pl_celobject_t *cel_body);
 
 // Interpolate object position and rotation between key frames.
 // Key frames is based on the physics system steps.

@@ -46,7 +46,7 @@ void
 main()
 {
   vec3 Normal = normalize(N);
-  float NdotL = max(dot(Normal, Ld), 0.0);
+  float NdotL = dot(Normal, Ld);
 
   vec4 Ambient, AmbientGlob;
 

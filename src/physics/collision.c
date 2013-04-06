@@ -54,26 +54,26 @@ pl_recgrid_delete(pl_recgrid_t *grid)
 }
 
 pl_collisioncontext_t*
-pl_new_collision_context(void)
+pl_new_collision_context(double size)
 {
   pl_collisioncontext_t *ctxt = smalloc(sizeof(pl_collisioncontext_t));
   ctxt->pool = pool_create(sizeof(pl_recgrid_t));
   obj_array_init(&ctxt->colls);
-  ctxt->otree = pl_new_recgrid(ctxt, pl_au_to_metres(100.0)); // Roughly the heliospause
+  ctxt->otree = pl_new_recgrid(ctxt, size); // Roughly the heliospause
   return ctxt;
 }
 
-void pl_collcontext_insert_object(pl_collisioncontext_t *ctxt, pl_recgrid_t *grid, PLobject *obj);
+void pl_collcontext_insert_object(pl_collisioncontext_t *ctxt, pl_recgrid_t *grid, pl_object_t *obj);
 
 static int
-getoctant(const lwcoord_t *coord, const PLobject *obj)
+getoctant(const lwcoord_t *coord, const pl_object_t *obj)
 {
   float3 dist = lwc_dist(&obj->p, coord);
-  int oct = signbit(dist.x) * 4 + signbit(dist.y) * 2 + signbit(dist.z);
+  int oct = vf3_octant(vf3_set(0, 0, 0), dist);
   return oct;
 }
 static bool
-fits(const pl_recgrid_t *grid, const PLobject *obj)
+fits(const pl_recgrid_t *grid, const pl_object_t *obj)
 {
   float3 dist = lwc_dist(&obj->p, &grid->centre);
 
@@ -112,7 +112,7 @@ split(pl_collisioncontext_t *ctxt, pl_recgrid_t *grid)
   }
 
   for (int i = 0 ; i < grid->objs.length ; i++) {
-    PLobject *obj = grid->objs.elems[i];
+    pl_object_t *obj = grid->objs.elems[i];
     int octant = getoctant(&grid->centre, obj);
     if (fits(grid->children[octant], obj)) {
       pl_collcontext_insert_object(ctxt, grid->children[octant], obj);
@@ -123,7 +123,7 @@ split(pl_collisioncontext_t *ctxt, pl_recgrid_t *grid)
 }
 
 void
-pl_collcontext_insert_object(pl_collisioncontext_t *ctxt, pl_recgrid_t *grid, PLobject *obj)
+pl_collcontext_insert_object(pl_collisioncontext_t *ctxt, pl_recgrid_t *grid, pl_object_t *obj)
 {
   int octant = getoctant(&grid->centre, obj);
   if (grid->children[octant] && fits(grid->children[octant], obj)){
@@ -146,12 +146,12 @@ pl_check_collissions(pl_recgrid_t *grid)
   }
 
   for (int i = 0 ; i < grid->objs.length ; ++i) {
-    PLobject *obj_a = grid->objs.elems[i];
+    pl_object_t *obj_a = grid->objs.elems[i];
     (void) obj_a; // TODO
 
     // Check against local objects
     for (int j = i ; j < grid->objs.length ; ++j) {
-      PLobject *obj_b = grid->objs.elems[j];
+      pl_object_t *obj_b = grid->objs.elems[j];
       (void) obj_b; // TODO
     }
 
@@ -160,7 +160,7 @@ pl_check_collissions(pl_recgrid_t *grid)
     while (higher_grid) {
       // Check against local objects
       for (int j = 0 ; j < higher_grid->objs.length ; ++j) {
-        PLobject *obj_b = higher_grid->objs.elems[j];
+        pl_object_t *obj_b = higher_grid->objs.elems[j];
         (void) obj_b; // TODO
       }
 
@@ -171,7 +171,7 @@ pl_check_collissions(pl_recgrid_t *grid)
 
 bool
 pl_collide_coarse(pl_collisioncontext_t *coll,
-                  PLobject * restrict obj_a, PLobject * restrict obj_b)
+                  pl_object_t * restrict obj_a, pl_object_t * restrict obj_b)
 {
   float3 dist = lwc_dist(&obj_a->p, &obj_b->p);
 
@@ -185,13 +185,13 @@ pl_collide_coarse(pl_collisioncontext_t *coll,
 
 bool
 pl_collide_fine(pl_collisioncontext_t *coll,
-              PLobject * restrict obj_a, PLobject * restrict obj_b)
+              pl_object_t * restrict obj_a, pl_object_t * restrict obj_b)
 {
   return true;
 }
 
 void
-pl_collide_insert_object(pl_collisioncontext_t *ctxt, PLobject *obj)
+pl_collide_insert_object(pl_collisioncontext_t *ctxt, pl_object_t *obj)
 {
   pl_collcontext_insert_object(ctxt, ctxt->otree, obj);
 }
@@ -236,7 +236,7 @@ pl_collide_tree_node(pl_collisioncontext_t *coll, pl_recgrid_t *otree)
     while (higher_grid) {
       // Check against local objects
       for (int j = 0 ; j < higher_grid->objs.length ; ++j) {
-        PLobject *obj_b = higher_grid->objs.elems[j];
+        pl_object_t *obj_b = higher_grid->objs.elems[j];
         if (pl_collide_coarse(coll, otree->objs.elems[i], obj_b)) {
           if (pl_collide_fine(coll, otree->objs.elems[i], obj_b)) {
             // TODO: Pair objects
@@ -260,8 +260,8 @@ pl_collide_step(pl_collisioncontext_t *coll)
 
   // Resolve computed collisions
   for (int i = 0 ; i < coll->colls.length ; i += 2) {
-    PLobject *a = coll->colls.elems[i];
-    PLobject *b = coll->colls.elems[i+1];
+    pl_object_t *a = coll->colls.elems[i];
+    pl_object_t *b = coll->colls.elems[i+1];
 
     float3 av = (a->m.m - b->m.m) / (a->m.m + b->m.m) * a->v +
                 (2.0f*b->m.m) / (a->m.m + b->m.m) * b->v;

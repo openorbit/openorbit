@@ -34,15 +34,16 @@
 #include "physics/physics.h"
 #include "res-manager.h"
 #include <openorbit/log.h>
-#include "palloc.h"
+#include "common/palloc.h"
 
-#include "3ds.h"
-#include "ac3d.h"
-#include "cmod.h"
-#include "collada.h"
+#include "rendering/3ds.h"
+#include "rendering/ac3d.h"
+#include "rendering/cmod.h"
+#include "rendering/collada.h"
 
 struct sg_geometry_t {
   sg_object_t *obj;
+  void (*update)(struct sg_geometry_t *);
   int gl_primitive_type;
   int vertex_count;
 
@@ -60,21 +61,58 @@ struct sg_geometry_t {
   GLuint ibo;
 };
 
+// Determines how we sync the position and rotation
+typedef enum {
+  SG_STATIC,
+  SG_OBJECT,
+  SG_OBJECT_NO_ROT,
+  SG_CELOBJECT,
+  SG_CELOBJECT_ROT,
+} sg_object_kind_t;
+
 struct sg_object_t {
   const char *name;
+  sg_object_kind_t kind;
+
   struct sg_object_t *parent;
   sg_scene_t *scene;
 
-  lwcoord_t p0; // Global position
-  lwcoord_t p1; // Global position
-  lwcoord_t p;  // Global position
+  float radius; // Radius is used by camera system (exponential zoom etc)
 
-  PLobject *rigidBody;
+  union {
+    struct {
+      pl_object_t *rigid_body;
+      lwcoord_t p0; // Global position
+      lwcoord_t p1; // Global position
+      lwcoord_t p;  // Global position
+      float3 dp;
+    } object;
+    struct {
+      pl_celobject_t *celestial_body;
+      double3 p0; // Global position
+      double3 p1; // Global position
+      double3 p;  // Global position
+      double3 dp;
+    } celobject;
+    struct {
+      pl_celobject_t *celestial_body;
+      pl_celobject_t *celestial_rot_body;
+
+      double3 p0; // Global position
+      double3 p1; // Global position
+      double3 p;  // Global position
+      double3 dp;
+    } celobject_rot;
+    struct {
+      lwcoord_t p0; // Global position
+      lwcoord_t p1; // Global position
+      lwcoord_t p;  // Global position
+    } stat;
+  };
 
   float3 camera_pos; // Relative to camera
   float3 parent_offset; // Offset from parent
 
-  float3 dp; // Delta pos per time step
   float3 dr; // Angular velocity
 
   quaternion_t q;  // Slerped quaternion
@@ -83,6 +121,7 @@ struct sg_object_t {
   quaternion_t dq; // Quaternion rot per time
 
   float4x4 R;
+  float4x4 scale; // Typically not used
   float4x4 modelViewMatrix;
 
   // Light sources associated with this object
@@ -99,11 +138,23 @@ struct sg_object_t {
   obj_array_t subObjects;
 };
 
+sg_scene_t*
+sg_object_get_scene(sg_object_t *obj)
+{
+  return obj->scene;
+}
+
+float
+sg_object_get_radius(sg_object_t *obj)
+{
+  return obj->radius;
+}
+
 void
 sg_object_print(const sg_object_t *obj)
 {
-  if (obj->rigidBody) {
-    log_info("** object %s", obj->rigidBody->name);
+  if (obj->kind == SG_OBJECT) {
+    log_info("** object %s", obj->object.rigid_body->name);
 
     //    log_info("\tlwc: [%d %d %d] + [%f %f %f]",
     //        obj->p.seg.x, obj->p.seg.y, obj->p.seg.z,
@@ -188,32 +239,103 @@ sg_object_get_parent_offset(sg_object_t *obj)
 float3
 sg_object_get_vel(sg_object_t *obj)
 {
-  return obj->dp;
+  switch (obj->kind) {
+  case SG_STATIC:
+    assert(0 && "fixme");
+    break;
+  case SG_CELOBJECT_ROT:
+    return vf3_set(obj->celobject_rot.dp.x, obj->celobject_rot.dp.y,
+                   obj->celobject_rot.dp.z);
+  case SG_CELOBJECT:
+    return vf3_set(obj->celobject.dp.x, obj->celobject.dp.y, obj->celobject.dp.z);
+  case SG_OBJECT_NO_ROT:
+    return obj->object.dp;
+  case SG_OBJECT:
+    return obj->object.dp;
+  default:
+      assert(0 && "invalid");
+  }
 }
 
 
 void
 sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc)
 {
-  *lwc = obj->p;
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
+    *lwc = obj->object.p;
+    return;
+  case SG_CELOBJECT:
+    lwc_setv(lwc, obj->celobject.p);
+    return;
+  case SG_CELOBJECT_ROT:
+    lwc_setv(lwc, obj->celobject_rot.p);
+    return;
+  case SG_STATIC:
+  default:
+    assert(0 && "invalid");
+  }
 }
 
 lwcoord_t
 sg_object_get_p0(const sg_object_t *obj)
 {
-  return obj->p0;
+  lwcoord_t lwc;
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
+    return obj->object.p0;
+  case SG_CELOBJECT:
+    lwc_setv(&lwc, obj->celobject.p0);
+    return lwc;
+  case SG_CELOBJECT_ROT:
+    lwc_setv(&lwc, obj->celobject_rot.p0);
+    return lwc;
+  case SG_STATIC:
+  default:
+    assert(0 && "invalid");
+  }
 }
 
 lwcoord_t
 sg_object_get_p1(const sg_object_t *obj)
 {
-  return obj->p1;
+  lwcoord_t lwc;
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
+    return obj->object.p1;
+  case SG_CELOBJECT:
+    lwc_setv(&lwc, obj->celobject.p1);
+    return lwc;
+  case SG_CELOBJECT_ROT:
+    lwc_setv(&lwc, obj->celobject_rot.p1);
+    return lwc;
+  case SG_STATIC:
+  default:
+    assert(0 && "invalid");
+  }
 }
 
 lwcoord_t
 sg_object_get_p(const sg_object_t *obj)
 {
-  return obj->p;
+  lwcoord_t lwc;
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
+    return obj->object.p;
+  case SG_CELOBJECT:
+    lwc_setv(&lwc, obj->celobject.p);
+    return lwc;
+  case SG_CELOBJECT_ROT:
+    lwc_setv(&lwc, obj->celobject_rot.p);
+    return lwc;
+  case SG_STATIC:
+  default:
+    assert(0 && "invalid");
+  }
 }
 
 
@@ -280,6 +402,8 @@ sg_geometry_draw(sg_geometry_t *geo)
   assert(geo != NULL);
   SG_CHECK_ERROR;
 
+  if (geo->update) geo->update(geo);
+
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS); // We will try to draw objects sorted by camera
                         // distance, less is correct in this case.
@@ -297,7 +421,8 @@ sg_geometry_draw(sg_geometry_t *geo)
     glDrawElements(geo->gl_primitive_type, geo->index_count, geo->index_type, 0);
     SG_CHECK_ERROR;
   } else {
-    if (geo->vertex_count) glDrawArrays(geo->gl_primitive_type, 0, geo->vertex_count);
+    if (geo->vertex_count) glDrawArrays(geo->gl_primitive_type, 0,
+                                        geo->vertex_count);
     SG_CHECK_ERROR;
   }
 
@@ -380,10 +505,11 @@ sg_object_draw(sg_object_t *obj)
 void
 sg_object_recompute_modelviewmatrix(sg_object_t *obj)
 {
-  if (obj->rigidBody) {
+  switch (obj->kind) {
+  case SG_OBJECT: {
     sg_camera_t *cam = sg_scene_get_cam(obj->scene);
     lwcoord_t pos = sg_camera_pos(cam);
-    obj->camera_pos = lwc_dist(&obj->p, &pos);
+    obj->camera_pos = lwc_dist(&obj->object.p, &pos);
 
     q_mf4_convert(obj->R, obj->q);
     if (obj->parent) {
@@ -396,9 +522,64 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
 
     float4x4 translate;
     mf4_make_translate(translate, obj->camera_pos);
+    mf4_mul2(obj->modelViewMatrix, obj->scale);
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
-  } else {
+  }
+    break;
+  case SG_OBJECT_NO_ROT: {
+    assert(obj->parent == NULL);
+    sg_camera_t *cam = sg_scene_get_cam(obj->scene);
+    lwcoord_t pos = sg_camera_pos(cam);
+    obj->camera_pos = lwc_dist(&obj->object.p, &pos);
+
+    mf4_cpy(obj->modelViewMatrix,
+            *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+    float4x4 translate;
+    mf4_make_translate(translate, obj->camera_pos);
+    mf4_mul2(obj->modelViewMatrix, obj->scale);
+    mf4_mul2(obj->modelViewMatrix, translate);
+  }
+    break;
+  case SG_CELOBJECT:
+    {
+      sg_camera_t *cam = sg_scene_get_cam(obj->scene);
+      lwcoord_t pos = sg_camera_pos(cam);
+
+      double3 tmp = obj->celobject.p - lwc_globald(&pos);
+      obj->camera_pos = vf3_set(tmp.x, tmp.y, tmp.z);
+      q_mf4_convert(obj->R, obj->q);
+
+      mf4_cpy(obj->modelViewMatrix,
+              *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+
+      float4x4 translate;
+      mf4_make_translate(translate, obj->camera_pos);
+      mf4_mul2(obj->modelViewMatrix, obj->scale);
+      mf4_mul2(obj->modelViewMatrix, translate);
+      mf4_mul2(obj->modelViewMatrix, obj->R);
+    }
+    break;
+  case SG_CELOBJECT_ROT:
+    {
+      sg_camera_t *cam = sg_scene_get_cam(obj->scene);
+      lwcoord_t pos = sg_camera_pos(cam);
+
+      double3 tmp = obj->celobject_rot.p - lwc_globald(&pos);
+      obj->camera_pos = vf3_set(tmp.x, tmp.y, tmp.z);
+      q_mf4_convert(obj->R, obj->q);
+
+      mf4_cpy(obj->modelViewMatrix,
+                *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
+
+      float4x4 translate;
+      mf4_make_translate(translate, obj->camera_pos);
+      mf4_mul2(obj->modelViewMatrix, obj->scale);
+      mf4_mul2(obj->modelViewMatrix, translate);
+      mf4_mul2(obj->modelViewMatrix, obj->R);
+    }
+    break;
+  case SG_STATIC: {
     float4x4 translate;
 
     if (obj->parent) {
@@ -408,11 +589,17 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
       mf4_cpy(obj->modelViewMatrix,
               *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
       lwcoord_t cpos = sg_camera_pos(sg_scene_get_cam(obj->scene));
-      mf4_make_translate(translate, lwc_dist(&obj->p, &cpos));
+
+      mf4_make_translate(translate, lwc_dist(&obj->stat.p, &cpos));
     }
 
+    mf4_mul2(obj->modelViewMatrix, obj->scale);
     mf4_mul2(obj->modelViewMatrix, translate);
     mf4_mul2(obj->modelViewMatrix, obj->R);
+  }
+    break;
+  default:
+    assert(0 && "invalid");
   }
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
@@ -463,8 +650,9 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
   glGenBuffers(1, &geo->vbo);
   SG_CHECK_ERROR;
 
-  log_info("geometry: %d |[%f %f %f]| = %f", geo->vbo, maxvert.x, maxvert.y, maxvert.z,
-            vf3_abs(maxvert));
+  log_info("geometry: (%s) %d |[%f %f %f]| = %f", obj->name, geo->vbo,
+           maxvert.x, maxvert.y, maxvert.z,
+           vf3_abs(maxvert));
 
 
   glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
@@ -557,42 +745,127 @@ sg_object_load_shader(sg_object_t *obj, const char *name)
 }
 
 void
-sg_object_set_rigid_body(sg_object_t *obj, PLobject *rigidBody)
+sg_object_set_rigid_body(sg_object_t *obj, pl_object_t *rigidBody)
 {
   if (obj->parent) {
     log_warn("setting rigid body for sg object that is not root");
     return;
   }
-  obj->rigidBody = rigidBody;
+  obj->kind = SG_OBJECT;
+  obj->object.rigid_body = rigidBody;
 }
-PLobject*
+
+void
+sg_object_set_celestial_body(sg_object_t *obj, pl_celobject_t *cel_body)
+{
+  if (obj->parent) {
+    log_warn("setting celestial body for sg object that is not root");
+    return;
+  }
+
+  if ( obj->kind == SG_CELOBJECT_ROT) {
+    obj->celobject_rot.celestial_body = cel_body;
+  } else {
+    obj->kind = SG_CELOBJECT;
+    obj->celobject.celestial_body = cel_body;
+  }
+}
+
+void
+sg_object_set_celestial_rot_body(sg_object_t *obj, pl_celobject_t *cel_body)
+{
+  if (obj->parent) {
+    log_warn("setting celestial body for sg object that is not root");
+    return;
+  }
+
+  if ( obj->kind == SG_CELOBJECT) {
+    pl_celobject_t *old_cobj = obj->celobject_rot.celestial_body;
+    obj->kind = SG_CELOBJECT_ROT;
+    obj->celobject_rot.celestial_body = old_cobj;
+    obj->celobject_rot.celestial_rot_body = cel_body;
+  } else {
+    obj->kind = SG_CELOBJECT_ROT;
+    obj->celobject.celestial_body = cel_body;
+  }
+}
+
+
+
+pl_object_t*
 sg_object_get_rigid_body(const sg_object_t *obj)
 {
-  return obj->rigidBody;
+  if (obj->kind == SG_OBJECT || obj->kind == SG_OBJECT_NO_ROT) {
+    return obj->object.rigid_body;
+  }
+
+  return NULL;
 }
 
 void
 sg_object_sync(sg_object_t *obj, float t)
 {
-  if (obj->rigidBody) {
+  switch (obj->kind) {
+  case SG_OBJECT:
     // Synchronise rotational velocity and quaternions
-    obj->dr = pl_object_get_angular_vel(obj->rigidBody);
-    obj->q0 = pl_object_get_quat(obj->rigidBody);
+    obj->dr = pl_object_get_angular_vel(obj->object.rigid_body);
+    obj->q0 = pl_object_get_quat(obj->object.rigid_body);
     obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
     obj->q = q_slerp(obj->q0, obj->q1, 0.0);
 
     // Synchronise world coordinates
-    obj->dp = pl_object_get_vel(obj->rigidBody);
-    obj->p0 = pl_object_get_lwc(obj->rigidBody);
-    obj->p1 = obj->p0;
+    obj->object.dp = pl_object_get_vel(obj->object.rigid_body);
+    obj->object.p0 = pl_object_get_lwc(obj->object.rigid_body);
+    obj->object.p1 = obj->object.p0;
 
-    lwc_translate3fv(&obj->p1, vf3_s_mul(obj->dp, t));
-    obj->p = obj->p0;
-  } else {
-    // TODO: Support translation and rotation of sub objects
-    //obj->q0 = obj->q1;
-    //obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
-    //obj->q = q_slerp(obj->q0, obj->q1, t);
+    lwc_translate3fv(&obj->object.p1, vf3_s_mul(obj->object.dp, t));
+    obj->object.p = obj->object.p0;
+
+    obj->radius = obj->object.rigid_body->radius;
+    break;
+  case SG_OBJECT_NO_ROT:
+    obj->q0 = Q_IDENT;
+    obj->q1 = Q_IDENT;
+    obj->q = Q_IDENT;
+
+    // Synchronise world coordinates
+    obj->object.dp = pl_object_get_vel(obj->object.rigid_body);
+    obj->object.p0 = pl_object_get_lwc(obj->object.rigid_body);
+    obj->object.p1 = obj->object.p0;
+
+    lwc_translate3fv(&obj->object.p1, vf3_s_mul(obj->object.dp, t));
+    obj->object.p = obj->object.p0;
+
+    obj->radius = obj->object.rigid_body->radius;
+    break;
+  case SG_CELOBJECT:
+    obj->q0 = pl_celobject_get_body_quat(obj->celobject.celestial_body);
+    obj->q1 = obj->q0;
+    obj->q = q_slerp(obj->q0, obj->q1, 0.0);
+
+    obj->celobject.dp = obj->celobject.celestial_body->cm_orbit->v;
+    obj->celobject.p0 = obj->celobject.celestial_body->cm_orbit->p;
+    obj->celobject.p1 = obj->celobject.p0 + obj->celobject.dp * t;
+    obj->celobject.p = obj->celobject.p0;
+
+    obj->radius = obj->celobject.celestial_body->cm_orbit->radius;
+    break;
+  case SG_CELOBJECT_ROT:
+    obj->q0 = pl_celobject_get_orbit_quat(obj->celobject_rot.celestial_rot_body);
+    obj->q1 = obj->q0;
+    obj->q = obj->q0;
+
+    obj->celobject_rot.dp = obj->celobject_rot.celestial_body->cm_orbit->v;
+    obj->celobject_rot.p0 = obj->celobject_rot.celestial_body->cm_orbit->p;
+    obj->celobject_rot.p1 = obj->celobject_rot.p0 + obj->celobject_rot.dp * t;
+    obj->celobject_rot.p = obj->celobject_rot.p0;
+
+    obj->radius = obj->celobject_rot.celestial_body->cm_orbit->radius;
+    break;
+  case SG_STATIC:
+    break;
+    default:
+    assert(0 && "invalid");
   }
 
   ARRAY_FOR_EACH(i, obj->subObjects) {
@@ -604,15 +877,28 @@ void
 sg_object_interpolate(sg_object_t *obj, float t)
 {
   // Interpolate rotation quaternion.
-  if (obj->rigidBody) {
+  switch (obj->kind) {
+  case SG_OBJECT:
+  case SG_OBJECT_NO_ROT:
     obj->q = q_slerp(obj->q0, obj->q1, t);
-
     // Approximate distance between physics frames
-    float3 dist = lwc_dist(&obj->p1, &obj->p0);
+    float3 dist = lwc_dist(&obj->object.p1, &obj->object.p0);
     dist = vf3_s_mul(dist, t);
-    obj->p = obj->p0;
-    lwc_translate3fv(&obj->p, dist);
+    obj->object.p = obj->object.p0;
+    lwc_translate3fv(&obj->object.p, dist);
+    break;
+  case SG_CELOBJECT:
+    obj->celobject.p = obj->celobject.p0
+                     + (obj->celobject.p1 - obj->celobject.p0) * t;
+    break;
+  case SG_CELOBJECT_ROT:
+    obj->celobject_rot.p = obj->celobject_rot.p0
+                         + (obj->celobject_rot.p1 - obj->celobject_rot.p0) * t;
+    break;
+  default:
+    break;
   }
+
   ARRAY_FOR_EACH(i, obj->subObjects) {
     sg_object_interpolate(ARRAY_ELEM(obj->subObjects, i), t);
   }
@@ -634,6 +920,7 @@ sg_new_object(sg_shader_t *shader, const char *name)
   obj->dq = Q_IDENT;
 
   mf4_ident(obj->R);
+  mf4_ident(obj->scale);
   mf4_ident(obj->modelViewMatrix);
 
   obj->material = sg_new_material();
@@ -675,6 +962,7 @@ sg_new_object_with_geo(sg_shader_t *shader, const char *name,
   obj->dq = Q_IDENT;
 
   mf4_ident(obj->R);
+  mf4_ident(obj->scale);
   mf4_ident(obj->modelViewMatrix);
 
   obj->geometry = sg_new_geometry(obj, gl_primitive,
@@ -721,7 +1009,8 @@ static void
 map_uv(float *u, float *v, float inc, float az)
 {
   *u = az/(2.0*M_PI) - 0.5; // Shift as we expect textures centered on meridian
-  *v = 1.0 - inc/M_PI;
+  *v = 1.0 - inc/M_PI; // Texture coordinates are positive upwards (but
+                       // inclination is positive downwards)
 }
 
 sg_object_t*
@@ -752,12 +1041,15 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
 
   // Default to 10 x 10 degree slices and stacks, note that the texture
   // coordinates are messed up around the poles here.
-#define STACKS 18
-#define SLICES 36
+#define STACKS 50
+#define SLICES 50
 
   // Azimuth is the longitude from [0,2pi]
   // Inclination correspond to colatitude, i.e. latitude where 0 is the north
   // pole and pi the south pole. This is obviously 90 - normal latitude.
+
+  // Textures are assumed to be defined with the meridian in the center.
+
   double az_sz = (2.0 * M_PI) / (double)SLICES;
   double inc_sz = M_PI / (double)STACKS;
 
@@ -921,48 +1213,114 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
   float_array_t verts;
   float_array_init(&verts);
 
+  u8_array_t colours;
+  u8_array_init(&colours);
+
   float semiMinor = semiMajor * sqrt(1.0 - ecc*ecc);
+  double focus = semiMajor * ecc;
 
-  float3x3 R;
-  mf3_zxz_rotmatrix(R, asc, inc, argOfPeriapsis);
-
-  // Naive way
+  // Naive way, we probably actually want just a single circle and then reuse it
+  // for all ellipses using a scaling transformation.
   double seg_angle = 2.0*M_PI/segments;
   for (size_t i = 0 ; i < segments ; i ++) {
     double angle = i * seg_angle;
-    double b_cos = semiMinor * cos(angle);
-    double a_sin = semiMajor * sin(angle);
-    double r = semiMajor * semiMinor / sqrt(b_cos*b_cos+a_sin*a_sin);
 
     float3 p;
-    p.y = r * cos(angle) - ecc * semiMajor;
-    p.x = r * sin(angle);
+    p.x = semiMajor * cos(angle) - focus; // Note, x is the vernal equinox,
+                                          // which is also the point where an
+                                          // orbital ellipse will have its
+                                          // periapsis if the long asc and
+                                          // arg peri would be 0
+    p.y = semiMinor * sin(angle);
     p.z = 0.0f;
 
-    p = mf3_v_mul(R, p);
     // Insert vec in array, note that center is in foci
     float_array_push(&verts, p.x);
     float_array_push(&verts, p.y);
     float_array_push(&verts, p.z);
+
+    u8_array_push(&colours, 255);
+    u8_array_push(&colours, 0);
+    u8_array_push(&colours, 0);
+    u8_array_push(&colours, 255);
   }
 
-  sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE_LOOP,
-                                            verts.length/3,
-                                            verts.elems, NULL, NULL);
-
+  sg_object_t *obj = sg_new_object(shader, name);
+  sg_new_geometry(obj, GL_LINE_LOOP, verts.length/3, verts.elems, NULL, NULL,
+                  0, 0, NULL,
+                  colours.elems);
   float_array_dispose(&verts);
+  u8_array_dispose(&colours);
+
   return obj;
 }
 
 sg_object_t*
 sg_new_axises(const char *name, sg_shader_t *shader, float length)
 {
-  float axis[] = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
-                  0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-                  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f};
-  sg_object_t *obj = sg_new_object_with_geo(shader, name, GL_LINE, 6, axis, NULL, NULL);
+  float axis[] = {0.0f, 0.0f, 0.0f,  length, 0.0f, 0.0f,
+                  0.0f, 0.0f, 0.0f,  0.0f, length, 0.0f,
+                  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, length};
+
+  static uint8_t colours[] = {
+    255,0,0,255, 255,0,0,255,
+    0,255,0,255, 0,255,0,255,
+    0,0,255,255, 0,0,255,255,
+  };
+
+
+  sg_object_t *obj = sg_new_object(shader, name);
+  sg_new_geometry(obj, GL_LINES, sizeof(axis)/(sizeof(axis[0])*3),
+                  axis, NULL, NULL, 0, 0, NULL, colours);
   return obj;
 }
+
+// Creates a scenegraph object representing a set of axises and a prime half
+// circle.
+sg_object_t*
+sg_new_axises_with_prime(const char *name, sg_shader_t *shader, float length)
+{
+  float axis[6*3+32*3*2] = {
+
+    0.0f, 0.0f, 0.0f,  length, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,  0.0f, length, 0.0f,
+    0.0f, 0.0f, 0.0f,  0.0f, 0.0f, length,
+
+    // Rest is prime meridian
+  };
+
+  uint8_t colours[6*4+32*4*2] = {
+    255,0,0,255,   255,0,0,255,
+    0,255,0,255,     0,255,0,255,
+    0,0,255,255,     0,0,255,255,
+
+    // Rest is prime meridian
+  };
+
+  // Fill in the meridian vertices (two per line) and colours
+  for (int i = 0 ; i < 32 ; i ++) {
+    axis[18+i*6+0] = length*sin(i*M_PI/32);
+    axis[18+i*6+2] = length*cos(i*M_PI/32);
+    axis[18+i*6+3] = length*sin((i+1)*M_PI/32);
+    axis[18+i*6+5] = length*cos((i+1)*M_PI/32);
+
+    colours[6*4+i*8+0] = 255;
+    colours[6*4+i*8+1] = 255;
+    colours[6*4+i*8+2] = 0;
+    colours[6*4+i*8+3] = 255;
+
+    colours[6*4+i*8+4] = 255;
+    colours[6*4+i*8+5] = 255;
+    colours[6*4+i*8+6] = 0;
+    colours[6*4+i*8+7] = 255;
+  }
+
+  sg_object_t *obj = sg_new_object(shader, name);
+  sg_new_geometry(obj, GL_LINES, sizeof(axis)/(sizeof(axis[0])*3),
+                  axis, NULL, NULL, 0, 0, NULL, colours);
+  return obj;
+}
+
 
 sg_object_t*
 sg_new_cube(const char *name, sg_shader_t *shader, float side)
@@ -1032,6 +1390,103 @@ sg_new_cube(const char *name, sg_shader_t *shader, float side)
 }
 
 void
+sg_dynamic_vectorset_update(sg_geometry_t *geo)
+{
+  assert(geo->obj->kind == SG_OBJECT_NO_ROT);
+  pl_object_t *plobj = geo->obj->object.rigid_body;
+
+  glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
+  SG_CHECK_ERROR;
+
+  float vectors[8*3] = {
+    0.0,0.0,0.0,  plobj->v.x, plobj->v.y, plobj->v.z,
+    0.0,0.0,0.0,  plobj->f.x, plobj->f.y, plobj->f.z,
+    0.0,0.0,0.0,  plobj->g.x, plobj->g.y, plobj->g.z,
+    0.0,0.0,0.0,  plobj->t.x, plobj->t.y, plobj->t.z,
+  };
+
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vectors), vectors);
+  SG_CHECK_ERROR;
+
+#if 0
+  static uint8_t colours[8*3] = {
+    0,255,255,    0,255,255,
+    255,255,0,    255,255,0,
+    255,0,255,    255,0,255,
+    255,255,255,  255,255,255,
+  };
+  glBufferSubData(GL_ARRAY_BUFFER, sizeof(vectors), sizeof(colours), colours);
+  SG_CHECK_ERROR;
+
+#endif
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  SG_CHECK_ERROR;
+}
+
+
+
+sg_object_t*
+sg_new_dynamic_vectorset(const char *name, sg_shader_t *shader, pl_object_t *plobj)
+{
+  sg_object_t *obj = sg_new_object(shader, name);
+  sg_geometry_t *geo = smalloc(sizeof(sg_geometry_t));
+  obj->geometry = geo;
+  geo->obj = obj;
+  geo->obj->kind = SG_OBJECT_NO_ROT;
+  geo->obj->object.rigid_body = plobj;
+  geo->gl_primitive_type = GL_LINES;
+  geo->vertex_count = 8;
+  geo->update = sg_dynamic_vectorset_update;
+
+  glGenVertexArrays(1, &geo->vba);
+  glBindVertexArray(geo->vba);
+  glGenBuffers(1, &geo->vbo);
+
+  SG_CHECK_ERROR;
+
+  glBindBuffer(GL_ARRAY_BUFFER, geo->vbo);
+  glBufferData(GL_ARRAY_BUFFER,
+               8*sizeof(float)*3 + 8*4,
+               NULL, // Just allocate, will copy with subdata
+               GL_DYNAMIC_DRAW);
+
+  SG_CHECK_ERROR;
+
+  float vectors[8*3] = {
+    0.0,0.0,0.0,  plobj->v.x, plobj->v.y, plobj->v.z,
+    0.0,0.0,0.0,  plobj->f.x, plobj->f.y, plobj->f.z,
+    0.0,0.0,0.0,  plobj->g.x, plobj->g.y, plobj->g.z,
+    0.0,0.0,0.0,  plobj->t.x, plobj->t.y, plobj->t.z,
+  };
+
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vectors), vectors);
+
+  glVertexAttribPointer(SG_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(SG_VERTEX);
+
+  static uint8_t colours[8*3] = {
+    0,255,255,    0,255,255,
+    255,255,0,    255,255,0,
+    255,0,255,    255,0,255,
+    255,255,255,  255,255,255,
+  };
+  glBufferSubData(GL_ARRAY_BUFFER, sizeof(vectors), sizeof(colours), colours);
+  SG_CHECK_ERROR;
+  glVertexAttribPointer(SG_COLOR, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0,
+                        (void*)sizeof(vectors));
+  SG_CHECK_ERROR;
+  glEnableVertexAttribArray(SG_COLOR);
+  SG_CHECK_ERROR;
+
+  glBindVertexArray(0); // Done
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+  return obj;
+}
+
+void
 sg_object_set_shader(sg_object_t *obj, sg_shader_t *shader)
 {
   obj->shader = shader;
@@ -1050,7 +1505,6 @@ sg_object_add_light(sg_object_t *obj, sg_light_t *light)
 
   obj->lights[obj->lightCount ++] = light;
   sg_light_set_obj(light, obj);
-  sg_scene_add_light(obj->scene, light);
 }
 
 //typedef void (*sg_object_visitor_t)(sg_object_t obj);

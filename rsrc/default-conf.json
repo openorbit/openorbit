@@ -29,14 +29,29 @@
         "action": "cam-rotate" 
       },
       {
-         "kind": "normal",
-         "key": "d",
-         "action": "detatch-stage"
+        "kind": "normal",
+        "key": "d",
+        "action": "detatch-stage"
+      },
+      {
+        "kind": "normal",
+        "key": "a",
+        "action": "cam-move-forward"
+      },
+      {
+        "kind": "normal",
+        "key": "z",
+        "action": "cam-move-back"
+      },
+      {
+        "kind": "normal",
+        "key": "1",
+        "action": "icrf-grid-toggle"
       }
     ],
     "mouse": {
 
-		},
+    },
     "joystick": [
       {
         "name": "default",

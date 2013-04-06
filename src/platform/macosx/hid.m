@@ -310,6 +310,8 @@ hidCalibrateDevice(IOHIDDeviceRef dev)
         break; // Ignore
     }
   }
+
+  CFRelease(elements);
 }
 
 void

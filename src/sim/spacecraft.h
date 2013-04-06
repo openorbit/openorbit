@@ -70,7 +70,7 @@ struct sim_stage_t {
   float expendedMass;
   sim_stage_state_t state;
 
-  PLobject *obj; // Mass and inertia tensor of stage, unit is kg
+  pl_object_t *obj; // Mass and inertia tensor of stage, unit is kg
                  //  obj_array_t actuators;
   obj_array_t engines;
   obj_array_t actuatorGroups;
@@ -116,7 +116,7 @@ struct sim_spacecraft_t {
   sim_record_t *rec;
 
   pl_world_t *world;
-  PLobject *obj;
+  pl_object_t *obj;
 
   const char *name;
   sim_axises_t axises;
@@ -167,7 +167,7 @@ void sim_stage_step(sim_stage_t *stage, sim_axises_t *axises, float dt);
 void sim_spacecraft_force(sim_spacecraft_t *sc, float rx, float ry, float rz);
 void sim_spacecraft_set_scene(sim_spacecraft_t *spacecraft, sg_scene_t *scene);
 
-PLobject* sim_spacecraft_get_pl_obj(sim_spacecraft_t *sc);
+pl_object_t* sim_spacecraft_get_pl_obj(sim_spacecraft_t *sc);
 
 /*!
   Set position of spacecraft in global coordinates

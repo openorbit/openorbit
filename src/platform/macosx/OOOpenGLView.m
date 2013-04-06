@@ -182,7 +182,7 @@ static io_keycode_t keymap [256] = {
 - (void)simTicker:(NSTimer*)theTimer
 {
   //NSLog(@"sim step");
-  sim_step(theTimer.timeInterval);
+  sim_step(sim_period);
   [self setNeedsDisplay:YES];
 }
 
@@ -199,14 +199,13 @@ static io_keycode_t keymap [256] = {
   float freq;
   config_get_float_def("openorbit/sim/freq", &freq, 20.0); // Read in Hz
   float wc_period = 1.0 / freq; // Period in s
-  float sim_period;
   config_get_float_def("openorbit/sim/period", &sim_period, wc_period);
 
 
   // Step now to ensure physic system is in sync before drawing
   sim_step(sim_period);
 
-  timer = [NSTimer scheduledTimerWithTimeInterval:sim_period target:self selector:@selector(simTicker:) userInfo:nil repeats:YES];
+  timer = [NSTimer scheduledTimerWithTimeInterval:wc_period target:self selector:@selector(simTicker:) userInfo:nil repeats:YES];
 }
 
 - (void)clearGLContext

@@ -25,20 +25,23 @@
 // Wrapper menu item class that allows the use of C-functions as menu actions
 @interface OOMenuItem : NSMenuItem {
   menu_func_t func;
+  void *arg;
 }
 - (OOMenuItem*) initWithTitle:(const char*)title
-                       action:(menu_func_t)function;
+                       action:(menu_func_t)function
+                          arg:(void*)arg;
 - (void)menuDispatch:(id)sender;
 @end
 
 @implementation OOMenuItem
 - (void)menuDispatch:(id)sender
 {
-  if (func) func();
+  if (func) func(arg);
 }
 
 - (OOMenuItem*) initWithTitle:(const char*)title
                        action:(menu_func_t)function
+                          arg:(void*)argument
 {
   NSString *menuName = [NSString stringWithFormat:@"%s", title];
 
@@ -48,6 +51,7 @@
   if (self) {
     self.target = self;
     func = function;
+    arg = argument;
   }
 
   return self;
@@ -76,13 +80,14 @@ menu_get(const char *menu_name)
 }
 
 menu_t*
-menu_new(menu_t *parent, const char *name, menu_func_t f)
+menu_new(menu_t *parent, const char *name, menu_func_t f, void *arg)
 {
   NSMenuItem *parentItem = (NSMenuItem*)parent;
   NSString *menuName = [NSString stringWithFormat:@"%s", name];
 
   OOMenuItem *newItem = [[OOMenuItem alloc] initWithTitle:name
-                                                   action:f];
+                                                   action:f
+                                                      arg:arg];
   NSMenu *menu = nil;
   if (parentItem) {
     menu = [parentItem submenu];
@@ -102,7 +107,7 @@ menu_new(menu_t *parent, const char *name, menu_func_t f)
 
 
 void
-print_foo(void)
+print_foo(void *foo)
 {
   printf("Hello World!\n");
 }
@@ -111,14 +116,14 @@ void
 menu_init(void)
 {
   // TODO
-  menu_t *spacecraftMenu = menu_new(NULL, "Spacecraft", NULL);
+  menu_t *spacecraftMenu = menu_new(NULL, "Spacecraft", NULL, NULL);
   NSLog(@"%p", spacecraftMenu);
-  /*menu_t *test =*/ menu_new(spacecraftMenu, "Test Menu Item", print_foo);
-  menu_t *scenarioMenu = menu_new(NULL, "Scenario", NULL);
+  /*menu_t *test =*/ menu_new(spacecraftMenu, "Test Menu Item", print_foo, NULL);
+  menu_t *scenarioMenu = menu_new(NULL, "Scenario", NULL, NULL);
   NSLog(@"%p", scenarioMenu);
   menu_t *viewMenu = menu_get("View");
   NSLog(@"%p", viewMenu);
-  /*menu_t *test2 =*/ menu_new(viewMenu, "Test Menu Item", print_foo);
+  /*menu_t *test2 =*/ menu_new(viewMenu, "Test Menu Item", print_foo, NULL);
   
 }
 

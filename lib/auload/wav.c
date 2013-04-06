@@ -206,6 +206,6 @@ wav_getbuffer(wav_file_t *wav)
     exit(1);
   }
 
-  alBufferData(buff, AL_FORMAT_STEREO16, wav->samples, (unsigned)wav->sampleByteSize, wav->nSamplesPerSec);
+  alBufferData(buff, format, wav->samples, (unsigned)wav->sampleByteSize, wav->nSamplesPerSec);
   return buff;
 }

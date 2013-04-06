@@ -18,6 +18,7 @@
  */
 
 
+#import <OpenGL/gl3.h>
 #import <Cocoa/Cocoa.h>
 #import "OOOpenGLView.h"
 

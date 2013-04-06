@@ -353,11 +353,11 @@ io_builtin_throttle(int state, void *data)
   if (data) {
     float newVal = io_get_slider(IO_SLIDER_THROT_0) - 0.1f;
     newVal = newVal < 0.0f ? 0.0f :newVal;
-    io_slider_changed(IO_SLIDER_THROT_0, io_get_slider(IO_SLIDER_THROT_0));
+    io_slider_changed(IO_SLIDER_THROT_0, newVal);
   } else {
     float newVal = io_get_slider(IO_SLIDER_THROT_0) + 0.1f;
     newVal = newVal > 1.0f ? 1.0f :newVal;
-    io_slider_changed(IO_SLIDER_THROT_0, io_get_slider(IO_SLIDER_THROT_0));
+    io_slider_changed(IO_SLIDER_THROT_0, newVal);
   }
 }
 
