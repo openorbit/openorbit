@@ -39,10 +39,14 @@
 #include "io-manager.h"
 #include "scripting/scripting.h"
 #include "plugin-handler.h"
+#include "menu-manager.h"
 
 #include <openorbit/log.h>
 
 sim_state_t gSIM_state = {0.0, NULL, NULL, NULL, NULL};
+
+void sim_setup_menus(sim_state_t *state);
+
 
 sg_scene_t*
 sim_get_scene(void)
@@ -98,6 +102,8 @@ sim_init_plugins(void)
 void
 sim_init(void)
 {
+  pl_init();
+
   sim_spacecraft_control_init();
 
   // Set log level, need to do that here
@@ -122,20 +128,21 @@ sim_init(void)
   io_init();
 
   gSIM_state.world = sim_load_world(sim_get_scene(), "data/solsystem.hrml");
-
+  pl_time_set(sim_time_get_jd());
 
 
   sim_spacecraft_t *sc = sim_new_spacecraft("Mercury", "Mercury I");
-  sim_spacecraft_set_sys_and_coords(sc, "Sol/Earth",
+  sim_spacecraft_set_sys_and_coords(sc, "Earth",
                       0.0 /*longitude*/,
                       0.0 /*latitude*/,
                       250.0e3 /*altitude*/);
   sim_set_spacecraft(sc);
+
   sg_camera_t *cam = sg_scene_get_cam(sc->scene);
-  sim_stage_t *stage = ARRAY_ELEM(sc->stages, 0);
+  sim_stage_t *stage = ARRAY_ELEM(sc->stages, 1);
   sg_camera_track_object(cam, stage->sgobj);
   sg_camera_follow_object(cam, stage->sgobj);
-  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -100.0));
+  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -150.0e9));
 
   simMfdInitAll(sim_get_main_viewport());
 
@@ -145,6 +152,7 @@ sim_init(void)
     log_fatal("script/postinit.py missing");
   }
 
+  sim_setup_menus(&gSIM_state);
 }
 
 
@@ -195,7 +203,6 @@ sim_step(float dt)
   gettimeofday(&start, NULL);
 
   simAxisPush();
-  //sgCamStep(sgGetCam(gSIM_state.sg), dt);
 
   pl_world_clear(gSIM_state.world);
 
@@ -208,7 +215,8 @@ sim_step(float dt)
   sim_spacecraft_step(gSIM_state.currentSc, dt);
   sim_event_dispatch_pending();
 
-  pl_world_step(gSIM_state.world, dt);
+  double jde = sim_time_get_jd();
+  pl_world_step(gSIM_state.world, jde, dt);
 
   log_trace("sim step");
 
@@ -240,4 +248,39 @@ pl_world_t*
 sim_get_world(void)
 {
   return gSIM_state.world;
+}
+
+void
+menu_camera(void *arg)
+{
+  sg_object_t *obj = arg;
+
+  float radius = sg_object_get_radius(obj);
+  log_info("selected camera target: %s radius: %f",
+           sg_object_get_name(obj), radius);
+
+  sg_scene_t *sc = sg_object_get_scene(obj);
+  sg_camera_t *cam = sg_scene_get_cam(sc);
+
+  sg_camera_track_object(cam, obj);
+  sg_camera_follow_object(cam, obj);
+
+
+  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0,
+                                           radius * 3.0));
+
+}
+
+void
+sim_setup_menus(sim_state_t *state)
+{
+  menu_t *cam_menu = menu_new(NULL, "Camera", NULL, NULL);
+
+  sg_scene_t *scene = sg_window_get_scene(state->win, 0);
+  size_t object_count = sg_scene_get_object_count(scene);
+  const sg_object_t **objects = sg_scene_get_objects(scene);
+  for (int i = 0 ; i < object_count ; i++) {
+    menu_new(cam_menu, sg_object_get_name(objects[i]), menu_camera,
+             (void*)objects[i]);
+  }
 }

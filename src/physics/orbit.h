@@ -1,5 +1,5 @@
 /*
-  Copyright 2008, 2009, 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2008, 2009, 2010, 2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -35,6 +35,7 @@
 #include "physics/reftypes.h"
 #include "physics/areodynamics.h"
 #include "physics/collision.h"
+#include "physics/barneshut.h"
 
 typedef struct pl_keplerelems_t {
   double ecc;
@@ -51,9 +52,9 @@ struct pl_astrobody_t {
   char *name;
   pl_world_t *world;
   pl_system_t *sys;
-  PLobject obj;
+  pl_object_t obj;
   double GM;
-  PLatmosphere *atm;
+  pl_atmosphere_t *atm;
   pl_keplerelems_t *kepler;
   //sg_object_t *drawable; //!< Link to scenegraph drawable object representing this
   //                      //!< object.
@@ -74,10 +75,10 @@ struct pl_astrobody_t {
   int orbitFixationPeriod; // How many steps between updates
 };
 
+#if 0
 struct pl_system_t {
   pl_world_t *world;
   pl_system_t *parent;
-  sg_scene_t *scene;
 
   const char *name;
   double effectiveRadius; //!< Radius of the entire system, i.e how far away
@@ -97,28 +98,33 @@ struct pl_system_t {
   double orbitalPeriod;
 };
 
-
 struct pl_world_t {
   const char *name;
-  pl_system_t *rootSys;
+  pl_bhut_tree_t *bhut_tree;
+
   pl_collisioncontext_t *collCtxt;
   obj_array_t objs; // All objects in world, even ones not placed in subsystems
+  obj_array_t root_objs; // Root objects, i.e. the ones not being sub objects
+
   obj_array_t partSys; // All particle systems in world
 };
+#endif
 
-pl_world_t* pl_new_world(const char *name, sg_scene_t *sc,
+#if 0
+pl_world_t* pl_new_world(const char *name,
                          double m, double gm, double radius,
                          double siderealPeriod, double obliquity,
-                         double eqRadius, double flattening);
+                         double eqRadius, double flattening,
+                         double size);
 
-pl_system_t* pl_new_root_system(pl_world_t *world, sg_scene_t *sc,
+pl_system_t* pl_new_root_system(pl_world_t *world,
                                 const char *name,
                                 double m, double gm, double obliquity,
                                 double siderealPeriod,
                                 double eqRadius, double flattening);
 
 
-pl_system_t* pl_new_orbit(pl_world_t *world, sg_scene_t *sc, const char *name,
+pl_system_t* pl_new_orbit(pl_world_t *world, const char *name,
                           double m, double gm,
                           double orbitPeriod, double obliquity,
                           double siderealPeriod,
@@ -127,7 +133,7 @@ pl_system_t* pl_new_orbit(pl_world_t *world, sg_scene_t *sc, const char *name,
                           double argOfPeriapsis,
                           double meanAnomaly,
                           double eqRadius, double flattening);
-pl_system_t* pl_new_sub_orbit(pl_system_t *orb, sg_scene_t *sc,
+pl_system_t* pl_new_sub_orbit(pl_system_t *orb,
                               const char *name, double m, double gm,
                               double orbitPeriod, double obliquity,
                               double siderealPeriod,
@@ -143,15 +149,20 @@ float3 pl_astrobody_get_pos(const pl_astrobody_t *obj);
 float3 pl_world_get_pos_for_name(const pl_world_t *world, const char *name);
 void pl_world_get_pos_for_name3f(const pl_world_t *world, const char *name,
                                  float *x, float *y, float *z);
-PLobject* pl_astrobody_get_obj(pl_astrobody_t *abody);
+pl_object_t* pl_astrobody_get_obj(pl_astrobody_t *abody);
 
 float3 pl_compute_current_velocity(pl_astrobody_t *ab);
 
-void pl_world_step(pl_world_t *world, double dt);
+/*! Do a time step for the world.
+ * \param world The world.
+ * \param jde TT / ephermis time as Julian Day.
+ * \param dt Delta time in seconds for integration.
+ */
+void pl_world_step(pl_world_t *world, double jde, double dt);
 void pl_world_clear(pl_world_t *world);
 
 double pl_orbital_period(double a, double GM);
 void pl_sys_init(pl_system_t *sys);
-
+#endif
 
 #endif /* ! _ORBIT_H_ */

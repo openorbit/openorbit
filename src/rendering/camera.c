@@ -30,10 +30,9 @@
 #include "common/moduleinit.h"
 #include <openorbit/log.h>
 #include "io-manager.h"
-#include "camera.h"
 #include "settings.h"
-#include "scenegraph.h"
-#include "palloc.h"
+#include "rendering/scenegraph.h"
+#include "common/palloc.h"
 
 /*
  Note, due to the large world and floating point precision, when rotating the
@@ -222,8 +221,8 @@ sg_camera_interpolate(sg_camera_t *cam, float t)
     lwc_translate3fv(&cam->p1, cam->dp);
 
     cam->p = cam->p0;
-    float3 d = lwc_dist(&cam->p1, &cam->p0);
-    lwc_translate3fv(&cam->p, vf3_s_mul(d, t));
+    float3 d = vf3_s_mul(lwc_dist(&cam->p1, &cam->p0), t);
+    lwc_translate3fv(&cam->p, vf3_set(d.x, d.y, d.z));
     ASSERT_CAM(cam);
   } else if (cam->src) {
     quaternion_t q = q_slerp(cam->q0, cam->q1, t);
@@ -231,14 +230,14 @@ sg_camera_interpolate(sg_camera_t *cam, float t)
     cam->q = q_mul(cam->q, q);
 
     cam->p = cam->p0;
-    float3 d = lwc_dist(&cam->p1, &cam->p0);
-    lwc_translate3fv(&cam->p, vf3_s_mul(d, t));
+    float3 d = vf3_s_mul(lwc_dist(&cam->p1, &cam->p0), t);
+    lwc_translate3fv(&cam->p, vf3_set(d.x, d.y, d.z));
   } else {
     cam->q = q_slerp(cam->q0, cam->q1, t);
 
     cam->p = cam->p0;
-    float3 d = lwc_dist(&cam->p1, &cam->p0);
-    lwc_translate3fv(&cam->p, vf3_s_mul(d, t));
+    float3 d = vf3_s_mul(lwc_dist(&cam->p1, &cam->p0), t);
+    lwc_translate3fv(&cam->p, vf3_set(d.x, d.y, d.z));
   }
 
   ASSERT_CAM(cam);
@@ -249,6 +248,7 @@ void
 sg_camera_sync(sg_camera_t *cam)
 {
   ASSERT_CAM(cam);
+  cam->src_offset += cam->dp;
 
   if (cam->src) {
     // Following an object
@@ -277,8 +277,8 @@ sg_camera_sync(sg_camera_t *cam)
       lwc_translate3fv(&cam->p1, cam->dp);
 
       cam->p = cam->p0;
-      float3 d = lwc_dist(&cam->p1, &cam->p0);
-      lwc_translate3fv(&cam->p, vf3_s_mul(d, 0.0));
+      //double3 d = lwc_dist(&cam->p1, &cam->p0);
+      //lwc_translate3fv(&cam->p, vf3_s_mul(d, 0.0));
       ASSERT_CAM(cam);
     } else {
       cam->q0 = cam->q1;
@@ -296,7 +296,6 @@ sg_camera_sync(sg_camera_t *cam)
     ASSERT_CAM(cam);
   }
   ASSERT_CAM(cam);
-
 }
 
 /* Camera actions, registered as action handlers */
@@ -348,7 +347,85 @@ sg_camera_rotate_hat(int buttonVal, void *data)
   ASSERT_CAM(cam);
 }
 
+void
+sg_camera_move_forward(int buttonVal, void *data)
+{
+  sg_scene_t *sc = sim_get_scene();
+  sg_camera_t *cam = sg_scene_get_cam(sc);
+
+  ASSERT_CAM(cam);
+
+  float wct_freq;
+  config_get_float_def("openorbit/sim/freq", &wct_freq, 20.0); // Hz
+
+  if ((cam->src == cam->tgt) && cam->src) {
+    // We are targeting our follow object this means orbiting it
+    if (buttonVal == 0) {
+      cam->dp = vf3_set(0, 0, 0);
+    } else {
+      // Key down
+      float3x3 camrot;
+      q_mf3_convert(camrot, cam->q);
+      float radius = sg_object_get_radius(cam->tgt);
+      lwcoord_t obj_pos = sg_object_get_p(cam->tgt);
+      lwcoord_t cam_pos = sg_camera_pos(cam);
+      float3 distv = lwc_dist(&cam_pos, &obj_pos);
+      double dist = vf3_abs(distv);
+      cam->dp = mf3_v_mul(camrot, vf3_set(-(dist-radius) / wct_freq, 0, 0));
+    }
+    cam->p1 = sg_object_get_p1(cam->src);
+    lwc_translate3fv(&cam->p1, cam->src_offset);
+    lwc_translate3fv(&cam->p1, cam->dp);
+  } else {
+    if (buttonVal == 0) {
+      // Key released
+    } else {
+      // Key down
+    }
+  }
+}
+
+void
+sg_camera_move_back(int buttonVal, void *data)
+{
+  sg_scene_t *sc = sim_get_scene();
+  sg_camera_t *cam = sg_scene_get_cam(sc);
+
+  ASSERT_CAM(cam);
+
+  float wct_freq;
+  config_get_float_def("openorbit/sim/freq", &wct_freq, 20.0); // Hz
+
+  if ((cam->src == cam->tgt) && cam->src) {
+    // We are targeting our follow object this means orbiting it
+    if (buttonVal == 0) {
+      cam->dp = vf3_set(0, 0, 0);
+    } else {
+      // Key down
+      float3x3 camrot;
+      q_mf3_convert(camrot, cam->q);
+      float radius = sg_object_get_radius(cam->tgt);
+      lwcoord_t obj_pos = sg_object_get_p(cam->tgt);
+      lwcoord_t cam_pos = sg_camera_pos(cam);
+      float3 distv = lwc_dist(&cam_pos, &obj_pos);
+      double dist = vf3_abs(distv);
+      cam->dp = mf3_v_mul(camrot, vf3_set((dist-radius) / wct_freq, 0, 0));
+    }
+    cam->p1 = sg_object_get_p1(cam->src);
+    lwc_translate3fv(&cam->p1, cam->src_offset);
+    lwc_translate3fv(&cam->p1, cam->dp);
+  } else {
+    if (buttonVal == 0) {
+      cam->dp = vf3_set(0, 0, 0);
+    } else {
+      // Key down
+    }
+  }
+}
+
 // TODO: Should move to sim part, where we will keep all the io stuff
 MODULE_INIT(sgcamera, "iomanager", NULL) {
   io_reg_action_handler("cam-rotate", sg_camera_rotate_hat, IO_BUTTON_HAT, NULL);
+  io_reg_action_handler("cam-move-forward", sg_camera_move_forward, IO_BUTTON_PUSH, NULL);
+  io_reg_action_handler("cam-move-back", sg_camera_move_back, IO_BUTTON_PUSH, NULL);
 }

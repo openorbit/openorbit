@@ -31,7 +31,7 @@
      associated with the system.
   3. pl_astrobody_t that represents a large astronomical body, like the sun, a
      planet or a moon.
-  4. PLobject that represent a small object.
+  4. pl_object_t that represent a small object.
   5. pl_mass_t that represent mass and inertia parameters.
 
   A feature with the physics library is that it is integrated with the
@@ -77,8 +77,10 @@
 
 #define PL_SEC_PER_DAY (3600.0 * 24.0)
 
+#define PL_M_PER_AU 149597870700.0
+
 #include "object.h"
-#include "orbit.h"
+#include "world.h"
 #include "mass.h"
 
 // We cannot cope with the precision issues without subdividing the universe

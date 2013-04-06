@@ -1,5 +1,5 @@
 openorbit {
-  star (name: Sol) {
+  star (name: Sun) {
     physical {
       mass: 1.991e30 kg;
       gm: 1.327e20;
@@ -95,8 +95,8 @@ openorbit {
           bond-albedo: 0.29;
         }
         orbit {
-          semimajor-axis: 1.00000011 au;
-          eccentricity: 0.01671022;
+          semimajor-axis: 1.00000261 au;
+          eccentricity: 0.01671023;
           inclination: 0.00005 deg;
           longitude-ascending-node: 348.73936 deg;
           longitude-periapsis: 102.94719 deg;
@@ -122,7 +122,7 @@ openorbit {
           texture: "textures/default/earth.jpg";
           night-texture: "textures/default/earth-night.jpg";
           specular-map: "textures/default/earth-spec.jpg";
-          bump-map: "textures/planetpixelemporium/earthbump1k.jpg";
+          //bump-map: "textures/planetpixelemporium/earthbump1k.jpg";
           shader: "planet";
           // Materials are used if not textures are given, though not fully so
           // Specular hilights are used when a specular map is given
@@ -135,7 +135,7 @@ openorbit {
           }
         }
         satellites {
-          moon (name: Luna) {
+          moon (name: Moon) {
             physical {
               mass: 7.36e22 kg;
               radius: 1.74e6 m;
@@ -403,7 +403,7 @@ openorbit {
         rendering {
           model: "sphere";
           shader: "planet";
-          texture: "textures/uranus.jpg";
+          texture: "textures/default/uranus.jpg";
         }
       }
       planet (name: Neptune) {

@@ -17,12 +17,13 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#import <OpenGL/gl3.h>
 #import <Cocoa/Cocoa.h>
 
 @interface OOOpenGLView : NSOpenGLView
 {
   NSTimer *timer;
   NSTimeInterval last;
+  float sim_period;
 }
 @end

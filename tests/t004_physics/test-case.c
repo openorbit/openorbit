@@ -27,7 +27,7 @@
 
 START_TEST(test_create_obj)
 {
-  PLobject2 *obj = plObject3d(PL_SEGMENT_LEN * 4.0 + 1000.0,
+  pl_object_t2 *obj = plObject3d(PL_SEGMENT_LEN * 4.0 + 1000.0,
                               - (PL_SEGMENT_LEN * 2.0 + 1000.0),
                               0.0);
   fail_unless(v3i_get(obj->p.seg, 0) == 4, "calculation of i failed, %d", (int)v3i_get(obj->p.seg, 0));
@@ -45,7 +45,7 @@ END_TEST
 
 START_TEST(test_translate_obj)
 {
-  PLobject2 *obj = plObject3d(PL_SEGMENT_LEN * 4.0 + 1000.0,
+  pl_object_t2 *obj = plObject3d(PL_SEGMENT_LEN * 4.0 + 1000.0,
                               - (PL_SEGMENT_LEN * 2.0 + 1000.0),
                               0.0);
   
@@ -77,10 +77,10 @@ END_TEST
 
 START_TEST(test_obj_dist)
 {
-  PLobject2 *obj = plObject3d(0.0,
+  pl_object_t2 *obj = plObject3d(0.0,
                               -(PL_SEGMENT_LEN - 100.0f),
                               0.0);
-  PLobject2 *obj2 = plObject3d(0.0,
+  pl_object_t2 *obj2 = plObject3d(0.0,
                                -(PL_SEGMENT_LEN + 100.0f),
                                0.0);
 

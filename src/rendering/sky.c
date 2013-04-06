@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2011,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -19,24 +19,31 @@
 
 
 
-#include "sky.h"
-#include "colour.h"
+#include "rendering/sky.h"
+#include "rendering/colour.h"
 #include "res-manager.h"
+#include "common/moduleinit.h"
+#include "sim.h"
+#include "io-manager.h"
+
 #include <openorbit/log.h>
 #include <tgmath.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <stddef.h>
 
-#include "scenegraph.h"
-#include "palloc.h"
+#include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "rendering/scenegraph.h"
+#include "common/palloc.h"
 
 struct sg_star_t {
   unsigned char r, g, b, a;
   float x, y, z;
 };
+
 
 struct sg_background_t {
   sg_scene_t *scene;
@@ -48,7 +55,118 @@ struct sg_background_t {
   size_t a_len;
   size_t n_stars;
   sg_star_t *data;
+
+  bool icrf_enabled;
+
+  GLuint icrf_vbo;
+  GLuint icrf_vba;
+  size_t icrf_num_lines;
+  sg_shader_t *icrf_shader;
 };
+
+void
+sg_new_icrf_grid(sg_background_t *bg)
+{
+  float_array_t arr;
+  float_array_init(&arr);
+
+  u8_array_t colours;
+  u8_array_init(&colours);
+
+  // We want to show the grid with slices and stacks of M_PI_4
+  // We are not generating triangles, but lines.
+#define STACKS 10
+#define SLICES 16
+  double az_sz = (2.0 * M_PI) / (double)SLICES;
+  double inc_sz = M_PI / (double)STACKS;
+
+  // Handle non polar stacks, note that the bottom stack is handled specially
+  for (int i = 1 ; i < STACKS ; i ++) {
+    double inc = i * M_PI / (double)STACKS;
+
+    for (int j = 0 ; j < SLICES ; j ++) {
+      // For every slice we generate two lines
+      double az = j * (2.0 * M_PI) / (double)SLICES;
+
+      // Line 1 longitude
+      float3 p[4];
+      p[0].x = sin(inc) * cos(az);
+      p[0].y = sin(inc) * sin(az);
+      p[0].z = cos(inc);
+
+      p[1].x = sin(inc) * cos(az+az_sz);
+      p[1].y = sin(inc) * sin(az+az_sz);
+      p[1].z = cos(inc);
+
+      // Line 2 latitude
+      if (i != STACKS - 1) {
+        p[2].x = sin(inc) * cos(az);
+        p[2].y = sin(inc) * sin(az);
+        p[2].z = cos(inc);
+
+        p[3].x = sin(inc+inc_sz) * cos(az);
+        p[3].y = sin(inc+inc_sz) * sin(az);
+        p[3].z = cos(inc+inc_sz);
+        for (int k = 0 ; k < 4 ; k ++) {
+          float_array_push(&arr, p[k].x);
+          float_array_push(&arr, p[k].y);
+          float_array_push(&arr, p[k].z);
+
+          u8_array_push(&colours, 128);
+          u8_array_push(&colours, 128);
+          u8_array_push(&colours, 255);
+          u8_array_push(&colours, 255);
+        }
+      } else {
+        for (int k = 0 ; k < 2 ; k ++) {
+          float_array_push(&arr, p[k].x);
+          float_array_push(&arr, p[k].y);
+          float_array_push(&arr, p[k].z);
+          u8_array_push(&colours, 128);
+          u8_array_push(&colours, 128);
+          u8_array_push(&colours, 255);
+          u8_array_push(&colours, 255);
+        }
+      }
+    }
+  }
+  bg->icrf_num_lines = arr.length/3/2;
+
+  glGenVertexArrays(1, &bg->icrf_vba);
+  glBindVertexArray(bg->icrf_vba);
+
+  glGenBuffers(1, &bg->icrf_vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, bg->icrf_vbo);
+  glBufferData(GL_ARRAY_BUFFER,
+               arr.length*sizeof(float)+colours.length, NULL,
+               GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, arr.length*sizeof(float), arr.elems);
+  glBufferSubData(GL_ARRAY_BUFFER, arr.length*sizeof(float),
+                  colours.length, colours.elems);
+  SG_CHECK_ERROR;
+
+  sg_shader_t *shader = sg_get_shader("flat");
+  bg->icrf_shader = shader;
+  glVertexAttribPointer(sg_shader_get_location(shader, SG_VERTEX, true),
+                        3, GL_FLOAT, GL_FALSE,
+                        0, 0);
+  glEnableVertexAttribArray(sg_shader_get_location(shader, SG_VERTEX, true));
+
+  glVertexAttribPointer(SG_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0,
+                        (void*)(arr.length*sizeof(float)));
+  glEnableVertexAttribArray(sg_shader_get_location(shader, SG_COLOR, true));
+
+
+  SG_CHECK_ERROR;
+
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+  float_array_dispose(&arr);
+  u8_array_dispose(&colours);
+}
+
 
 void
 sg_background_set_scene(sg_background_t *bg, sg_scene_t *sc)
@@ -80,11 +198,6 @@ ooVmagToAlpha(double vmag)
 
     if (normalised_lin_diff > 1.0) return 1.0;
     return normalised_lin_diff;
-}
-
-
-double deg2rad(double deg) {
-    return deg * M_PI / 180.0;
 }
 
 void
@@ -137,7 +250,7 @@ sgCreateBackgroundFromFile(const char *file)
   double vmag, ra, dec, btmag, vtmag, bv, vi;
   while (fscanf(f, "%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
                 &vmag, &ra, &dec, &btmag, &vtmag, &bv, &vi) == 7) {
-    sgAddStar(stars, deg2rad(ra), deg2rad(dec), vmag, bv);
+    sgAddStar(stars, ra*VMATH_RAD_PER_DEG, dec*VMATH_RAD_PER_DEG, vmag, bv);
   }
 
 
@@ -174,9 +287,10 @@ sgCreateBackgroundFromFile(const char *file)
   stars->data = NULL;
   SG_CHECK_ERROR;
 
+  sg_new_icrf_grid(stars);
   return stars;
-
 }
+
 void
 sg_background_draw(sg_background_t *bg)
 {
@@ -197,4 +311,31 @@ sg_background_draw(sg_background_t *bg)
   glDrawArrays(GL_POINTS, 0, bg->n_stars);
   glBindVertexArray(0);
   SG_CHECK_ERROR;
+
+  // Draw icrf grid
+  if (bg->icrf_enabled) {
+    sg_shader_bind(bg->icrf_shader);
+    sg_shader_set_projection(bg->icrf_shader, *sg_camera_project(cam));
+    sg_shader_set_model_view(bg->icrf_shader, *sg_camera_modelview(cam));
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindVertexArray(bg->icrf_vba);
+    glDrawArrays(GL_LINES, 0, bg->icrf_num_lines*2);
+    glBindVertexArray(0);
+    SG_CHECK_ERROR;
+  }
+}
+
+void
+sg_icrf_toggle(int button_val, void *data)
+{
+  sg_scene_t *sc = sim_get_scene();
+  sg_background_t *bg = sg_scene_get_bg(sc);
+
+  if (button_val == 1) {
+    bg->icrf_enabled = !bg->icrf_enabled;
+  }
+}
+
+MODULE_INIT(sky, "iomanager", NULL) {
+  io_reg_action_handler("icrf-grid-toggle", sg_icrf_toggle, IO_BUTTON_PUSH, NULL);
 }

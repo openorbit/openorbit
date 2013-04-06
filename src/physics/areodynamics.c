@@ -266,14 +266,15 @@ pl_estimate_temp(double luminocity, double albedo, double R)
 // rotation tangent subtracted
 
 float3
-pl_compute_airvelocity(PLobject *obj)
+pl_compute_airvelocity(pl_object_t *obj)
 {
   // TODO: Adjust for planet rotation and wind
-  return -(obj->v - obj->sys->orbitalBody->obj.v);
+  // TOOD: Replace deprecated system with other mechanism
+  return -obj->v; //(obj->v - obj->sys->orbitalBody->obj.v);
 }
 
 double
-pl_object_compute_airspeed(PLobject *obj)
+pl_object_compute_airspeed(pl_object_t *obj)
 {
   return vf3_abs(pl_compute_airvelocity(obj));
 }
@@ -298,7 +299,7 @@ pl_compute_drag(float3 v, double p, double Cd, double A)
 // Lift: 0.5 * density * velocity ** 2 * A * CL
 //  where A is the planform area, i.e. area of the wings
 float3
-pl_atmosphere_compute_lift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil)
+pl_atmosphere_compute_lift(pl_atmosphere_t *atm, pl_object_t *obj, PLairfoil *foil)
 {
   //float3 vel = plComputeAirvelocity(obj);
   //float speed = plComputeAirspeed(obj);
@@ -315,7 +316,7 @@ pl_atmosphere_compute_lift(PLatmosphere *atm, PLobject *obj, PLairfoil *foil)
 
 
 void
-pl_atmosphere_init(PLatmosphere *atm, float groundPressure, float h0)
+pl_atmosphere_init(pl_atmosphere_t *atm, float groundPressure, float h0)
 {
   atm->P0 = groundPressure;
   atm->T0 = NAN;
@@ -330,7 +331,7 @@ pl_atmosphere_init(PLatmosphere *atm, float groundPressure, float h0)
  *  friction drag), and the drag from any airfoils.
  */
 float3
-pl_object_compute_drag(PLobject *obj)
+pl_object_compute_drag(pl_object_t *obj)
 {
   double p = pl_object_compute_airdensity(obj);
   float3 vel = pl_compute_airvelocity(obj); // TODO: Adjust for planet rotation
@@ -340,10 +341,13 @@ pl_object_compute_drag(PLobject *obj)
 }
 
 double
-pl_object_compute_airpressure(PLobject *obj)
+pl_object_compute_airpressure(pl_object_t *obj)
 {
+  return 0.0;
+  // TODO: Update to new physics system.
+#if 0
   pl_system_t *sys = obj->sys;
-  PLatmosphere *atm = obj->sys->orbitalBody->atm;
+  pl_atmosphere_t *atm = obj->sys->orbitalBody->atm;
   float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
   //float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
@@ -352,22 +356,31 @@ pl_object_compute_airpressure(PLobject *obj)
   //log_info("airpressure for %s = %f Pa", obj->name, pressure);
 
   return pressure;
+#endif
 }
 
 double
-pl_object_compute_altitude(PLobject *obj)
+pl_object_compute_altitude(pl_object_t *obj)
 {
+  return 0.0;
+  // TODO: Fix for new physics system
+#if 0
   pl_system_t *sys = obj->sys;
   float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad;
   return h;
+#endif
 }
 
 double
-pl_object_compute_airdensity(PLobject *obj)
+pl_object_compute_airdensity(pl_object_t *obj)
 {
+  return 0.0;
+  // TODO: Fix for new physics system
+
+#if 0
   pl_system_t *sys = obj->sys;
-  PLatmosphere *atm = obj->sys->orbitalBody->atm;
+  pl_atmosphere_t *atm = obj->sys->orbitalBody->atm;
   float3 dist = lwc_dist(&obj->p, &sys->orbitalBody->obj.p);
   //float g0 = sys->orbitalBody->GM / (sys->orbitalBody->eqRad * sys->orbitalBody->eqRad); // TODO: Cache g0
   float h = vf3_abs(dist) - sys->orbitalBody->eqRad; // TODO: adjust for oblateness
@@ -381,13 +394,14 @@ pl_object_compute_airdensity(PLobject *obj)
   //plPressureAtAltitude(atm->p0, atm->T0, g0, atm->M, h, 0.0);
   //return pressure * atm->M / (PL_UGC * atm->T0);
   return density;
+#endif
 }
 
 
 //double
-//plComputeAirdensityWithCurrentPressure(PLobject *obj)
+//plComputeAirdensityWithCurrentPressure(pl_object_t *obj)
 //{
-//  PLatmosphere *atm = obj->sys->orbitalBody->atm;
+//  pl_atmosphere_t *atm = obj->sys->orbitalBody->atm;
 //  return obj->airPressure * atm->M / (PL_UGC * atm->T0);
 //}
 
@@ -420,7 +434,7 @@ pl_pressure_at_altitude(double Pb, double Tb, double g0, double M, double h,
 }
 
 float
-pl_atmosphere_simple_compute_airpressure(const PLatmosphere *atm, float h)
+pl_atmosphere_simple_compute_airpressure(const pl_atmosphere_t *atm, float h)
 {
   double e = exp(-h/atm->h0);
   double p = atm->P0 * e;
@@ -534,10 +548,10 @@ pl_new_atmosphere_template(size_t layers, double g0, double M, const double *p_b
   return atm;
 }
 
-PLatmosphere*
+pl_atmosphere_t*
 pl_new_atmosphere(float sample_dist, float h, pl_atm_template_t *t)
 {
-  PLatmosphere *atm = smalloc(sizeof(PLatmosphere));
+  pl_atmosphere_t *atm = smalloc(sizeof(pl_atmosphere_t));
   float_array_init(&atm->P);
   float_array_init(&atm->p);
 
@@ -553,7 +567,7 @@ pl_new_atmosphere(float sample_dist, float h, pl_atm_template_t *t)
 }
 
 float
-pl_atmosphere_pressure(const PLatmosphere *atm, float h)
+pl_atmosphere_pressure(const pl_atmosphere_t *atm, float h)
 {
   if (atm == NULL) return 0.0;
   if (h < 0.0) {
@@ -577,7 +591,7 @@ pl_atmosphere_pressure(const PLatmosphere *atm, float h)
 }
 
 float
-pl_atmosphere_density(const PLatmosphere *atm, float h)
+pl_atmosphere_density(const pl_atmosphere_t *atm, float h)
 {
   if (atm == NULL) return 0.0;
   if (h < 0.0) {

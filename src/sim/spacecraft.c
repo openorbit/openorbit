@@ -1,5 +1,5 @@
 /*
-  Copyright 2009,2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010,2011,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -28,11 +28,11 @@
 #include <gencds/hashtable.h>
 #include <gencds/array.h>
 #include "common/moduleinit.h"
-#include "actuator.h"
+#include "sim/actuator.h"
 #include "io-manager.h"
 #include "sim/pubsub.h"
 #include "rendering/object.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 extern sim_state_t gSIM_state;
 
@@ -239,7 +239,6 @@ sim_spacecraft_init(sim_spacecraft_t *sc, const char *name)
   sc->toggleMainEngine = sim_spacecraft_default_engine_toggle;
   sc->axisUpdate = sim_spacecraft_default_axis_update;
   pl_mass_set(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  pl_system_add_object(world->rootSys, sc->obj);
 }
 
 #if 0
@@ -291,10 +290,10 @@ sim_spacecraft_toggle_main_engine(sim_spacecraft_t *sc)
   sc->toggleMainEngine(sc);
 }
 
-PLobject*
+pl_object_t*
 sim_spacecraft_get_pl_obj(sim_spacecraft_t *sc)
 {
-  return (PLobject*)sc->obj;
+  return (pl_object_t*)sc->obj;
 }
 
 
@@ -447,6 +446,7 @@ sim_spacecraft_set_scene(sim_spacecraft_t *spacecraft, sg_scene_t *scene)
   }
 }
 
+#if 0
 void
 sim_spacecraft_set_system(sim_spacecraft_t *spacecraft, pl_system_t *sys)
 {
@@ -454,7 +454,7 @@ sim_spacecraft_set_system(sim_spacecraft_t *spacecraft, pl_system_t *sys)
 
   if (oldSys != NULL) {
     for (int i = 0 ; i < oldSys->rigidObjs.length ; ++i) {
-      PLobject *oldSysObj = oldSys->rigidObjs.elems[i];
+      pl_object_t *oldSysObj = oldSys->rigidObjs.elems[i];
       if (oldSysObj == spacecraft->obj) {
         obj_array_remove(&oldSys->rigidObjs, i);
         break;
@@ -464,6 +464,8 @@ sim_spacecraft_set_system(sim_spacecraft_t *spacecraft, pl_system_t *sys)
   obj_array_push(&sys->rigidObjs, spacecraft->obj);
   spacecraft->obj->sys = sys;
 }
+#endif
+
 void
 sim_spacecraft_set_pos(sim_spacecraft_t *sc, double x, double y, double z)
 {
@@ -472,13 +474,14 @@ sim_spacecraft_set_pos(sim_spacecraft_t *sc, double x, double y, double z)
 
 void
 sim_spacecraft_set_sys_and_pos(sim_spacecraft_t *sc, const char *sysName,
-                    double x, double y, double z)
+                               double x, double y, double z)
 {
-  pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
-  if (astrobody != NULL) {
-    pl_object_set_pos_rel3d(sc->obj, &astrobody->obj, x, y, z);
-    sim_spacecraft_set_system(sc, astrobody->sys);
-    float3 v = pl_compute_current_velocity(astrobody);
+  //pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
+  pl_celobject_t *body = pl_world_get_celobject(sc->world, sysName);
+  if (body != NULL) {
+    pl_object_set_pos_celobj_rel(sc->obj, body, vf3_set(x, y, z));
+    //sim_spacecraft_set_system(sc, astrobody->sys);
+    float3 v = vf3_set(body->cm_orbit->v.x, body->cm_orbit->v.y, body->cm_orbit->v.z);//pl_compute_current_velocity(astrobody);
     pl_object_set_vel3fv(sc->obj, v);
   } else {
     log_warn("astrobody '%s' not found", sysName);
@@ -487,24 +490,30 @@ sim_spacecraft_set_sys_and_pos(sim_spacecraft_t *sc, const char *sysName,
 
 void
 sim_spacecraft_set_sys_and_coords(sim_spacecraft_t *sc, const char *sysName,
-                    double longitude, double latitude, double altitude)
+                                  double longitude, double latitude,
+                                  double altitude)
 {
   // Find planetoid object
-  pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
-  if (astrobody != NULL) {
+  pl_celobject_t *body = pl_world_get_celobject(sc->world, sysName);
+  //pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
+  if (body != NULL) {
     // Compute position relative to planet centre, this requires the equatorial
     // radius and the eccentricity of the spheroid, we shoudl also adjust for
     // sideral rotation.
-    float3 p = geodetic2cart_f(astrobody->eqRad, astrobody->angEcc,
+    // TODO: angular eccentricity not provided at present.
+    float3 p = geodetic2cart_f(body->cm_orbit->radius, 0.0,
                                latitude, longitude, altitude);
-    pl_object_set_pos_rel3fv(sc->obj, &astrobody->obj, p);
+    //pl_object_set_pos_rel3fv(sc->obj, &astrobody->obj, p);
+    pl_object_set_pos_celobj_rel(sc->obj, body, p);
 
-    sim_spacecraft_set_system(sc, astrobody->sys);
-    float3 v = pl_compute_current_velocity(astrobody);
+    //sim_spacecraft_set_system(sc, astrobody->sys);
+
+    float3 v = vf3_set(body->cm_orbit->v.x, body->cm_orbit->v.y,
+                       body->cm_orbit->v.z); //pl_compute_current_velocity(astrobody);
 
     // Compute standard orbital velocity
     float3 velvec = vf3_normalise(vf3_cross(p, vf3_set(0.0f, 0.0f, 1.0f)));
-    velvec = vf3_s_mul(velvec, sqrtf(sc->obj->sys->orbitalBody->GM/vf3_abs(p)));
+    velvec = vf3_s_mul(velvec, sqrtf(body->cm_orbit->GM/vf3_abs(p)));
     pl_object_set_vel3fv(sc->obj, vf3_add(v, velvec));
   }
 }
@@ -571,7 +580,7 @@ sim_spacecraft_get_altitude(sim_spacecraft_t *sc)
   return pl_object_compute_altitude(sc->obj);
 }
 
-
+#if 0
 float3
 sim_spacecraft_get_rel_pos(sim_spacecraft_t *sc)
 {
@@ -589,7 +598,7 @@ sim_spacecraft_get_sys(sim_spacecraft_t *sc)
 {
   return sc->obj->sys;
 }
-
+#endif
 
 void
 sim_stage_arm_engines(sim_stage_t *stage)
@@ -666,7 +675,16 @@ InitSpacecraft(sim_class_t *cls, void *obj, void *arg)
   sc->toggleMainEngine = sim_spacecraft_default_engine_toggle;
   sc->axisUpdate = sim_spacecraft_default_axis_update;
   pl_mass_set(&sc->obj->m, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  pl_system_add_object(world->rootSys, sc->obj);
+
+  // Adding vectors to scenegraph
+  char vecname[strlen(args->name) + 5];
+  strcpy(vecname, args->name);
+  strcat(vecname, ".vec");
+  sg_object_t *vectors =
+    sg_new_dynamic_vectorset(vecname, sg_get_shader("flat"), sc->obj);
+  sg_scene_add_object(sc->scene, vectors);
+
+  //pl_system_add_object(world->rootSys, sc->obj);
 }
 
 typedef struct {
@@ -710,5 +728,3 @@ MODULE_INIT(spacecraft, "object", NULL)
   sim_class_add_field(stage_class, SIM_TYPE_OBJ_ARR,
                       "payload", offsetof(sim_stage_t, payload));
 }
-
-

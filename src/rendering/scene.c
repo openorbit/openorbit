@@ -48,6 +48,13 @@ sg_scene_set_bg(sg_scene_t *sc, sg_background_t *bg)
   sg_background_set_scene(bg, sc);
 }
 
+sg_background_t*
+sg_scene_get_bg(sg_scene_t *sc)
+{
+  return sc->bg;
+}
+
+
 void
 sg_scene_set_cam(sg_scene_t *sc, sg_camera_t *cam)
 {
@@ -248,3 +255,14 @@ sg_scene_has_name(sg_scene_t *sc, const char *name)
   return false;
 }
 
+const sg_object_t**
+sg_scene_get_objects(sg_scene_t *scene)
+{
+  return (const sg_object_t**)scene->objects_sorted_by_name.elems;
+}
+
+size_t
+sg_scene_get_object_count(sg_scene_t *scene)
+{
+  return scene->objects_sorted_by_name.length;
+}
