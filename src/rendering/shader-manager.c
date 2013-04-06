@@ -1,5 +1,5 @@
 /*
- Copyright 2010,2011,2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011,2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -38,7 +38,7 @@
 #endif
 
 #include "rendering/scenegraph.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 struct sg_light_ids_t {
   GLint pos;

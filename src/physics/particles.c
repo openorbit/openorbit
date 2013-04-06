@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -18,12 +18,12 @@
  */
 
 
-#include "particles.h"
+#include "physics/particles.h"
 
 #include <stdlib.h>
 #include <assert.h>
-#include "orbit.h"
-#include "palloc.h"
+#include "physics/orbit.h"
+#include "common/palloc.h"
 
 static float3
 random_direction(float ra, float dec, float maxOffsetAngle)

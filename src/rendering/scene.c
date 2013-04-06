@@ -1,5 +1,5 @@
 /*
- Copyright 2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -24,7 +24,7 @@
 #include "rendering/object.h"
 #include "common/palloc.h"
 #include "common/monotonic-time.h"
-#include "log.h"
+#include <openorbit/log.h>
 #include "settings.h"
 
 struct sg_scene_t {

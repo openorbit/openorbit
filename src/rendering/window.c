@@ -1,5 +1,5 @@
 /*
- Copyright 2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -21,7 +21,7 @@
 #include "rendering/viewport.h"
 #include "rendering/scene.h"
 #include "rendering/scenegraph.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 struct sg_window_t {
   obj_array_t viewports;
@@ -65,4 +65,3 @@ sg_window_get_scene(sg_window_t *win, int idx)
 {
   return sg_viewport_get_scene(sg_window_get_viewport(win, idx));
 }
-

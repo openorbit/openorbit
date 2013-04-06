@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -25,7 +25,7 @@
 #include "rendering/object.h"
 
 #include "physics/object.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -243,5 +243,3 @@ sg_light_get_quadratic_attenuation(const sg_light_t *light)
 {
   return light->quadraticAttenuation;
 }
-
-

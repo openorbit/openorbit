@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2011,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -33,7 +33,7 @@
 #include <openorbit/log.h>
 #include "common/moduleinit.h"
 #include "common/mapped-file.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 struct config_t
 {

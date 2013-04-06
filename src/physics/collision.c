@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -22,10 +22,10 @@
 #include <assert.h>
 #include <openorbit/log.h>
 
-#include "collision.h"
+#include "physics/collision.h"
 #include <vmath/lwcoord.h>
 #include "physics/object.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 #define THRESHOLD 10
 #define TOLERANCE 0.1
@@ -277,4 +277,3 @@ pl_collide_step(pl_collisioncontext_t *coll)
     lwc_dump(&a->p);lwc_dump(&b->p);
   }
 }
-

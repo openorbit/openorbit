@@ -1,5 +1,5 @@
 /*
-  Copyright 2009,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2011,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -30,7 +30,7 @@
 #include "texture.h"
 #include "res-manager.h"
 #include "common/moduleinit.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -231,4 +231,3 @@ sgTextTexture(SGtextbuffer *buff)
 {
   return text_bitmap_texid(buff);
 }
-

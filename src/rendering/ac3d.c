@@ -1,5 +1,5 @@
 /*
- Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2009,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -28,8 +28,8 @@
 #include <math.h>
 #include <vmath/vmath-convert.h>
 #include "rendering/object.h"
-#include "palloc.h"
-#include "log.h"
+#include "common/palloc.h"
+#include <openorbit/log.h>
 
 #define BUFF_SIZE 1024
 
@@ -135,7 +135,7 @@ make_file(void)
 {
   struct ac3d_file_t *ac3d = smalloc(sizeof(struct ac3d_file_t));
   memset(ac3d, 0, sizeof(struct ac3d_file_t));
-  
+
   ac3d->mat_alen = 8;
   ac3d->mat_count = 0;
   ac3d->materials = calloc(8, sizeof(struct ac3d_material_t));
@@ -370,7 +370,7 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
       }
 
       normal = vf3_normalise(normal);
-      
+
       float_array_push(&normals, normal[0]);
       float_array_push(&normals, normal[1]);
       float_array_push(&normals, normal[2]);
@@ -620,4 +620,3 @@ error:
 
   return NULL;
 }
-
