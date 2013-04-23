@@ -44,25 +44,25 @@
  */
 struct sg_camera_t {
   sg_scene_t *scene;
-  float4x4 proj_matrix;
-  float4x4 view_matrix;
+  double4x4 proj_matrix;
+  double4x4 view_matrix;
 
   lwcoord_t p0;        // Initial camera position
   lwcoord_t p1;        // End position of camera
   lwcoord_t p;         // Interpolated position of camera
-  float3    dp;        // Velocity of camera
+  double3    dp;        // Velocity of camera
 
-  quaternion_t q;   // Quaternion used for view matrix (slerped from q0, q1)
-  quaternion_t q0;  // Quaternion from.
-  quaternion_t q1;  // Quaternion to (q0 * dq).
-  quaternion_t dq;  // Quaternion rot per time unit
+  quatd_t q;   // Quaternion used for view matrix (slerped from q0, q1)
+  quatd_t q0;  // Quaternion from.
+  quatd_t q1;  // Quaternion to (q0 * dq).
+  quatd_t dq;  // Quaternion rot per time unit
 
   // If there is a target object, rotation is relative to that objects location
   // the source object constrains the lwc variable.
   sg_object_t *tgt; // Target object, must have rigid obj backing
   sg_object_t *src; // Source object, must have rigid obj backing
 
-  float3 src_offset;  // Source object, must have rigid obj backing
+  double3 src_offset;  // Source object, must have rigid obj backing
 };
 
 
@@ -92,14 +92,14 @@ sg_camera_pos(sg_camera_t *cam)
   return cam->p;
 }
 
-quaternion_t
+quatd_t
 sg_camera_quat(sg_camera_t *cam)
 {
   ASSERT_CAM(cam);
   return cam->q;
 }
 
-const float4x4*
+const double4x4*
 sg_camera_project(sg_camera_t *cam)
 {
   ASSERT_CAM(cam);
@@ -110,14 +110,14 @@ void
 sg_camera_update_modelview(sg_camera_t *cam)
 {
   ASSERT_CAM(cam);
-  float4x4 qm;
+  double4x4 qm;
 
-  mf4_ident_z_up(cam->view_matrix);
-  q_mf4_convert_inv(qm, cam->q);
-  mf4_mul2(cam->view_matrix, qm);
+  md4_ident_z_up(cam->view_matrix);
+  qd_md4_convert_inv(qm, cam->q);
+  md4_mul2(cam->view_matrix, qm);
 }
 
-const float4x4*
+const double4x4*
 sg_camera_modelview(sg_camera_t *cam)
 {
   ASSERT_CAM(cam);
@@ -130,10 +130,10 @@ sg_new_camera(sg_scene_t *scene)
   sg_camera_t *cam = smalloc(sizeof(sg_camera_t));
 
   // Initial rotation correspond to a vector pointing down the negative x axis.
-  cam->dq = Q_IDENT;
-  cam->q0 = Q_IDENT;
-  cam->q1 = Q_IDENT;
-  cam->q = Q_IDENT;
+  cam->dq = QD_IDENT;
+  cam->q0 = QD_IDENT;
+  cam->q1 = QD_IDENT;
+  cam->q = QD_IDENT;
 
   sg_camera_set_perspective(cam, 1.0);
 
@@ -172,14 +172,14 @@ sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj)
 
   if (cam->tgt == NULL) {
     cam->q0 = sg_object_get_q0(obj);
-    cam->q1 = q_normalise(q_mul(cam->q0, cam->dq));
+    cam->q1 = qd_normalise(qd_mul(cam->q0, cam->dq));
   }
 
   ASSERT_CAM(cam);
 }
 
 void
-sg_camera_set_follow_offset(sg_camera_t *cam, float3 offs)
+sg_camera_set_follow_offset(sg_camera_t *cam, double3 offs)
 {
   ASSERT_CAM(cam);
 
@@ -195,7 +195,7 @@ sg_camera_set_perspective(sg_camera_t *cam, float perspective)
 {
   ASSERT_CAM(cam);
 
-  mf4_perspective(cam->proj_matrix, M_PI_4, perspective,
+  md4_perspective(cam->proj_matrix, M_PI_4, perspective,
                   0.1, 1000000000000.0);
 
   ASSERT_CAM(cam);
@@ -208,36 +208,36 @@ sg_camera_interpolate(sg_camera_t *cam, float t)
   assert(t <= 1.0);
 
   if (cam->tgt) {
-    cam->q = q_slerp(cam->q0, cam->q1, t);
-    float3x3 R;
-    q_mf3_convert(R, cam->q);
-    cam->src_offset = mf3_v_mul(R, vf3_set(vf3_abs(cam->src_offset), 0.0, 0.0));
+    cam->q = qd_slerp(cam->q0, cam->q1, t);
+    double3x3 R;
+    qd_md3_convert(R, cam->q);
+    cam->src_offset = md3_v_mul(R, vd3_set(vd3_abs(cam->src_offset), 0.0, 0.0));
 
     cam->p0 = sg_object_get_p0(cam->src);
-    lwc_translate3fv(&cam->p0, cam->src_offset);
+    lwc_translate3dv(&cam->p0, cam->src_offset);
 
     cam->p1 = sg_object_get_p1(cam->src);
-    lwc_translate3fv(&cam->p1, cam->src_offset);
-    lwc_translate3fv(&cam->p1, cam->dp);
+    lwc_translate3dv(&cam->p1, cam->src_offset);
+    lwc_translate3dv(&cam->p1, cam->dp);
 
     cam->p = cam->p0;
-    float3 d = vf3_s_mul(lwc_dist(&cam->p1, &cam->p0), t);
-    lwc_translate3fv(&cam->p, vf3_set(d.x, d.y, d.z));
+    double3 d = vd3_s_mul(lwc_dist(&cam->p1, &cam->p0), t);
+    lwc_translate3dv(&cam->p, d);
     ASSERT_CAM(cam);
   } else if (cam->src) {
-    quaternion_t q = q_slerp(cam->q0, cam->q1, t);
+    quatd_t q = qd_slerp(cam->q0, cam->q1, t);
     cam->q = sg_object_get_quat(cam->src);
-    cam->q = q_mul(cam->q, q);
+    cam->q = qd_mul(cam->q, q);
 
     cam->p = cam->p0;
-    float3 d = vf3_s_mul(lwc_dist(&cam->p1, &cam->p0), t);
-    lwc_translate3fv(&cam->p, vf3_set(d.x, d.y, d.z));
+    double3 d = vd3_s_mul(lwc_dist(&cam->p1, &cam->p0), t);
+    lwc_translate3dv(&cam->p, d);
   } else {
-    cam->q = q_slerp(cam->q0, cam->q1, t);
+    cam->q = qd_slerp(cam->q0, cam->q1, t);
 
     cam->p = cam->p0;
-    float3 d = vf3_s_mul(lwc_dist(&cam->p1, &cam->p0), t);
-    lwc_translate3fv(&cam->p, vf3_set(d.x, d.y, d.z));
+    double3 d = vd3_s_mul(lwc_dist(&cam->p1, &cam->p0), t);
+    lwc_translate3dv(&cam->p, d);
   }
 
   ASSERT_CAM(cam);
@@ -253,28 +253,28 @@ sg_camera_sync(sg_camera_t *cam)
   if (cam->src) {
     // Following an object
     cam->p0 = sg_object_get_p0(cam->src);
-    lwc_translate3fv(&cam->p0, cam->src_offset);
+    lwc_translate3dv(&cam->p0, cam->src_offset);
 
     cam->p1 = sg_object_get_p1(cam->src);
-    lwc_translate3fv(&cam->p1, cam->src_offset);
-    lwc_translate3fv(&cam->p1, cam->dp);
+    lwc_translate3dv(&cam->p1, cam->src_offset);
+    lwc_translate3dv(&cam->p1, cam->dp);
 
     if (cam->tgt) {
       // Orbiting an object
       cam->q0 = cam->q1;
-      cam->q1 = q_normalise(q_mul(cam->q0, cam->dq));
-      cam->q = q_slerp(cam->q0, cam->q1, 0.0);
+      cam->q1 = qd_normalise(qd_mul(cam->q0, cam->dq));
+      cam->q = qd_slerp(cam->q0, cam->q1, 0.0);
 
-      float3x3 R;
-      q_mf3_convert(R, cam->q);
-      cam->src_offset = mf3_v_mul(R, vf3_set(vf3_abs(cam->src_offset), 0.0, 0.0));
+      double3x3 R;
+      qd_md3_convert(R, cam->q);
+      cam->src_offset = md3_v_mul(R, vd3_set(vd3_abs(cam->src_offset), 0.0, 0.0));
 
       cam->p0 = sg_object_get_p0(cam->src);
-      lwc_translate3fv(&cam->p0, cam->src_offset);
+      lwc_translate3dv(&cam->p0, cam->src_offset);
 
       cam->p1 = sg_object_get_p1(cam->src);
-      lwc_translate3fv(&cam->p1, cam->src_offset);
-      lwc_translate3fv(&cam->p1, cam->dp);
+      lwc_translate3dv(&cam->p1, cam->src_offset);
+      lwc_translate3dv(&cam->p1, cam->dp);
 
       cam->p = cam->p0;
       //double3 d = lwc_dist(&cam->p1, &cam->p0);
@@ -282,17 +282,17 @@ sg_camera_sync(sg_camera_t *cam)
       ASSERT_CAM(cam);
     } else {
       cam->q0 = cam->q1;
-      cam->q1 = q_normalise(q_mul(cam->q0, cam->dq));
-      quaternion_t q = q_slerp(cam->q0, cam->q1, 0.0);
+      cam->q1 = qd_normalise(qd_mul(cam->q0, cam->dq));
+      quatd_t q = qd_slerp(cam->q0, cam->q1, 0.0);
 
       cam->q = sg_object_get_q0(cam->src);
-      cam->q = q_mul(cam->q, q);
+      cam->q = qd_mul(cam->q, q);
       ASSERT_CAM(cam);
     }
   } else {
     cam->q0 = cam->q1;
-    cam->q1 = q_normalise(q_mul(cam->q0, cam->dq));
-    cam->q = q_slerp(cam->q0, cam->q1, 0.0);
+    cam->q1 = qd_normalise(qd_mul(cam->q0, cam->dq));
+    cam->q = qd_slerp(cam->q0, cam->q1, 0.0);
     ASSERT_CAM(cam);
   }
   ASSERT_CAM(cam);
@@ -324,24 +324,24 @@ sg_camera_rotate_hat(int buttonVal, void *data)
   if ((cam->src == cam->tgt) && cam->src) {
     // We are targeting our follow object this means orbiting it
     if (buttonVal == -1) {
-      cam->dq = Q_IDENT;
+      cam->dq = QD_IDENT;
     } else {
-      cam->dq = q_rot(0.0,
-                      cosf(DEG_TO_RAD(buttonVal)),
-                      sinf(DEG_TO_RAD(buttonVal)),
-                      M_PI_2 / wct_freq);
+      cam->dq = qd_rot(0.0,
+                       cosf(DEG_TO_RAD(buttonVal)),
+                       sinf(DEG_TO_RAD(buttonVal)),
+                       M_PI_2 / wct_freq);
     }
-    cam->q1 = q_mul(cam->q0, cam->dq);
+    cam->q1 = qd_mul(cam->q0, cam->dq);
   } else {
     if (buttonVal == -1) {
-      cam->dq = Q_IDENT;
+      cam->dq = QD_IDENT;
     } else {
-      cam->dq = q_rot(0.0,
-                      cosf(DEG_TO_RAD(buttonVal)),
-                      sinf(DEG_TO_RAD(buttonVal)),
-                      M_PI_2 / wct_freq);
+      cam->dq = qd_rot(0.0,
+                       cosf(DEG_TO_RAD(buttonVal)),
+                       sinf(DEG_TO_RAD(buttonVal)),
+                       M_PI_2 / wct_freq);
     }
-    cam->q1 = q_mul(cam->q0, cam->dq);
+    cam->q1 = qd_mul(cam->q0, cam->dq);
   }
 
   ASSERT_CAM(cam);
@@ -361,21 +361,21 @@ sg_camera_move_forward(int buttonVal, void *data)
   if ((cam->src == cam->tgt) && cam->src) {
     // We are targeting our follow object this means orbiting it
     if (buttonVal == 0) {
-      cam->dp = vf3_set(0, 0, 0);
+      cam->dp = vd3_set(0, 0, 0);
     } else {
       // Key down
-      float3x3 camrot;
-      q_mf3_convert(camrot, cam->q);
-      float radius = sg_object_get_radius(cam->tgt);
+      double3x3 camrot;
+      qd_md3_convert(camrot, cam->q);
+      double radius = sg_object_get_radius(cam->tgt);
       lwcoord_t obj_pos = sg_object_get_p(cam->tgt);
       lwcoord_t cam_pos = sg_camera_pos(cam);
-      float3 distv = lwc_dist(&cam_pos, &obj_pos);
-      double dist = vf3_abs(distv);
-      cam->dp = mf3_v_mul(camrot, vf3_set(-(dist-radius) / wct_freq, 0, 0));
+      double3 distv = lwc_dist(&cam_pos, &obj_pos);
+      double dist = vd3_abs(distv);
+      cam->dp = md3_v_mul(camrot, vd3_set(-(dist-radius) / wct_freq, 0, 0));
     }
     cam->p1 = sg_object_get_p1(cam->src);
-    lwc_translate3fv(&cam->p1, cam->src_offset);
-    lwc_translate3fv(&cam->p1, cam->dp);
+    lwc_translate3dv(&cam->p1, cam->src_offset);
+    lwc_translate3dv(&cam->p1, cam->dp);
   } else {
     if (buttonVal == 0) {
       // Key released
@@ -399,24 +399,24 @@ sg_camera_move_back(int buttonVal, void *data)
   if ((cam->src == cam->tgt) && cam->src) {
     // We are targeting our follow object this means orbiting it
     if (buttonVal == 0) {
-      cam->dp = vf3_set(0, 0, 0);
+      cam->dp = vd3_set(0, 0, 0);
     } else {
       // Key down
-      float3x3 camrot;
-      q_mf3_convert(camrot, cam->q);
+      double3x3 camrot;
+      qd_md3_convert(camrot, cam->q);
       float radius = sg_object_get_radius(cam->tgt);
       lwcoord_t obj_pos = sg_object_get_p(cam->tgt);
       lwcoord_t cam_pos = sg_camera_pos(cam);
-      float3 distv = lwc_dist(&cam_pos, &obj_pos);
-      double dist = vf3_abs(distv);
-      cam->dp = mf3_v_mul(camrot, vf3_set((dist-radius) / wct_freq, 0, 0));
+      double3 distv = lwc_dist(&cam_pos, &obj_pos);
+      double dist = vd3_abs(distv);
+      cam->dp = md3_v_mul(camrot, vd3_set((dist-radius) / wct_freq, 0, 0));
     }
     cam->p1 = sg_object_get_p1(cam->src);
-    lwc_translate3fv(&cam->p1, cam->src_offset);
-    lwc_translate3fv(&cam->p1, cam->dp);
+    lwc_translate3dv(&cam->p1, cam->src_offset);
+    lwc_translate3dv(&cam->p1, cam->dp);
   } else {
     if (buttonVal == 0) {
-      cam->dp = vf3_set(0, 0, 0);
+      cam->dp = vd3_set(0, 0, 0);
     } else {
       // Key down
     }

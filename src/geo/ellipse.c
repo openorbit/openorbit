@@ -1,5 +1,5 @@
 /*
-  Copyright 2009 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -28,7 +28,7 @@
 
 
 #include "ellipse.h"
-#include "palloc.h"
+#include "common/palloc.h"
 #include <openorbit/log.h>
 
 void

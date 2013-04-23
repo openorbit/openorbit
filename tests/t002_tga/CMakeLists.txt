@@ -1,6 +1,6 @@
 
 set(tc_TC_NAME "T002_Tga")
-set(tc_SRC tga-test.c ${CMAKE_SOURCE_DIR}/src/parsers/tga.c)
+set(tc_SRC tga-test.c ${CMAKE_SOURCE_DIR}/lib/imgload/tga.c)
 set(tc_TGT t002_tgatest)
 set(tc_LIBS)
 set(tc_INCDIRS ${CMAKE_SOURCE_DIR}/src/parsers)

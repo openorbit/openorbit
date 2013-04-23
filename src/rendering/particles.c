@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -23,9 +23,9 @@
 #else
 #include <GL3/gl3.h>
 #endif
-#include "texture.h"
+#include "rendering/texture.h"
 #include <vmath/vmath.h>
-#include "palloc.h"
+#include "common/palloc.h"
 
 #if 0
 void

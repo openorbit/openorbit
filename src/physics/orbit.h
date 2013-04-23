@@ -45,7 +45,7 @@ typedef struct pl_keplerelems_t {
   double longAsc;
   double argPeri;
   double meanAnomalyOfEpoch;
-  quaternion_t qOrbit; // Orbital quaternion, this is derived information
+  quatd_t qOrbit; // Orbital quaternion, this is derived information
 } pl_keplerelems_t ;
 
 struct pl_astrobody_t {

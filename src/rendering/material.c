@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -24,7 +24,7 @@
 #else
 #include <GL3/gl3.h>
 #endif
-#include "palloc.h"
+#include "common/palloc.h"
 
 struct sg_material_t {
   float4 emission;

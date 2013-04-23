@@ -23,11 +23,11 @@
 #include <vmath/vmath.h>
 
 struct pl_mass_t {
-  float m; //!< Mass in kg
-  float minMass; //!< Minimum mass
-  float3x3 I; //!< Moment of inertia
-  float3x3 I_inv; //!< Inverse of moment of inertia
-  float3 cog; //!< Center of gravity
+  double m; //!< Mass in kg
+  double minMass; //!< Minimum mass
+  double3x3 I; //!< Moment of inertia
+  double3x3 I_inv; //!< Inverse of moment of inertia
+  double3 cog; //!< Center of gravity
 };
 
 typedef struct pl_mass_t pl_mass_t;
@@ -65,11 +65,11 @@ void pl_mass_set_min(pl_mass_t *m, float minMass);
 
 /*! Rotate mass m by rotation matrix rm
  */
-void pl_mass_rotate_m(pl_mass_t *m, const float3x3 rm);
+void pl_mass_rotate_m(pl_mass_t *m, const double3x3 rm);
 
 /*! Rotate mass m by quaternion q
  */
-void pl_mass_rotate_q(pl_mass_t *m, quaternion_t q);
+void pl_mass_rotate_q(pl_mass_t *m, quatd_t q);
 
 
 void pl_mass_hollow_cylinder(pl_mass_t *mo, float m, float r);

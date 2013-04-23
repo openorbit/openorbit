@@ -37,34 +37,34 @@ struct pl_object_t {
   pl_mass_t m;
 
   lwcoord_t p; // Large world coordinates
-  quaternion_t q; // Rotation quaternion
-  float3 p_offset; // Only for use by subobjects
+  quatd_t q; // Rotation quaternion
+  double3 p_offset; // Only for use by subobjects
 
-  float3x3 R; // Rotation wrt frame of reference
-  float3x3 I_inv_world; // Inverse of inertia in world coordinates
+  double3x3 R; // Rotation wrt frame of reference
+  double3x3 I_inv_world; // Inverse of inertia in world coordinates
 
-  float3 v; // Velocity
-  float3 angVel; // Angular velocity
-  float3 f_ack; // Force accumulator
-  float3 t_ack; // Torque accumulator
+  double3 v; // Velocity
+  double3 angVel; // Angular velocity
+  double3 f_ack; // Force accumulator
+  double3 t_ack; // Torque accumulator
 
-  float3 g_ack; // Gravitational force accumulator
+  double3 g_ack; // Gravitational force accumulator
 
 
-  float radius; // For simple collission detection
-  float airPressure; // In Pa
-  float airDensity; // In kg / m^3
-  float dragCoef; // Drag coefficent
-  float area; // Average area used when calculating drag, we should actually add
+  double radius; // For simple collission detection
+  double airPressure; // In Pa
+  double airDensity; // In kg / m^3
+  double dragCoef; // Drag coefficent
+  double area; // Average area used when calculating drag, we should actually add
               // a callback function to calculate the area
-  float temperature; // Temperature of object in K
+  double temperature; // Temperature of object in K
 
   obj_array_t psystem;// Optionally attatched particle systems
   obj_array_t children;
 
-  float3 g; // Previous g_ack
-  float3 t; // Previous t_ack
-  float3 f; // Previous f_ack
+  double3 g; // Previous g_ack
+  double3 t; // Previous t_ack
+  double3 f; // Previous f_ack
 };
 
 // Create standard object
@@ -138,15 +138,15 @@ void pl_object_normalise(pl_object_t *obj);
 /*! Clear object accumulators */
 void pl_object_clear(pl_object_t *obj);
 
-float3 pl_object_get_vel(pl_object_t *obj);
+double3 pl_object_get_vel(pl_object_t *obj);
 void pl_object_set_vel3f(pl_object_t *obj, float dx, float dy, float dz);
 void pl_object_set_vel3fv(pl_object_t *obj, float3 dp);
 
-float3 pl_object_get_angular_vel(pl_object_t *obj);
+double3 pl_object_get_angular_vel(pl_object_t *obj);
 void pl_object_set_angular_vel3f(pl_object_t *obj, float rx, float ry, float rz);
 void pl_object_set_angular_vel3fv(pl_object_t *obj, float3 r);
 
-quaternion_t pl_object_get_quat(pl_object_t *obj);
+quatd_t pl_object_get_quat(pl_object_t *obj);
 
 lwcoord_t pl_object_get_lwc(pl_object_t *obj);
 

@@ -265,7 +265,7 @@ pl_estimate_temp(double luminocity, double albedo, double R)
 // current speed of the object with the speed of the planet and the current
 // rotation tangent subtracted
 
-float3
+double3
 pl_compute_airvelocity(pl_object_t *obj)
 {
   // TODO: Adjust for planet rotation and wind
@@ -276,7 +276,7 @@ pl_compute_airvelocity(pl_object_t *obj)
 double
 pl_object_compute_airspeed(pl_object_t *obj)
 {
-  return vf3_abs(pl_compute_airvelocity(obj));
+  return vd3_abs(pl_compute_airvelocity(obj));
 }
 // Compute drag force from
 // \param v Velocity of object of fluid
@@ -284,13 +284,13 @@ pl_object_compute_airspeed(pl_object_t *obj)
 // \param Cd Drag coeficient for object
 // \param A Area of object (i.e. the orthographic projection area)
 // \result A vector with the drag force (oposite direction of velocity)
-float3
-pl_compute_drag(float3 v, double p, double Cd, double A)
+double3
+pl_compute_drag(double3 v, double p, double Cd, double A)
 {
-  double v_mag = vf3_abs(vf3_neg(v));
+  double v_mag = vd3_abs(vd3_neg(v));
   double fd = 0.5 * p * v_mag * v_mag * Cd * A;
-  float3 vf_dir = vf3_normalise(v);
-  return vf3_s_mul(vf_dir, fd);
+  double3 vf_dir = vd3_normalise(v);
+  return vd3_s_mul(vf_dir, fd);
 }
 
 // Computing lift of airfoils using thin airfoil theory
@@ -330,13 +330,13 @@ pl_atmosphere_init(pl_atmosphere_t *atm, float groundPressure, float h0)
  *  We need to compute parasitic drag (form, profile, interference and skin
  *  friction drag), and the drag from any airfoils.
  */
-float3
+double3
 pl_object_compute_drag(pl_object_t *obj)
 {
   double p = pl_object_compute_airdensity(obj);
-  float3 vel = pl_compute_airvelocity(obj); // TODO: Adjust for planet rotation
+  double3 vel = pl_compute_airvelocity(obj); // TODO: Adjust for planet rotation
 
-  float3 drag = pl_compute_drag(vel, p, obj->dragCoef, obj->area);
+  double3 drag = pl_compute_drag(vel, p, obj->dragCoef, obj->area);
   return drag;//vf3_set(0.0, 0.0, 0.0);
 }
 

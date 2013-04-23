@@ -1,5 +1,5 @@
 /*
- Copyright 2009,2010,2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2009,2010,2012,2013 Mattias Holm <mattias.holm(at)openorbit.org>
  
  This file is part of Open Orbit. Open Orbit is free software: you can
  redistribute it and/or modify it under the terms of the GNU General Public
@@ -131,7 +131,7 @@ pool_create(size_t obj_size)
   pool_t *pool = malloc(sizeof(pool_t));
   assert(pool);
 
-  pool->obj_size = clp2_32(obj_size);
+  pool->obj_size = clp2_32((uint32_t)obj_size);
   pool->free_pointer = mmap(NULL, 8*4096, PROT_READ|PROT_WRITE, MAP_ANON|MAP_PRIVATE, 0, 0);
 
   pool_obj_t *pool_obj = pool->free_pointer;

@@ -21,9 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "orbit.h"
+#include "physics/orbit.h"
 
-#include "physics.h"
+#include "physics/physics.h"
 
 #include <vmath/vmath.h>
 #include "sim.h"
@@ -32,7 +32,7 @@
 #include <openorbit/log.h>
 #include "parsers/hrml.h"
 #include "res-manager.h"
-#include "palloc.h"
+#include "common/palloc.h"
 #include <vmath/lwcoord.h>
 #include <celmek/celmek.h>
 

@@ -1,3 +1,6 @@
+include_directories(../lib/vmath/include)
+include_directories(../lib/celmek/include)
+
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${PYTHON_INCLUDE_PATH})
 if (${SDLTTF_FOUND})
@@ -26,90 +29,75 @@ elseif(UNIX)
     include_directories(platform/sdl/)
 endif (APPLE)
 
-#add_subdirectory(libgencds)
-add_subdirectory(physics)
-add_subdirectory(scripting)
-add_subdirectory(parsers)
-add_subdirectory(plugins)
-
-#aux_source_directory(libgencds gencds_src)
-#aux_source_directory(rendering rendering_src)
-#aux_source_directory(vessel vessel_src)
-#aux_source_directory(geo geo_src)
-#aux_source_directory(sim sim_src)
-#aux_source_directory(common common_src)
-
 set(openorbit_SRC
   io-manager.c
   plugin-handler.c
   sim.c
+  terminal.c
   log.c
   settings.c
   startup.c
-  common/lwcoord.c
-  common/moduleinit.c
-  common/stringextras.c
-  common/mapped-file.c
-  common/palloc.c
-  scripting/scripting.c
-  
+
+  parsers/hrml.c
   geo/ellipse.c
 
-  parsers/3ds.c
-  parsers/ac3d.c
-  parsers/cmod.c
-  parsers/collada.c
-  parsers/hrml.c
-  parsers/hrml3d.c
-  parsers/model.c
+  common/mapped-file.c
+  common/monotonic-time.c
+  common/stringextras.c
+  common/moduleinit.c
+  common/palloc.c
 
-  libgencds/array.c
-  libgencds/avl-tree.c
-  libgencds/hashtable.c
-  libgencds/heap.c
-  libgencds/list.c
-  libgencds/object-manager.c
-  libgencds/object-manager2.c
-
+  rendering/3ds.c
+  rendering/overlay.c
+  rendering/ac3d.c
+  rendering/particles.c
+  rendering/camera.c
+  rendering/scene.c
+  rendering/cmod.c
+  rendering/scenegraph.c
+  rendering/collada.c
+  rendering/shader-manager.c
+  rendering/colour.c
+  rendering/sky.c
+  rendering/gui.c
+  rendering/terrain.c
+  rendering/light.c
+  rendering/text.c
+  rendering/location.c
+  rendering/texture.c
+  rendering/material.c
+  rendering/viewport.c
+  rendering/object.c
+  rendering/window.c
 
   physics/areodynamics.c
-  physics/collision.c
   physics/mass.c
-  physics/object.c
-  physics/orbit.c
   physics/particles.c
+  physics/barneshut.c
+  physics/object.c
   physics/rockets.c
+  physics/celestial-object.c
+  physics/octtree.c
   physics/sectors.c
-  
-  rendering/camera.c
-  rendering/render.c
-  rendering/colour.c
-  rendering/scenegraph.c
-  rendering/drawable.c
-  rendering/shader-manager.c
-  rendering/gui.c
-  rendering/sky.c
-  rendering/light.c
-  rendering/terrain.c
-  rendering/material.c
-  rendering/text.c
-  rendering/particles.c
-  rendering/texture.c
-  rendering/planet.c
+  physics/collision.c
+  physics/orbit.c
+  physics/world.c
 
   sim/actuator.c
-  sim/simenvironment.c
-  sim/battery.c
-  sim/simevent.c
-  sim/class.c
-  sim/simtime.c
-  sim/haps.c
-  sim/spacecraft-control.c
   sim/propellant-tank.c
-  sim/spacecraft.c
+  sim/simtime.c
+  sim/battery.c
   sim/pubsub.c
+  sim/spacecraft-control.c
+  sim/class.c
+  sim/simenvironment.c
+  sim/spacecraft.c
+  sim/haps.c
+  sim/simevent.c
   sim/world-loader.c
-)
+
+  sim/spacecraft/mercury/mercury.c
+  )
 
 set(darwin_src
   platform/macosx/OOAppDelegate.m
@@ -191,7 +179,6 @@ add_executable(openorbit MACOSX_BUNDLE
                ${ORBIT_PLUGINS}
              )
 
-add_dependencies(openorbit ${ORBIT_PLUGIN_TARGETS})
 set_target_properties(openorbit
                       PROPERTIES
                       RELEASE_OUTPUT_NAME "${open_orbit_name}"

@@ -1,5 +1,5 @@
 /*
- Copyright 2010,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2011,2013 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -17,9 +17,9 @@
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "propellant-tank.h"
-#include "spacecraft.h"
-#include "palloc.h"
+#include "sim/propellant-tank.h"
+#include "sim/spacecraft.h"
+#include "common/palloc.h"
 
 sim_tank_t*
 sim_new_tank(sim_stage_t *stage, const char *tankName, float p, float v, float t)

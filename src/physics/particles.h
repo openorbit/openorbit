@@ -31,10 +31,10 @@ struct pl_particle_t {
   bool active;
   float	age; // Age of particles
   float	lifeTime; // lifetime
-	float	fadeFactor;
+  float fadeFactor;
   float3 rgb; // Colour
-  float3 p; // Position
-  float3 v; // Velocity
+  double3 p; // Position
+  double3 v; // Velocity
   float3 s; // Size
 };
 
@@ -43,8 +43,8 @@ struct pl_particles_t {
   //GLuint texture;
   float directionLimit;
   float3 rgb; // Default colour
-  float3 p; // Default position of emitter (relative to object position)
-  float3 v; // Default velocity vector for new particle
+  double3 p; // Default position of emitter (relative to object position)
+  double3 v; // Default velocity vector for new particle
   float emissionRate; // Emmission rate of particles
   float lifeTime; // Average life of paticles
   size_t particleCount; // Maximum particles in system, old particles are simply

@@ -40,30 +40,30 @@ void sg_object_add_child(sg_object_t *obj, sg_object_t *child);
 sg_scene_t* sg_object_get_scene(sg_object_t *obj);
 
 
-void sg_object_set_camera_pos(sg_object_t *obj, float3 pos);
-float3 sg_object_get_camera_pos(sg_object_t *obj);
+void sg_object_set_camera_pos(sg_object_t *obj, double3 pos);
+double3 sg_object_get_camera_pos(sg_object_t *obj);
 void sg_object_get_lwc(sg_object_t *obj, lwcoord_t *lwc);
-float3 sg_object_get_vel(sg_object_t *obj);
-void sg_object_camera_moved(sg_object_t *obj, float3 cam_dp);
+double3 sg_object_get_vel(sg_object_t *obj);
+void sg_object_camera_moved(sg_object_t *obj, double3 cam_dp);
 
 void sg_object_print(const sg_object_t *obj);
 
-const float4x4* sg_object_get_modelview(const sg_object_t *obj);
+const double4x4* sg_object_get_modelview(const sg_object_t *obj);
 
-float sg_object_get_radius(sg_object_t *obj);
-quaternion_t sg_object_get_quat(const sg_object_t *obj);
-quaternion_t sg_object_get_q0(const sg_object_t *obj);
-quaternion_t sg_object_get_q1(const sg_object_t *obj);
+double sg_object_get_radius(sg_object_t *obj);
+quatd_t sg_object_get_quat(const sg_object_t *obj);
+quatd_t sg_object_get_q0(const sg_object_t *obj);
+quatd_t sg_object_get_q1(const sg_object_t *obj);
 
 lwcoord_t sg_object_get_p0(const sg_object_t *obj);
 lwcoord_t sg_object_get_p1(const sg_object_t *obj);
 lwcoord_t sg_object_get_p(const sg_object_t *obj);
 
-void sg_object_set_rot(sg_object_t *obj, float3x3 rot);
-void sg_object_set_quat(sg_object_t *obj, quaternion_t q);
+void sg_object_set_rot(sg_object_t *obj, double3x3 rot);
+void sg_object_set_quat(sg_object_t *obj, quatd_t q);
 
-float3 sg_object_get_parent_offset(sg_object_t *obj);
-void sg_object_set_parent_offset(sg_object_t *obj, float3 po);
+double3 sg_object_get_parent_offset(sg_object_t *obj);
+void sg_object_set_parent_offset(sg_object_t *obj, double3 po);
 
 const char* sg_object_get_name(const sg_object_t *obj);
 void sg_object_set_scene(sg_object_t *obj, sg_scene_t *sc);
@@ -79,8 +79,7 @@ sg_new_geometry(sg_object_t *obj, int gl_primitive, size_t vertexCount,
                 uint8_t *colours);
 
 sg_object_t* sg_new_ellipse(const char *name, sg_shader_t *shader,
-                            float semiMajor, float ecc, float inc, float asc,
-                            float argOfPeriapsis, int segments);
+                            float semiMajor, float ecc, int segments);
 
 sg_object_t* sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
                            sg_texture_t *tex, sg_texture_t *nightTex,
