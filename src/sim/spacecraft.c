@@ -423,14 +423,14 @@ void
 sim_stage_set_offset3f(sim_stage_t *stage, float x, float y, float z)
 {
   stage->pos = vf3_set(x, y, z);
-  stage->obj->p_offset = vf3_set(x, y, z);
+  stage->obj->p_offset = vd3_set(x, y, z);
 }
 
 void
 sim_stage_set_offset3fv(sim_stage_t *stage, float3 p)
 {
   stage->pos = p;
-  stage->obj->p_offset = p;
+  stage->obj->p_offset = vf3_to_vd3(p);
 }
 
 void
@@ -531,47 +531,47 @@ sim_spacecraft_add_stage(sim_spacecraft_t *sc, sim_stage_t *stage)
 
 // TODO: This is buggy, gravity is only set on the parent object unless the
 //       stage has been detatched.
-float3
+double3
 sim_stage_get_gravity(sim_stage_t *stage)
 {
   return stage->obj->g_ack;
 }
 
-float3
+double3
 sim_spacecraft_get_gravity(sim_spacecraft_t *sc)
 {
   // TODO: Return the real gravity instead of force ackumulator
   return sc->obj->g_ack;
 }
 
-float3
+double3
 sim_spacecraft_get_velocity(sim_spacecraft_t *sc)
 {
   return sc->obj->v;
 }
 
-float3
+double3
 sim_spacecraft_get_airspeed(sim_spacecraft_t *sc)
 {
   return pl_compute_airvelocity(sc->obj);
 }
 
-float3
+double3
 sim_spacecraft_get_force(sim_spacecraft_t *sc)
 {
   return sc->obj->f_ack;
 }
 
-quaternion_t
+quatd_t
 sim_spacecraft_get_quaternion(sim_spacecraft_t *sc)
 {
   return sc->obj->q;
 }
 
-const float3x3*
+const double3x3*
 sim_spacecraft_get_rotmat(sim_spacecraft_t *sc)
 {
-  return (const float3x3*)&sc->obj->R;
+  return &sc->obj->R;
 }
 
 float

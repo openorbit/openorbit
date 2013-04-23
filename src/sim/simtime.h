@@ -32,6 +32,5 @@ int64_t sim_time_jd_to_time_stamp(double jd);
 time_t sim_time_get_time(void);
 int64_t sim_time_get_time_stamp(void);
 
-
 #endif /* end of include guard: SIMTIME_H_STPF70AM */
 

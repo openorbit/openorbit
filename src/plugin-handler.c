@@ -1,5 +1,5 @@
 /*
-  Copyright 2006 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -34,7 +34,7 @@
 #include "res-manager.h"
 #include "plugin-handler.h"
 #include <openorbit/log.h>
-#include "palloc.h"
+#include "common/palloc.h"
 
 
 #ifndef SO_EXT

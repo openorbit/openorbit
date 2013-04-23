@@ -1,5 +1,5 @@
 /*
-  Copyright 2009,2010 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2009,2010,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -25,7 +25,6 @@
 #include "sim/simevent.h"
 #include "sim/simtime.h"
 #include <openorbit/log.h>
-#include "palloc.h"
 
 #define OO_EVENT_QUEUE_INIT_LEN 100
 

@@ -1,18 +1,18 @@
 /*
- Copyright 2012 Mattias Holm <mattias.holm(at)openorbit.org>
- 
+ Copyright 2012,2013 Mattias Holm <mattias.holm(at)openorbit.org>
+
  This file is part of Open Orbit.
- 
+
  Open Orbit is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
- 
+
  Open Orbit is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with Open Orbit.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,7 +28,7 @@
 
 #include "terminal.h"
 #include "res-manager.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 
 // Length of terminal buffer
@@ -87,7 +87,7 @@ list_node(avl_node_t *node)
   list_node(node->left);
   avl_str_node_t *sn = (avl_str_node_t*)node;
   terminal_command_t *cmd = node->data;
-  
+
   fprintf(stdout, "\t%s: %s\n", sn->key, cmd->synopsis);
   list_node(node->right);
 }
@@ -98,11 +98,11 @@ terminal_list_cmd(int argc, const char *argv[argc])
   if (argc != 1) {
     return 1;
   }
-  
+
 
   avl_node_t *root = commands->root;
   list_node(root);
-  
+
   return 0;
 }
 
@@ -120,7 +120,7 @@ terminal_init_builtins(void)
   "Shows help for the given command";
   hc.cmd = terminal_help_cmd;
   avl_insert(commands, "help", &hc);
-  
+
   static terminal_command_t qc;
   qc.name = "quit";
   qc.synopsis = "quit open orbit";
@@ -129,7 +129,7 @@ terminal_init_builtins(void)
   qc.cmd = terminal_quit_cmd;
   avl_insert(commands, "quit", &qc);
   avl_insert(commands, "exit", &qc);
-  
+
   static terminal_command_t lc;
   lc.name = "list";
   lc.synopsis = "list all commands";
@@ -202,7 +202,7 @@ terminal_main(void *arg)
   Tokenizer *tok = tok_init(NULL);
   while (1) {
     line = el_gets(el, &line_len);
-  
+
     if (line_len > 0) {
       tok_reset(tok);
       int argc;

@@ -1,5 +1,5 @@
 /*
- Copyright 2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2012,2013 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -25,9 +25,9 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <complex.h>
-#include "palloc.h"
+#include "common/palloc.h"
 
-#include "class.h"
+#include "sim/class.h"
 
 #include <gencds/hashtable.h>
 #include <gencds/avl-tree.h>

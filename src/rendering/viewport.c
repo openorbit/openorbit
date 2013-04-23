@@ -1,5 +1,5 @@
 /*
- Copyright 2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -33,7 +33,7 @@
 #include "rendering/scene.h"
 #include "rendering/overlay.h"
 #include "rendering/window.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 struct sg_viewport_t {
   sg_scene_t *scene;

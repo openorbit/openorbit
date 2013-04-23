@@ -1,5 +1,5 @@
 /*
-  Copyright 2006,2009,2011 Mattias Holm <mattias.holm(at)openorbit.org>
+  Copyright 2006,2009,2011,2013 Mattias Holm <lorrden(at)openorbit.org>
 
   This file is part of Open Orbit.
 
@@ -37,7 +37,7 @@
 #include "res-manager.h"
 #include "rendering/scenegraph.h"
 #include <string.h>
-#include "palloc.h"
+#include "common/palloc.h"
 
 struct sg_texture_t {
   GLint width, height;

@@ -115,9 +115,9 @@ pl_mass_set(pl_mass_t *mo, float m,
   mo->I[1][2] = iyz;
   mo->I[2][1] = iyz;
 
-  mo->cog = vf3_set(cox, coy, coz);
+  mo->cog = vd3_set(cox, coy, coz);
 
-  mf3_inv2(mo->I_inv, mo->I);
+  md3_inv2(mo->I_inv, mo->I);
 
   mo->minMass = 0.0f;
 }
@@ -190,51 +190,51 @@ pl_mass_solid_cone(pl_mass_t *mo, float m, float r, float h)
 void
 pl_mass_translate(pl_mass_t *m, float dx, float dy, float dz)
 {
-  float3x3 re;
-  mf3_ident(re);
-  float3 r = vf3_set(dx, dy, dz);
-  float rdot = vf3_dot(r, r);
+  double3x3 re;
+  md3_ident(re);
+  double3 r = vd3_set(dx, dy, dz);
+  double rdot = vd3_dot(r, r);
   re[0][0] = rdot;
   re[1][1] = rdot;
   re[2][2] = rdot;
-  float3x3 rout;
-  vf3_outprod(rout, r, r);
-  float3x3 madj;
-  mf3_sub(madj, re, rout);
+  double3x3 rout;
+  vd3_outprod(rout, r, r);
+  double3x3 madj;
+  md3_sub(madj, re, rout);
 
-  float3x3 mtmp;
-  mf3_s_mul(mtmp, madj, m->m);
-  mf3_add2(m->I, mtmp);
+  double3x3 mtmp;
+  md3_s_mul(mtmp, madj, m->m);
+  md3_add2(m->I, mtmp);
 
-  m->cog = vf3_add(m->cog, r);
-  mf3_inv2(m->I_inv, m->I);
+  m->cog = vd3_add(m->cog, r);
+  md3_inv2(m->I_inv, m->I);
 }
 
 void
-pl_mass_rotate_m(pl_mass_t *m, const float3x3 rm)
+pl_mass_rotate_m(pl_mass_t *m, const double3x3 rm)
 {
   // We want to rotate the inertia tensor with
   // Ir = M * I0 * M^-1
   // Please verify
 
-  float3x3 rmi;
-  mf3_inv2(rmi, rm);
+  double3x3 rmi;
+  md3_inv2(rmi, rm);
 
-  float3x3 mtmp;
+  double3x3 mtmp;
   memset(mtmp, 0, sizeof(float3x3));
 
-  mf3_mul3(mtmp, m->I, rmi);
-  mf3_mul3(m->I, rm, mtmp);
+  md3_mul3(mtmp, m->I, rmi);
+  md3_mul3(m->I, rm, mtmp);
 
-  m->cog = mf3_v_mul(rm, m->cog);
-  mf3_inv2(m->I_inv, m->I);
+  m->cog = md3_v_mul(rm, m->cog);
+  md3_inv2(m->I_inv, m->I);
 }
 
 void
-pl_mass_rotate_q(pl_mass_t *m, quaternion_t q)
+pl_mass_rotate_q(pl_mass_t *m, quatd_t q)
 {
-  float3x3 mat;
-  q_mf3_convert(mat, q);
+  double3x3 mat;
+  qd_md3_convert(mat, q);
 
   pl_mass_rotate_m(m, mat);
 }
@@ -245,28 +245,28 @@ pl_mass_add(pl_mass_t * restrict md, const pl_mass_t * restrict ms)
 {
   float recip = 1.0f / (md->m + ms->m);
 
-  float3 a = vf3_s_mul(md->cog, md->m);
-  float3 b = vf3_s_mul(ms->cog, ms->m);
-  float3 c = vf3_add(a, b);
-  md->cog = vf3_s_mul(c, recip);
+  double3 a = vd3_s_mul(md->cog, md->m);
+  double3 b = vd3_s_mul(ms->cog, ms->m);
+  double3 c = vd3_add(a, b);
+  md->cog = vd3_s_mul(c, recip);
 
   md->m += ms->m;
 
   for (int i = 0 ; i < 3 ; ++ i) {
-    md->I[i] = vf3_add(md->I[i], ms->I[i]);
+    md->I[i] = vd3_add(md->I[i], ms->I[i]);
   }
-  mf3_inv2(md->I_inv, md->I);
+  md3_inv2(md->I_inv, md->I);
 }
 
 void
 pl_mass_mod(pl_mass_t *m, float newMass)
 {
-  float s = newMass / m->m;
+  double s = newMass / m->m;
   m->m = newMass;
 
   for (int i = 0 ; i < 3 ; ++ i) {
-    m->I[i] = vf3_s_mul(m->I[i], s);
-    m->I_inv[i] = vf3_s_mul(m->I_inv[i], 1.0f/s);
+    m->I[i] = vd3_s_mul(m->I[i], s);
+    m->I_inv[i] = vd3_s_mul(m->I_inv[i], 1.0/s);
   }
 }
 

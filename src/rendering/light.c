@@ -1,5 +1,5 @@
 /*
- Copyright 2010 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2010,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -25,7 +25,7 @@
 #include "rendering/object.h"
 
 #include "physics/object.h"
-#include "palloc.h"
+#include "common/palloc.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@
 struct sg_light_t {
   sg_scene_t *scene;
   sg_object_t *obj;
-  float3 pos; // Global pos, relative to object position
+  double3 pos; // Global pos, relative to object position
 
   int lightId;
 
@@ -72,14 +72,12 @@ sg_light_set_pos3f(sg_light_t *light, float x, float y, float z)
 }
 
 void
-sg_light_set_posv(sg_light_t *light, float3 v)
+sg_light_set_posv(sg_light_t *light, double3 v)
 {
-  light->pos[0] = vf3_x(v);
-  light->pos[1] = vf3_y(v);
-  light->pos[2] = vf3_z(v);
+  light->pos = v;
 }
 
-float3
+double3
 sg_light_get_pos(const sg_light_t *light)
 {
   // Compute actual light pos, relative to camera
@@ -88,10 +86,10 @@ sg_light_get_pos(const sg_light_t *light)
     sg_object_get_lwc(light->obj, &light_pos);
     sg_camera_t *cam = sg_scene_get_cam(light->scene);
     lwcoord_t cam_pos = sg_camera_pos(cam);
-    float3 dist = lwc_dist(&light_pos, &cam_pos);
+    double3 dist = lwc_dist(&light_pos, &cam_pos);
 
-    const float4x4 *mv = sg_camera_modelview(cam);
-    float4 pos = mf4_v_mul(*mv, vf4_setv(dist,1.0));
+    const double4x4 *mv = sg_camera_modelview(cam);
+    double4 pos = md4_v_mul(*mv, vd4_setv(dist,1.0));
     return pos.xyz;
   }
   return light->pos.xyz;
@@ -185,7 +183,7 @@ sg_light_set_attenuation(sg_light_t *light, float const_att, float lin_att,
 
 
 sg_light_t*
-sg_new_light3f(sg_scene_t *sc, float x, float y, float z)
+sg_new_light3d(sg_scene_t *sc, double x, double y, double z)
 {
   sg_light_t *light = smalloc(sizeof(sg_light_t));
   light->scene = sc;
@@ -220,9 +218,9 @@ sg_new_light3f(sg_scene_t *sc, float x, float y, float z)
 }
 
 sg_light_t*
-sg_new_light(sg_scene_t *sc, float3 p)
+sg_new_light(sg_scene_t *sc, double3 p)
 {
-  return sg_new_light3f(sc, vf3_x(p), vf3_y(p), vf3_z(p));
+  return sg_new_light3d(sc, p.x, p.y, p.z);
 }
 
 float
@@ -243,5 +241,3 @@ sg_light_get_quadratic_attenuation(const sg_light_t *light)
 {
   return light->quadraticAttenuation;
 }
-
-

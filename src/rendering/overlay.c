@@ -1,5 +1,5 @@
 /*
- Copyright 2012 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2012,2013 Mattias Holm <lorrden(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -30,8 +30,8 @@
 #include "rendering/types.h"
 #include "rendering/shader-manager.h"
 #include "rendering/scenegraph.h"
-#include "log.h"
-#include "palloc.h"
+#include <openorbit/log.h>
+#include "common/palloc.h"
 
 struct sg_overlay_t {
   bool enabled;
@@ -170,4 +170,3 @@ sg_overlay_get_object(const sg_overlay_t *overlay)
 {
   return overlay->obj;
 }
-
