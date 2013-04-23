@@ -508,13 +508,15 @@ sg_shader_bind(sg_shader_t *program)
 }
 
 void
-sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj)
+sg_shader_set_projection(sg_shader_t *shader, const double4x4 proj)
 {
   assert(shader != NULL);
   SG_CHECK_ERROR;
+  float4x4 pf;
+  md4_to_mf4(proj, pf);
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.projectionId, 1, GL_TRUE,
-                     (GLfloat*)proj);
+                     (GLfloat*)pf);
   SG_CHECK_ERROR;
 
   //for (int i = 0; i < 4; i++) {
@@ -524,14 +526,17 @@ sg_shader_set_projection(sg_shader_t *shader, const float4x4 proj)
 }
 
 void
-sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
+sg_shader_set_model_view(sg_shader_t *shader, const double4x4 modelview)
 {
   assert(shader != NULL);
   SG_CHECK_ERROR;
 
+  float4x4 mvf;
+  md4_to_mf4(modelview, mvf);
+
   sg_shader_bind(shader);
   glUniformMatrix4fv(shader->uniforms.modelViewId, 1, GL_TRUE,
-                     (GLfloat*)modelview);
+                     (GLfloat*)mvf);
   SG_CHECK_ERROR;
 
   //for (int i = 0; i < 4; i++) {
@@ -541,10 +546,11 @@ sg_shader_set_model_view(sg_shader_t *shader, const float4x4 modelview)
 }
 
 void
-sg_shader_set_normal_matrix(sg_shader_t *shader, const float4x4 norm)
+sg_shader_set_normal_matrix(sg_shader_t *shader, const double4x4 norm)
 {
   assert(shader != NULL);
   SG_CHECK_ERROR;
+
   sg_shader_bind(shader);
   if (shader->uniforms.normalMatrixId >= 0) {
     float nmat[9];
@@ -634,7 +640,7 @@ sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
   SG_CHECK_ERROR;
   sg_shader_bind(shader);
 
-  float3 pos = sg_light_get_pos(light);
+  double3 pos = sg_light_get_pos(light);
 
   //log_info("light pos %f %f %f", pos.x, pos.y, pos.z);
 
@@ -642,8 +648,9 @@ sg_shader_bind_light(sg_shader_t *shader, unsigned light_num,
   float4 diffuse = sg_light_get_diffuse(light);
   float4 specular = sg_light_get_specular(light);
 
+  float3 posf = vd3_to_vf3(pos);
   glUniform3fv(shader->uniforms.lightIds[light_num].pos, 1,
-               (float*)&pos);
+               (float*)&posf);
   glUniform4fv(shader->uniforms.lightIds[light_num].ambient, 1,
                (float*)&amb);
   glUniform4fv(shader->uniforms.lightIds[light_num].diffuse, 1,

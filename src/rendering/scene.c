@@ -190,12 +190,12 @@ sg_scene_distance_sort(sg_scene_t *sc)
             lwcoord_t pa = sg_object_get_p(*ap);
             lwcoord_t pb = sg_object_get_p(*bp);
 
-            float3 va = lwc_dist(&pa, &cam_pos);
-            float3 vb = lwc_dist(&pb, &cam_pos);
+            double3 va = lwc_dist(&pa, &cam_pos);
+            double3 vb = lwc_dist(&pb, &cam_pos);
 
             int res = 0;
-            if (vf3_abs_square(va) < vf3_abs_square(vb)) res = 1;
-            else if (vf3_abs_square(va) > vf3_abs_square(vb)) res = -1;
+            if (vd3_abs_square(va) < vd3_abs_square(vb)) res = 1;
+            else if (vd3_abs_square(va) > vd3_abs_square(vb)) res = -1;
 
             return res;
           });

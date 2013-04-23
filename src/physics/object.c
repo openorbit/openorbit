@@ -39,8 +39,8 @@
 void
 pl_object_compute_derived(pl_object_t *obj)
 {
-  q_mf3_convert(obj->R, obj->q); // Convert our quaternion to rotation matrix
-  mf3_basis(obj->I_inv_world, obj->m.I_inv, obj->R);
+  qd_md3_convert(obj->R, obj->q); // Convert our quaternion to rotation matrix
+  md3_basis(obj->I_inv_world, obj->m.I_inv, obj->R);
 }
 void
 pl_object_init(pl_object_t *obj)
@@ -56,15 +56,15 @@ pl_object_init(pl_object_t *obj)
   obj->name = NULL;
   obj->parent = NULL;
 
-  obj->f_ack = vf3_set(0.0, 0.0, 0.0);
-  obj->t_ack = vf3_set(0.0, 0.0, 0.0);
-  obj->g_ack = vf3_set(0.0, 0.0, 0.0);
+  obj->f_ack = vd3_set(0.0, 0.0, 0.0);
+  obj->t_ack = vd3_set(0.0, 0.0, 0.0);
+  obj->g_ack = vd3_set(0.0, 0.0, 0.0);
 
-  obj->v = vf3_set(0.0, 0.0, 0.0);
+  obj->v = vd3_set(0.0, 0.0, 0.0);
   pl_object_set_angular_vel3f(obj, 0.0f, 0.0f, 0.0f);
 
-  obj->q = q_rot(1.0, 0.0, 0.0, 0.0); // Rotation quaternion
-  obj->p_offset = vf3_set(0.0, 0.0, 0.0);
+  obj->q = qd_rot(1.0, 0.0, 0.0, 0.0); // Rotation quaternion
+  obj->p_offset = vd3_set(0.0, 0.0, 0.0);
 
   obj->airPressure = 0.0;
   obj->dragCoef = 0.0;
@@ -108,7 +108,7 @@ pl_new_sub_object3f(pl_world_t *world, pl_object_t *parent, const char * name,
   obj->world = parent->world;
   obj->parent = parent;
 
-  obj->p_offset = vf3_set(x, y, z);
+  obj->p_offset = vd3_set(x, y, z);
   obj_array_push(&world->rigid_bodies, obj);
   obj_array_push(&parent->children, obj);
   return obj;
@@ -180,7 +180,7 @@ pl_object_set_pos_ext3f(pl_object_t *obj,
   PL_CHECK_OBJ(obj);
 
   obj->p.seg = vl3_set(i, j, k);
-  obj->p.offs = vf3_set(x, y, z);
+  obj->p.offs = vd3_set(x, y, z);
   lwc_normalise(&obj->p);
 
   PL_CHECK_OBJ(obj);
@@ -246,9 +246,11 @@ pl_object_force3fv(pl_object_t *obj, float3 f)
 {
   while (obj->parent) obj = obj->parent;
 
+  double3 fd = vf3_to_vd3(f);
+
   PL_CHECK_OBJ(obj);
 
-  obj->f_ack += f;
+  obj->f_ack += fd;
 
   PL_CHECK_OBJ(obj);
 }
@@ -260,8 +262,8 @@ pl_object_force_relative3f(pl_object_t *obj, float fx, float fy, float fz)
   while (obj->parent) obj = obj->parent;
   PL_CHECK_OBJ(obj);
 
-  float3 f = vf3_set(fx, fy, fz);
-  float3 f_rot = mf3_v_mul(obj->R, f);
+  double3 f = vd3_set(fx, fy, fz);
+  double3 f_rot = md3_v_mul(obj->R, f);
   obj->f_ack += f_rot;
 }
 
@@ -271,7 +273,8 @@ pl_force_relative3fv(pl_object_t *obj, float3 f)
   while (obj->parent) obj = obj->parent;
   PL_CHECK_OBJ(obj);
 
-  float3 f_rot = mf3_v_mul(obj->R, f);
+  double3 fd = vf3_to_vd3(f);
+  double3 f_rot = md3_v_mul(obj->R, fd);
   obj->f_ack += f_rot;
 }
 
@@ -282,13 +285,13 @@ pl_object_force_relative_pos3f(pl_object_t *obj,
 {
   PL_CHECK_OBJ(obj);
 
-  float3 f = vf3_set(fx, fy, fz);
-  float3 p = vf3_set(px, py, pz);
+  double3 f = vd3_set(fx, fy, fz);
+  double3 p = vd3_set(px, py, pz);
 
   while (obj->parent) { p += obj->p_offset; obj = obj->parent; }
 
-  float3 f_rot = mf3_v_mul(obj->R, f);
-  float3 t_rot = vf3_cross(mf3_v_mul(obj->R, p - obj->m.cog), f_rot);
+  double3 f_rot = md3_v_mul(obj->R, f);
+  double3 t_rot = vd3_cross(md3_v_mul(obj->R, p - obj->m.cog), f_rot);
   obj->f_ack += f_rot;
   obj->t_ack += t_rot;
 }
@@ -296,26 +299,26 @@ pl_object_force_relative_pos3f(pl_object_t *obj,
 void
 pl_object_torque3f(pl_object_t *obj, float tx, float ty, float tz)
 {
-  obj->t_ack += vf3_set(tx, ty, tz);
+  obj->t_ack += vd3_set(tx, ty, tz);
 }
 
 void
 pl_object_torque3fv(pl_object_t *obj, float3 t)
 {
-  obj->t_ack += t;
+  obj->t_ack += vf3_to_vd3(t);
 }
 
 void
 pl_object_torque_relative3f(pl_object_t *obj, float tx, float ty, float tz,
                    float px, float py, float pz)
 {
-  obj->t_ack += mf3_v_mul(obj->R, vf3_set(tx, ty, tz));
+  obj->t_ack += md3_v_mul(obj->R, vd3_set(tx, ty, tz));
 }
 
 void
 pl_object_torque_relative3fv(pl_object_t *obj, float3 t, float3 p)
 {
-  obj->t_ack += mf3_v_mul(obj->R, t);
+  obj->t_ack += md3_v_mul(obj->R, vf3_to_vd3(t));
 }
 
 
@@ -323,11 +326,12 @@ pl_object_torque_relative3fv(pl_object_t *obj, float3 t, float3 p)
 void
 pl_object_force_relative_pos3fv(pl_object_t *obj, float3 f, float3 p)
 {
-  while (obj->parent) { p += obj->p_offset; obj = obj->parent; }
-  float3x3 Rt;
-  mf3_transpose2(Rt, obj->R);
-  float3 f_rot = mf3_v_mul(Rt, f);
-  float3 t_rot = vf3_cross(mf3_v_mul(Rt, p - obj->m.cog), f_rot);
+  double3 pos = vf3_to_vd3(p);
+  while (obj->parent) { pos += obj->p_offset; obj = obj->parent; }
+  double3x3 Rt;
+  md3_transpose2(Rt, obj->R);
+  double3 f_rot = md3_v_mul(Rt, vf3_to_vd3(f));
+  double3 t_rot = vd3_cross(md3_v_mul(Rt, pos - obj->m.cog), f_rot);
   obj->f_ack += f_rot;
   obj->t_ack += t_rot;
 }
@@ -336,7 +340,7 @@ void
 pl_object_set_gravity3f(pl_object_t *obj, float x, float y, float z)
 {
   while (obj->parent) obj = obj->parent;
-  obj->g_ack += vf3_set(x, y, z);
+  obj->g_ack += vd3_set(x, y, z);
 }
 
 
@@ -344,7 +348,7 @@ void
 pl_object_set_gravity3fv(pl_object_t *obj, float3 f)
 {
   while (obj->parent) obj = obj->parent;
-  obj->g_ack += f;
+  obj->g_ack += vf3_to_vd3(f);
 }
 
 
@@ -372,14 +376,14 @@ pl_object_step(pl_object_t *obj, float dt)
   obj->airDensity = pl_object_compute_airdensity(obj);
 #endif
   PL_CHECK_OBJ(obj);
-  float3 fm = ((obj->f_ack + obj->g_ack)/ obj->m.m);
+  double3 fm = ((obj->f_ack + obj->g_ack)/ obj->m.m);
 
   obj->v += fm * dt; // Update velocity from force
-  float3 dv = vf3_s_mul(obj->v, dt);
-  lwc_translate3fv(&obj->p, dv); // Update position from velocity
+  double3 dv = vd3_s_mul(obj->v, dt);
+  lwc_translate3dv(&obj->p, dv); // Update position from velocity
 
-  obj->angVel += mf3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
-  obj->q = q_normalise(q_vf3_rot(obj->q, obj->angVel, dt));    // Update quaternion with rotational velocity
+  obj->angVel += md3_v_mul(obj->I_inv_world, obj->t_ack) * dt; // Update angular velocity with torque
+  obj->q = qd_normalise(qd_vd3_rot(obj->q, obj->angVel, dt));    // Update quaternion with rotational velocity
 
   pl_object_compute_derived(obj); // Compute derived data (world inverted inertia tensor etc)
 
@@ -398,8 +402,8 @@ pl_object_step_child(pl_object_t *obj, float dt)
   obj->v = obj->parent->v; // Update velocity from force
   obj->p = obj->parent->p;
 
-  float3 p_offset_rot = mf3_v_mul(obj->parent->R, obj->p_offset);
-  lwc_translate3fv(&obj->p, p_offset_rot); // Update position from parent
+  double3 p_offset_rot = md3_v_mul(obj->parent->R, obj->p_offset);
+  lwc_translate3dv(&obj->p, p_offset_rot); // Update position from parent
   obj->angVel = obj->parent->angVel;
   obj->q = obj->parent->q;
 
@@ -415,8 +419,8 @@ pl_object_normalise(pl_object_t *obj)
   // to 64 bit positions
   assert(sizeof(obj->p.offs) == sizeof(float3));
 
-  obj->q = q_normalise(obj->q);
-  q_mf3_convert(obj->R, obj->q);
+  obj->q = qd_normalise(obj->q);
+  qd_md3_convert(obj->R, obj->q);
 
   lwc_normalise(&obj->p);
 }
@@ -428,26 +432,26 @@ pl_object_clear(pl_object_t *obj)
   obj->t = obj->t_ack;
   obj->f = obj->f_ack;
 
-  obj->f_ack = vf3_set(0.0f, 0.0f, 0.0f);
-  obj->t_ack = vf3_set(0.0f, 0.0f, 0.0f);
-  obj->g_ack = vf3_set(0.0f, 0.0f, 0.0f);
+  obj->f_ack = vd3_set(0.0f, 0.0f, 0.0f);
+  obj->t_ack = vd3_set(0.0f, 0.0f, 0.0f);
+  obj->g_ack = vd3_set(0.0f, 0.0f, 0.0f);
 }
 
 void
 pl_object_set_angular_vel3f(pl_object_t *obj, float rx, float ry, float rz)
 {
-  obj->angVel = vf3_set(rx, ry, rz);
+  obj->angVel = vd3_set(rx, ry, rz);
 }
 
 void
 pl_object_set_vel3f(pl_object_t *obj, float dx, float dy, float dz)
 {
-  obj->v = vf3_set(dx, dy, dz);
+  obj->v = vd3_set(dx, dy, dz);
 }
 void
 pl_object_set_vel3fv(pl_object_t *obj, float3 dp)
 {
-  obj->v = dp;
+  obj->v = vf3_to_vd3(dp);
 }
 
 void
@@ -469,16 +473,16 @@ pl_object_set_area(pl_object_t *obj, float area)
 // The quaternion should represent rotation around dec and ra of the main rot
 // vector and r should represent the rads per second that the rotation will be
 void
-plSetAngularVel4fq(pl_object_t *obj, quaternion_t q, float r)
+plSetAngularVel4fq(pl_object_t *obj, quatd_t q, float r)
 {
-  float3 v = vf3_set(1.0f, 0.0f, 0.0f);
-  quaternion_t qrx = q_rot(1.0f, 0.0f, 0.0f, r);
-  quaternion_t qr = q_mul(q, qrx);
+  double3 v = vd3_set(1, 0, 0);
+  quatd_t qrx = qd_rot(1, 0, 0, r);
+  quatd_t qr = qd_mul(q, qrx);
 
-  float3x3 m;
-  q_mf3_convert(m, qr);
+  double3x3 m;
+  qd_md3_convert(m, qr);
 
-  float3 ra = mf3_v_mul(m, v);
+  double3 ra = md3_v_mul(m, v);
 
   obj->angVel = ra;
 }
@@ -487,23 +491,23 @@ plSetAngularVel4fq(pl_object_t *obj, quaternion_t q, float r)
 void
 pl_object_set_angular_vel3fv(pl_object_t *obj, float3 r)
 {
-  obj->angVel = r;
+  obj->angVel = vf3_to_vd3(r);
 }
 
 
-float3
+double3
 pl_object_get_vel(pl_object_t *obj)
 {
   return obj->v;
 }
 
-float3
+double3
 pl_object_get_angular_vel(pl_object_t *obj)
 {
   return obj->angVel;
 }
 
-quaternion_t
+quatd_t
 pl_object_get_quat(pl_object_t *obj)
 {
   return obj->q;

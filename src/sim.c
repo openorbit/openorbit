@@ -142,7 +142,7 @@ sim_init(void)
   sim_stage_t *stage = ARRAY_ELEM(sc->stages, 1);
   sg_camera_track_object(cam, stage->sgobj);
   sg_camera_follow_object(cam, stage->sgobj);
-  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0, -150.0e9));
+  sg_camera_set_follow_offset(cam, vd3_set(0.0, 0.0, -150.0e9));
 
   simMfdInitAll(sim_get_main_viewport());
 
@@ -216,9 +216,10 @@ sim_step(float dt)
   sim_event_dispatch_pending();
 
   double jde = sim_time_get_jd();
+  time_t time = sim_time_get_time();
   pl_world_step(gSIM_state.world, jde, dt);
 
-  log_trace("sim step");
+  log_trace("sim step %.15f = %lld, delta %.15f", jde, time, dt);
 
   sg_scene_sync(sim_get_scene());
 }
@@ -266,9 +267,7 @@ menu_camera(void *arg)
   sg_camera_follow_object(cam, obj);
 
 
-  sg_camera_set_follow_offset(cam, vf3_set(0.0, 0.0,
-                                           radius * 3.0));
-
+  sg_camera_set_follow_offset(cam, vd3_set(0.0, 0.0, radius * 3.0));
 }
 
 void

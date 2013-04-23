@@ -64,7 +64,7 @@ pl_new_particle_system(const char *name, size_t particleCount)
 void
 pl_particles_set_emitter_direction3f(pl_particles_t *ps, float x, float y, float z)
 {
-  ps->v = vf3_set(x, y, z);
+  ps->v = vd3_set(x, y, z);
 }
 
 void
@@ -80,7 +80,7 @@ pl_particles_attach3f(pl_particles_t *ps, pl_object_t *obj, float x, float y, fl
   } else {
     obj_array_push(&obj->world->particle_systems, ps);
   }
-  ps->p = vf3_set(x, y, z);
+  ps->p = vd3_set(x, y, z);
 }
 
 
@@ -135,7 +135,7 @@ pl_particles_step(pl_particles_t *ps, float dt)
   size_t activeParticles = 0;
   for (size_t i = 0 ; i < ps->particleCount ; ++i) {
     if (ps->particles[i].active) {
-      ps->particles[i].p += vf3_s_mul(ps->particles[i].v, dt) + vf3_s_mul(ps->obj->v, dt);
+      ps->particles[i].p += vd3_s_mul(ps->particles[i].v, dt) + vd3_s_mul(ps->obj->v, dt);
       ps->particles[i].age += dt;
       activeParticles++;
 
@@ -173,8 +173,8 @@ pl_particles_step(pl_particles_t *ps, float dt)
       ps->particles[i].age = 0.0;
       // Adjust lifetime by +-20 %
       ps->particles[i].lifeTime = ps->lifeTime + ps->lifeTime * rand_percent(20);
-      ps->particles[i].p = v_q_rot(ps->p, ps->obj->q);
-      ps->particles[i].v = v_q_rot(ps->v * vf3_set(rand_percent(10), rand_percent(10), rand_percent(10)), ps->obj->q);
+      ps->particles[i].p = vd3_qd_rot(ps->p, ps->obj->q);
+      ps->particles[i].v = vd3_qd_rot(ps->v * vd3_set(rand_percent(10), rand_percent(10), rand_percent(10)), ps->obj->q);
       ps->particles[i].rgb = ps->rgb;
     } else {
       break;

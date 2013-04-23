@@ -85,7 +85,7 @@ struct sg_object_t {
       lwcoord_t p0; // Global position
       lwcoord_t p1; // Global position
       lwcoord_t p;  // Global position
-      float3 dp;
+      double3 dp;
     } object;
     struct {
       pl_celobject_t *celestial_body;
@@ -110,19 +110,19 @@ struct sg_object_t {
     } stat;
   };
 
-  float3 camera_pos; // Relative to camera
-  float3 parent_offset; // Offset from parent
+  double3 camera_pos; // Relative to camera
+  double3 parent_offset; // Offset from parent
 
-  float3 dr; // Angular velocity
+  double3 dr; // Angular velocity
 
-  quaternion_t q;  // Slerped quaternion
-  quaternion_t q0; // Quaternion from
-  quaternion_t q1; // Quaternion to
-  quaternion_t dq; // Quaternion rot per time
+  quatd_t q;  // Slerped quaternion
+  quatd_t q0; // Quaternion from
+  quatd_t q1; // Quaternion to
+  quatd_t dq; // Quaternion rot per time
 
-  float4x4 R;
-  float4x4 scale; // Typically not used
-  float4x4 modelViewMatrix;
+  double4x4 R;
+  double4x4 scale; // Typically not used
+  double4x4 modelViewMatrix;
 
   // Light sources associated with this object
   size_t lightCount;
@@ -144,7 +144,7 @@ sg_object_get_scene(sg_object_t *obj)
   return obj->scene;
 }
 
-float
+double
 sg_object_get_radius(sg_object_t *obj)
 {
   return obj->radius;
@@ -199,44 +199,44 @@ sg_object_add_child(sg_object_t *obj, sg_object_t *child)
 int
 sg_objects_compare_dist(sg_object_t const **o0, sg_object_t const **o1)
 {
-  bool gt = vf3_gt((*o0)->camera_pos, (*o1)->camera_pos);
+  bool gt = vd3_gt((*o0)->camera_pos, (*o1)->camera_pos);
 
   if (gt) return -1;
   else return 1;
 }
 
-const float4x4*
+const double4x4*
 sg_object_get_modelview(const sg_object_t *obj)
 {
   return &obj->modelViewMatrix;
 }
 
-float3
+double3
 sg_object_get_camrea_pos(sg_object_t *obj)
 {
   return obj->camera_pos;
 }
 
 void
-sg_object_set_camrea_pos(sg_object_t *obj, float3 cp)
+sg_object_set_camrea_pos(sg_object_t *obj, double3 cp)
 {
   obj->camera_pos = cp;
 }
 
 void
-sg_object_set_parent_offset(sg_object_t *obj, float3 po)
+sg_object_set_parent_offset(sg_object_t *obj, double3 po)
 {
   obj->parent_offset = po;
 }
 
-float3
+double3
 sg_object_get_parent_offset(sg_object_t *obj)
 {
   return obj->parent_offset;
 }
 
 
-float3
+double3
 sg_object_get_vel(sg_object_t *obj)
 {
   switch (obj->kind) {
@@ -244,10 +244,9 @@ sg_object_get_vel(sg_object_t *obj)
     assert(0 && "fixme");
     break;
   case SG_CELOBJECT_ROT:
-    return vf3_set(obj->celobject_rot.dp.x, obj->celobject_rot.dp.y,
-                   obj->celobject_rot.dp.z);
+    return obj->celobject_rot.dp;
   case SG_CELOBJECT:
-    return vf3_set(obj->celobject.dp.x, obj->celobject.dp.y, obj->celobject.dp.z);
+    return obj->celobject.dp;
   case SG_OBJECT_NO_ROT:
     return obj->object.dp;
   case SG_OBJECT:
@@ -340,33 +339,33 @@ sg_object_get_p(const sg_object_t *obj)
 
 
 
-quaternion_t
+quatd_t
 sg_object_get_quat(const sg_object_t *obj)
 {
   return obj->q;
 }
 
 void
-sg_object_set_rot(sg_object_t *obj, float3x3 rot)
+sg_object_set_rot(sg_object_t *obj, double3x3 rot)
 {
-  obj->q = mf3_q_convert(rot);
+  obj->q = md3_qd_convert(rot);
 }
 
 
 
 void
-sg_object_set_quat(sg_object_t *obj, quaternion_t q)
+sg_object_set_quat(sg_object_t *obj, quatd_t q)
 {
   obj->q = q;
 }
 
 
-quaternion_t
+quatd_t
 sg_object_get_q0(const sg_object_t *obj)
 {
   return obj->q0;
 }
-quaternion_t
+quatd_t
 sg_object_get_q1(const sg_object_t *obj)
 {
   return obj->q1;
@@ -449,7 +448,7 @@ sg_object_draw(sg_object_t *obj)
     SG_CHECK_ERROR;
 
     // TODO: Merge mvp
-    const float4x4 *pm = sg_camera_project(sg_scene_get_cam(obj->scene));
+    const double4x4 *pm = sg_camera_project(sg_scene_get_cam(obj->scene));
     sg_shader_set_projection(obj->shader, &(*pm)[0]);
     SG_CHECK_ERROR;
 
@@ -511,20 +510,20 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
     lwcoord_t pos = sg_camera_pos(cam);
     obj->camera_pos = lwc_dist(&obj->object.p, &pos);
 
-    q_mf4_convert(obj->R, obj->q);
+    qd_md4_convert(obj->R, obj->q);
     if (obj->parent) {
       assert(0 && "should not happen");
-      mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+      md4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
     } else {
-      mf4_cpy(obj->modelViewMatrix,
+      md4_cpy(obj->modelViewMatrix,
               *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
     }
 
-    float4x4 translate;
-    mf4_make_translate(translate, obj->camera_pos);
-    mf4_mul2(obj->modelViewMatrix, obj->scale);
-    mf4_mul2(obj->modelViewMatrix, translate);
-    mf4_mul2(obj->modelViewMatrix, obj->R);
+    double4x4 translate;
+    md4_make_translate(translate, obj->camera_pos);
+    md4_mul2(obj->modelViewMatrix, obj->scale);
+    md4_mul2(obj->modelViewMatrix, translate);
+    md4_mul2(obj->modelViewMatrix, obj->R);
   }
     break;
   case SG_OBJECT_NO_ROT: {
@@ -533,12 +532,12 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
     lwcoord_t pos = sg_camera_pos(cam);
     obj->camera_pos = lwc_dist(&obj->object.p, &pos);
 
-    mf4_cpy(obj->modelViewMatrix,
+    md4_cpy(obj->modelViewMatrix,
             *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
-    float4x4 translate;
-    mf4_make_translate(translate, obj->camera_pos);
-    mf4_mul2(obj->modelViewMatrix, obj->scale);
-    mf4_mul2(obj->modelViewMatrix, translate);
+    double4x4 translate;
+    md4_make_translate(translate, obj->camera_pos);
+    md4_mul2(obj->modelViewMatrix, obj->scale);
+    md4_mul2(obj->modelViewMatrix, translate);
   }
     break;
   case SG_CELOBJECT:
@@ -547,17 +546,17 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
       lwcoord_t pos = sg_camera_pos(cam);
 
       double3 tmp = obj->celobject.p - lwc_globald(&pos);
-      obj->camera_pos = vf3_set(tmp.x, tmp.y, tmp.z);
-      q_mf4_convert(obj->R, obj->q);
+      obj->camera_pos = vd3_set(tmp.x, tmp.y, tmp.z);
+      qd_md4_convert(obj->R, obj->q);
 
-      mf4_cpy(obj->modelViewMatrix,
+      md4_cpy(obj->modelViewMatrix,
               *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
 
-      float4x4 translate;
-      mf4_make_translate(translate, obj->camera_pos);
-      mf4_mul2(obj->modelViewMatrix, obj->scale);
-      mf4_mul2(obj->modelViewMatrix, translate);
-      mf4_mul2(obj->modelViewMatrix, obj->R);
+      double4x4 translate;
+      md4_make_translate(translate, obj->camera_pos);
+      md4_mul2(obj->modelViewMatrix, obj->scale);
+      md4_mul2(obj->modelViewMatrix, translate);
+      md4_mul2(obj->modelViewMatrix, obj->R);
     }
     break;
   case SG_CELOBJECT_ROT:
@@ -566,36 +565,36 @@ sg_object_recompute_modelviewmatrix(sg_object_t *obj)
       lwcoord_t pos = sg_camera_pos(cam);
 
       double3 tmp = obj->celobject_rot.p - lwc_globald(&pos);
-      obj->camera_pos = vf3_set(tmp.x, tmp.y, tmp.z);
-      q_mf4_convert(obj->R, obj->q);
+      obj->camera_pos = vd3_set(tmp.x, tmp.y, tmp.z);
+      qd_md4_convert(obj->R, obj->q);
 
-      mf4_cpy(obj->modelViewMatrix,
+      md4_cpy(obj->modelViewMatrix,
                 *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
 
-      float4x4 translate;
-      mf4_make_translate(translate, obj->camera_pos);
-      mf4_mul2(obj->modelViewMatrix, obj->scale);
-      mf4_mul2(obj->modelViewMatrix, translate);
-      mf4_mul2(obj->modelViewMatrix, obj->R);
+      double4x4 translate;
+      md4_make_translate(translate, obj->camera_pos);
+      md4_mul2(obj->modelViewMatrix, obj->scale);
+      md4_mul2(obj->modelViewMatrix, translate);
+      md4_mul2(obj->modelViewMatrix, obj->R);
     }
     break;
   case SG_STATIC: {
-    float4x4 translate;
+    double4x4 translate;
 
     if (obj->parent) {
-      mf4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
-      mf4_make_translate(translate, obj->parent_offset);
+      md4_cpy(obj->modelViewMatrix, obj->parent->modelViewMatrix);
+      md4_make_translate(translate, obj->parent_offset);
     } else {
-      mf4_cpy(obj->modelViewMatrix,
+      md4_cpy(obj->modelViewMatrix,
               *sg_camera_modelview(sg_scene_get_cam(obj->scene)));
       lwcoord_t cpos = sg_camera_pos(sg_scene_get_cam(obj->scene));
 
-      mf4_make_translate(translate, lwc_dist(&obj->stat.p, &cpos));
+      md4_make_translate(translate, lwc_dist(&obj->stat.p, &cpos));
     }
 
-    mf4_mul2(obj->modelViewMatrix, obj->scale);
-    mf4_mul2(obj->modelViewMatrix, translate);
-    mf4_mul2(obj->modelViewMatrix, obj->R);
+    md4_mul2(obj->modelViewMatrix, obj->scale);
+    md4_mul2(obj->modelViewMatrix, translate);
+    md4_mul2(obj->modelViewMatrix, obj->R);
   }
     break;
   default:
@@ -810,30 +809,30 @@ sg_object_sync(sg_object_t *obj, float t)
     // Synchronise rotational velocity and quaternions
     obj->dr = pl_object_get_angular_vel(obj->object.rigid_body);
     obj->q0 = pl_object_get_quat(obj->object.rigid_body);
-    obj->q1 = q_vf3_rot(obj->q0, obj->dr, t);
-    obj->q = q_slerp(obj->q0, obj->q1, 0.0);
+    obj->q1 = qd_vd3_rot(obj->q0, obj->dr, t);
+    obj->q = qd_slerp(obj->q0, obj->q1, 0.0);
 
     // Synchronise world coordinates
     obj->object.dp = pl_object_get_vel(obj->object.rigid_body);
     obj->object.p0 = pl_object_get_lwc(obj->object.rigid_body);
     obj->object.p1 = obj->object.p0;
 
-    lwc_translate3fv(&obj->object.p1, vf3_s_mul(obj->object.dp, t));
+    lwc_translate3dv(&obj->object.p1, vd3_s_mul(obj->object.dp, t));
     obj->object.p = obj->object.p0;
 
     obj->radius = obj->object.rigid_body->radius;
     break;
   case SG_OBJECT_NO_ROT:
-    obj->q0 = Q_IDENT;
-    obj->q1 = Q_IDENT;
-    obj->q = Q_IDENT;
+    obj->q0 = QD_IDENT;
+    obj->q1 = QD_IDENT;
+    obj->q = QD_IDENT;
 
     // Synchronise world coordinates
     obj->object.dp = pl_object_get_vel(obj->object.rigid_body);
     obj->object.p0 = pl_object_get_lwc(obj->object.rigid_body);
     obj->object.p1 = obj->object.p0;
 
-    lwc_translate3fv(&obj->object.p1, vf3_s_mul(obj->object.dp, t));
+    lwc_translate3dv(&obj->object.p1, vd3_s_mul(obj->object.dp, t));
     obj->object.p = obj->object.p0;
 
     obj->radius = obj->object.rigid_body->radius;
@@ -841,7 +840,7 @@ sg_object_sync(sg_object_t *obj, float t)
   case SG_CELOBJECT:
     obj->q0 = pl_celobject_get_body_quat(obj->celobject.celestial_body);
     obj->q1 = obj->q0;
-    obj->q = q_slerp(obj->q0, obj->q1, 0.0);
+    obj->q = qd_slerp(obj->q0, obj->q1, 0.0);
 
     obj->celobject.dp = obj->celobject.celestial_body->cm_orbit->v;
     obj->celobject.p0 = obj->celobject.celestial_body->cm_orbit->p;
@@ -880,12 +879,12 @@ sg_object_interpolate(sg_object_t *obj, float t)
   switch (obj->kind) {
   case SG_OBJECT:
   case SG_OBJECT_NO_ROT:
-    obj->q = q_slerp(obj->q0, obj->q1, t);
+    obj->q = qd_slerp(obj->q0, obj->q1, t);
     // Approximate distance between physics frames
-    float3 dist = lwc_dist(&obj->object.p1, &obj->object.p0);
-    dist = vf3_s_mul(dist, t);
+    double3 dist = lwc_dist(&obj->object.p1, &obj->object.p0);
+    dist = vd3_s_mul(dist, t);
     obj->object.p = obj->object.p0;
-    lwc_translate3fv(&obj->object.p, dist);
+    lwc_translate3dv(&obj->object.p, dist);
     break;
   case SG_CELOBJECT:
     obj->celobject.p = obj->celobject.p0
@@ -914,14 +913,14 @@ sg_new_object(sg_shader_t *shader, const char *name)
   obj->shader = shader;
   obj_array_init(&obj->subObjects);
 
-  obj->q = Q_IDENT;
-  obj->q0 = Q_IDENT;
-  obj->q1 = Q_IDENT;
-  obj->dq = Q_IDENT;
+  obj->q = QD_IDENT;
+  obj->q0 = QD_IDENT;
+  obj->q1 = QD_IDENT;
+  obj->dq = QD_IDENT;
 
-  mf4_ident(obj->R);
-  mf4_ident(obj->scale);
-  mf4_ident(obj->modelViewMatrix);
+  md4_ident(obj->R);
+  md4_ident(obj->scale);
+  md4_ident(obj->modelViewMatrix);
 
   obj->material = sg_new_material();
 
@@ -956,14 +955,14 @@ sg_new_object_with_geo(sg_shader_t *shader, const char *name,
   obj->shader = shader;
   obj_array_init(&obj->subObjects);
 
-  obj->q = Q_IDENT;
-  obj->q0 = Q_IDENT;
-  obj->q1 = Q_IDENT;
-  obj->dq = Q_IDENT;
+  obj->q = QD_IDENT;
+  obj->q0 = QD_IDENT;
+  obj->q1 = QD_IDENT;
+  obj->dq = QD_IDENT;
 
-  mf4_ident(obj->R);
-  mf4_ident(obj->scale);
-  mf4_ident(obj->modelViewMatrix);
+  md4_ident(obj->R);
+  md4_ident(obj->scale);
+  md4_ident(obj->modelViewMatrix);
 
   obj->geometry = sg_new_geometry(obj, gl_primitive,
                                   vertexCount, vertices, normals, texCoords,
@@ -1207,8 +1206,7 @@ sg_new_sphere(const char *name, sg_shader_t *shader, float radius,
 
 sg_object_t*
 sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
-               float ecc, float inc, float asc,
-               float argOfPeriapsis, int segments)
+               float ecc, int segments)
 {
   float_array_t verts;
   float_array_init(&verts);

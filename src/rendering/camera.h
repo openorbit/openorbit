@@ -30,9 +30,9 @@ extern "C" {
 
   sg_camera_t* sg_new_camera(sg_scene_t *scene);
   lwcoord_t sg_camera_pos(sg_camera_t *cam);
-  quaternion_t sg_camera_quat(sg_camera_t *cam);
-  const float4x4* sg_camera_project(sg_camera_t *cam);
-  const float4x4* sg_camera_modelview(sg_camera_t *cam);
+  quatd_t sg_camera_quat(sg_camera_t *cam);
+  const double4x4* sg_camera_project(sg_camera_t *cam);
+  const double4x4* sg_camera_modelview(sg_camera_t *cam);
 
   void sg_camera_track_object(sg_camera_t *cam, sg_object_t *obj);
   void sg_camera_follow_object(sg_camera_t *cam, sg_object_t *obj);
@@ -40,7 +40,7 @@ extern "C" {
   sg_object_t* sg_camera_get_tracked_object(sg_camera_t *cam);
 
   void sg_camera_update_modelview(sg_camera_t *cam);
-  void sg_camera_set_follow_offset(sg_camera_t *cam, float3 offs);
+  void sg_camera_set_follow_offset(sg_camera_t *cam, double3 offs);
 
   // Interpolate camera position and rotation based on WCT
   void sg_camera_interpolate(sg_camera_t *cam, float t);

@@ -205,15 +205,15 @@ void sim_stage_set_offset3fv(sim_stage_t *stage, float3 p);
 
 void sim_get_axises(sim_axises_t *axises);
 
-float3 sim_stage_get_gravity(sim_stage_t *stage);
+double3 sim_stage_get_gravity(sim_stage_t *stage);
 //float3 simGetAirspeedVector(sim_stage_t *stage);
 
-float3 sim_spacecraft_get_gravity(sim_spacecraft_t *sc);
-float3 sim_spacecraft_get_velocity(sim_spacecraft_t *sc);
-float3 sim_spacecraft_get_airspeed(sim_spacecraft_t *sc);
-float3 sim_spacecraft_get_force(sim_spacecraft_t *sc);
-quaternion_t sim_spacecraft_get_quaternion(sim_spacecraft_t *sc);
-const float3x3* sim_spacecraft_get_rotmat(sim_spacecraft_t *sc);
+double3 sim_spacecraft_get_gravity(sim_spacecraft_t *sc);
+double3 sim_spacecraft_get_velocity(sim_spacecraft_t *sc);
+double3 sim_spacecraft_get_airspeed(sim_spacecraft_t *sc);
+double3 sim_spacecraft_get_force(sim_spacecraft_t *sc);
+quatd_t sim_spacecraft_get_quaternion(sim_spacecraft_t *sc);
+const double3x3* sim_spacecraft_get_rotmat(sim_spacecraft_t *sc);
 float sim_spacecraft_get_altitude(sim_spacecraft_t *sc);
 
 // Returns the position vector that is relative to the dominating

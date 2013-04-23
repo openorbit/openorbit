@@ -246,17 +246,17 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
   // Transfer rotation matrix, but ensure it is transposed for GL
   // Note, no longer applicable for GL 3, we simply flag matrix uniforms as
   // needing transposition.
-  float3x3 rot;
-  mf3_ident(rot);
+  double3x3 rot;
+  md3_ident(rot);
 
   // Does not transpose anymore
   for (int i = 0 ; i < 3 ; ++ i) {
-    rot[i] = vf3_set(obj->rot[i][0], obj->rot[i][1], obj->rot[i][2]);
+    rot[i] = vd3_set(obj->rot[i][0], obj->rot[i][1], obj->rot[i][2]);
   }
 
   sg_object_set_rot(model, rot);
   sg_object_set_parent_offset(model,
-                              vf3_set(obj->pos[0], obj->pos[1], obj->pos[2]));
+                              vd3_set(obj->pos[0], obj->pos[1], obj->pos[2]));
 
   // BUG: assume this object has the same material for all faces, this is not
   //      correct, and we should ensure that a face with its own material

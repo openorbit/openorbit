@@ -477,7 +477,7 @@ ooLoadStar__(HRMLobject *obj, sg_scene_t *sc)
                                         mat);
 
   sg_scene_add_object(sc, drawable); // TODO: scale to radius
-  sg_light_t *starLightSource = sg_new_light3f(sc, 0.0f, 0.0f, 0.0f);
+  sg_light_t *starLightSource = sg_new_light3d(sc, 0.0, 0.0, 0.0);
   sg_object_add_light(drawable, starLightSource);
 
   // Create the new world for physics simulation. The size parameter is used

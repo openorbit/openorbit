@@ -68,18 +68,18 @@ void pl_collcontext_insert_object(pl_collisioncontext_t *ctxt, pl_recgrid_t *gri
 static int
 getoctant(const lwcoord_t *coord, const pl_object_t *obj)
 {
-  float3 dist = lwc_dist(&obj->p, coord);
-  int oct = vf3_octant(vf3_set(0, 0, 0), dist);
+  double3 dist = lwc_dist(&obj->p, coord);
+  int oct = vd3_octant(vd3_set(0, 0, 0), dist);
   return oct;
 }
 static bool
 fits(const pl_recgrid_t *grid, const pl_object_t *obj)
 {
-  float3 dist = lwc_dist(&obj->p, &grid->centre);
+  double3 dist = lwc_dist(&obj->p, &grid->centre);
 
-  if (fabsf(dist.x) + obj->radius > grid->size
-      || fabsf(dist.y) + obj->radius > grid->size
-      || fabsf(dist.z) + obj->radius > grid->size) {
+  if (fabs(dist.x) + obj->radius > grid->size
+      || fabs(dist.y) + obj->radius > grid->size
+      || fabs(dist.z) + obj->radius > grid->size) {
     return false;
   }
   return true;
@@ -173,9 +173,9 @@ bool
 pl_collide_coarse(pl_collisioncontext_t *coll,
                   pl_object_t * restrict obj_a, pl_object_t * restrict obj_b)
 {
-  float3 dist = lwc_dist(&obj_a->p, &obj_b->p);
+  double3 dist = lwc_dist(&obj_a->p, &obj_b->p);
 
-  if (vf3_abs(dist) > (obj_a->radius + obj_b->radius)) {
+  if (vd3_abs(dist) > (obj_a->radius + obj_b->radius)) {
     return false;
   }
   log_warn("collision test succeeded %s : %s", obj_a->name, obj_b->name);
@@ -263,9 +263,9 @@ pl_collide_step(pl_collisioncontext_t *coll)
     pl_object_t *a = coll->colls.elems[i];
     pl_object_t *b = coll->colls.elems[i+1];
 
-    float3 av = (a->m.m - b->m.m) / (a->m.m + b->m.m) * a->v +
+    double3 av = (a->m.m - b->m.m) / (a->m.m + b->m.m) * a->v +
                 (2.0f*b->m.m) / (a->m.m + b->m.m) * b->v;
-    float3 bv = (b->m.m - a->m.m) / (a->m.m + b->m.m) * b->v +
+    double3 bv = (b->m.m - a->m.m) / (a->m.m + b->m.m) * b->v +
                 (2.0f*a->m.m) / (a->m.m + b->m.m) * a->v;
 
 
