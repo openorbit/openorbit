@@ -362,7 +362,7 @@ hidConnected(void *ctxt, IOReturn result, void *sender, IOHIDDeviceRef dev)
   int deviceID = io_register_device(vendorID, vendorStr,
                                     productID, productStr,
                                     buttonCount, hatCount);
-  CFDictionarySetValue(_deviceToIDDict, dev, (void*)deviceID);
+  CFDictionarySetValue(_deviceToIDDict, dev, (void*)(uintptr_t)deviceID);
 
   if (IOHIDDeviceConformsTo(dev, kHIDPage_Simulation,
                             kHIDUsage_Sim_SpaceshipSimulationDevice)) {
