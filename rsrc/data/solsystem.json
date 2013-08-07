@@ -1,0 +1,253 @@
+[
+ {
+  "name": "Sol",
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/sol.tga",
+    "shader": "star"
+  }
+ },
+ {
+  "name": "Mercury",
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/mercury.tga",
+    "shader": "planet",
+  }
+ },
+ {
+  "name": "Venus",
+  "atmosphere": {
+    "surface-pressure": [9200.0e3 "Pa"],
+    "temp": [737.0 K],
+    "molar-mass": [43.45e-3 "kg_mol"],
+    "adiabatic-lapse-rate": [10.468e-3 "K_m"],
+    "wind": [0.3, 1.0, "m/s"],
+    "scale-height": [15.9e3 m],
+    "g0": 8.8989,
+    "h_b": [0.0],
+    "P_b": [9200.0e3],
+    "p_b": [66.61900],
+    "L_b": [0.0],
+    "T_b": [731.0],
+  },
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/default/venus.jpg",
+    "shader": "planet",
+  }
+ },
+ {
+  "name": "Earth",
+  "atmosphere": {
+    "surface-pressure": [101.4e3 Pa],
+    "temp": [288.0 K],
+    "molar-mass": [28.97e-3 kg_mol],
+    "adiabatic-lapse-rate": [9.760e-3 K_m],
+    "wind": [0, 100 m/s],
+    "scale-height": [8.5e3 m],
+    "g0": 9.7986,
+    "h_b": [     0.0, 11000.0, 20000.0, 32000.0, 47000.0, 51000.0,  71000.0],
+    "P_b": [111325.0, 22632.1, 5474.89, 868.019, 110.906, 66.9389,  3.95642],
+    "p_b": [  1.2250, 0.36391, 0.08803, 0.01322, 0.00143, 0.00086, 0.000086],
+    "L_b": [ -0.0065,     0.0,   0.001,  0.0028,     0.0, -0.0028,   -0.002],
+    "T_b": [  288.15,  216.65,  216.65,  228.65,  270.65,  270.65,   214.65],
+  },
+  "rendering": {
+    "model": "cube-sphere",
+    "texture": "textures/default/earth.jpg",
+    "night-texture": "textures/default/earth-night.jpg",
+    "specular-map": "textures/default/earth-spec.jpg",
+    "bump-map": "textures/planetpixelemporium/earthbump1k.jpg",
+    "shader": "planet",
+
+    "texture-cube": ["textures/default/earth-px.jpg",
+                     "textures/default/earth-py.jpg",
+                     "textures/default/earth-nx.jpg",
+                     "textures/default/earth-ny.jpg",
+                     "textures/default/earth-pz.jpg",
+                     "textures/default/earth-nz.jpg"];
+    "night-cube": ["textures/default/earth-night-px.jpg",
+                   "textures/default/earth-night-py.jpg",
+                   "textures/default/earth-night-nx.jpg",
+                   "textures/default/earth-night-ny.jpg",
+                   "textures/default/earth-night-pz.jpg",
+                   "textures/default/earth-night-nz.jpg"];
+    "specular-cube": ["textures/default/earth-spec-px.jpg",
+                      "textures/default/earth-spec-py.jpg",
+                      "textures/default/earth-spec-nx.jpg",
+                      "textures/default/earth-spec-ny.jpg",
+                      "textures/default/earth-spec-pz.jpg",
+                      "textures/default/earth-spec-nz.jpg"];
+    "material": {
+      "emission": [0.0, 0.0, 0.0, 0.0],
+      "ambient": [1.0, 1.0, 1.0, 1.0],
+      "diffuse": [1.0, 1.0, 1.0, 1.0],
+      "specular": [0.5, 0.5, 0.55, 1.0],
+      "shininess": 10.0,
+    }
+  }
+ },
+ {
+  "kind": "moon",
+  "name": "Luna",
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/default/moon.jpg",
+    "bump-map": "textures/default/moon-bump.jpg",
+    "shader": "planet",
+  }
+ },
+ {
+  "kind": "planet",
+  "name": "Mars",
+  "atmosphere": {
+    "surface-pressure": [600.0 Pa],
+    "temp": [210.0 K],
+    "molar-mass": [43.34e-3 kg_mol],
+    "adiabatic-lapse-rate": [4.500e-3 K_m],
+    "scale-height": [11.1e3 m],
+    "g0": 3.7410,
+    "h_b": [0.0],
+    "P_b": [700.0],
+    "p_b": [0.017314],
+    "L_b": [0.0],
+    "T_b": [214.0],
+  },
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/default/mars.jpg",
+    "shader": "planet",
+  }
+ },
+ {
+  "kind": "planet",
+  "name": "Jupiter",
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/default/jupiter.jpg",
+    "shader": "planet",
+  },
+  "atmosphere": {
+    "adiabatic-lapse-rate": [1.963e-3 K_m],
+    "surface-pressure": [1000.0 Pa],
+    "scale-height": [27.0e3 m],
+    "molar-mass": [2.22e-3 kg_mol],
+    "g0": 24.2561,
+    "h_b": [0.0],
+    "P_b": [100.0e3],
+    "p_b": [0.16182],
+    "L_b": [0.0],
+    "T_b": [165.0],
+  }
+ },
+ {
+  "kind": "moon",
+  "name": "Io",
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/default/io.jpg",
+    "albedo": 0.62,
+    "shader": "planet",
+  }
+ },
+ {
+  "kind": "moon",
+  "name": "Europa",
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/default/europa.jpg",
+    "shader": "planet",
+    "albedo": 0.68,
+  }
+ },
+ {
+  "kind": "moon",
+  "name": "Ganymede",
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/default/ganymede.jpg",
+    "shader": "planet",
+    "albedo": 0.44,
+  }
+ },
+ {
+  "kind": "moon",
+  "name": "Callisto",
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/Callisto.png",
+    "shader": "planet",
+    "albedo": 0.19,
+  }
+ },
+ {
+  "kind": "planet",
+  "name": "Saturn",
+  "atmosphere": {
+    "adiabatic-lapse-rate": [0.714e-3 K_m],
+    "surface-pressure": [1000.0 Pa],
+    "scale-height": [59.5e3 m],
+    "molar-mass": [2.07e-3 kg_mol],
+    "g0": 10.0009,
+    "h_b": [0.0],
+    "P_b": [100.0e3],
+    "p_b": [0.19172],
+    "L_b": [0.0], // Unknown lapse rate
+    "T_b": [134.0],
+  },
+  "rendering": {
+    "model": "sphere",
+    "texture": "textures/default/saturn.jpg",
+    "shader": "planet",
+    "albedo": 0.342 bond, 0.47 geom
+  }
+ },
+ {
+  "kind": "moon",
+  "name": "Titan",
+  "adiabatic-lapse-rate": [1.301e-3 K/m],
+ },
+ {
+  "kind": "planet",
+  "name": "Uranus",
+  "atmosphere": {
+    "adiabatic-lapse-rate": [0.676e-3 K_m],
+    "surface-pressure": [1000.0 Pa],
+    "scale-height": [27.7e3 m],
+    "molar-mass": [2.64e-3 kg_mol],
+    "g0": 8.8007,
+    "h_b": [0.0],
+    "P_b": [100.0e3],
+    "p_b": [0.36399],
+    "L_b": [0.0],
+    "T_b": [76.0],
+  },
+  "rendering": {
+    "model": "sphere",
+    "shader": "planet",
+    "texture": "textures/uranus.jpg",
+  }
+ },
+ {
+  "kind": "planet",
+  "name": "Neptune",
+  "atmosphere": {
+    "adiabatic-lapse-rate": [0.853e-3 K_m],
+    "surface-pressure": [1000.0 Pa],
+    "scale-height": [20.0e3 m],
+    "molar-mass": [2.53e-3 kg_mol],
+    "g0": 11.1046,
+    "h_b": [0.0],
+    "P_b": [100.0e3],
+    "p_b": [0.36399],
+    "L_b": [0.0],
+    "T_b": [76.0],
+  },
+  "rendering": {
+    "model": "sphere",
+    "shader": "planet",
+    "texture": "textures/default/neptune.jpg",
+  }
+ }
+]
