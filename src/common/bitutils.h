@@ -103,7 +103,7 @@ static inline uint64_t ooBigToHost64(uint64_t a) {return a;}
 #endif
 
 // Hackers Delight p48, round up to closest power of 2
-static uint32_t
+static inline uint32_t
 clp2_32(uint32_t x)
 {
   x = x - 1;

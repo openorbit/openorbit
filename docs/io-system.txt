@@ -1,0 +1,100 @@
+I/O SYSTEM
+==========
+
+The I/O system handles joysticks, gamepads, keyboards and mice.
+
+(Note mouse support is not in at the moment)
+
+There are a number of controls supported:
+  buttons (either up or down)
+  hat (directional digital button)
+  axises (-1 to +1 normalized values)
+  sliders (0 to +1 normalized values)
+
+Buttons are normal keys on a keyboard buttons on the joysticks and gamepads.
+Since it is likelly that the user cannot assign all axises to the joystick, the
+I/O system supports keyboard emulation of hats, axises and sliders.
+
+
+Buttons
+-------
+Buttons are connected to an action function and as soon as the button the action
+function will be invoked. The same function is also invoked when the button is
+released. On button down, the state parameter will be set to 1 and on up the
+state parameter will be set to 0.
+
+Hats
+----
+Hats are connected to an action function, depending on whether the hat-function
+is declared as multi value or a pure hat the state will be different. If it is
+multivalue, the state will be set to [0..n) when the hat is activated, where n
+is the number of hat states. If the hat is a "real" hat, the state parameter
+will be degrees from north.
+
+If the hat is released, the state parameter will be -1 in both cases.
+
+Emulating hats with the keyboard
+--------------------------------
+Hats can be emulated with the keyboard if necessary. The following is entered
+in the config file for this under control/keys/ in the config file:
+
+{
+  "kind": "hat",
+  "keys": ["up", "right", "down", "left"],
+  "action": "cam-rotate" 
+}
+
+Here we say that this describes a virtual hat switch by setting kind to "hat",
+the keys array list the key name that will be bound to the hat, and the action
+is the actual function to invoke when any of the buttons is pressed.
+
+The state parameter will be set to i*360/len(keys) where i is the place of the
+key in the keys array.
+
+Axises
+------
+Axises are controls that are typically analog and give values between -1.0 and
++1.0.
+
+Emulating axises with the keyboard
+----------------------------------
+Axis emulation is not perfect, the axis is either fully positive, fully negative
+or neutral.
+
+Sliders
+-------
+Sliders are essentially axises that are not self centered, as they are not self
+centered, their values are seen as only positive by openorbit.
+
+The range of values for sliders are [0.0, 1.0]
+
+Emulating sliders with the keyboard
+-----------------------------------
+Slider emulation will increment the slider in steps of 0.1 per press on the key.
+
+
+
+The I/O system principles and practice.
+
+int ioBindAxis(const char *axis);
+
+Returns an axis identifier for the given axis name
+
+float ioPollAxis(int axisId);
+Return [0.0, 1.0], the current value of the axis identifier. If the axis is a joystick axis, it
+will poll the joystick, otherwise it will return the cached axis value.
+
+Joystick axises are polled, button presses are dispatched, however, some buttons are intercepted as axis emulation presses.
+
+Main Event loop:
+  get event
+  when event is key:
+    is key emulating axis+, then set axis value to 1.0
+    is key emulating axis-, then set axis value to -1.0
+    is key down, dispatch to key down handler
+    is key up, dispatch to key up handler
+  when event is button:
+    is button emulating axis+, then set axis value to 1.0
+    is button emulating axis-, then set axis value to -1.0
+    is button down, dispatch to button down handler
+    is button up, dispatch to button up handler

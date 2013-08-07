@@ -1,0 +1,35 @@
+Math and Physics in Open Orbit
+==============================
+
+Open Orbit simulates the movement of solar system bodies and spacecraft within.
+It does not handle extra solar system objects at present.
+
+Coordinate Systems
+-----------------
+The primary global coordinate system is the ICRF system. This rougly matches
+the equatorial system of the J2000.0 epoch.
+
+In laymen terms, this means that:
+  The x-axis points at the vernal equinox as it was at the year 2000.
+  The y-axis is the right handed cross product of the x and z axises
+  The z-axis points upwards toward the earths north pole
+
+Since the core of the simulator is implemented using rigid body dynamics, all
+coordinates are rectangular internally. However, conversion functions exists
+in the celmek library.
+
+Spatial Partitioning
+--------------------
+
+Collisions
+----------
+
+Rigid Body Dynamics
+-------------------
+Force
+Torque
+Gravity
+Mass and the Moment of Inertia
+
+Atmospheric Simulation
+----------------------
