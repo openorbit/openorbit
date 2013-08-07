@@ -1214,7 +1214,7 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
   u8_array_t colours;
   u8_array_init(&colours);
 
-  float semiMinor = semiMajor * sqrt(1.0 - ecc*ecc);
+  double semiMinor = semiMajor * sqrt(1.0 - ecc*ecc);
   double focus = semiMajor * ecc;
 
   // Naive way, we probably actually want just a single circle and then reuse it
@@ -1223,14 +1223,14 @@ sg_new_ellipse(const char *name, sg_shader_t *shader, float semiMajor,
   for (size_t i = 0 ; i < segments ; i ++) {
     double angle = i * seg_angle;
 
-    float3 p;
+    double3 p;
     p.x = semiMajor * cos(angle) - focus; // Note, x is the vernal equinox,
                                           // which is also the point where an
                                           // orbital ellipse will have its
                                           // periapsis if the long asc and
                                           // arg peri would be 0
     p.y = semiMinor * sin(angle);
-    p.z = 0.0f;
+    p.z = 0.0;
 
     // Insert vec in array, note that center is in foci
     float_array_push(&verts, p.x);
