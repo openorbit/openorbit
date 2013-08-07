@@ -332,6 +332,12 @@ ac3d_obj_to_model(struct ac3d_file_t *ac3d, struct ac3d_object_t *obj,
 
     // Build up an index vector for on the fly triangulation of the polygon
     int triangles = 1 + (obj->surfs[i].refs - 3);
+
+    if (triangles <= 0) {
+      log_error("traingles must be positive");
+      break;
+    }
+
     int idx_seq_len = triangles * 3;
     int idxseq[idx_seq_len];
     for (int j = 0 ; j < triangles ; ++ j) {
