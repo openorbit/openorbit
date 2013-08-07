@@ -1,0 +1,6 @@
+[submodule "lib/celmek"]
+	path = lib/celmek
+	url = https://github.com/openorbit/celmek.git
+[submodule "lib/vmath"]
+	path = lib/vmath
+	url = https://github.com/openorbit/vmath.git
