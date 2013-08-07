@@ -406,19 +406,19 @@ MODULE_INIT(iomanager, NULL)
 //  gIoKeyData[SDL_SCANCODE_Q].down[IO_MOD_R_CMD].data = NULL;
 
   for (int i = 0 ; i < IO_AXIS_COUNT ; i++) {
-    hashtable_insert(gIoAxisNameMap, axisMap[i], (void*)i);
+    hashtable_insert(gIoAxisNameMap, axisMap[i], (void*)(uintptr_t)i);
   }
 
   for (int i = 0 ; i < IO_AXIS_COUNT ; i++) {
-    hashtable_insert(gIoPhysAxisNameMap, physAxisMap[i], (void*)i);
+    hashtable_insert(gIoPhysAxisNameMap, physAxisMap[i], (void*)(uintptr_t)i);
   }
 
   for (int i = 0 ; i < IO_SLIDER_COUNT ; i++) {
-    hashtable_insert(gIoVirtSliderNameMap, sliderMap[i], (void*)i);
+    hashtable_insert(gIoVirtSliderNameMap, sliderMap[i], (void*)(uintptr_t)i);
   }
 
   for (int i = 0 ; i < IO_SLIDER_COUNT ; i++) {
-    hashtable_insert(gIoPhysSliderNameMap, physSliderMap[i], (void*)i);
+    hashtable_insert(gIoPhysSliderNameMap, physSliderMap[i], (void*)(uintptr_t)i);
   }
 
   obj_array_init(&devices);
@@ -543,14 +543,14 @@ ioSetHatEmu(const char *action, int keycount, io_keycode_t keys[keycount])
 
       for (int i = 0 ; i < keycount ; i++) {
         io_set_key_handler2(keys[i], io_builtin_hat_emu_dispatch,
-                         keyHandler, (void*)(step_size*i));
+                         keyHandler, (void*)(uintptr_t)(step_size*i));
 
       }
     } else if (keyHandler->kind == IO_BUTTON_MULTI) {
       // Normal state should be [0..keycount)
       for (int i = 0 ; i < keycount ; i++) {
         io_set_key_handler2(keys[i], io_builtin_hat_emu_dispatch,
-                         keyHandler, (void*)i);
+                         keyHandler, (void*)(uintptr_t)i);
 
       }
     }
