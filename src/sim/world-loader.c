@@ -268,8 +268,7 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
   HRMLvalue planetName = hrmlGetAttrForName(obj, "name");
 
   pl_atm_template_t *atm = NULL;
-  double mass, radius = NAN, siderealPeriod, axialTilt = 0.0, gm = NAN;
-  double semiMajor = NAN, ecc, inc = NAN, longAscNode = NAN, longPerihel = NAN, meanLong;
+  double semiMajor = NAN, ecc = NAN;
   //double pressure = 0.0, scale_height = 1.0; //TODO
   const char *tex = NULL;
   const char *shader = NULL;
@@ -280,44 +279,15 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
   sg_material_t *mat = sg_new_material();
   sg_material_init(mat);
 
-  double flattening = 0.0;
+  const char *model = NULL;
 
   for (HRMLobject *child = obj->children; child != NULL ; child = child->next) {
-    if (!strcmp(child->name, "physical")) {
-      for (HRMLobject *phys = child->children; phys != NULL; phys = phys->next) {
-        if (!strcmp(phys->name, "mass")) {
-          mass = hrmlGetReal(phys);
-        } else if (!strcmp(phys->name, "radius")) {
-          radius = hrmlGetReal(phys);
-        } else if (!strcmp(phys->name, "sidereal-rotational-period")) {
-          siderealPeriod = hrmlGetReal(phys);
-        } else if (!strcmp(phys->name, "axial-tilt")) {
-          axialTilt = hrmlGetReal(phys);
-        } else if (!strcmp(phys->name, "gm")) {
-          gm = hrmlGetReal(phys);
-        } else if (!strcmp(phys->name, "flattening")) {
-          flattening = hrmlGetReal(phys);
-        }
-      }
-    } else if (!strcmp(child->name, "orbit")) {
+    if (!strcmp(child->name, "orbit")) {
       for (HRMLobject *orbit = child->children; orbit != NULL; orbit = orbit->next) {
         if (!strcmp(orbit->name, "semimajor-axis")) {
           semiMajor = hrmlGetReal(orbit);
         } else if (!strcmp(orbit->name, "eccentricity")) {
           ecc = hrmlGetReal(orbit);
-        } else if (!strcmp(orbit->name, "inclination")) {
-          inc = hrmlGetReal(orbit);
-        } else if (!strcmp(orbit->name, "longitude-ascending-node")) {
-          longAscNode = hrmlGetReal(orbit);
-        } else if (!strcmp(orbit->name, "longitude-periapsis")) {
-          longPerihel = hrmlGetReal(orbit);
-        } else if (!strcmp(orbit->name, "mean-longitude")) {
-          meanLong = hrmlGetReal(orbit);
-        } else if (!strcmp(orbit->name, "reference-date")) {
-
-        } else {
-          fprintf(stderr, "load, invalid orbit token: %s\n", orbit->name);
-          assert(0);
         }
       }
     } else if (!strcmp(child->name, "atmosphere")) {
@@ -325,7 +295,7 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
     } else if (!strcmp(child->name, "rendering")) {
       for (HRMLobject *rend = child->children; rend != NULL; rend = rend->next) {
         if (!strcmp(rend->name, "model")) {
-
+          model = hrmlGetStr(rend);
         } else if (!strcmp(rend->name, "texture")) {
           tex = hrmlGetStr(rend);
         } else if (!strcmp(rend->name, "night-texture")) {
@@ -345,42 +315,29 @@ ooLoadPlanet__(pl_world_t *world, HRMLobject *obj, sg_scene_t *sc)
     }
   }
 
-  if (isnan(gm)) {
-    gm = mass*PL_G;
-  }
-
-  // NOTE: At present, all planets must be specified with AUs as parameters
-  //double period = pl_orbital_period(pl_au_to_metres(semiMajor), world->rootSys->orbitalBody->GM+gm) / PL_SEC_PER_DAY;
   pl_celobject_t *celbody = pl_world_get_celobject(world, planetName.u.str);
   sg_object_t *drawable = sg_new_sphere(planetName.u.str,
-                                        sg_get_shader(shader), radius,
+                                        sg_get_shader(shader),
+                                        celbody->cm_orbit->radius,
                                         sg_load_texture(tex),
                                         sg_load_texture(nightTex),
                                         sg_load_texture(spec),
                                         mat);
 
   sg_scene_add_object(sc, drawable); // TODO: scale to radius
-  //pl_system_t *sys = pl_new_orbit(world, planetName.u.str,
-  //                           mass, gm,
-  //                           period, axialTilt, siderealPeriod,
-  //                           pl_au_to_metres(semiMajor),
-  //                           pl_au_to_metres(ooGeoComputeSemiMinor(semiMajor, ecc)),
-  //                           inc, longAscNode, longPerihel, meanLong, radius, flattening);
 
   char elname[strlen(planetName.u.str)+5];
   strcpy(elname, planetName.u.str);
   strcat(elname, ".orb");
   sg_object_t *ellipse = sg_new_ellipse(elname, sg_get_shader("flat"),
-                                        pl_au_to_metres(semiMajor), ecc,
-                                        DEG_TO_RAD(inc), DEG_TO_RAD(longAscNode),
-                                        DEG_TO_RAD(longPerihel), 500);
+                                        pl_au_to_metres(semiMajor), ecc, 500);
 
   char axname[strlen(planetName.u.str)+6];
   strcpy(axname, planetName.u.str);
   strcat(axname, ".axis");
 
   sg_object_t *axises = sg_new_axises_with_prime(axname, sg_get_shader("flat"),
-                                                 radius*2);
+                                                 celbody->cm_orbit->radius*2);
   sg_object_set_celestial_body(axises, celbody);
   sg_scene_add_object(sc, axises);
 
