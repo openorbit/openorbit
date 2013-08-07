@@ -497,3 +497,47 @@ sim_load_world(sg_scene_t *sc, const char *fileName)
   log_info("loaded solar system");
   return world;
 }
+
+void
+sim_load_object(json_t *obj)
+{
+
+}
+
+pl_world_t*
+sim_load_world_json(const char *fileName)
+{
+  char *file = rsrc_get_path(fileName);
+  json_error_t err;
+  json_t *json = json_load_file(file, 0, &err);
+
+  if (json == NULL) {
+    free(file);
+    return NULL;
+  }
+
+  // The json file was valid, we now must verify that the content is valid
+  if (json_is_object(json)) {
+    json_t *root = NULL;
+    if ((root = json_object_get(json, "openorbit"))) {
+      json_t *star = NULL;
+      if ((star = json_object_get(root, "star"))) {
+        json_t *name = json_object_get(star, "name");
+        json_t *phys = json_object_get(star, "physical");
+        json_t *rend = json_object_get(star, "rendering");
+        json_t *sattelites = json_object_get(star, "sattelites");
+        if (json_is_string(name) && json_is_object(phys) &&
+            json_is_object(rend) && json_is_array(sattelites)) {
+          size_t sat_count = json_array_size(sattelites);
+          for (size_t i = 0 ; i < sat_count ; i ++) {
+            json_t *sat = json_array_get(sattelites, i);
+            sim_load_object(sat);
+          }
+        }
+      }
+    }
+  }
+
+  free(file);
+  return NULL;
+}
