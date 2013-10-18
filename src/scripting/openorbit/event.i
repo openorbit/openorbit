@@ -2,7 +2,7 @@
 
 %{
   /* Code for wrapper */
-#include "simevent.h"
+#include "sim/simevent.h"
 
   struct pyevent {
     bool periodic;
@@ -97,7 +97,7 @@
 %}
 
 %typemap(in) PyObject * {
-	$1 = (PyObject *) $input;
+        $1 = (PyObject *) $input;
 }
 
 
