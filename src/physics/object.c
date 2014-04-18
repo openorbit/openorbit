@@ -356,7 +356,7 @@ void
 pl_object_dump(pl_object_t *obj)
 {
   fprintf(stderr, "obj: %p\n", (void*)obj);
-  fprintf(stderr, "\tmass: %f [%f, %f, %f]\n", obj->m.m, obj->m.I[0][0], obj->m.I[1][1], obj->m.I[2][2]);
+  fprintf(stderr, "\tmass: %f [%f, %f, %f]\n", obj->m.m, obj->m.In[0][0], obj->m.In[1][1], obj->m.In[2][2]);
   fprintf(stderr, "\tcog: [%f, %f, %f]\n", obj->m.cog.x, obj->m.cog.y, obj->m.cog.z);
   fprintf(stderr, "\tv: %f %f %f\n", obj->v.x, obj->v.y, obj->v.z);
   fprintf(stderr, "\tf_acc: %f %f %f\n", obj->f_ack.x, obj->f_ack.y, obj->f_ack.z);

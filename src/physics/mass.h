@@ -25,7 +25,7 @@
 struct pl_mass_t {
   double m; //!< Mass in kg
   double minMass; //!< Minimum mass
-  double3x3 I; //!< Moment of inertia
+  double3x3 In; //!< Moment of inertia
   double3x3 I_inv; //!< Inverse of moment of inertia
   double3 cog; //!< Center of gravity
 };
