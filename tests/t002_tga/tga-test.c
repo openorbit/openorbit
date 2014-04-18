@@ -22,22 +22,22 @@
 #include <assert.h>
 #include <check.h>
 
-#include "tga.h"
+#include "../../lib/imgload/tga.h"
 
 static char *rle_file_name = NULL;
 static char *uncomp_file_name = NULL;
 
 START_TEST(test_tga_uncomp)
 {
-    FILE *uncompFile = fopen(uncomp_file_name, "r"); 
-    
+    FILE *uncompFile = fopen(uncomp_file_name, "r");
+
     assert(uncompFile);
-    
+
     tga_image_t uncomp;
     int resUncomp = tga_read_file(&uncomp, uncompFile);
-    
+
     assert(resUncomp == 0);
-    
+
     fail_unless(uncomp.header.img_type == TGA_UNCOMP_TRUE_COL_IMG,
                 "Image does not appear to be a true colour image");
     fail_unless(uncomp.header.img_spec.width == (uint16_t)512,
@@ -46,12 +46,12 @@ START_TEST(test_tga_uncomp)
                 "Image does not have the correct height");
     fail_unless(uncomp.header.img_spec.depth == (uint8_t)24,
                 "Image does not have the correct depth");
-    
+
     uint8_t *dat = uncomp.data;
     uint16_t width = uncomp.header.img_spec.width;
     uint16_t height = uncomp.header.img_spec.height;
 
-   
+
     for (int i = 0 ; i < height ; i ++) {
         int j = 0;
 
@@ -59,11 +59,11 @@ START_TEST(test_tga_uncomp)
         fail_unless(dat[i*width*3 + 0] == (uint8_t)0xff,
                     "blue stuff(0): (%x!=0xff) i = %d, j = %d",
                     dat[i*width*3 + 0] , i, 0);
-            
+
         fail_unless(dat[i*width*3 + 1] == (uint8_t)0x00,
                     "blue stuff(1): (%x!=0x00) i = %d, j = %d",
                     dat[i*width*3 + 1] , i, 0);
-                        
+
         fail_unless(dat[i*width*3 + 2] == (uint8_t)0x00,
                     "blue stuff(2): (%x!=0x00) i = %d, j = %d",
                     dat[i*width*3 + 2] , i, 0);
@@ -88,24 +88,24 @@ START_TEST(test_tga_uncomp)
                         dat[i*width*3 + j*3 + 1] , i, j);
             fail_unless(dat[i*width*3 + j*3 + 2] == (uint8_t)0x99,
                         "brown stuff(2): (%x!=0x99) i = %d, j = %d",
-                        dat[i*width*3 + j*3 + 2] , i, j);            
+                        dat[i*width*3 + j*3 + 2] , i, j);
         }
-        
+
         /* Last pixel of line */
         fail_unless(dat[i*width*3 + 511*3 + 0] == (uint8_t)0x33,
-                    "brown stuff(0): (%x!=0x33) i = %d, j = %d", 
+                    "brown stuff(0): (%x!=0x33) i = %d, j = %d",
                     dat[i*width*3 + 511*3 + 0] , i, 511);
-        
+
         fail_unless(dat[i*width*3 + 511*3 + 1] == (uint8_t)0x66,
                     "brown stuff(1): (%x!=0x66) i = %d, j = %d",
                     dat[i*width*3 + 511*3 + 1] , i, 511);
-                    
+
         fail_unless(dat[i*width*3 + 511*3 + 2] == (uint8_t)0x99,
                     "brown stuff(2): (%x!=0x99) i = %d, j = %d",
-                    dat[i*width*3 + 511*3 + 2] , i, 511);            
-        
-    } 
-    
+                    dat[i*width*3 + 511*3 + 2] , i, 511);
+
+    }
+
     fclose(uncompFile);
     free(uncomp.data);
 }
@@ -115,12 +115,12 @@ START_TEST(test_tga_rle)
 {
     FILE *rleFile = fopen(rle_file_name, "r");
     assert(rleFile);
-    
+
     tga_image_t rle;
     int resRle = tga_read_file(&rle, rleFile);
-    
+
     assert(resRle == 0);
-    
+
     fail_unless(rle.header.img_type == TGA_RLE_TRUE_COL_IMG,
                 "RLE image does not appear to be a rle true colour image");
     fail_unless(rle.header.img_spec.width == (uint16_t)512,
@@ -129,12 +129,12 @@ START_TEST(test_tga_rle)
                 "Image does not have the correct height");
     fail_unless(rle.header.img_spec.depth == (uint8_t)24,
                 "Image does not have the correct depth");
-    
+
     uint8_t *dat = rle.data;
-    
+
     uint16_t width = rle.header.img_spec.width;
     uint16_t height = rle.header.img_spec.height;
-    
+
     for (int i = 0 ; i < height ; i ++) {
         int j = 0;
 
@@ -142,11 +142,11 @@ START_TEST(test_tga_rle)
         fail_unless(dat[i*width*3 + 0] == (uint8_t)0xff,
                     "blue stuff(0): (%x!=0xff) i = %d, j = %d",
                     dat[i*width*3 + 0] , i, 0);
-            
+
         fail_unless(dat[i*width*3 + 1] == (uint8_t)0x00,
                     "blue stuff(1): (%x!=0x00) i = %d, j = %d",
                     dat[i*width*3 + 1] , i, 0);
-                        
+
         fail_unless(dat[i*width*3 + 2] == (uint8_t)0x00,
                     "blue stuff(2): (%x!=0x00) i = %d, j = %d",
                     dat[i*width*3 + 2] , i, 0);
@@ -172,26 +172,26 @@ START_TEST(test_tga_rle)
                         dat[i*width*3 + j*3 + 1] , i, j);
             fail_unless(dat[i*width*3 + j*3 + 2] == (uint8_t)0x99,
                         "brown stuff(2): (%x!=0x99) i = %d, j = %d",
-                        dat[i*width*3 + j*3 + 2] , i, j);            
+                        dat[i*width*3 + j*3 + 2] , i, j);
         }
-        
+
         /* End of line pixel */
         fail_unless(dat[i*width*3 + 511*3 + 0] == (uint8_t)0x33,
-                    "brown stuff(0): (%x!=0x33) i = %d, j = %d", 
+                    "brown stuff(0): (%x!=0x33) i = %d, j = %d",
                     dat[i*width*3 + 511*3 + 0] , i, 511);
-        
+
         fail_unless(dat[i*width*3 + 511*3 + 1] == (uint8_t)0x66,
                     "brown stuff(1): (%x!=0x66) i = %d, j = %d",
                     dat[i*width*3 + 511*3 + 1] , i, 511);
-                    
+
         fail_unless(dat[i*width*3 + 511*3 + 2] == (uint8_t)0x99,
                     "brown stuff(2): (%x!=0x99) i = %d, j = %d",
-                    dat[i*width*3 + 511*3 + 2] , i, 511);            
-    } 
+                    dat[i*width*3 + 511*3 + 2] , i, 511);
+    }
 
     fclose(rleFile);
     free(rle.data);
-    
+
 }
 END_TEST
 Suite
@@ -202,21 +202,20 @@ Suite
                 " file and after that the uncompressed file");
         exit(EXIT_FAILURE);
     }
-    
+
     rle_file_name = argv[1];
     uncomp_file_name = argv[2];
-    
+
     Suite *s = suite_create ("TGA Test");
-    
+
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
 
     tcase_add_test(tc_core, test_tga_uncomp);
     tcase_add_test(tc_core, test_tga_rle);
     tcase_set_timeout(tc_core, 10); // these tests will take some time
-        
+
     suite_add_tcase(s, tc_core);
-    
+
     return s;
 }
-
