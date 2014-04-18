@@ -1,3 +1,5 @@
+include(swig)
+
 include_directories(../lib/vmath/include)
 include_directories(../lib/celmek/include)
 
@@ -47,63 +49,81 @@ set(openorbit_SRC
   common/moduleinit.c
   common/palloc.c
 
+  libgencds/array.c
+  libgencds/avl-tree.c
+  libgencds/hashtable.c
+  libgencds/heap.c
+  libgencds/list.c
+
   rendering/3ds.c
   rendering/overlay.c
   rendering/ac3d.c
   rendering/particles.c
   rendering/camera.c
-  rendering/scene.c
   rendering/cmod.c
-  rendering/scenegraph.c
   rendering/collada.c
-  rendering/shader-manager.c
   rendering/colour.c
-  rendering/sky.c
   rendering/gui.c
-  rendering/terrain.c
   rendering/light.c
-  rendering/text.c
   rendering/location.c
-  rendering/texture.c
   rendering/material.c
-  rendering/viewport.c
   rendering/object.c
+  rendering/scene.c
+  rendering/scenegraph.c
+  rendering/shader-manager.c
+  rendering/sky.c
+  rendering/terrain.c
+  rendering/text.c
+  rendering/texture.c
+  rendering/viewport.c
   rendering/window.c
 
   physics/areodynamics.c
-  physics/mass.c
-  physics/particles.c
-  physics/barneshut.c
-  physics/object.c
-  physics/rockets.c
+#  physics/barneshut.c
   physics/celestial-object.c
-  physics/octtree.c
-  physics/sectors.c
   physics/collision.c
+  physics/mass.c
+  physics/object.c
+  physics/octtree.c
   physics/orbit.c
+  physics/particles.c
+  physics/rockets.c
+  physics/sectors.c
   physics/world.c
 
+  scripting/scripting.c
+
   sim/actuator.c
-  sim/propellant-tank.c
-  sim/simtime.c
   sim/battery.c
-  sim/pubsub.c
-  sim/spacecraft-control.c
   sim/class.c
-  sim/simenvironment.c
-  sim/spacecraft.c
   sim/haps.c
+  sim/propellant-tank.c
+  sim/pubsub.c
+  sim/simenvironment.c
   sim/simevent.c
+  sim/simtime.c
+  sim/spacecraft-control.c
+  sim/spacecraft.c
   sim/world-loader.c
+
+  sim/mfd/mfd.c
 
   sim/spacecraft/mercury/mercury.c
   )
+
+swig_wrap(python scripting/openorbit/config.i)
+swig_wrap(python scripting/openorbit/event.i)
+set(scripting_src
+    ${CMAKE_CURRENT_BINARY_DIR}/scripting/openorbit/config.i.c
+    ${CMAKE_CURRENT_BINARY_DIR}/scripting/openorbit/event.i.c
+)
 
 set(darwin_src
   platform/macosx/OOAppDelegate.m
   platform/macosx/OOOpenGLView.m
   platform/macosx/cgbitmaps.c
   platform/macosx/hid.m
+  platform/macosx/menu-manager.m
   platform/macosx/mouse.c
   platform/macosx/osx-main.m
   platform/macosx/res-manager.c
@@ -122,6 +142,8 @@ set(unix_src
 #	CMakeLists.txt)
 
 #add_cmake_list()
+
+list(APPEND openorbit_SRC ${scripting_src})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 add_definitions(-DHAVE_CONFIG)
@@ -185,14 +207,14 @@ set_target_properties(openorbit
                       DEBUG_OUTPUT_NAME "${open_orbit_debug_name}")
 
 target_link_libraries(openorbit
-                      vmath imgload auload
-                      dl ${LIBJANSSON}
+                      vmath celmek imgload auload
+                      dl ${LIBEDIT} ${LIBJANSSON}
                       ${PNG_LIBRARIES} ${JPEG_LIBRARIES}
                       ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY}
 		      ${SDL_LIBRARY}
 		      ${GLUT_LIBRARIES} ${LIBXML2_LIBRARIES}
 		      ${PYTHON_LIBRARIES} ${FREETYPE_LIBRARIES}
-		      ${IOKIT}
+		      ${IOKIT} ${OBJC} ${COCOA}
 		      )
 
 if (${SDLTTF_FOUND})

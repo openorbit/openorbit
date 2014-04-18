@@ -7,6 +7,10 @@ set(CMAKE_CXX_COMPILER_INIT "clang")
 project(openorbit)
 cmake_minimum_required(VERSION 2.8)
 
+set(CMAKE_MODULE_PATH
+  ${CMAKE_SOURCE_DIR}/cmake
+  ${CMAKE_MODULE_PATH})
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
         "Choose the type of build, options are: None Debug Analyse Release."
@@ -21,9 +25,20 @@ endif (NOT APPLE)
 
 if (APPLE)
   find_library(IOKIT IOKit)
+  find_library(OBJC objc)
+  find_library(COCOA Cocoa)
+
   if (NOT IOKIT)
     message(FATAL_ERROR "cannot find IOKit.framework")
   endif (NOT IOKIT)
+
+  if (NOT OBJC)
+    message(FATAL_ERROR "cannot find objc runtime")
+  endif (NOT OBJC)
+
+  if (NOT COCOA)
+    message(FATAL_ERROR "cannot find Cocoa.framework")
+  endif (NOT COCOA)
 endif (APPLE)
 
 find_package(OpenGL REQUIRED)
@@ -38,6 +53,13 @@ find_library(LIBJANSSON jansson)
 if (NOT LIBJANSSON)
   message(FATAL_ERROR "cannot find libjansson")
 endif (NOT LIBJANSSON)
+
+find_library(LIBEDIT edit)
+if (NOT LIBEDIT)
+  message(FATAL_ERROR "cannot find libedit")
+endif (NOT LIBEDIT)
+
+
 # TODO: Download missing packages, i.e. sdl, ode et.al.
 # file(DOWNLOAD url file [TIMEOUT timeout] [STATUS status] [LOG log])
 
