@@ -70,6 +70,10 @@ struct pl_object_t {
 // Create standard object
 pl_object_t* pl_new_object(pl_world_t *sys, const char *name);
 
+// Delete object
+void pl_delete_object(pl_object_t *obj);
+
+
 // Create subobject
 pl_object_t* pl_new_sub_object3f(pl_world_t *world, pl_object_t *parent,
                                  const char *name,
