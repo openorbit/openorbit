@@ -221,12 +221,6 @@ MainEngineToggle(sim_spacecraft_t *sc)
   }
 }
 
-static sim_spacecraft_t*
-MercuryNew(void)
-{
-  sim_spacecraft_t *sc = smalloc(sizeof(sim_spacecraft_t));
-  return sc;
-}
 
 static void
 MercuryInit(sim_spacecraft_t *sc)

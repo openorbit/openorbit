@@ -163,13 +163,6 @@ MainEngineToggle(sim_spacecraft_t *sc)
   }
 }
 
-static sim_spacecraft_t*
-GemeniNew(void)
-{
-  sim_spacecraft_t *sc = smalloc(sizeof(sim_spacecraft_t));
-  return sc;
-}
-
 static void
 GemeniInit(sim_spacecraft_t *sc)
 {
