@@ -116,4 +116,40 @@ clp2_32(uint32_t x)
 }
 
 
+// Software impl of clz instruction, replace with intrinic or asm
+static inline int
+clz_64(uint64_t x)
+{
+  if (x == 0) return 64;
+
+  int res = 0;
+
+  if (!(x & UINT64_C(0xffffffff00000000))) {
+    x <<= 32;
+    res += 32;
+  }
+  if (!(x & UINT64_C(0xffff000000000000))) {
+    x <<= 16;
+    res += 16;
+  }
+  if (!(x & UINT64_C(0xff00000000000000))) {
+    x <<= 8;
+    res += 8;
+  }
+  if (!(x & UINT64_C(0xf000000000000000))) {
+    x <<= 4;
+    res += 4;
+  }
+  if (!(x & UINT64_C(0xc000000000000000))) {
+    x <<= 2;
+    res += 2;
+  }
+  if (!(x & UINT64_C(0x8000000000000000))) {
+    res += 1;
+  }
+
+  return res;
+}
+
+
 #endif /* end of include guard: BITUTILS_H_HBYMFJ6H */
