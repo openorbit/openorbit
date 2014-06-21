@@ -1,4 +1,5 @@
 include(swig)
+include(ibtool)
 
 include_directories(../lib/vmath/include)
 include_directories(../lib/celmek/include)
@@ -135,6 +136,30 @@ set(unix_src
   platform/sdl/sdl-window.c
   platform/posix/res-manager.c)
 
+
+set(ORBIT_SCRIPTS
+  ${CMAKE_SOURCE_DIR}/rsrc/script/init.py
+  ${CMAKE_SOURCE_DIR}/rsrc/script/postinit.py
+)
+
+set(ORBIT_SHADERS
+  rendering/shaders/fixed/fixed.vertex
+  rendering/shaders/fixed/fixed.fragment
+  rendering/shaders/flat/flat.vertex
+  rendering/shaders/flat/flat.fragment
+  rendering/shaders/overlay/overlay.vertex
+  rendering/shaders/overlay/overlay.fragment
+  rendering/shaders/planet/planet.vertex
+  rendering/shaders/planet/planet.fragment
+  rendering/shaders/shared/shader-types.glsl
+  rendering/shaders/sky/sky.vertex
+  rendering/shaders/sky/sky.fragment
+  rendering/shaders/spacecraft/spacecraft.vertex
+  rendering/shaders/spacecraft/spacecraft.fragment
+  rendering/shaders/star/star.vertex
+  rendering/shaders/star/star.fragment
+)
+
   #${rendering_src} ${vessel_src} ${geo_src} ${sim_src} ${gencds_src} ${common_src})
 
 #set(openorbit_FILES
@@ -153,20 +178,24 @@ set(open_orbit_name "openorbit")
 set(open_orbit_debug_name "openorbit-dbg")
 
 if (APPLE)
-    list(APPEND openorbit_SRC ${darwin_src})
+  ibtool_compile(platform/macosx/MainMenu.xib)
+  set(ORBIT_NIBS
+      ${CMAKE_CURRENT_BINARY_DIR}/platform/macosx/MainMenu.nib)
+ 
+  list(APPEND openorbit_SRC ${darwin_src})
     
-    set(MACOSX_BUNDLE_INFO_STRING "Open Orbit, an interactive space flight simulator")
+  set(MACOSX_BUNDLE_INFO_STRING "Open Orbit, an interactive space flight simulator")
 #    SET(MACOSX_BUNDLE_ICON_FILE)
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "Open Orbit")
+  set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.openorbit.openorbit")
 #    SET(MACOSX_BUNDLE_LONG_VERSION_STRING)
-    set(MACOSX_BUNDLE_BUNDLE_NAME "Open Orbit")
+  set(MACOSX_BUNDLE_BUNDLE_NAME "Open Orbit")
 #    SET(MACOSX_BUNDLE_SHORT_VERSION_STRING)
 #    SET(MACOSX_BUNDLE_BUNDLE_VERSION)
-    set(MACOSX_BUNDLE_COPYRIGHT "Mattias Holm")
+  set(MACOSX_BUNDLE_COPYRIGHT "Mattias Holm")
 
-    # update name for the mac
-    set(open_orbit_name "Open Orbit")
-    set(open_orbit_debug_name "Open Orbit Debug")
+  # update name for the mac
+  set(open_orbit_name "Open Orbit")
+  set(open_orbit_debug_name "Open Orbit Debug")
 elseif(UNIX)
 # Unix system that is not darwin
 
@@ -187,6 +216,11 @@ set_source_files_properties(${ORBIT_PLUGINS}
                             GENERATED true
                             MACOSX_PACKAGE_LOCATION Resources/plugins)
 
+set_source_files_properties(${ORBIT_NIBS}
+                            PROPERTIES
+                            GENERATED true
+                            MACOSX_PACKAGE_LOCATION Resources/)
+
 include(../rsrc/CMakeLists.txt)
 
 add_executable(openorbit MACOSX_BUNDLE
@@ -199,6 +233,7 @@ add_executable(openorbit MACOSX_BUNDLE
                ${ORBIT_SCRIPTS}
                ${ORBIT_DEP_YAML}
                ${ORBIT_PLUGINS}
+	       ${ORBIT_NIBS}
              )
 
 set_target_properties(openorbit
