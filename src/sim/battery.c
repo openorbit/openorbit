@@ -31,6 +31,7 @@ sim_powerbus_reset(sim_powerbus_t *pb)
 {
   pb->currentLoad = 0.0;
   pb->currentPower = 0.0;
+  pb->overloadAction = PowerOverloadLog;
 }
 
 float
