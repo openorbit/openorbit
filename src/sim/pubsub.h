@@ -43,6 +43,7 @@ typedef enum {
   SIM_TYPE_UUID,
 
   SIM_TYPE_OBJ,
+  SIM_TYPE_IFACE,
 
   SIM_TYPE_BOOL,
   SIM_TYPE_CHAR,
@@ -101,6 +102,7 @@ typedef enum {
   SIM_TYPE_COMPLEX_DOUBLE_ARR,
 
   SIM_TYPE_OBJ_ARR,
+  SIM_TYPE_INVALID,
   SIM_TYPE_COUNT,
 } sim_type_id_t;
 

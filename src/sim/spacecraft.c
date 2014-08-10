@@ -713,18 +713,18 @@ MODULE_INIT(spacecraft, "object", NULL)
 
   // Fields in the spacecraft class
   sim_class_add_field(sc_class, SIM_TYPE_OBJ_ARR,
-                      "stages", offsetof(sim_spacecraft_t, stages));
+                      "stages", offsetof(sim_spacecraft_t, stages), NULL, NULL);
   sim_class_add_field(sc_class, SIM_TYPE_OBJ_ARR,
-                      "engines", offsetof(sim_spacecraft_t, engines));
+                      "engines", offsetof(sim_spacecraft_t, engines), NULL, NULL);
 
 
   // Fields in the stage class
   sim_class_add_field(stage_class, SIM_TYPE_OBJ,
-                      "sc", offsetof(sim_stage_t, sc));
+                      "sc", offsetof(sim_stage_t, sc), NULL, NULL);
   sim_class_add_field(stage_class, SIM_TYPE_FLOAT_VEC3,
-                      "pos", offsetof(sim_stage_t, pos));
+                      "pos", offsetof(sim_stage_t, pos), NULL, NULL);
   sim_class_add_field(stage_class, SIM_TYPE_OBJ_ARR,
-                      "engines", offsetof(sim_stage_t, engines));
+                      "engines", offsetof(sim_stage_t, engines), NULL, NULL);
   sim_class_add_field(stage_class, SIM_TYPE_OBJ_ARR,
-                      "payload", offsetof(sim_stage_t, payload));
+                      "payload", offsetof(sim_stage_t, payload), NULL, NULL);
 }
