@@ -27,90 +27,24 @@
 
 START_TEST(test_create_obj)
 {
-  pl_object_t *obj = pl_new_object(PL_SEGMENT_LEN * 4.0 + 1000.0,
-                              - (PL_SEGMENT_LEN * 2.0 + 1000.0),
-                              0.0);
-  fail_unless(obj->p.seg.x == 4, "calculation of i failed, %d", (int)obj->p.seg.x);
-  fail_unless(obj->p.seg.y == -2, "calculation of j failed");
-  fail_unless(obj->p.seg.z== 0, "calculation of k failed");
-
-  fail_unless(IN_RANGE(obj->p.offs.x, 999.99, 1000.01), "calculation of x failed %f", obj->p.offs.x);
-  fail_unless(IN_RANGE(obj->p.offs.y, -1000.01, -999.99), "calculation of y failed");
-  fail_unless(IN_RANGE(obj->p.offs.z, 0.0, 0.0), "calculation of z failed");
+  pl_world_t *world = pl_new_world(1000000.0);
+  pl_object_t *obj = pl_new_object(world, "test-object");
 
 
-  plObjectDelete(obj);
+  fail_unless(obj->p.seg.x == 0, "calculation of i failed, %d", (int)obj->p.seg.x);
+  fail_unless(obj->p.seg.y == 0, "calculation of j failed");
+  fail_unless(obj->p.seg.z == 0, "calculation of k failed");
+
+  fail_unless(IN_RANGE(obj->p.offs.x, 0, 0),
+              "calculation of x failed %f", obj->p.offs.x);
+  fail_unless(IN_RANGE(obj->p.offs.y, 0, 0), "calculation of y failed");
+  fail_unless(IN_RANGE(obj->p.offs.z, 0, 0), "calculation of z failed");
+
+
+  pl_delete_object(obj);
 }
 END_TEST
 
-START_TEST(test_translate_obj)
-{
-  pl_object_t *obj = pl_new_object(PL_SEGMENT_LEN * 4.0 + 1000.0,
-                              - (PL_SEGMENT_LEN * 2.0 + 1000.0),
-                              0.0);
-
-  fail_unless(obj->p.seg.x == 4,
-              "i was not set properly (%d)", (int)obj->p.seg.x);
-  fail_unless(obj->p.seg.y == -2,
-              "j was not set properly (%d)", (int)obj->p.seg.y);
-  fail_unless(obj->p.seg.z == 0,
-              "k was not set properly (%d)", (int)obj->p.seg.z);
-
-
-  float3 dp = vf3_set(PL_SEGMENT_LEN * 1.0,
-                         PL_SEGMENT_LEN * 1.0,
-                         - PL_SEGMENT_LEN * 1.0);
-  plTranslateObject3fv(obj, dp);
-
-  fail_unless(obj->p.seg.x == 5, "i was not incremented (%d)", (int)obj->p.seg.x);
-  fail_unless(obj->p.seg.y == -2, "j should not be incremented (%d)", (int)obj->p.seg.y);
-  fail_unless(obj->p.seg.z == -1, "k was not decremented (%d)", (int)obj->p.seg.z);
-
-  fail_unless(IN_RANGE(obj->p.offs.x, 999.99, 1000.01),
-              "calculation of x failed (%f)", obj->p.offs.x);
-  fail_unless(IN_RANGE(obj->p.offs.y, 23.9, 24.1),
-              "calculation of y failed (%f)", obj->p.offs.y);
-  fail_unless(IN_RANGE(obj->p.offs.z, -0.001, 0.001),
-              "calculation of z failed (%f)", obj->p.offs.z);
-}
-END_TEST
-
-START_TEST(test_obj_dist)
-{
-  pl_object_t *obj = pl_new_object(0.0,
-                              -(PL_SEGMENT_LEN - 100.0f),
-                              0.0);
-  pl_object_t *obj2 = pl_new_object(0.0,
-                               -(PL_SEGMENT_LEN + 100.0f),
-                               0.0);
-
-
-  float3 dist0 = plObjectDistance(obj, obj2);
-
-  fail_unless(IN_RANGE(dist0.x, 0.0, 0.00),
-              "calculation of x failed (%f)", dist0.x);
-  fail_unless(IN_RANGE(dist0.y, 199.9, 200.1),
-              "calculation of y failed (%f)", dist0.y);
-  fail_unless(IN_RANGE(dist0.z, 0.0, 0.00),
-              "calculation of z failed (%f)", dist0.z);
-
-
-  float3 dp = vf3_set(0.0,
-                        150.0,
-                        0.0);
-  plTranslateObject3fv(obj2, dp);
-
-  float3 dist = plObjectDistance(obj, obj2);
-
-  fail_unless(IN_RANGE(dist.x, 0.0, 0.00),
-              "calculation of x failed (%f)", dist.x);
-  fail_unless(IN_RANGE(dist.y, 49.9, 50.1),
-              "calculation of y failed (%f)", dist.y);
-  fail_unless(IN_RANGE(dist.z, 0.0, 0.00),
-              "calculation of z failed (%f)", dist.z);
-
-}
-END_TEST
 Suite
 *test_suite (void)
 {
@@ -118,10 +52,9 @@ Suite
 
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
+
     tcase_add_test(tc_core, test_create_obj);
 
-    tcase_add_test(tc_core, test_translate_obj);
-    tcase_add_test(tc_core, test_obj_dist);
     suite_add_tcase(s, tc_core);
 
     return s;

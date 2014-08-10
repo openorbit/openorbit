@@ -1,8 +1,13 @@
-include_directories(${CHECK_INCLUDES})
+include_directories(${LIBCHECK_INCLUDE_DIR})
 add_subdirectory(common)
 
-include_directories(common ${CMAKE_SOURCE_DIR}/src)
-link_libraries(testMain ${CHECK_LIB})
+include_directories(
+  common
+  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_SOURCE_DIR}/lib/vmath/include
+  ${CMAKE_SOURCE_DIR}/lib/celmek/include)
+
+link_libraries(testMain ${LIBCHECK_LIBRARY})
 add_subdirectory(t000_hashtable)
 add_subdirectory(t001_heap)
 add_subdirectory(t002_tga)

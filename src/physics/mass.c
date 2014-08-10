@@ -105,19 +105,19 @@ pl_mass_set(pl_mass_t *mo, float m,
   memset(mo, 0, sizeof(pl_mass_t));
 
   mo->m = m;
-  mo->I[0][0] = ixx;
-  mo->I[1][1] = iyy;
-  mo->I[2][2] = izz;
-  mo->I[0][1] = ixy;
-  mo->I[1][0] = ixy;
-  mo->I[0][2] = ixz;
-  mo->I[2][0] = ixz;
-  mo->I[1][2] = iyz;
-  mo->I[2][1] = iyz;
+  mo->In[0][0] = ixx;
+  mo->In[1][1] = iyy;
+  mo->In[2][2] = izz;
+  mo->In[0][1] = ixy;
+  mo->In[1][0] = ixy;
+  mo->In[0][2] = ixz;
+  mo->In[2][0] = ixz;
+  mo->In[1][2] = iyz;
+  mo->In[2][1] = iyz;
 
   mo->cog = vd3_set(cox, coy, coz);
 
-  md3_inv2(mo->I_inv, mo->I);
+  md3_inv2(mo->I_inv, mo->In);
 
   mo->minMass = 0.0f;
 }
@@ -204,10 +204,10 @@ pl_mass_translate(pl_mass_t *m, float dx, float dy, float dz)
 
   double3x3 mtmp;
   md3_s_mul(mtmp, madj, m->m);
-  md3_add2(m->I, mtmp);
+  md3_add2(m->In, mtmp);
 
   m->cog = vd3_add(m->cog, r);
-  md3_inv2(m->I_inv, m->I);
+  md3_inv2(m->I_inv, m->In);
 }
 
 void
@@ -223,11 +223,11 @@ pl_mass_rotate_m(pl_mass_t *m, const double3x3 rm)
   double3x3 mtmp;
   memset(mtmp, 0, sizeof(float3x3));
 
-  md3_mul3(mtmp, m->I, rmi);
-  md3_mul3(m->I, rm, mtmp);
+  md3_mul3(mtmp, m->In, rmi);
+  md3_mul3(m->In, rm, mtmp);
 
   m->cog = md3_v_mul(rm, m->cog);
-  md3_inv2(m->I_inv, m->I);
+  md3_inv2(m->I_inv, m->In);
 }
 
 void
@@ -253,9 +253,9 @@ pl_mass_add(pl_mass_t * restrict md, const pl_mass_t * restrict ms)
   md->m += ms->m;
 
   for (int i = 0 ; i < 3 ; ++ i) {
-    md->I[i] = vd3_add(md->I[i], ms->I[i]);
+    md->In[i] = vd3_add(md->In[i], ms->In[i]);
   }
-  md3_inv2(md->I_inv, md->I);
+  md3_inv2(md->I_inv, md->In);
 }
 
 void
@@ -265,7 +265,7 @@ pl_mass_mod(pl_mass_t *m, float newMass)
   m->m = newMass;
 
   for (int i = 0 ; i < 3 ; ++ i) {
-    m->I[i] = vd3_s_mul(m->I[i], s);
+    m->In[i] = vd3_s_mul(m->In[i], s);
     m->I_inv[i] = vd3_s_mul(m->I_inv[i], 1.0/s);
   }
 }

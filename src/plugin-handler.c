@@ -29,7 +29,6 @@
 
 
 #include <gencds/hashtable.h>
-#include <gencds/object-manager2.h>
 
 #include "res-manager.h"
 #include "plugin-handler.h"
@@ -57,7 +56,7 @@ plugin_init(void)
         log_fatal("plugin: plugin dictionary not created");
     }
 
-    ctxt.objectManager = omCtxtNew();
+    //ctxt.objectManager = omCtxtNew();
 }
 
 /* read in all dynlibs in the plug-in directories */

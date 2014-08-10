@@ -1,5 +1,5 @@
 /*
- Copyright 2012,2013 Mattias Holm <mattias.holm(at)openorbit.org>
+ Copyright 2012,2013,2014 Mattias Holm <mattias.holm(at)openorbit.org>
 
  This file is part of Open Orbit.
 
@@ -37,6 +37,22 @@
 static avl_tree_t *classes;
 static avl_tree_t *objects;
 
+void
+sim_default_setter(sim_object_t *obj, sim_prop_val_t prop)
+{
+  (void)obj;
+  (void)prop;
+}
+
+sim_prop_val_t
+sim_default_getter(sim_object_t *obj)
+{
+  (void)obj;
+
+  sim_prop_val_t prop = {.typ = SIM_TYPE_INVALID};
+  return prop;
+}
+
 static void
 Object_init(sim_class_t *cls, void *obj, void *arg)
 {
@@ -53,11 +69,11 @@ sim_class_init(void)
   sim_class_t *cls = sim_register_class(NULL, "Object", Object_init,
                                         sizeof(sim_object_t));
   sim_class_add_field(cls, SIM_TYPE_CLASS_PTR,
-                      "cls", offsetof(sim_object_t, cls));
+                      "cls", offsetof(sim_object_t, cls), NULL, NULL);
   sim_class_add_field(cls, SIM_TYPE_UUID,
-                      "uuid", offsetof(sim_object_t, uuid));
+                      "uuid", offsetof(sim_object_t, uuid), NULL, NULL);
   sim_class_add_field(cls, SIM_TYPE_STR,
-                      "name", offsetof(sim_object_t, name));
+                      "name", offsetof(sim_object_t, name), NULL, NULL);
 
   objects = avl_uuid_new();
 }
@@ -126,12 +142,18 @@ sim_register_class(const char *super, const char *name,
 
 void
 sim_class_add_field(sim_class_t *class, sim_type_id_t type,
-                    const char *key, off_t offset)
+                    const char *key, off_t offset, sim_setter_fn set, sim_getter_fn get)
 {
   sim_field_t *field = smalloc(sizeof(sim_field_t));
   field->name = strdup(key);
   field->typ = type;
   field->offs = offset;
+
+  if (set) field->set = set;
+  else field->set = sim_default_setter;
+
+  if (get) field->get = get;
+  else field->get = sim_default_getter;
 
   obj_array_push(&class->fields, field);
 
@@ -190,9 +212,121 @@ sim_init_object(sim_object_t *obj, const char *name, void *arg)
   obj->cls->init(obj->cls, obj, arg);
 }
 
+sim_prop_val_t
+sim_get_field(sim_object_t *obj, const char *field_name)
+{
+  sim_prop_val_t prop = {.typ = SIM_TYPE_INVALID};
+
+  sim_field_t *field = sim_class_get_field(obj->cls, field_name);
+  if (!field) {
+    log_error("field '%s' is not a member of class '%s'",
+              field_name, obj->cls->name);
+    return prop;
+  }
+
+  if (field->get) {
+    prop = field->get(obj);
+  } else {
+    prop.typ = field->typ;
+
+    switch (field->typ) {
+    case SIM_TYPE_CLASS_PTR:
+      prop.class_ptr = *(sim_class_t**) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_UUID:
+      memcpy(prop.uuid, (((uint8_t*)obj) + field->offs), sizeof(uuid_t));
+      break;
+    case SIM_TYPE_OBJ:
+      prop.obj = *(void**) (((uint8_t*)obj) + field->offs);
+    case SIM_TYPE_IFACE:
+      prop.iface.obj = *(void**) (((uint8_t*)obj) + field->offs);
+      prop.iface.iface =
+        *(void**) (((uint8_t*)obj) + field->offs + sizeof(void*));
+      break;
+    case SIM_TYPE_BOOL:
+      prop.boolean = *(bool*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_CHAR:
+      prop.schar = *(char*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_UCHAR:
+      prop.uchar = *(unsigned char*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_SHORT:
+      prop.sshort = *(short*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_USHORT:
+      prop.ushort = *(unsigned short*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_INT:
+      prop.sint = *(int*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_UINT:
+      prop.uint = *(unsigned int*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_LONG:
+      prop.slong = *(long*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_ULONG:
+      prop.ulong = *(unsigned long*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_UINT8:
+      prop.u8 = *(uint8_t*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_UINT16:
+      prop.u16 = *(uint16_t*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_UINT32:
+      prop.u32 = *(uint32_t*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_UINT64:
+      prop.u64 = *(uint64_t*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_INT8:
+      prop.i8 = *(int8_t*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_INT16:
+      prop.i16 = *(int16_t*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_INT32:
+      prop.i32 = *(int32_t*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_INT64:
+      prop.i64 = *(int64_t*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_STR:
+      prop.str = *(const char**) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_FLOAT:
+      prop.f = *(float*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_DOUBLE:
+      prop.d = *(double*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_COMPLEX_FLOAT:
+      prop.cf = *(complex float*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_COMPLEX_DOUBLE:
+      prop.cd = *(complex double*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_FLOAT_VEC3:
+      prop.fv3 = *(float3*) (((uint8_t*)obj) + field->offs);
+      break;
+    case SIM_TYPE_FLOAT_VEC4:
+      prop.fv4 = *(float4*) (((uint8_t*)obj) + field->offs);
+      break;
+
+      // Does not handle arrays or matrices
+    default:
+      assert(0 && "invalid case");
+    }
+  }
+
+  return prop;
+}
+
 void
-sim_set_field(sim_object_t *obj, const char *field_name,
-              size_t len, void *data)
+sim_set_field(sim_object_t *obj, const char *field_name, sim_prop_val_t prop)
 {
   sim_field_t *field = sim_class_get_field(obj->cls, field_name);
   if (!field) {
@@ -201,72 +335,103 @@ sim_set_field(sim_object_t *obj, const char *field_name,
     return;
   }
 
-  switch (field->typ) {
-  case SIM_TYPE_RECORD:
-  case SIM_TYPE_LINK:
-  case SIM_TYPE_CLASS_PTR:
-  case SIM_TYPE_UUID:
-  case SIM_TYPE_OBJ:
-  case SIM_TYPE_BOOL:
-  case SIM_TYPE_CHAR:
-  case SIM_TYPE_UCHAR:
-  case SIM_TYPE_SHORT:
-  case SIM_TYPE_USHORT:
-  case SIM_TYPE_INT:
-  case SIM_TYPE_UINT:
-  case SIM_TYPE_LONG:
-  case SIM_TYPE_ULONG:
-  case SIM_TYPE_UINT8:
-  case SIM_TYPE_UINT16:
-  case SIM_TYPE_UINT32:
-  case SIM_TYPE_UINT64:
-  case SIM_TYPE_INT8:
-  case SIM_TYPE_INT16:
-  case SIM_TYPE_INT32:
-  case SIM_TYPE_INT64:
-  case SIM_TYPE_STR:
-  case SIM_TYPE_FLOAT:
-  case SIM_TYPE_DOUBLE:
+  if (field->typ != prop.typ) {
+    log_error("type mismatch between field and set property");
+  }
 
-  case SIM_TYPE_COMPLEX_FLOAT:
-  case SIM_TYPE_COMPLEX_DOUBLE:
+  if (field->set) {
+    field->set(obj, prop);
+  } else {
+    switch (field->typ) {
+    case SIM_TYPE_CLASS_PTR:
+      *(sim_class_t**) (((uint8_t*)obj) + field->offs) = prop.class_ptr;
+      break;
+    case SIM_TYPE_UUID:
+      memcpy((((uint8_t*)obj) + field->offs), prop.uuid, sizeof(uuid_t));
+      break;
+    case SIM_TYPE_OBJ:
+      *(sim_object_t**) (((uint8_t*)obj) + field->offs) = prop.obj;
+      break;
+    case SIM_TYPE_IFACE:
+      *(void**) (((uint8_t*)obj) + field->offs) = prop.iface.obj;
+      *(void**) (((uint8_t*)obj) + field->offs + sizeof(void*)) = prop.iface.iface;
+      break;
+    case SIM_TYPE_BOOL:
+      *(bool*) (((uint8_t*)obj) + field->offs) = prop.boolean;
+      break;
+    case SIM_TYPE_CHAR:
+      *(char*) (((uint8_t*)obj) + field->offs) = prop.schar;
+      break;
+    case SIM_TYPE_UCHAR:
+      *(unsigned char*) (((uint8_t*)obj) + field->offs) = prop.uchar;
+      break;
+    case SIM_TYPE_SHORT:
+      *(short*) (((uint8_t*)obj) + field->offs) = prop.sshort;
+      break;
+    case SIM_TYPE_USHORT:
+      *(unsigned short*) (((uint8_t*)obj) + field->offs) = prop.ushort;
+      break;
+    case SIM_TYPE_INT:
+      *(int*) (((uint8_t*)obj) + field->offs) = prop.sint;
+      break;
+    case SIM_TYPE_UINT:
+      *(unsigned int*) (((uint8_t*)obj) + field->offs) = prop.uint;
+      break;
+    case SIM_TYPE_LONG:
+      *(long*) (((uint8_t*)obj) + field->offs) = prop.slong;
+      break;
+    case SIM_TYPE_ULONG:
+      *(unsigned long*) (((uint8_t*)obj) + field->offs) = prop.ulong;
+      break;
 
-  case SIM_TYPE_FLOAT_VEC3:
-  case SIM_TYPE_FLOAT_VEC4:
-  case SIM_TYPE_FLOAT_VEC3x3:
-  case SIM_TYPE_FLOAT_VEC4x4:
-
-      // Common array types
-  case SIM_TYPE_BOOL_ARR:
-  case SIM_TYPE_CHAR_ARR:
-  case SIM_TYPE_UCHAR_ARR:
-  case SIM_TYPE_SHORT_ARR:
-  case SIM_TYPE_USHORT_ARR:
-  case SIM_TYPE_INT_ARR:
-  case SIM_TYPE_UINT_ARR:
-  case SIM_TYPE_LONG_ARR:
-  case SIM_TYPE_ULONG_ARR:
-
-  case SIM_TYPE_UINT8_ARR:
-  case SIM_TYPE_UINT16_ARR:
-  case SIM_TYPE_UINT32_ARR:
-  case SIM_TYPE_UINT64_ARR:
-
-  case SIM_TYPE_INT8_ARR:
-  case SIM_TYPE_INT16_ARR:
-  case SIM_TYPE_INT32_ARR:
-  case SIM_TYPE_INT64_ARR:
-
-  case SIM_TYPE_FLOAT_ARR:
-  case SIM_TYPE_DOUBLE_ARR:
-
-  case SIM_TYPE_COMPLEX_FLOAT_ARR:
-  case SIM_TYPE_COMPLEX_DOUBLE_ARR:
-
-  case SIM_TYPE_OBJ_ARR:
-
-  default:
-    assert(0 && "invalid case");
+    case SIM_TYPE_UINT8:
+      *(uint8_t*) (((uint8_t*)obj) + field->offs) = prop.u8;
+      break;
+    case SIM_TYPE_UINT16:
+      *(uint16_t*) (((uint8_t*)obj) + field->offs) = prop.u16;
+      break;
+    case SIM_TYPE_UINT32:
+      *(uint32_t*) (((uint8_t*)obj) + field->offs) = prop.u32;
+      break;
+    case SIM_TYPE_UINT64:
+      *(uint64_t*) (((uint8_t*)obj) + field->offs) = prop.u64;
+      break;
+    case SIM_TYPE_INT8:
+      *(int8_t*) (((uint8_t*)obj) + field->offs) = prop.i8;
+      break;
+    case SIM_TYPE_INT16:
+      *(int16_t*) (((uint8_t*)obj) + field->offs) = prop.i16;
+      break;
+    case SIM_TYPE_INT32:
+      *(int32_t*) (((uint8_t*)obj) + field->offs) = prop.i32;
+      break;
+    case SIM_TYPE_INT64:
+      *(int64_t*) (((uint8_t*)obj) + field->offs) = prop.i64;
+      break;
+    case SIM_TYPE_STR:
+      assert(0 && "cannot set string at the moment");
+      break;
+    case SIM_TYPE_FLOAT:
+      *(float*) (((uint8_t*)obj) + field->offs) = prop.f;
+      break;
+    case SIM_TYPE_DOUBLE:
+      *(double*) (((uint8_t*)obj) + field->offs) = prop.d;
+      break;
+    case SIM_TYPE_COMPLEX_FLOAT:
+      *(complex float*) (((uint8_t*)obj) + field->offs) = prop.cf;
+      break;
+    case SIM_TYPE_COMPLEX_DOUBLE:
+      *(complex double*) (((uint8_t*)obj) + field->offs) = prop.cd;
+      break;
+    case SIM_TYPE_FLOAT_VEC3:
+      *(float3*) (((uint8_t*)obj) + field->offs) = prop.fv3;
+      break;
+    case SIM_TYPE_FLOAT_VEC4:
+      *(float4*) (((uint8_t*)obj) + field->offs) = prop.fv4;
+      break;
+    default:
+      assert(0 && "invalid case");
+    }
   }
 }
 
@@ -662,7 +827,7 @@ sim_print_field(FILE *fout, sim_object_t *obj, sim_field_t *field)
     break;
   }
   case SIM_TYPE_OBJ: {
-    sim_object_t *sobj = (sim_object_t*)((uintptr_t)obj + field->offs);
+    sim_object_t *sobj = *(sim_object_t**)((uintptr_t)obj + field->offs);
     uuid_string_t uuid_str;
     uuid_unparse(sobj->uuid, uuid_str);
     fprintf(fout, "\t%s : %s\n", field->name, uuid_str);
@@ -687,6 +852,49 @@ sim_print_field(FILE *fout, sim_object_t *obj, sim_field_t *field)
     assert(0 && "invalid case");
   }
 }
+
+#if 0
+static PyMethodDef OpenOrbitMethods[] = {
+  {NULL, NULL, 0, NULL}
+};
+
+static PyModuleDef OpenOrbitModule = {
+  PyModuleDef_HEAD_INIT, "openorbit", NULL, -1, OpenOrbitMethods,
+  NULL, NULL, NULL, NULL
+};
+
+void
+sim_py_init()
+{
+  PyObject *module = PyModule_Create(&OpenOrbitModule);
+  if (module == NULL) {
+    log_error("simpy: could not create python module");
+  }
+
+  PyObject *orbit_objects;
+  PyObject *orbit_classes;
+
+  if (PyModule_AddObject(module, "classes", orbit_classes == -1) {
+    log_error("simpy: could not add 'classes' object");
+  }
+
+  if (PyModule_AddObject(module, "objects", orbit_objects == -1) {
+    log_error("simpy: could not add 'objects' object");
+  }
+
+}
+
+
+void
+sim_py_set_prop()
+{
+  PyObject* PyObject_GetAttrString(PyObject *o, const char *attr_name)
+  int PyObject_SetAttrString(PyObject *o, const char *attr_name, PyObject *v)
+  PyObject* PyObject_CallObject(PyObject *callable_object, PyObject *args)
+  PyObject* PyObject_CallMethod(PyObject *o, const char *method, const char *format, ...)
+
+}
+#endif
 
 void
 sim_print_object(FILE *fout, sim_object_t *obj)
@@ -718,3 +926,6 @@ sim_read_objects(FILE *fin)
 {
   // TODO: Deserailize objects, should decide on fileformat first
 }
+
+
+

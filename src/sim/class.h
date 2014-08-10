@@ -41,16 +41,60 @@ typedef struct sim_class_t {
 } sim_class_t;
 
 typedef struct {
-  const char *name;
   sim_type_id_t typ;
-  off_t offs;
-} sim_field_t;
+  union {
+    void *obj;
+    bool boolean;
+    char schar;
+    unsigned char uchar;
+    short sshort;
+    unsigned short ushort;
+    int sint;
+    unsigned int uint;
+    long slong;
+    unsigned long ulong;
+
+    float f;
+    double d;
+    complex float cf;
+    complex double cd;
+
+    int8_t i8;
+    int16_t i16;
+    int32_t i32;
+    int64_t i64;
+    uint8_t u8;
+    uint16_t u16;
+    uint32_t u32;
+    uint64_t u64;
+
+    float3 fv3;
+    float4 fv4;
+
+    uuid_t uuid;
+    const char *str;
+
+    struct {void *obj; void *iface;} iface;
+    sim_class_t *class_ptr;
+  };
+} sim_prop_val_t;
 
 typedef struct {
   sim_class_t *cls;
   uuid_t uuid;
   const char *name;
 } sim_object_t;
+
+typedef void (*sim_setter_fn)(sim_object_t *obj, sim_prop_val_t val);
+typedef sim_prop_val_t (*sim_getter_fn)(sim_object_t *obj);
+
+typedef struct {
+  const char *name;
+  sim_type_id_t typ;
+  off_t offs;
+  sim_setter_fn set;
+  sim_getter_fn get;
+} sim_field_t;
 
 // Default class registry function
 sim_class_t*
@@ -68,7 +112,8 @@ sim_class_t* sim_class_get(const char *cls_name);
 
 
 void sim_class_add_field(sim_class_t *class, sim_type_id_t type,
-                         const char *key, off_t offset);
+                         const char *key, off_t offset,
+                         sim_setter_fn set, sim_getter_fn get);
 sim_field_t* sim_class_get_field(sim_class_t *cls, const char *key);
 
 void sim_class_add_interface(sim_class_t *class, const char *key,
@@ -80,10 +125,12 @@ sim_object_t* sim_alloc_object(const char *cls_name);
 void sim_init_object(sim_object_t *obj, const char *name, void *arg);
 void sim_delete_object(sim_object_t *obj);
 
-// Set a field in an object. Len is ignored for scalars, otherwise, it is the
-// length of the array pointed to by data.
-void sim_set_field(sim_object_t *obj, const char *field_name,
-                   size_t len, void *data);
+sim_prop_val_t
+sim_get_field(sim_object_t *obj, const char *field_name);
+
+void
+sim_set_field(sim_object_t *obj, const char *field_name, sim_prop_val_t val);
+
 // Sets a field, but uses an optional index to set a specific element in
 // arrays, vectors and complex numbers.
 void sim_set_field_by_index(sim_object_t *obj, const char *field_name,

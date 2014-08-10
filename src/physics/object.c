@@ -96,6 +96,30 @@ pl_new_object(pl_world_t *world, const char *name)
   return obj;
 }
 
+void
+pl_delete_object(pl_object_t *obj)
+{
+  pl_world_t *world = obj->world;
+  if (obj->parent) {
+    pl_object_detatch(obj);
+  }
+
+  ARRAY_FOR_EACH(i, world->rigid_bodies) {
+    if (ARRAY_ELEM(world->rigid_bodies, i) == obj) {
+      obj_array_remove(&world->rigid_bodies, i);
+    }
+  }
+
+  ARRAY_FOR_EACH(i, world->root_bodies) {
+    if (ARRAY_ELEM(world->root_bodies, i) == obj) {
+      obj_array_remove(&world->root_bodies, i);
+    }
+  }
+
+  // BUG: Must also be removed from collission context and octtree
+  free(obj);
+}
+
 pl_object_t*
 pl_new_sub_object3f(pl_world_t *world, pl_object_t *parent, const char * name,
               float x, float y, float z)
@@ -356,7 +380,7 @@ void
 pl_object_dump(pl_object_t *obj)
 {
   fprintf(stderr, "obj: %p\n", (void*)obj);
-  fprintf(stderr, "\tmass: %f [%f, %f, %f]\n", obj->m.m, obj->m.I[0][0], obj->m.I[1][1], obj->m.I[2][2]);
+  fprintf(stderr, "\tmass: %f [%f, %f, %f]\n", obj->m.m, obj->m.In[0][0], obj->m.In[1][1], obj->m.In[2][2]);
   fprintf(stderr, "\tcog: [%f, %f, %f]\n", obj->m.cog.x, obj->m.cog.y, obj->m.cog.z);
   fprintf(stderr, "\tv: %f %f %f\n", obj->v.x, obj->v.y, obj->v.z);
   fprintf(stderr, "\tf_acc: %f %f %f\n", obj->f_ack.x, obj->f_ack.y, obj->f_ack.z);

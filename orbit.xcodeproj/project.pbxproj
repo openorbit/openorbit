@@ -127,6 +127,8 @@
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
 		EC564723156B8E8300D6A871 /* terminal.c in Sources */ = {isa = PBXBuildFile; fileRef = EC564722156B8E8300D6A871 /* terminal.c */; };
 		EC564724156B8E8300D6A871 /* terminal.c in Sources */ = {isa = PBXBuildFile; fileRef = EC564722156B8E8300D6A871 /* terminal.c */; };
+		EC56C2CD198F57D30059693B /* gltf.c in Sources */ = {isa = PBXBuildFile; fileRef = EC56C2CC198F57D30059693B /* gltf.c */; };
+		EC56C2CE198F57D30059693B /* gltf.c in Sources */ = {isa = PBXBuildFile; fileRef = EC56C2CC198F57D30059693B /* gltf.c */; };
 		EC571BE61443675D002CA003 /* cgbitmaps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC571BE51443675D002CA003 /* cgbitmaps.c */; };
 		EC571BE71443675D002CA003 /* cgbitmaps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC571BE51443675D002CA003 /* cgbitmaps.c */; };
 		EC5F72531154E10D00FBE08B /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
@@ -204,7 +206,6 @@
 		EC75356A14177EA6000A7CB4 /* apollo.c in Sources */ = {isa = PBXBuildFile; fileRef = ECA0639A13A54D7100D720F1 /* apollo.c */; };
 		EC75356E14177EA6000A7CB4 /* sdl-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC7535121417725F000A7CB4 /* sdl-main.c */; };
 		EC75356F14177EA6000A7CB4 /* sdl-window.c in Sources */ = {isa = PBXBuildFile; fileRef = EC753514141774CB000A7CB4 /* sdl-window.c */; };
-		EC75357114177EA6000A7CB4 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
 		EC75357314177EA6000A7CB4 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE17A871079DE71006B6A37 /* OpenGL.framework */; };
 		EC75357514177EA6000A7CB4 /* libimgload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECBF1745108C565600D3E412 /* libimgload.a */; };
 		EC75357614177EA6000A7CB4 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC88CFC010A2B8F100A11B1D /* libxml2.dylib */; };
@@ -253,6 +254,8 @@
 		ECA27D7C1433BDD60074B04C /* hid.m in Sources */ = {isa = PBXBuildFile; fileRef = ECA27D7B1433BDD60074B04C /* hid.m */; };
 		ECA27D8514360CBE0074B04C /* default-conf.json in Resources */ = {isa = PBXBuildFile; fileRef = ECA27D8414360CBE0074B04C /* default-conf.json */; };
 		ECA27D8614360CBE0074B04C /* default-conf.json in Resources */ = {isa = PBXBuildFile; fileRef = ECA27D8414360CBE0074B04C /* default-conf.json */; };
+		ECB3BA74190121F900257528 /* libpng16.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECB3BA73190121F900257528 /* libpng16.a */; };
+		ECB3BA761901224E00257528 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECB3BA751901224E00257528 /* libz.a */; };
 		ECB81B4715317153006E8EAC /* libcheck.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC34BD62107B26D30011B76E /* libcheck.a */; };
 		ECB81B4815317170006E8EAC /* testdriver-main.c in Sources */ = {isa = PBXBuildFile; fileRef = EC4485330CCD247E001C88AD /* testdriver-main.c */; };
 		ECB81B49153171B3006E8EAC /* test-avltree.c in Sources */ = {isa = PBXBuildFile; fileRef = ECB81B3615317079006E8EAC /* test-avltree.c */; };
@@ -262,14 +265,13 @@
 		ECBF174B108C566E00D3E412 /* pngfile.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1737108C55ED00D3E412 /* pngfile.c */; };
 		ECBF174D108C566E00D3E412 /* tga.c in Sources */ = {isa = PBXBuildFile; fileRef = ECBF1739108C55ED00D3E412 /* tga.c */; };
 		ECBF174F108C568900D3E412 /* image.h in Headers */ = {isa = PBXBuildFile; fileRef = ECBF173B108C563800D3E412 /* image.h */; };
-		ECBF1750108C569F00D3E412 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
 		ECBF1751108C569F00D3E412 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6010748ECA00EB6DDF /* libjpeg.a */; };
 		ECBF1754108C56CF00D3E412 /* libimgload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECBF1745108C565600D3E412 /* libimgload.a */; };
-		ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4FCC6210748F4B00EB6DDF /* libpng.dylib */; };
 		ECC909A41175A14B00E8D477 /* shader-manager.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909A21175A14B00E8D477 /* shader-manager.c */; };
 		ECC909B11175A65A00E8D477 /* mapped-file.c in Sources */ = {isa = PBXBuildFile; fileRef = ECC909AF1175A65A00E8D477 /* mapped-file.c */; };
 		ECCE40B31541B52000CA2B54 /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = ECCE40B21541B52000CA2B54 /* log.h */; };
 		ECCED4E011CFD8EB00F20D07 /* config.i in Sources */ = {isa = PBXBuildFile; fileRef = ECCED4DF11CFD8EB00F20D07 /* config.i */; };
+		ECCFEE4C19555EC100D0BC6E /* libcelmek.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE73AF316F9D7EE00A4662C /* libcelmek.a */; };
 		ECD57DE316DFBE4200815416 /* monotonic-time.c in Sources */ = {isa = PBXBuildFile; fileRef = ECD57DE216DFBE4200815416 /* monotonic-time.c */; };
 		ECD57DE416DFBE4200815416 /* monotonic-time.c in Sources */ = {isa = PBXBuildFile; fileRef = ECD57DE216DFBE4200815416 /* monotonic-time.c */; };
 		ECDA4BBF1539FCCB00B78FED /* moduleinit.c in Sources */ = {isa = PBXBuildFile; fileRef = ECDA4BBE1539FCCB00B78FED /* moduleinit.c */; };
@@ -282,7 +284,6 @@
 		ECE3C1F014363DCB001C1F32 /* sdl-mouse.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE3C1EF14363DCB001C1F32 /* sdl-mouse.c */; };
 		ECE6A8441167CAB400003CBD /* pubsub.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE6A8431167CAB400003CBD /* pubsub.c */; };
 		ECE73AF216F9D7EE00A4662C /* libvmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE73AEC16F7037900A4662C /* libvmath.a */; };
-		ECE73AF416F9D7EE00A4662C /* libcelmek.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE73AF316F9D7EE00A4662C /* libcelmek.a */; };
 		ECE73B0616FC477500A4662C /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE73B0516FC477400A4662C /* world.c */; };
 		ECE73B0716FC477500A4662C /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE73B0516FC477400A4662C /* world.c */; };
 		ECE73B0816FC477500A4662C /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = ECE73B0516FC477400A4662C /* world.c */; };
@@ -399,13 +400,6 @@
 			remoteGlobalIDString = ECBF1744108C565600D3E412;
 			remoteInfo = imgload;
 		};
-		EC9B2CF4172921AA00AA17A0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = EC9B2CE71729207E00AA17A0;
-			remoteInfo = terrain;
-		};
 		ECB81B45153170F0006E8EAC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EC4476760CCBFEDB001C88AD /* Project object */;
@@ -439,15 +433,6 @@
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EC3485F11715453600B28E60 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
 		};
 		EC47E6B411D4D23200523F78 /* Copy Scripts */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -641,11 +626,12 @@
 		EC4C89EA137D4D0D007AC0DF /* dragarea */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = dragarea; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4C89F6137D4E77007AC0DF /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		EC4FCC6010748ECA00EB6DDF /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = /opt/local/lib/libjpeg.a; sourceTree = "<absolute>"; };
-		EC4FCC6210748F4B00EB6DDF /* libpng.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng.dylib; path = /usr/X11/lib/libpng.dylib; sourceTree = "<absolute>"; };
 		EC51E6E110BBE766009FA70D /* mass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mass.h; sourceTree = "<group>"; };
 		EC51E6E210BBE766009FA70D /* mass.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mass.c; sourceTree = "<group>"; };
 		EC564722156B8E8300D6A871 /* terminal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = terminal.c; sourceTree = "<group>"; };
 		EC564725156B8EB700D6A871 /* terminal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = terminal.h; sourceTree = "<group>"; };
+		EC56C2CC198F57D30059693B /* gltf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gltf.c; sourceTree = "<group>"; };
+		EC56C2CF198F57F10059693B /* gltf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gltf.h; sourceTree = "<group>"; };
 		EC571BE51443675D002CA003 /* cgbitmaps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cgbitmaps.c; sourceTree = "<group>"; };
 		EC5F72511154E10D00FBE08B /* material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
 		EC5F72521154E10D00FBE08B /* material.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = material.c; sourceTree = "<group>"; };
@@ -690,7 +676,6 @@
 		EC8CC1E615F1FE0D00FC71F4 /* collada.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = collada.h; sourceTree = "<group>"; };
 		EC8CC1F315F2003400FC71F4 /* overlay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = overlay.h; sourceTree = "<group>"; };
 		EC8CC1F415F2003D00FC71F4 /* overlay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = overlay.c; sourceTree = "<group>"; };
-		EC8CF77716EE3AAE004A6F83 /* libcelmek.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcelmek.a; path = lib/celmek/build/Release/libcelmek.a; sourceTree = "<group>"; };
 		EC8CF7C016EE3EEA004A6F83 /* celestial-object.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "celestial-object.c"; sourceTree = "<group>"; };
 		EC8E749E14F773240052BBE6 /* pcm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcm.c; sourceTree = "<group>"; };
 		EC8E749F14F773240052BBE6 /* pcm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcm.h; sourceTree = "<group>"; };
@@ -717,6 +702,8 @@
 		ECA5CC26157F85C70060A678 /* menu-manager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "menu-manager.h"; sourceTree = "<group>"; };
 		ECA5F8B1109D8FE7004278EC /* Hrml Manual */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Hrml Manual"; sourceTree = "<group>"; };
 		ECB36C9F162420C200FC9BA4 /* Math and Physics.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Math and Physics.txt"; sourceTree = "<group>"; };
+		ECB3BA73190121F900257528 /* libpng16.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng16.a; path = ../../../../opt/local/lib/libpng16.a; sourceTree = "<group>"; };
+		ECB3BA751901224E00257528 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../../opt/local/lib/libz.a; sourceTree = "<group>"; };
 		ECB81B3615317079006E8EAC /* test-avltree.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "test-avltree.c"; sourceTree = "<group>"; };
 		ECB81B3B153170AE006E8EAC /* t010_avltree */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = t010_avltree; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECBF1734108C55ED00D3E412 /* image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
@@ -749,7 +736,7 @@
 		ECE6A8421167CAB400003CBD /* pubsub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pubsub.h; sourceTree = "<group>"; };
 		ECE6A8431167CAB400003CBD /* pubsub.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pubsub.c; sourceTree = "<group>"; };
 		ECE73AEC16F7037900A4662C /* libvmath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvmath.a; path = "../build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug/libvmath.a"; sourceTree = "<group>"; };
-		ECE73AF316F9D7EE00A4662C /* libcelmek.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcelmek.a; path = "../build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug/libcelmek.a"; sourceTree = "<group>"; };
+		ECE73AF316F9D7EE00A4662C /* libcelmek.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcelmek.a; path = "/Users/holm/Projects/build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug/libcelmek.a"; sourceTree = "<absolute>"; };
 		ECE73B0516FC477400A4662C /* world.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = world.c; sourceTree = "<group>"; };
 		ECE73B0916FC478400A4662C /* world.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
 		ECE73B0A16FC4D0100A4662C /* octtree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = octtree.h; sourceTree = "<group>"; };
@@ -827,7 +814,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECE73AF416F9D7EE00A4662C /* libcelmek.a in Frameworks */,
+				ECCFEE4C19555EC100D0BC6E /* libcelmek.a in Frameworks */,
 				ECE73AF216F9D7EE00A4662C /* libvmath.a in Frameworks */,
 				EC6CA8AC156BAD650052D56E /* libedit.dylib in Frameworks */,
 				EC9351D414F7989900962391 /* libpython2.7.a in Frameworks */,
@@ -836,7 +823,6 @@
 				EC23870014F7866E00C59F16 /* IOKit.framework in Frameworks */,
 				EC0FBA7011A66E3300CEF95A /* CoreFoundation.framework in Frameworks */,
 				EC0FBAD811A6721B00CEF95A /* ApplicationServices.framework in Frameworks */,
-				ECBF175D108C57DC00D3E412 /* libpng.dylib in Frameworks */,
 				EC2386FE14F7851F00C59F16 /* libjansson.a in Frameworks */,
 				EC88CFC110A2B8F100A11B1D /* libxml2.dylib in Frameworks */,
 				EC9DA88B12EB84540028A131 /* libfreetype.a in Frameworks */,
@@ -858,20 +844,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC75357114177EA6000A7CB4 /* libpng.dylib in Frameworks */,
 				EC75357314177EA6000A7CB4 /* OpenGL.framework in Frameworks */,
 				EC75357514177EA6000A7CB4 /* libimgload.a in Frameworks */,
 				EC75357614177EA6000A7CB4 /* libxml2.dylib in Frameworks */,
 				EC75357714177EA6000A7CB4 /* CoreFoundation.framework in Frameworks */,
 				EC75357814177EA6000A7CB4 /* ApplicationServices.framework in Frameworks */,
 				EC75357914177EA6000A7CB4 /* libfreetype.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EC9B2CE51729207E00AA17A0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -887,7 +865,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECBF1750108C569F00D3E412 /* libpng.dylib in Frameworks */,
+				ECB3BA761901224E00257528 /* libz.a in Frameworks */,
+				ECB3BA74190121F900257528 /* libpng16.a in Frameworks */,
 				ECBF1751108C569F00D3E412 /* libjpeg.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1155,6 +1134,8 @@
 				EC8CC1E415F1FE0B00FC71F4 /* cmod.h */,
 				EC8CC1E515F1FE0C00FC71F4 /* collada.c */,
 				EC8CC1E615F1FE0D00FC71F4 /* collada.h */,
+				EC56C2CC198F57D30059693B /* gltf.c */,
+				EC56C2CF198F57F10059693B /* gltf.h */,
 				EC9351E914F9443C00962391 /* ui */,
 				EC13F0F011762C7900E39B89 /* shaders */,
 				EC34BC281079EE080011B76E /* camera.c */,
@@ -1295,7 +1276,6 @@
 		EC4476740CCBFEDB001C88AD = {
 			isa = PBXGroup;
 			children = (
-				ECE73AF316F9D7EE00A4662C /* libcelmek.a */,
 				EC4C89F5137D4E5B007AC0DF /* tools */,
 				ECA5F8AF109D8FB3004278EC /* docs */,
 				EC34BDB1107B2C480011B76E /* lib */,
@@ -1337,9 +1317,10 @@
 		EC447DDF0CCC0681001C88AD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ECB3BA751901224E00257528 /* libz.a */,
+				ECB3BA73190121F900257528 /* libpng16.a */,
 				ECE73AF316F9D7EE00A4662C /* libcelmek.a */,
 				ECE73AEC16F7037900A4662C /* libvmath.a */,
-				EC8CF77716EE3AAE004A6F83 /* libcelmek.a */,
 				EC6CA8AB156BAD650052D56E /* libedit.dylib */,
 				EC9351D314F7989900962391 /* libpython2.7.a */,
 				EC2386FD14F7851F00C59F16 /* libjansson.a */,
@@ -1348,7 +1329,6 @@
 				EC88CFC010A2B8F100A11B1D /* libxml2.dylib */,
 				EC0FBA6F11A66E3300CEF95A /* CoreFoundation.framework */,
 				EC34BD62107B26D30011B76E /* libcheck.a */,
-				EC4FCC6210748F4B00EB6DDF /* libpng.dylib */,
 				EC4FCC6010748ECA00EB6DDF /* libjpeg.a */,
 				ECE17A871079DE71006B6A37 /* OpenGL.framework */,
 				EC2386FF14F7866E00C59F16 /* IOKit.framework */,
@@ -1619,13 +1599,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EC9B2CE61729207E00AA17A0 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		ECBF1741108C565600D3E412 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1782,7 +1755,6 @@
 				EC4485D50CCD4A19001C88AD /* PBXBuildRule */,
 			);
 			dependencies = (
-				EC9B2CF5172921AA00AA17A0 /* PBXTargetDependency */,
 				ECE73AF116F8B68F00A4662C /* PBXTargetDependency */,
 				ECBF1753108C56C700D3E412 /* PBXTargetDependency */,
 			);
@@ -2046,6 +2018,7 @@
 				EC34BC8B1079EE080011B76E /* res-manager.c in Sources */,
 				EC34BC8F1079EE080011B76E /* plugin-handler.c in Sources */,
 				EC34BC931079EE080011B76E /* camera.c in Sources */,
+				EC56C2CD198F57D30059693B /* gltf.c in Sources */,
 				EC34BC941079EE080011B76E /* colour.c in Sources */,
 				EC34BC951079EE080011B76E /* gui.c in Sources */,
 				EC34BC981079EE080011B76E /* scenegraph.c in Sources */,
@@ -2186,6 +2159,7 @@
 				EC75356214177EA6000A7CB4 /* battery.c in Sources */,
 				EC75356314177EA6000A7CB4 /* propellant-tank.c in Sources */,
 				EC75356414177EA6000A7CB4 /* collision.c in Sources */,
+				EC56C2CE198F57D30059693B /* gltf.c in Sources */,
 				EC75356514177EA6000A7CB4 /* config.i in Sources */,
 				EC75356614177EA6000A7CB4 /* event.i in Sources */,
 				EC75356714177EA6000A7CB4 /* mfd.c in Sources */,
@@ -2368,65 +2342,15 @@
 			};
 			name = Release;
 		};
-		EC3485FA1715453600B28E60 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_EMPTY_BODY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				HEADER_SEARCH_PATHS = (
-					include,
-					lib/vmath/include,
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug\"",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		EC3485FB1715453600B28E60 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_EMPTY_BODY = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				HEADER_SEARCH_PATHS = (
-					include,
-					lib/vmath/include,
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug\"",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		EC4476780CCBFEDB001C88AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EC768C4E1060D651009B558C /* openorbit.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
@@ -2453,6 +2377,9 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
@@ -2777,6 +2704,7 @@
 					/opt/local/lib,
 					/opt/local/Library/Frameworks/Python.framework/Versions/2.7,
 					"\"$(SRCROOT)/deps/local/lib\"",
+					"/Users/holm/Projects/build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -2826,6 +2754,7 @@
 					/opt/local/lib,
 					/opt/local/Library/Frameworks/Python.framework/Versions/2.7,
 					"\"$(SRCROOT)/deps/local/lib\"",
+					"/Users/holm/Projects/build/xcode/openorbit-dedsvcolgmnwsngknbkhajjvalec/Build/Products/Debug",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -2995,55 +2924,6 @@
 			};
 			name = Release;
 		};
-		EC9B2CEA1729207F00AA17A0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				HEADER_SEARCH_PATHS = (
-					include,
-					lib/vmath/include,
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		EC9B2CEB1729207F00AA17A0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				HEADER_SEARCH_PATHS = (
-					include,
-					lib/vmath/include,
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		ECB81B43153170AE006E8EAC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3168,15 +3048,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EC3485F91715453600B28E60 /* Build configuration list for PBXNativeTarget "terrainbuilder" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				EC3485FA1715453600B28E60 /* Debug */,
-				EC3485FB1715453600B28E60 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		EC4476770CCBFEDB001C88AD /* Build configuration list for PBXProject "orbit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -3272,15 +3143,6 @@
 			buildConfigurations = (
 				EC75358114177EA6000A7CB4 /* Debug */,
 				EC75358214177EA6000A7CB4 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		EC9B2CE91729207F00AA17A0 /* Build configuration list for PBXNativeTarget "terrain" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				EC9B2CEA1729207F00AA17A0 /* Debug */,
-				EC9B2CEB1729207F00AA17A0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

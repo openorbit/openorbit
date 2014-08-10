@@ -25,8 +25,8 @@
 #include <gencds/heap.h>
 
 
-heap_t
-*heap_new(size_t n_levels, compute_rank_f f)
+heap_t*
+heap_new(size_t n_levels, compute_rank_f f)
 {
     heap_t *h;
 
@@ -75,7 +75,7 @@ heap_insert(heap_t *h, void *data)
     if (pthread_mutex_lock(&h->lock)) return false;
 #endif
 
-    if (h->last < h->size - 1) {
+    if (h->last < h->size) {
         h->elements[h->last + 1].rank = h->compute_rank(data);
         h->elements[h->last + 1].data = data;
         h->last ++;
@@ -110,8 +110,8 @@ heap_insert(heap_t *h, void *data)
     return false;
 }
 
-void
-*heap_remove(heap_t *h)
+void*
+heap_remove(heap_t *h)
 {
     assert(h);
 
@@ -168,8 +168,8 @@ void
     return NULL;
 }
 
-void
-*heap_peek(heap_t *h)
+void*
+heap_peek(heap_t *h)
 {
     assert(h);
     if (h->last) return h->elements[1].data;
