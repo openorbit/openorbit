@@ -127,6 +127,8 @@
 		EC51E6E310BBE766009FA70D /* mass.c in Sources */ = {isa = PBXBuildFile; fileRef = EC51E6E210BBE766009FA70D /* mass.c */; };
 		EC564723156B8E8300D6A871 /* terminal.c in Sources */ = {isa = PBXBuildFile; fileRef = EC564722156B8E8300D6A871 /* terminal.c */; };
 		EC564724156B8E8300D6A871 /* terminal.c in Sources */ = {isa = PBXBuildFile; fileRef = EC564722156B8E8300D6A871 /* terminal.c */; };
+		EC56C2CD198F57D30059693B /* gltf.c in Sources */ = {isa = PBXBuildFile; fileRef = EC56C2CC198F57D30059693B /* gltf.c */; };
+		EC56C2CE198F57D30059693B /* gltf.c in Sources */ = {isa = PBXBuildFile; fileRef = EC56C2CC198F57D30059693B /* gltf.c */; };
 		EC571BE61443675D002CA003 /* cgbitmaps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC571BE51443675D002CA003 /* cgbitmaps.c */; };
 		EC571BE71443675D002CA003 /* cgbitmaps.c in Sources */ = {isa = PBXBuildFile; fileRef = EC571BE51443675D002CA003 /* cgbitmaps.c */; };
 		EC5F72531154E10D00FBE08B /* material.c in Sources */ = {isa = PBXBuildFile; fileRef = EC5F72521154E10D00FBE08B /* material.c */; };
@@ -628,6 +630,8 @@
 		EC51E6E210BBE766009FA70D /* mass.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mass.c; sourceTree = "<group>"; };
 		EC564722156B8E8300D6A871 /* terminal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = terminal.c; sourceTree = "<group>"; };
 		EC564725156B8EB700D6A871 /* terminal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = terminal.h; sourceTree = "<group>"; };
+		EC56C2CC198F57D30059693B /* gltf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gltf.c; sourceTree = "<group>"; };
+		EC56C2CF198F57F10059693B /* gltf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gltf.h; sourceTree = "<group>"; };
 		EC571BE51443675D002CA003 /* cgbitmaps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cgbitmaps.c; sourceTree = "<group>"; };
 		EC5F72511154E10D00FBE08B /* material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
 		EC5F72521154E10D00FBE08B /* material.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = material.c; sourceTree = "<group>"; };
@@ -1130,6 +1134,8 @@
 				EC8CC1E415F1FE0B00FC71F4 /* cmod.h */,
 				EC8CC1E515F1FE0C00FC71F4 /* collada.c */,
 				EC8CC1E615F1FE0D00FC71F4 /* collada.h */,
+				EC56C2CC198F57D30059693B /* gltf.c */,
+				EC56C2CF198F57F10059693B /* gltf.h */,
 				EC9351E914F9443C00962391 /* ui */,
 				EC13F0F011762C7900E39B89 /* shaders */,
 				EC34BC281079EE080011B76E /* camera.c */,
@@ -2012,6 +2018,7 @@
 				EC34BC8B1079EE080011B76E /* res-manager.c in Sources */,
 				EC34BC8F1079EE080011B76E /* plugin-handler.c in Sources */,
 				EC34BC931079EE080011B76E /* camera.c in Sources */,
+				EC56C2CD198F57D30059693B /* gltf.c in Sources */,
 				EC34BC941079EE080011B76E /* colour.c in Sources */,
 				EC34BC951079EE080011B76E /* gui.c in Sources */,
 				EC34BC981079EE080011B76E /* scenegraph.c in Sources */,
@@ -2152,6 +2159,7 @@
 				EC75356214177EA6000A7CB4 /* battery.c in Sources */,
 				EC75356314177EA6000A7CB4 /* propellant-tank.c in Sources */,
 				EC75356414177EA6000A7CB4 /* collision.c in Sources */,
+				EC56C2CE198F57D30059693B /* gltf.c in Sources */,
 				EC75356514177EA6000A7CB4 /* config.i in Sources */,
 				EC75356614177EA6000A7CB4 /* event.i in Sources */,
 				EC75356714177EA6000A7CB4 /* mfd.c in Sources */,
