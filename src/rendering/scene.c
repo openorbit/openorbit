@@ -114,7 +114,7 @@ sg_scene_get_light(sg_scene_t *sc, int i)
 int
 sg_scene_get_num_lights(sg_scene_t *sc)
 {
-  return ARRAY_LEN(sc->lights);
+  return (int) ARRAY_LEN(sc->lights); // Loss of precision acceptable
 }
 
 

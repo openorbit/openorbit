@@ -357,7 +357,7 @@ config_get_int_def(const char *key, int *val, int defVal)
 {
   json_t *obj = lookup(key);
   if (json_is_integer(obj)) {
-    *val = json_integer_value(obj);
+    *val = (int)json_integer_value(obj);
   } else {
     *val = defVal;
   }
