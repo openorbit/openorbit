@@ -39,3 +39,9 @@
     * Soyuz
     * Ariane with human rated capsule
     * Skylon
+
+* Fix resource loading on linux
+
+  We can look up the install path using readlink(/proc/self/exe), if this fail
+  fallback to the configure install base.
+
