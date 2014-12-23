@@ -479,7 +479,7 @@ sim_spacecraft_set_sys_and_pos(sim_spacecraft_t *sc, const char *sysName,
   //pl_astrobody_t *astrobody = pl_world_get_object(sc->world, sysName);
   pl_celobject_t *body = pl_world_get_celobject(sc->world, sysName);
   if (body != NULL) {
-    pl_object_set_pos_celobj_rel(sc->obj, body, vf3_set(x, y, z));
+    pl_object_set_pos_celobj_rel(sc->obj, body, vd3_set(x, y, z));
     //sim_spacecraft_set_system(sc, astrobody->sys);
     float3 v = vf3_set(body->cm_orbit->v.x, body->cm_orbit->v.y, body->cm_orbit->v.z);//pl_compute_current_velocity(astrobody);
     pl_object_set_vel3fv(sc->obj, v);
@@ -501,20 +501,20 @@ sim_spacecraft_set_sys_and_coords(sim_spacecraft_t *sc, const char *sysName,
     // radius and the eccentricity of the spheroid, we shoudl also adjust for
     // sideral rotation.
     // TODO: angular eccentricity not provided at present.
-    float3 p = geodetic2cart_f(body->cm_orbit->radius, 0.0,
+    double3 p = geodetic2cart_d(body->cm_orbit->radius, 0.0,
                                latitude, longitude, altitude);
     //pl_object_set_pos_rel3fv(sc->obj, &astrobody->obj, p);
     pl_object_set_pos_celobj_rel(sc->obj, body, p);
 
     //sim_spacecraft_set_system(sc, astrobody->sys);
 
-    float3 v = vf3_set(body->cm_orbit->v.x, body->cm_orbit->v.y,
-                       body->cm_orbit->v.z); //pl_compute_current_velocity(astrobody);
+    double3 v = vd3_set(body->cm_orbit->v.x, body->cm_orbit->v.y,
+                        body->cm_orbit->v.z); //pl_compute_current_velocity(astrobody);
 
     // Compute standard orbital velocity
-    float3 velvec = vf3_normalise(vf3_cross(p, vf3_set(0.0f, 0.0f, 1.0f)));
-    velvec = vf3_s_mul(velvec, sqrtf(body->cm_orbit->GM/vf3_abs(p)));
-    pl_object_set_vel3fv(sc->obj, vf3_add(v, velvec));
+    double3 velvec = vd3_normalise(vd3_cross(p, vd3_set(0.0, 0.0, 1.0)));
+    velvec = vd3_s_mul(velvec, sqrt(body->cm_orbit->GM/vd3_abs(p)));
+    pl_object_set_vel3dv(sc->obj, vd3_add(v, velvec));
   }
 }
 

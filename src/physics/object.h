@@ -33,6 +33,7 @@ struct pl_object_t {
   pl_world_t *world;
   pl_octtree_t *tree;
   struct pl_object_t *parent;
+  pl_celobject_t *dominator;
   char *name;
   pl_mass_t m;
 
@@ -61,6 +62,8 @@ struct pl_object_t {
 
   obj_array_t psystem;// Optionally attatched particle systems
   obj_array_t children;
+
+  obj_array_t aerofoils; // Aerofoils for object
 
   double3 g; // Previous g_ack
   double3 t; // Previous t_ack
@@ -133,8 +136,8 @@ void pl_object_set_pos_rel3fv(pl_object_t * restrict obj,
                           const pl_object_t * restrict otherObj,
                           float3 rp);
 void pl_object_set_pos_celobj_rel(pl_object_t * restrict obj,
-                                  const pl_celobject_t * restrict otherObj,
-                                  float3 rp);
+                                  pl_celobject_t * restrict otherObj,
+                                  double3 rp);
 
 void pl_object_step(pl_object_t *obj, float dt);
 void pl_object_step_child(pl_object_t *obj, float dt);
@@ -145,6 +148,7 @@ void pl_object_clear(pl_object_t *obj);
 double3 pl_object_get_vel(pl_object_t *obj);
 void pl_object_set_vel3f(pl_object_t *obj, float dx, float dy, float dz);
 void pl_object_set_vel3fv(pl_object_t *obj, float3 dp);
+void pl_object_set_vel3dv(pl_object_t *obj, double3 dp);
 
 double3 pl_object_get_angular_vel(pl_object_t *obj);
 void pl_object_set_angular_vel3f(pl_object_t *obj, float rx, float ry, float rz);

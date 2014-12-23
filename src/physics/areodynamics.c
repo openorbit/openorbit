@@ -268,9 +268,22 @@ pl_estimate_temp(double luminocity, double albedo, double R)
 double3
 pl_compute_airvelocity(pl_object_t *obj)
 {
-  // TODO: Adjust for planet rotation and wind
-  // TOOD: Replace deprecated system with other mechanism
-  return -obj->v; //(obj->v - obj->sys->orbitalBody->obj.v);
+  // Compute the rotated up vector for the body that is dominating this object
+  double3 up = vd3_qd_rot(vd3_set(0, 0, 1), obj->dominator->cm_orbit->q);
+
+  const double rot_vel_day = obj->dominator->cm_orbit->W_prime; // Rad / day
+  const double rot_vel_s = rot_vel_day / (24.0*3600.0); // Rad / s
+
+  const double3 local_pos = lwc_relvec_d3(&obj->p, obj->dominator->cm_orbit->p);
+  const double3 rot_wind_dir = vd3_cross(up, local_pos);
+
+  const double local_pos_len = vd3_abs(local_pos);
+  const double local_pos_circumference = local_pos_len * 2.0 * M_PI;
+
+  const double3 rot_wind_vel =
+    vd3_normalise(rot_wind_dir) * local_pos_circumference * rot_vel_s;
+
+  return (-obj->v) + rot_wind_vel; //(obj->v - obj->sys->orbitalBody->obj.v);
 }
 
 double
@@ -299,9 +312,10 @@ pl_compute_drag(double3 v, double p, double Cd, double A)
 // Lift: 0.5 * density * velocity ** 2 * A * CL
 //  where A is the planform area, i.e. area of the wings
 float3
-pl_atmosphere_compute_lift(pl_atmosphere_t *atm, pl_object_t *obj, PLairfoil *foil)
+pl_atmosphere_compute_lift(pl_atmosphere_t *atm, pl_object_t *obj, pl_aerofoil_t *foil)
 {
-  //float3 vel = plComputeAirvelocity(obj);
+  double3 vel = obj->v;
+  double3 av = pl_compute_airvelocity(obj);
   //float speed = plComputeAirspeed(obj);
 
   // TODO: Compute alpha from rotation and velocity, obviously this should
@@ -334,7 +348,7 @@ double3
 pl_object_compute_drag(pl_object_t *obj)
 {
   double p = pl_object_compute_airdensity(obj);
-  double3 vel = pl_compute_airvelocity(obj); // TODO: Adjust for planet rotation
+  double3 vel = pl_compute_airvelocity(obj);
 
   double3 drag = pl_compute_drag(vel, p, obj->dragCoef, obj->area);
   return drag;//vf3_set(0.0, 0.0, 0.0);

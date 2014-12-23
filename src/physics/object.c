@@ -73,6 +73,7 @@ pl_object_init(pl_object_t *obj)
 
   obj_array_init(&obj->children);
   obj_array_init(&obj->psystem);
+  obj_array_init(&obj->aerofoils);
 
   pl_object_compute_derived(obj);
 }
@@ -239,15 +240,17 @@ pl_object_set_pos_rel3fv(pl_object_t * restrict obj,
 
 void
 pl_object_set_pos_celobj_rel(pl_object_t * restrict obj,
-                             const pl_celobject_t * restrict otherObj,
-                             float3 rp)
+                             pl_celobject_t * restrict otherObj,
+                             double3 rp)
 {
   PL_CHECK_OBJ(obj);
 
   double3 celobj_p = otherObj->cm_orbit->p;
   lwc_set(&obj->p, celobj_p.x, celobj_p.y, celobj_p.z);
-  lwc_translate3fv(&obj->p, rp);
+  lwc_translate3dv(&obj->p, rp);
   lwc_dump(&obj->p);
+
+  obj->dominator = otherObj;
 
   PL_CHECK_OBJ(obj);
 }
@@ -477,6 +480,13 @@ pl_object_set_vel3fv(pl_object_t *obj, float3 dp)
 {
   obj->v = vf3_to_vd3(dp);
 }
+
+void
+pl_object_set_vel3dv(pl_object_t *obj, double3 dp)
+{
+  obj->v = dp;
+}
+
 
 void
 pl_object_set_drag_coef(pl_object_t *obj, float coef)

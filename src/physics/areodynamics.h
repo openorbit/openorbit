@@ -104,13 +104,13 @@ typedef struct pl_molecule_t {
 typedef float (*pl_atm_comp_fn_t)(pl_atm_layer_t *,float);
 
 struct pl_atm_layer_t {
-  float g0;
-  float P_b;
-  float T_b;
-  float M; // Molar mass (kg / mol)
-  float p_b;
-  float h_b;
-  float L_b;
+  double g0;
+  double P_b;
+  double T_b;
+  double M; // Molar mass (kg / mol)
+  double p_b;
+  double h_b;
+  double L_b;
   pl_atm_comp_fn_t compPressure;
   pl_atm_comp_fn_t compDensity;
 };
@@ -179,12 +179,12 @@ float pl_atmosphere_density(const pl_atmosphere_t *atm, float h);
 float pl_atmosphere_pressure(const pl_atmosphere_t *atm, float h);
 
 
-typedef struct PLairfoil {
-  float area;
-  float Ct0;
-} PLairfoil;
+typedef struct {
+  double area;
+  double Ct0;
+} pl_aerofoil_t;
 
-float3 pl_atmosphere_compute_lift(pl_atmosphere_t *atm, pl_object_t *obj, PLairfoil *foil);
+float3 pl_atmosphere_compute_lift(pl_atmosphere_t *atm, pl_object_t *obj, pl_aerofoil_t *foil);
 
 
 #endif /* ! PL_ATMOSPHERE_H */

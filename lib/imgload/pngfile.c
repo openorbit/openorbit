@@ -88,7 +88,7 @@ png_read_file(png_image_t *img, FILE *file)
   int           color_type;
   png_uint_32 width;            /* PNG image width in pixels */
   png_uint_32 height;           /* PNG image height in pixels */
-  png_uint_32 rowbytes;         /* raw bytes at row n in image */
+  png_size_t rowbytes;         /* raw bytes at row n in image */
 
   png_read_info(png_struct, png_info);
   png_get_IHDR(png_struct, png_info, &width, &height, &bit_depth, 
