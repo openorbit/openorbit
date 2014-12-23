@@ -4,3 +4,9 @@
 [submodule "lib/vmath"]
 	path = lib/vmath
 	url = https://github.com/openorbit/vmath.git
+[submodule "lib/libcheck"]
+	path = lib/libcheck
+	url = https://github.com/openorbit/libcheck.git
+[submodule "lib/jansson"]
+	path = lib/jansson
+	url = https://github.com/openorbit/jansson.git
